@@ -61,6 +61,39 @@ export interface BreadcrumbItem {
   href?: string;
 }
 
+// ── Economy ───────────────────────────────────────────────────────────────────
+
+export type EconomyMetricId = "gdp" | "debt_ratio" | "unemployment" | "companies";
+
+export interface TopCompany {
+  name: string;
+  sector: string;
+  revenue_bn: number;
+}
+
+export interface CountryEconomyData {
+  gdp: number;
+  debt_ratio: number;
+  unemployment: number;
+  companies: number;
+  top_companies?: TopCompany[];
+}
+
+export interface EconomyYear {
+  year: number;
+  label: string;
+  dataNote: string;
+  countries: Record<string, CountryEconomyData>;
+}
+
+export interface EconomyMetric {
+  id: EconomyMetricId;
+  label: string;
+  shortLabel: string;
+  unit: string;
+  description: string;
+}
+
 // ── Epidemics ─────────────────────────────────────────────────────────────────
 
 export type EpidemicDiseaseId = "black-death" | "covid" | "hiv" | "hantavirus";

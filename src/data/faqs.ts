@@ -51,21 +51,6 @@ export const FAQS_EMPIRES: FAQItem[] = [
   },
 ];
 
-export const FAQS_ECONOMY: FAQItem[] = [
-  {
-    question: "What is the most indebted country in the world?",
-    answer:
-      "As of 2024, Japan has the highest debt-to-GDP ratio among major economies, at approximately 260%. However, Japan's debt is largely held domestically in yen, which reduces default risk. Among countries with high external debt exposure, several emerging economies face greater vulnerability despite lower absolute debt levels.",
-    category: "Economic Facts",
-  },
-  {
-    question: "How is public debt measured?",
-    answer:
-      "Public debt is most commonly measured as a percentage of GDP (Gross Domestic Product). This ratio indicates how large a country's debt is relative to the size of its economy. The IMF and World Bank use this metric for cross-country comparisons. A ratio above 90% is generally considered a risk threshold, though context — interest rates, debt structure, and currency composition — matters enormously.",
-    category: "Methodology",
-  },
-];
-
 export const FAQS_EPIDEMICS: FAQItem[] = [
   {
     question: "Comment sont calculés les taux de létalité sur cette carte ?",
@@ -114,6 +99,57 @@ export const FAQS_EPIDEMICS: FAQItem[] = [
     answer:
       "L'absence de données pour certains pays reflète soit un manque de surveillance épidémiologique, soit des données non disponibles publiquement, soit une exposition réellement très faible (cas de l'hantavirus dans de nombreux pays). Pour la Peste Noire, l'Asie centrale et l'Afrique subsaharienne sont sous-représentées en raison du manque de sources historiques, non d'une absence d'impact réel.",
     category: "Méthodologie",
+  },
+];
+
+export const FAQS_ECONOMY: FAQItem[] = [
+  {
+    question: "Qu'est-ce que le PIB et comment est-il calculé ?",
+    answer:
+      "Le Produit Intérieur Brut (PIB) mesure la valeur totale des biens et services produits dans un pays sur une période donnée. Il se calcule selon trois approches équivalentes : par la production (somme des valeurs ajoutées), par les dépenses (consommation + investissement + dépenses publiques + exportations nettes), ou par les revenus. Le PIB nominal est exprimé en dollars courants, ce qui permet des comparaisons directes entre pays mais est sensible aux variations de change.",
+    category: "Concepts",
+  },
+  {
+    question: "Que signifie un ratio dette/PIB élevé ?",
+    answer:
+      "Le ratio dette/PIB exprime le montant de la dette publique en pourcentage de la production économique annuelle du pays. Un ratio élevé (au-delà de 100%) ne signifie pas forcément une crise imminente — le Japon dépasse 260% depuis des années sans perdre la confiance des marchés. Ce qui compte davantage : la capacité à refinancer cette dette, la confiance des investisseurs, la devise dans laquelle elle est libellée, et la croissance économique. La zone de vigilance généralement admise se situe autour de 60% (critère de Maastricht).",
+    category: "Concepts",
+  },
+  {
+    question: "Comment mesure-t-on le taux de chômage ?",
+    answer:
+      "Le taux de chômage selon l'OIT (Organisation Internationale du Travail) compte les personnes sans emploi, disponibles pour travailler et en recherche active dans les quatre semaines précédentes. Il exclut les personnes découragées (qui ont arrêté de chercher) et les sous-employés. Les méthodologies nationales varient, ce qui rend les comparaisons internationales délicates. Le taux U-6 américain, qui inclut les travailleurs marginaux, est typiquement 2 à 3 points supérieur au taux officiel.",
+    category: "Concepts",
+  },
+  {
+    question: "Pourquoi certains pays ont-ils plus d'entreprises que d'autres ?",
+    answer:
+      "Le nombre d'entreprises enregistrées dépend de plusieurs facteurs : la facilité administrative de création (les pays nordiques et l'Asie du Sud-Est ont simplifié ce processus), le niveau de formalisation de l'économie (l'économie informelle est massive en Afrique et en Asie du Sud), la taille de la population, et les incitations fiscales. L'Inde et la Chine ont des chiffres très élevés en partie grâce à leurs vastes marchés intérieurs et à des réformes récentes de simplification administrative.",
+    category: "Concepts",
+  },
+  {
+    question: "Quelles sont les sources des données économiques affichées ?",
+    answer:
+      "Les données PIB et dette sont issues des bases de données de la Banque mondiale (World Development Indicators) et du Fonds Monétaire International (World Economic Outlook). Les taux de chômage proviennent de l'Organisation Internationale du Travail (ILOSTAT). Les données sur les entreprises sont des estimations Banque mondiale complétées par des sources nationales. Les chiffres des entreprises cotées sont issus des bourses mondiales. Toutes les valeurs sont des approximations susceptibles de révision.",
+    category: "Méthodologie",
+  },
+  {
+    question: "Comment lire la carte choroplèthe économique ?",
+    answer:
+      "La carte utilise un dégradé de vert allant du kaki sombre (valeur la plus faible) au vert néon (valeur la plus élevée). L'échelle est logarithmique pour le PIB et le nombre d'entreprises (pour mieux visualiser les différences entre petits et grands pays), et linéaire pour les ratios. Les pays en gris n'ont pas de données disponibles. Cliquez sur un pays pour voir ses quatre indicateurs et l'évolution sur les six années disponibles.",
+    category: "Utilisation",
+  },
+  {
+    question: "Quelle est la différence entre PIB nominal et PIB en parité de pouvoir d'achat ?",
+    answer:
+      "Le PIB nominal convertit simplement la production nationale au taux de change courant. Le PIB en parité de pouvoir d'achat (PPA) ajuste les prix locaux pour permettre des comparaisons plus justes du niveau de vie. Exemple : avec 100 dollars, on peut acheter davantage en Inde qu'aux États-Unis. En PPA, la Chine dépasse les États-Unis depuis 2016. Cette carte utilise le PIB nominal, plus approprié pour comparer les poids économiques sur les marchés financiers internationaux.",
+    category: "Concepts",
+  },
+  {
+    question: "Quel impact ont les crises économiques sur les indicateurs mondiaux ?",
+    answer:
+      "Les données 2020 illustrent parfaitement l'impact des crises : la pandémie COVID-19 a provoqué la plus forte contraction du PIB mondial depuis la Seconde Guerre mondiale (-3,5% mondial). Les dettes publiques ont explosé dans tous les pays développés (+20 à +40 points de ratio dette/PIB en un an). Le chômage américain a dépassé 14% en avril 2020. Les crises précédentes (2008-2009) ont eu un impact comparable mais plus ciblé sur les pays développés. La comparaison entre les années 2015, 2020 et 2023 permet de visualiser la récupération post-COVID.",
+    category: "Analyse",
   },
 ];
 

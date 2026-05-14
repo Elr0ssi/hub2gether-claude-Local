@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Layout } from "@/components/layout/Layout";
 import { MapViewLoader } from "@/components/map/MapViewLoader";
 import { EpidemicsMapViewLoader } from "@/components/map/EpidemicsMapViewLoader";
+import { EconomyMapViewLoader } from "@/components/map/EconomyMapViewLoader";
 import { ArticleGrid } from "@/components/articles/ArticleGrid";
 import { FAQSection } from "@/components/faq/FAQSection";
 import { getThemeById } from "@/data/themes";
@@ -18,7 +19,7 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return [{ theme: "empires" }, { theme: "epidemics" }];
+  return [{ theme: "empires" }, { theme: "epidemics" }, { theme: "economy" }];
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -57,6 +58,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
+  if (theme === "economy") {
+    return {
+      title: "Économie mondiale — Carte interactive",
+      description:
+        "Comparez le PIB, la dette publique, le chômage et les entreprises de 33 pays entre 2000 et 2023. Données Banque mondiale et FMI.",
+      openGraph: {
+        title: "Économie mondiale — Carte interactive | The Essential Data",
+        description:
+          "Visualisez l'évolution économique mondiale sur 23 ans : PIB, dette/PIB, chômage et top entreprises par pays.",
+        type: "website",
+      },
+    };
+  }
+
   return {
     title: `${themeData.label} — Interactive Map`,
     description: themeData.description,
@@ -77,6 +92,7 @@ export default async function MapPage({ params, searchParams }: PageProps) {
   const initialYear = year ? parseInt(year) : 117;
 
   const isEpidemics = theme === "epidemics";
+  const isEconomy = theme === "economy";
 
   return (
     <Layout>
@@ -88,6 +104,8 @@ export default async function MapPage({ params, searchParams }: PageProps) {
         <h1 className="text-heading-1 mb-2" style={{ color: "var(--ink)" }}>
           {isEpidemics
             ? "Épidémies mondiales"
+            : isEconomy
+            ? "Économie mondiale"
             : theme === "empires"
             ? "Roman Empire"
             : themeData.label}
@@ -95,6 +113,8 @@ export default async function MapPage({ params, searchParams }: PageProps) {
         <p className="text-body" style={{ maxWidth: "600px" }}>
           {isEpidemics
             ? "Visualisez l'impact de quatre grandes épidémies — Peste Noire, COVID-19, VIH/SIDA et Hantavirus — pays par pays. Cliquez sur un pays pour afficher les cas confirmés et le nombre de décès."
+            : isEconomy
+            ? "Comparez le PIB, la dette publique, le chômage et les entreprises de 33 pays entre 2000 et 2023. Cliquez sur un pays pour voir l'évolution complète et le top 10 des entreprises."
             : theme === "empires"
             ? "Trace the rise and fall of the Roman Empire across seven key periods, from the founding city-state to the fall of Constantinople."
             : themeData.description}
@@ -115,6 +135,8 @@ export default async function MapPage({ params, searchParams }: PageProps) {
         >
           {isEpidemics ? (
             <EpidemicsMapViewLoader />
+          ) : isEconomy ? (
+            <EconomyMapViewLoader />
           ) : (
             <MapViewLoader theme={themeData.id as ThemeId} initialYear={initialYear} />
           )}
@@ -125,10 +147,12 @@ export default async function MapPage({ params, searchParams }: PageProps) {
       {articles.length > 0 && (
         <ArticleGrid
           articles={articles.slice(0, 3)}
-          title={isEpidemics ? "Analyses éditoriales" : "Related analysis"}
+          title={isEpidemics || isEconomy ? "Analyses éditoriales" : "Related analysis"}
           subtitle={
             isEpidemics
               ? "Analyses approfondies sur les grandes pandémies et leur impact géopolitique."
+              : isEconomy
+              ? "Décryptages économiques : PIB, dette, chômage et géopolitique financière mondiale."
               : "Editorial deep-dives on the Roman Empire — its expansion, administration, decline and legacy."
           }
         />

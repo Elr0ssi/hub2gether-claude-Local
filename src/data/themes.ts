@@ -16,9 +16,8 @@ export const THEMES: Theme[] = [
     description:
       "Map global debt, GDP, trade flows, and economic inequality. Understand how finance reshapes geopolitical power in the 21st century.",
     slug: "economy",
-    available: false,
+    available: true,
     icon: "TrendingUp",
-    comingSoonLabel: "Q3 2025",
   },
   {
     id: "conflicts",

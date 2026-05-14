@@ -4,12 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Maximize2, Minimize2, ChevronLeft, PenLine, Map, Navigation, Satellite } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { EpidemicsInteractiveMap } from "./EpidemicsInteractiveMap";
-import { EpidemicsLeafletMap, type LeafletTileStyle } from "./EpidemicsLeafletMap";
-import { EpidemicsSidePanel } from "@/components/sidebar/EpidemicsSidePanel";
+import { EconomyInteractiveMap } from "./EconomyInteractiveMap";
+import { EconomyLeafletMap, type LeafletTileStyle } from "./EconomyLeafletMap";
+import { EconomySidePanel } from "@/components/sidebar/EconomySidePanel";
 import { ThemeDropdown } from "./ThemeDropdown";
-import { EPIDEMICS, getDiseaseById } from "@/data/epidemics/epidemics";
-import type { EpidemicDiseaseId } from "@/types";
+import { ECONOMY_METRICS, ECONOMY_YEARS, ECONOMY_YEAR_VALUES, getYearData } from "@/data/economy/economy";
+import type { EconomyMetricId } from "@/types";
 
 type MapStyle = "editorial" | LeafletTileStyle;
 
@@ -20,7 +20,7 @@ const MAP_STYLES: { id: MapStyle; label: string; Icon: React.ElementType }[] = [
   { id: "satellite", label: "Satellite",  Icon: Satellite  },
 ];
 
-export function EpidemicsMapView() {
+export function EconomyMapView() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -28,7 +28,10 @@ export function EpidemicsMapView() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [mapStyle, setMapStyle] = useState<MapStyle>("editorial");
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+
+  const metric = (searchParams.get("metric") ?? "gdp") as EconomyMetricId;
+  const year = parseInt(searchParams.get("year") ?? "2023");
+  const economyYear = getYearData(year) ?? ECONOMY_YEARS[ECONOMY_YEARS.length - 1];
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setIsFullscreen(false); };
@@ -36,35 +39,38 @@ export function EpidemicsMapView() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const diseaseId = (searchParams.get("disease") ?? "covid") as EpidemicDiseaseId;
-  const disease = getDiseaseById(diseaseId) ?? EPIDEMICS[0];
-
-  const handleDiseaseChange = useCallback(
-    (id: EpidemicDiseaseId) => {
+  const updateParam = useCallback(
+    (key: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString());
-      params.set("disease", id);
+      params.set(key, value);
       router.push(`${pathname}?${params.toString()}`, { scroll: false });
-      setSelectedCountry(null);
     },
     [router, pathname, searchParams]
   );
 
-  const handleCountryClick = useCallback((countryName: string) => {
-    setSelectedCountry(countryName);
+  const handleMetricChange = useCallback((id: EconomyMetricId) => {
+    updateParam("metric", id);
+    setSelectedCountry(null);
+  }, [updateParam]);
+
+  const handleYearChange = useCallback((y: number) => {
+    updateParam("year", y.toString());
+    setSelectedCountry(null);
+  }, [updateParam]);
+
+  const handleCountryClick = useCallback((name: string) => {
+    setSelectedCountry(name);
     setSidePanelOpen(true);
   }, []);
+
+  const currentMetric = ECONOMY_METRICS.find((m) => m.id === metric) ?? ECONOMY_METRICS[0];
 
   return (
     <>
       {/* Map card */}
       <div
-        ref={cardRef}
         className={`border rounded-2xl overflow-hidden${isFullscreen ? " fixed inset-0 z-[9999] rounded-none flex flex-col" : ""}`}
-        style={{
-          border: "1px solid var(--border)",
-          boxShadow: "var(--shadow-float)",
-          background: "var(--surface)",
-        }}
+        style={{ border: "1px solid var(--border)", boxShadow: "var(--shadow-float)", background: "var(--surface)" }}
       >
         {/* Main toolbar */}
         <div
@@ -72,23 +78,23 @@ export function EpidemicsMapView() {
           style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
         >
           <div className="flex items-center gap-3 flex-wrap">
-            <ThemeDropdown currentTheme="epidemics" />
+            <ThemeDropdown currentTheme="economy" />
             <div className="h-4 w-px" style={{ background: "var(--border)" }} />
 
-            {/* Disease selector */}
+            {/* Metric selector */}
             <div className="flex items-center gap-1">
-              {EPIDEMICS.map((d) => (
+              {ECONOMY_METRICS.map((m) => (
                 <button
-                  key={d.id}
-                  onClick={() => handleDiseaseChange(d.id as EpidemicDiseaseId)}
+                  key={m.id}
+                  onClick={() => handleMetricChange(m.id)}
                   className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
                   style={
-                    d.id === diseaseId
+                    m.id === metric
                       ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
                       : { background: "transparent", color: "var(--ink-3)", border: "1px solid transparent" }
                   }
                 >
-                  {d.label}
+                  {m.shortLabel}
                 </button>
               ))}
             </div>
@@ -96,10 +102,7 @@ export function EpidemicsMapView() {
 
           <div className="flex items-center gap-2">
             {/* Map style switcher */}
-            <div
-              className="flex items-center rounded-lg overflow-hidden"
-              style={{ border: "1px solid var(--border)" }}
-            >
+            <div className="flex items-center rounded-lg overflow-hidden" style={{ border: "1px solid var(--border)" }}>
               {MAP_STYLES.map(({ id, label, Icon }) => (
                 <button
                   key={id}
@@ -138,19 +141,30 @@ export function EpidemicsMapView() {
           </div>
         </div>
 
-        {/* Sub-header */}
+        {/* Year selector */}
         <div
-          className="px-5 py-2 border-b flex items-center gap-2"
+          className="px-5 py-2 border-b flex items-center gap-3 overflow-x-auto"
           style={{ borderColor: "var(--border)", background: "var(--surface)" }}
         >
-          <span className="text-xs font-semibold" style={{ color: "var(--accent)" }}>
-            {disease.label}
-          </span>
-          <span className="text-xs" style={{ color: "var(--ink-4)" }}>
-            · {disease.period}
-          </span>
-          <span className="text-xs ml-auto" style={{ color: "var(--ink-4)" }}>
-            {Object.keys(disease.countries).length} pays documentés
+          <span className="text-xs font-semibold shrink-0" style={{ color: "var(--ink-3)" }}>Année :</span>
+          <div className="flex items-center gap-1">
+            {ECONOMY_YEAR_VALUES.map((y) => (
+              <button
+                key={y}
+                onClick={() => handleYearChange(y)}
+                className="px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200"
+                style={
+                  y === year
+                    ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
+                    : { background: "transparent", color: "var(--ink-3)", border: "1px solid transparent" }
+                }
+              >
+                {y}
+              </button>
+            ))}
+          </div>
+          <span className="ml-auto text-xs shrink-0" style={{ color: "var(--ink-4)" }}>
+            {Object.keys(economyYear.countries).length} pays
           </span>
         </div>
 
@@ -158,14 +172,16 @@ export function EpidemicsMapView() {
         <div className={`flex${isFullscreen ? " flex-1 overflow-hidden" : ""}`} style={isFullscreen ? {} : { minHeight: "480px" }}>
           <div className="flex-1 overflow-hidden" style={{ minWidth: 0 }}>
             {mapStyle === "editorial" ? (
-              <EpidemicsInteractiveMap
-                disease={disease}
+              <EconomyInteractiveMap
+                economyYear={economyYear}
+                metric={metric}
                 selectedCountry={selectedCountry}
                 onCountryClick={handleCountryClick}
               />
             ) : (
-              <EpidemicsLeafletMap
-                disease={disease}
+              <EconomyLeafletMap
+                economyYear={economyYear}
+                metric={metric}
                 selectedCountry={selectedCountry}
                 onCountryClick={handleCountryClick}
                 tileStyle={mapStyle}
@@ -174,19 +190,20 @@ export function EpidemicsMapView() {
             )}
           </div>
 
-          <EpidemicsSidePanel
-            disease={disease}
+          <EconomySidePanel
             countryName={selectedCountry}
+            yearData={economyYear}
+            metric={metric}
             open={sidePanelOpen}
             onClose={() => setSidePanelOpen(false)}
           />
         </div>
       </div>
 
-      {/* Disease info blocks */}
+      {/* Info blocks */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={diseaseId}
+          key={`${metric}-${year}`}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
@@ -195,36 +212,35 @@ export function EpidemicsMapView() {
         >
           <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
             <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              À propos de {disease.label}
+              Indicateur affiché
             </p>
-            <p className="text-small leading-relaxed" style={{ color: "var(--ink-2)" }}>
-              {disease.description}
+            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>{currentMetric.label}</p>
+            <p className="text-small leading-relaxed" style={{ color: "var(--ink-2)" }}>{currentMetric.description}</p>
+          </div>
+
+          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
+              Période
+            </p>
+            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>{year}</p>
+            <p className="text-small" style={{ color: "var(--ink-3)" }}>
+              {year === 2020 ? "Année COVID-19 — forte contraction mondiale" : `Données économiques mondiales ${year}`}
             </p>
           </div>
 
           <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
             <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              Agent pathogène
-            </p>
-            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
-              {disease.pathogen}
-            </p>
-          </div>
-
-          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              Chiffres mondiaux
+              Couverture
             </p>
             <div className="space-y-2 mt-1">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-small" style={{ color: "var(--ink-3)" }}>Cas totaux</span>
-                <span className="text-small font-semibold" style={{ color: "var(--ink)" }}>{disease.globalCases}</span>
-              </div>
-              <div style={{ height: "1px", background: "var(--border)" }} />
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-small" style={{ color: "var(--ink-3)" }}>Décès totaux</span>
-                <span className="text-small font-semibold" style={{ color: "var(--accent)" }}>{disease.globalDeaths}</span>
-              </div>
+              {ECONOMY_METRICS.map((m) => (
+                <div key={m.id} className="flex items-center justify-between gap-2">
+                  <span className="text-small" style={{ color: "var(--ink-3)" }}>{m.label}</span>
+                  <span className="text-small font-semibold" style={{ color: m.id === metric ? "var(--accent)" : "var(--ink)" }}>
+                    {m.unit}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -233,7 +249,7 @@ export function EpidemicsMapView() {
               Source des données
             </p>
             <p className="text-small leading-relaxed" style={{ color: "var(--ink-4)" }}>
-              {disease.dataNote}
+              {economyYear.dataNote}
             </p>
           </div>
         </motion.div>

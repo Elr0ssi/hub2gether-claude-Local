@@ -4,15 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, GeoJSON, ZoomControl } from "react-leaflet";
 import type { FeatureCollection, Feature } from "geojson";
 import type { PathOptions, Layer } from "leaflet";
-import type { EpidemicDisease } from "@/types";
+import type { EconomyYear, EconomyMetricId } from "@/types";
+import { ECONOMY_METRICS } from "@/data/economy/economy";
 import {
-  getMaxDeaths,
-  getDeathIntensity,
+  getMaxMetricValue,
+  getValueIntensity,
   interpolateGreen,
   GRADIENT_CSS,
-} from "@/lib/epidemicsColors";
+} from "@/lib/economyColors";
 
-// Natural Earth 110m countries GeoJSON — same source as world-atlas, with `name` field
 const GEO_URL =
   "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_110m_admin_0_countries.geojson";
 
@@ -36,29 +36,26 @@ const TILES = {
 
 export type LeafletTileStyle = keyof typeof TILES;
 
-interface EpidemicsLeafletMapProps {
-  disease: EpidemicDisease;
+interface EconomyLeafletMapProps {
+  economyYear: EconomyYear;
+  metric: EconomyMetricId;
   selectedCountry: string | null;
   onCountryClick: (name: string) => void;
   tileStyle: LeafletTileStyle;
   fillHeight?: boolean;
 }
 
-// Convert hex/rgb fill to an actual rgb string for PathOptions
-function rgbStringToHex(rgb: string): string {
-  // Leaflet accepts rgb() strings directly as fillColor
-  return rgb;
-}
-
-export function EpidemicsLeafletMap({
-  disease,
+export function EconomyLeafletMap({
+  economyYear,
+  metric,
   selectedCountry,
   onCountryClick,
   tileStyle,
   fillHeight = false,
-}: EpidemicsLeafletMapProps) {
+}: EconomyLeafletMapProps) {
   const [geoData, setGeoData] = useState<FeatureCollection | null>(null);
   const cacheRef = useRef<FeatureCollection | null>(null);
+  const metricDef = ECONOMY_METRICS.find((m) => m.id === metric);
 
   useEffect(() => {
     if (cacheRef.current) { setGeoData(cacheRef.current); return; }
@@ -68,23 +65,18 @@ export function EpidemicsLeafletMap({
         cacheRef.current = data;
         setGeoData(data);
       })
-      .catch(() => {/* silent — map still renders without choropleth */});
+      .catch(() => {});
   }, []);
 
-  const maxDeaths = getMaxDeaths(disease.countries);
+  const maxValue = getMaxMetricValue(economyYear.countries, metric);
 
   const getFeatureStyle = (feature: Feature | undefined): PathOptions => {
     const name: string = (feature?.properties as Record<string, string>)?.name ?? "";
-    const t = getDeathIntensity(name, disease.countries, maxDeaths);
+    const t = getValueIntensity(name, economyYear.countries, maxValue, metric);
     const isSelected = selectedCountry === name;
 
     if (isSelected) {
-      return {
-        fillColor: "#39FF88",
-        fillOpacity: 0.9,
-        color: "#39FF88",
-        weight: 2,
-      };
+      return { fillColor: "#39FF88", fillOpacity: 0.9, color: "#39FF88", weight: 2 };
     }
     if (t === 0) {
       return {
@@ -95,45 +87,48 @@ export function EpidemicsLeafletMap({
       };
     }
     return {
-      fillColor: rgbStringToHex(interpolateGreen(t)),
+      fillColor: interpolateGreen(t),
       fillOpacity: tileStyle === "satellite" ? 0.75 : 0.82,
       color: tileStyle === "satellite" ? "rgba(255,255,255,0.4)" : "#A0A0A0",
       weight: 0.5,
     };
   };
 
+  const formatValue = (name: string): string => {
+    const data = economyYear.countries[name];
+    if (!data) return name;
+    const v = data[metric] as number;
+    const unit = metricDef?.unit ?? "";
+    if (metric === "gdp" || metric === "companies") {
+      return `${name}<br/>${metricDef?.label} : <strong>${v.toLocaleString("fr-FR")} ${unit}</strong>`;
+    }
+    return `${name}<br/>${metricDef?.label} : <strong>${v.toLocaleString("fr-FR")} ${unit}</strong>`;
+  };
+
   const onEachFeature = (feature: Feature, layer: Layer) => {
     const name: string = (feature.properties as Record<string, string>)?.name ?? "";
-    const hasData = Boolean(disease.countries[name]);
+    const hasData = Boolean(economyYear.countries[name]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const l = layer as any;
 
-    // Tooltip
     l.bindTooltip(
-      hasData
-        ? `<strong>${name}</strong><br/>Décès : <strong>${disease.countries[name].deaths.toLocaleString("fr-FR")}</strong>`
-        : name,
-      { direction: "auto", className: "leaflet-epidemic-tooltip" }
+      hasData ? formatValue(name) : name,
+      { direction: "auto", className: "leaflet-economy-tooltip" }
     );
 
     if (hasData) {
       l.on("click", () => onCountryClick(name));
       l.on("mouseover", () => {
-        const t = getDeathIntensity(name, disease.countries, maxDeaths);
-        const base = interpolateGreen(t);
-        // lighten slightly on hover
         l.setStyle({ fillOpacity: 1, weight: 1.5 });
         l.bringToFront();
       });
       l.on("mouseout", () => {
-        const isSelected = selectedCountry === name;
-        const t = getDeathIntensity(name, disease.countries, maxDeaths);
+        const isSel = selectedCountry === name;
         l.setStyle({
-          fillOpacity: isSelected ? 0.9 : tileStyle === "satellite" ? 0.75 : 0.82,
-          weight: isSelected ? 2 : 0.5,
+          fillOpacity: isSel ? 0.9 : tileStyle === "satellite" ? 0.75 : 0.82,
+          weight: isSel ? 2 : 0.5,
         });
       });
-      l.getElement && (l.getElement().style.cursor = "pointer");
     }
   };
 
@@ -156,7 +151,7 @@ export function EpidemicsLeafletMap({
         />
         {geoData && (
           <GeoJSON
-            key={`${disease.id}-${selectedCountry ?? "none"}-${tileStyle}`}
+            key={`${economyYear.year}-${metric}-${selectedCountry ?? "none"}-${tileStyle}`}
             data={geoData}
             style={getFeatureStyle}
             onEachFeature={onEachFeature}
@@ -171,11 +166,11 @@ export function EpidemicsLeafletMap({
           background: "rgba(255,255,255,0.93)",
           border: "1px solid rgba(0,0,0,0.1)",
           backdropFilter: "blur(8px)",
-          minWidth: "130px",
+          minWidth: "150px",
         }}
       >
         <p style={{ color: "#555", fontSize: "0.62rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "6px" }}>
-          Décès cumulés
+          {metricDef?.label} ({metricDef?.unit})
         </p>
         <div className="h-2 rounded-full mb-1" style={{ background: GRADIENT_CSS }} />
         <div className="flex justify-between">
@@ -187,9 +182,8 @@ export function EpidemicsLeafletMap({
         </p>
       </div>
 
-      {/* Tooltip CSS */}
       <style>{`
-        .leaflet-epidemic-tooltip {
+        .leaflet-economy-tooltip {
           background: rgba(255,255,255,0.95);
           border: 1px solid #E8E8E8;
           border-radius: 8px;
@@ -198,9 +192,7 @@ export function EpidemicsLeafletMap({
           color: #0A0A0A;
           box-shadow: 0 2px 8px rgba(0,0,0,0.12);
         }
-        .leaflet-epidemic-tooltip::before {
-          display: none;
-        }
+        .leaflet-economy-tooltip::before { display: none; }
       `}</style>
     </div>
   );

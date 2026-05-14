@@ -136,6 +136,74 @@ export const ARTICLES: Article[] = [
     tags: ["Vaccins", "COVID-19", "Inégalités", "COVAX", "Santé mondiale"],
     featured: false,
   },
+
+  // ── Economy articles ───────────────────────────────────────────────────────
+  {
+    slug: "pib-mondial-geopolitique-puissance",
+    title: "Le PIB comme outil de puissance géopolitique",
+    excerpt:
+      "La richesse économique n'est pas qu'un chiffre — c'est un vecteur de pouvoir diplomatique, militaire et culturel. Décryptage de la manière dont le PIB façonne l'ordre mondial.",
+    theme: "economy",
+    publishedAt: "2025-03-10",
+    readingTime: 10,
+    tags: ["PIB", "Géopolitique", "Puissance", "États-Unis", "Chine"],
+    featured: true,
+  },
+  {
+    slug: "dette-publique-comparaison-internationale",
+    title: "La dette publique mondiale : qui doit quoi, et à qui ?",
+    excerpt:
+      "Le Japon dépasse 260% de dette/PIB, l'Italie 140%, les États-Unis 123%. Pourtant tous empruntent encore. Comprendre pourquoi le ratio dette/PIB ne dit pas tout.",
+    theme: "economy",
+    publishedAt: "2025-03-03",
+    readingTime: 9,
+    tags: ["Dette publique", "FMI", "Obligations", "Crise financière", "Souveraineté"],
+    featured: false,
+  },
+  {
+    slug: "chomage-inegalites-marches-travail",
+    title: "Chômage mondial : les grandes fractures du marché du travail",
+    excerpt:
+      "Afrique du Sud à 32%, Europe du Nord sous 3% : les disparités de chômage révèlent des structures économiques et sociales radicalement différentes.",
+    theme: "economy",
+    publishedAt: "2025-02-24",
+    readingTime: 8,
+    tags: ["Chômage", "Marché du travail", "Inégalités", "OCDE", "OIT"],
+    featured: false,
+  },
+  {
+    slug: "chine-usa-guerre-economique-decennie",
+    title: "Chine vs États-Unis : la grande rivalité économique de notre siècle",
+    excerpt:
+      "En 2000, la Chine représentait 12% du PIB américain. En 2023, 65%. Cette ascension fulgurante a redessiné les alliances mondiales et déclenché une guerre technologique sans précédent.",
+    theme: "economy",
+    publishedAt: "2025-02-17",
+    readingTime: 12,
+    tags: ["Chine", "États-Unis", "Guerre économique", "Technologie", "Géopolitique"],
+    featured: false,
+  },
+  {
+    slug: "entreprises-geants-economie-mondiale",
+    title: "Les géants technologiques et leur poids sur l'économie mondiale",
+    excerpt:
+      "Apple, Microsoft, Amazon : les 10 plus grandes entreprises mondiales pèsent autant que le PIB de plusieurs continents réunis. Leur puissance redéfinit les règles du capitalisme.",
+    theme: "economy",
+    publishedAt: "2025-02-10",
+    readingTime: 9,
+    tags: ["Entreprises", "Big Tech", "Capitalisme", "Monopoles", "Régulation"],
+    featured: false,
+  },
+  {
+    slug: "covid-impact-economique-cartographie",
+    title: "COVID-19 : cartographie de l'impact économique mondial en 2020",
+    excerpt:
+      "La contraction de -3,5% du PIB mondial en 2020 masque des réalités très hétérogènes : certains pays ont rebondi en quelques mois, d'autres s'en remettent encore.",
+    theme: "economy",
+    publishedAt: "2025-02-03",
+    readingTime: 8,
+    tags: ["COVID-19", "Récession", "PIB", "Politique économique", "Relance"],
+    featured: false,
+  },
 ];
 
 export function getArticlesByTheme(theme: string): Article[] {
