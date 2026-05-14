@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Users, Skull, AlertTriangle, Info } from "lucide-react";
+import { X, Users, Skull, AlertTriangle, MapPin } from "lucide-react";
 import { formatNumber } from "@/lib/utils";
 import type { EpidemicDisease } from "@/types";
 
@@ -30,8 +30,8 @@ export function EpidemicsSidePanel({ disease, countryName, open, onClose }: Epid
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col overflow-y-auto"
           style={{
-            width: "320px",
-            minWidth: "320px",
+            width: "300px",
+            minWidth: "300px",
             background: "var(--surface)",
             borderLeft: "1px solid var(--border)",
             height: "100%",
@@ -56,7 +56,7 @@ export function EpidemicsSidePanel({ disease, countryName, open, onClose }: Epid
             <button
               onClick={onClose}
               className="btn-ghost p-1.5 mt-0.5 shrink-0"
-              aria-label="Close panel"
+              aria-label="Fermer"
             >
               <X size={16} />
             </button>
@@ -70,87 +70,73 @@ export function EpidemicsSidePanel({ disease, countryName, open, onClose }: Epid
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.25 }}
-                className="flex-1 overflow-y-auto"
+                className="flex-1"
               >
-                {/* Stats grid */}
+                {/* Country stats */}
                 <div
-                  className="grid grid-cols-2 gap-px border-b"
-                  style={{ borderColor: "var(--border)", background: "var(--border)" }}
+                  className="grid grid-cols-1 gap-px"
+                  style={{ background: "var(--border)" }}
                 >
                   {[
                     {
                       icon: Users,
                       label: "Cas confirmés",
                       value: formatNumber(data.infected),
-                      color: "var(--ink)",
+                      sub: data.infected.toLocaleString("fr-FR"),
+                      accent: false,
                     },
                     {
                       icon: Skull,
                       label: "Décès",
                       value: formatNumber(data.deaths),
-                      color: "var(--accent)",
+                      sub: data.deaths.toLocaleString("fr-FR"),
+                      accent: true,
                     },
                     {
                       icon: AlertTriangle,
-                      label: "Létalité",
+                      label: "Taux de létalité",
                       value: mortalityRate(data.infected, data.deaths),
-                      color: "var(--ink)",
+                      sub: "décès / cas confirmés",
+                      accent: false,
                     },
                     {
-                      icon: Info,
-                      label: "Maladie",
-                      value: disease.label,
-                      color: "var(--ink)",
+                      icon: MapPin,
+                      label: "Pays",
+                      value: countryName,
+                      sub: disease.label,
+                      accent: false,
                     },
-                  ].map(({ icon: Icon, label, value, color }) => (
+                  ].map(({ icon: Icon, label, value, sub, accent }) => (
                     <div
                       key={label}
-                      className="px-4 py-3 flex flex-col gap-1"
+                      className="px-5 py-4 flex items-center gap-4"
                       style={{ background: "var(--surface)" }}
                     >
-                      <div className="flex items-center gap-1.5">
-                        <Icon size={11} style={{ color: "var(--ink-4)" }} />
-                        <span className="text-caption">{label}</span>
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ background: accent ? "rgba(57,255,136,0.12)" : "var(--surface-2)" }}
+                      >
+                        <Icon size={15} style={{ color: accent ? "var(--accent)" : "var(--ink-3)" }} />
                       </div>
-                      <span className="text-sm font-semibold" style={{ color }}>
-                        {value}
-                      </span>
+                      <div className="min-w-0">
+                        <p className="text-caption mb-0.5">{label}</p>
+                        <p
+                          className="text-sm font-bold leading-none"
+                          style={{ color: accent ? "var(--accent)" : "var(--ink)" }}
+                        >
+                          {value}
+                        </p>
+                        {sub && (
+                          <p className="text-caption mt-0.5 truncate" style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>
+                            {sub}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
 
-                {/* Disease description */}
-                <div className="px-5 py-4 border-b" style={{ borderColor: "var(--border-light)" }}>
-                  <p className="section-title mb-2.5">À propos de {disease.label}</p>
-                  <p className="text-small leading-relaxed" style={{ color: "var(--ink-3)" }}>
-                    {disease.description}
-                  </p>
-                </div>
-
-                {/* Pathogen */}
-                <div className="px-5 py-4 border-b" style={{ borderColor: "var(--border-light)" }}>
-                  <p className="section-title mb-2.5">Agent pathogène</p>
-                  <p className="text-small font-medium" style={{ color: "var(--ink)" }}>
-                    {disease.pathogen}
-                  </p>
-                </div>
-
-                {/* Global figures */}
-                <div className="px-5 py-4 border-b" style={{ borderColor: "var(--border-light)" }}>
-                  <p className="section-title mb-3">Chiffres mondiaux</p>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-small" style={{ color: "var(--ink-3)" }}>Cas totaux</span>
-                      <span className="text-small font-semibold" style={{ color: "var(--ink)" }}>{disease.globalCases}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-small" style={{ color: "var(--ink-3)" }}>Décès totaux</span>
-                      <span className="text-small font-semibold" style={{ color: "var(--accent)" }}>{disease.globalDeaths}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Data note */}
+                {/* Source note */}
                 <div className="px-5 py-4">
                   <p className="text-caption leading-relaxed" style={{ color: "var(--ink-4)" }}>
                     {disease.dataNote}
@@ -169,13 +155,13 @@ export function EpidemicsSidePanel({ disease, countryName, open, onClose }: Epid
                   className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
                   style={{ background: "var(--surface-2)" }}
                 >
-                  <Users size={22} style={{ color: "var(--ink-4)" }} />
+                  <MapPin size={20} style={{ color: "var(--ink-4)" }} />
                 </div>
                 <p className="text-small font-medium mb-2" style={{ color: "var(--ink-2)" }}>
                   Aucun pays sélectionné
                 </p>
                 <p className="text-caption leading-relaxed" style={{ color: "var(--ink-4)" }}>
-                  Cliquez sur un pays coloré sur la carte pour afficher les données épidémiologiques.
+                  Cliquez sur un pays coloré pour afficher ses données.
                 </p>
               </motion.div>
             )}

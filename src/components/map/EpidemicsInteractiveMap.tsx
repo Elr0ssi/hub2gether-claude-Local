@@ -7,12 +7,12 @@ import type { EpidemicDisease } from "@/types";
 
 const WORLD_MAP_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-// Gradient stops: light mint → medium green → forest → dark kaki
+// Gradient stops: dark kaki (low) → neon green (high)
 const COLOR_STOPS: [number, number, number][] = [
-  [210, 245, 220],  // very light mint (t=0, lowest)
-  [80,  195, 115],  // medium green   (t=0.33)
-  [28,  120,  60],  // forest green   (t=0.66)
-  [10,   50,  22],  // dark kaki      (t=1, highest)
+  [ 40,  55,  30],  // dark kaki/olive  (t=0, lowest)
+  [ 28, 120,  60],  // forest green     (t=0.33)
+  [ 80, 195, 115],  // medium green     (t=0.66)
+  [ 57, 255, 136],  // neon #39FF88     (t=1, highest)
 ];
 
 function interpolateGreen(t: number): string {
@@ -159,7 +159,7 @@ export function EpidemicsInteractiveMap({ disease, selectedCountry, onCountryCli
         </p>
         <div
           className="h-2 rounded-full mb-1"
-          style={{ background: "linear-gradient(to right, rgb(210,245,220), rgb(80,195,115), rgb(28,120,60), rgb(10,50,22))" }}
+          style={{ background: "linear-gradient(to right, rgb(40,55,30), rgb(28,120,60), rgb(80,195,115), rgb(57,255,136))" }}
         />
         <div className="flex justify-between">
           <span style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>Faible</span>
