@@ -8,7 +8,7 @@ export const EPIDEMICS: EpidemicDisease[] = [
   {
     id: "covid",
     label: "COVID-19",
-    period: "2020 – present",
+    period: "Déc. 2019 – présent",
     pathogen: "SARS-CoV-2 coronavirus",
     description:
       "The COVID-19 pandemic caused by SARS-CoV-2 became the most documented infectious disease event in history. Declared a global pandemic by the WHO on 11 March 2020, it spread to every country on Earth within weeks.",
@@ -69,7 +69,7 @@ export const EPIDEMICS: EpidemicDisease[] = [
   {
     id: "black-death",
     label: "Peste Noire",
-    period: "1347 – 1353",
+    period: "Oct. 1347 – 1353",
     pathogen: "Yersinia pestis (bubonic plague)",
     description:
       "La Peste Noire fut la pandémie la plus dévastatrice de l'histoire humaine. En moins de six ans, elle tua entre un tiers et la moitié de la population eurasienne, bouleversant durablement l'économie, la société et l'Église médiévale.",
@@ -114,7 +114,7 @@ export const EPIDEMICS: EpidemicDisease[] = [
   {
     id: "hiv",
     label: "VIH / SIDA",
-    period: "1981 – présent",
+    period: "Juin 1981 – présent",
     pathogen: "VIH (Virus de l'Immunodéficience Humaine)",
     description:
       "L'épidémie de VIH/SIDA reste l'une des pandémies les plus longues de l'histoire moderne. Depuis son identification en 1981, elle a tué plus de 40 millions de personnes, avec une concentration majeure en Afrique subsaharienne.",
@@ -169,7 +169,7 @@ export const EPIDEMICS: EpidemicDisease[] = [
   {
     id: "hantavirus",
     label: "Hantavirus",
-    period: "1978 – présent",
+    period: "1976 – présent",
     pathogen: "Hantavirus (famille Hantaviridae)",
     description:
       "Les hantavirus sont transmis par les rongeurs et provoquent deux syndromes graves : la fièvre hémorragique avec syndrome rénal (FHSR) en Eurasie, et le syndrome pulmonaire à hantavirus (SPH) en Amérique. La létalité du SPH atteint 35–40%.",

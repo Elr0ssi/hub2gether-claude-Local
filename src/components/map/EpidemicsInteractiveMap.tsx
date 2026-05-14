@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ComposableMap, Geographies, Geography, type GeographyItem } from "react-simple-maps";
+import { ComposableMap, Geographies, Geography, ZoomableGroup, type GeographyItem } from "react-simple-maps";
+import { Plus, Minus, Maximize } from "lucide-react";
 import type { EpidemicDisease } from "@/types";
 
 const WORLD_MAP_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -33,6 +34,8 @@ function getCountryFill(countryName: string, disease: EpidemicDisease, maxDeaths
 
 export function EpidemicsInteractiveMap({ disease, selectedCountry, onCountryClick }: EpidemicsInteractiveMapProps) {
   const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [center, setCenter] = useState<[number, number]>([20, 10]);
   const maxDeaths = getMaxDeaths(disease);
 
   return (
@@ -42,39 +45,73 @@ export function EpidemicsInteractiveMap({ disease, selectedCountry, onCountryCli
         projectionConfig={{ center: [20, 10], scale: 155 }}
         style={{ width: "100%", height: "100%" }}
       >
-        <Geographies geography={WORLD_MAP_URL}>
-          {({ geographies }) =>
-            geographies.map((geo: GeographyItem) => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const name: string = (geo as any).properties?.name ?? "";
-              const isHovered = hoveredCountry === name;
-              const isSelected = selectedCountry === name;
-              const hasData = Boolean(disease.countries[name]);
-              const fill = getCountryFill(name, disease, maxDeaths, isHovered, isSelected);
+        <ZoomableGroup
+          zoom={zoom}
+          center={center}
+          onMoveEnd={({ coordinates, zoom: z }) => {
+            setCenter(coordinates);
+            setZoom(z);
+          }}
+        >
+          <Geographies geography={WORLD_MAP_URL}>
+            {({ geographies }) =>
+              geographies.map((geo: GeographyItem) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const name: string = (geo as any).properties?.name ?? "";
+                const isHovered = hoveredCountry === name;
+                const isSelected = selectedCountry === name;
+                const hasData = Boolean(disease.countries[name]);
+                const fill = getCountryFill(name, disease, maxDeaths, isHovered, isSelected);
 
-              return (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill={fill}
-                  stroke={isSelected ? "#39FF88" : "#D8D8D8"}
-                  strokeWidth={isSelected ? 1.2 : 0.4}
-                  onClick={() => {
-                    if (hasData) onCountryClick(name);
-                  }}
-                  onMouseEnter={() => setHoveredCountry(name)}
-                  onMouseLeave={() => setHoveredCountry(null)}
-                  style={{
-                    default: { outline: "none", cursor: hasData ? "pointer" : "default" },
-                    hover: { outline: "none", cursor: hasData ? "pointer" : "default" },
-                    pressed: { outline: "none" },
-                  }}
-                />
-              );
-            })
-          }
-        </Geographies>
+                return (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill={fill}
+                    stroke={isSelected ? "#39FF88" : "#D8D8D8"}
+                    strokeWidth={isSelected ? 1.2 : 0.4}
+                    onClick={() => {
+                      if (hasData) onCountryClick(name);
+                    }}
+                    onMouseEnter={() => setHoveredCountry(name)}
+                    onMouseLeave={() => setHoveredCountry(null)}
+                    style={{
+                      default: { outline: "none", cursor: hasData ? "pointer" : "default" },
+                      hover: { outline: "none", cursor: hasData ? "pointer" : "default" },
+                      pressed: { outline: "none" },
+                    }}
+                  />
+                );
+              })
+            }
+          </Geographies>
+        </ZoomableGroup>
       </ComposableMap>
+
+      {/* Zoom controls */}
+      <div className="absolute top-3 right-3 flex flex-col gap-1 z-10">
+        {[
+          { icon: Plus, action: () => setZoom((z) => Math.min(z * 1.5, 10)), label: "Zoom in" },
+          { icon: Minus, action: () => setZoom((z) => Math.max(z / 1.5, 1)), label: "Zoom out" },
+          { icon: Maximize, action: () => { setZoom(1); setCenter([20, 10]); }, label: "Reset view" },
+        ].map(({ icon: Icon, action, label }) => (
+          <button
+            key={label}
+            onClick={action}
+            aria-label={label}
+            className="w-7 h-7 flex items-center justify-center rounded-lg transition-all"
+            style={{
+              background: "rgba(255,255,255,0.92)",
+              border: "1px solid var(--border)",
+              color: "var(--ink-2)",
+              backdropFilter: "blur(8px)",
+              boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+            }}
+          >
+            <Icon size={13} />
+          </button>
+        ))}
+      </div>
 
       {/* Legend */}
       <div

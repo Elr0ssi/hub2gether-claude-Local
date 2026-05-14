@@ -50,7 +50,16 @@ declare module "react-simple-maps" {
   export function ComposableMap(props: ComposableMapProps): JSX.Element;
   export function Geographies(props: GeographiesProps): JSX.Element;
   export function Geography(props: GeographyProps): JSX.Element;
-  export function ZoomableGroup(props: Record<string, unknown>): JSX.Element;
+  interface ZoomableGroupProps {
+    zoom?: number;
+    center?: [number, number];
+    onMoveEnd?: (position: { coordinates: [number, number]; zoom: number }) => void;
+    filterZoomEvent?: (event: WheelEvent) => boolean;
+    translateExtent?: [[number, number], [number, number]];
+    children?: ReactNode;
+  }
+
+  export function ZoomableGroup(props: ZoomableGroupProps): JSX.Element;
   export function Sphere(props: SVGAttributes<SVGPathElement>): JSX.Element;
   export function Graticule(props: SVGAttributes<SVGPathElement>): JSX.Element;
   export function Marker(props: MarkerProps): JSX.Element;

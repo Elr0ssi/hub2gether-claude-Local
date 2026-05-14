@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /Applications/Codex.app -name \"npm\" 2>/dev/null | head -5 *)",
+      "Bash(# Modern node versions bundle corepack and npm. Let's try finding them *)"
+    ]
+  }
+}

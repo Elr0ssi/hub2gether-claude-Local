@@ -1,6 +1,7 @@
 import type { Article } from "@/types";
 
 export const ARTICLES: Article[] = [
+  // Empires articles
   {
     slug: "roman-empire-peak-117-ad",
     title: "Why the Roman Empire Reached Its Maximum Extent in 117 AD",
@@ -65,6 +66,74 @@ export const ARTICLES: Article[] = [
     publishedAt: "2024-11-15",
     readingTime: 11,
     tags: ["Constantinople", "Ottoman Empire", "Byzantine", "1453"],
+    featured: false,
+  },
+
+  // Epidemics articles
+  {
+    slug: "covid-mondialisation-90-jours",
+    title: "COVID-19 et mondialisation : comment le virus a fait le tour du monde en 90 jours",
+    excerpt:
+      "Identifié à Wuhan en décembre 2019, le SARS-CoV-2 atteignait 114 pays le 11 mars 2020 — date de la déclaration de pandémie par l'OMS. Une propagation sans précédent dans l'histoire humaine.",
+    theme: "epidemics",
+    publishedAt: "2025-02-10",
+    readingTime: 9,
+    tags: ["COVID-19", "SARS-CoV-2", "Pandémie", "Mondialisation"],
+    featured: true,
+  },
+  {
+    slug: "peste-noire-europe-medievale",
+    title: "La Peste Noire : comment une pandémie a reconfiguré l'Europe médiévale",
+    excerpt:
+      "Entre 1347 et 1353, la Yersinia pestis tua entre un tiers et la moitié de la population européenne. Au-delà du choc démographique, elle déclencha une révolution sociale, économique et religieuse sans précédent.",
+    theme: "epidemics",
+    publishedAt: "2025-02-03",
+    readingTime: 12,
+    tags: ["Peste Noire", "Moyen Âge", "Démographie", "Europe"],
+    featured: true,
+  },
+  {
+    slug: "vih-sida-afrique-subsaharienne",
+    title: "VIH/SIDA : 40 ans d'épidémie et l'Afrique subsaharienne toujours en première ligne",
+    excerpt:
+      "L'Afrique subsaharienne concentre 67% des personnes vivant avec le VIH dans le monde. Pourquoi la géographie de cette épidémie est-elle si inégalement distribuée ?",
+    theme: "epidemics",
+    publishedAt: "2025-01-27",
+    readingTime: 11,
+    tags: ["VIH", "SIDA", "Afrique", "Santé mondiale", "ONUSIDA"],
+    featured: false,
+  },
+  {
+    slug: "hantavirus-rongeurs-vecteurs-silencieux",
+    title: "Hantavirus : les rongeurs, vecteurs silencieux d'une maladie méconnue",
+    excerpt:
+      "Contrairement aux autres grandes épidémies, l'hantavirus ne se transmet pas d'homme à homme. Une spécificité qui explique sa géographie morcelée et les défis de sa surveillance.",
+    theme: "epidemics",
+    publishedAt: "2025-01-20",
+    readingTime: 7,
+    tags: ["Hantavirus", "Zoonose", "Rongeurs", "SPH", "FHSR"],
+    featured: false,
+  },
+  {
+    slug: "epidemies-geopolitique-frontieres",
+    title: "Épidémies et géopolitique : quand les pandémies reconfigurent les alliances",
+    excerpt:
+      "COVID-19 a révélé les fractures du système international de santé : compétition vaccinale, effondrement des chaînes d'approvisionnement, nationalisme sanitaire.",
+    theme: "epidemics",
+    publishedAt: "2025-01-13",
+    readingTime: 10,
+    tags: ["Géopolitique", "COVID-19", "Diplomatie", "OMS", "Vaccins"],
+    featured: false,
+  },
+  {
+    slug: "inegalites-vaccinales-monde",
+    title: "L'injustice vaccinale : comment les pays riches ont accaparé 80% des doses COVID",
+    excerpt:
+      "En 2021, les pays à hauts revenus représentant 16% de la population mondiale avaient reçu 60% des doses. Une asymétrie qui a prolongé la pandémie et alimenté l'émergence de nouveaux variants.",
+    theme: "epidemics",
+    publishedAt: "2025-01-06",
+    readingTime: 8,
+    tags: ["Vaccins", "COVID-19", "Inégalités", "COVAX", "Santé mondiale"],
     featured: false,
   },
 ];
