@@ -2,14 +2,23 @@
 
 import { useCallback, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Maximize2, ChevronLeft } from "lucide-react";
+import { Maximize2, ChevronLeft, PenLine, Map, Navigation, Satellite } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { EpidemicsInteractiveMap } from "./EpidemicsInteractiveMap";
+import { EpidemicsLeafletMap, type LeafletTileStyle } from "./EpidemicsLeafletMap";
 import { EpidemicsSidePanel } from "@/components/sidebar/EpidemicsSidePanel";
 import { ThemeDropdown } from "./ThemeDropdown";
 import { EPIDEMICS, getDiseaseById } from "@/data/epidemics/epidemics";
 import type { EpidemicDiseaseId } from "@/types";
 
+type MapStyle = "editorial" | LeafletTileStyle;
+
+const MAP_STYLES: { id: MapStyle; label: string; Icon: React.ElementType }[] = [
+  { id: "editorial", label: "Éditorial",  Icon: PenLine   },
+  { id: "standard",  label: "Standard",   Icon: Map       },
+  { id: "detailed",  label: "Détaillé",   Icon: Navigation },
+  { id: "satellite", label: "Satellite",  Icon: Satellite  },
+];
 
 export function EpidemicsMapView() {
   const router = useRouter();
@@ -17,6 +26,7 @@ export function EpidemicsMapView() {
   const searchParams = useSearchParams();
   const [sidePanelOpen, setSidePanelOpen] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const [mapStyle, setMapStyle] = useState<MapStyle>("editorial");
 
   const diseaseId = (searchParams.get("disease") ?? "covid") as EpidemicDiseaseId;
   const disease = getDiseaseById(diseaseId) ?? EPIDEMICS[0];
@@ -47,7 +57,7 @@ export function EpidemicsMapView() {
           background: "var(--surface)",
         }}
       >
-        {/* Toolbar */}
+        {/* Main toolbar */}
         <div
           className="px-4 py-3 border-b flex items-center justify-between gap-4 flex-wrap"
           style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
@@ -65,17 +75,8 @@ export function EpidemicsMapView() {
                   className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
                   style={
                     d.id === diseaseId
-                      ? {
-                          background: "var(--accent-dim)",
-                          color: "#0D7A40",
-                          border: "1px solid rgba(57,255,136,0.3)",
-                          fontWeight: 700,
-                        }
-                      : {
-                          background: "transparent",
-                          color: "var(--ink-3)",
-                          border: "1px solid transparent",
-                        }
+                      ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
+                      : { background: "transparent", color: "var(--ink-3)", border: "1px solid transparent" }
                   }
                 >
                   {d.label}
@@ -85,29 +86,42 @@ export function EpidemicsMapView() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Map style switcher */}
+            <div
+              className="flex items-center rounded-lg overflow-hidden"
+              style={{ border: "1px solid var(--border)" }}
+            >
+              {MAP_STYLES.map(({ id, label, Icon }) => (
+                <button
+                  key={id}
+                  onClick={() => setMapStyle(id)}
+                  title={label}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium transition-all duration-150"
+                  style={
+                    id === mapStyle
+                      ? { background: "var(--accent-dim)", color: "#0D7A40", borderRight: "1px solid rgba(57,255,136,0.2)" }
+                      : { background: "var(--surface-2)", color: "var(--ink-3)", borderRight: "1px solid var(--border)" }
+                  }
+                >
+                  <Icon size={12} />
+                  <span className="hidden sm:inline">{label}</span>
+                </button>
+              ))}
+            </div>
+
             {sidePanelOpen ? (
-              <button
-                onClick={() => setSidePanelOpen(false)}
-                className="btn-ghost px-2.5 py-1.5 text-xs gap-1.5"
-                title="Expand map"
-              >
-                <Maximize2 size={13} />
-                Expand
+              <button onClick={() => setSidePanelOpen(false)} className="btn-ghost px-2.5 py-1.5 text-xs gap-1.5">
+                <Maximize2 size={13} /> Expand
               </button>
             ) : (
-              <button
-                onClick={() => setSidePanelOpen(true)}
-                className="btn-ghost px-2.5 py-1.5 text-xs gap-1.5"
-                title="Show details"
-              >
-                <ChevronLeft size={13} />
-                Détails
+              <button onClick={() => setSidePanelOpen(true)} className="btn-ghost px-2.5 py-1.5 text-xs gap-1.5">
+                <ChevronLeft size={13} /> Détails
               </button>
             )}
           </div>
         </div>
 
-        {/* Sub-header: disease label + period + country count */}
+        {/* Sub-header */}
         <div
           className="px-5 py-2 border-b flex items-center gap-2"
           style={{ borderColor: "var(--border)", background: "var(--surface)" }}
@@ -125,12 +139,21 @@ export function EpidemicsMapView() {
 
         {/* Map + Side panel */}
         <div className="flex" style={{ minHeight: "480px" }}>
-          <div className="flex-1" style={{ minWidth: 0 }}>
-            <EpidemicsInteractiveMap
-              disease={disease}
-              selectedCountry={selectedCountry}
-              onCountryClick={handleCountryClick}
-            />
+          <div className="flex-1 overflow-hidden" style={{ minWidth: 0 }}>
+            {mapStyle === "editorial" ? (
+              <EpidemicsInteractiveMap
+                disease={disease}
+                selectedCountry={selectedCountry}
+                onCountryClick={handleCountryClick}
+              />
+            ) : (
+              <EpidemicsLeafletMap
+                disease={disease}
+                selectedCountry={selectedCountry}
+                onCountryClick={handleCountryClick}
+                tileStyle={mapStyle}
+              />
+            )}
           </div>
 
           <EpidemicsSidePanel
@@ -142,7 +165,7 @@ export function EpidemicsMapView() {
         </div>
       </div>
 
-      {/* Disease info blocks — below the map card */}
+      {/* Disease info blocks */}
       <AnimatePresence mode="wait">
         <motion.div
           key={diseaseId}
@@ -152,11 +175,7 @@ export function EpidemicsMapView() {
           transition={{ duration: 0.25 }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4"
         >
-          {/* Block 1: À propos */}
-          <div
-            className="rounded-xl px-4 py-4 flex flex-col gap-2"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-          >
+          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
             <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
               À propos de {disease.label}
             </p>
@@ -165,11 +184,7 @@ export function EpidemicsMapView() {
             </p>
           </div>
 
-          {/* Block 2: Agent pathogène */}
-          <div
-            className="rounded-xl px-4 py-4 flex flex-col gap-2"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-          >
+          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
             <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
               Agent pathogène
             </p>
@@ -178,11 +193,7 @@ export function EpidemicsMapView() {
             </p>
           </div>
 
-          {/* Block 3: Chiffres mondiaux */}
-          <div
-            className="rounded-xl px-4 py-4 flex flex-col gap-2"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-          >
+          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
             <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
               Chiffres mondiaux
             </p>
@@ -199,11 +210,7 @@ export function EpidemicsMapView() {
             </div>
           </div>
 
-          {/* Block 4: Source */}
-          <div
-            className="rounded-xl px-4 py-4 flex flex-col gap-2"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-          >
+          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
             <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
               Source des données
             </p>

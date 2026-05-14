@@ -4,60 +4,9 @@ import { useState } from "react";
 import { ComposableMap, Geographies, Geography, ZoomableGroup, type GeographyItem } from "react-simple-maps";
 import { Plus, Minus, Maximize } from "lucide-react";
 import type { EpidemicDisease } from "@/types";
+import { getMaxDeaths, getCountryFillColor, GRADIENT_CSS } from "@/lib/epidemicsColors";
 
 const WORLD_MAP_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
-
-// Gradient stops: dark kaki (low) → neon green (high)
-const COLOR_STOPS: [number, number, number][] = [
-  [ 40,  55,  30],  // dark kaki/olive  (t=0, lowest)
-  [ 28, 120,  60],  // forest green     (t=0.33)
-  [ 80, 195, 115],  // medium green     (t=0.66)
-  [ 57, 255, 136],  // neon #39FF88     (t=1, highest)
-];
-
-function interpolateGreen(t: number): string {
-  const n = COLOR_STOPS.length - 1;
-  const seg = Math.min(t * n, n - 0.001);
-  const i = Math.floor(seg);
-  const lt = seg - i;
-  const [r1, g1, b1] = COLOR_STOPS[i];
-  const [r2, g2, b2] = COLOR_STOPS[i + 1];
-  const r = Math.round(r1 + (r2 - r1) * lt);
-  const g = Math.round(g1 + (g2 - g1) * lt);
-  const b = Math.round(b1 + (b2 - b1) * lt);
-  return `rgb(${r},${g},${b})`;
-}
-
-function brighten(color: string, amount: number): string {
-  const m = color.match(/rgb\((\d+),(\d+),(\d+)\)/);
-  if (!m) return color;
-  const clamp = (v: number) => Math.min(255, Math.max(0, v));
-  return `rgb(${clamp(+m[1] + amount)},${clamp(+m[2] + amount)},${clamp(+m[3] + amount)})`;
-}
-
-function getMaxDeaths(disease: EpidemicDisease): number {
-  return Math.max(...Object.values(disease.countries).map((d) => d.deaths), 1);
-}
-
-function getIntensity(countryName: string, disease: EpidemicDisease, maxDeaths: number): number {
-  const data = disease.countries[countryName];
-  if (!data || data.deaths === 0) return 0;
-  return Math.log10(data.deaths + 1) / Math.log10(maxDeaths + 1);
-}
-
-function getCountryFill(
-  countryName: string,
-  disease: EpidemicDisease,
-  maxDeaths: number,
-  isHovered: boolean,
-  isSelected: boolean
-): string {
-  if (isSelected) return "#39FF88";
-  const t = getIntensity(countryName, disease, maxDeaths);
-  if (t === 0) return isHovered ? "#DCDCDC" : "#EBEBEB";
-  const base = interpolateGreen(t);
-  return isHovered ? brighten(base, 20) : base;
-}
 
 interface EpidemicsInteractiveMapProps {
   disease: EpidemicDisease;
@@ -69,7 +18,7 @@ export function EpidemicsInteractiveMap({ disease, selectedCountry, onCountryCli
   const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([20, 10]);
-  const maxDeaths = getMaxDeaths(disease);
+  const maxDeaths = getMaxDeaths(disease.countries);
 
   return (
     <div className="relative w-full" style={{ aspectRatio: "16/9", minHeight: "420px" }}>
@@ -94,7 +43,7 @@ export function EpidemicsInteractiveMap({ disease, selectedCountry, onCountryCli
                 const isHovered = hoveredCountry === name;
                 const isSelected = selectedCountry === name;
                 const hasData = Boolean(disease.countries[name]);
-                const fill = getCountryFill(name, disease, maxDeaths, isHovered, isSelected);
+                const fill = getCountryFillColor(name, disease.countries, maxDeaths, isHovered, isSelected);
 
                 return (
                   <Geography
@@ -157,10 +106,7 @@ export function EpidemicsInteractiveMap({ disease, selectedCountry, onCountryCli
         <p style={{ color: "var(--ink-3)", fontSize: "0.62rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "6px" }}>
           Décès cumulés
         </p>
-        <div
-          className="h-2 rounded-full mb-1"
-          style={{ background: "linear-gradient(to right, rgb(40,55,30), rgb(28,120,60), rgb(80,195,115), rgb(57,255,136))" }}
-        />
+        <div className="h-2 rounded-full mb-1" style={{ background: GRADIENT_CSS }} />
         <div className="flex justify-between">
           <span style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>Faible</span>
           <span style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>Élevé</span>
@@ -170,7 +116,6 @@ export function EpidemicsInteractiveMap({ disease, selectedCountry, onCountryCli
         </p>
       </div>
 
-      {/* Hint */}
       {!selectedCountry && (
         <div
           className="absolute bottom-3 right-3 px-3 py-1.5 rounded-full text-xs font-medium pointer-events-none"
