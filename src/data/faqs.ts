@@ -100,9 +100,39 @@ export const FAQS_EPIDEMICS: FAQItem[] = [
       "L'absence de données pour certains pays reflète soit un manque de surveillance épidémiologique, soit des données non disponibles publiquement, soit une exposition réellement très faible (cas de l'hantavirus dans de nombreux pays). Pour la Peste Noire, l'Asie centrale et l'Afrique subsaharienne sont sous-représentées en raison du manque de sources historiques, non d'une absence d'impact réel.",
     category: "Méthodologie",
   },
+  {
+    question: "Qu'est-ce que le HMPV (Métapneumovirus humain) et pourquoi est-il sur la carte en 2025 ?",
+    answer:
+      "Le Métapneumovirus humain (hMPV) est un virus respiratoire connu depuis 2001, responsable d'infections des voies respiratoires inférieures similaires à la grippe. Il a connu une forte résurgence en Chine début 2025 (janvier-février), avec une hausse significative des hospitalisations pédiatriques et des cas sévères chez les personnes âgées. Cette vague s'est ensuite propagée dans d'autres régions d'Asie et d'Europe. Le hMPV ne représente pas une menace pandémique comparable au COVID-19, mais son émergence médiatisée et la surveillance renforcée post-COVID en font un indicateur important de la circulation des virus respiratoires en 2025.",
+    category: "HMPV 2025",
+  },
+  {
+    question: "Combien de personnes meurent de maladies infectieuses chaque année dans le monde ?",
+    answer:
+      "Les maladies infectieuses restent l'une des principales causes de décès dans le monde. Le VIH/SIDA tue environ 630 000 personnes par an (ONUSIDA 2023). La tuberculose (non représentée ici) cause ~1,3 million de décès. L'hantavirus tue entre 20 000 et 50 000 personnes annuellement selon les estimations. Le COVID-19, en phase endémique, cause encore 100 000 à 300 000 décès par an selon l'OMS. La Peste Noire, éteinte sous sa forme médiévale, reste présente à l'état endémique dans certaines régions (quelques centaines de cas par an). La carte permet de visualiser ces disparités géographiques.",
+    category: "Analyse",
+  },
 ];
 
 export const FAQS_ECONOMY: FAQItem[] = [
+  {
+    question: "Quel est le PIB de la France en 2025 ?",
+    answer:
+      "Selon les projections du FMI (WEO avril 2025), le PIB nominal de la France est estimé à 3 274 milliards de dollars en 2025. La France reste la 7e économie mondiale et la 2e de la zone euro. Son ratio dette/PIB atteint 113% et son taux de chômage est de 7,4%. Avec une croissance modérée de +1,1%, la France fait face à un environnement de consolidation budgétaire tout en maintenant sa position parmi les grandes puissances économiques.",
+    category: "PIB par pays 2025",
+  },
+  {
+    question: "Quel pays a le PIB le plus élevé en 2025 ?",
+    answer:
+      "En 2025, les États-Unis restent la première économie mondiale avec un PIB nominal de 30 337 milliards de dollars (projections FMI), devant la Chine (19 535 milliards), l'Allemagne (4 702 milliards), le Japon (4 389 milliards) et l'Inde (4 187 milliards). En termes de PIB en parité de pouvoir d'achat (PPA), la Chine dépasse les États-Unis depuis 2016. Le classement nominal reste pertinent pour mesurer le poids sur les marchés financiers internationaux.",
+    category: "PIB par pays 2025",
+  },
+  {
+    question: "Quelle est la dette publique de la France en 2025 ?",
+    answer:
+      "La dette publique française atteint 113% du PIB en 2025, selon les projections FMI. En valeur absolue, cela représente environ 3 700 milliards d'euros. Ce niveau dépasse largement le critère de Maastricht (60%), mais reste en dessous du Japon (254%), de l'Italie (137%) ou de la Grèce (157%). Les marchés financiers accordent encore leur confiance à la France grâce à la solidité de l'euro, aux mécanismes de soutien européens et à la diversification des détenteurs de dette.",
+    category: "PIB par pays 2025",
+  },
   {
     question: "Qu'est-ce que le PIB et comment est-il calculé ?",
     answer:
@@ -148,8 +178,20 @@ export const FAQS_ECONOMY: FAQItem[] = [
   {
     question: "Quel impact ont les crises économiques sur les indicateurs mondiaux ?",
     answer:
-      "Les données 2020 illustrent parfaitement l'impact des crises : la pandémie COVID-19 a provoqué la plus forte contraction du PIB mondial depuis la Seconde Guerre mondiale (-3,5% mondial). Les dettes publiques ont explosé dans tous les pays développés (+20 à +40 points de ratio dette/PIB en un an). Le chômage américain a dépassé 14% en avril 2020. Les crises précédentes (2008-2009) ont eu un impact comparable mais plus ciblé sur les pays développés. La comparaison entre les années 2015, 2020 et 2023 permet de visualiser la récupération post-COVID.",
+      "Les données 2020 illustrent parfaitement l'impact des crises : la pandémie COVID-19 a provoqué la plus forte contraction du PIB mondial depuis la Seconde Guerre mondiale (-3,5% mondial). Les dettes publiques ont explosé dans tous les pays développés (+20 à +40 points de ratio dette/PIB en un an). Le chômage américain a dépassé 14% en avril 2020. Les crises précédentes (2008-2009) ont eu un impact comparable mais plus ciblé sur les pays développés. La comparaison entre les années 2015, 2020 et 2025 permet de visualiser la récupération post-COVID.",
     category: "Analyse",
+  },
+  {
+    question: "Comment comparer le PIB de deux pays avec cet outil ?",
+    answer:
+      "Rendez-vous sur la page Comparaison (accessible depuis la barre de navigation) pour sélectionner deux pays et les confronter directement. Vous y verrez le PIB 2025, la dette publique, le chômage, la superficie, la population et le budget militaire côte à côte avec le ratio automatique. Sur la carte interactive économique, cliquez sur un pays pour afficher dans le panneau latéral ses quatre indicateurs et leur évolution de 2000 à 2025.",
+    category: "Utilisation",
+  },
+  {
+    question: "Qu'est-ce que la vue YTD (depuis le début de l'année) sur la carte économique ?",
+    answer:
+      "La vue YTD (Year-To-Date, ou 'depuis le 1er janvier') est disponible pour l'année en cours sur l'indicateur PIB. Elle affiche le PIB généré depuis le 1er janvier jusqu'au jour actuel, calculé par prorata (PIB annuel × jours écoulés / 365). Cette vue est utile pour visualiser la production économique en temps réel, notamment pour comparer où en sont les économies mondiales à mi-année. Le PIB est un flux (production journalière) qui se prête bien à ce calcul, contrairement à la dette ou au chômage qui sont des stocks ou des taux instantanés.",
+    category: "Utilisation",
   },
 ];
 

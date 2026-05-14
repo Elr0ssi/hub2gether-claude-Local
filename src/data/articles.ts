@@ -204,6 +204,50 @@ export const ARTICLES: Article[] = [
     tags: ["COVID-19", "Récession", "PIB", "Politique économique", "Relance"],
     featured: false,
   },
+  {
+    slug: "pib-par-pays-2025-classement-complet",
+    title: "Classement PIB par pays 2025 : les 20 premières économies mondiales",
+    excerpt:
+      "États-Unis (30 337 Md$), Chine (19 535 Md$), Allemagne (4 702 Md$)... Le classement complet des PIB nominaux 2025 selon les projections FMI d'avril, avec analyse des tendances.",
+    theme: "economy",
+    publishedAt: "2025-04-20",
+    readingTime: 7,
+    tags: ["PIB 2025", "Classement mondial", "FMI", "Économie mondiale", "Projections"],
+    featured: true,
+  },
+  {
+    slug: "dette-publique-france-2025-enjeux",
+    title: "La dette publique française à 113% du PIB en 2025 : faut-il s'inquiéter ?",
+    excerpt:
+      "La France affiche une dette de 113% de son PIB en 2025. Comparée au Japon (254%), à l'Italie (137%) ou à l'Allemagne (67%), cette situation est-elle soutenable ? Analyse comparative avec les données FMI.",
+    theme: "economy",
+    publishedAt: "2025-04-10",
+    readingTime: 9,
+    tags: ["Dette France 2025", "FMI", "Finances publiques", "Zone euro", "Comparaison"],
+    featured: false,
+  },
+  {
+    slug: "hmpv-2025-nouveau-virus-chine-monde",
+    title: "HMPV 2025 : le Métapneumovirus humain, nouveau virus à surveiller",
+    excerpt:
+      "Début 2025, la Chine enregistrait une forte hausse des hospitalisations liées au hMPV. Ce virus respiratoire, cousin du VRS, circule mondialement. Faut-il craindre une nouvelle pandémie ?",
+    theme: "epidemics",
+    publishedAt: "2025-03-15",
+    readingTime: 8,
+    tags: ["HMPV 2025", "Métapneumovirus", "Chine", "Virus respiratoire", "OMS"],
+    featured: true,
+  },
+  {
+    slug: "carte-epidemies-monde-comparaison-historique",
+    title: "Des épidémies à travers l'histoire : ce que les cartes révèlent",
+    excerpt:
+      "Comparer la Peste Noire de 1347 et le COVID-19 de 2020 sur une carte, c'est mesurer 700 ans de progrès médical — et pointer les inégalités persistantes dans la réponse aux crises sanitaires.",
+    theme: "epidemics",
+    publishedAt: "2025-03-05",
+    readingTime: 10,
+    tags: ["Histoire épidémies", "COVID-19", "Peste Noire", "Cartographie", "Santé mondiale"],
+    featured: false,
+  },
 ];
 
 export function getArticlesByTheme(theme: string): Article[] {

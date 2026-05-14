@@ -1,15 +1,37 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Maximize2, Minimize2, ChevronLeft, PenLine, Map, Navigation, Satellite } from "lucide-react";
+import { Maximize2, Minimize2, ChevronLeft, PenLine, Map, Navigation, Satellite, CalendarDays } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { EconomyInteractiveMap } from "./EconomyInteractiveMap";
 import { EconomyLeafletMap, type LeafletTileStyle } from "./EconomyLeafletMap";
 import { EconomySidePanel } from "@/components/sidebar/EconomySidePanel";
 import { ThemeDropdown } from "./ThemeDropdown";
-import { ECONOMY_METRICS, ECONOMY_YEARS, ECONOMY_YEAR_VALUES, getYearData } from "@/data/economy/economy";
-import type { EconomyMetricId } from "@/types";
+import { ECONOMY_METRICS, ECONOMY_YEARS, ECONOMY_YEAR_VALUES, getYearData, DEFAULT_YEAR } from "@/data/economy/economy";
+import type { EconomyMetricId, EconomyYear } from "@/types";
+
+function computeYtdEconomyYear(economyYear: EconomyYear): EconomyYear {
+  const today = new Date();
+  const startOfYear = new Date(today.getFullYear(), 0, 1);
+  const dayOfYear = Math.ceil((today.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
+  const fraction = dayOfYear / 365;
+
+  const ytdCountries: EconomyYear["countries"] = {};
+  for (const [country, data] of Object.entries(economyYear.countries)) {
+    ytdCountries[country] = {
+      ...data,
+      // GDP is a flow: prorate to days elapsed. Rates (debt, unemployment, companies) stay unchanged.
+      gdp: Math.round(data.gdp * fraction),
+    };
+  }
+  return {
+    ...economyYear,
+    label: `${economyYear.year} YTD`,
+    dataNote: `${economyYear.dataNote} — Vue YTD : PIB annuel × ${dayOfYear} jours / 365.`,
+    countries: ytdCountries,
+  };
+}
 
 type MapStyle = "editorial" | LeafletTileStyle;
 
@@ -28,10 +50,17 @@ export function EconomyMapView() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [mapStyle, setMapStyle] = useState<MapStyle>("editorial");
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [ytdMode, setYtdMode] = useState(false);
 
   const metric = (searchParams.get("metric") ?? "gdp") as EconomyMetricId;
-  const year = parseInt(searchParams.get("year") ?? "2023");
+  const year = parseInt(searchParams.get("year") ?? String(DEFAULT_YEAR));
   const economyYear = getYearData(year) ?? ECONOMY_YEARS[ECONOMY_YEARS.length - 1];
+  const isCurrentYear = year === DEFAULT_YEAR;
+
+  const activeEconomyYear = useMemo(
+    () => (ytdMode && isCurrentYear && metric === "gdp" ? computeYtdEconomyYear(economyYear) : economyYear),
+    [economyYear, ytdMode, isCurrentYear, metric]
+  );
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setIsFullscreen(false); };
@@ -82,7 +111,7 @@ export function EconomyMapView() {
             <div className="h-4 w-px" style={{ background: "var(--border)" }} />
 
             {/* Metric selector */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-wrap">
               {ECONOMY_METRICS.map((m) => (
                 <button
                   key={m.id}
@@ -98,6 +127,26 @@ export function EconomyMapView() {
                 </button>
               ))}
             </div>
+
+            {/* YTD toggle — only for current year + GDP metric */}
+            {isCurrentYear && metric === "gdp" && (
+              <>
+                <div className="h-4 w-px" style={{ background: "var(--border)" }} />
+                <button
+                  onClick={() => setYtdMode((v) => !v)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
+                  style={
+                    ytdMode
+                      ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
+                      : { background: "transparent", color: "var(--ink-3)", border: "1px solid var(--border)" }
+                  }
+                  title="PIB généré depuis le 1er janvier — prorata annuel au jour actuel"
+                >
+                  <CalendarDays size={11} />
+                  Depuis le 1er jan.
+                </button>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -151,8 +200,8 @@ export function EconomyMapView() {
             {ECONOMY_YEAR_VALUES.map((y) => (
               <button
                 key={y}
-                onClick={() => handleYearChange(y)}
-                className="px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200"
+                onClick={() => { handleYearChange(y); setYtdMode(false); }}
+                className="flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200"
                 style={
                   y === year
                     ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
@@ -160,11 +209,18 @@ export function EconomyMapView() {
                 }
               >
                 {y}
+                {y === DEFAULT_YEAR && (
+                  <span className="text-xs px-1 rounded" style={{ background: "rgba(57,255,136,0.2)", color: "#0D7A40", fontSize: "0.55rem", fontWeight: 800, letterSpacing: "0.04em" }}>
+                    LIVE
+                  </span>
+                )}
               </button>
             ))}
           </div>
           <span className="ml-auto text-xs shrink-0" style={{ color: "var(--ink-4)" }}>
-            {Object.keys(economyYear.countries).length} pays
+            {ytdMode && isCurrentYear
+              ? `PIB ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}`
+              : `${Object.keys(economyYear.countries).length} pays`}
           </span>
         </div>
 
@@ -173,14 +229,14 @@ export function EconomyMapView() {
           <div className="flex-1 overflow-hidden" style={{ minWidth: 0 }}>
             {mapStyle === "editorial" ? (
               <EconomyInteractiveMap
-                economyYear={economyYear}
+                economyYear={activeEconomyYear}
                 metric={metric}
                 selectedCountry={selectedCountry}
                 onCountryClick={handleCountryClick}
               />
             ) : (
               <EconomyLeafletMap
-                economyYear={economyYear}
+                economyYear={activeEconomyYear}
                 metric={metric}
                 selectedCountry={selectedCountry}
                 onCountryClick={handleCountryClick}
@@ -192,7 +248,7 @@ export function EconomyMapView() {
 
           <EconomySidePanel
             countryName={selectedCountry}
-            yearData={economyYear}
+            yearData={activeEconomyYear}
             metric={metric}
             open={sidePanelOpen}
             onClose={() => setSidePanelOpen(false)}
@@ -222,9 +278,19 @@ export function EconomyMapView() {
             <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
               Période
             </p>
-            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>{year}</p>
+            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+              {ytdMode && isCurrentYear
+                ? `${year} · ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`
+                : year}
+            </p>
             <p className="text-small" style={{ color: "var(--ink-3)" }}>
-              {year === 2020 ? "Année COVID-19 — forte contraction mondiale" : `Données économiques mondiales ${year}`}
+              {ytdMode && isCurrentYear
+                ? `PIB généré depuis le 1er janvier ${year} — prorata au jour actuel`
+                : year === 2020
+                ? "Année COVID-19 — forte contraction mondiale"
+                : year === 2025
+                ? "Projections FMI avril 2025 — données les plus récentes"
+                : `Données économiques mondiales ${year}`}
             </p>
           </div>
 

@@ -9,19 +9,32 @@ import { getFeaturedArticles } from "@/data/articles";
 import { FAQS_EMPIRES } from "@/data/faqs";
 
 export const metadata: Metadata = {
-  title: "The Essential Data — Geopolitical Intelligence",
+  title: "The Essential Data — Cartes géopolitiques interactives PIB, Épidémies, Empires",
   description:
-    "Explore history's greatest empires, conflicts, and economic powers through interactive maps and data journalism. Start with the Roman Empire.",
+    "Explorez le PIB par pays 2025, les épidémies mondiales et les grands empires historiques grâce à des cartes interactives. Données FMI, Banque mondiale, OMS. Data journalism géopolitique de référence.",
+  keywords: [
+    "carte PIB monde 2025",
+    "PIB par pays 2025",
+    "carte géopolitique interactive",
+    "données économiques mondiales",
+    "empires historiques carte",
+    "empire romain carte interactif",
+    "épidémies mondiales carte",
+    "world GDP map",
+    "geopolitical data journalism",
+    "comparaison pays économie",
+  ],
   openGraph: {
-    title: "The Essential Data — Geopolitical Intelligence",
+    title: "The Essential Data — Cartes géopolitiques interactives",
     description:
-      "Interactive historical maps and data journalism. Economy, conflicts, empires, epidemics and power dynamics — mapped through time.",
+      "PIB par pays 2025, épidémies mondiales (COVID, VIH, Peste Noire), empires historiques. Cartes interactives avec données FMI, Banque mondiale et OMS.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Essential Data — Geopolitical Intelligence",
-    description: "Interactive historical maps and data journalism.",
+    title: "The Essential Data — Cartes géopolitiques interactives",
+    description:
+      "PIB par pays 2025, épidémies mondiales, empires historiques. Data journalism géopolitique.",
   },
 };
 
