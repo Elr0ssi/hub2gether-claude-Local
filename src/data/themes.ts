@@ -46,9 +46,8 @@ export const THEMES: Theme[] = [
     description:
       "Explore how pandemics spread across borders, which regions face the highest exposure, and how health crises rewrite global priorities.",
     slug: "epidemics",
-    available: false,
+    available: true,
     icon: "Activity",
-    comingSoonLabel: "Q4 2025",
   },
 ];
 

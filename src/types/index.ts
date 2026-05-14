@@ -60,3 +60,24 @@ export interface BreadcrumbItem {
   label: string;
   href?: string;
 }
+
+// ── Epidemics ─────────────────────────────────────────────────────────────────
+
+export type EpidemicDiseaseId = "black-death" | "covid" | "hiv" | "hantavirus";
+
+export interface CountryEpidemicData {
+  infected: number;
+  deaths: number;
+}
+
+export interface EpidemicDisease {
+  id: EpidemicDiseaseId;
+  label: string;
+  period: string;
+  pathogen: string;
+  description: string;
+  globalCases: string;
+  globalDeaths: string;
+  dataNote: string;
+  countries: Record<string, CountryEpidemicData>;
+}

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Layout } from "@/components/layout/Layout";
 import { MapViewLoader } from "@/components/map/MapViewLoader";
+import { EpidemicsMapViewLoader } from "@/components/map/EpidemicsMapViewLoader";
 import { ArticleGrid } from "@/components/articles/ArticleGrid";
 import { FAQSection } from "@/components/faq/FAQSection";
 import { getThemeById } from "@/data/themes";
@@ -17,7 +18,7 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return [{ theme: "empires" }];
+  return [{ theme: "empires" }, { theme: "epidemics" }];
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -42,6 +43,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
+  if (theme === "epidemics") {
+    return {
+      title: "Épidémies mondiales — Carte interactive",
+      description:
+        "Visualisez l'impact de la Peste Noire, du COVID-19, du VIH et de l'Hantavirus pays par pays. Cas confirmés, décès et taux de létalité.",
+      openGraph: {
+        title: "Épidémies mondiales — Carte interactive | The Essential Data",
+        description:
+          "Comparez l'impact de quatre grandes épidémies à travers le monde : Peste Noire (1347), COVID-19, VIH/SIDA, Hantavirus.",
+        type: "website",
+      },
+    };
+  }
+
   return {
     title: `${themeData.label} — Interactive Map`,
     description: themeData.description,
@@ -61,6 +76,8 @@ export default async function MapPage({ params, searchParams }: PageProps) {
   const faqs = getFaqsByTheme(theme);
   const initialYear = year ? parseInt(year) : 117;
 
+  const isEpidemics = theme === "epidemics";
+
   return (
     <Layout>
       {/* Page header */}
@@ -69,10 +86,16 @@ export default async function MapPage({ params, searchParams }: PageProps) {
           <span className="accent-badge text-xs capitalize">{themeData.label}</span>
         </div>
         <h1 className="text-heading-1 mb-2" style={{ color: "var(--ink)" }}>
-          {theme === "empires" ? "Roman Empire" : themeData.label}
+          {isEpidemics
+            ? "Épidémies mondiales"
+            : theme === "empires"
+            ? "Roman Empire"
+            : themeData.label}
         </h1>
-        <p className="text-body" style={{ maxWidth: "540px" }}>
-          {theme === "empires"
+        <p className="text-body" style={{ maxWidth: "600px" }}>
+          {isEpidemics
+            ? "Visualisez l'impact de quatre grandes épidémies — Peste Noire, COVID-19, VIH/SIDA et Hantavirus — pays par pays. Cliquez sur un pays pour afficher les cas confirmés et le nombre de décès."
+            : theme === "empires"
             ? "Trace the rise and fall of the Roman Empire across seven key periods, from the founding city-state to the fall of Constantinople."
             : themeData.description}
         </p>
@@ -90,7 +113,11 @@ export default async function MapPage({ params, searchParams }: PageProps) {
             </div>
           }
         >
-          <MapViewLoader theme={themeData.id as ThemeId} initialYear={initialYear} />
+          {isEpidemics ? (
+            <EpidemicsMapViewLoader />
+          ) : (
+            <MapViewLoader theme={themeData.id as ThemeId} initialYear={initialYear} />
+          )}
         </Suspense>
       </div>
 
@@ -98,8 +125,12 @@ export default async function MapPage({ params, searchParams }: PageProps) {
       {articles.length > 0 && (
         <ArticleGrid
           articles={articles.slice(0, 3)}
-          title="Related analysis"
-          subtitle="Editorial deep-dives on the Roman Empire — its expansion, administration, decline and legacy."
+          title={isEpidemics ? "Analyses éditoriales" : "Related analysis"}
+          subtitle={
+            isEpidemics
+              ? "Analyses approfondies sur les grandes pandémies et leur impact géopolitique."
+              : "Editorial deep-dives on the Roman Empire — its expansion, administration, decline and legacy."
+          }
         />
       )}
 
