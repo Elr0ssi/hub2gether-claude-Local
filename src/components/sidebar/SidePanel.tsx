@@ -10,9 +10,10 @@ interface SidePanelProps {
   entry: TimelineEntry | null;
   open: boolean;
   onClose: () => void;
+  empireName?: string;
 }
 
-export function SidePanel({ entry, open, onClose }: SidePanelProps) {
+export function SidePanel({ entry, open, onClose, empireName = "Roman Empire" }: SidePanelProps) {
   return (
     <AnimatePresence>
       {open && entry && (
@@ -35,7 +36,7 @@ export function SidePanel({ entry, open, onClose }: SidePanelProps) {
             <div>
               <span className="accent-badge text-xs mb-2 inline-flex">Empires</span>
               <h2 className="text-heading-2" style={{ color: "var(--ink)" }}>
-                Roman Empire
+                {empireName}
               </h2>
             </div>
             <button

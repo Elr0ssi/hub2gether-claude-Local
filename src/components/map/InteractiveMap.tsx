@@ -12,15 +12,28 @@ const WORLD_MAP_URL =
 interface InteractiveMapProps {
   geojsonFile: string;
   onTerritoryClick?: () => void;
+  mapCenter?: [number, number];
+  mapScale?: number;
 }
 
-export function InteractiveMap({ geojsonFile, onTerritoryClick }: InteractiveMapProps) {
+export function InteractiveMap({
+  geojsonFile,
+  onTerritoryClick,
+  mapCenter = [20, 42],
+  mapScale = 600,
+}: InteractiveMapProps) {
   const [empireData, setEmpireData] = useState<object | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hovering, setHovering] = useState(false);
   const [zoom, setZoom] = useState(1);
-  const [center, setCenter] = useState<[number, number]>([20, 40]);
+  const [center, setCenter] = useState<[number, number]>(mapCenter);
   const cache = useRef<Map<string, object>>(new Map());
+
+  // Reset view when empire/center changes
+  useEffect(() => {
+    setCenter(mapCenter);
+    setZoom(1);
+  }, [mapCenter[0], mapCenter[1]]);
 
   useEffect(() => {
     const url = geojsonFile;
@@ -29,7 +42,6 @@ export function InteractiveMap({ geojsonFile, onTerritoryClick }: InteractiveMap
       setIsLoading(false);
       return;
     }
-
     setIsLoading(true);
     fetch(url)
       .then((r) => r.json())
@@ -54,7 +66,7 @@ export function InteractiveMap({ geojsonFile, onTerritoryClick }: InteractiveMap
 
       <ComposableMap
         projection="geoNaturalEarth1"
-        projectionConfig={{ center: [20, 40], scale: 550 }}
+        projectionConfig={{ center: mapCenter, scale: mapScale }}
         style={{ width: "100%", height: "100%" }}
       >
         <ZoomableGroup
@@ -65,19 +77,19 @@ export function InteractiveMap({ geojsonFile, onTerritoryClick }: InteractiveMap
             setZoom(z);
           }}
         >
-          {/* World base layer */}
+          {/* World base layer — light gray, empire territory will be bright green overlay */}
           <Geographies geography={WORLD_MAP_URL}>
             {({ geographies }) =>
               geographies.map((geo: GeographyItem) => (
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}
-                  fill="#F2F2F2"
-                  stroke="#E0E0E0"
-                  strokeWidth={0.4}
+                  fill="#ECECEC"
+                  stroke="#D8D8D8"
+                  strokeWidth={0.35}
                   style={{
                     default: { outline: "none" },
-                    hover: { outline: "none", fill: "#EBEBEB" },
+                    hover: { outline: "none", fill: "#E2E2E2" },
                     pressed: { outline: "none" },
                   }}
                 />
@@ -85,7 +97,7 @@ export function InteractiveMap({ geojsonFile, onTerritoryClick }: InteractiveMap
             }
           </Geographies>
 
-          {/* Empire territory overlay */}
+          {/* Empire territory — solid neon green */}
           <AnimatePresence mode="wait">
             {empireData && (
               <motion.g
@@ -102,19 +114,23 @@ export function InteractiveMap({ geojsonFile, onTerritoryClick }: InteractiveMap
                       <Geography
                         key={geo.rsmKey}
                         geography={geo}
-                        fill={hovering ? "rgba(57,255,136,0.55)" : "rgba(57,255,136,0.35)"}
-                        stroke="#39FF88"
-                        strokeWidth={0.8}
+                        fill={hovering ? "#39FF88" : "rgba(57,255,136,0.82)"}
+                        stroke="#1AD965"
+                        strokeWidth={hovering ? 1.2 : 0.7}
                         onClick={onTerritoryClick}
                         onMouseEnter={() => setHovering(true)}
                         onMouseLeave={() => setHovering(false)}
                         style={{
-                          default: { outline: "none", cursor: "pointer" },
+                          default: {
+                            outline: "none",
+                            cursor: "pointer",
+                            filter: "drop-shadow(0 0 3px rgba(57,255,136,0.35))",
+                          },
                           hover: {
-                            fill: "rgba(57,255,136,0.6)",
-                            stroke: "#39FF88",
-                            strokeWidth: 1.2,
-                            filter: "drop-shadow(0 0 6px rgba(57,255,136,0.4))",
+                            fill: "#39FF88",
+                            stroke: "#1AD965",
+                            strokeWidth: 1.4,
+                            filter: "drop-shadow(0 0 8px rgba(57,255,136,0.55))",
                             outline: "none",
                             cursor: "pointer",
                           },
@@ -133,9 +149,9 @@ export function InteractiveMap({ geojsonFile, onTerritoryClick }: InteractiveMap
       {/* Zoom controls */}
       <div className="absolute top-3 right-3 flex flex-col gap-1 z-10">
         {[
-          { icon: Plus, action: () => setZoom((z) => Math.min(z * 1.5, 8)), label: "Zoom in" },
+          { icon: Plus, action: () => setZoom((z) => Math.min(z * 1.5, 10)), label: "Zoom in" },
           { icon: Minus, action: () => setZoom((z) => Math.max(z / 1.5, 1)), label: "Zoom out" },
-          { icon: Maximize, action: () => { setZoom(1); setCenter([20, 40]); }, label: "Reset view" },
+          { icon: Maximize, action: () => { setZoom(1); setCenter(mapCenter); }, label: "Reset view" },
         ].map(({ icon: Icon, action, label }) => (
           <button
             key={label}
@@ -155,10 +171,19 @@ export function InteractiveMap({ geojsonFile, onTerritoryClick }: InteractiveMap
         ))}
       </div>
 
-      {/* Click prompt */}
+      {/* Legend */}
+      <div
+        className="absolute bottom-3 left-3 px-3 py-2 rounded-xl flex items-center gap-2"
+        style={{ background: "rgba(255,255,255,0.92)", border: "1px solid var(--border)", backdropFilter: "blur(8px)" }}
+      >
+        <div className="w-3 h-3 rounded-sm" style={{ background: "rgba(57,255,136,0.82)", border: "1px solid #1AD965" }} />
+        <span style={{ color: "var(--ink-3)", fontSize: "0.62rem", fontWeight: 600 }}>Territoire de l'empire</span>
+      </div>
+
+      {/* Click hint */}
       {empireData && !isLoading && (
         <div
-          className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full text-xs font-medium pointer-events-none"
+          className="absolute bottom-3 right-3 px-3 py-1.5 rounded-full text-xs font-medium pointer-events-none"
           style={{
             background: "rgba(255,255,255,0.9)",
             border: "1px solid var(--border)",
@@ -166,7 +191,7 @@ export function InteractiveMap({ geojsonFile, onTerritoryClick }: InteractiveMap
             backdropFilter: "blur(8px)",
           }}
         >
-          Scroll to zoom · Click territory
+          Scroll pour zoomer · Cliquez sur le territoire
         </div>
       )}
     </div>
