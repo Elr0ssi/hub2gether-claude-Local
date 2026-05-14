@@ -87,6 +87,19 @@ export function Navbar() {
           })}
         </nav>
 
+        {/* Comparaison link */}
+        <Link
+          href="/comparaison"
+          className={cn(
+            "hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 shrink-0",
+            pathname === "/comparaison"
+              ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
+              : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
+          )}
+        >
+          Comparer
+        </Link>
+
         {/* CTA */}
         <Link href="/map/empires" className="btn-primary text-sm hidden sm:inline-flex">
           Explore Map
