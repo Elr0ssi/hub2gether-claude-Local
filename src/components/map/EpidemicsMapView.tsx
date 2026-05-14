@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Maximize2, ChevronLeft, Calendar, FlaskConical, Users, Skull } from "lucide-react";
+import { Maximize2, ChevronLeft } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { EpidemicsInteractiveMap } from "./EpidemicsInteractiveMap";
 import { EpidemicsSidePanel } from "@/components/sidebar/EpidemicsSidePanel";
@@ -10,12 +10,6 @@ import { ThemeDropdown } from "./ThemeDropdown";
 import { EPIDEMICS, getDiseaseById } from "@/data/epidemics/epidemics";
 import type { EpidemicDiseaseId } from "@/types";
 
-const INFO_BLOCKS = [
-  { icon: Calendar, label: "Période", key: "period" as const },
-  { icon: FlaskConical, label: "Agent pathogène", key: "pathogen" as const },
-  { icon: Users, label: "Cas mondiaux", key: "globalCases" as const },
-  { icon: Skull, label: "Décès mondiaux", key: "globalDeaths" as const },
-];
 
 export function EpidemicsMapView() {
   const router = useRouter();
@@ -156,31 +150,67 @@ export function EpidemicsMapView() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.25 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4"
         >
-          {INFO_BLOCKS.map(({ icon: Icon, label, key }) => (
-            <div
-              key={key}
-              className="rounded-xl px-4 py-3 flex flex-col gap-1.5"
-              style={{
-                background: "var(--surface)",
-                border: "1px solid var(--border)",
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <Icon size={13} style={{ color: "var(--accent)" }} />
-                <span
-                  className="text-xs font-semibold uppercase tracking-wider"
-                  style={{ color: "var(--ink-4)", letterSpacing: "0.06em" }}
-                >
-                  {label}
-                </span>
+          {/* Block 1: À propos */}
+          <div
+            className="rounded-xl px-4 py-4 flex flex-col gap-2"
+            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+          >
+            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
+              À propos de {disease.label}
+            </p>
+            <p className="text-small leading-relaxed" style={{ color: "var(--ink-2)" }}>
+              {disease.description}
+            </p>
+          </div>
+
+          {/* Block 2: Agent pathogène */}
+          <div
+            className="rounded-xl px-4 py-4 flex flex-col gap-2"
+            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+          >
+            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
+              Agent pathogène
+            </p>
+            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+              {disease.pathogen}
+            </p>
+          </div>
+
+          {/* Block 3: Chiffres mondiaux */}
+          <div
+            className="rounded-xl px-4 py-4 flex flex-col gap-2"
+            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+          >
+            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
+              Chiffres mondiaux
+            </p>
+            <div className="space-y-2 mt-1">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-small" style={{ color: "var(--ink-3)" }}>Cas totaux</span>
+                <span className="text-small font-semibold" style={{ color: "var(--ink)" }}>{disease.globalCases}</span>
               </div>
-              <p className="text-sm font-semibold leading-snug" style={{ color: "var(--ink)" }}>
-                {disease[key]}
-              </p>
+              <div style={{ height: "1px", background: "var(--border)" }} />
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-small" style={{ color: "var(--ink-3)" }}>Décès totaux</span>
+                <span className="text-small font-semibold" style={{ color: "var(--accent)" }}>{disease.globalDeaths}</span>
+              </div>
             </div>
-          ))}
+          </div>
+
+          {/* Block 4: Source */}
+          <div
+            className="rounded-xl px-4 py-4 flex flex-col gap-2"
+            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+          >
+            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
+              Source des données
+            </p>
+            <p className="text-small leading-relaxed" style={{ color: "var(--ink-4)" }}>
+              {disease.dataNote}
+            </p>
+          </div>
         </motion.div>
       </AnimatePresence>
     </>
