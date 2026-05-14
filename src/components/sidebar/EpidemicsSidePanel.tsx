@@ -10,6 +10,7 @@ interface EpidemicsSidePanelProps {
   countryName: string | null;
   open: boolean;
   onClose: () => void;
+  isYtd?: boolean;
 }
 
 function mortalityRate(infected: number, deaths: number): string {
@@ -17,7 +18,7 @@ function mortalityRate(infected: number, deaths: number): string {
   return ((deaths / infected) * 100).toFixed(1) + "%";
 }
 
-export function EpidemicsSidePanel({ disease, countryName, open, onClose }: EpidemicsSidePanelProps) {
+export function EpidemicsSidePanel({ disease, countryName, open, onClose, isYtd = false }: EpidemicsSidePanelProps) {
   const data = countryName ? disease.countries[countryName] ?? null : null;
 
   return (
@@ -80,14 +81,14 @@ export function EpidemicsSidePanel({ disease, countryName, open, onClose }: Epid
                   {[
                     {
                       icon: Users,
-                      label: "Cas confirmés",
+                      label: isYtd ? "Cas estimés YTD" : "Cas confirmés",
                       value: formatNumber(data.infected),
                       sub: data.infected.toLocaleString("fr-FR"),
                       accent: false,
                     },
                     {
                       icon: Skull,
-                      label: "Décès",
+                      label: isYtd ? "Décès estimés YTD" : "Décès",
                       value: formatNumber(data.deaths),
                       sub: data.deaths.toLocaleString("fr-FR"),
                       accent: true,

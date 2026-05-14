@@ -96,11 +96,12 @@ export interface EconomyMetric {
 
 // ── Epidemics ─────────────────────────────────────────────────────────────────
 
-export type EpidemicDiseaseId = "black-death" | "covid" | "hiv" | "hantavirus";
+export type EpidemicDiseaseId = "black-death" | "covid" | "hiv" | "hantavirus" | "hmpv";
 
 export interface CountryEpidemicData {
   infected: number;
   deaths: number;
+  deaths_per_year?: number; // annual rate (most recent full year) for YTD prorata
 }
 
 export interface EpidemicDisease {
@@ -112,5 +113,6 @@ export interface EpidemicDisease {
   globalCases: string;
   globalDeaths: string;
   dataNote: string;
+  ongoing?: boolean; // true = active disease, enables YTD mode
   countries: Record<string, CountryEpidemicData>;
 }

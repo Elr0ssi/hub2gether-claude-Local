@@ -1,11 +1,11 @@
 // Shared color logic for the epidemics choropleth — used by both SVG and Leaflet maps.
 
-// 4-stop gradient: dark kaki (few deaths) → neon green (most deaths)
+// 4-stop gradient: neon (few deaths) → dark (most deaths)
 const COLOR_STOPS: [number, number, number][] = [
-  [ 40,  55,  30],  // dark kaki/olive
-  [ 28, 120,  60],  // forest green
+  [ 57, 255, 136],  // neon #39FF88 — lowest intensity
   [ 80, 195, 115],  // medium green
-  [ 57, 255, 136],  // neon #39FF88
+  [ 28, 120,  60],  // forest green
+  [ 10,  45,  22],  // near-black deep green — highest intensity
 ];
 
 export function interpolateGreen(t: number): string {
@@ -54,4 +54,4 @@ export function getCountryFillColor(
 }
 
 export const GRADIENT_CSS =
-  "linear-gradient(to right, rgb(40,55,30), rgb(28,120,60), rgb(80,195,115), rgb(57,255,136))";
+  "linear-gradient(to right, rgb(57,255,136), rgb(80,195,115), rgb(28,120,60), rgb(10,45,22))";

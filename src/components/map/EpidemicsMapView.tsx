@@ -1,15 +1,33 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Maximize2, Minimize2, ChevronLeft, PenLine, Map, Navigation, Satellite } from "lucide-react";
+import { Maximize2, Minimize2, ChevronLeft, PenLine, Map, Navigation, Satellite, CalendarDays } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { EpidemicsInteractiveMap } from "./EpidemicsInteractiveMap";
 import { EpidemicsLeafletMap, type LeafletTileStyle } from "./EpidemicsLeafletMap";
 import { EpidemicsSidePanel } from "@/components/sidebar/EpidemicsSidePanel";
 import { ThemeDropdown } from "./ThemeDropdown";
 import { EPIDEMICS, getDiseaseById } from "@/data/epidemics/epidemics";
-import type { EpidemicDiseaseId } from "@/types";
+import type { EpidemicDiseaseId, EpidemicDisease } from "@/types";
+
+function computeYtdDisease(disease: EpidemicDisease): EpidemicDisease {
+  const today = new Date();
+  const startOfYear = new Date(today.getFullYear(), 0, 1);
+  const dayOfYear = Math.ceil((today.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
+  const fraction = dayOfYear / 365;
+
+  const ytdCountries: EpidemicDisease["countries"] = {};
+  for (const [country, data] of Object.entries(disease.countries)) {
+    const annualDeaths = data.deaths_per_year ?? 0;
+    ytdCountries[country] = {
+      ...data,
+      infected: Math.round((data.infected / Math.max(data.deaths, 1)) * annualDeaths * fraction),
+      deaths: Math.round(annualDeaths * fraction),
+    };
+  }
+  return { ...disease, countries: ytdCountries };
+}
 
 type MapStyle = "editorial" | LeafletTileStyle;
 
@@ -28,6 +46,7 @@ export function EpidemicsMapView() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [mapStyle, setMapStyle] = useState<MapStyle>("editorial");
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [ytdMode, setYtdMode] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,12 +58,18 @@ export function EpidemicsMapView() {
   const diseaseId = (searchParams.get("disease") ?? "covid") as EpidemicDiseaseId;
   const disease = getDiseaseById(diseaseId) ?? EPIDEMICS[0];
 
+  const activeDisease = useMemo(
+    () => (ytdMode && disease.ongoing ? computeYtdDisease(disease) : disease),
+    [disease, ytdMode]
+  );
+
   const handleDiseaseChange = useCallback(
     (id: EpidemicDiseaseId) => {
       const params = new URLSearchParams(searchParams.toString());
       params.set("disease", id);
       router.push(`${pathname}?${params.toString()}`, { scroll: false });
       setSelectedCountry(null);
+      setYtdMode(false);
     },
     [router, pathname, searchParams]
   );
@@ -76,7 +101,7 @@ export function EpidemicsMapView() {
             <div className="h-4 w-px" style={{ background: "var(--border)" }} />
 
             {/* Disease selector */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-wrap">
               {EPIDEMICS.map((d) => (
                 <button
                   key={d.id}
@@ -92,6 +117,26 @@ export function EpidemicsMapView() {
                 </button>
               ))}
             </div>
+
+            {/* YTD toggle — only for ongoing diseases */}
+            {disease.ongoing && (
+              <>
+                <div className="h-4 w-px" style={{ background: "var(--border)" }} />
+                <button
+                  onClick={() => setYtdMode((v) => !v)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
+                  style={
+                    ytdMode
+                      ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
+                      : { background: "transparent", color: "var(--ink-3)", border: "1px solid var(--border)" }
+                  }
+                  title="Estimation au prorata du nombre de jours écoulés depuis le 1er janvier"
+                >
+                  <CalendarDays size={11} />
+                  Depuis le 1er jan.
+                </button>
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -140,7 +185,7 @@ export function EpidemicsMapView() {
 
         {/* Sub-header */}
         <div
-          className="px-5 py-2 border-b flex items-center gap-2"
+          className="px-5 py-2 border-b flex items-center gap-2 flex-wrap"
           style={{ borderColor: "var(--border)", background: "var(--surface)" }}
         >
           <span className="text-xs font-semibold" style={{ color: "var(--accent)" }}>
@@ -149,6 +194,14 @@ export function EpidemicsMapView() {
           <span className="text-xs" style={{ color: "var(--ink-4)" }}>
             · {disease.period}
           </span>
+          {ytdMode && disease.ongoing && (
+            <span
+              className="text-xs px-2 py-0.5 rounded-full font-semibold"
+              style={{ background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.25)" }}
+            >
+              Estimation {new Date().getFullYear()} · au {new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
+            </span>
+          )}
           <span className="text-xs ml-auto" style={{ color: "var(--ink-4)" }}>
             {Object.keys(disease.countries).length} pays documentés
           </span>
@@ -159,13 +212,13 @@ export function EpidemicsMapView() {
           <div className="flex-1 overflow-hidden" style={{ minWidth: 0 }}>
             {mapStyle === "editorial" ? (
               <EpidemicsInteractiveMap
-                disease={disease}
+                disease={activeDisease}
                 selectedCountry={selectedCountry}
                 onCountryClick={handleCountryClick}
               />
             ) : (
               <EpidemicsLeafletMap
-                disease={disease}
+                disease={activeDisease}
                 selectedCountry={selectedCountry}
                 onCountryClick={handleCountryClick}
                 tileStyle={mapStyle}
@@ -175,10 +228,11 @@ export function EpidemicsMapView() {
           </div>
 
           <EpidemicsSidePanel
-            disease={disease}
+            disease={activeDisease}
             countryName={selectedCountry}
             open={sidePanelOpen}
             onClose={() => setSidePanelOpen(false)}
+            isYtd={ytdMode && !!disease.ongoing}
           />
         </div>
       </div>
@@ -213,16 +267,22 @@ export function EpidemicsMapView() {
 
           <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
             <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              Chiffres mondiaux
+              {ytdMode && disease.ongoing
+                ? `Estimation ${new Date().getFullYear()} · au ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`
+                : "Chiffres mondiaux"}
             </p>
             <div className="space-y-2 mt-1">
               <div className="flex items-center justify-between gap-2">
-                <span className="text-small" style={{ color: "var(--ink-3)" }}>Cas totaux</span>
+                <span className="text-small" style={{ color: "var(--ink-3)" }}>
+                  {ytdMode && disease.ongoing ? "Cas estimés YTD" : "Cas totaux"}
+                </span>
                 <span className="text-small font-semibold" style={{ color: "var(--ink)" }}>{disease.globalCases}</span>
               </div>
               <div style={{ height: "1px", background: "var(--border)" }} />
               <div className="flex items-center justify-between gap-2">
-                <span className="text-small" style={{ color: "var(--ink-3)" }}>Décès totaux</span>
+                <span className="text-small" style={{ color: "var(--ink-3)" }}>
+                  {ytdMode && disease.ongoing ? "Décès estimés YTD" : "Décès totaux"}
+                </span>
                 <span className="text-small font-semibold" style={{ color: "var(--accent)" }}>{disease.globalDeaths}</span>
               </div>
             </div>
@@ -234,6 +294,9 @@ export function EpidemicsMapView() {
             </p>
             <p className="text-small leading-relaxed" style={{ color: "var(--ink-4)" }}>
               {disease.dataNote}
+              {ytdMode && disease.ongoing && (
+                <> · <span style={{ color: "var(--accent)" }}>Vue YTD : prorata annuel 2024 × jours écoulés / 365.</span></>
+              )}
             </p>
           </div>
         </motion.div>
