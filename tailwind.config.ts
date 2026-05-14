@@ -41,22 +41,18 @@ const config: Config = {
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-accent":
-          "linear-gradient(135deg, #39FF88 0%, #00E5FF 100%)",
-        "gradient-surface":
-          "linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 100%)",
+        "gradient-accent": "linear-gradient(135deg, #39FF88 0%, #00E5FF 100%)",
+        "gradient-surface": "linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 100%)",
       },
       animation: {
         "fade-in": "fadeIn 0.3s ease forwards",
         "slide-up": "slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-        "slide-in-right":
-          "slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+        "slide-in-right": "slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "scale-in": "scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards",
         "pulse-glow": "pulseGlow 2s ease-in-out infinite",
         "spin-slow": "spin 8s linear infinite",
         shimmer: "shimmer 2s linear infinite",
         "bounce-gentle": "bounceGentle 1.5s ease-in-out infinite",
-        "counter-up": "counterUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards",
       },
       keyframes: {
         fadeIn: {
@@ -76,12 +72,8 @@ const config: Config = {
           to: { opacity: "1", transform: "scale(1)" },
         },
         pulseGlow: {
-          "0%, 100%": {
-            boxShadow: "0 0 10px rgba(57,255,136,0.2)",
-          },
-          "50%": {
-            boxShadow: "0 0 20px rgba(57,255,136,0.4), 0 0 40px rgba(57,255,136,0.2)",
-          },
+          "0%, 100%": { boxShadow: "0 0 10px rgba(57,255,136,0.2)" },
+          "50%": { boxShadow: "0 0 20px rgba(57,255,136,0.4), 0 0 40px rgba(57,255,136,0.2)" },
         },
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
@@ -90,10 +82,6 @@ const config: Config = {
         bounceGentle: {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-4px)" },
-        },
-        counterUp: {
-          from: { opacity: "0", transform: "translateY(8px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
         },
       },
       transitionTimingFunction: {

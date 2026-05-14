@@ -1,0 +1,62 @@
+export type ThemeId = "economy" | "conflicts" | "military" | "epidemics" | "empires";
+
+export interface Theme {
+  id: ThemeId;
+  label: string;
+  description: string;
+  slug: string;
+  available: boolean;
+  icon: string;
+  comingSoonLabel?: string;
+}
+
+export interface EmpireStats {
+  areaSqKm: number;
+  populationEstimate: number;
+  capitalCity: string;
+  politicalSystem: string;
+  keyFacts: string[];
+}
+
+export interface TimelineEntry {
+  year: number;
+  label: string;
+  slug: string;
+  era: string;
+  description: string;
+  analysis: string;
+  geojsonFile: string;
+  stats: EmpireStats;
+}
+
+export interface EmpireEntity {
+  id: string;
+  name: string;
+  theme: ThemeId;
+  slug: string;
+  shortDescription: string;
+  fullDescription: string;
+  timeline: TimelineEntry[];
+}
+
+export interface Article {
+  slug: string;
+  title: string;
+  excerpt: string;
+  theme: ThemeId;
+  publishedAt: string;
+  readingTime: number;
+  tags: string[];
+  featured?: boolean;
+}
+
+export interface FAQItem {
+  question: string;
+  answer: string;
+  category?: string;
+}
+
+export interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}

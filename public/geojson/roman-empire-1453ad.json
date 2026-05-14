@@ -1,0 +1,30 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Final Byzantine State — Constantinople",
+        "year": 1453,
+        "era": "End of the Byzantine Empire",
+        "description": "By 1453, the Byzantine Empire had been reduced to the city of Constantinople and a few surrounding territories. On 29 May 1453, the city fell to the Ottoman Turks."
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [27.8, 41.4],
+            [28.5, 41.4],
+            [29.5, 41.2],
+            [29.8, 40.9],
+            [29.5, 40.6],
+            [28.5, 40.7],
+            [27.8, 40.8],
+            [27.5, 41.0],
+            [27.8, 41.4]
+          ]
+        ]
+      }
+    }
+  ]
+}
