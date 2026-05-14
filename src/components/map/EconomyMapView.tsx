@@ -225,7 +225,7 @@ export function EconomyMapView() {
         </div>
 
         {/* Map + Side panel */}
-        <div className={`flex${isFullscreen ? " flex-1 overflow-hidden" : ""}`} style={isFullscreen ? {} : { minHeight: "480px" }}>
+        <div className={`flex flex-col lg:flex-row${isFullscreen ? " flex-1 overflow-hidden" : ""}`} style={isFullscreen ? {} : { minHeight: "480px" }}>
           <div className="flex-1 overflow-hidden" style={{ minWidth: 0 }}>
             {mapStyle === "editorial" ? (
               <EconomyInteractiveMap

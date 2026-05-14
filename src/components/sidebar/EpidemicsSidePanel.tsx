@@ -25,17 +25,14 @@ export function EpidemicsSidePanel({ disease, countryName, open, onClose, isYtd 
     <AnimatePresence>
       {open && (
         <motion.aside
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 40 }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 16 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col overflow-y-auto"
+          className="flex flex-col overflow-y-auto w-full lg:w-[300px] lg:min-w-[300px] border-t lg:border-t-0 lg:border-l"
           style={{
-            width: "300px",
-            minWidth: "300px",
             background: "var(--surface)",
-            borderLeft: "1px solid var(--border)",
-            height: "100%",
+            borderColor: "var(--border)",
           }}
         >
           {/* Header */}

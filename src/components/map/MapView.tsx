@@ -89,7 +89,7 @@ export function MapView({ theme, initialYear = 117 }: MapViewProps) {
       </div>
 
       {/* Map + Side panel row */}
-      <div className="flex" style={{ minHeight: "480px" }}>
+      <div className="flex flex-col lg:flex-row" style={{ minHeight: "480px" }}>
         {/* Map area */}
         <div className="flex-1 flex flex-col" style={{ minWidth: 0 }}>
           <div className="flex-1">

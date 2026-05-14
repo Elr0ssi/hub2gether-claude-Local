@@ -39,6 +39,33 @@ export interface EmpireEntity {
   timeline: TimelineEntry[];
 }
 
+// ── Article rich body ─────────────────────────────────────────────────────────
+
+export type ArticleSection =
+  | { type: "lead"; content: string }
+  | { type: "text"; heading?: string; content: string }
+  | { type: "stats"; items: { value: string; label: string; note?: string }[] }
+  | {
+      type: "carousel";
+      title: string;
+      items: { name: string; emoji?: string; detail: string; subdetail?: string }[];
+    }
+  | {
+      type: "image-text";
+      heading: string;
+      content: string;
+      imageUrl: string;
+      imageAlt: string;
+      flip?: boolean;
+    }
+  | {
+      type: "timeline";
+      title: string;
+      items: { date: string; title: string; description: string }[];
+    }
+  | { type: "highlight"; content: string }
+  | { type: "quote"; text: string; source: string };
+
 export interface Article {
   slug: string;
   title: string;
@@ -48,6 +75,9 @@ export interface Article {
   readingTime: number;
   tags: string[];
   featured?: boolean;
+  heroImage?: string;
+  heroCaption?: string;
+  body?: ArticleSection[];
 }
 
 export interface FAQItem {

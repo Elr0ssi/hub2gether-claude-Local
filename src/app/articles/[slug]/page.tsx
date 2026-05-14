@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Clock } from "lucide-react";
+import { ArrowLeft, Clock, Tag } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { ArticleGrid } from "@/components/articles/ArticleGrid";
+import { ArticleBody } from "@/components/articles/ArticleBody";
 import { ARTICLES, getArticleBySlug, getArticlesByTheme } from "@/data/articles";
 
 interface PageProps {
@@ -22,12 +23,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: article.title,
     description: article.excerpt,
+    keywords: article.tags,
     openGraph: {
       title: `${article.title} | The Essential Data`,
       description: article.excerpt,
       type: "article",
       publishedTime: article.publishedAt,
       tags: article.tags,
+      images: article.heroImage ? [{ url: article.heroImage }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
@@ -40,18 +43,26 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", {
+function formatDate(iso: string, locale: string) {
+  return new Date(iso).toLocaleDateString(locale, {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
 }
 
+const THEME_MAP: Record<string, { label: string; backHref: string; locale: string }> = {
+  economy:   { label: "Économie",  backHref: "/map/economy",   locale: "fr-FR" },
+  epidemics: { label: "Épidémies", backHref: "/map/epidemics", locale: "fr-FR" },
+  empires:   { label: "Empires",   backHref: "/map/empires",   locale: "en-US" },
+};
+
 export default async function ArticlePage({ params }: PageProps) {
   const { slug } = await params;
   const article = getArticleBySlug(slug);
   if (!article) notFound();
+
+  const themeConfig = THEME_MAP[article.theme] ?? { label: article.theme, backHref: "/", locale: "en-US" };
 
   const related = getArticlesByTheme(article.theme)
     .filter((a) => a.slug !== slug)
@@ -63,14 +74,9 @@ export default async function ArticlePage({ params }: PageProps) {
     headline: article.title,
     description: article.excerpt,
     datePublished: article.publishedAt,
-    author: {
-      "@type": "Organization",
-      name: "The Essential Data",
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "The Essential Data",
-    },
+    image: article.heroImage,
+    author: { "@type": "Organization", name: "The Essential Data" },
+    publisher: { "@type": "Organization", name: "The Essential Data" },
     keywords: article.tags.join(", "),
   };
 
@@ -78,98 +84,197 @@ export default async function ArticlePage({ params }: PageProps) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "/" },
-      { "@type": "ListItem", position: 2, name: "Articles", item: "/articles" },
+      { "@type": "ListItem", position: 1, name: "Accueil", item: "/" },
+      { "@type": "ListItem", position: 2, name: themeConfig.label, item: themeConfig.backHref },
       { "@type": "ListItem", position: 3, name: article.title },
     ],
   };
 
   return (
     <Layout>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
-      <article className="max-w-3xl mx-auto px-6 py-16">
-        {/* Back */}
+      {/* Hero image */}
+      {article.heroImage && (
+        <div className="relative w-full overflow-hidden" style={{ height: "380px" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={article.heroImage}
+            alt={article.heroCaption ?? article.title}
+            className="w-full h-full object-cover"
+            style={{ filter: "brightness(0.55)" }}
+          />
+          {/* Title overlay */}
+          <div
+            className="absolute bottom-0 left-0 right-0 px-6 pb-8 pt-16"
+            style={{
+              background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 100%)",
+            }}
+          >
+            <div className="max-w-3xl mx-auto">
+              <div className="flex items-center gap-3 mb-3">
+                <span
+                  className="text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-widest"
+                  style={{ background: "var(--accent)", color: "#000" }}
+                >
+                  {themeConfig.label}
+                </span>
+                <span className="flex items-center gap-1 text-xs" style={{ color: "rgba(255,255,255,0.7)" }}>
+                  <Clock size={11} />
+                  {article.readingTime} min
+                </span>
+              </div>
+              <h1
+                className="font-black leading-tight"
+                style={{ color: "#fff", fontSize: "clamp(1.4rem, 3vw, 2.1rem)", letterSpacing: "-0.02em", textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}
+              >
+                {article.title}
+              </h1>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <article className="max-w-3xl mx-auto px-6 py-10">
+        {/* Back link */}
         <Link
-          href="/map/empires"
-          className="btn-ghost px-0 mb-8 inline-flex gap-1.5 text-sm"
+          href={themeConfig.backHref}
+          className="btn-ghost px-0 mb-6 inline-flex gap-1.5 text-sm"
           style={{ color: "var(--ink-3)" }}
         >
           <ArrowLeft size={15} />
-          Back to map
+          Retour à la carte {themeConfig.label}
         </Link>
 
-        {/* Header */}
-        <header className="mb-10">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="accent-badge capitalize">{article.theme}</span>
-            <span className="flex items-center gap-1 text-caption" style={{ color: "var(--ink-4)" }}>
-              <Clock size={11} />
-              {article.readingTime} min read
-            </span>
-          </div>
-
-          <h1 className="text-heading-1 mb-4" style={{ color: "var(--ink)", fontSize: "2rem", letterSpacing: "-0.025em" }}>
-            {article.title}
-          </h1>
-
-          <p className="text-body" style={{ fontSize: "1.0625rem", color: "var(--ink-2)" }}>
-            {article.excerpt}
-          </p>
-
-          <div className="flex items-center gap-3 mt-5 pt-5" style={{ borderTop: "1px solid var(--border)" }}>
-            <span className="text-small">The Essential Data</span>
-            <span style={{ color: "var(--border)" }}>·</span>
-            <span className="text-caption">{formatDate(article.publishedAt)}</span>
-          </div>
-        </header>
-
-        {/* Article body (placeholder) */}
-        <div className="space-y-6">
-          <p className="text-body leading-relaxed" style={{ fontSize: "1.0625rem" }}>
-            {article.excerpt} This is a preview of the full article. The complete analysis —
-            including primary sources, historical maps, and expert commentary — will be available
-            as we develop the editorial platform.
-          </p>
-
-          <div
-            className="p-6 rounded-2xl border"
-            style={{ border: "1px solid var(--accent-border)", background: "var(--accent-dim)" }}
-          >
-            <p className="text-small font-semibold mb-1" style={{ color: "#0D7A40" }}>
-              Explore the data
-            </p>
-            <p className="text-small mb-3">
-              See the territories described in this article on our interactive historical map.
-            </p>
-            <Link href="/map/empires" className="btn-primary text-xs">
-              Open the map
-            </Link>
-          </div>
-
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2 pt-4 border-t" style={{ borderColor: "var(--border)" }}>
-            {article.tags.map((tag) => (
-              <span key={tag} className="tag">
-                {tag}
+        {/* Header (shown when no hero image) */}
+        {!article.heroImage && (
+          <header className="mb-10">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="accent-badge capitalize">{themeConfig.label}</span>
+              <span className="flex items-center gap-1 text-caption" style={{ color: "var(--ink-4)" }}>
+                <Clock size={11} />
+                {article.readingTime} min
               </span>
-            ))}
+            </div>
+            <h1
+              className="text-heading-1 mb-4"
+              style={{ color: "var(--ink)", fontSize: "2rem", letterSpacing: "-0.025em" }}
+            >
+              {article.title}
+            </h1>
+            <p className="text-body" style={{ fontSize: "1.0625rem", color: "var(--ink-2)" }}>
+              {article.excerpt}
+            </p>
+          </header>
+        )}
+
+        {/* Byline */}
+        <div
+          className="flex items-center justify-between gap-4 py-4 mb-8"
+          style={{ borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black"
+              style={{ background: "var(--accent)", color: "#000" }}
+            >
+              T
+            </div>
+            <div>
+              <p className="text-xs font-semibold" style={{ color: "var(--ink)" }}>
+                The Essential Data
+              </p>
+              <p className="text-xs" style={{ color: "var(--ink-4)" }}>
+                {formatDate(article.publishedAt, themeConfig.locale)}
+              </p>
+            </div>
           </div>
+          <span className="flex items-center gap-1 text-xs" style={{ color: "var(--ink-4)" }}>
+            <Clock size={11} />
+            {article.readingTime} min de lecture
+          </span>
+        </div>
+
+        {/* Hero caption */}
+        {article.heroCaption && article.heroImage && (
+          <p className="text-xs italic mb-6 -mt-2" style={{ color: "var(--ink-4)" }}>
+            {article.heroCaption}
+          </p>
+        )}
+
+        {/* Article body — rich content or excerpt fallback */}
+        {article.body ? (
+          <ArticleBody sections={article.body} />
+        ) : (
+          <div className="space-y-6">
+            <p
+              className="text-base leading-relaxed"
+              style={{ fontSize: "1.0625rem", color: "var(--ink-2)", lineHeight: "1.8" }}
+            >
+              {article.excerpt}
+            </p>
+            <div
+              className="p-6 rounded-2xl"
+              style={{ border: "1px solid rgba(57,255,136,0.25)", background: "var(--accent-dim)" }}
+            >
+              <p className="text-small font-semibold mb-1" style={{ color: "#0D7A40" }}>
+                Explorer les données
+              </p>
+              <p className="text-small mb-3">
+                Retrouvez les données liées à cet article sur notre carte interactive.
+              </p>
+              <Link href={themeConfig.backHref} className="btn-primary text-xs">
+                Ouvrir la carte
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* CTA to map */}
+        <div
+          className="mt-10 p-6 rounded-2xl"
+          style={{ background: "var(--accent-dim)", border: "1px solid rgba(57,255,136,0.25)" }}
+        >
+          <p className="text-small font-semibold mb-1" style={{ color: "#0D7A40" }}>
+            Explorer les données interactives
+          </p>
+          <p className="text-small mb-3" style={{ color: "var(--ink-2)" }}>
+            Visualisez les données présentées dans cet article sur notre carte mondiale interactive.
+          </p>
+          <Link href={themeConfig.backHref} className="btn-primary text-xs">
+            Ouvrir la carte →
+          </Link>
+        </div>
+
+        {/* Tags */}
+        <div
+          className="flex flex-wrap gap-2 pt-6 mt-6"
+          style={{ borderTop: "1px solid var(--border)" }}
+        >
+          <Tag size={12} style={{ color: "var(--ink-4)", marginTop: "2px" }} />
+          {article.tags.map((tag) => (
+            <span key={tag} className="tag">
+              {tag}
+            </span>
+          ))}
         </div>
       </article>
 
-      {/* Related */}
+      {/* Related articles */}
       {related.length > 0 && (
-        <ArticleGrid articles={related} title="Related analysis" />
+        <ArticleGrid
+          articles={related}
+          title={article.theme === "empires" ? "Related analysis" : "À lire aussi"}
+          subtitle={
+            article.theme === "economy"
+              ? "Autres analyses économiques et données mondiales."
+              : article.theme === "epidemics"
+              ? "Autres analyses sur les épidémies et la santé mondiale."
+              : "More editorial analysis on the empires theme."
+          }
+        />
       )}
     </Layout>
   );
 }
-

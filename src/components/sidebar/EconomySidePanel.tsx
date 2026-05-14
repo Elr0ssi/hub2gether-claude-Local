@@ -265,14 +265,14 @@ export function EconomySidePanel({ countryName, yearData, metric, open, onClose 
     <AnimatePresence>
       {open && (
         <motion.aside
-          initial={{ width: 0, opacity: 0 }}
-          animate={{ width: 300, opacity: 1 }}
-          exit={{ width: 0, opacity: 0 }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 16 }}
           transition={{ duration: 0.25, ease: "easeInOut" }}
-          className="overflow-hidden flex-shrink-0"
-          style={{ borderLeft: "1px solid var(--border)", background: "var(--surface)" }}
+          className="flex-shrink-0 overflow-hidden w-full lg:w-[300px] lg:min-w-[300px] border-t lg:border-t-0 lg:border-l"
+          style={{ borderColor: "var(--border)", background: "var(--surface)" }}
         >
-          <div className="w-[300px] h-full overflow-y-auto">
+          <div className="h-full overflow-y-auto">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 sticky top-0" style={{ borderBottom: "1px solid var(--border)", background: "var(--surface)", zIndex: 10 }}>
               <span className="text-xs font-bold" style={{ color: "var(--accent)" }}>

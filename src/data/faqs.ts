@@ -1,208 +1,22 @@
+// Central aggregator — add FAQs in the per-theme files:
+//   src/data/economy/faqs.ts   → economy FAQs
+//   src/data/epidemics/faqs.ts → epidemics FAQs
+//   src/data/empires/faqs.ts   → empires FAQs
 import type { FAQItem } from "@/types";
+import { FAQS_ECONOMY } from "./economy/faqs";
+import { FAQS_EPIDEMICS } from "./epidemics/faqs";
+import { FAQS_EMPIRES } from "./empires/faqs";
 
-export const FAQS_EMPIRES: FAQItem[] = [
-  {
-    question: "What was the largest empire in history?",
-    answer:
-      "By total land area, the Mongol Empire (1206–1368) was the largest contiguous land empire in history, covering approximately 24 million km² at its peak. The British Empire was technically larger in total (including overseas territories) at around 35 million km², but was not contiguous. The Roman Empire at its peak under Trajan (117 AD) covered approximately 5 million km².",
-    category: "Historical Facts",
-  },
-  {
-    question: "When did the Roman Empire reach its peak expansion?",
-    answer:
-      "The Roman Empire reached its greatest territorial extent in 117 AD under Emperor Trajan, who had just completed the conquest of Dacia (modern Romania) and briefly held Mesopotamia (modern Iraq). This peak covered approximately 5 million km² and included territories from Scotland to the Euphrates River. His successor Hadrian almost immediately abandoned Mesopotamia, recognising it as strategically indefensible.",
-    category: "Roman Empire",
-  },
-  {
-    question: "Why did the Roman Empire fall?",
-    answer:
-      "Historians debate this extensively. Major contributing factors include: military pressure from Germanic peoples and later the Huns on the Rhine-Danube frontier; economic strain from maintaining a vast army; political instability (the '3rd Century Crisis' saw 50+ emperors in 50 years); the division of the empire in 395 AD; the debasement of the currency causing inflation; and the shifting of wealth and power to the East. There was no single cause — it was a centuries-long process of fragmentation.",
-    category: "Roman Empire",
-  },
-  {
-    question: "How did empires control territories before modern communication?",
-    answer:
-      "Pre-modern empires relied on a combination of: military garrisons at strategic points; road networks that allowed rapid troop movements (Rome had over 400,000 km of roads); local administrative intermediaries who collected taxes and maintained order; cultural assimilation (spreading language, law, and religion); and economic integration through trade networks. The most successful empires typically ruled through local elites rather than imposing direct imperial administration everywhere.",
-    category: "Empire Dynamics",
-  },
-  {
-    question: "What distinguished the Roman Empire from other ancient empires?",
-    answer:
-      "Several factors made Rome unique: its remarkably inclusive citizenship policy (non-Romans could become citizens and even emperors); its sophisticated legal system, which remains the foundation of law in most of continental Europe; its infrastructure investment — aqueducts, roads, and cities built to last; and its capacity for political adaptation, shifting from kingdom to republic to principate over eight centuries. Rome absorbed and integrated conquered peoples rather than simply exploiting them.",
-    category: "Roman Empire",
-  },
-  {
-    question: "How accurate are the territorial maps on this site?",
-    answer:
-      "Our maps represent scholarly consensus on approximate historical boundaries. Ancient borders were rarely fixed lines in the modern sense — they were zones of control, influence, and transition. The maps show the generally accepted maximum extent of control at each period, based on historical sources and archaeological evidence. For research purposes, we recommend consulting specialist sources such as the Ancient World Mapping Center (UNC) or the Digital Atlas of Roman and Medieval Civilizations (Harvard).",
-    category: "Methodology",
-  },
-  {
-    question: "Where does the historical data come from?",
-    answer:
-      "Our territorial data draws on peer-reviewed historical scholarship, including works by leading ancient historians and the Ancient World Mapping Center at the University of North Carolina. Population estimates are based on modern demographic analyses of ancient sources by scholars including Walter Scheidel and Bruce Frier. We aim to represent mainstream academic consensus while acknowledging that ancient demographic figures carry inherent uncertainty.",
-    category: "Methodology",
-  },
-  {
-    question: "What happened to the Eastern Roman Empire after 476 AD?",
-    answer:
-      "The Eastern Roman Empire — known today as the Byzantine Empire — survived for nearly a thousand years after the fall of the Western Empire. Centred on Constantinople (modern Istanbul), it remained a major Mediterranean power through the early medieval period, reached a second peak under Justinian I in the 6th century (briefly reconquering Italy and North Africa), and gradually diminished under pressure from Arab conquests (7th century), the Seljuk Turks (11th century), and the Crusaders (who sacked Constantinople in 1204). It finally ended when the Ottoman Turks captured Constantinople on 29 May 1453.",
-    category: "Byzantine Empire",
-  },
-];
-
-export const FAQS_EPIDEMICS: FAQItem[] = [
-  {
-    question: "Comment sont calculés les taux de létalité sur cette carte ?",
-    answer:
-      "Le taux de létalité (Case Fatality Rate — CFR) est calculé en divisant le nombre de décès confirmés par le nombre de cas confirmés. Ce ratio est une sous-estimation de la létalité réelle, car il dépend fortement des capacités de dépistage de chaque pays. Pour le COVID-19, les pays à faibles revenus ayant peu testé présentent des CFR apparemment élevés, non reflet d'une maladie plus mortelle, mais d'un sous-dénombrement des cas.",
-    category: "Méthodologie",
-  },
-  {
-    question: "Pourquoi les données de la Peste Noire sont-elles si imprécises ?",
-    answer:
-      "La Peste Noire (1347–1353) précède les recensements modernes de plusieurs siècles. Les estimations reposent sur des registres paroissiaux, des chroniques médiévales, des archives notariales et des fouilles archéologiques. Les fourchettes vont de 30% à 60% de mortalité en Europe occidentale selon les régions. Les données géographiques utilisent les frontières modernes comme approximation, ce qui introduit une distorsion supplémentaire.",
-    category: "Méthodologie",
-  },
-  {
-    question: "Quelle est la différence entre FHSR et SPH pour l'hantavirus ?",
-    answer:
-      "L'hantavirus provoque deux syndromes distincts selon le variant. La Fièvre Hémorragique avec Syndrome Rénal (FHSR) est dominante en Eurasie — notamment en Chine, Corée et Scandinavie — avec une létalité de 1 à 15%. Le Syndrome Pulmonaire à Hantavirus (SPH) sévit en Amérique du Nord et du Sud, causé par différents variants (Sin Nombre aux USA, Andes en Amérique du Sud), avec une létalité beaucoup plus élevée atteignant 35 à 40%.",
-    category: "Hantavirus",
-  },
-  {
-    question: "Pourquoi l'Afrique subsaharienne concentre-t-elle autant de cas de VIH ?",
-    answer:
-      "La concentration du VIH en Afrique subsaharienne tient à plusieurs facteurs : les réseaux sexuels plus denses dans certaines communautés, l'accès limité aux préservatifs et à l'éducation sexuelle, des systèmes de santé sous-financés, et un accès tardif aux traitements antirétroviraux. Des inégalités structurelles — pauvreté, mobilité des populations, inégalités de genre — amplifient la transmission. Aujourd'hui, l'accès au traitement s'est massivement amélioré, mais l'épidémie reste active.",
-    category: "VIH/SIDA",
-  },
-  {
-    question: "Le COVID-19 est-il toujours une pandémie ?",
-    answer:
-      "L'OMS a mis fin à l'urgence de santé publique de portée internationale (USPPI) liée au COVID-19 le 5 mai 2023. Cela ne signifie pas que le virus a disparu : le SARS-CoV-2 circule encore activement dans le monde entier. L'OMS considère désormais qu'il s'est installé dans une phase endémique, comparable à la grippe saisonnière, nécessitant une surveillance continue mais ne justifiant plus les mesures d'urgence mondiales.",
-    category: "COVID-19",
-  },
-  {
-    question: "Comment les épidémies historiques ont-elles modifié les structures sociales ?",
-    answer:
-      "Les grandes épidémies ont systématiquement accéléré des transformations sociales profondes. La Peste Noire a décimé la paysannerie européenne, rendant la main-d'œuvre rare et permettant aux survivants de négocier de meilleures conditions — précipitant la fin du servage. Le COVID-19 a accéléré la numérisation du travail, amplifié les inégalités économiques entre travailleurs qualifiés (télétravail possible) et non qualifiés, et a révélé la fragilité des États-providences.",
-    category: "Analyse",
-  },
-  {
-    question: "D'où proviennent les données affichées sur la carte ?",
-    answer:
-      "Les données COVID-19 proviennent de l'Organisation Mondiale de la Santé (OMS) et du Johns Hopkins Coronavirus Resource Center (données cumulatives début 2024). Les données VIH/SIDA sont issues des rapports ONUSIDA 2023. Les données hantavirus proviennent de l'OMS et du CDC américain. Les données Peste Noire sont des estimations académiques issues de travaux de démographie historique. Toutes ces données sont susceptibles d'être actualisées.",
-    category: "Méthodologie",
-  },
-  {
-    question: "Pourquoi certains pays n'ont-ils pas de données sur la carte ?",
-    answer:
-      "L'absence de données pour certains pays reflète soit un manque de surveillance épidémiologique, soit des données non disponibles publiquement, soit une exposition réellement très faible (cas de l'hantavirus dans de nombreux pays). Pour la Peste Noire, l'Asie centrale et l'Afrique subsaharienne sont sous-représentées en raison du manque de sources historiques, non d'une absence d'impact réel.",
-    category: "Méthodologie",
-  },
-  {
-    question: "Qu'est-ce que le HMPV (Métapneumovirus humain) et pourquoi est-il sur la carte en 2025 ?",
-    answer:
-      "Le Métapneumovirus humain (hMPV) est un virus respiratoire connu depuis 2001, responsable d'infections des voies respiratoires inférieures similaires à la grippe. Il a connu une forte résurgence en Chine début 2025 (janvier-février), avec une hausse significative des hospitalisations pédiatriques et des cas sévères chez les personnes âgées. Cette vague s'est ensuite propagée dans d'autres régions d'Asie et d'Europe. Le hMPV ne représente pas une menace pandémique comparable au COVID-19, mais son émergence médiatisée et la surveillance renforcée post-COVID en font un indicateur important de la circulation des virus respiratoires en 2025.",
-    category: "HMPV 2025",
-  },
-  {
-    question: "Combien de personnes meurent de maladies infectieuses chaque année dans le monde ?",
-    answer:
-      "Les maladies infectieuses restent l'une des principales causes de décès dans le monde. Le VIH/SIDA tue environ 630 000 personnes par an (ONUSIDA 2023). La tuberculose (non représentée ici) cause ~1,3 million de décès. L'hantavirus tue entre 20 000 et 50 000 personnes annuellement selon les estimations. Le COVID-19, en phase endémique, cause encore 100 000 à 300 000 décès par an selon l'OMS. La Peste Noire, éteinte sous sa forme médiévale, reste présente à l'état endémique dans certaines régions (quelques centaines de cas par an). La carte permet de visualiser ces disparités géographiques.",
-    category: "Analyse",
-  },
-];
-
-export const FAQS_ECONOMY: FAQItem[] = [
-  {
-    question: "Quel est le PIB de la France en 2025 ?",
-    answer:
-      "Selon les projections du FMI (WEO avril 2025), le PIB nominal de la France est estimé à 3 274 milliards de dollars en 2025. La France reste la 7e économie mondiale et la 2e de la zone euro. Son ratio dette/PIB atteint 113% et son taux de chômage est de 7,4%. Avec une croissance modérée de +1,1%, la France fait face à un environnement de consolidation budgétaire tout en maintenant sa position parmi les grandes puissances économiques.",
-    category: "PIB par pays 2025",
-  },
-  {
-    question: "Quel pays a le PIB le plus élevé en 2025 ?",
-    answer:
-      "En 2025, les États-Unis restent la première économie mondiale avec un PIB nominal de 30 337 milliards de dollars (projections FMI), devant la Chine (19 535 milliards), l'Allemagne (4 702 milliards), le Japon (4 389 milliards) et l'Inde (4 187 milliards). En termes de PIB en parité de pouvoir d'achat (PPA), la Chine dépasse les États-Unis depuis 2016. Le classement nominal reste pertinent pour mesurer le poids sur les marchés financiers internationaux.",
-    category: "PIB par pays 2025",
-  },
-  {
-    question: "Quelle est la dette publique de la France en 2025 ?",
-    answer:
-      "La dette publique française atteint 113% du PIB en 2025, selon les projections FMI. En valeur absolue, cela représente environ 3 700 milliards d'euros. Ce niveau dépasse largement le critère de Maastricht (60%), mais reste en dessous du Japon (254%), de l'Italie (137%) ou de la Grèce (157%). Les marchés financiers accordent encore leur confiance à la France grâce à la solidité de l'euro, aux mécanismes de soutien européens et à la diversification des détenteurs de dette.",
-    category: "PIB par pays 2025",
-  },
-  {
-    question: "Qu'est-ce que le PIB et comment est-il calculé ?",
-    answer:
-      "Le Produit Intérieur Brut (PIB) mesure la valeur totale des biens et services produits dans un pays sur une période donnée. Il se calcule selon trois approches équivalentes : par la production (somme des valeurs ajoutées), par les dépenses (consommation + investissement + dépenses publiques + exportations nettes), ou par les revenus. Le PIB nominal est exprimé en dollars courants, ce qui permet des comparaisons directes entre pays mais est sensible aux variations de change.",
-    category: "Concepts",
-  },
-  {
-    question: "Que signifie un ratio dette/PIB élevé ?",
-    answer:
-      "Le ratio dette/PIB exprime le montant de la dette publique en pourcentage de la production économique annuelle du pays. Un ratio élevé (au-delà de 100%) ne signifie pas forcément une crise imminente — le Japon dépasse 260% depuis des années sans perdre la confiance des marchés. Ce qui compte davantage : la capacité à refinancer cette dette, la confiance des investisseurs, la devise dans laquelle elle est libellée, et la croissance économique. La zone de vigilance généralement admise se situe autour de 60% (critère de Maastricht).",
-    category: "Concepts",
-  },
-  {
-    question: "Comment mesure-t-on le taux de chômage ?",
-    answer:
-      "Le taux de chômage selon l'OIT (Organisation Internationale du Travail) compte les personnes sans emploi, disponibles pour travailler et en recherche active dans les quatre semaines précédentes. Il exclut les personnes découragées (qui ont arrêté de chercher) et les sous-employés. Les méthodologies nationales varient, ce qui rend les comparaisons internationales délicates. Le taux U-6 américain, qui inclut les travailleurs marginaux, est typiquement 2 à 3 points supérieur au taux officiel.",
-    category: "Concepts",
-  },
-  {
-    question: "Pourquoi certains pays ont-ils plus d'entreprises que d'autres ?",
-    answer:
-      "Le nombre d'entreprises enregistrées dépend de plusieurs facteurs : la facilité administrative de création (les pays nordiques et l'Asie du Sud-Est ont simplifié ce processus), le niveau de formalisation de l'économie (l'économie informelle est massive en Afrique et en Asie du Sud), la taille de la population, et les incitations fiscales. L'Inde et la Chine ont des chiffres très élevés en partie grâce à leurs vastes marchés intérieurs et à des réformes récentes de simplification administrative.",
-    category: "Concepts",
-  },
-  {
-    question: "Quelles sont les sources des données économiques affichées ?",
-    answer:
-      "Les données PIB et dette sont issues des bases de données de la Banque mondiale (World Development Indicators) et du Fonds Monétaire International (World Economic Outlook). Les taux de chômage proviennent de l'Organisation Internationale du Travail (ILOSTAT). Les données sur les entreprises sont des estimations Banque mondiale complétées par des sources nationales. Les chiffres des entreprises cotées sont issus des bourses mondiales. Toutes les valeurs sont des approximations susceptibles de révision.",
-    category: "Méthodologie",
-  },
-  {
-    question: "Comment lire la carte choroplèthe économique ?",
-    answer:
-      "La carte utilise un dégradé de vert allant du kaki sombre (valeur la plus faible) au vert néon (valeur la plus élevée). L'échelle est logarithmique pour le PIB et le nombre d'entreprises (pour mieux visualiser les différences entre petits et grands pays), et linéaire pour les ratios. Les pays en gris n'ont pas de données disponibles. Cliquez sur un pays pour voir ses quatre indicateurs et l'évolution sur les six années disponibles.",
-    category: "Utilisation",
-  },
-  {
-    question: "Quelle est la différence entre PIB nominal et PIB en parité de pouvoir d'achat ?",
-    answer:
-      "Le PIB nominal convertit simplement la production nationale au taux de change courant. Le PIB en parité de pouvoir d'achat (PPA) ajuste les prix locaux pour permettre des comparaisons plus justes du niveau de vie. Exemple : avec 100 dollars, on peut acheter davantage en Inde qu'aux États-Unis. En PPA, la Chine dépasse les États-Unis depuis 2016. Cette carte utilise le PIB nominal, plus approprié pour comparer les poids économiques sur les marchés financiers internationaux.",
-    category: "Concepts",
-  },
-  {
-    question: "Quel impact ont les crises économiques sur les indicateurs mondiaux ?",
-    answer:
-      "Les données 2020 illustrent parfaitement l'impact des crises : la pandémie COVID-19 a provoqué la plus forte contraction du PIB mondial depuis la Seconde Guerre mondiale (-3,5% mondial). Les dettes publiques ont explosé dans tous les pays développés (+20 à +40 points de ratio dette/PIB en un an). Le chômage américain a dépassé 14% en avril 2020. Les crises précédentes (2008-2009) ont eu un impact comparable mais plus ciblé sur les pays développés. La comparaison entre les années 2015, 2020 et 2025 permet de visualiser la récupération post-COVID.",
-    category: "Analyse",
-  },
-  {
-    question: "Comment comparer le PIB de deux pays avec cet outil ?",
-    answer:
-      "Rendez-vous sur la page Comparaison (accessible depuis la barre de navigation) pour sélectionner deux pays et les confronter directement. Vous y verrez le PIB 2025, la dette publique, le chômage, la superficie, la population et le budget militaire côte à côte avec le ratio automatique. Sur la carte interactive économique, cliquez sur un pays pour afficher dans le panneau latéral ses quatre indicateurs et leur évolution de 2000 à 2025.",
-    category: "Utilisation",
-  },
-  {
-    question: "Qu'est-ce que la vue YTD (depuis le début de l'année) sur la carte économique ?",
-    answer:
-      "La vue YTD (Year-To-Date, ou 'depuis le 1er janvier') est disponible pour l'année en cours sur l'indicateur PIB. Elle affiche le PIB généré depuis le 1er janvier jusqu'au jour actuel, calculé par prorata (PIB annuel × jours écoulés / 365). Cette vue est utile pour visualiser la production économique en temps réel, notamment pour comparer où en sont les économies mondiales à mi-année. Le PIB est un flux (production journalière) qui se prête bien à ce calcul, contrairement à la dette ou au chômage qui sont des stocks ou des taux instantanés.",
-    category: "Utilisation",
-  },
-];
+export { FAQS_ECONOMY, FAQS_EPIDEMICS, FAQS_EMPIRES };
 
 export function getFaqsByTheme(theme: string): FAQItem[] {
   switch (theme) {
-    case "empires":
-      return FAQS_EMPIRES;
     case "economy":
       return FAQS_ECONOMY;
     case "epidemics":
       return FAQS_EPIDEMICS;
+    case "empires":
+      return FAQS_EMPIRES;
     default:
       return [];
   }
