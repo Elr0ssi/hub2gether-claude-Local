@@ -27,6 +27,12 @@ function fmtMetric(v: number, metric: EconomyMetricId): string {
   return `${v.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`;
 }
 
+function fmtDebtAmount(gdp: number, debtRatio: number): string {
+  const amount = Math.round(gdp * debtRatio / 100);
+  if (amount >= 1000) return `${(amount / 1000).toFixed(1)} T$`;
+  return `${fmtNumber(amount)} Mds$`;
+}
+
 function getMaxForTrend(countryName: string, metric: EconomyMetricId): number {
   let max = 1;
   for (const yr of ECONOMY_YEARS) {
@@ -51,8 +57,14 @@ function EconomicView({ countryName, yearData, metric }: { countryName: string; 
 
       {/* Active metric highlighted */}
       <div className="rounded-xl px-4 py-4 flex flex-col gap-1" style={{ background: "var(--accent-dim)", border: "1px solid rgba(57,255,136,0.3)" }}>
-        <span className="text-xs font-semibold" style={{ color: "#0D7A40" }}>{ECONOMY_METRICS.find(m => m.id === metric)?.label}</span>
-        <span className="text-2xl font-bold tabular-nums" style={{ color: "#0D7A40" }}>{fmtMetric(data[metric] as number, metric)}</span>
+        <span className="text-xs font-semibold" style={{ color: "#0D7A40" }}>
+          {metric === "debt_ratio" ? `Montant de la dette ${yearData?.year}` : ECONOMY_METRICS.find(m => m.id === metric)?.label}
+        </span>
+        <span className="text-2xl font-bold tabular-nums" style={{ color: "#0D7A40" }}>
+          {metric === "debt_ratio"
+            ? fmtDebtAmount(data.gdp, data.debt_ratio)
+            : fmtMetric(data[metric] as number, metric)}
+        </span>
         {metric === "debt_ratio" && debt && (
           <span className="text-xs mt-1" style={{ color: "#0D7A40", opacity: 0.8 }}>{debt.creditor}</span>
         )}
@@ -68,11 +80,11 @@ function EconomicView({ countryName, yearData, metric }: { countryName: string; 
               <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>{debt.inflation_2024} %</p>
             </div>
             <div className="rounded-xl px-3 py-2.5" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-              <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>Pic historique</p>
+              <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>% Dette / PIB</p>
               <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>
-                {debt.inflation_peak_pct > 999 ? `${(debt.inflation_peak_pct / 1000).toFixed(0)}k` : debt.inflation_peak_pct} %
+                {data.debt_ratio.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %
               </p>
-              <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>{debt.inflation_peak_date}</p>
+              <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>{yearData?.year}</p>
             </div>
           </div>
           {debt.debt_2024_bn > 0 && (
