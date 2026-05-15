@@ -87,12 +87,10 @@ export function EconomyMapView() {
 
   const handleMetricChange = useCallback((id: EconomyMetricId) => {
     updateParam("metric", id);
-    setSelectedCountry(null);
   }, [updateParam]);
 
   const handleYearChange = useCallback((y: number) => {
     updateParam("year", y.toString());
-    setSelectedCountry(null);
   }, [updateParam]);
 
   const handleCountryClick = useCallback((name: string) => {
