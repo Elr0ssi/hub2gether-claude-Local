@@ -3,8 +3,17 @@ import { ROMAN_TIMELINE } from "./timelines/roman";
 import { MONGOL_TIMELINE } from "./timelines/mongol";
 import { OTTOMAN_TIMELINE } from "./timelines/ottoman";
 import { MACEDONIAN_TIMELINE } from "./timelines/macedonian";
+import { NAPOLEONIC_TIMELINE } from "./timelines/napoleonic";
+import { FRENCH_COLONIAL_TIMELINE } from "./timelines/french-colonial";
 
-export { ROMAN_TIMELINE, MONGOL_TIMELINE, OTTOMAN_TIMELINE, MACEDONIAN_TIMELINE };
+export {
+  ROMAN_TIMELINE,
+  MONGOL_TIMELINE,
+  OTTOMAN_TIMELINE,
+  MACEDONIAN_TIMELINE,
+  NAPOLEONIC_TIMELINE,
+  FRENCH_COLONIAL_TIMELINE,
+};
 
 export interface EmpireDef {
   id: string;
@@ -27,6 +36,26 @@ export const EMPIRES: EmpireDef[] = [
     mapCenter: [20, 42],
     mapScale: 600,
     timeline: ROMAN_TIMELINE,
+  },
+  {
+    id: "napoleonic",
+    name: "Empire napoléonien",
+    nameEn: "Napoleonic Empire",
+    period: "1804 – 1815",
+    defaultYear: 1812,
+    mapCenter: [10, 46],
+    mapScale: 520,
+    timeline: NAPOLEONIC_TIMELINE,
+  },
+  {
+    id: "french-colonial",
+    name: "Empire colonial français",
+    nameEn: "French Colonial Empire",
+    period: "1534 – 1962",
+    defaultYear: 1920,
+    mapCenter: [20, 15],
+    mapScale: 140,
+    timeline: FRENCH_COLONIAL_TIMELINE,
   },
   {
     id: "mongol",

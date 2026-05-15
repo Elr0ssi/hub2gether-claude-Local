@@ -13,9 +13,11 @@ import type { ThemeId } from "@/types";
 
 const EMPIRE_LABELS: Record<string, string> = {
   roman: "🏛️",
+  napoleonic: "⚔️",
+  "french-colonial": "🇫🇷",
   mongol: "🐴",
   ottoman: "🌙",
-  macedonian: "⚔️",
+  macedonian: "🗡️",
 };
 
 interface MapViewProps {
@@ -78,22 +80,23 @@ export function MapView({ theme, initialYear = 117 }: MapViewProps) {
     >
       {/* Toolbar */}
       <div
-        className="px-4 py-3 border-b flex items-center justify-between gap-4 flex-wrap"
+        className="px-4 py-3 border-b flex items-center justify-between gap-3"
         style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
       >
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <ThemeDropdown currentTheme={theme} />
-          <div className="h-4 w-px" style={{ background: "var(--border)" }} />
+          <div className="h-4 w-px shrink-0" style={{ background: "var(--border)" }} />
 
-          {/* Empire selector */}
-          <div className="flex items-center gap-1 flex-wrap">
+          {/* Empire selector — horizontally scrollable on mobile */}
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-none" style={{ scrollbarWidth: "none" }}>
             {EMPIRES.map((empire) => {
               const isActive = empire.id === empireId;
               return (
                 <button
                   key={empire.id}
                   onClick={() => handleEmpireChange(empire.id)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 shrink-0"
+                  title={`${empire.name} — ${empire.period}`}
                   style={
                     isActive
                       ? {
@@ -110,15 +113,15 @@ export function MapView({ theme, initialYear = 117 }: MapViewProps) {
                   }
                 >
                   <span>{EMPIRE_LABELS[empire.id] ?? "🗺️"}</span>
-                  <span className="hidden sm:inline">{empire.name}</span>
+                  <span className="hidden md:inline">{empire.name}</span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs" style={{ color: "var(--ink-4)" }}>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-xs hidden sm:block" style={{ color: "var(--ink-4)" }}>
             {currentEmpire.period}
           </span>
           {sidePanelOpen ? (
