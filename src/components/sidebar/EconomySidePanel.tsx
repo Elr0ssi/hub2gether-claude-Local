@@ -7,7 +7,11 @@ import type { EconomyMetricId } from "@/types";
 import { ECONOMY_METRICS, ECONOMY_YEARS } from "@/data/economy/economy";
 import { getDebtByCountry } from "@/data/economy/debtData";
 import { getLaborByCountry } from "@/data/economy/laborData";
+import { getTradeByCountry, fmtTradeBalance } from "@/data/economy/tradeData";
+import { COMPARISON_COUNTRIES } from "@/data/comparison/comparisonData";
 import type { CountryEconomyData } from "@/types";
+
+const _compIndex = new Map(COMPARISON_COUNTRIES.map(c => [c.name, c]));
 
 interface EconomySidePanelProps {
   countryName: string | null;
@@ -70,22 +74,46 @@ function EconomicView({ countryName, yearData, metric }: { countryName: string; 
         )}
       </div>
 
-      {/* Inflation (from CSV) */}
-      {metric === "debt_ratio" && debt && (
-        <div className="flex flex-col gap-2">
-          <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>Contexte inflationniste</p>
+      {/* GDP context grid */}
+      {metric === "gdp" && (() => {
+        const comp = _compIndex.get(countryName);
+        const trade = getTradeByCountry(countryName);
+        return (
           <div className="grid grid-cols-2 gap-2">
             <div className="rounded-xl px-3 py-2.5" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-              <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>Inflation 2024</p>
-              <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>{debt.inflation_2024} %</p>
+              <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>PIB / habitant</p>
+              <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>
+                {comp ? `${comp.gdp_per_capita_usd.toLocaleString("fr-FR")} $` : "—"}
+              </p>
+              <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>par personne</p>
             </div>
             <div className="rounded-xl px-3 py-2.5" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-              <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>% Dette / PIB</p>
-              <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>
-                {data.debt_ratio.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %
+              <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>Balance commerciale</p>
+              <p
+                className="text-sm font-bold tabular-nums mt-0.5"
+                style={{ color: trade ? (trade.balance_bn >= 0 ? "#16a34a" : "#dc2626") : "var(--ink)" }}
+              >
+                {trade ? fmtTradeBalance(trade.balance_bn) : "—"}
               </p>
-              <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>{yearData?.year}</p>
+              <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>exports − imports</p>
             </div>
+          </div>
+        );
+      })()}
+
+      {/* Debt context grid */}
+      {metric === "debt_ratio" && debt && (
+        <div className="grid grid-cols-2 gap-2">
+          <div className="rounded-xl px-3 py-2.5" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
+            <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>Inflation 2024</p>
+            <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>{debt.inflation_2024} %</p>
+          </div>
+          <div className="rounded-xl px-3 py-2.5" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
+            <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>% Dette / PIB</p>
+            <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>
+              {data.debt_ratio.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %
+            </p>
+            <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>{yearData?.year}</p>
           </div>
         </div>
       )}
