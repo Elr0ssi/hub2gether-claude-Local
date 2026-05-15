@@ -87,23 +87,6 @@ function EconomicView({ countryName, yearData, metric }: { countryName: string; 
               <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>{yearData?.year}</p>
             </div>
           </div>
-          {debt.debt_2024_bn > 0 && (
-            <div className="flex flex-col gap-1.5 mt-1">
-              {[
-                { label: "Dette 2000", value: `${fmtNumber(debt.debt_2000_bn)} Mds€`, pct: `${debt.debt_2000_pct}%` },
-                { label: "Dette 2014", value: `${fmtNumber(debt.debt_2014_bn)} Mds€`, pct: `${debt.debt_2014_pct}%` },
-                { label: "Dette 2024", value: `${fmtNumber(debt.debt_2024_bn)} Mds€`, pct: `${debt.debt_2024_pct}%` },
-              ].map(row => (
-                <div key={row.label} className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-                  <span className="text-xs" style={{ color: "var(--ink-3)" }}>{row.label}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold tabular-nums" style={{ color: "var(--ink)" }}>{row.value}</span>
-                    <span className="text-xs" style={{ color: "var(--accent)", minWidth: 40, textAlign: "right" }}>{row.pct}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       )}
 
