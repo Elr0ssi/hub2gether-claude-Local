@@ -354,8 +354,8 @@ export function EconomyRankingsTable({
           className="px-5 py-3 border-t flex items-center justify-between gap-4"
           style={{ borderColor: "var(--border-light)", background: "var(--surface-2)" }}
         >
-          <span className="text-caption">
-            {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, filtered.length)} sur {filtered.length} pays
+          <span className="text-caption" translate="no">
+            {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, filtered.length)} / {filtered.length}
           </span>
           <div className="flex items-center gap-1">
             <button

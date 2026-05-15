@@ -231,11 +231,11 @@ export function EconomyMapView() {
               </>
             )}
           </div>
-          <span className="ml-auto text-xs shrink-0" style={{ color: "var(--ink-4)" }}>
-            {ytdMode && isCurrentYear
-              ? `Prorata au ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}`
-              : `${Object.keys(economyYear.countries).length} pays`}
-          </span>
+          {ytdMode && isCurrentYear && (
+            <span className="ml-auto text-xs shrink-0" style={{ color: "var(--ink-4)" }}>
+              Prorata au {new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
+            </span>
+          )}
         </div>
 
         {/* Map + Side panel */}
