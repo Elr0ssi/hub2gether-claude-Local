@@ -189,7 +189,6 @@ function UnemploymentView({ countryName, yearData }: { countryName: string; year
 // ─────────────────────────────────────────────────────────────
 function CompaniesView({ countryName, yearData }: { countryName: string; yearData: EconomySidePanelProps["yearData"] }) {
   const data = yearData?.countries[countryName];
-  const maxVal = getMaxForTrend(countryName, "companies");
   if (!data) return null;
 
   return (
@@ -197,10 +196,9 @@ function CompaniesView({ countryName, yearData }: { countryName: string; yearDat
       <p className="text-xs" style={{ color: "var(--ink-4)" }}>Données {yearData?.year}</p>
 
       {/* Total count */}
-      <div className="rounded-xl px-4 py-4 flex flex-col gap-1" style={{ background: "var(--accent-dim)", border: "1px solid rgba(57,255,136,0.3)" }}>
+      <div className="rounded-xl px-3 py-3 flex items-center justify-between gap-3" style={{ background: "var(--accent-dim)", border: "1px solid rgba(57,255,136,0.3)" }}>
         <span className="text-xs font-semibold" style={{ color: "#0D7A40" }}>Entreprises enregistrées</span>
-        <span className="text-3xl font-bold tabular-nums" style={{ color: "#0D7A40" }}>{fmtNumber(data.companies)} <span className="text-lg">k</span></span>
-        <span className="text-xs mt-1" style={{ color: "#0D7A40", opacity: 0.8 }}>en milliers</span>
+        <span className="text-xl font-bold tabular-nums" style={{ color: "#0D7A40" }}>{fmtNumber(data.companies)} k</span>
       </div>
 
       {/* Top companies */}
@@ -230,27 +228,6 @@ function CompaniesView({ countryName, yearData }: { countryName: string; yearDat
         </div>
       )}
 
-      {/* Trend */}
-      <div>
-        <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>Évolution du nombre d'entreprises</p>
-        <div className="flex flex-col gap-1.5">
-          {ECONOMY_YEARS.map((yr) => {
-            const d = yr.countries[countryName];
-            if (!d) return null;
-            const v = d.companies;
-            const isCurrent = yr.year === yearData?.year;
-            return (
-              <div key={yr.year} className="flex items-center gap-2">
-                <span className="text-xs tabular-nums" style={{ color: isCurrent ? "#0D7A40" : "var(--ink-3)", fontWeight: isCurrent ? 700 : 400, minWidth: 36 }}>{yr.year}</span>
-                <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--surface-2)" }}>
-                  <div className="h-full rounded-full" style={{ width: `${Math.min((v / maxVal) * 100, 100)}%`, background: isCurrent ? "#39FF88" : "var(--ink-4)", transition: "width 0.4s ease" }} />
-                </div>
-                <span className="text-xs tabular-nums text-right" style={{ color: isCurrent ? "#0D7A40" : "var(--ink-3)", minWidth: 60 }}>{fmtNumber(v)} k</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }

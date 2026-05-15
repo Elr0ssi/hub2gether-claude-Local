@@ -63,6 +63,49 @@ function defaultSortDir(metricId: EconomyMetricId): "asc" | "desc" {
   return metricId === "debt_ratio" || metricId === "unemployment" ? "asc" : "desc";
 }
 
+// ── Column config per metric ──────────────────────────────────────────────────
+interface ColDef {
+  key: string;
+  header: string;
+  unit: string;
+  getValue: (data: EconomyYear["countries"][string]) => number;
+  format: (data: EconomyYear["countries"][string]) => string;
+  sortDir: "asc" | "desc";
+}
+
+function getColDefs(metric: EconomyMetricId): ColDef[] {
+  if (metric === "gdp") return [{
+    key: "gdp", header: "PIB", unit: "Mds USD",
+    getValue: (d) => d.gdp,
+    format: (d) => formatValue(d.gdp, "gdp"),
+    sortDir: "desc",
+  }];
+  if (metric === "debt_ratio") return [
+    {
+      key: "debt_ratio", header: "% Dette / PIB", unit: "%",
+      getValue: (d) => d.debt_ratio,
+      format: (d) => `${d.debt_ratio.toFixed(1)} %`,
+      sortDir: "desc",
+    },
+    {
+      key: "debt_abs", header: "Montant dette", unit: "Mds USD",
+      getValue: (d) => Math.round(d.gdp * d.debt_ratio / 100),
+      format: (d) => {
+        const v = Math.round(d.gdp * d.debt_ratio / 100);
+        return formatValue(v, "gdp");
+      },
+      sortDir: "desc",
+    },
+  ];
+  if (metric === "unemployment") return [{
+    key: "unemployment", header: "Chômage", unit: "%",
+    getValue: (d) => d.unemployment,
+    format: (d) => `${d.unemployment.toFixed(1)} %`,
+    sortDir: "asc",
+  }];
+  return [];
+}
+
 // ── Component ─────────────────────────────────────────────────────────────────
 interface EconomyRankingsTableProps {
   metric: EconomyMetricId;
@@ -81,21 +124,27 @@ export function EconomyRankingsTable({
   ytdMode,
   onCountryClick,
 }: EconomyRankingsTableProps) {
-  const [sortMetric, setSortMetric] = useState<EconomyMetricId>(metric);
+  const [sortColKey, setSortColKey] = useState<string>(metric);
   const [sortDir, setSortDir] = useState<"asc" | "desc">(defaultSortDir(metric));
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
 
-  // Sync sort metric when parent metric changes
-  const effectiveSortMetric = metric !== sortMetric ? metric : sortMetric;
-  const effectiveSortDir = metric !== sortMetric ? defaultSortDir(metric) : sortDir;
+  // No ranking for companies
+  const cols = getColDefs(metric);
+  if (cols.length === 0) return null;
 
-  const handleSort = (m: EconomyMetricId) => {
-    if (m === effectiveSortMetric) {
+  // Reset sort when metric changes
+  const primaryCol = cols[0];
+  const effectiveSortKey = cols.find(c => c.key === sortColKey) ? sortColKey : primaryCol.key;
+  const effectiveSortCol = cols.find(c => c.key === effectiveSortKey) ?? primaryCol;
+  const effectiveSortDir = cols.find(c => c.key === sortColKey) ? sortDir : primaryCol.sortDir;
+
+  const handleSort = (key: string, dir: "asc" | "desc") => {
+    if (key === effectiveSortKey) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
-      setSortMetric(m);
-      setSortDir(defaultSortDir(m));
+      setSortColKey(key);
+      setSortDir(dir);
     }
     setPage(0);
   };
@@ -107,24 +156,22 @@ export function EconomyRankingsTable({
     return prev ?? null;
   }, [year]);
 
-  // Build ranked rows
+  // Build ranked rows sorted by primary col
   const allRows = useMemo(() => {
     const countries = Object.entries(activeEconomyYear.countries);
 
-    // Sort for current ranking
     const sorted = [...countries].sort(([, a], [, b]) => {
-      const av = getMetricValue(a, effectiveSortMetric);
-      const bv = getMetricValue(b, effectiveSortMetric);
+      const av = effectiveSortCol.getValue(a);
+      const bv = effectiveSortCol.getValue(b);
       return effectiveSortDir === "desc" ? bv - av : av - bv;
     });
 
-    // Previous year rank map for delta
     const prevRankMap: Record<string, number> = {};
     if (prevYearData) {
       const prevSorted = Object.entries(prevYearData.countries).sort(([, a], [, b]) => {
-        const av = getMetricValue(a, effectiveSortMetric);
-        const bv = getMetricValue(b, effectiveSortMetric);
-        return effectiveSortDir === "desc" ? bv - av : av - bv;
+        const av = primaryCol.getValue(a);
+        const bv = primaryCol.getValue(b);
+        return primaryCol.sortDir === "desc" ? bv - av : av - bv;
       });
       prevSorted.forEach(([name], i) => { prevRankMap[name] = i + 1; });
     }
@@ -135,7 +182,7 @@ export function EconomyRankingsTable({
       const delta = prevRank !== undefined ? prevRank - rank : null;
       return { name, data, rank, delta };
     });
-  }, [activeEconomyYear, effectiveSortMetric, effectiveSortDir, prevYearData]);
+  }, [activeEconomyYear, effectiveSortCol, effectiveSortDir, primaryCol, prevYearData]);
 
   // Filtered rows
   const filtered = useMemo(() => {
@@ -186,38 +233,8 @@ export function EconomyRankingsTable({
         </div>
       </div>
 
-      {/* Metric tabs */}
-      <div
-        className="px-5 py-2 border-b flex items-center gap-1 overflow-x-auto"
-        style={{ borderColor: "var(--border-light)" }}
-      >
-        <span className="text-caption shrink-0 mr-2">Trier par :</span>
-        {ECONOMY_METRICS.map((m) => (
-          <button
-            key={m.id}
-            onClick={() => handleSort(m.id)}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all shrink-0"
-            style={
-              m.id === effectiveSortMetric
-                ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
-                : { background: "transparent", color: "var(--ink-3)", border: "1px solid transparent" }
-            }
-          >
-            {m.shortLabel}
-            {m.id === effectiveSortMetric ? (
-              effectiveSortDir === "desc" ? <ChevronDown size={11} /> : <ChevronUp size={11} />
-            ) : (
-              <ChevronsUpDown size={11} style={{ opacity: 0.4 }} />
-            )}
-          </button>
-        ))}
-        <span className="ml-auto text-caption shrink-0">
-          {filtered.length} pays
-        </span>
-      </div>
-
-      {/* Table */}
-      <div className="overflow-x-auto">
+      {/* Table — translate="no" prevents browser auto-translation of units (Mds, k, %) */}
+      <div className="overflow-x-auto" translate="no">
         <table className="w-full" style={{ borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border-light)", background: "var(--surface-2)" }}>
@@ -227,27 +244,27 @@ export function EconomyRankingsTable({
               <th className="px-3 py-2.5 text-left" style={{ color: "var(--ink-4)", fontSize: "0.62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                 Pays
               </th>
-              {ECONOMY_METRICS.map((m) => (
+              {cols.map((col) => (
                 <th
-                  key={m.id}
-                  className="px-3 py-2.5 text-right cursor-pointer hover:bg-opacity-50 transition-colors"
-                  onClick={() => handleSort(m.id)}
+                  key={col.key}
+                  className="px-3 py-2.5 text-right cursor-pointer transition-colors"
+                  onClick={() => handleSort(col.key, col.sortDir)}
                   style={{
-                    color: m.id === effectiveSortMetric ? "#0D7A40" : "var(--ink-4)",
+                    color: col.key === effectiveSortKey ? "#0D7A40" : "var(--ink-4)",
                     fontSize: "0.62rem",
                     fontWeight: 700,
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
-                    background: m.id === metric ? "rgba(57,255,136,0.04)" : "transparent",
+                    background: "rgba(57,255,136,0.04)",
                     whiteSpace: "nowrap",
                   }}
                 >
                   <span className="flex items-center justify-end gap-1">
-                    {m.shortLabel}
-                    <span style={{ opacity: 0.5, fontSize: "0.55rem" }}>{m.unit}</span>
-                    {m.id === effectiveSortMetric ? (
+                    {col.header}
+                    <span style={{ opacity: 0.5, fontSize: "0.55rem" }}>{col.unit}</span>
+                    {col.key === effectiveSortKey ? (
                       effectiveSortDir === "desc" ? <ChevronDown size={10} /> : <ChevronUp size={10} />
-                    ) : null}
+                    ) : <ChevronsUpDown size={10} style={{ opacity: 0.3 }} />}
                   </span>
                 </th>
               ))}
@@ -255,7 +272,7 @@ export function EconomyRankingsTable({
           </thead>
           <AnimatePresence mode="wait">
             <motion.tbody
-              key={`${effectiveSortMetric}-${effectiveSortDir}-${year}-${page}`}
+              key={`${metric}-${effectiveSortKey}-${effectiveSortDir}-${year}-${page}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -285,18 +302,13 @@ export function EconomyRankingsTable({
                         {delta !== null && delta !== 0 && (
                           <span
                             className="text-xs font-semibold flex items-center gap-0.5"
-                            style={{
-                              color: delta > 0 ? "#16a34a" : "#dc2626",
-                              fontSize: "0.58rem",
-                            }}
+                            style={{ color: delta > 0 ? "#16a34a" : "#dc2626", fontSize: "0.58rem" }}
                           >
                             {delta > 0 ? <TrendingUp size={9} /> : <TrendingDown size={9} />}
                             {Math.abs(delta)}
                           </span>
                         )}
-                        {delta === 0 && (
-                          <Minus size={9} style={{ color: "var(--ink-4)" }} />
-                        )}
+                        {delta === 0 && <Minus size={9} style={{ color: "var(--ink-4)" }} />}
                       </div>
                     </td>
 
@@ -312,26 +324,22 @@ export function EconomyRankingsTable({
                       </div>
                     </td>
 
-                    {/* Metric values */}
-                    {ECONOMY_METRICS.map((m) => {
-                      const val = getMetricValue(data, m.id);
-                      const isActive = m.id === metric;
-                      return (
-                        <td
-                          key={m.id}
-                          className="px-3 py-2.5 text-right tabular-nums"
-                          style={{
-                            background: isActive ? "rgba(57,255,136,0.05)" : "transparent",
-                            fontWeight: isActive ? 700 : 400,
-                            color: isActive ? "var(--ink)" : "var(--ink-3)",
-                            fontSize: isActive ? "0.8rem" : "0.72rem",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {formatValue(val, m.id)}
-                        </td>
-                      );
-                    })}
+                    {/* Data columns */}
+                    {cols.map((col) => (
+                      <td
+                        key={col.key}
+                        className="px-3 py-2.5 text-right tabular-nums"
+                        style={{
+                          background: "rgba(57,255,136,0.05)",
+                          fontWeight: col.key === effectiveSortKey ? 700 : 500,
+                          color: "var(--ink)",
+                          fontSize: "0.8rem",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {col.format(data)}
+                      </td>
+                    ))}
                   </tr>
                 );
               })}
