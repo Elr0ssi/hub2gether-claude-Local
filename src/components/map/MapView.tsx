@@ -2,14 +2,20 @@
 
 import { useCallback, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Maximize2, Minimize2, ChevronLeft } from "lucide-react";
-import { InteractiveMap } from "./InteractiveMap";
+import { Maximize2, Minimize2, ChevronLeft, Map, Navigation, Satellite } from "lucide-react";
+import { EmpireLeafletMap, type EmpireTileStyle } from "./EmpireLeafletMap";
 import { TimelineSelector } from "./TimelineSelector";
 import { ThemeDropdown } from "./ThemeDropdown";
 import { SidePanel } from "@/components/sidebar/SidePanel";
 import { EMPIRES, getEmpireById } from "@/data/empires/empires-index";
 import { formatYear } from "@/lib/utils";
 import type { ThemeId } from "@/types";
+
+const TILE_STYLES: { id: EmpireTileStyle; label: string; Icon: React.ElementType }[] = [
+  { id: "standard",  label: "Standard",  Icon: Map       },
+  { id: "detailed",  label: "Détaillé",  Icon: Navigation },
+  { id: "satellite", label: "Satellite", Icon: Satellite  },
+];
 
 const EMPIRE_LABELS: Record<string, string> = {
   roman: "🏛️",
@@ -31,6 +37,7 @@ export function MapView({ theme, initialYear = 117 }: MapViewProps) {
   const searchParams = useSearchParams();
   const [sidePanelOpen, setSidePanelOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [tileStyle, setTileStyle] = useState<EmpireTileStyle>("standard");
 
   const empireId = searchParams.get("empire") ?? "roman";
   const currentEmpire = getEmpireById(empireId) ?? EMPIRES[0];
@@ -121,7 +128,27 @@ export function MapView({ theme, initialYear = 117 }: MapViewProps) {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs hidden sm:block" style={{ color: "var(--ink-4)" }}>
+          {/* Tile style switcher */}
+          <div className="flex items-center rounded-lg overflow-hidden" style={{ border: "1px solid var(--border)" }}>
+            {TILE_STYLES.map(({ id, label, Icon }) => (
+              <button
+                key={id}
+                onClick={() => setTileStyle(id)}
+                title={label}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium transition-all duration-150"
+                style={
+                  id === tileStyle
+                    ? { background: "var(--accent-dim)", color: "#0D7A40", borderRight: "1px solid rgba(57,255,136,0.2)" }
+                    : { background: "var(--surface-2)", color: "var(--ink-3)", borderRight: "1px solid var(--border)" }
+                }
+              >
+                <Icon size={12} />
+                <span className="hidden sm:inline">{label}</span>
+              </button>
+            ))}
+          </div>
+
+          <span className="text-xs hidden lg:block" style={{ color: "var(--ink-4)" }}>
             {currentEmpire.period}
           </span>
           {sidePanelOpen ? (
@@ -139,7 +166,7 @@ export function MapView({ theme, initialYear = 117 }: MapViewProps) {
             title={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
           >
             {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
-            <span className="hidden sm:inline">{isFullscreen ? "Réduire" : "Expand"}</span>
+            <span className="hidden sm:inline">{isFullscreen ? "Réduire" : "Développer"}</span>
           </button>
         </div>
       </div>
@@ -151,12 +178,13 @@ export function MapView({ theme, initialYear = 117 }: MapViewProps) {
       >
         {/* Map + Timeline */}
         <div className="flex-1 flex flex-col" style={{ minWidth: 0 }}>
-          <div className="flex-1">
-            <InteractiveMap
+          <div className={`flex-1${isFullscreen ? " h-full" : ""}`}>
+            <EmpireLeafletMap
               geojsonFile={currentEntry.geojsonFile}
+              empireName={currentEmpire.name}
+              tileStyle={tileStyle}
               onTerritoryClick={() => setSidePanelOpen(true)}
-              mapCenter={currentEmpire.mapCenter}
-              mapScale={currentEmpire.mapScale}
+              fillHeight={isFullscreen}
             />
           </div>
 
