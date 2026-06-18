@@ -275,7 +275,7 @@ export function EconomySidePanel({ countryName, yearData, metric, open, onClose 
           <div className="h-full overflow-y-auto">
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 sticky top-0" style={{ borderBottom: "1px solid var(--border)", background: "var(--surface)", zIndex: 10 }}>
-              <span className="text-xs font-bold" style={{ color: "var(--accent)" }}>
+              <span className="text-xs font-bold" style={{ color: "#0D7A40" }}>
                 {countryName ?? "Sélection"}
               </span>
               <button onClick={onClose} className="btn-ghost p-1.5 rounded-lg"><X size={14} /></button>

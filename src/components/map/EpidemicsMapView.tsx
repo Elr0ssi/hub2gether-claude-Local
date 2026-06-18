@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Maximize2, Minimize2, ChevronLeft, PenLine, Map, Navigation, Satellite, CalendarDays } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 import { EpidemicsInteractiveMap } from "./EpidemicsInteractiveMap";
 import { EpidemicsLeafletMap, type LeafletTileStyle } from "./EpidemicsLeafletMap";
 import { EpidemicsSidePanel } from "@/components/sidebar/EpidemicsSidePanel";
@@ -47,7 +46,6 @@ export function EpidemicsMapView() {
   const [mapStyle, setMapStyle] = useState<MapStyle>("editorial");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ytdMode, setYtdMode] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setIsFullscreen(false); };
@@ -62,6 +60,11 @@ export function EpidemicsMapView() {
     () => (ytdMode && disease.ongoing ? computeYtdDisease(disease) : disease),
     [disease, ytdMode]
   );
+
+  const totalYtdCases = useMemo(() => {
+    if (!ytdMode || !disease.ongoing) return null;
+    return Object.values(activeDisease.countries).reduce((sum, c) => sum + (c.infected || 0), 0);
+  }, [ytdMode, disease.ongoing, activeDisease]);
 
   const handleDiseaseChange = useCallback(
     (id: EpidemicDiseaseId) => {
@@ -83,7 +86,6 @@ export function EpidemicsMapView() {
     <>
       {/* Map card */}
       <div
-        ref={cardRef}
         className={`border rounded-2xl overflow-hidden${isFullscreen ? " fixed inset-0 z-[9999] rounded-none flex flex-col" : ""}`}
         style={{
           border: "1px solid var(--border)",
@@ -96,47 +98,8 @@ export function EpidemicsMapView() {
           className="px-4 py-3 border-b flex items-center justify-between gap-4 flex-wrap"
           style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
         >
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-3">
             <ThemeDropdown currentTheme="epidemics" />
-            <div className="h-4 w-px" style={{ background: "var(--border)" }} />
-
-            {/* Disease selector */}
-            <div className="flex items-center gap-1 flex-wrap">
-              {EPIDEMICS.map((d) => (
-                <button
-                  key={d.id}
-                  onClick={() => handleDiseaseChange(d.id as EpidemicDiseaseId)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
-                  style={
-                    d.id === diseaseId
-                      ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
-                      : { background: "transparent", color: "var(--ink-3)", border: "1px solid transparent" }
-                  }
-                >
-                  {d.label}
-                </button>
-              ))}
-            </div>
-
-            {/* YTD toggle — only for ongoing diseases */}
-            {disease.ongoing && (
-              <>
-                <div className="h-4 w-px" style={{ background: "var(--border)" }} />
-                <button
-                  onClick={() => setYtdMode((v) => !v)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
-                  style={
-                    ytdMode
-                      ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
-                      : { background: "transparent", color: "var(--ink-3)", border: "1px solid var(--border)" }
-                  }
-                  title="Estimation au prorata du nombre de jours écoulés depuis le 1er janvier"
-                >
-                  <CalendarDays size={11} />
-                  Depuis le 1er jan.
-                </button>
-              </>
-            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -178,9 +141,58 @@ export function EpidemicsMapView() {
               title={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
             >
               {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
-              {isFullscreen ? "Réduire" : "Expand"}
+              {isFullscreen ? "Réduire" : "Agrandir"}
             </button>
           </div>
+        </div>
+
+        {/* Disease selector (équivalent du sélecteur d'années en économie) */}
+        <div
+          className="px-5 py-2 border-b flex items-center gap-3 overflow-x-auto"
+          style={{ borderColor: "var(--border)", background: "var(--surface)", scrollbarWidth: "none" }}
+        >
+          <span className="text-xs font-semibold shrink-0" style={{ color: "var(--ink-3)" }}>Épidémie :</span>
+          <div className="flex items-center gap-1">
+            {EPIDEMICS.map((d) => (
+              <button
+                key={d.id}
+                onClick={() => handleDiseaseChange(d.id as EpidemicDiseaseId)}
+                className="px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shrink-0"
+                style={
+                  d.id === diseaseId
+                    ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
+                    : { background: "transparent", color: "var(--ink-3)", border: "1px solid transparent" }
+                }
+              >
+                {d.label}
+              </button>
+            ))}
+
+            {/* "Depuis 2026" — uniquement pour les épidémies en cours */}
+            {disease.ongoing && (
+              <>
+                <div className="w-px h-4 shrink-0 mx-1" style={{ background: "var(--border)" }} />
+                <button
+                  onClick={() => setYtdMode((v) => !v)}
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-200 shrink-0"
+                  title="Cas estimés depuis le 1er janvier 2026"
+                  style={
+                    ytdMode
+                      ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
+                      : { background: "transparent", color: "var(--ink-3)", border: "1px solid var(--border)" }
+                  }
+                >
+                  <CalendarDays size={11} />
+                  Depuis 2026
+                </button>
+              </>
+            )}
+          </div>
+          {ytdMode && disease.ongoing && totalYtdCases !== null && (
+            <span className="ml-auto text-xs shrink-0" style={{ color: "var(--ink-4)" }}>
+              {totalYtdCases.toLocaleString("fr-FR")} cas en 2026
+            </span>
+          )}
         </div>
 
         {/* Sub-header */}
@@ -194,14 +206,6 @@ export function EpidemicsMapView() {
           <span className="text-xs" style={{ color: "var(--ink-4)" }}>
             · {disease.period}
           </span>
-          {ytdMode && disease.ongoing && (
-            <span
-              className="text-xs px-2 py-0.5 rounded-full font-semibold"
-              style={{ background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.25)" }}
-            >
-              Estimation {new Date().getFullYear()} · au {new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
-            </span>
-          )}
           <span className="text-xs ml-auto" style={{ color: "var(--ink-4)" }}>
             {Object.keys(disease.countries).length} pays documentés
           </span>
@@ -238,69 +242,64 @@ export function EpidemicsMapView() {
       </div>
 
       {/* Disease info blocks */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={diseaseId}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.25 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4"
-        >
-          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              À propos de {disease.label}
-            </p>
-            <p className="text-small leading-relaxed" style={{ color: "var(--ink-2)" }}>
-              {disease.description}
-            </p>
-          </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+        <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+          <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
+            À propos de {disease.label}
+          </p>
+          <p className="text-small leading-relaxed" style={{ color: "var(--ink-2)" }}>
+            {disease.description}
+          </p>
+        </div>
 
-          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              Agent pathogène
-            </p>
-            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
-              {disease.pathogen}
-            </p>
-          </div>
+        <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+          <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
+            Agent pathogène
+          </p>
+          <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+            {disease.pathogen}
+          </p>
+        </div>
 
-          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              {ytdMode && disease.ongoing
-                ? `Estimation ${new Date().getFullYear()} · au ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`
-                : "Chiffres mondiaux"}
-            </p>
-            <div className="space-y-2 mt-1">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-small" style={{ color: "var(--ink-3)" }}>
-                  {ytdMode && disease.ongoing ? "Cas estimés YTD" : "Cas totaux"}
-                </span>
-                <span className="text-small font-semibold" style={{ color: "var(--ink)" }}>{disease.globalCases}</span>
-              </div>
-              <div style={{ height: "1px", background: "var(--border)" }} />
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-small" style={{ color: "var(--ink-3)" }}>
-                  {ytdMode && disease.ongoing ? "Décès estimés YTD" : "Décès totaux"}
-                </span>
-                <span className="text-small font-semibold" style={{ color: "var(--accent)" }}>{disease.globalDeaths}</span>
-              </div>
+        <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+          <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
+            {ytdMode && disease.ongoing
+              ? `Cas depuis le 1er jan. ${new Date().getFullYear()}`
+              : "Chiffres mondiaux"}
+          </p>
+          <div className="space-y-2 mt-1">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-small" style={{ color: "var(--ink-3)" }}>
+                {ytdMode && disease.ongoing ? "Cas estimés 2026" : "Cas totaux"}
+              </span>
+              <span className="text-small font-semibold" style={{ color: "var(--ink)" }}>
+                {ytdMode && disease.ongoing && totalYtdCases !== null
+                  ? totalYtdCases.toLocaleString("fr-FR")
+                  : disease.globalCases}
+              </span>
+            </div>
+            <div style={{ height: "1px", background: "var(--border)" }} />
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-small" style={{ color: "var(--ink-3)" }}>
+                {ytdMode && disease.ongoing ? "Décès estimés 2026" : "Décès totaux"}
+              </span>
+              <span className="text-small font-semibold" style={{ color: "var(--accent)" }}>{disease.globalDeaths}</span>
             </div>
           </div>
+        </div>
 
-          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              Source des données
-            </p>
-            <p className="text-small leading-relaxed" style={{ color: "var(--ink-4)" }}>
-              {disease.dataNote}
-              {ytdMode && disease.ongoing && (
-                <> · <span style={{ color: "var(--accent)" }}>Vue YTD : prorata annuel 2024 × jours écoulés / 365.</span></>
-              )}
-            </p>
-          </div>
-        </motion.div>
-      </AnimatePresence>
+        <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+          <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
+            Source des données
+          </p>
+          <p className="text-small leading-relaxed" style={{ color: "var(--ink-4)" }}>
+            {disease.dataNote}
+            {ytdMode && disease.ongoing && (
+              <> · <span style={{ color: "var(--accent)" }}>Vue 2026 : prorata annuel 2024 × jours écoulés / 365.</span></>
+            )}
+          </p>
+        </div>
+      </div>
     </>
   );
 }

@@ -1,9 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Maximize2, Minimize2, ChevronLeft, PenLine, Map, Navigation, Satellite } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 import { EconomyInteractiveMap } from "./EconomyInteractiveMap";
 import { EconomyLeafletMap, type LeafletTileStyle } from "./EconomyLeafletMap";
 import { EconomySidePanel } from "@/components/sidebar/EconomySidePanel";
@@ -29,7 +28,7 @@ function computeLiveYearData(baseYear: EconomyYear): EconomyYear {
   }
   return {
     year: today.getFullYear(),
-    label: "En direct",
+    label: "Depuis 2026",
     dataNote: `Prorata ${baseYear.year} au ${dateStr} (jour ${dayOfYear}/365). PIB = annuel × fraction. Taux : derniers chiffres disponibles.`,
     countries: liveCountries,
   };
@@ -97,8 +96,6 @@ export function EconomyMapView() {
     setSelectedCountry(name);
     setSidePanelOpen(true);
   }, []);
-
-  const currentMetric = ECONOMY_METRICS.find((m) => m.id === metric) ?? ECONOMY_METRICS[0];
 
   return (
     <>
@@ -172,7 +169,7 @@ export function EconomyMapView() {
               title={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
             >
               {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
-              {isFullscreen ? "Réduire" : "Expand"}
+              {isFullscreen ? "Réduire" : "Agrandir"}
             </button>
           </div>
         </div>
@@ -204,32 +201,30 @@ export function EconomyMapView() {
               </button>
             ))}
 
-            {/* "En direct" button — always next to 2025 */}
-            {isCurrentYear && (
-              <>
-                <div className="w-px h-4 shrink-0 mx-1" style={{ background: "var(--border)" }} />
-                <button
-                  onClick={() => { handleYearChange(DEFAULT_YEAR); setYtdMode((v) => !v); }}
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-200 shrink-0"
-                  title="Prorata des données de l'année précédente depuis le 1er janvier — PIB au jour actuel"
-                  style={
-                    ytdMode
-                      ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
-                      : { background: "transparent", color: "var(--ink-3)", border: "1px solid var(--border)" }
-                  }
-                >
-                  <span
-                    className="w-1.5 h-1.5 rounded-full shrink-0"
-                    style={{
-                      background: ytdMode ? "#39FF88" : "var(--ink-4)",
-                      boxShadow: ytdMode ? "0 0 6px rgba(57,255,136,0.8)" : "none",
-                      animation: ytdMode ? "pulse-glow 2s ease-in-out infinite" : "none",
-                    }}
-                  />
-                  En direct
-                </button>
-              </>
-            )}
+            {/* "Depuis 2026" button — toujours visible */}
+            <>
+              <div className="w-px h-4 shrink-0 mx-1" style={{ background: "var(--border)" }} />
+              <button
+                onClick={() => { handleYearChange(DEFAULT_YEAR); setYtdMode((v) => !v); }}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-200 shrink-0"
+                title="PIB au prorata des données 2025 depuis le 1er janvier 2026"
+                style={
+                  ytdMode && isCurrentYear
+                    ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
+                    : { background: "transparent", color: "var(--ink-3)", border: "1px solid var(--border)" }
+                }
+              >
+                <span
+                  className="w-1.5 h-1.5 rounded-full shrink-0"
+                  style={{
+                    background: ytdMode && isCurrentYear ? "#39FF88" : "var(--ink-4)",
+                    boxShadow: ytdMode && isCurrentYear ? "0 0 6px rgba(57,255,136,0.8)" : "none",
+                    animation: ytdMode && isCurrentYear ? "pulse-glow 2s ease-in-out infinite" : "none",
+                  }}
+                />
+                Depuis 2026
+              </button>
+            </>
           </div>
           {ytdMode && isCurrentYear && (
             <span className="ml-auto text-xs shrink-0" style={{ color: "var(--ink-4)" }}>
@@ -268,72 +263,17 @@ export function EconomyMapView() {
             onClose={() => setSidePanelOpen(false)}
           />
         </div>
-      </div>
 
-      {/* Info blocks */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={`${metric}-${year}`}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.25 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4"
+        {/* Source note */}
+        <div
+          className="px-5 py-1.5 border-t flex items-center justify-end"
+          style={{ borderColor: "var(--border)", background: "var(--surface)" }}
         >
-          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              Indicateur affiché
-            </p>
-            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>{currentMetric.label}</p>
-            <p className="text-small leading-relaxed" style={{ color: "var(--ink-2)" }}>{currentMetric.description}</p>
-          </div>
-
-          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              Période
-            </p>
-            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
-              {ytdMode && isCurrentYear
-                ? `${year} · ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`
-                : year}
-            </p>
-            <p className="text-small" style={{ color: "var(--ink-3)" }}>
-              {ytdMode && isCurrentYear
-                ? `PIB généré depuis le 1er janvier ${year} — prorata au jour actuel`
-                : year === 2020
-                ? "Année COVID-19 — forte contraction mondiale"
-                : year === 2025
-                ? "Projections FMI avril 2025 — données les plus récentes"
-                : `Données économiques mondiales ${year}`}
-            </p>
-          </div>
-
-          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              Couverture
-            </p>
-            <div className="space-y-2 mt-1">
-              {ECONOMY_METRICS.map((m) => (
-                <div key={m.id} className="flex items-center justify-between gap-2">
-                  <span className="text-small" style={{ color: "var(--ink-3)" }}>{m.label}</span>
-                  <span className="text-small font-semibold" style={{ color: m.id === metric ? "var(--accent)" : "var(--ink)" }}>
-                    {m.unit}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              Source des données
-            </p>
-            <p className="text-small leading-relaxed" style={{ color: "var(--ink-4)" }}>
-              {activeEconomyYear.dataNote}
-            </p>
-          </div>
-        </motion.div>
-      </AnimatePresence>
+          <p style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>
+            Source : {activeEconomyYear.dataNote}
+          </p>
+        </div>
+      </div>
 
       {/* Rankings table */}
       <EconomyRankingsTable
