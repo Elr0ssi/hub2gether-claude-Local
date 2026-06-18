@@ -47,14 +47,14 @@ export function DetailSection({ entry, prev, next }: DetailSectionProps) {
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-caption mb-8" aria-label="Breadcrumb">
         <Link href="/" className="hover:text-[var(--ink-2)] transition-colors">
-          Home
+          Accueil
         </Link>
         <span style={{ color: "var(--border)" }}>/</span>
         <Link href="/map/empires" className="hover:text-[var(--ink-2)] transition-colors">
           Empires
         </Link>
         <span style={{ color: "var(--border)" }}>/</span>
-        <span style={{ color: "var(--ink-2)" }}>Roman Empire</span>
+        <span style={{ color: "var(--ink-2)" }}>Empire romain</span>
         <span style={{ color: "var(--border)" }}>/</span>
         <span style={{ color: "var(--ink)" }}>{formatYear(entry.year)}</span>
       </nav>
@@ -66,7 +66,7 @@ export function DetailSection({ entry, prev, next }: DetailSectionProps) {
         </div>
 
         <h1 className="text-heading-1 mb-3" style={{ color: "var(--ink)", fontSize: "2.25rem", letterSpacing: "-0.03em" }}>
-          Roman Empire at {entry.label}
+          Empire romain — {entry.label}
           <br />
           <span style={{ color: "var(--accent)" }}>{formatYear(entry.year)}</span>
         </h1>
@@ -82,10 +82,10 @@ export function DetailSection({ entry, prev, next }: DetailSectionProps) {
         style={{ borderColor: "var(--border)", background: "var(--surface)" }}
       >
         {[
-          { icon: MapPin, label: "Territory", value: `${formatNumber(entry.stats.areaSqKm)} km²` },
+          { icon: MapPin, label: "Territoire", value: `${formatNumber(entry.stats.areaSqKm)} km²` },
           { icon: Users, label: "Population", value: formatNumber(entry.stats.populationEstimate) },
-          { icon: Building, label: "Capital", value: entry.stats.capitalCity },
-          { icon: Calendar, label: "Political system", value: entry.stats.politicalSystem },
+          { icon: Building, label: "Capitale", value: entry.stats.capitalCity },
+          { icon: Calendar, label: "Système politique", value: entry.stats.politicalSystem },
         ].map(({ icon: Icon, label, value }) => (
           <div key={label} className="flex flex-col gap-1.5">
             <div className="flex items-center gap-1.5">
@@ -102,7 +102,7 @@ export function DetailSection({ entry, prev, next }: DetailSectionProps) {
       {/* Key facts */}
       <section className="mb-10">
         <h2 className="text-heading-2 mb-5" style={{ color: "var(--ink)" }}>
-          Key facts
+          Points clés
         </h2>
         <ul className="space-y-3">
           {entry.stats.keyFacts.map((fact, i) => (
@@ -120,7 +120,7 @@ export function DetailSection({ entry, prev, next }: DetailSectionProps) {
       {/* Analysis */}
       <section className="mb-12">
         <h2 className="text-heading-2 mb-5" style={{ color: "var(--ink)" }}>
-          Historical analysis
+          Analyse historique
         </h2>
         <div className="prose-like">
           <p className="text-body leading-relaxed" style={{ fontSize: "1.0625rem" }}>
@@ -135,9 +135,8 @@ export function DetailSection({ entry, prev, next }: DetailSectionProps) {
         style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
       >
         <p className="text-small" style={{ color: "var(--ink-3)" }}>
-          <strong style={{ color: "var(--ink-2)" }}>Data sources:</strong> Historical boundaries
-          based on peer-reviewed scholarship. Population estimates from Scheidel &amp; Frier,{" "}
-          <em>The size of the Roman economy</em>. Territorial data informed by the Ancient World
+          <strong style={{ color: "var(--ink-2)" }}>Sources :</strong> Frontières historiques issues de travaux académiques révisés par les pairs. Estimations démographiques d'après Scheidel &amp; Frier,{" "}
+          <em>The size of the Roman economy</em>. Données territoriales issues de l'Ancient World
           Mapping Center (UNC Chapel Hill).
         </p>
       </div>
@@ -156,7 +155,7 @@ export function DetailSection({ entry, prev, next }: DetailSectionProps) {
             <ArrowLeft size={14} />
             <span>
               <span className="block text-xs" style={{ color: "var(--ink-4)" }}>
-                Previous
+                Précédent
               </span>
               {formatYear(prev.year)} — {prev.label}
             </span>
@@ -172,7 +171,7 @@ export function DetailSection({ entry, prev, next }: DetailSectionProps) {
           >
             <span>
               <span className="block text-xs" style={{ color: "var(--ink-4)" }}>
-                Next
+                Suivant
               </span>
               {formatYear(next.year)} — {next.label}
             </span>

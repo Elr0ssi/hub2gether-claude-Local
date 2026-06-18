@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { ChevronDown, Crown, TrendingUp, Swords, Shield, Activity, Lock } from "lucide-react";
+import { ChevronDown, Crown, TrendingUp, Swords, Shield, Activity, Lock, Vote } from "lucide-react";
 import { THEMES } from "@/data/themes";
 import type { ThemeId } from "@/types";
 
@@ -12,6 +12,7 @@ const ICONS: Record<string, React.ElementType> = {
   Swords,
   Shield,
   Activity,
+  Vote,
 };
 
 interface ThemeDropdownProps {
@@ -68,7 +69,7 @@ export function ThemeDropdown({ currentTheme }: ThemeDropdownProps) {
                   <span>{theme.label}</span>
                   <span className="ml-auto flex items-center gap-1 text-xs" style={{ color: "var(--ink-5)" }}>
                     <Lock size={10} />
-                    {theme.comingSoonLabel ?? "Soon"}
+                    {theme.comingSoonLabel ?? "Bientôt"}
                   </span>
                 </DropdownMenu.Item>
               );

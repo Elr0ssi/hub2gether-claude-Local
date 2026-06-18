@@ -1,4 +1,4 @@
-export type ThemeId = "economy" | "conflicts" | "military" | "epidemics" | "empires";
+export type ThemeId = "economy" | "conflicts" | "military" | "epidemics" | "empires" | "politics";
 
 export interface Theme {
   id: ThemeId;

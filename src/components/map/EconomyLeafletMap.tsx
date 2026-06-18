@@ -118,16 +118,10 @@ export function EconomyLeafletMap({
 
     if (hasData) {
       l.on("click", () => onCountryClick(name));
-      l.on("mouseover", () => {
-        l.setStyle({ fillOpacity: 1, weight: 1.5 });
-        l.bringToFront();
-      });
+      l.on("mouseover", () => { l.bringToFront(); });
       l.on("mouseout", () => {
         const isSel = selectedCountry === name;
-        l.setStyle({
-          fillOpacity: isSel ? 0.9 : tileStyle === "satellite" ? 0.75 : 0.82,
-          weight: isSel ? 2 : 0.5,
-        });
+        l.setStyle({ weight: isSel ? 2 : 0.5 });
       });
     }
   };

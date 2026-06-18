@@ -100,11 +100,11 @@ function ComparisonRow({
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs" style={{ color: "var(--ink-3)" }}>{nameA}</span>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold tabular-nums" style={{ color: a >= b ? "var(--accent)" : "var(--ink-3)" }}>
+              <span className="text-xs font-semibold tabular-nums" style={{ color: a >= b ? "#0D7A40" : "var(--ink-3)" }}>
                 {valueA !== null ? fmt(a, unit) : "—"}
               </span>
               {rankA !== null && rankA !== undefined && (
-                <span className="text-xs tabular-nums px-1 rounded" style={{ color: "var(--ink-4)", background: "var(--surface-2)", fontSize: "0.6rem" }}>
+                <span className="tabular-nums px-1.5 py-0.5 rounded-md font-bold" style={{ color: "#0D7A40", background: "rgba(57,255,136,0.12)", border: "1px solid rgba(57,255,136,0.3)", fontSize: "0.58rem" }}>
                   #{rankA}
                 </span>
               )}
@@ -113,7 +113,7 @@ function ComparisonRow({
           <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--surface-2)" }}>
             <div
               className="h-full rounded-full transition-all duration-700"
-              style={{ width: `${pctA}%`, background: a >= b ? "#39FF88" : "var(--ink-4)", opacity: valueA === null ? 0.2 : 1 }}
+              style={{ width: `${pctA}%`, background: a >= b ? "#0D7A40" : "var(--ink-4)", opacity: valueA === null ? 0.2 : 1 }}
             />
           </div>
         </div>
@@ -126,11 +126,11 @@ function ComparisonRow({
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs" style={{ color: "var(--ink-3)" }}>{nameB}</span>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-semibold tabular-nums" style={{ color: b >= a ? "var(--accent)" : "var(--ink-3)" }}>
+              <span className="text-xs font-semibold tabular-nums" style={{ color: b >= a ? "#0D7A40" : "var(--ink-3)" }}>
                 {valueB !== null ? fmt(b, unit) : "—"}
               </span>
               {rankB !== null && rankB !== undefined && (
-                <span className="text-xs tabular-nums px-1 rounded" style={{ color: "var(--ink-4)", background: "var(--surface-2)", fontSize: "0.6rem" }}>
+                <span className="tabular-nums px-1.5 py-0.5 rounded-md font-bold" style={{ color: "#0D7A40", background: "rgba(57,255,136,0.12)", border: "1px solid rgba(57,255,136,0.3)", fontSize: "0.58rem" }}>
                   #{rankB}
                 </span>
               )}
@@ -139,7 +139,7 @@ function ComparisonRow({
           <div className="h-2 rounded-full overflow-hidden" style={{ background: "var(--surface-2)" }}>
             <div
               className="h-full rounded-full transition-all duration-700"
-              style={{ width: `${pctB}%`, background: b >= a ? "#39FF88" : "var(--ink-4)", opacity: valueB === null ? 0.2 : 1 }}
+              style={{ width: `${pctB}%`, background: b >= a ? "#0D7A40" : "var(--ink-4)", opacity: valueB === null ? 0.2 : 1 }}
             />
           </div>
         </div>
