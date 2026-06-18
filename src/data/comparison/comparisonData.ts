@@ -19,6 +19,11 @@ export interface ComparisonCountry {
   coal_mt?: number;      // million tonnes/year
   // Military
   military_budget_bn?: number; // billion USD, 2023
+  // Military capabilities (approximate 2023-2024, IISS/SIPRI)
+  military_tanks?: number;       // main battle tanks
+  military_infantry_k?: number;  // active ground forces in thousands
+  military_ships?: number;       // major naval vessels
+  military_aircraft?: number;    // total military aircraft
 }
 
 export const COMPARISON_COUNTRIES: ComparisonCountry[] = [
@@ -190,4 +195,76 @@ export function getComparisonByName(name: string): ComparisonCountry | undefined
 
 export function getAllCountryNames(): string[] {
   return COMPARISON_COUNTRIES.map((c) => c.name).sort();
+}
+
+// Capacités militaires (IISS Military Balance 2023-2024, estimations)
+export const MILITARY_CAPABILITIES: Record<string, {
+  tanks?: number;
+  infantry_k?: number;
+  ships?: number;
+  aircraft?: number;
+}> = {
+  "United States of America": { tanks: 5500,  infantry_k: 485,  ships: 297, aircraft: 13300 },
+  "China":                    { tanks: 5000,  infantry_k: 1000, ships: 355, aircraft: 3300  },
+  "Russia":                   { tanks: 12000, infantry_k: 850,  ships: 205, aircraft: 4100  },
+  "India":                    { tanks: 4614,  infantry_k: 1455, ships: 130, aircraft: 2200  },
+  "North Korea":              { tanks: 6000,  infantry_k: 950,  ships: 200, aircraft: 800   },
+  "South Korea":              { tanks: 2200,  infantry_k: 530,  ships: 70,  aircraft: 1600  },
+  "Egypt":                    { tanks: 4767,  infantry_k: 320,  ships: 60,  aircraft: 1000  },
+  "Turkey":                   { tanks: 2605,  infantry_k: 300,  ships: 60,  aircraft: 1100  },
+  "Pakistan":                 { tanks: 1500,  infantry_k: 560,  ships: 30,  aircraft: 1400  },
+  "Iran":                     { tanks: 1650,  infantry_k: 350,  ships: 100, aircraft: 600   },
+  "Israel":                   { tanks: 1370,  infantry_k: 170,  ships: 20,  aircraft: 600   },
+  "Ukraine":                  { tanks: 800,   infantry_k: 300,  ships: 35,  aircraft: 300   },
+  "Poland":                   { tanks: 1000,  infantry_k: 185,  ships: 25,  aircraft: 450   },
+  "Greece":                   { tanks: 1300,  infantry_k: 90,   ships: 50,  aircraft: 500   },
+  "France":                   { tanks: 222,   infantry_k: 115,  ships: 55,  aircraft: 1100  },
+  "United Kingdom":           { tanks: 227,   infantry_k: 82,   ships: 60,  aircraft: 900   },
+  "Germany":                  { tanks: 300,   infantry_k: 183,  ships: 25,  aircraft: 700   },
+  "Japan":                    { tanks: 700,   infantry_k: 150,  ships: 100, aircraft: 1500  },
+  "Italy":                    { tanks: 200,   infantry_k: 96,   ships: 45,  aircraft: 800   },
+  "Taiwan":                   { tanks: 800,   infantry_k: 88,   ships: 55,  aircraft: 700   },
+  "Saudi Arabia":             { tanks: 900,   infantry_k: 227,  ships: 55,  aircraft: 900   },
+  "Brazil":                   { tanks: 469,   infantry_k: 190,  ships: 40,  aircraft: 700   },
+  "Vietnam":                  { tanks: 1300,  infantry_k: 380,  ships: 55,  aircraft: 500   },
+  "Thailand":                 { tanks: 600,   infantry_k: 180,  ships: 55,  aircraft: 250   },
+  "Algeria":                  { tanks: 400,   infantry_k: 125,  ships: 40,  aircraft: 500   },
+  "Indonesia":                { tanks: 300,   infantry_k: 400,  ships: 150, aircraft: 300   },
+  "Philippines":              { tanks: 50,    infantry_k: 125,  ships: 85,  aircraft: 250   },
+  "Malaysia":                 { tanks: 48,    infantry_k: 109,  ships: 60,  aircraft: 250   },
+  "Spain":                    { tanks: 400,   infantry_k: 75,   ships: 45,  aircraft: 600   },
+  "Australia":                { tanks: 200,   infantry_k: 59,   ships: 45,  aircraft: 500   },
+  "Romania":                  { tanks: 400,   infantry_k: 68,   ships: 20,  aircraft: 200   },
+  "Azerbaijan":               { tanks: 700,   infantry_k: 67,   ships: 10,  aircraft: 250   },
+  "Kazakhstan":               { tanks: 900,   infantry_k: 70,   ships: 10,  aircraft: 350   },
+  "United Arab Emirates":     { tanks: 600,   infantry_k: 65,   ships: 55,  aircraft: 500   },
+  "Iraq":                     { tanks: 600,   infantry_k: 190,  ships: 15,  aircraft: 350   },
+  "Syria":                    { tanks: 1000,  infantry_k: 200,  ships: 10,  aircraft: 150   },
+  "Ethiopia":                 { tanks: 300,   infantry_k: 150,  ships: 5,   aircraft: 100   },
+  "Myanmar":                  { tanks: 500,   infantry_k: 350,  ships: 80,  aircraft: 300   },
+  "South Africa":             { tanks: 200,   infantry_k: 40,   ships: 25,  aircraft: 250   },
+  "Mexico":                   { tanks: 200,   infantry_k: 170,  ships: 100, aircraft: 350   },
+  "Argentina":                { tanks: 200,   infantry_k: 43,   ships: 25,  aircraft: 350   },
+  "Colombia":                 { tanks: 40,    infantry_k: 200,  ships: 25,  aircraft: 350   },
+  "Peru":                     { tanks: 300,   infantry_k: 80,   ships: 25,  aircraft: 350   },
+  "Netherlands":              { tanks: 18,    infantry_k: 34,   ships: 25,  aircraft: 250   },
+  "Sweden":                   { tanks: 120,   infantry_k: 24,   ships: 30,  aircraft: 200   },
+  "Norway":                   { tanks: 36,    infantry_k: 17,   ships: 30,  aircraft: 200   },
+  "Canada":                   { tanks: 82,    infantry_k: 42,   ships: 30,  aircraft: 400   },
+  "Finland":                  { tanks: 200,   infantry_k: 19,   ships: 20,  aircraft: 200   },
+  "Denmark":                  { tanks: 44,    infantry_k: 17,   ships: 25,  aircraft: 100   },
+  "Belgium":                  { tanks: 28,    infantry_k: 26,   ships: 15,  aircraft: 100   },
+  "Austria":                  { tanks: 56,    infantry_k: 23,   ships: 0,   aircraft: 50    },
+  "Singapore":                { tanks: 100,   infantry_k: 72,   ships: 35,  aircraft: 150   },
+  "Czech Republic":           { tanks: 30,    infantry_k: 26,   ships: 0,   aircraft: 50    },
+  "Hungary":                  { tanks: 44,    infantry_k: 24,   ships: 0,   aircraft: 100   },
+  "Kuwait":                   { tanks: 200,   infantry_k: 15,   ships: 20,  aircraft: 100   },
+  "Qatar":                    { tanks: 100,   infantry_k: 12,   ships: 25,  aircraft: 100   },
+  "Nigeria":                  { tanks: 200,   infantry_k: 135,  ships: 30,  aircraft: 150   },
+  "Bangladesh":               { tanks: 300,   infantry_k: 165,  ships: 25,  aircraft: 100   },
+  "Venezuela":                { tanks: 300,   infantry_k: 115,  ships: 25,  aircraft: 300   },
+};
+
+export function getMilitaryCap(name: string): NonNullable<(typeof MILITARY_CAPABILITIES)[string]> {
+  return MILITARY_CAPABILITIES[name] ?? {};
 }

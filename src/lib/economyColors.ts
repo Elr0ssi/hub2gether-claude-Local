@@ -42,7 +42,7 @@ export function getCountryFillColorEconomy(
 ): string {
   if (isSelected) return "#39FF88";
   const t = getValueIntensity(countryName, countries, maxValue, metric);
-  if (t === 0) return isHovered ? "#DCDCDC" : "#EBEBEB";
+  if (t === 0) return "#EBEBEB";
   const base = interpolateGreen(t);
-  return isHovered ? brightenRgb(base, 25) : base;
+  return base;
 }
