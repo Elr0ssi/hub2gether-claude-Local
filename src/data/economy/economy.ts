@@ -5,8 +5,8 @@ export const ECONOMY_METRICS: EconomyMetric[] = [
     id: "gdp",
     label: "PIB",
     shortLabel: "PIB",
-    unit: "Mds USD",
-    description: "Produit Intérieur Brut nominal en milliards de dollars américains.",
+    unit: "Mds €",
+    description: "Produit Intérieur Brut nominal en milliards d'euros (équivalent USD courants).",
   },
   {
     id: "debt_ratio",
@@ -36,7 +36,7 @@ export const ECONOMY_YEARS: EconomyYear[] = [
   {
     year: 2000,
     label: "2000",
-    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards USD courants.",
+    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards € (équivalent USD courants).",
     countries: {
       "United States of America": { gdp: 10_300, debt_ratio: 54,  unemployment: 4.0,  companies: 27_000 },
       China:                       { gdp: 1_210,  debt_ratio: 23,  unemployment: 3.1,  companies: 8_000  },
@@ -148,7 +148,7 @@ export const ECONOMY_YEARS: EconomyYear[] = [
   {
     year: 2005,
     label: "2005",
-    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards USD courants.",
+    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards € (équivalent USD courants).",
     countries: {
       "United States of America": { gdp: 13_090, debt_ratio: 62,  unemployment: 5.1,  companies: 29_000 },
       China:                       { gdp: 2_290,  debt_ratio: 26,  unemployment: 4.2,  companies: 12_000 },
@@ -256,7 +256,7 @@ export const ECONOMY_YEARS: EconomyYear[] = [
   {
     year: 2010,
     label: "2010",
-    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards USD courants.",
+    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards € (équivalent USD courants).",
     countries: {
       "United States of America": { gdp: 15_050, debt_ratio: 95,  unemployment: 9.6,  companies: 30_000 },
       China:                       { gdp: 6_090,  debt_ratio: 34,  unemployment: 4.1,  companies: 20_000 },
@@ -364,7 +364,7 @@ export const ECONOMY_YEARS: EconomyYear[] = [
   {
     year: 2015,
     label: "2015",
-    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards USD courants.",
+    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards € (équivalent USD courants).",
     countries: {
       "United States of America": { gdp: 18_210, debt_ratio: 105, unemployment: 5.3,  companies: 31_000 },
       China:                       { gdp: 11_060, debt_ratio: 41,  unemployment: 4.1,  companies: 32_000 },

@@ -12,7 +12,7 @@ import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
 import { getArticlesByTheme, ARTICLES } from "@/data/articles";
 import { useDragScroll } from "@/hooks/useDragScroll";
 
-const KEY_YEARS = [1900, 1914, 1920, 1933, 1939, 1945, 1950, 1960, 1970, 1980, 1989, 1991, 2000, 2008, 2016, 2020, 2025];
+const KEY_YEARS = [1933, 1939, 1945, 1950, 1960, 1970, 1980, 1989, 1991, 2000, 2008, 2016, 2020, 2025];
 
 const politicsArticles = getArticlesByTheme("politics");
 
@@ -134,7 +134,7 @@ export function PoliticsMapView() {
                     }}
                     title={`Aller en ${ky}`}
                   >
-                    {ky === 1900 || ky === 1945 || ky === 1989 || ky === 2025 ? ky : "·"}
+                    {ky === 1933 || ky === 1945 || ky === 1989 || ky === 2025 ? ky : "·"}
                   </button>
                 );
               })}

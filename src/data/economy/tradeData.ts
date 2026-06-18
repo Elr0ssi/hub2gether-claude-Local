@@ -81,6 +81,6 @@ export function getTradeByCountry(name: string): TradeEntry | null {
 export function fmtTradeBalance(bn: number): string {
   const abs = Math.abs(bn);
   const sign = bn >= 0 ? "+" : "−";
-  if (abs >= 1000) return `${sign}${(abs / 1000).toFixed(1)} T$`;
-  return `${sign}${abs.toLocaleString("fr-FR")} Mds$`;
+  if (abs >= 1000) return `${sign}${(abs / 1000).toFixed(1)} T€`;
+  return `${sign}${abs.toLocaleString("fr-FR")} Mds€`;
 }
