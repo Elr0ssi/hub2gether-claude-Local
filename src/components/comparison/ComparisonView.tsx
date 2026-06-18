@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { BarChart2, Globe, Zap, Shield, ArrowRight } from "lucide-react";
-import { COMPARISON_COUNTRIES, getComparisonByName, getMilitaryCap, MILITARY_CAPABILITIES } from "@/data/comparison/comparisonData";
+import { useState, useRef, useEffect } from "react";
+import { BarChart2, Globe, Zap, Shield, ArrowRight, ChevronDown, Search } from "lucide-react";
+import { COMPARISON_COUNTRIES, getComparisonByName, getMilitaryCap, MILITARY_CAPABILITIES, type ComparisonCountry } from "@/data/comparison/comparisonData";
 import { getYearData } from "@/data/economy/economy";
 import { getDebtByCountry } from "@/data/economy/debtData";
 
@@ -70,6 +70,116 @@ function rankAmongMil(countryName: string, field: "tanks" | "infantry_k" | "ship
     .sort((a, b) => b.value - a.value);
   const idx = sorted.findIndex((c) => c.name === countryName);
   return idx >= 0 ? idx + 1 : null;
+}
+
+// ── Searchable country combobox ───────────────────────────────────────────────
+function CountryCombobox({
+  value,
+  onChange,
+  countries,
+}: {
+  value: string;
+  onChange: (name: string) => void;
+  countries: ComparisonCountry[];
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const ref = useRef<HTMLDivElement>(null);
+
+  const selected = countries.find((c) => c.name === value);
+  const filtered = query.trim()
+    ? countries.filter(
+        (c) =>
+          c.name_fr.toLowerCase().includes(query.toLowerCase()) ||
+          c.name.toLowerCase().includes(query.toLowerCase())
+      )
+    : countries;
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+        setQuery("");
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative flex-1 w-full">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full px-3 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all"
+        style={{
+          background: "var(--surface-2)",
+          border: "1px solid var(--border)",
+          color: "var(--ink)",
+          outline: "none",
+          cursor: "pointer",
+        }}
+      >
+        <span className="text-base shrink-0">{selected?.flag ?? "🌍"}</span>
+        <span className="flex-1 text-left truncate">{selected?.name_fr ?? value}</span>
+        <ChevronDown size={13} style={{ color: "var(--ink-4)", flexShrink: 0 }} />
+      </button>
+
+      {open && (
+        <div
+          className="absolute top-full mt-1 left-0 right-0 z-50 rounded-xl overflow-hidden shadow-xl"
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            maxHeight: "260px",
+            overflowY: "auto",
+          }}
+        >
+          <div
+            className="sticky top-0 px-3 py-2 flex items-center gap-2"
+            style={{ background: "var(--surface-2)", borderBottom: "1px solid var(--border)", zIndex: 10 }}
+          >
+            <Search size={12} style={{ color: "var(--ink-4)", flexShrink: 0 }} />
+            <input
+              autoFocus
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Rechercher un pays…"
+              className="bg-transparent outline-none text-xs w-full"
+              style={{ color: "var(--ink)" }}
+            />
+          </div>
+          {filtered.length === 0 && (
+            <div className="px-4 py-3 text-xs" style={{ color: "var(--ink-4)" }}>
+              Aucun résultat
+            </div>
+          )}
+          {filtered.map((c) => (
+            <button
+              key={c.code}
+              onClick={() => { onChange(c.name); setOpen(false); setQuery(""); }}
+              className="w-full px-3 py-2 flex items-center gap-2 text-left transition-colors"
+              style={{
+                background: c.name === value ? "var(--accent-dim)" : "transparent",
+                color: c.name === value ? "#0D7A40" : "var(--ink)",
+                borderBottom: "1px solid var(--border-light)",
+                fontSize: "0.875rem",
+              }}
+              onMouseEnter={(e) => {
+                if (c.name !== value) (e.currentTarget as HTMLElement).style.background = "var(--surface-2)";
+              }}
+              onMouseLeave={(e) => {
+                if (c.name !== value) (e.currentTarget as HTMLElement).style.background = "transparent";
+              }}
+            >
+              <span className="text-base shrink-0">{c.flag}</span>
+              <span>{c.name_fr}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function ComparisonRow({
@@ -325,19 +435,7 @@ export function ComparisonView() {
         {/* Pays A */}
         <div className="flex-1 flex flex-col gap-1.5 w-full">
           <label className="text-xs font-semibold" style={{ color: "var(--ink-3)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Pays A</label>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">{cmpA?.flag ?? "🌍"}</span>
-            <select
-              value={countryA}
-              onChange={(e) => setCountryA(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-xl text-sm font-medium appearance-none"
-              style={{ background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--ink)", outline: "none", cursor: "pointer" }}
-            >
-              {sortedCountries.map((c) => (
-                <option key={c.code} value={c.name}>{c.flag} {c.name_fr}</option>
-              ))}
-            </select>
-          </div>
+          <CountryCombobox value={countryA} onChange={setCountryA} countries={sortedCountries} />
           {cmpA && (
             <p className="text-xs" style={{ color: "var(--ink-4)" }}>
               {cmpA.capital} · {cmpA.population_millions.toLocaleString("fr-FR")} M hab.
@@ -358,19 +456,7 @@ export function ComparisonView() {
         {/* Pays B */}
         <div className="flex-1 flex flex-col gap-1.5 w-full">
           <label className="text-xs font-semibold" style={{ color: "var(--ink-3)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Pays B</label>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">{cmpB?.flag ?? "🌍"}</span>
-            <select
-              value={countryB}
-              onChange={(e) => setCountryB(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-xl text-sm font-medium appearance-none"
-              style={{ background: "var(--surface-2)", border: "1px solid var(--border)", color: "var(--ink)", outline: "none", cursor: "pointer" }}
-            >
-              {sortedCountries.map((c) => (
-                <option key={c.code} value={c.name}>{c.flag} {c.name_fr}</option>
-              ))}
-            </select>
-          </div>
+          <CountryCombobox value={countryB} onChange={setCountryB} countries={sortedCountries} />
           {cmpB && (
             <p className="text-xs" style={{ color: "var(--ink-4)" }}>
               {cmpB.capital} · {cmpB.population_millions.toLocaleString("fr-FR")} M hab.

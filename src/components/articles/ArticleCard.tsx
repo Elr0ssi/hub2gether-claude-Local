@@ -7,7 +7,7 @@ interface ArticleCardProps {
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-US", {
+  return new Date(iso).toLocaleDateString("fr-FR", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -68,7 +68,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
             className="flex items-center gap-1 text-xs font-semibold transition-all group-hover:gap-2"
             style={{ color: "#0D7A40" }}
           >
-            Read article
+            Lire l'article
             <ArrowRight size={13} />
           </Link>
         </div>

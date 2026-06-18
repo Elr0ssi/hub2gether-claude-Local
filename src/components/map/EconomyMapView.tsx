@@ -9,7 +9,12 @@ import { EconomySidePanel } from "@/components/sidebar/EconomySidePanel";
 import { EconomyRankingsTable } from "./EconomyRankingsTable";
 import { ThemeDropdown } from "./ThemeDropdown";
 import { ECONOMY_METRICS, ECONOMY_YEARS, ECONOMY_YEAR_VALUES, getYearData, DEFAULT_YEAR } from "@/data/economy/economy";
+import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
+import { getArticlesByTheme, ARTICLES } from "@/data/articles";
+import { useDragScroll } from "@/hooks/useDragScroll";
 import type { EconomyMetricId, EconomyYear } from "@/types";
+
+const economyArticles = getArticlesByTheme("economy");
 
 function computeLiveYearData(baseYear: EconomyYear): EconomyYear {
   const today = new Date();
@@ -52,6 +57,7 @@ export function EconomyMapView() {
   const [mapStyle, setMapStyle] = useState<MapStyle>("editorial");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ytdMode, setYtdMode] = useState(false);
+  const { ref: yearRowRef, onMouseDown: onYearRowDown, onMouseUp: onYearRowUp, onMouseLeave: onYearRowLeave, onMouseMove: onYearRowMove } = useDragScroll();
 
   const metric = (searchParams.get("metric") ?? "gdp") as EconomyMetricId;
   const year = parseInt(searchParams.get("year") ?? String(DEFAULT_YEAR));
@@ -96,6 +102,16 @@ export function EconomyMapView() {
     setSelectedCountry(name);
     setSidePanelOpen(true);
   }, []);
+
+  const countryArticles = useMemo(() => {
+    if (!selectedCountry) return [];
+    const q = selectedCountry.toLowerCase();
+    return ARTICLES.filter(
+      (a) =>
+        a.title.toLowerCase().includes(q) ||
+        a.tags.some((t) => t.toLowerCase().includes(q))
+    );
+  }, [selectedCountry]);
 
   return (
     <>
@@ -176,8 +192,13 @@ export function EconomyMapView() {
 
         {/* Year selector */}
         <div
+          ref={yearRowRef}
           className="px-5 py-2 border-b flex items-center gap-3 overflow-x-auto"
-          style={{ borderColor: "var(--border)", background: "var(--surface)", scrollbarWidth: "none" }}
+          style={{ borderColor: "var(--border)", background: "var(--surface)", scrollbarWidth: "none", cursor: "grab" }}
+          onMouseDown={onYearRowDown}
+          onMouseUp={onYearRowUp}
+          onMouseLeave={onYearRowLeave}
+          onMouseMove={onYearRowMove}
         >
           <span className="text-xs font-semibold shrink-0" style={{ color: "var(--ink-3)" }}>Année :</span>
           <div className="flex items-center gap-1">
@@ -286,6 +307,29 @@ export function EconomyMapView() {
           setSidePanelOpen(true);
         }}
       />
+
+      {/* Article carousels */}
+      <div
+        className="mt-6 rounded-2xl p-5 flex flex-col gap-6"
+        style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+      >
+        {selectedCountry && (
+          <ArticleCarousel
+            articles={countryArticles}
+            title={`Recommandations — ${selectedCountry}`}
+            subtitle="Articles liés au pays sélectionné"
+            emptyMessage={`Aucun article spécifique pour ${selectedCountry} pour l'instant.`}
+            icon="pin"
+          />
+        )}
+        <ArticleCarousel
+          articles={economyArticles}
+          title="Analyses économiques"
+          subtitle="Tous les articles de l'onglet Économie"
+          emptyMessage="Aucun article disponible pour cet onglet."
+          icon="newspaper"
+        />
+      </div>
     </>
   );
 }

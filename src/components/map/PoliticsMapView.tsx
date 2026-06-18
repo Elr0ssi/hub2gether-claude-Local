@@ -4,24 +4,40 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Maximize2, Minimize2, ChevronLeft } from "lucide-react";
 import { PoliticsInteractiveMap } from "./PoliticsInteractiveMap";
 import { PoliticsSidePanel } from "@/components/sidebar/PoliticsSidePanel";
+import { MunicipalElectionsSection } from "./MunicipalElectionsSection";
 import { ThemeDropdown } from "./ThemeDropdown";
 import { getAllPoliticsForYear, getPoliticsForYear, POLITICS_MIN_YEAR, POLITICS_MAX_YEAR } from "@/data/politics/politics";
 import { ORIENTATION_COLORS, ORIENTATION_LABELS } from "@/lib/politicsColors";
+import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
+import { getArticlesByTheme, ARTICLES } from "@/data/articles";
+import { useDragScroll } from "@/hooks/useDragScroll";
 
 const KEY_YEARS = [1900, 1914, 1920, 1933, 1939, 1945, 1950, 1960, 1970, 1980, 1989, 1991, 2000, 2008, 2016, 2020, 2025];
+
+const politicsArticles = getArticlesByTheme("politics");
 
 export function PoliticsMapView() {
   const [sidePanelOpen, setSidePanelOpen] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [year, setYear] = useState(2025);
-  const [dragging, setDragging] = useState(false);
+  const { ref: yearBtnsRef, onMouseDown: onYearBtnsDown, onMouseUp: onYearBtnsUp, onMouseLeave: onYearBtnsLeave, onMouseMove: onYearBtnsMove } = useDragScroll();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setIsFullscreen(false); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  const countryArticles = useMemo(() => {
+    if (!selectedCountry) return [];
+    const q = selectedCountry.toLowerCase();
+    return ARTICLES.filter(
+      (a) =>
+        a.title.toLowerCase().includes(q) ||
+        a.tags.some((t) => t.toLowerCase().includes(q))
+    );
+  }, [selectedCountry]);
 
   const politicsData = useMemo(() => getAllPoliticsForYear(year), [year]);
 
@@ -93,10 +109,6 @@ export function PoliticsMapView() {
               max={POLITICS_MAX_YEAR}
               value={year}
               onChange={(e) => setYear(parseInt(e.target.value))}
-              onMouseDown={() => setDragging(true)}
-              onMouseUp={() => setDragging(false)}
-              onTouchStart={() => setDragging(true)}
-              onTouchEnd={() => setDragging(false)}
               className="w-full h-2 rounded-full appearance-none cursor-pointer"
               style={{
                 background: `linear-gradient(to right, var(--accent) 0%, var(--accent) ${((year - POLITICS_MIN_YEAR) / (POLITICS_MAX_YEAR - POLITICS_MIN_YEAR)) * 100}%, var(--surface-2) ${((year - POLITICS_MIN_YEAR) / (POLITICS_MAX_YEAR - POLITICS_MIN_YEAR)) * 100}%, var(--surface-2) 100%)`,
@@ -130,12 +142,20 @@ export function PoliticsMapView() {
           </div>
 
           {/* Quick year buttons */}
-          <div className="flex items-center gap-1 flex-wrap">
+          <div
+            ref={yearBtnsRef}
+            className="flex items-center gap-1 overflow-x-auto pb-0.5"
+            style={{ scrollbarWidth: "none", cursor: "grab" }}
+            onMouseDown={onYearBtnsDown}
+            onMouseUp={onYearBtnsUp}
+            onMouseLeave={onYearBtnsLeave}
+            onMouseMove={onYearBtnsMove}
+          >
             {KEY_YEARS.map((ky) => (
               <button
                 key={ky}
                 onClick={() => setYear(ky)}
-                className="px-2 py-0.5 rounded text-xs font-medium transition-all duration-150 shrink-0"
+                className="px-2 py-0.5 rounded text-xs font-medium transition-all duration-150 shrink-0 select-none"
                 style={
                   ky === year
                     ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
@@ -200,6 +220,32 @@ export function PoliticsMapView() {
           );
         })}
       </div>
+
+      {/* Article carousels */}
+      <div
+        className="mt-6 rounded-2xl p-5 flex flex-col gap-6"
+        style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+      >
+        {selectedCountry && (
+          <ArticleCarousel
+            articles={countryArticles}
+            title={`Recommandations — ${selectedCountry}`}
+            subtitle="Articles liés au pays sélectionné"
+            emptyMessage={`Aucun article spécifique pour ${selectedCountry} pour l'instant.`}
+            icon="pin"
+          />
+        )}
+        <ArticleCarousel
+          articles={politicsArticles}
+          title="Analyses politiques"
+          subtitle="Tous les articles de l'onglet Politique"
+          emptyMessage="Aucun article disponible pour cet onglet."
+          icon="newspaper"
+        />
+      </div>
+
+      {/* Municipal elections */}
+      <MunicipalElectionsSection />
 
       <style>{`
         input[type=range]::-webkit-slider-thumb {

@@ -1,11 +1,11 @@
 import type { PoliticalOrientation, PoliticalPeriod } from "@/data/politics/politics";
 
 export const ORIENTATION_COLORS: Record<PoliticalOrientation, string> = {
-  far_left:  "#8B1C1C",
-  left:      "#C53030",
-  center:    "#B7791F",
-  right:     "#2B6CB0",
-  far_right: "#1A365D",
+  far_left:  "#E57373",
+  left:      "#F48FB1",
+  center:    "#FFD54F",
+  right:     "#64B5F6",
+  far_right: "#9575CD",
 };
 
 export const ORIENTATION_LABELS: Record<PoliticalOrientation, string> = {
