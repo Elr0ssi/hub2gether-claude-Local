@@ -26,14 +26,13 @@ export function Footer() {
               </span>
             </div>
             <p className="text-small max-w-xs leading-relaxed">
-              Premium geopolitical data journalism. Explore history and power through
-              interactive maps, data visualisation and editorial analysis.
+              Journalisme de données géopolitique. Explorez l'histoire et les rapports de force à travers des cartes interactives, des visualisations de données et des analyses éditoriales.
             </p>
           </div>
 
           {/* Themes */}
           <div>
-            <p className="section-title mb-4">Themes</p>
+            <p className="section-title mb-4">Thèmes</p>
             <ul className="space-y-2">
               {THEMES.map((theme) => (
                 <li key={theme.id}>
@@ -48,7 +47,7 @@ export function Footer() {
                     <span className="text-small opacity-50 cursor-not-allowed">
                       {theme.label}{" "}
                       <span style={{ fontSize: "0.7rem" }}>
-                        — {theme.comingSoonLabel ?? "Soon"}
+                        — {theme.comingSoonLabel ?? "Bientôt"}
                       </span>
                     </span>
                   )}
@@ -59,14 +58,14 @@ export function Footer() {
 
           {/* About */}
           <div>
-            <p className="section-title mb-4">About</p>
+            <p className="section-title mb-4">À propos</p>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/methodology"
                   className="text-small hover:text-[var(--ink)] transition-colors"
                 >
-                  Data Methodology
+                  Méthodologie
                 </Link>
               </li>
               <li>
@@ -74,7 +73,7 @@ export function Footer() {
                   href="/sources"
                   className="text-small hover:text-[var(--ink)] transition-colors"
                 >
-                  Data Sources
+                  Sources de données
                 </Link>
               </li>
               <li>
@@ -82,7 +81,7 @@ export function Footer() {
                   href="/articles"
                   className="text-small hover:text-[var(--ink)] transition-colors"
                 >
-                  All Articles
+                  Tous les articles
                 </Link>
               </li>
               <li>
@@ -92,7 +91,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="text-small hover:text-[var(--ink)] transition-colors"
                 >
-                  AWMC — Map Sources
+                  AWMC — Sources cartographiques
                 </a>
               </li>
             </ul>
@@ -104,11 +103,10 @@ export function Footer() {
           style={{ borderTop: "1px solid var(--border)" }}
         >
           <p className="text-caption">
-            © {year} The Essential Data. Historical boundaries are approximate and for
-            editorial purposes.
+            © {year} The Essential Data. Les frontières historiques sont approximatives et à des fins éditoriales.
           </p>
           <p className="text-caption flex items-center gap-1">
-            Built with verified historical sources ·
+            Construit avec des sources historiques vérifiées ·
             <a
               href="https://awmc.unc.edu"
               target="_blank"

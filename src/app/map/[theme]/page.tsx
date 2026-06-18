@@ -5,6 +5,7 @@ import { Layout } from "@/components/layout/Layout";
 import { MapViewLoader } from "@/components/map/MapViewLoader";
 import { EpidemicsMapViewLoader } from "@/components/map/EpidemicsMapViewLoader";
 import { EconomyMapViewLoader } from "@/components/map/EconomyMapViewLoader";
+import { PoliticsMapViewLoader } from "@/components/map/PoliticsMapViewLoader";
 import { ArticleGrid } from "@/components/articles/ArticleGrid";
 import { FAQSection } from "@/components/faq/FAQSection";
 import { getThemeById } from "@/data/themes";
@@ -19,7 +20,7 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return [{ theme: "empires" }, { theme: "epidemics" }, { theme: "economy" }];
+  return [{ theme: "empires" }, { theme: "epidemics" }, { theme: "economy" }, { theme: "politics" }];
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -115,8 +116,32 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
+  if (theme === "politics") {
+    return {
+      title: "Carte politique mondiale — Régimes et orientations politiques 1900–2025",
+      description:
+        "Explorez les régimes politiques et les orientations idéologiques de 20+ pays depuis 1900. Démocraties, dictatures, totalitarismes — naviguez sur une frise chronologique interactive.",
+      keywords: [
+        "carte politique mondiale",
+        "régimes politiques par pays",
+        "orientation politique monde",
+        "démocratie dictature carte",
+        "histoire politique mondiale",
+        "extrême droite gauche carte",
+        "frise chronologique politique",
+      ],
+      alternates: { canonical: "/map/politics" },
+      openGraph: {
+        title: "Carte politique mondiale 1900–2025 — The Essential Data",
+        description:
+          "Régimes et orientations politiques de 20+ pays depuis 1900. Frise chronologique interactive.",
+        type: "website",
+      },
+    };
+  }
+
   return {
-    title: `${themeData.label} — Interactive Map`,
+    title: `${themeData.label} — Carte interactive`,
     description: themeData.description,
     alternates: { canonical: `/map/${theme}` },
   };
@@ -178,6 +203,7 @@ export default async function MapPage({ params, searchParams }: PageProps) {
 
   const isEpidemics = theme === "epidemics";
   const isEconomy = theme === "economy";
+  const isPolitics = theme === "politics";
   const datasetSchema = DATASET_SCHEMAS[theme];
 
   return (
@@ -198,8 +224,10 @@ export default async function MapPage({ params, searchParams }: PageProps) {
             ? "Épidémies mondiales"
             : isEconomy
             ? "Économie mondiale"
+            : isPolitics
+            ? "Politique mondiale"
             : theme === "empires"
-            ? "Roman Empire"
+            ? "Empire romain"
             : themeData.label}
         </h1>
         <p className="text-body" style={{ maxWidth: "600px" }}>
@@ -207,8 +235,10 @@ export default async function MapPage({ params, searchParams }: PageProps) {
             ? "Visualisez l'impact de cinq grandes épidémies — Peste Noire, COVID-19, VIH/SIDA, Hantavirus et HMPV 2025 — pays par pays. Cas confirmés, décès et taux de létalité. Vue YTD disponible pour les maladies actives."
             : isEconomy
             ? "Comparez le PIB, la dette publique, le chômage et les entreprises de 70+ pays de 2000 à 2025. Projections FMI avril 2025 — vue en temps réel (YTD) disponible pour l'année en cours."
+            : isPolitics
+            ? "Explorez les régimes politiques et les orientations idéologiques de 20+ pays depuis 1900. Naviguez sur la frise chronologique pour voir comment le monde politique a évolué d'une décennie à l'autre."
             : theme === "empires"
-            ? "Trace the rise and fall of the Roman Empire across seven key periods, from the founding city-state to the fall of Constantinople."
+            ? "Retracez l'ascension et la chute de l'Empire romain en sept périodes clés, de la cité latine fondatrice à la chute de Constantinople."
             : themeData.description}
         </p>
       </div>
@@ -229,6 +259,8 @@ export default async function MapPage({ params, searchParams }: PageProps) {
             <EpidemicsMapViewLoader />
           ) : isEconomy ? (
             <EconomyMapViewLoader />
+          ) : isPolitics ? (
+            <PoliticsMapViewLoader />
           ) : (
             <MapViewLoader theme={themeData.id as ThemeId} initialYear={initialYear} />
           )}
@@ -239,13 +271,15 @@ export default async function MapPage({ params, searchParams }: PageProps) {
       {articles.length > 0 && (
         <ArticleGrid
           articles={articles.slice(0, 3)}
-          title={isEpidemics || isEconomy ? "Analyses éditoriales" : "Related analysis"}
+          title="Analyses éditoriales"
           subtitle={
             isEpidemics
               ? "Analyses approfondies sur les grandes pandémies, leur géographie et leur impact géopolitique."
               : isEconomy
               ? "Décryptages économiques : PIB par pays 2025, dette publique mondiale, chômage et rivalités géopolitiques."
-              : "Editorial deep-dives on the Roman Empire — its expansion, administration, decline and legacy."
+              : isPolitics
+              ? "Analyses sur les grands basculements politiques du XXe et XXIe siècle — populismes, transitions démocratiques et autoritarismes."
+              : "Décryptages éditoriaux sur l'Empire romain — son expansion, son administration, son déclin et son héritage."
           }
         />
       )}

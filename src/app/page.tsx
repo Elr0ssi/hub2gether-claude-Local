@@ -47,8 +47,8 @@ export default function HomePage() {
       <ThemePreviewGrid themes={THEMES} />
       <ArticleGrid
         articles={featuredArticles}
-        title="Deep dives"
-        subtitle="Editorial analysis on the rise and fall of empires, the mechanics of expansion, and the lessons of history."
+        title="Analyses approfondies"
+        subtitle="Décryptages éditoriaux sur la montée et la chute des empires, les mécaniques de l'expansion et les leçons de l'histoire."
       />
       <FAQSection items={FAQS_EMPIRES} />
     </Layout>

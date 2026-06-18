@@ -42,7 +42,7 @@ export function SidePanel({ entry, open, onClose, empireName = "Roman Empire" }:
             <button
               onClick={onClose}
               className="btn-ghost p-1.5 mt-0.5 shrink-0"
-              aria-label="Close panel"
+              aria-label="Fermer le panneau"
             >
               <X size={16} />
             </button>
@@ -60,7 +60,7 @@ export function SidePanel({ entry, open, onClose, empireName = "Roman Empire" }:
             >
               {/* Period title */}
               <div className="px-5 py-4 border-b" style={{ borderColor: "var(--border-light)" }}>
-                <p className="text-caption mb-1">Selected period</p>
+                <p className="text-caption mb-1">Période sélectionnée</p>
                 <p className="text-heading-3" style={{ color: "var(--accent)", textShadow: "0 0 16px rgba(57,255,136,0.3)" }}>
                   {formatYear(entry.year)}
                 </p>
@@ -80,7 +80,7 @@ export function SidePanel({ entry, open, onClose, empireName = "Roman Empire" }:
                 {[
                   {
                     icon: MapPin,
-                    label: "Area",
+                    label: "Superficie",
                     value: `${formatNumber(entry.stats.areaSqKm)} km²`,
                   },
                   {
@@ -90,12 +90,12 @@ export function SidePanel({ entry, open, onClose, empireName = "Roman Empire" }:
                   },
                   {
                     icon: Building,
-                    label: "Capital",
+                    label: "Capitale",
                     value: entry.stats.capitalCity,
                   },
                   {
                     icon: Calendar,
-                    label: "System",
+                    label: "Système",
                     value: entry.stats.politicalSystem,
                   },
                 ].map(({ icon: Icon, label, value }) => (
@@ -117,13 +117,13 @@ export function SidePanel({ entry, open, onClose, empireName = "Roman Empire" }:
 
               {/* Description */}
               <div className="px-5 py-4 border-b" style={{ borderColor: "var(--border-light)" }}>
-                <p className="section-title mb-2.5">Summary</p>
+                <p className="section-title mb-2.5">Résumé</p>
                 <p className="text-small leading-relaxed">{entry.description}</p>
               </div>
 
               {/* Key facts */}
               <div className="px-5 py-4 border-b" style={{ borderColor: "var(--border-light)" }}>
-                <p className="section-title mb-3">Key facts</p>
+                <p className="section-title mb-3">Points clés</p>
                 <ul className="space-y-2">
                   {entry.stats.keyFacts.map((fact, i) => (
                     <li key={i} className="flex items-start gap-2">
@@ -139,7 +139,7 @@ export function SidePanel({ entry, open, onClose, empireName = "Roman Empire" }:
 
               {/* Analysis */}
               <div className="px-5 py-4 border-b" style={{ borderColor: "var(--border-light)" }}>
-                <p className="section-title mb-2.5">Analysis</p>
+                <p className="section-title mb-2.5">Analyse</p>
                 <p className="text-small leading-relaxed" style={{ color: "var(--ink-3)" }}>
                   {entry.analysis}
                 </p>
@@ -151,7 +151,7 @@ export function SidePanel({ entry, open, onClose, empireName = "Roman Empire" }:
                   href={`/map/empires/roman-empire-${entry.slug}`}
                   className="btn-primary w-full justify-center gap-2"
                 >
-                  Read full analysis
+                  Lire l'analyse complète
                   <ArrowRight size={15} />
                 </Link>
               </div>

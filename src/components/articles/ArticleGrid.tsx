@@ -12,7 +12,7 @@ interface ArticleGridProps {
 
 export function ArticleGrid({
   articles,
-  title = "Latest analysis",
+  title = "Dernières analyses",
   subtitle,
 }: ArticleGridProps) {
   if (articles.length === 0) return null;
@@ -20,7 +20,7 @@ export function ArticleGrid({
   return (
     <section className="max-w-7xl mx-auto px-6 py-16">
       <div className="mb-10">
-        <p className="section-title mb-2">Editorial</p>
+        <p className="section-title mb-2">Éditorial</p>
         <h2 className="text-heading-1" style={{ color: "var(--ink)" }}>
           {title}
         </h2>
