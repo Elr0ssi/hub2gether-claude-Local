@@ -26,15 +26,15 @@ function fmtNumber(v: number): string {
 }
 
 function fmtMetric(v: number, metric: EconomyMetricId): string {
-  if (metric === "gdp")         return `${fmtNumber(v)} Mds$`;
+  if (metric === "gdp")         return `${fmtNumber(v)} Mds€`;
   if (metric === "companies")   return `${fmtNumber(v)} k`;
   return `${v.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`;
 }
 
 function fmtDebtAmount(gdp: number, debtRatio: number): string {
   const amount = Math.round(gdp * debtRatio / 100);
-  if (amount >= 1000) return `${(amount / 1000).toFixed(1)} T$`;
-  return `${fmtNumber(amount)} Mds$`;
+  if (amount >= 1000) return `${(amount / 1000).toFixed(1)} T€`;
+  return `${fmtNumber(amount)} Mds€`;
 }
 
 function getMaxForTrend(countryName: string, metric: EconomyMetricId): number {
@@ -83,7 +83,7 @@ function EconomicView({ countryName, yearData, metric }: { countryName: string; 
             <div className="rounded-xl px-3 py-2.5" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
               <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>PIB / habitant</p>
               <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>
-                {comp ? `${comp.gdp_per_capita_usd.toLocaleString("fr-FR")} $` : "—"}
+                {comp ? `${comp.gdp_per_capita_usd.toLocaleString("fr-FR")} €` : "—"}
               </p>
               <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>par personne</p>
             </div>
@@ -238,7 +238,7 @@ function CompaniesView({ countryName, yearData }: { countryName: string; yearDat
                   <span className="text-xs font-semibold truncate" style={{ color: "var(--ink)" }}>{c.name}</span>
                   <span style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>{c.sector}</span>
                 </div>
-                <span className="text-xs tabular-nums whitespace-nowrap" style={{ color: "var(--ink-2)" }}>{c.revenue_bn} Mds$</span>
+                <span className="text-xs tabular-nums whitespace-nowrap" style={{ color: "var(--ink-2)" }}>{c.revenue_bn} Mds€</span>
               </div>
             ))}
           </div>

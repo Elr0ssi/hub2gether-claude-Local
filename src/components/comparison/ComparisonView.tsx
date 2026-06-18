@@ -25,8 +25,8 @@ interface ComparisonRow {
 }
 
 function fmt(v: number, unit: string): string {
-  if (unit === "Mds$")    return `${v.toLocaleString("fr-FR")} Mds$`;
-  if (unit === "USD/hab") return `${v.toLocaleString("fr-FR")} $`;
+  if (unit === "Mds€")    return `${v.toLocaleString("fr-FR")} Mds€`;
+  if (unit === "€/hab")   return `${v.toLocaleString("fr-FR")} €`;
   if (unit === "km²")     return `${v.toLocaleString("fr-FR")} km²`;
   if (unit === "M hab")   return `${v.toLocaleString("fr-FR")} M`;
   if (unit === "kbd")     return `${v.toLocaleString("fr-FR")} kb/j`;
@@ -292,13 +292,13 @@ export function ComparisonView() {
 
   const economyRows: ComparisonRow[] = [
     {
-      label: "PIB", unit: "Mds$",
+      label: "PIB", unit: "Mds€",
       valueA: ecoA?.gdp ?? null, valueB: ecoB?.gdp ?? null, higherLabel: "plus grand",
       rankA: rankAmongEco(countryA, ecoCountries, "gdp"),
       rankB: rankAmongEco(countryB, ecoCountries, "gdp"),
     },
     {
-      label: "PIB / habitant", unit: "USD/hab",
+      label: "PIB / habitant", unit: "€/hab",
       valueA: cmpA?.gdp_per_capita_usd ?? null, valueB: cmpB?.gdp_per_capita_usd ?? null, higherLabel: "plus riche",
       rankA: rankAmongCmp(countryA, (c) => c.gdp_per_capita_usd),
       rankB: rankAmongCmp(countryB, (c) => c.gdp_per_capita_usd),
@@ -310,7 +310,7 @@ export function ComparisonView() {
       rankB: rankAmongEco(countryB, ecoCountries, "debt_ratio"),
     },
     {
-      label: "Dette 2024", unit: "Mds$",
+      label: "Dette 2024", unit: "Mds€",
       valueA: debtA ? debtA.debt_2024_bn * 1.09 : null, valueB: debtB ? debtB.debt_2024_bn * 1.09 : null, higherLabel: "plus de dette",
       rankA: null, rankB: null,
     },
@@ -385,7 +385,7 @@ export function ComparisonView() {
 
   const militaryRows: ComparisonRow[] = [
     {
-      label: "Budget militaire", unit: "Mds$",
+      label: "Budget militaire", unit: "Mds€",
       valueA: cmpA?.military_budget_bn ?? null, valueB: cmpB?.military_budget_bn ?? null, higherLabel: "plus dépensier",
       rankA: rankAmongCmp(countryA, (c) => c.military_budget_bn),
       rankB: rankAmongCmp(countryB, (c) => c.military_budget_bn),

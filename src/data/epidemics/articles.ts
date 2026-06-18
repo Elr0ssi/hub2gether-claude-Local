@@ -119,7 +119,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         { value: "90 jours", label: "De Wuhan au monde entier", note: "Décembre 2019 — mars 2020" },
         { value: "7M+", label: "Décès officiels OMS", note: "Cumul jusqu'en 2024" },
         { value: "774M", label: "Cas confirmés cumulés", note: "Chiffre OMS début 2024" },
-        { value: "$12 500 Md", label: "Coût économique mondial", note: "FMI estimation 2020–2023" },
+        { value: "12 500 Md€", label: "Coût économique mondial", note: "FMI estimation 2020–2023" },
       ]},
       { type: "carousel", title: "Les pays les plus touchés par COVID-19", items: [
         { name: "États-Unis", emoji: "🇺🇸", detail: "103M cas · 1,1M décès", subdetail: "Première vague dévastatrice à New York (mars-avril 2020). Gestion politique fragmentée entre États." },
@@ -216,7 +216,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       { type: "lead", content: "La pandémie de COVID-19 a mis à nu la fragilité de la gouvernance sanitaire mondiale. Derrière les discours de solidarité internationale, la réalité a été celle de la compétition : pour les masques, les respirateurs, les vaccins. Le \"nationalisme vaccinal\" des pays riches — qui ont pré-acheté plusieurs fois leur dotation — a retardé la protection des populations vulnérables et facilité l'émergence de variants." },
       { type: "stats", items: [
         { value: "80%", label: "Doses COVID aux pays riches", note: "2021, 16% de la pop. mondiale" },
-        { value: "$2 Md", label: "Budget annuel OMS", note: "Moitié du budget d'un grand hôpital US" },
+        { value: "2 Md€", label: "Budget annuel OMS", note: "Moitié du budget d'un grand hôpital US" },
         { value: "194", label: "États membres OMS", note: "Mais aucun pouvoir coercitif" },
         { value: "15%", label: "Couverture vaccinale", note: "Afrique subsaharienne fin 2021" },
       ]},
@@ -238,7 +238,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         { value: "60%", label: "Doses reçues par pays riches", note: "Représentant 16% de la pop." },
         { value: "15%", label: "Couverture Afrique fin 2021", note: "Vs 70%+ en Europe occidentale" },
         { value: "2 Md", label: "Doses promises via COVAX", note: "Objectif initial 2021, non atteint" },
-        { value: "+$1 500 Md", label: "Coût économique des variants", note: "FMI : retards dus aux variants" },
+        { value: "+1 500 Md€", label: "Coût économique des variants", note: "FMI : retards dus aux variants" },
       ]},
     ],
   },

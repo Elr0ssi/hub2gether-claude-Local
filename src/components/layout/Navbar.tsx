@@ -36,6 +36,23 @@ export function Navbar() {
 
         {/* Theme navigation */}
         <nav className="hidden md:flex items-center gap-1">
+          <Link
+            href="/preview"
+            className={cn(
+              "relative px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150",
+              pathname === "/preview"
+                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
+                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
+            )}
+          >
+            Présentation
+            {pathname === "/preview" && (
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
+                style={{ background: "var(--accent)" }}
+              />
+            )}
+          </Link>
           {THEMES.map((theme) => {
             const isActive =
               pathname === `/map/${theme.slug}` ||

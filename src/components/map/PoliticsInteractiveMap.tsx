@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { ComposableMap, Geographies, Geography, ZoomableGroup, type GeographyItem } from "react-simple-maps";
 import { Plus, Minus, Maximize } from "lucide-react";
 import type { PoliticalPeriod } from "@/data/politics/politics";
@@ -17,6 +17,14 @@ interface PoliticsInteractiveMapProps {
 export function PoliticsInteractiveMap({ politicsData, selectedCountry, onCountryClick }: PoliticsInteractiveMapProps) {
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([20, 10]);
+  const [flashCountry, setFlashCountry] = useState<string | null>(null);
+
+  const handleCountryClick = useCallback((name: string, hasData: boolean) => {
+    if (!hasData) return;
+    onCountryClick(name);
+    setFlashCountry(name);
+    setTimeout(() => setFlashCountry(null), 700);
+  }, [onCountryClick]);
 
   return (
     <div className="relative w-full" style={{ aspectRatio: "16/9", minHeight: "420px" }}>
@@ -39,19 +47,27 @@ export function PoliticsInteractiveMap({ politicsData, selectedCountry, onCountr
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const name: string = (geo as any).properties?.name ?? "";
                 const isSelected = selectedCountry === name;
+                const isFlashing = flashCountry === name;
                 const hasData = Boolean(politicsData[name]);
-                const fill = getCountryFillColorPolitics(name, politicsData, isSelected);
+                const fill = getCountryFillColorPolitics(name, politicsData);
 
                 return (
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}
                     fill={fill}
-                    stroke={isSelected ? "#39FF88" : "#C8C8C8"}
-                    strokeWidth={isSelected ? 1.4 : 0.35}
-                    onClick={() => { if (hasData) onCountryClick(name); }}
+                    stroke={isSelected ? "#fff" : "#C8C8C8"}
+                    strokeWidth={isSelected ? 1.2 : 0.35}
+                    className={isFlashing ? "politics-flash" : ""}
+                    onClick={() => handleCountryClick(name, hasData)}
                     style={{
-                      default: { outline: "none", cursor: hasData ? "pointer" : "default", opacity: hasData ? 1 : 0.6 },
+                      default: {
+                        outline: "none",
+                        cursor: hasData ? "pointer" : "default",
+                        opacity: hasData ? 1 : 0.6,
+                        filter: isSelected ? `drop-shadow(0 0 6px ${fill}cc) drop-shadow(0 0 12px ${fill}66)` : "none",
+                        transition: "filter 0.3s ease",
+                      },
                       hover: { outline: "none", cursor: hasData ? "pointer" : "default", opacity: 0.85 },
                       pressed: { outline: "none" },
                     }}
@@ -127,6 +143,18 @@ export function PoliticsInteractiveMap({ politicsData, selectedCountry, onCountr
           Cliquez sur un pays
         </div>
       )}
+
+      <style>{`
+        @keyframes politics-flash-anim {
+          0%   { filter: brightness(1); }
+          20%  { filter: brightness(1.9) saturate(1.4); }
+          50%  { filter: brightness(1.6) saturate(1.2); }
+          100% { filter: brightness(1); }
+        }
+        .politics-flash {
+          animation: politics-flash-anim 0.7s ease-out forwards;
+        }
+      `}</style>
     </div>
   );
 }

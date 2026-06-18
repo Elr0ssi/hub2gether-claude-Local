@@ -40,8 +40,8 @@ const FLAGS: Record<string, string> = {
 function formatValue(value: number | undefined, metricId: EconomyMetricId): string {
   if (value === undefined || value === null) return "—";
   if (metricId === "gdp") {
-    if (value >= 1000) return `${(value / 1000).toFixed(1)} T$`;
-    return `${value.toLocaleString("fr-FR")} Mds`;
+    if (value >= 1000) return `${(value / 1000).toFixed(1)} T€`;
+    return `${value.toLocaleString("fr-FR")} Mds€`;
   }
   if (metricId === "debt_ratio") return `${value.toFixed(1)} %`;
   if (metricId === "unemployment") return `${value.toFixed(1)} %`;
@@ -75,7 +75,7 @@ interface ColDef {
 
 function getColDefs(metric: EconomyMetricId): ColDef[] {
   if (metric === "gdp") return [{
-    key: "gdp", header: "PIB", unit: "Mds USD",
+    key: "gdp", header: "PIB", unit: "Mds €",
     getValue: (d) => d.gdp,
     format: (d) => formatValue(d.gdp, "gdp"),
     sortDir: "desc",
@@ -88,7 +88,7 @@ function getColDefs(metric: EconomyMetricId): ColDef[] {
       sortDir: "desc",
     },
     {
-      key: "debt_abs", header: "Montant dette", unit: "Mds USD",
+      key: "debt_abs", header: "Montant dette", unit: "Mds €",
       getValue: (d) => Math.round(d.gdp * d.debt_ratio / 100),
       format: (d) => {
         const v = Math.round(d.gdp * d.debt_ratio / 100);

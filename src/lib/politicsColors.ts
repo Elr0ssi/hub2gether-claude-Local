@@ -23,9 +23,7 @@ export const ORIENTATION_ORDER: PoliticalOrientation[] = [
 export function getCountryFillColorPolitics(
   countryName: string,
   politicsData: Record<string, PoliticalPeriod>,
-  isSelected: boolean
 ): string {
-  if (isSelected) return "#39FF88";
   const period = politicsData[countryName];
   if (!period) return "#EBEBEB";
   return ORIENTATION_COLORS[period.orientation];
