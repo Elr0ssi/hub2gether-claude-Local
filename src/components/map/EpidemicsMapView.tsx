@@ -8,7 +8,12 @@ import { EpidemicsLeafletMap, type LeafletTileStyle } from "./EpidemicsLeafletMa
 import { EpidemicsSidePanel } from "@/components/sidebar/EpidemicsSidePanel";
 import { ThemeDropdown } from "./ThemeDropdown";
 import { EPIDEMICS, getDiseaseById } from "@/data/epidemics/epidemics";
+import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
+import { getArticlesByTheme, ARTICLES } from "@/data/articles";
+import { useDragScroll } from "@/hooks/useDragScroll";
 import type { EpidemicDiseaseId, EpidemicDisease } from "@/types";
+
+const epidemicsArticles = getArticlesByTheme("epidemics");
 
 function computeYtdDisease(disease: EpidemicDisease): EpidemicDisease {
   const today = new Date();
@@ -46,6 +51,7 @@ export function EpidemicsMapView() {
   const [mapStyle, setMapStyle] = useState<MapStyle>("editorial");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ytdMode, setYtdMode] = useState(false);
+  const { ref: diseaseRowRef, onMouseDown: onDiseaseRowDown, onMouseUp: onDiseaseRowUp, onMouseLeave: onDiseaseRowLeave, onMouseMove: onDiseaseRowMove } = useDragScroll();
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setIsFullscreen(false); };
@@ -81,6 +87,16 @@ export function EpidemicsMapView() {
     setSelectedCountry(countryName);
     setSidePanelOpen(true);
   }, []);
+
+  const countryArticles = useMemo(() => {
+    if (!selectedCountry) return [];
+    const q = selectedCountry.toLowerCase();
+    return ARTICLES.filter(
+      (a) =>
+        a.title.toLowerCase().includes(q) ||
+        a.tags.some((t) => t.toLowerCase().includes(q))
+    );
+  }, [selectedCountry]);
 
   return (
     <>
@@ -148,8 +164,13 @@ export function EpidemicsMapView() {
 
         {/* Disease selector (équivalent du sélecteur d'années en économie) */}
         <div
+          ref={diseaseRowRef}
           className="px-5 py-2 border-b flex items-center gap-3 overflow-x-auto"
-          style={{ borderColor: "var(--border)", background: "var(--surface)", scrollbarWidth: "none" }}
+          style={{ borderColor: "var(--border)", background: "var(--surface)", scrollbarWidth: "none", cursor: "grab" }}
+          onMouseDown={onDiseaseRowDown}
+          onMouseUp={onDiseaseRowUp}
+          onMouseLeave={onDiseaseRowLeave}
+          onMouseMove={onDiseaseRowMove}
         >
           <span className="text-xs font-semibold shrink-0" style={{ color: "var(--ink-3)" }}>Épidémie :</span>
           <div className="flex items-center gap-1">
@@ -299,6 +320,29 @@ export function EpidemicsMapView() {
             )}
           </p>
         </div>
+      </div>
+
+      {/* Article carousels */}
+      <div
+        className="mt-6 rounded-2xl p-5 flex flex-col gap-6"
+        style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+      >
+        {selectedCountry && (
+          <ArticleCarousel
+            articles={countryArticles}
+            title={`Recommandations — ${selectedCountry}`}
+            subtitle="Articles liés au pays sélectionné"
+            emptyMessage={`Aucun article spécifique pour ${selectedCountry} pour l'instant.`}
+            icon="pin"
+          />
+        )}
+        <ArticleCarousel
+          articles={epidemicsArticles}
+          title="Analyses épidémiques"
+          subtitle="Tous les articles de l'onglet Épidémies"
+          emptyMessage="Aucun article disponible pour cet onglet."
+          icon="newspaper"
+        />
       </div>
     </>
   );
