@@ -1,13 +1,10 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { Maximize2, Minimize2, ChevronLeft, Shield } from "lucide-react";
+import { Maximize2, Minimize2, ChevronLeft, Shield, ChevronUp, ChevronDown } from "lucide-react";
 import { MilitaryInteractiveMap } from "./MilitaryInteractiveMap";
 import { MilitarySidePanel } from "@/components/sidebar/MilitarySidePanel";
 import { ThemeDropdown } from "./ThemeDropdown";
-import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
-import { ARTICLES } from "@/data/articles";
-import { MILITARY_ARTICLES } from "@/data/military/articles";
 import { useDragScroll } from "@/hooks/useDragScroll";
 import {
   getMilitaryData,
@@ -25,6 +22,8 @@ export function MilitaryMapView() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [sidePanelOpen, setSidePanelOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [rankMetric, setRankMetric] = useState<MilitaryMetricId>("budget");
+  const [rankAsc, setRankAsc] = useState(false);
   const { ref: yearBtnsRef, onMouseDown: onYearBtnsDown, onMouseUp: onYearBtnsUp, onMouseLeave: onYearBtnsLeave, onMouseMove: onYearBtnsMove } = useDragScroll();
 
   const data = useMemo(() => getMilitaryData(year), [year]);
@@ -34,15 +33,6 @@ export function MilitaryMapView() {
     [selectedCountry, data]
   );
 
-  const countryArticles = useMemo(() => {
-    if (!selectedCountry) return [];
-    const q = selectedCountry.toLowerCase();
-    return ARTICLES.filter(a =>
-      a.title.toLowerCase().includes(q) ||
-      a.tags.some(t => t.toLowerCase().includes(q))
-    );
-  }, [selectedCountry]);
-
   const handleCountryClick = useCallback((name: string) => {
     setSelectedCountry(name);
     setSidePanelOpen(true);
@@ -50,15 +40,16 @@ export function MilitaryMapView() {
 
   const activeMetric = MILITARY_METRICS.find(m => m.id === metric)!;
 
-  // Top 5 for selected metric
-  const top5 = useMemo(() => {
-    return Object.entries(data)
-      .map(([name, d]) => ({ name, value: d[metric] }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 5);
-  }, [data, metric]);
+  // Full ranking for selected rank metric
+  const allRanked = useMemo(() => {
+    const sorted = Object.entries(data)
+      .map(([name, d]) => ({ name, value: d[rankMetric] }))
+      .sort((a, b) => rankAsc ? a.value - b.value : b.value - a.value);
+    return sorted;
+  }, [data, rankMetric, rankAsc]);
 
-  const maxValue = top5[0]?.value ?? 1;
+  const rankMax = allRanked.length > 0 ? Math.max(...allRanked.map(r => r.value)) : 1;
+  const rankMetricDef = MILITARY_METRICS.find(m => m.id === rankMetric)!;
 
   return (
     <>
@@ -216,53 +207,83 @@ export function MilitaryMapView() {
         </div>
       </div>
 
-      {/* Top 5 ranking */}
-      <div className="mt-4 rounded-2xl p-4" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-        <div className="flex items-center gap-2 mb-3">
-          <Shield size={14} style={{ color: activeMetric.color }} />
-          <p className="text-xs font-bold" style={{ color: "var(--ink-2)" }}>
-            Top 5 — {activeMetric.label} ({activeMetric.unit}) en {year}
-          </p>
+      {/* Full ranking table */}
+      <div className="mt-4 rounded-2xl overflow-hidden" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+        {/* Header + metric tabs */}
+        <div className="px-4 pt-4 pb-3 border-b flex items-center justify-between gap-3 flex-wrap"
+          style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+          <div className="flex items-center gap-2">
+            <Shield size={14} style={{ color: rankMetricDef.color }} />
+            <p className="text-xs font-bold" style={{ color: "var(--ink-2)" }}>
+              Classement complet — {year}
+            </p>
+          </div>
+          <div className="flex items-center gap-1 flex-wrap">
+            {MILITARY_METRICS.map(m => (
+              <button
+                key={m.id}
+                onClick={() => { setRankMetric(m.id); setRankAsc(false); }}
+                className="px-2.5 py-1 rounded-lg text-xs transition-all"
+                style={rankMetric === m.id
+                  ? { background: m.color + "22", color: m.color, border: `1px solid ${m.color}55`, fontWeight: 700 }
+                  : { background: "transparent", color: "var(--ink-4)", border: "1px solid transparent" }
+                }
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-col gap-2">
-          {top5.map(({ name, value }, idx) => {
-            const pct = (value / maxValue) * 100;
-            return (
-              <div key={name} className="flex items-center gap-3">
-                <span className="w-4 text-right text-xs font-bold shrink-0" style={{ color: "var(--ink-4)" }}>{idx + 1}</span>
-                <span className="w-28 text-xs truncate shrink-0" style={{ color: selectedCountry === name ? activeMetric.color : "var(--ink)" }}>
-                  {name}
-                </span>
-                <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--surface-2)" }}>
-                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: activeMetric.color, transition: "width 0.4s ease" }} />
-                </div>
-                <span className="text-xs tabular-nums shrink-0 font-semibold" style={{ color: activeMetric.color, minWidth: "80px", textAlign: "right", fontSize: "0.62rem" }}>
-                  {value.toLocaleString("fr-FR")} {activeMetric.unit}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
 
-      {/* Article carousels */}
-      <div className="mt-6 rounded-2xl p-5 flex flex-col gap-6" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-        {selectedCountry && (
-          <ArticleCarousel
-            articles={countryArticles}
-            title={`Recommandations — ${selectedCountry}`}
-            subtitle="Articles liés au pays sélectionné"
-            emptyMessage={`Aucun article spécifique pour ${selectedCountry} pour l'instant.`}
-            icon="pin"
-          />
-        )}
-        <ArticleCarousel
-          articles={MILITARY_ARTICLES}
-          title="Analyses militaires"
-          subtitle="Tous les articles de l'onglet Militaire"
-          emptyMessage="Aucun article disponible."
-          icon="newspaper"
-        />
+        {/* Table */}
+        <div className="overflow-y-auto" style={{ maxHeight: "420px" }}>
+          <table className="w-full" style={{ borderCollapse: "collapse" }}>
+            <thead style={{ position: "sticky", top: 0, background: "var(--surface)", zIndex: 1 }}>
+              <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                <th className="px-3 py-2 text-left" style={{ color: "var(--ink-4)", fontSize: "0.6rem", fontWeight: 600, width: "32px" }}>#</th>
+                <th className="px-2 py-2 text-left" style={{ color: "var(--ink-4)", fontSize: "0.6rem", fontWeight: 600 }}>Pays</th>
+                <th className="px-2 py-2 text-left hidden sm:table-cell" style={{ color: "var(--ink-4)", fontSize: "0.6rem", fontWeight: 600 }}>Barres</th>
+                <th
+                  className="px-3 py-2 text-right cursor-pointer select-none"
+                  style={{ color: rankMetricDef.color, fontSize: "0.6rem", fontWeight: 700, whiteSpace: "nowrap" }}
+                  onClick={() => setRankAsc(a => !a)}
+                >
+                  <span className="flex items-center justify-end gap-1">
+                    {rankMetricDef.label}
+                    {rankAsc ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+                  </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {allRanked.map(({ name, value }, idx) => {
+                const pct = (value / rankMax) * 100;
+                const isHighlighted = selectedCountry === name;
+                return (
+                  <tr
+                    key={name}
+                    className="cursor-pointer transition-all"
+                    style={{ borderBottom: "1px solid var(--border)", background: isHighlighted ? rankMetricDef.color + "11" : "transparent" }}
+                    onClick={() => { setSelectedCountry(name); setSidePanelOpen(true); }}
+                  >
+                    <td className="px-3 py-2 text-right tabular-nums" style={{ color: "var(--ink-4)", fontSize: "0.65rem", fontWeight: 600 }}>{idx + 1}</td>
+                    <td className="px-2 py-2" style={{ color: isHighlighted ? rankMetricDef.color : "var(--ink)", fontSize: "0.7rem", fontWeight: isHighlighted ? 700 : 400, maxWidth: "120px" }}>
+                      <span className="block truncate">{name}</span>
+                    </td>
+                    <td className="px-2 py-2 hidden sm:table-cell" style={{ minWidth: "80px" }}>
+                      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--surface-2)" }}>
+                        <div className="h-full rounded-full transition-all duration-300" style={{ width: `${pct}%`, background: rankMetricDef.color }} />
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 text-right tabular-nums" style={{ color: rankMetricDef.color, fontSize: "0.65rem", fontWeight: 600, whiteSpace: "nowrap" }}>
+                      {value.toLocaleString("fr-FR")} <span style={{ color: "var(--ink-4)", fontWeight: 400 }}>{rankMetricDef.unit}</span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <style>{`

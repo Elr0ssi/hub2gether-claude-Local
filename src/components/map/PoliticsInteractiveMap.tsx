@@ -65,8 +65,6 @@ export function PoliticsInteractiveMap({ politicsData, selectedCountry, onCountr
                         outline: "none",
                         cursor: hasData ? "pointer" : "default",
                         opacity: hasData ? 1 : 0.6,
-                        filter: isSelected ? `drop-shadow(0 0 6px ${fill}cc) drop-shadow(0 0 12px ${fill}66)` : "none",
-                        transition: "filter 0.3s ease",
                       },
                       hover: { outline: "none", cursor: hasData ? "pointer" : "default", opacity: 0.85 },
                       pressed: { outline: "none" },
@@ -146,14 +144,12 @@ export function PoliticsInteractiveMap({ politicsData, selectedCountry, onCountr
 
       <style>{`
         @keyframes politics-flash-anim {
-          0%   { filter: brightness(1); }
-          20%  { filter: brightness(1.9) saturate(1.4); }
-          50%  { filter: brightness(1.6) saturate(1.2); }
-          100% { filter: brightness(1); }
+          0%   { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); }
+          20%  { filter: drop-shadow(0 0 10px rgba(255,255,255,1)) drop-shadow(0 0 22px rgba(255,255,255,0.6)); }
+          60%  { filter: drop-shadow(0 0 6px rgba(255,255,255,0.4)); }
+          100% { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); }
         }
-        .politics-flash {
-          animation: politics-flash-anim 0.7s ease-out forwards;
-        }
+        .politics-flash { animation: politics-flash-anim 0.65s ease-out forwards; }
       `}</style>
     </div>
   );

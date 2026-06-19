@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Shield, Users, Plane, Ship, Crosshair, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, Shield, Users, Plane, Ship, Crosshair } from "lucide-react";
+import { useDragScroll } from "@/hooks/useDragScroll";
 import type { MilitaryMetricId, MilitaryCountryData } from "@/data/military/military";
 import { MILITARY_METRICS } from "@/data/military/military";
 import { MILITARY_EQUIPMENT, EQUIPMENT_TYPE_LABELS, EQUIPMENT_TYPE_ICONS } from "@/data/military/militaryEquipment";
@@ -107,13 +108,10 @@ function EquipmentCard({ equipment }: { equipment: MilitaryEquipment }) {
 
 export function MilitarySidePanel({ countryName, data, metric, year, open, onClose }: MilitarySidePanelProps) {
   const [filterType, setFilterType] = useState<EquipmentType | "all">("all");
-  const [carouselIdx, setCarouselIdx] = useState(0);
+  const { ref: carouselRef, onMouseDown, onMouseUp, onMouseLeave, onMouseMove } = useDragScroll();
 
   const equipment = countryName ? (MILITARY_EQUIPMENT[countryName] ?? []) : [];
   const filtered = filterType === "all" ? equipment : equipment.filter(e => e.type === filterType);
-
-  const CARDS_VISIBLE = 2;
-  const maxIdx = Math.max(0, filtered.length - CARDS_VISIBLE);
 
   return (
     <AnimatePresence>
@@ -184,7 +182,7 @@ export function MilitarySidePanel({ countryName, data, metric, year, open, onClo
                           return (
                             <button
                               key={id}
-                              onClick={() => { setFilterType(id as EquipmentType | "all"); setCarouselIdx(0); }}
+                              onClick={() => { setFilterType(id as EquipmentType | "all"); }}
                               className="px-2 py-0.5 rounded text-xs transition-all"
                               style={filterType === id
                                 ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700, fontSize: "0.62rem" }
@@ -197,39 +195,22 @@ export function MilitarySidePanel({ countryName, data, metric, year, open, onClo
                         })}
                       </div>
 
-                      {/* Carousel */}
+                      {/* Carousel drag-scroll */}
                       {filtered.length > 0 ? (
-                        <div className="relative">
-                          <div className="flex gap-3 overflow-hidden">
-                            {filtered.slice(carouselIdx, carouselIdx + CARDS_VISIBLE).map((eq) => (
-                              <EquipmentCard key={eq.name} equipment={eq} />
-                            ))}
-                          </div>
-
-                          {/* Nav arrows */}
-                          {filtered.length > CARDS_VISIBLE && (
-                            <div className="flex items-center justify-between mt-2">
-                              <button
-                                disabled={carouselIdx === 0}
-                                onClick={() => setCarouselIdx(i => Math.max(0, i - 1))}
-                                className="w-7 h-7 rounded-lg flex items-center justify-center transition-all disabled:opacity-30"
-                                style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
-                              >
-                                <ChevronLeft size={13} />
-                              </button>
-                              <span style={{ color: "var(--ink-4)", fontSize: "0.62rem" }}>
-                                {carouselIdx + 1}–{Math.min(carouselIdx + CARDS_VISIBLE, filtered.length)} / {filtered.length}
-                              </span>
-                              <button
-                                disabled={carouselIdx >= maxIdx}
-                                onClick={() => setCarouselIdx(i => Math.min(maxIdx, i + 1))}
-                                className="w-7 h-7 rounded-lg flex items-center justify-center transition-all disabled:opacity-30"
-                                style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
-                              >
-                                <ChevronRight size={13} />
-                              </button>
+                        <div
+                          ref={carouselRef}
+                          className="flex gap-3 overflow-x-auto pb-2 select-none"
+                          style={{ scrollbarWidth: "none", cursor: "grab", scrollSnapType: "x mandatory" }}
+                          onMouseDown={onMouseDown}
+                          onMouseUp={onMouseUp}
+                          onMouseLeave={onMouseLeave}
+                          onMouseMove={onMouseMove}
+                        >
+                          {filtered.map((eq) => (
+                            <div key={eq.name} style={{ scrollSnapAlign: "start", flexShrink: 0 }}>
+                              <EquipmentCard equipment={eq} />
                             </div>
-                          )}
+                          ))}
                         </div>
                       ) : (
                         <p style={{ color: "var(--ink-4)", fontSize: "0.7rem" }}>Aucun équipement dans cette catégorie.</p>

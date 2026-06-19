@@ -46,7 +46,6 @@ export function getCountryFillColor(
   isHovered = false,
   isSelected = false
 ): string {
-  if (isSelected) return "#39FF88";
   const t = getDeathIntensity(countryName, countries, maxDeaths);
   if (t === 0) return isHovered ? "#DCDCDC" : "#EBEBEB";
   const base = interpolateGreen(t);

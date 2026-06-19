@@ -62,11 +62,8 @@ export function MilitaryInteractiveMap({ data, metric, selectedCountry, onCountr
                       default: {
                         outline: "none",
                         cursor: hasData ? "pointer" : "default",
-                        filter: isSelected
-                          ? `drop-shadow(0 0 6px ${metricColor}99)`
-                          : "none",
                       },
-                      hover: { outline: "none", opacity: hasData ? 0.85 : 1 },
+                      hover: { outline: "none", opacity: hasData ? 0.85 : 1, cursor: hasData ? "pointer" : "default" },
                       pressed: { outline: "none" },
                     }}
                     className={isFlashing ? "military-flash" : ""}
@@ -98,12 +95,12 @@ export function MilitaryInteractiveMap({ data, metric, selectedCountry, onCountr
 
       <style>{`
         @keyframes military-flash-anim {
-          0%   { filter: brightness(1); }
-          20%  { filter: brightness(1.9) saturate(1.5); }
-          50%  { filter: brightness(1.6) saturate(1.2); }
-          100% { filter: brightness(1); }
+          0%   { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); }
+          20%  { filter: drop-shadow(0 0 10px rgba(255,255,255,1)) drop-shadow(0 0 22px rgba(255,255,255,0.6)); }
+          60%  { filter: drop-shadow(0 0 6px rgba(255,255,255,0.4)); }
+          100% { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); }
         }
-        .military-flash { animation: military-flash-anim 0.7s ease-out forwards; }
+        .military-flash { animation: military-flash-anim 0.65s ease-out forwards; }
       `}</style>
     </div>
   );
