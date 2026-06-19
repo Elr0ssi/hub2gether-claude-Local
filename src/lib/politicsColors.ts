@@ -4,8 +4,8 @@ export const ORIENTATION_COLORS: Record<PoliticalOrientation, string> = {
   far_left:  "#E57373",
   left:      "#F48FB1",
   center:    "#FFD54F",
-  right:     "#64B5F6",
-  far_right: "#9575CD",
+  right:     "#90CAF9",
+  far_right: "#1565C0",
 };
 
 export const ORIENTATION_LABELS: Record<PoliticalOrientation, string> = {

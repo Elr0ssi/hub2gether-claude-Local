@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { ComposableMap, Geographies, Geography, ZoomableGroup, type GeographyItem } from "react-simple-maps";
 import { Plus, Minus } from "lucide-react";
 import type { MilitaryMetricId, MilitaryCountryData } from "@/data/military/military";
-import { getColorForMilitary, MILITARY_METRICS } from "@/data/military/military";
+import { getColorForMilitary } from "@/data/military/military";
 
 const WORLD_MAP_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -19,15 +19,15 @@ export function MilitaryInteractiveMap({ data, metric, selectedCountry, onCountr
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([20, 10]);
   const [flashCountry, setFlashCountry] = useState<string | null>(null);
+  const [flashColor, setFlashColor] = useState("#ffffff");
 
-  const handleClick = useCallback((name: string, hasData: boolean) => {
+  const handleClick = useCallback((name: string, hasData: boolean, color: string) => {
     if (!hasData) return;
     onCountryClick(name);
     setFlashCountry(name);
+    setFlashColor(color);
     setTimeout(() => setFlashCountry(null), 700);
   }, [onCountryClick]);
-
-  const metricColor = MILITARY_METRICS.find(m => m.id === metric)?.color ?? "#1565C0";
 
   return (
     <div className="relative w-full" style={{ aspectRatio: "16/9", minHeight: "420px" }}>
@@ -67,7 +67,7 @@ export function MilitaryInteractiveMap({ data, metric, selectedCountry, onCountr
                       pressed: { outline: "none" },
                     }}
                     className={isFlashing ? "military-flash" : ""}
-                    onClick={() => handleClick(name, hasData)}
+                    onClick={() => handleClick(name, hasData, fill)}
                   />
                 );
               })
@@ -95,10 +95,10 @@ export function MilitaryInteractiveMap({ data, metric, selectedCountry, onCountr
 
       <style>{`
         @keyframes military-flash-anim {
-          0%   { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); }
-          20%  { filter: drop-shadow(0 0 10px rgba(255,255,255,1)) drop-shadow(0 0 22px rgba(255,255,255,0.6)); }
-          60%  { filter: drop-shadow(0 0 6px rgba(255,255,255,0.4)); }
-          100% { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); }
+          0%   { filter: drop-shadow(0 0 0px ${flashColor}00); }
+          20%  { filter: drop-shadow(0 0 12px ${flashColor}bb) drop-shadow(0 0 26px ${flashColor}55); }
+          60%  { filter: drop-shadow(0 0 7px ${flashColor}66); }
+          100% { filter: drop-shadow(0 0 0px ${flashColor}00); }
         }
         .military-flash { animation: military-flash-anim 0.65s ease-out forwards; }
       `}</style>
