@@ -2,7 +2,6 @@ import type { Article } from "@/types";
 
 export const MILITARY_ARTICLES: Article[] = [
   {
-    id: "mil-001",
     slug: "course-armements-2025",
     theme: "military",
     title: "La nouvelle course aux armements : qui dépense le plus en 2025 ?",
@@ -21,7 +20,6 @@ export const MILITARY_ARTICLES: Article[] = [
     ],
   },
   {
-    id: "mil-002",
     slug: "chars-guerre-ukraine",
     theme: "military",
     title: "La bataille des chars en Ukraine : Leopard, Abrams et T-90 face à face",
@@ -39,7 +37,6 @@ export const MILITARY_ARTICLES: Article[] = [
     ],
   },
   {
-    id: "mil-003",
     slug: "drones-revolution-militaire",
     theme: "military",
     title: "La révolution des drones : du Bayraktar au Shahed, la guerre change de visage",
@@ -57,7 +54,6 @@ export const MILITARY_ARTICLES: Article[] = [
     ],
   },
   {
-    id: "mil-004",
     slug: "marine-guerre-mer-chine",
     theme: "military",
     title: "La Chine et sa marine : 727 navires pour contrôler la mer de Chine",
@@ -70,7 +66,6 @@ export const MILITARY_ARTICLES: Article[] = [
     ],
   },
   {
-    id: "mil-005",
     slug: "europe-rearmement-otan",
     theme: "military",
     title: "L'Europe se réarme : 2% du PIB et la fin du dividende de la paix",
@@ -88,7 +83,6 @@ export const MILITARY_ARTICLES: Article[] = [
     ],
   },
   {
-    id: "mil-006",
     slug: "nucleaire-puissances",
     theme: "military",
     title: "Armes nucléaires : les 9 puissances, 12 500 ogives et l'équilibre de la terreur",

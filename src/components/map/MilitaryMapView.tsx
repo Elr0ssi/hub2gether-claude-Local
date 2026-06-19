@@ -21,7 +21,7 @@ import {
 
 export function MilitaryMapView() {
   const [metric, setMetric] = useState<MilitaryMetricId>("budget");
-  const [year, setYear] = useState(DEFAULT_MILITARY_YEAR);
+  const [year, setYear] = useState<number>(DEFAULT_MILITARY_YEAR);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [sidePanelOpen, setSidePanelOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
