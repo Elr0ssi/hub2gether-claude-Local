@@ -6,6 +6,7 @@ import { MapViewLoader } from "@/components/map/MapViewLoader";
 import { EpidemicsMapViewLoader } from "@/components/map/EpidemicsMapViewLoader";
 import { EconomyMapViewLoader } from "@/components/map/EconomyMapViewLoader";
 import { PoliticsMapViewLoader } from "@/components/map/PoliticsMapViewLoader";
+import { MilitaryMapViewLoader } from "@/components/map/MilitaryMapViewLoader";
 import { ArticleGrid } from "@/components/articles/ArticleGrid";
 import { FAQSection } from "@/components/faq/FAQSection";
 import { getThemeById } from "@/data/themes";
@@ -20,7 +21,7 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return [{ theme: "empires" }, { theme: "epidemics" }, { theme: "economy" }, { theme: "politics" }];
+  return [{ theme: "empires" }, { theme: "epidemics" }, { theme: "economy" }, { theme: "politics" }, { theme: "military" }];
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -204,6 +205,7 @@ export default async function MapPage({ params, searchParams }: PageProps) {
   const isEpidemics = theme === "epidemics";
   const isEconomy = theme === "economy";
   const isPolitics = theme === "politics";
+  const isMilitary = theme === "military";
   const datasetSchema = DATASET_SCHEMAS[theme];
 
   return (
@@ -226,6 +228,8 @@ export default async function MapPage({ params, searchParams }: PageProps) {
             ? "Économie mondiale"
             : isPolitics
             ? "Politique mondiale"
+            : isMilitary
+            ? "Puissances militaires mondiales"
             : theme === "empires"
             ? "Empire romain"
             : themeData.label}
@@ -237,6 +241,8 @@ export default async function MapPage({ params, searchParams }: PageProps) {
             ? "Comparez le PIB, la dette publique, le chômage et les entreprises de 70+ pays de 2000 à 2025. Projections FMI avril 2025 — vue en temps réel (YTD) disponible pour l'année en cours."
             : isPolitics
             ? "Explorez les régimes politiques et les orientations idéologiques de 20+ pays depuis 1900. Naviguez sur la frise chronologique pour voir comment le monde politique a évolué d'une décennie à l'autre."
+            : isMilitary
+            ? "Comparez les budgets de défense, effectifs, chars, navires et avions militaires de 30 pays de 2000 à 2024. Cliquez sur un pays pour voir ses équipements majeurs."
             : theme === "empires"
             ? "Retracez l'ascension et la chute de l'Empire romain en sept périodes clés, de la cité latine fondatrice à la chute de Constantinople."
             : themeData.description}
@@ -261,6 +267,8 @@ export default async function MapPage({ params, searchParams }: PageProps) {
             <EconomyMapViewLoader />
           ) : isPolitics ? (
             <PoliticsMapViewLoader />
+          ) : isMilitary ? (
+            <MilitaryMapViewLoader />
           ) : (
             <MapViewLoader theme={themeData.id as ThemeId} initialYear={initialYear} />
           )}
@@ -279,6 +287,8 @@ export default async function MapPage({ params, searchParams }: PageProps) {
               ? "Décryptages économiques : PIB par pays 2025, dette publique mondiale, chômage et rivalités géopolitiques."
               : isPolitics
               ? "Analyses sur les grands basculements politiques du XXe et XXIe siècle — populismes, transitions démocratiques et autoritarismes."
+              : isMilitary
+              ? "Analyses sur les grandes puissances militaires, la course aux armements et les nouveaux conflits armés."
               : "Décryptages éditoriaux sur l'Empire romain — son expansion, son administration, son déclin et son héritage."
           }
         />

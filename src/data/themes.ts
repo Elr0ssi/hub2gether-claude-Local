@@ -44,9 +44,8 @@ export const THEMES: Theme[] = [
     description:
       "Comparez les budgets de défense, les capacités militaires et les arsenaux nucléaires. Appréhendez l'équilibre des forces à travers des données concrètes.",
     slug: "military",
-    available: false,
+    available: true,
     icon: "Shield",
-    comingSoonLabel: "T4 2025",
   },
   {
     id: "epidemics",
