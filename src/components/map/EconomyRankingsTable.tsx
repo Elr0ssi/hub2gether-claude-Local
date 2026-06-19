@@ -195,6 +195,7 @@ export function EconomyRankingsTable({
   const pageRows = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   const currentMetric = ECONOMY_METRICS.find((m) => m.id === metric) ?? ECONOMY_METRICS[0];
+  const barMax = useMemo(() => Math.max(...allRows.map(r => primaryCol.getValue(r.data)), 1), [allRows, primaryCol]);
 
   return (
     <div
@@ -236,13 +237,16 @@ export function EconomyRankingsTable({
       {/* Table — translate="no" prevents browser auto-translation of units (Mds, k, %) */}
       <div className="overflow-x-auto" translate="no">
         <table className="w-full" style={{ borderCollapse: "collapse" }}>
-          <thead>
+          <thead style={{ position: "sticky", top: 0, background: "var(--surface-2)", zIndex: 1 }}>
             <tr style={{ borderBottom: "1px solid var(--border-light)", background: "var(--surface-2)" }}>
               <th className="px-4 py-2.5 text-left" style={{ color: "var(--ink-4)", fontSize: "0.62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", width: "52px" }}>
                 #
               </th>
               <th className="px-3 py-2.5 text-left" style={{ color: "var(--ink-4)", fontSize: "0.62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                 Pays
+              </th>
+              <th className="px-3 py-2.5 text-left hidden sm:table-cell" style={{ color: "var(--ink-4)", fontSize: "0.62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                Barres
               </th>
               {cols.map((col) => (
                 <th
@@ -255,7 +259,7 @@ export function EconomyRankingsTable({
                     fontWeight: 700,
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
-                    background: "rgba(57,255,136,0.04)",
+                    background: col.key === effectiveSortKey ? "rgba(57,255,136,0.06)" : "transparent",
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -280,6 +284,8 @@ export function EconomyRankingsTable({
             >
               {pageRows.map(({ name, data, rank, delta }, idx) => {
                 const isEven = idx % 2 === 1;
+                const barValue = primaryCol.getValue(data);
+                const barPct = (barValue / barMax) * 100;
                 return (
                   <tr
                     key={name}
@@ -290,7 +296,7 @@ export function EconomyRankingsTable({
                       borderBottom: "1px solid var(--border-light)",
                       cursor: onCountryClick ? "pointer" : "default",
                     }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(57,255,136,0.04)"; }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(57,255,136,0.06)"; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = isEven ? "var(--surface-2)" : "var(--surface)"; }}
                   >
                     {/* Rank */}
@@ -324,15 +330,22 @@ export function EconomyRankingsTable({
                       </div>
                     </td>
 
+                    {/* Bar */}
+                    <td className="px-3 py-2.5 hidden sm:table-cell" style={{ minWidth: "100px" }}>
+                      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--surface-2)" }}>
+                        <div className="h-full rounded-full" style={{ width: `${barPct}%`, background: "#0D7A40", transition: "width 0.3s ease" }} />
+                      </div>
+                    </td>
+
                     {/* Data columns */}
                     {cols.map((col) => (
                       <td
                         key={col.key}
                         className="px-3 py-2.5 text-right tabular-nums"
                         style={{
-                          background: "rgba(57,255,136,0.05)",
+                          background: col.key === effectiveSortKey ? "rgba(57,255,136,0.05)" : "transparent",
                           fontWeight: col.key === effectiveSortKey ? 700 : 500,
-                          color: "var(--ink)",
+                          color: col.key === effectiveSortKey ? "#0D7A40" : "var(--ink)",
                           fontSize: "0.8rem",
                           whiteSpace: "nowrap",
                         }}
