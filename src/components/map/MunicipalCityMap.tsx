@@ -11,10 +11,14 @@ interface MunicipalCityMapProps {
   onCityClick: (city: CityResult) => void;
 }
 
-// Country view bounds: [lat, lon, zoom]
-const COUNTRY_VIEWS: Record<string, { center: [number, number]; zoom: number }> = {
-  France:  { center: [46.8, 2.3],  zoom: 5 },
-  Germany: { center: [51.2, 10.4], zoom: 5 },
+// Country bounding boxes [[south, west], [north, east]]
+const COUNTRY_BOUNDS: Record<string, [[number, number], [number, number]]> = {
+  France:         [[41.3, -5.5],   [51.5,  9.5]],
+  Germany:        [[47.3,  5.9],   [55.1, 15.1]],
+  USA:            [[24.0, -125.0], [49.5, -66.0]],
+  "United Kingdom": [[49.9, -8.6],  [60.9,  1.8]],
+  Spain:          [[35.9, -9.3],   [43.8,  4.4]],
+  Italy:          [[36.6,  6.6],   [47.1, 18.5]],
 };
 
 export function MunicipalCityMap({ cities, country, selectedCity, onCityClick }: MunicipalCityMapProps) {
@@ -37,17 +41,25 @@ export function MunicipalCityMap({ cities, country, selectedCity, onCityClick }:
         shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
       });
 
-      const view = COUNTRY_VIEWS[country] ?? { center: [20, 0] as [number, number], zoom: 3 };
+      const bounds = COUNTRY_BOUNDS[country];
       const map = L.map(mapRef.current!, {
-        center: view.center,
-        zoom: view.zoom,
         zoomControl: true,
         attributionControl: false,
+        minZoom: bounds ? 4 : 2,
+        maxZoom: 13,
       });
 
       L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
         maxZoom: 18,
       }).addTo(map);
+
+      if (bounds) {
+        const leafletBounds = L.latLngBounds(bounds[0], bounds[1]);
+        map.fitBounds(leafletBounds, { padding: [20, 20] });
+        map.setMaxBounds(leafletBounds.pad(0.08));
+      } else {
+        map.setView([20, 0], 3);
+      }
 
       leafletMapRef.current = map;
 

@@ -17,8 +17,8 @@ interface ArticleCarouselProps {
 function ArticleCardCompact({ article }: { article: Article }) {
   return (
     <article
-      className="flex-shrink-0 w-64 flex flex-col gap-2 p-4 rounded-xl transition-all"
-      style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+      className="flex-shrink-0 w-64 flex flex-col gap-2 p-4 rounded-xl transition-all duration-200 hover:-translate-y-1 article-card-hover"
+      style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}
     >
       <div className="flex items-center justify-between gap-2">
         <span className="accent-badge capitalize text-xs">{article.theme}</span>
@@ -105,6 +105,13 @@ export function ArticleCarousel({ articles, title, subtitle, emptyMessage, icon 
           />
         </div>
       </div>
+
+      <style>{`
+        .article-card-hover:hover {
+          box-shadow: 0 6px 20px rgba(0,0,0,0.14);
+          border-color: var(--border-hover, rgba(57,255,136,0.25)) !important;
+        }
+      `}</style>
 
       {/* Carousel */}
       {filtered.length === 0 ? (
