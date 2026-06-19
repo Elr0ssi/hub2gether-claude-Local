@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { ComposableMap, Geographies, Geography, ZoomableGroup, type GeographyItem } from "react-simple-maps";
 import { Plus, Minus, Maximize } from "lucide-react";
 import type { EconomyYear, EconomyMetricId } from "@/types";
-import { getMaxMetricValue, getValueIntensity, getCountryFillColorEconomy, GRADIENT_CSS } from "@/lib/economyColors";
+import { getMaxMetricValue, getCountryFillColorEconomy, GRADIENT_CSS } from "@/lib/economyColors";
 import { ECONOMY_METRICS } from "@/data/economy/economy";
 
 const WORLD_MAP_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -19,15 +19,17 @@ interface EconomyInteractiveMapProps {
 export function EconomyInteractiveMap({ economyYear, metric, selectedCountry, onCountryClick }: EconomyInteractiveMapProps) {
   const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
   const [flashCountry, setFlashCountry] = useState<string | null>(null);
+  const [flashColor, setFlashColor] = useState("#ffffff");
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([20, 10]);
   const maxValue = getMaxMetricValue(economyYear.countries, metric);
   const metricDef = ECONOMY_METRICS.find((m) => m.id === metric);
 
-  const handleClick = useCallback((name: string, hasData: boolean) => {
+  const handleClick = useCallback((name: string, hasData: boolean, color: string) => {
     if (!hasData) return;
     onCountryClick(name);
     setFlashCountry(name);
+    setFlashColor(color);
     setTimeout(() => setFlashCountry(null), 700);
   }, [onCountryClick]);
 
@@ -64,8 +66,8 @@ export function EconomyInteractiveMap({ economyYear, metric, selectedCountry, on
                     fill={fill}
                     stroke={isSelected ? "#fff" : "#C8C8C8"}
                     strokeWidth={isSelected ? 1.4 : 0.35}
-                    className={isFlashing ? "map-white-flash" : ""}
-                    onClick={() => handleClick(name, hasData)}
+                    className={isFlashing ? "map-color-flash" : ""}
+                    onClick={() => handleClick(name, hasData, fill)}
                     onMouseEnter={() => setHoveredCountry(name)}
                     onMouseLeave={() => setHoveredCountry(null)}
                     style={{
@@ -143,13 +145,13 @@ export function EconomyInteractiveMap({ economyYear, metric, selectedCountry, on
         </div>
       )}
       <style>{`
-        @keyframes map-white-flash-anim {
-          0%   { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); }
-          20%  { filter: drop-shadow(0 0 10px rgba(255,255,255,1)) drop-shadow(0 0 22px rgba(255,255,255,0.6)); }
-          60%  { filter: drop-shadow(0 0 6px rgba(255,255,255,0.4)); }
-          100% { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); }
+        @keyframes map-color-flash-anim {
+          0%   { filter: drop-shadow(0 0 0px ${flashColor}00); }
+          20%  { filter: drop-shadow(0 0 12px ${flashColor}bb) drop-shadow(0 0 26px ${flashColor}55); }
+          60%  { filter: drop-shadow(0 0 7px ${flashColor}66); }
+          100% { filter: drop-shadow(0 0 0px ${flashColor}00); }
         }
-        .map-white-flash { animation: map-white-flash-anim 0.65s ease-out forwards; }
+        .map-color-flash { animation: map-color-flash-anim 0.65s ease-out forwards; }
       `}</style>
     </div>
   );

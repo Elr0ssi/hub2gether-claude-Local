@@ -10,7 +10,7 @@ import {
   ORIENTATION_COLORS_MUNICIPAL,
   ORIENTATION_LABELS_MUNICIPAL,
   getMunicipalData,
-  type ElectionRound,
+  type MunicipalElectionYear,
   type CityResult,
 } from "@/data/politics/municipalElections";
 
@@ -19,6 +19,17 @@ const MunicipalCityMap = lazy(() =>
 );
 
 const COUNTRIES_WITH_DATA = new Set(MUNICIPAL_ELECTIONS.map((d) => d.country));
+
+// Merge all rounds, last result per city wins (= final elected mayor)
+function getFinalResults(election: MunicipalElectionYear): CityResult[] {
+  const cityMap = new Map<string, CityResult>();
+  for (const round of election.rounds) {
+    for (const city of round.cities) {
+      cityMap.set(city.city, city);
+    }
+  }
+  return Array.from(cityMap.values()).sort((a, b) => a.city.localeCompare(b.city, "fr"));
+}
 
 // ── Country dropdown ──────────────────────────────────────────────────────────
 function CountryDropdown({
@@ -177,7 +188,7 @@ function CitySidePanel({ city, onClose }: { city: CityResult | null; onClose: ()
         {/* Vote share */}
         <div>
           <p style={{ color: "var(--ink-3)", fontSize: "0.62rem", textTransform: "uppercase", fontWeight: 700, letterSpacing: "0.06em", marginBottom: 6 }}>
-            Part des votes
+            Voix obtenues
           </p>
           <div className="flex items-center gap-2">
             <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "var(--surface-2)" }}>
@@ -209,9 +220,9 @@ function CitySidePanel({ city, onClose }: { city: CityResult | null; onClose: ()
   );
 }
 
-// ── City results grid (fallback / no-map view) ────────────────────────────────
-function CityResultsGrid({ round }: { round: ElectionRound }) {
-  if (round.cities.length === 0) {
+// ── City results grid ─────────────────────────────────────────────────────────
+function CityResultsGrid({ cities }: { cities: CityResult[] }) {
+  if (cities.length === 0) {
     return (
       <div
         className="flex flex-col items-center justify-center py-10 rounded-xl gap-2"
@@ -220,7 +231,7 @@ function CityResultsGrid({ round }: { round: ElectionRound }) {
         <Calendar size={22} style={{ color: "var(--ink-4)" }} />
         <p className="text-sm font-medium" style={{ color: "var(--ink-3)" }}>Scrutin à venir</p>
         <p style={{ color: "var(--ink-4)", fontSize: "0.72rem" }}>
-          Les résultats seront disponibles après le {round.date.split("-").reverse().join("/")}
+          Les résultats seront disponibles après le scrutin.
         </p>
       </div>
     );
@@ -228,7 +239,7 @@ function CityResultsGrid({ round }: { round: ElectionRound }) {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-      {round.cities.map((city) => (
+      {cities.map((city) => (
         <div
           key={city.city}
           className="rounded-xl px-4 py-3 flex flex-col gap-1.5"
@@ -246,7 +257,7 @@ function CityResultsGrid({ round }: { round: ElectionRound }) {
           <p className="text-xs font-medium" style={{ color: "var(--ink-2)" }}>{city.winner}</p>
           <div className="mt-1">
             <div className="flex items-center justify-between mb-1">
-              <p style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>Part des votes</p>
+              <p style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>Voix obtenues</p>
               <p style={{ color: city.partyColor, fontSize: "0.65rem", fontWeight: 700 }}>{city.voteShare.toFixed(1)} %</p>
             </div>
             <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--surface)" }}>
@@ -263,7 +274,6 @@ function CityResultsGrid({ round }: { round: ElectionRound }) {
 export function MunicipalElectionsSection() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const [selectedRoundIdx, setSelectedRoundIdx] = useState(0);
   const [selectedCity, setSelectedCity] = useState<CityResult | null>(null);
   const { ref: yearsRef, onMouseDown, onMouseUp, onMouseLeave, onMouseMove } = useDragScroll();
 
@@ -273,19 +283,17 @@ export function MunicipalElectionsSection() {
   const years = data?.elections.map((e) => e.year) ?? [];
   const activeYear = selectedYear ?? years[years.length - 1] ?? null;
   const activeElection = data?.elections.find((e) => e.year === activeYear);
-  const activeRound = activeElection?.rounds[selectedRoundIdx];
-  const hasCities = (activeRound?.cities.length ?? 0) > 0;
+  const finalCities = activeElection ? getFinalResults(activeElection) : [];
+  const hasCities = finalCities.length > 0;
 
   const handleCountryChange = (name: string) => {
     setSelectedCountry(name);
     setSelectedYear(null);
-    setSelectedRoundIdx(0);
     setSelectedCity(null);
   };
 
   const handleYearChange = (year: number) => {
     setSelectedYear(year);
-    setSelectedRoundIdx(0);
     setSelectedCity(null);
   };
 
@@ -303,7 +311,7 @@ export function MunicipalElectionsSection() {
         <div className="flex-1">
           <p className="text-xs font-bold" style={{ color: "var(--ink-2)" }}>Élections municipales</p>
           <p style={{ color: "var(--ink-4)", fontSize: "0.65rem" }}>
-            Résultats par ville · Données disponibles pour la France et l'Allemagne
+            Maires élus par ville · Données disponibles pour la France et l'Allemagne
           </p>
         </div>
         <CountryDropdown value={selectedCountry} onChange={handleCountryChange} />
@@ -373,40 +381,15 @@ export function MunicipalElectionsSection() {
               </div>
             </div>
 
-            {/* Round / Region selector */}
-            {activeElection && activeElection.rounds.length > 1 && (
-              <div>
-                <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
-                  Tour / Région
-                </p>
-                <div className="flex gap-2 flex-wrap">
-                  {activeElection.rounds.map((round, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => { setSelectedRoundIdx(idx); setSelectedCity(null); }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-                      style={
-                        idx === selectedRoundIdx
-                          ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
-                          : { background: "var(--surface-2)", color: "var(--ink-3)", border: "1px solid var(--border)" }
-                      }
-                    >
-                      {round.region ?? round.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Round label */}
-            {activeRound && (
+            {/* Results label */}
+            {hasCities && (
               <p className="text-xs font-semibold" style={{ color: "var(--ink-3)" }}>
-                {activeRound.label}
+                Maires élus — {finalCities.length} ville{finalCities.length > 1 ? "s" : ""}
               </p>
             )}
 
-            {/* Map + side panel (only when there are cities) */}
-            {activeRound && hasCities && (
+            {/* Map + side panel */}
+            {hasCities && (
               <div
                 className="rounded-xl overflow-hidden flex flex-col lg:flex-row"
                 style={{ border: "1px solid var(--border)", minHeight: "360px" }}
@@ -418,7 +401,7 @@ export function MunicipalElectionsSection() {
                     </div>
                   }>
                     <MunicipalCityMap
-                      cities={activeRound.cities}
+                      cities={finalCities}
                       country={selectedCountry}
                       selectedCity={selectedCity?.city ?? null}
                       onCityClick={(city) => setSelectedCity((prev) => prev?.city === city.city ? null : city)}
@@ -451,8 +434,8 @@ export function MunicipalElectionsSection() {
               </div>
             )}
 
-            {/* Empty round */}
-            {activeRound && !hasCities && <CityResultsGrid round={activeRound} />}
+            {/* No cities (upcoming election) */}
+            {!hasCities && <CityResultsGrid cities={[]} />}
           </>
         )}
       </div>

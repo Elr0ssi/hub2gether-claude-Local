@@ -17,14 +17,16 @@ interface EpidemicsInteractiveMapProps {
 export function EpidemicsInteractiveMap({ disease, selectedCountry, onCountryClick }: EpidemicsInteractiveMapProps) {
   const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
   const [flashCountry, setFlashCountry] = useState<string | null>(null);
+  const [flashColor, setFlashColor] = useState("#ffffff");
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([20, 10]);
   const maxDeaths = getMaxDeaths(disease.countries);
 
-  const handleClick = useCallback((name: string, hasData: boolean) => {
+  const handleClick = useCallback((name: string, hasData: boolean, color: string) => {
     if (!hasData) return;
     onCountryClick(name);
     setFlashCountry(name);
+    setFlashColor(color);
     setTimeout(() => setFlashCountry(null), 700);
   }, [onCountryClick]);
 
@@ -61,8 +63,8 @@ export function EpidemicsInteractiveMap({ disease, selectedCountry, onCountryCli
                     fill={fill}
                     stroke={isSelected ? "#fff" : "#C8C8C8"}
                     strokeWidth={isSelected ? 1.4 : 0.35}
-                    className={isFlashing ? "map-white-flash" : ""}
-                    onClick={() => handleClick(name, hasData)}
+                    className={isFlashing ? "map-color-flash" : ""}
+                    onClick={() => handleClick(name, hasData, fill)}
                     onMouseEnter={() => setHoveredCountry(name)}
                     onMouseLeave={() => setHoveredCountry(null)}
                     style={{
@@ -140,13 +142,13 @@ export function EpidemicsInteractiveMap({ disease, selectedCountry, onCountryCli
         </div>
       )}
       <style>{`
-        @keyframes map-white-flash-anim {
-          0%   { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); }
-          20%  { filter: drop-shadow(0 0 10px rgba(255,255,255,1)) drop-shadow(0 0 22px rgba(255,255,255,0.6)); }
-          60%  { filter: drop-shadow(0 0 6px rgba(255,255,255,0.4)); }
-          100% { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); }
+        @keyframes map-color-flash-anim {
+          0%   { filter: drop-shadow(0 0 0px ${flashColor}00); }
+          20%  { filter: drop-shadow(0 0 12px ${flashColor}bb) drop-shadow(0 0 26px ${flashColor}55); }
+          60%  { filter: drop-shadow(0 0 7px ${flashColor}66); }
+          100% { filter: drop-shadow(0 0 0px ${flashColor}00); }
         }
-        .map-white-flash { animation: map-white-flash-anim 0.65s ease-out forwards; }
+        .map-color-flash { animation: map-color-flash-anim 0.65s ease-out forwards; }
       `}</style>
     </div>
   );
