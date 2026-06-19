@@ -144,11 +144,11 @@ export function EpidemicsInteractiveMap({ disease, selectedCountry, onCountryCli
       <style>{`
         @keyframes map-color-flash-anim {
           0%   { filter: drop-shadow(0 0 0px ${flashColor}00); }
-          20%  { filter: drop-shadow(0 0 12px ${flashColor}bb) drop-shadow(0 0 26px ${flashColor}55); }
-          60%  { filter: drop-shadow(0 0 7px ${flashColor}66); }
+          15%  { filter: drop-shadow(0 0 18px ${flashColor}ee) drop-shadow(0 0 40px ${flashColor}99) drop-shadow(0 0 70px ${flashColor}44); }
+          50%  { filter: drop-shadow(0 0 10px ${flashColor}99) drop-shadow(0 0 24px ${flashColor}55); }
           100% { filter: drop-shadow(0 0 0px ${flashColor}00); }
         }
-        .map-color-flash { animation: map-color-flash-anim 0.65s ease-out forwards; }
+        .map-color-flash { animation: map-color-flash-anim 0.8s ease-out forwards; }
       `}</style>
     </div>
   );

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Clock, Tag } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
-import { ArticleGrid } from "@/components/articles/ArticleGrid";
+import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
 import { ArticleBody } from "@/components/articles/ArticleBody";
 import { ARTICLES, getArticleBySlug, getArticlesByTheme } from "@/data/articles";
 
@@ -65,8 +65,7 @@ export default async function ArticlePage({ params }: PageProps) {
   const themeConfig = THEME_MAP[article.theme] ?? { label: article.theme, backHref: "/", locale: "en-US" };
 
   const related = getArticlesByTheme(article.theme)
-    .filter((a) => a.slug !== slug)
-    .slice(0, 3);
+    .filter((a) => a.slug !== slug);
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -263,17 +262,19 @@ export default async function ArticlePage({ params }: PageProps) {
 
       {/* Related articles */}
       {related.length > 0 && (
-        <ArticleGrid
-          articles={related}
-          title={article.theme === "empires" ? "Related analysis" : "À lire aussi"}
-          subtitle={
-            article.theme === "economy"
-              ? "Autres analyses économiques et données mondiales."
-              : article.theme === "epidemics"
-              ? "Autres analyses sur les épidémies et la santé mondiale."
-              : "More editorial analysis on the empires theme."
-          }
-        />
+        <div className="border-t" style={{ borderColor: "var(--border)" }}>
+          <ArticleCarousel
+            articles={related}
+            title={article.theme === "empires" ? "Related analysis" : "À lire aussi"}
+            subtitle={
+              article.theme === "economy"
+                ? "Autres analyses économiques et données mondiales."
+                : article.theme === "epidemics"
+                ? "Autres analyses sur les épidémies et la santé mondiale."
+                : "More editorial analysis on the empires theme."
+            }
+          />
+        </div>
       )}
     </Layout>
   );
