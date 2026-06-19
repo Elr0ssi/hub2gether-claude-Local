@@ -40,8 +40,8 @@ const FLAGS: Record<string, string> = {
 function formatValue(value: number | undefined, metricId: EconomyMetricId): string {
   if (value === undefined || value === null) return "—";
   if (metricId === "gdp") {
-    if (value >= 1000) return `${(value / 1000).toFixed(1)} T€`;
-    return `${value.toLocaleString("fr-FR")} Mds€`;
+    if (value >= 1000) return `${(value / 1000).toFixed(1)} T$`;
+    return `${value.toLocaleString("fr-FR")} Mds`;
   }
   if (metricId === "debt_ratio") return `${value.toFixed(1)} %`;
   if (metricId === "unemployment") return `${value.toFixed(1)} %`;
@@ -75,7 +75,7 @@ interface ColDef {
 
 function getColDefs(metric: EconomyMetricId): ColDef[] {
   if (metric === "gdp") return [{
-    key: "gdp", header: "PIB", unit: "Mds €",
+    key: "gdp", header: "PIB", unit: "Mds USD",
     getValue: (d) => d.gdp,
     format: (d) => formatValue(d.gdp, "gdp"),
     sortDir: "desc",
@@ -88,7 +88,7 @@ function getColDefs(metric: EconomyMetricId): ColDef[] {
       sortDir: "desc",
     },
     {
-      key: "debt_abs", header: "Montant dette", unit: "Mds €",
+      key: "debt_abs", header: "Montant dette", unit: "Mds USD",
       getValue: (d) => Math.round(d.gdp * d.debt_ratio / 100),
       format: (d) => {
         const v = Math.round(d.gdp * d.debt_ratio / 100);
@@ -115,8 +115,6 @@ interface EconomyRankingsTableProps {
   onCountryClick?: (name: string) => void;
 }
 
-const PAGE_SIZE = 20;
-
 export function EconomyRankingsTable({
   metric,
   year,
@@ -127,7 +125,6 @@ export function EconomyRankingsTable({
   const [sortColKey, setSortColKey] = useState<string>(metric);
   const [sortDir, setSortDir] = useState<"asc" | "desc">(defaultSortDir(metric));
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(0);
 
   // No ranking for companies
   const cols = getColDefs(metric);
@@ -146,7 +143,6 @@ export function EconomyRankingsTable({
       setSortColKey(key);
       setSortDir(dir);
     }
-    setPage(0);
   };
 
   // Previous year data for rank delta
@@ -191,11 +187,7 @@ export function EconomyRankingsTable({
     return allRows.filter((r) => r.name.toLowerCase().includes(q));
   }, [allRows, search]);
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const pageRows = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-
   const currentMetric = ECONOMY_METRICS.find((m) => m.id === metric) ?? ECONOMY_METRICS[0];
-  const barMax = useMemo(() => Math.max(...allRows.map(r => primaryCol.getValue(r.data)), 1), [allRows, primaryCol]);
 
   return (
     <div
@@ -227,7 +219,7 @@ export function EconomyRankingsTable({
             type="text"
             placeholder="Rechercher un pays…"
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+            onChange={(e) => setSearch(e.target.value)}
             className="bg-transparent outline-none text-xs w-full"
             style={{ color: "var(--ink-2)" }}
           />
@@ -235,18 +227,15 @@ export function EconomyRankingsTable({
       </div>
 
       {/* Table — translate="no" prevents browser auto-translation of units (Mds, k, %) */}
-      <div className="overflow-x-auto" translate="no">
+      <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "460px" }} translate="no">
         <table className="w-full" style={{ borderCollapse: "collapse" }}>
-          <thead style={{ position: "sticky", top: 0, background: "var(--surface-2)", zIndex: 1 }}>
+          <thead>
             <tr style={{ borderBottom: "1px solid var(--border-light)", background: "var(--surface-2)" }}>
               <th className="px-4 py-2.5 text-left" style={{ color: "var(--ink-4)", fontSize: "0.62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", width: "52px" }}>
                 #
               </th>
               <th className="px-3 py-2.5 text-left" style={{ color: "var(--ink-4)", fontSize: "0.62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                 Pays
-              </th>
-              <th className="px-3 py-2.5 text-left hidden sm:table-cell" style={{ color: "var(--ink-4)", fontSize: "0.62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                Barres
               </th>
               {cols.map((col) => (
                 <th
@@ -259,7 +248,7 @@ export function EconomyRankingsTable({
                     fontWeight: 700,
                     textTransform: "uppercase",
                     letterSpacing: "0.06em",
-                    background: col.key === effectiveSortKey ? "rgba(57,255,136,0.06)" : "transparent",
+                    background: "rgba(57,255,136,0.04)",
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -276,16 +265,14 @@ export function EconomyRankingsTable({
           </thead>
           <AnimatePresence mode="wait">
             <motion.tbody
-              key={`${metric}-${effectiveSortKey}-${effectiveSortDir}-${year}-${page}`}
+              key={`${metric}-${effectiveSortKey}-${effectiveSortDir}-${year}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18 }}
             >
-              {pageRows.map(({ name, data, rank, delta }, idx) => {
+              {filtered.map(({ name, data, rank, delta }, idx) => {
                 const isEven = idx % 2 === 1;
-                const barValue = primaryCol.getValue(data);
-                const barPct = (barValue / barMax) * 100;
                 return (
                   <tr
                     key={name}
@@ -296,7 +283,7 @@ export function EconomyRankingsTable({
                       borderBottom: "1px solid var(--border-light)",
                       cursor: onCountryClick ? "pointer" : "default",
                     }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(57,255,136,0.06)"; }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(57,255,136,0.04)"; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = isEven ? "var(--surface-2)" : "var(--surface)"; }}
                   >
                     {/* Rank */}
@@ -330,22 +317,15 @@ export function EconomyRankingsTable({
                       </div>
                     </td>
 
-                    {/* Bar */}
-                    <td className="px-3 py-2.5 hidden sm:table-cell" style={{ minWidth: "100px" }}>
-                      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--surface-2)" }}>
-                        <div className="h-full rounded-full" style={{ width: `${barPct}%`, background: "#0D7A40", transition: "width 0.3s ease" }} />
-                      </div>
-                    </td>
-
                     {/* Data columns */}
                     {cols.map((col) => (
                       <td
                         key={col.key}
                         className="px-3 py-2.5 text-right tabular-nums"
                         style={{
-                          background: col.key === effectiveSortKey ? "rgba(57,255,136,0.05)" : "transparent",
+                          background: "rgba(57,255,136,0.05)",
                           fontWeight: col.key === effectiveSortKey ? 700 : 500,
-                          color: col.key === effectiveSortKey ? "#0D7A40" : "var(--ink)",
+                          color: "var(--ink)",
                           fontSize: "0.8rem",
                           whiteSpace: "nowrap",
                         }}
@@ -361,62 +341,13 @@ export function EconomyRankingsTable({
         </table>
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div
-          className="px-5 py-3 border-t flex items-center justify-between gap-4"
-          style={{ borderColor: "var(--border-light)", background: "var(--surface-2)" }}
-        >
-          <span className="text-caption" translate="no">
-            {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, filtered.length)} / {filtered.length}
-          </span>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setPage((p) => Math.max(0, p - 1))}
-              disabled={page === 0}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-              style={{
-                background: "var(--surface)",
-                border: "1px solid var(--border)",
-                color: page === 0 ? "var(--ink-4)" : "var(--ink-2)",
-                opacity: page === 0 ? 0.4 : 1,
-              }}
-            >
-              ← Préc.
-            </button>
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              const p = Math.max(0, Math.min(page - 2, totalPages - 5)) + i;
-              return (
-                <button
-                  key={p}
-                  onClick={() => setPage(p)}
-                  className="w-8 h-7 rounded-lg text-xs font-medium transition-all"
-                  style={
-                    p === page
-                      ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
-                      : { background: "var(--surface)", border: "1px solid var(--border)", color: "var(--ink-3)" }
-                  }
-                >
-                  {p + 1}
-                </button>
-              );
-            })}
-            <button
-              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-              disabled={page >= totalPages - 1}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
-              style={{
-                background: "var(--surface)",
-                border: "1px solid var(--border)",
-                color: page >= totalPages - 1 ? "var(--ink-4)" : "var(--ink-2)",
-                opacity: page >= totalPages - 1 ? 0.4 : 1,
-              }}
-            >
-              Suiv. →
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Footer: count */}
+      <div
+        className="px-5 py-2 border-t text-xs"
+        style={{ borderColor: "var(--border-light)", background: "var(--surface-2)", color: "var(--ink-4)" }}
+      >
+        {filtered.length} pays
+      </div>
     </div>
   );
 }

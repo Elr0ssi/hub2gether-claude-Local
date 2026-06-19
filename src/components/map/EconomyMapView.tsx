@@ -1,20 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Maximize2, Minimize2, ChevronLeft, PenLine, Map, Navigation, Satellite } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { EconomyInteractiveMap } from "./EconomyInteractiveMap";
 import { EconomyLeafletMap, type LeafletTileStyle } from "./EconomyLeafletMap";
 import { EconomySidePanel } from "@/components/sidebar/EconomySidePanel";
 import { EconomyRankingsTable } from "./EconomyRankingsTable";
 import { ThemeDropdown } from "./ThemeDropdown";
 import { ECONOMY_METRICS, ECONOMY_YEARS, ECONOMY_YEAR_VALUES, getYearData, DEFAULT_YEAR } from "@/data/economy/economy";
-import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
-import { getArticlesByTheme, ARTICLES } from "@/data/articles";
-import { useDragScroll } from "@/hooks/useDragScroll";
 import type { EconomyMetricId, EconomyYear } from "@/types";
-
-const economyArticles = getArticlesByTheme("economy");
 
 function computeLiveYearData(baseYear: EconomyYear): EconomyYear {
   const today = new Date();
@@ -33,7 +29,7 @@ function computeLiveYearData(baseYear: EconomyYear): EconomyYear {
   }
   return {
     year: today.getFullYear(),
-    label: "Depuis 2026",
+    label: "En direct",
     dataNote: `Prorata ${baseYear.year} au ${dateStr} (jour ${dayOfYear}/365). PIB = annuel × fraction. Taux : derniers chiffres disponibles.`,
     countries: liveCountries,
   };
@@ -57,7 +53,25 @@ export function EconomyMapView() {
   const [mapStyle, setMapStyle] = useState<MapStyle>("editorial");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ytdMode, setYtdMode] = useState(false);
-  const { ref: yearRowRef, onMouseDown: onYearRowDown, onMouseUp: onYearRowUp, onMouseLeave: onYearRowLeave, onMouseMove: onYearRowMove } = useDragScroll();
+  const yearRowRef = useRef<HTMLDivElement>(null);
+  const yearRowDragging = useRef(false);
+  const yearRowStartX = useRef(0);
+  const yearRowScrollLeft = useRef(0);
+  const onYearRowDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    yearRowDragging.current = true;
+    yearRowStartX.current = e.pageX - (yearRowRef.current?.offsetLeft ?? 0);
+    yearRowScrollLeft.current = yearRowRef.current?.scrollLeft ?? 0;
+    if (yearRowRef.current) yearRowRef.current.style.cursor = "grabbing";
+  };
+  const onYearRowUp = () => { yearRowDragging.current = false; if (yearRowRef.current) yearRowRef.current.style.cursor = "grab"; };
+  const onYearRowLeave = () => { yearRowDragging.current = false; if (yearRowRef.current) yearRowRef.current.style.cursor = "grab"; };
+  const onYearRowMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!yearRowDragging.current || !yearRowRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - (yearRowRef.current.offsetLeft ?? 0);
+    const walk = (x - yearRowStartX.current) * 1.5;
+    yearRowRef.current.scrollLeft = yearRowScrollLeft.current - walk;
+  };
 
   const metric = (searchParams.get("metric") ?? "gdp") as EconomyMetricId;
   const year = parseInt(searchParams.get("year") ?? String(DEFAULT_YEAR));
@@ -103,15 +117,7 @@ export function EconomyMapView() {
     setSidePanelOpen(true);
   }, []);
 
-  const countryArticles = useMemo(() => {
-    if (!selectedCountry) return [];
-    const q = selectedCountry.toLowerCase();
-    return ARTICLES.filter(
-      (a) =>
-        a.title.toLowerCase().includes(q) ||
-        a.tags.some((t) => t.toLowerCase().includes(q))
-    );
-  }, [selectedCountry]);
+  const currentMetric = ECONOMY_METRICS.find((m) => m.id === metric) ?? ECONOMY_METRICS[0];
 
   return (
     <>
@@ -185,32 +191,111 @@ export function EconomyMapView() {
               title={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
             >
               {isFullscreen ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
-              {isFullscreen ? "Réduire" : "Agrandir"}
+              {isFullscreen ? "Réduire" : "Expand"}
             </button>
           </div>
         </div>
 
         {/* Year selector */}
-        <div
-          ref={yearRowRef}
-          className="px-5 py-2 border-b flex items-center gap-3 overflow-x-auto"
-          style={{ borderColor: "var(--border)", background: "var(--surface)", scrollbarWidth: "none", cursor: "grab" }}
-          onMouseDown={onYearRowDown}
-          onMouseUp={onYearRowUp}
-          onMouseLeave={onYearRowLeave}
-          onMouseMove={onYearRowMove}
+        <div className="px-5 py-3 border-b flex flex-col gap-2"
+          style={{ borderColor: "var(--border)", background: "var(--surface)" }}
         >
-          <span className="text-xs font-semibold shrink-0" style={{ color: "var(--ink-3)" }}>Année :</span>
-          <div className="flex items-center gap-1">
+          {/* Top row: label / year / count */}
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-semibold" style={{ color: "var(--ink-3)" }}>Année :</span>
+            <span className="text-sm font-bold tabular-nums" style={{ color: "var(--ink)" }}>{ytdMode && isCurrentYear ? "En direct" : year}</span>
+            <span className="text-xs ml-auto" style={{ color: "var(--ink-4)" }}>
+              {Object.keys(activeEconomyYear.countries).length} pays documentés
+            </span>
+          </div>
+
+          {/* Slider row + En direct button */}
+          <div className="flex items-center gap-3">
+            <div className="relative flex flex-col gap-1 flex-1">
+              <input
+                type="range"
+                min={0}
+                max={ECONOMY_YEAR_VALUES.length - 1}
+                value={ECONOMY_YEAR_VALUES.indexOf(year) === -1 ? ECONOMY_YEAR_VALUES.length - 1 : ECONOMY_YEAR_VALUES.indexOf(year)}
+                onChange={(e) => {
+                  const idx = parseInt(e.target.value);
+                  handleYearChange(ECONOMY_YEAR_VALUES[idx]);
+                  setYtdMode(false);
+                }}
+                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                style={{
+                  background: (() => {
+                    const idx = ECONOMY_YEAR_VALUES.indexOf(year) === -1 ? ECONOMY_YEAR_VALUES.length - 1 : ECONOMY_YEAR_VALUES.indexOf(year);
+                    const pct = (idx / (ECONOMY_YEAR_VALUES.length - 1)) * 100;
+                    return `linear-gradient(to right, #0D7A40 0%, #0D7A40 ${pct}%, var(--surface-2) ${pct}%, var(--surface-2) 100%)`;
+                  })(),
+                  outline: "none",
+                  accentColor: "#0D7A40",
+                }}
+              />
+              {/* Tick marks */}
+              <div className="relative h-3">
+                {ECONOMY_YEAR_VALUES.map((y, i) => {
+                  const pct = (i / (ECONOMY_YEAR_VALUES.length - 1)) * 100;
+                  return (
+                    <button
+                      key={y}
+                      onClick={() => { handleYearChange(y); setYtdMode(false); }}
+                      className="absolute transform -translate-x-1/2 text-xs transition-all"
+                      style={{ left: `${pct}%`, color: y === year && !ytdMode ? "#0D7A40" : "var(--ink-4)", fontWeight: y === year && !ytdMode ? 700 : 400, fontSize: "0.55rem", top: 0 }}
+                      title={`Aller en ${y}`}
+                    >
+                      {y}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* "En direct" button — outside the slider */}
+            {isCurrentYear && (
+              <button
+                onClick={() => { handleYearChange(DEFAULT_YEAR); setYtdMode((v) => !v); }}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-200 shrink-0"
+                title="Prorata des données de l'année précédente depuis le 1er janvier — PIB au jour actuel"
+                style={
+                  ytdMode
+                    ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
+                    : { background: "transparent", color: "var(--ink-3)", border: "1px solid var(--border)" }
+                }
+              >
+                <span
+                  className="w-1.5 h-1.5 rounded-full shrink-0"
+                  style={{
+                    background: ytdMode ? "#39FF88" : "var(--ink-4)",
+                    boxShadow: ytdMode ? "0 0 6px rgba(57,255,136,0.8)" : "none",
+                    animation: ytdMode ? "pulse-glow 2s ease-in-out infinite" : "none",
+                  }}
+                />
+                En direct
+              </button>
+            )}
+          </div>
+
+          {/* Quick year buttons (drag-scrollable) */}
+          <div
+            ref={yearRowRef}
+            className="flex items-center gap-1 overflow-x-auto pb-0.5"
+            style={{ scrollbarWidth: "none", cursor: "grab" }}
+            onMouseDown={onYearRowDown}
+            onMouseUp={onYearRowUp}
+            onMouseLeave={onYearRowLeave}
+            onMouseMove={onYearRowMove}
+          >
             {ECONOMY_YEAR_VALUES.map((y) => (
               <button
                 key={y}
                 onClick={() => { handleYearChange(y); setYtdMode(false); }}
-                className="flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 shrink-0"
+                className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium transition-all duration-200 shrink-0 select-none"
                 style={
                   y === year && !ytdMode
                     ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
-                    : { background: "transparent", color: "var(--ink-3)", border: "1px solid transparent" }
+                    : { background: "transparent", color: "var(--ink-4)", border: "1px solid transparent" }
                 }
               >
                 {y}
@@ -221,34 +306,10 @@ export function EconomyMapView() {
                 )}
               </button>
             ))}
-
-            {/* "Depuis 2026" button — toujours visible */}
-            <>
-              <div className="w-px h-4 shrink-0 mx-1" style={{ background: "var(--border)" }} />
-              <button
-                onClick={() => { handleYearChange(DEFAULT_YEAR); setYtdMode((v) => !v); }}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-200 shrink-0"
-                title="PIB au prorata des données 2025 depuis le 1er janvier 2026"
-                style={
-                  ytdMode && isCurrentYear
-                    ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
-                    : { background: "transparent", color: "var(--ink-3)", border: "1px solid var(--border)" }
-                }
-              >
-                <span
-                  className="w-1.5 h-1.5 rounded-full shrink-0"
-                  style={{
-                    background: ytdMode && isCurrentYear ? "#39FF88" : "var(--ink-4)",
-                    boxShadow: ytdMode && isCurrentYear ? "0 0 6px rgba(57,255,136,0.8)" : "none",
-                    animation: ytdMode && isCurrentYear ? "pulse-glow 2s ease-in-out infinite" : "none",
-                  }}
-                />
-                Depuis 2026
-              </button>
-            </>
           </div>
+
           {ytdMode && isCurrentYear && (
-            <span className="ml-auto text-xs shrink-0" style={{ color: "var(--ink-4)" }}>
+            <span className="text-xs" style={{ color: "var(--ink-4)" }}>
               Prorata au {new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
             </span>
           )}
@@ -284,17 +345,72 @@ export function EconomyMapView() {
             onClose={() => setSidePanelOpen(false)}
           />
         </div>
-
-        {/* Source note */}
-        <div
-          className="px-5 py-1.5 border-t flex items-center justify-end"
-          style={{ borderColor: "var(--border)", background: "var(--surface)" }}
-        >
-          <p style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>
-            Source : {activeEconomyYear.dataNote}
-          </p>
-        </div>
       </div>
+
+      {/* Info blocks */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`${metric}-${year}`}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.25 }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4"
+        >
+          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
+              Indicateur affiché
+            </p>
+            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>{currentMetric.label}</p>
+            <p className="text-small leading-relaxed" style={{ color: "var(--ink-2)" }}>{currentMetric.description}</p>
+          </div>
+
+          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
+              Période
+            </p>
+            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+              {ytdMode && isCurrentYear
+                ? `${year} · ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`
+                : year}
+            </p>
+            <p className="text-small" style={{ color: "var(--ink-3)" }}>
+              {ytdMode && isCurrentYear
+                ? `PIB généré depuis le 1er janvier ${year} — prorata au jour actuel`
+                : year === 2020
+                ? "Année COVID-19 — forte contraction mondiale"
+                : year === 2025
+                ? "Projections FMI avril 2025 — données les plus récentes"
+                : `Données économiques mondiales ${year}`}
+            </p>
+          </div>
+
+          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
+              Couverture
+            </p>
+            <div className="space-y-2 mt-1">
+              {ECONOMY_METRICS.map((m) => (
+                <div key={m.id} className="flex items-center justify-between gap-2">
+                  <span className="text-small" style={{ color: "var(--ink-3)" }}>{m.label}</span>
+                  <span className="text-small font-semibold" style={{ color: m.id === metric ? "var(--accent)" : "var(--ink)" }}>
+                    {m.unit}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
+              Source des données
+            </p>
+            <p className="text-small leading-relaxed" style={{ color: "var(--ink-4)" }}>
+              {activeEconomyYear.dataNote}
+            </p>
+          </div>
+        </motion.div>
+      </AnimatePresence>
 
       {/* Rankings table */}
       <EconomyRankingsTable
@@ -307,29 +423,6 @@ export function EconomyMapView() {
           setSidePanelOpen(true);
         }}
       />
-
-      {/* Article carousels */}
-      <div
-        className="mt-6 rounded-2xl p-5 flex flex-col gap-6"
-        style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-      >
-        {selectedCountry && (
-          <ArticleCarousel
-            articles={countryArticles}
-            title={`Recommandations — ${selectedCountry}`}
-            subtitle="Articles liés au pays sélectionné"
-            emptyMessage={`Aucun article spécifique pour ${selectedCountry} pour l'instant.`}
-            icon="pin"
-          />
-        )}
-        <ArticleCarousel
-          articles={economyArticles}
-          title="Analyses économiques"
-          subtitle="Tous les articles de l'onglet Économie"
-          emptyMessage="Aucun article disponible pour cet onglet."
-          icon="newspaper"
-        />
-      </div>
     </>
   );
 }

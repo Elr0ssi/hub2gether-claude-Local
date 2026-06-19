@@ -212,6 +212,14 @@ function UnemploymentView({ countryName, yearData }: { countryName: string; year
 // ─────────────────────────────────────────────────────────────
 function CompaniesView({ countryName, yearData }: { countryName: string; yearData: EconomySidePanelProps["yearData"] }) {
   const data = yearData?.countries[countryName];
+  const labor = getLaborByCountry(countryName);
+  const comp = _compIndex.get(countryName);
+  const activePct = labor && comp ? ((labor.active_population_millions / comp.population_millions) * 100) : null;
+
+  const year2023Data = ECONOMY_YEARS.find(y => y.year === 2023)?.countries[countryName];
+  const topCompanies = year2023Data?.top_companies;
+  const maxVal = getMaxForTrend(countryName, "companies");
+
   if (!data) return null;
 
   return (
@@ -224,14 +232,56 @@ function CompaniesView({ countryName, yearData }: { countryName: string; yearDat
         <span className="text-xl font-bold tabular-nums" style={{ color: "#0D7A40" }}>{fmtNumber(data.companies)} k</span>
       </div>
 
-      {/* Top companies */}
-      {data.top_companies && data.top_companies.length > 0 && (
+      {/* Active population */}
+      <div className="grid grid-cols-2 gap-2">
+        <div className="rounded-xl px-3 py-3 flex flex-col gap-1" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
+          <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>Pop. active</p>
+          <p className="text-base font-bold tabular-nums" style={{ color: "var(--ink)" }}>
+            {labor ? `${labor.active_population_millions.toLocaleString("fr-FR")} M` : "—"}
+          </p>
+          <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>personnes (15-64 ans)</p>
+        </div>
+        <div className="rounded-xl px-3 py-3 flex flex-col gap-1" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
+          <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>% Pop. active</p>
+          <p className="text-base font-bold tabular-nums" style={{ color: "var(--ink)" }}>
+            {activePct !== null ? `${activePct.toFixed(1)} %` : "—"}
+          </p>
+          <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>sur {comp ? `${comp.population_millions.toLocaleString("fr-FR")} M hab.` : "—"}</p>
+        </div>
+      </div>
+
+      {/* Year trend */}
+      <div>
+        <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
+          Évolution des entreprises
+        </p>
+        <div className="flex flex-col gap-1.5">
+          {ECONOMY_YEARS.map((yr) => {
+            const d = yr.countries[countryName];
+            if (!d) return null;
+            const v = d.companies;
+            const isCurrent = yr.year === yearData?.year;
+            return (
+              <div key={yr.year} className="flex items-center gap-2">
+                <span className="text-xs tabular-nums" style={{ color: isCurrent ? "#0D7A40" : "var(--ink-3)", fontWeight: isCurrent ? 700 : 400, minWidth: 36 }}>{yr.year}</span>
+                <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--surface-2)" }}>
+                  <div className="h-full rounded-full" style={{ width: `${Math.min((v / maxVal) * 100, 100)}%`, background: isCurrent ? "#39FF88" : "var(--ink-4)", transition: "width 0.4s ease" }} />
+                </div>
+                <span className="text-xs tabular-nums text-right" style={{ color: isCurrent ? "#0D7A40" : "var(--ink-3)", minWidth: 52 }}>{fmtNumber(v)} k</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Top companies (always from 2023) */}
+      {topCompanies && topCompanies.length > 0 ? (
         <div>
           <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
-            Top {data.top_companies.length} entreprises
+            Top {topCompanies.length} entreprises <span style={{ color: "var(--ink-4)", textTransform: "none", fontWeight: 400 }}>(2023)</span>
           </p>
           <div className="flex flex-col gap-1.5">
-            {data.top_companies.map((c, i) => (
+            {topCompanies.map((c, i) => (
               <div key={c.name} className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
                 <span className="text-xs font-bold tabular-nums" style={{ color: "var(--accent)", minWidth: 18 }}>{i + 1}</span>
                 <div className="flex flex-col flex-1 min-w-0">
@@ -243,14 +293,11 @@ function CompaniesView({ countryName, yearData }: { countryName: string; yearDat
             ))}
           </div>
         </div>
-      )}
-
-      {(!data.top_companies || data.top_companies.length === 0) && (
-        <div className="text-center py-4">
-          <p className="text-xs" style={{ color: "var(--ink-4)" }}>Top entreprises disponibles pour l'année 2023</p>
+      ) : (
+        <div className="rounded-xl px-3 py-3 text-center" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
+          <p className="text-xs" style={{ color: "var(--ink-4)" }}>Données top entreprises disponibles pour l'année 2023</p>
         </div>
       )}
-
     </div>
   );
 }
