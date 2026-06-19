@@ -119,7 +119,10 @@ function CountryCombobox({
           cursor: "pointer",
         }}
       >
-        <span className="text-base shrink-0">{selected?.flag ?? "🌍"}</span>
+        {selected
+          ? <img src={`https://flagcdn.com/20x15/${selected.code.toLowerCase()}.png`} alt="" width={20} height={15} style={{ borderRadius: "2px", objectFit: "cover", flexShrink: 0 }} />
+          : <span className="shrink-0">🌍</span>
+        }
         <span className="flex-1 text-left truncate">{selected?.name_fr ?? value}</span>
         <ChevronDown size={13} style={{ color: "var(--ink-4)", flexShrink: 0 }} />
       </button>
@@ -172,7 +175,7 @@ function CountryCombobox({
                 if (c.name !== value) (e.currentTarget as HTMLElement).style.background = "transparent";
               }}
             >
-              <span className="text-base shrink-0">{c.flag}</span>
+              <img src={`https://flagcdn.com/20x15/${c.code.toLowerCase()}.png`} alt="" width={20} height={15} style={{ borderRadius: "2px", objectFit: "cover", flexShrink: 0 }} />
               <span>{c.name_fr}</span>
             </button>
           ))}
@@ -205,7 +208,7 @@ function ComparisonRow({
 
       {/* Pays A */}
       <div className="flex items-center gap-3">
-        <span className="text-lg shrink-0">{flagA}</span>
+        {flagA ? <img src={`https://flagcdn.com/20x15/${flagA.toLowerCase()}.png`} alt="" width={20} height={15} style={{ borderRadius: "2px", objectFit: "cover", flexShrink: 0 }} /> : null}
         <div className="flex-1">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs" style={{ color: "var(--ink-3)" }}>{nameA}</span>
@@ -231,7 +234,7 @@ function ComparisonRow({
 
       {/* Pays B */}
       <div className="flex items-center gap-3">
-        <span className="text-lg shrink-0">{flagB}</span>
+        {flagB ? <img src={`https://flagcdn.com/20x15/${flagB.toLowerCase()}.png`} alt="" width={20} height={15} style={{ borderRadius: "2px", objectFit: "cover", flexShrink: 0 }} /> : null}
         <div className="flex-1">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs" style={{ color: "var(--ink-3)" }}>{nameB}</span>
@@ -258,7 +261,7 @@ function ComparisonRow({
       {/* Ratio */}
       {ratio !== null && winner && (
         <div className="flex items-center gap-1.5 self-end">
-          <span className="text-lg">{winnerFlag}</span>
+          {winnerFlag ? <img src={`https://flagcdn.com/20x15/${winnerFlag.toLowerCase()}.png`} alt="" width={20} height={15} style={{ borderRadius: "2px", objectFit: "cover" }} /> : null}
           <span className="text-xs px-2.5 py-1 rounded-full font-semibold" style={{ background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)" }}>
             {ratio >= 2 ? `${ratio.toLocaleString("fr-FR", { maximumFractionDigits: 1 })}×` : `+${((ratio - 1) * 100).toFixed(0)}%`} {higherLabel}
           </span>
@@ -495,10 +498,10 @@ export function ComparisonView() {
           style={{ borderBottom: "1px solid var(--border)", background: "var(--surface-2)" }}
         >
           <div className="flex items-center gap-3">
-            <span className="text-xl">{cmpA?.flag}</span>
+            {cmpA && <img src={`https://flagcdn.com/20x15/${cmpA.code.toLowerCase()}.png`} alt="" width={22} height={17} style={{ borderRadius: "3px", objectFit: "cover" }} />}
             <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>{cmpA?.name_fr ?? countryA}</span>
             <ArrowRight size={14} style={{ color: "var(--ink-4)" }} />
-            <span className="text-xl">{cmpB?.flag}</span>
+            {cmpB && <img src={`https://flagcdn.com/20x15/${cmpB.code.toLowerCase()}.png`} alt="" width={22} height={17} style={{ borderRadius: "3px", objectFit: "cover" }} />}
             <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>{cmpB?.name_fr ?? countryB}</span>
           </div>
           <span className="text-xs px-2 py-1 rounded-lg" style={{ background: "var(--accent-dim)", color: "#0D7A40", fontWeight: 600 }}>
@@ -512,8 +515,8 @@ export function ComparisonView() {
             <ComparisonRow
               key={row.label}
               {...row}
-              flagA={cmpA?.flag ?? "🌍"}
-              flagB={cmpB?.flag ?? "🌍"}
+              flagA={cmpA?.code ?? ""}
+              flagB={cmpB?.code ?? ""}
               nameA={cmpA?.name_fr ?? countryA}
               nameB={cmpB?.name_fr ?? countryB}
             />

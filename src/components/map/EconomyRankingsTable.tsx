@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronUp, ChevronDown, ChevronsUpDown, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { ECONOMY_METRICS, ECONOMY_YEARS } from "@/data/economy/economy";
@@ -35,6 +35,17 @@ const FLAGS: Record<string, string> = {
   "Cuba": "🇨🇺", "Cyprus": "🇨🇾", "Iceland": "🇮🇸", "Malta": "🇲🇹",
   "Bahrain": "🇧🇭", "Kuwait": "🇰🇼", "Oman": "🇴🇲",
 };
+
+// ── Flag image helper (avoids emoji rendering as text on some Android devices) ──
+function flagImg(emoji: string | undefined): React.ReactNode {
+  if (!emoji) return <span style={{ fontSize: "0.9rem" }}>🌍</span>;
+  const chars = [...emoji];
+  const a = chars[0]?.codePointAt(0) ?? 0;
+  const b = chars[1]?.codePointAt(0) ?? 0;
+  if (chars.length < 2 || a < 0x1F1E6 || b < 0x1F1E6) return <span style={{ fontSize: "0.9rem" }}>🌍</span>;
+  const code = (String.fromCharCode(a - 0x1F1E6 + 65) + String.fromCharCode(b - 0x1F1E6 + 65)).toLowerCase();
+  return <img src={`https://flagcdn.com/20x15/${code}.png`} alt="" width={20} height={15} style={{ borderRadius: "2px", objectFit: "cover", flexShrink: 0 }} />;
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function formatValue(value: number | undefined, metricId: EconomyMetricId): string {
@@ -308,9 +319,7 @@ export function EconomyRankingsTable({
                     {/* Country */}
                     <td className="px-3 py-2.5">
                       <div className="flex items-center gap-2">
-                        <span style={{ fontSize: "1.1rem", lineHeight: 1 }}>
-                          {FLAGS[name] ?? "🌍"}
-                        </span>
+                        {flagImg(FLAGS[name])}
                         <span className="text-xs font-medium" style={{ color: "var(--ink)", whiteSpace: "nowrap" }}>
                           {name}
                         </span>
