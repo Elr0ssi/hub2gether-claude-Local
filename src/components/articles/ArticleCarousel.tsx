@@ -14,51 +14,64 @@ interface ArticleCarouselProps {
   icon?: "newspaper" | "pin";
 }
 
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("fr-FR", { year: "numeric", month: "short", day: "numeric" });
+}
+
 function ArticleCardCompact({ article }: { article: Article }) {
   return (
     <article
-      className="flex-shrink-0 w-64 flex flex-col gap-2 p-4 rounded-xl transition-all duration-200 hover:-translate-y-1 article-card-hover"
-      style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "0 2px 12px rgba(0,0,0,0.07)" }}
+      className="flex-shrink-0 w-72 flex flex-col rounded-2xl overflow-hidden transition-all duration-200 hover:-translate-y-1 article-card-hover"
+      style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}
     >
-      <div className="flex items-center justify-between gap-2">
-        <span className="accent-badge capitalize text-xs">{article.theme}</span>
-        <span className="flex items-center gap-1" style={{ color: "var(--ink-4)", fontSize: "0.62rem" }}>
-          <Clock size={10} />
-          {article.readingTime} min
-        </span>
+      {/* Accent bar */}
+      <div style={{ height: "3px", background: "var(--accent)", opacity: 0.45, flexShrink: 0 }} />
+
+      <div className="px-4 pt-3 pb-4 flex flex-col gap-2.5 flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <span className="accent-badge capitalize text-xs">{article.theme}</span>
+          <span className="flex items-center gap-1" style={{ color: "var(--ink-4)", fontSize: "0.62rem" }}>
+            <Clock size={10} />
+            {article.readingTime} min
+          </span>
+        </div>
+        <h3
+          className="font-bold leading-snug"
+          style={{
+            color: "var(--ink)",
+            fontSize: "0.82rem",
+            display: "-webkit-box",
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
+          {article.title}
+        </h3>
+        <p
+          className="leading-relaxed"
+          style={{
+            color: "var(--ink-3)",
+            display: "-webkit-box",
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            fontSize: "0.72rem",
+          }}
+        >
+          {article.excerpt}
+        </p>
+        <div className="flex items-center justify-between mt-auto pt-2.5" style={{ borderTop: "1px solid var(--border)" }}>
+          <span style={{ color: "var(--ink-4)", fontSize: "0.62rem" }}>{formatDate(article.publishedAt)}</span>
+          <Link
+            href={`/articles/${article.slug}`}
+            className="flex items-center gap-1 text-xs font-semibold transition-all hover:gap-2"
+            style={{ color: "#0D7A40" }}
+          >
+            Lire l'article <ArrowRight size={11} />
+          </Link>
+        </div>
       </div>
-      <h3
-        className="text-xs font-semibold leading-snug"
-        style={{
-          color: "var(--ink)",
-          display: "-webkit-box",
-          WebkitLineClamp: 3,
-          WebkitBoxOrient: "vertical",
-          overflow: "hidden",
-        }}
-      >
-        {article.title}
-      </h3>
-      <p
-        className="text-xs leading-relaxed"
-        style={{
-          color: "var(--ink-3)",
-          display: "-webkit-box",
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: "vertical",
-          overflow: "hidden",
-          fontSize: "0.65rem",
-        }}
-      >
-        {article.excerpt}
-      </p>
-      <Link
-        href={`/articles/${article.slug}`}
-        className="flex items-center gap-1 text-xs font-semibold mt-auto"
-        style={{ color: "#0D7A40" }}
-      >
-        Lire <ArrowRight size={11} />
-      </Link>
     </article>
   );
 }
@@ -108,8 +121,8 @@ export function ArticleCarousel({ articles, title, subtitle, emptyMessage, icon 
 
       <style>{`
         .article-card-hover:hover {
-          box-shadow: 0 6px 20px rgba(0,0,0,0.14);
-          border-color: var(--border-hover, rgba(57,255,136,0.25)) !important;
+          box-shadow: 0 8px 28px rgba(0,0,0,0.16);
+          border-color: rgba(57,255,136,0.3) !important;
         }
       `}</style>
 
@@ -126,7 +139,7 @@ export function ArticleCarousel({ articles, title, subtitle, emptyMessage, icon 
       ) : (
         <div
           ref={ref}
-          className="flex gap-3 overflow-x-auto pb-2"
+          className="flex gap-4 overflow-x-auto pb-2"
           style={{ scrollbarWidth: "none", cursor: "grab" }}
           onMouseDown={onMouseDown}
           onMouseUp={onMouseUp}

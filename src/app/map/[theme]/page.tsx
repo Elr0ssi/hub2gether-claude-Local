@@ -7,10 +7,8 @@ import { EpidemicsMapViewLoader } from "@/components/map/EpidemicsMapViewLoader"
 import { EconomyMapViewLoader } from "@/components/map/EconomyMapViewLoader";
 import { PoliticsMapViewLoader } from "@/components/map/PoliticsMapViewLoader";
 import { MilitaryMapViewLoader } from "@/components/map/MilitaryMapViewLoader";
-import { ArticleGrid } from "@/components/articles/ArticleGrid";
 import { FAQSection } from "@/components/faq/FAQSection";
 import { getThemeById } from "@/data/themes";
-import { getArticlesByTheme } from "@/data/articles";
 import { getFaqsByTheme } from "@/data/faqs";
 import { Skeleton } from "@/components/ui/Skeleton";
 import type { ThemeId } from "@/types";
@@ -198,7 +196,6 @@ export default async function MapPage({ params, searchParams }: PageProps) {
     notFound();
   }
 
-  const articles = getArticlesByTheme(theme);
   const faqs = getFaqsByTheme(theme);
   const initialYear = year ? parseInt(year) : 117;
 
@@ -274,25 +271,6 @@ export default async function MapPage({ params, searchParams }: PageProps) {
           )}
         </Suspense>
       </div>
-
-      {/* Articles */}
-      {articles.length > 0 && (
-        <ArticleGrid
-          articles={articles.slice(0, 3)}
-          title="Analyses éditoriales"
-          subtitle={
-            isEpidemics
-              ? "Analyses approfondies sur les grandes pandémies, leur géographie et leur impact géopolitique."
-              : isEconomy
-              ? "Décryptages économiques : PIB par pays 2025, dette publique mondiale, chômage et rivalités géopolitiques."
-              : isPolitics
-              ? "Analyses sur les grands basculements politiques du XXe et XXIe siècle — populismes, transitions démocratiques et autoritarismes."
-              : isMilitary
-              ? "Analyses sur les grandes puissances militaires, la course aux armements et les nouveaux conflits armés."
-              : "Décryptages éditoriaux sur l'Empire romain — son expansion, son administration, son déclin et son héritage."
-          }
-        />
-      )}
 
       {/* FAQ */}
       {faqs.length > 0 && <FAQSection items={faqs} />}

@@ -40,7 +40,6 @@ export function getCountryFillColorEconomy(
   isHovered = false,
   isSelected = false
 ): string {
-  if (isSelected) return "#39FF88";
   const t = getValueIntensity(countryName, countries, maxValue, metric);
   if (t === 0) return "#EBEBEB";
   const base = interpolateGreen(t);

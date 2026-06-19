@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { ComposableMap, Geographies, Geography, ZoomableGroup, type GeographyItem } from "react-simple-maps";
 import { Plus, Minus, Maximize } from "lucide-react";
 import type { EpidemicDisease } from "@/types";
@@ -16,9 +16,17 @@ interface EpidemicsInteractiveMapProps {
 
 export function EpidemicsInteractiveMap({ disease, selectedCountry, onCountryClick }: EpidemicsInteractiveMapProps) {
   const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
+  const [flashCountry, setFlashCountry] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([20, 10]);
   const maxDeaths = getMaxDeaths(disease.countries);
+
+  const handleClick = useCallback((name: string, hasData: boolean) => {
+    if (!hasData) return;
+    onCountryClick(name);
+    setFlashCountry(name);
+    setTimeout(() => setFlashCountry(null), 700);
+  }, [onCountryClick]);
 
   return (
     <div className="relative w-full" style={{ aspectRatio: "16/9", minHeight: "420px" }}>
@@ -42,17 +50,19 @@ export function EpidemicsInteractiveMap({ disease, selectedCountry, onCountryCli
                 const name: string = (geo as any).properties?.name ?? "";
                 const isHovered = hoveredCountry === name;
                 const isSelected = selectedCountry === name;
+                const isFlashing = flashCountry === name;
                 const hasData = Boolean(disease.countries[name]);
-                const fill = getCountryFillColor(name, disease.countries, maxDeaths, isHovered, isSelected);
+                const fill = getCountryFillColor(name, disease.countries, maxDeaths, isHovered, false);
 
                 return (
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}
                     fill={fill}
-                    stroke={isSelected ? "#39FF88" : "#C8C8C8"}
+                    stroke={isSelected ? "#fff" : "#C8C8C8"}
                     strokeWidth={isSelected ? 1.4 : 0.35}
-                    onClick={() => { if (hasData) onCountryClick(name); }}
+                    className={isFlashing ? "map-white-flash" : ""}
+                    onClick={() => handleClick(name, hasData)}
                     onMouseEnter={() => setHoveredCountry(name)}
                     onMouseLeave={() => setHoveredCountry(null)}
                     style={{
@@ -129,6 +139,15 @@ export function EpidemicsInteractiveMap({ disease, selectedCountry, onCountryCli
           Cliquez sur un pays
         </div>
       )}
+      <style>{`
+        @keyframes map-white-flash-anim {
+          0%   { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); }
+          20%  { filter: drop-shadow(0 0 10px rgba(255,255,255,1)) drop-shadow(0 0 22px rgba(255,255,255,0.6)); }
+          60%  { filter: drop-shadow(0 0 6px rgba(255,255,255,0.4)); }
+          100% { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); }
+        }
+        .map-white-flash { animation: map-white-flash-anim 0.65s ease-out forwards; }
+      `}</style>
     </div>
   );
 }
