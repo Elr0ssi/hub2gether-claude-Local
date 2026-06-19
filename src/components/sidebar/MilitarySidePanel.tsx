@@ -6,7 +6,7 @@ import { X, Shield, Users, Plane, Ship, Crosshair, ChevronLeft, ChevronRight } f
 import type { MilitaryMetricId, MilitaryCountryData } from "@/data/military/military";
 import { MILITARY_METRICS } from "@/data/military/military";
 import { MILITARY_EQUIPMENT, EQUIPMENT_TYPE_LABELS, EQUIPMENT_TYPE_ICONS } from "@/data/military/militaryEquipment";
-import type { EquipmentType } from "@/data/military/militaryEquipment";
+import type { EquipmentType, MilitaryEquipment } from "@/data/military/militaryEquipment";
 
 interface MilitarySidePanelProps {
   countryName: string | null;
@@ -41,7 +41,7 @@ const EQUIPMENT_FILTER_TYPES: { id: EquipmentType | "all"; label: string }[] = [
   { id: "system",    label: "Systèmes" },
 ];
 
-function EquipmentCard({ equipment }: { equipment: ReturnType<typeof MILITARY_EQUIPMENT[string]["0"]> }) {
+function EquipmentCard({ equipment }: { equipment: MilitaryEquipment }) {
   const [imgErr, setImgErr] = useState(false);
   const icon = EQUIPMENT_TYPE_ICONS[equipment.type];
 
