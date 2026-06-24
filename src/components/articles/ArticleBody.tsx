@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Check } from "lucide-react";
 import type { ArticleSection } from "@/types";
+
+const ArticleWorldMap = dynamic(
+  () => import("./ArticleWorldMap").then(m => m.ArticleWorldMap),
+  { ssr: false, loading: () => <div className="my-8 h-48 rounded-2xl animate-pulse" style={{ background: "var(--surface-2)" }} /> }
+);
 
 // ── Stat block ────────────────────────────────────────────────────────────────
 function StatsSection({ items }: { items: { value: string; label: string; note?: string }[] }) {
@@ -317,6 +322,194 @@ function QuoteSection({ text, source }: { text: string; source: string }) {
   );
 }
 
+// ── Horizontal bar chart ──────────────────────────────────────────────────────
+function ChartSection({
+  title, subtitle, unit,
+  bars,
+}: {
+  title: string; subtitle?: string; unit?: string;
+  bars: { label: string; flag?: string; value: number; color?: string; note?: string }[];
+}) {
+  const max = Math.max(...bars.map(b => b.value));
+  return (
+    <div className="my-8 p-5 rounded-2xl" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
+      <div className="mb-4">
+        <p className="text-sm font-bold" style={{ color: "var(--ink)" }}>{title}</p>
+        {subtitle && <p className="text-xs mt-0.5" style={{ color: "var(--ink-4)" }}>{subtitle}</p>}
+      </div>
+      <div className="flex flex-col gap-2.5">
+        {bars.map((bar, i) => {
+          const pct = max > 0 ? (bar.value / max) * 100 : 0;
+          const color = bar.color ?? "#0D7A40";
+          return (
+            <div key={bar.label} className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 shrink-0" style={{ width: "130px" }}>
+                {bar.flag && (
+                  <img
+                    src={`https://flagcdn.com/20x15/${bar.flag}.png`}
+                    alt="" width={16} height={12}
+                    style={{ borderRadius: "2px", objectFit: "cover", flexShrink: 0 }}
+                  />
+                )}
+                <span className="text-xs font-medium truncate" style={{ color: "var(--ink-2)" }}>{bar.label}</span>
+              </div>
+              <div className="flex-1 relative h-5 flex items-center">
+                <div className="absolute inset-0 rounded-full" style={{ background: "var(--surface)" }} />
+                <motion.div
+                  className="absolute left-0 top-0 h-full rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${pct}%` }}
+                  transition={{ duration: 0.7, delay: i * 0.05, ease: "easeOut" }}
+                  style={{ background: color, opacity: 0.85 }}
+                />
+              </div>
+              <div className="shrink-0 text-right" style={{ minWidth: "80px" }}>
+                <span className="text-xs font-bold tabular-nums" style={{ color }}>
+                  {bar.value.toLocaleString("fr-FR")}
+                </span>
+                {unit && <span className="text-xs ml-1" style={{ color: "var(--ink-4)" }}>{unit}</span>}
+                {bar.note && <span className="block text-xs" style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>{bar.note}</span>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Image gallery ─────────────────────────────────────────────────────────────
+function GallerySection({ title, images }: { title?: string; images: { url: string; caption: string; credit?: string }[] }) {
+  const [active, setActive] = useState(0);
+  return (
+    <div className="my-8 rounded-2xl overflow-hidden" style={{ border: "1px solid var(--border)" }}>
+      {title && (
+        <div className="px-5 py-3 border-b" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+          <p className="text-xs font-bold" style={{ color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{title}</p>
+        </div>
+      )}
+      {/* Main image */}
+      <div className="relative" style={{ aspectRatio: "16/9", background: "var(--surface-2)" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          key={active}
+          src={images[active].url}
+          alt={images[active].caption}
+          className="w-full h-full object-cover"
+          loading="lazy"
+          style={{ display: "block" }}
+        />
+        <div className="absolute bottom-0 left-0 right-0 px-4 py-3" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%)" }}>
+          <p className="text-xs text-white leading-snug">{images[active].caption}</p>
+          {images[active].credit && <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.58rem" }}>© {images[active].credit}</p>}
+        </div>
+      </div>
+      {/* Thumbnails */}
+      {images.length > 1 && (
+        <div className="flex gap-2 p-3 overflow-x-auto" style={{ background: "var(--surface-2)" }}>
+          {images.map((img, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              className="shrink-0 rounded-lg overflow-hidden transition-all"
+              style={{
+                width: "72px", height: "48px",
+                outline: i === active ? "2px solid var(--accent)" : "2px solid transparent",
+                opacity: i === active ? 1 : 0.55,
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={img.url} alt="" className="w-full h-full object-cover" loading="lazy" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Comparison table ──────────────────────────────────────────────────────────
+function ComparisonTableSection({
+  title, headers, rows,
+}: {
+  title: string; headers: string[]; rows: { label: string; flag?: string; cells: string[] }[];
+}) {
+  return (
+    <div className="my-8 rounded-2xl overflow-hidden" style={{ border: "1px solid var(--border)" }}>
+      <div className="px-5 py-3 border-b" style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}>
+        <p className="text-xs font-bold" style={{ color: "var(--ink)" }}>{title}</p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full" style={{ borderCollapse: "collapse" }}>
+          <thead style={{ background: "var(--surface-2)" }}>
+            <tr>
+              <th className="px-4 py-2 text-left" style={{ color: "var(--ink-4)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>Pays</th>
+              {headers.map(h => (
+                <th key={h} className="px-4 py-2 text-right" style={{ color: "var(--ink-4)", fontSize: "0.6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, i) => (
+              <tr key={row.label} style={{ borderTop: "1px solid var(--border)", background: i % 2 === 1 ? "var(--surface-2)" : "var(--surface)" }}>
+                <td className="px-4 py-2.5">
+                  <div className="flex items-center gap-2">
+                    {row.flag && <img src={`https://flagcdn.com/20x15/${row.flag}.png`} alt="" width={16} height={12} style={{ borderRadius: "2px", objectFit: "cover" }} />}
+                    <span className="text-xs font-medium" style={{ color: "var(--ink)" }}>{row.label}</span>
+                  </div>
+                </td>
+                {row.cells.map((cell, j) => (
+                  <td key={j} className="px-4 py-2.5 text-right">
+                    <span className="text-xs tabular-nums font-semibold" style={{ color: "var(--ink-2)" }}>{cell}</span>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ── Structured list ───────────────────────────────────────────────────────────
+function ListSection({
+  heading, style = "bullet", items,
+}: {
+  heading?: string; style?: "bullet" | "number" | "check"; items: { text: string; note?: string }[];
+}) {
+  return (
+    <div className="my-6">
+      {heading && (
+        <h2 className="text-lg font-bold mb-3" style={{ color: "var(--ink)", fontSize: "1.15rem" }}>
+          {heading}
+        </h2>
+      )}
+      <div className="flex flex-col gap-2">
+        {items.map((item, i) => (
+          <div key={i} className="flex items-start gap-3">
+            <div className="shrink-0 mt-0.5" style={{ width: "20px" }}>
+              {style === "check" ? (
+                <span className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "var(--accent-dim)", border: "1px solid rgba(57,255,136,0.3)" }}>
+                  <Check size={10} style={{ color: "#0D7A40" }} />
+                </span>
+              ) : style === "number" ? (
+                <span className="text-xs font-bold tabular-nums" style={{ color: "var(--accent)" }}>{i + 1}.</span>
+              ) : (
+                <span className="w-1.5 h-1.5 rounded-full mt-1.5 block" style={{ background: "var(--accent)" }} />
+              )}
+            </div>
+            <div className="flex-1">
+              <span className="text-sm leading-relaxed" style={{ color: "var(--ink-2)" }}>{item.text}</span>
+              {item.note && <span className="block text-xs mt-0.5" style={{ color: "var(--ink-4)" }}>{item.note}</span>}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Main renderer ─────────────────────────────────────────────────────────────
 export function ArticleBody({ sections }: { sections: ArticleSection[] }) {
   return (
@@ -380,6 +573,21 @@ export function ArticleBody({ sections }: { sections: ArticleSection[] }) {
 
           case "quote":
             return <QuoteSection key={i} text={section.text} source={section.source} />;
+
+          case "chart":
+            return <ChartSection key={i} title={section.title} subtitle={section.subtitle} unit={section.unit} bars={section.bars} />;
+
+          case "gallery":
+            return <GallerySection key={i} title={section.title} images={section.images} />;
+
+          case "map-highlight":
+            return <ArticleWorldMap key={i} title={section.title} subtitle={section.subtitle} countries={section.countries} legend={section.legend} />;
+
+          case "comparison-table":
+            return <ComparisonTableSection key={i} title={section.title} headers={section.headers} rows={section.rows} />;
+
+          case "list":
+            return <ListSection key={i} heading={section.heading} style={section.style} items={section.items} />;
 
           default:
             return null;

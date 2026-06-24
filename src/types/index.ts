@@ -64,7 +64,40 @@ export type ArticleSection =
       items: { date: string; title: string; description: string }[];
     }
   | { type: "highlight"; content: string }
-  | { type: "quote"; text: string; source: string };
+  | { type: "quote"; text: string; source: string }
+  // ── NEW rich types ─────────────────────────────────────────────────────────
+  | {
+      type: "chart";
+      title: string;
+      subtitle?: string;
+      unit?: string;
+      bars: { label: string; flag?: string; value: number; color?: string; note?: string }[];
+    }
+  | {
+      type: "gallery";
+      title?: string;
+      images: { url: string; caption: string; credit?: string }[];
+    }
+  | {
+      type: "map-highlight";
+      title: string;
+      subtitle?: string;
+      /** ISO 2-letter code → display config */
+      countries: Record<string, { color: string; label?: string }>;
+      legend?: { color: string; label: string }[];
+    }
+  | {
+      type: "comparison-table";
+      title: string;
+      headers: string[];
+      rows: { label: string; flag?: string; cells: string[] }[];
+    }
+  | {
+      type: "list";
+      heading?: string;
+      style?: "bullet" | "number" | "check";
+      items: { text: string; note?: string }[];
+    };
 
 export interface Article {
   slug: string;
