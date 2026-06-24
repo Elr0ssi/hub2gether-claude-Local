@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronUp, ChevronDown, Shield } from "lucide-react";
 import { MILITARY_METRICS, getMilitaryData } from "@/data/military/military";
@@ -17,6 +17,16 @@ const FLAGS: Record<string, string> = {
   "Vietnam": "🇻🇳", "Greece": "🇬🇷", "Netherlands": "🇳🇱", "Sweden": "🇸🇪",
   "Switzerland": "🇨🇭", "Norway": "🇳🇴", "North Korea": "🇰🇵",
 };
+
+function flagImg(emoji: string | undefined): React.ReactNode {
+  if (!emoji) return <span style={{ fontSize: "0.9rem" }}>🌍</span>;
+  const chars = [...emoji];
+  const a = chars[0]?.codePointAt(0) ?? 0;
+  const b = chars[1]?.codePointAt(0) ?? 0;
+  if (chars.length < 2 || a < 0x1F1E6 || b < 0x1F1E6) return <span style={{ fontSize: "0.9rem" }}>🌍</span>;
+  const code = (String.fromCharCode(a - 0x1F1E6 + 65) + String.fromCharCode(b - 0x1F1E6 + 65)).toLowerCase();
+  return <img src={`https://flagcdn.com/20x15/${code}.png`} alt="" width={20} height={15} style={{ borderRadius: "2px", objectFit: "cover", flexShrink: 0 }} />;
+}
 
 const MEDALS = ["🥇", "🥈", "🥉"];
 
@@ -200,7 +210,7 @@ export function MilitaryRankingsTable({
                     {/* Country */}
                     <td className="px-3 py-2.5">
                       <div className="flex items-center gap-2">
-                        <span style={{ fontSize: "1rem", lineHeight: 1, flexShrink: 0 }}>{FLAGS[name] ?? "🌍"}</span>
+                        {flagImg(FLAGS[name])}
                         <span className="text-xs font-medium" style={{ color: isHighlighted ? metricDef.color : "var(--ink)", whiteSpace: "nowrap" }}>
                           {name}
                         </span>

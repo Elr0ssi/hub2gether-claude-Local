@@ -1,8 +1,51 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Globe, TrendingUp, Swords } from "lucide-react";
+
+const BLOB_SHAPES = [
+  "60% 40% 30% 70% / 60% 30% 70% 40%",
+  "40% 60% 55% 45% / 35% 65% 45% 65%",
+  "50% 50% 70% 30% / 45% 55% 35% 65%",
+  "70% 30% 45% 55% / 65% 35% 60% 40%",
+  "35% 65% 60% 40% / 50% 50% 65% 35%",
+  "60% 40% 30% 70% / 60% 30% 70% 40%",
+];
+
+const BLOB_SHAPES_B = [
+  "45% 55% 65% 35% / 55% 45% 55% 45%",
+  "65% 35% 40% 60% / 40% 60% 40% 60%",
+  "35% 65% 55% 45% / 60% 40% 65% 35%",
+  "55% 45% 70% 30% / 35% 65% 45% 55%",
+  "70% 30% 50% 50% / 50% 50% 40% 60%",
+  "45% 55% 65% 35% / 55% 45% 55% 45%",
+];
+
+function MorphingBlob({
+  shapes, size, color, style, duration,
+}: {
+  shapes: string[]; size: number; color: string; style?: React.CSSProperties; duration: number;
+}) {
+  const reduced = useReducedMotion();
+  if (reduced) return null;
+  return (
+    <motion.div
+      aria-hidden="true"
+      animate={{ borderRadius: shapes }}
+      transition={{ duration, repeat: Infinity, ease: "easeInOut", repeatType: "loop" }}
+      style={{
+        position: "absolute",
+        width: size, height: size,
+        background: color,
+        filter: "blur(48px)",
+        pointerEvents: "none",
+        willChange: "border-radius",
+        ...style,
+      }}
+    />
+  );
+}
 
 const STATS = [
   { value: "6", label: "Grands empires", icon: Globe },
@@ -13,15 +56,29 @@ const STATS = [
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden" style={{ minHeight: "92vh" }}>
-      {/* Neon orb — top right */}
-      <div
-        className="neon-orb"
-        style={{ width: "700px", height: "700px", top: "-180px", right: "-150px", opacity: 0.5 }}
+      {/* Morphing blob — top right */}
+      <MorphingBlob
+        shapes={BLOB_SHAPES}
+        size={680}
+        color="rgba(57,255,136,0.13)"
+        duration={10}
+        style={{ top: "-200px", right: "-180px" }}
       />
-      {/* Neon orb — bottom left */}
-      <div
-        className="neon-orb"
-        style={{ width: "450px", height: "450px", bottom: "-60px", left: "-100px", opacity: 0.35 }}
+      {/* Morphing blob — bottom left */}
+      <MorphingBlob
+        shapes={BLOB_SHAPES_B}
+        size={440}
+        color="rgba(57,255,136,0.09)"
+        duration={13}
+        style={{ bottom: "-80px", left: "-120px" }}
+      />
+      {/* Morphing blob — center accent */}
+      <MorphingBlob
+        shapes={BLOB_SHAPES_B.slice().reverse()}
+        size={320}
+        color="rgba(57,255,136,0.06)"
+        duration={16}
+        style={{ top: "30%", left: "30%" }}
       />
 
       {/* Subtle dot-grid background */}

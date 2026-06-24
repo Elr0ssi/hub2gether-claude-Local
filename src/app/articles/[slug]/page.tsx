@@ -51,6 +51,24 @@ function formatDate(iso: string, locale: string) {
   });
 }
 
+function AdSlot({ format }: { format: "vertical" | "horizontal" }) {
+  const dim = format === "vertical"
+    ? { width: "160px", height: "600px", label: "160×600" }
+    : { width: "100%", height: "90px", label: "728×90" };
+  return (
+    <div style={{
+      width: dim.width, height: dim.height,
+      border: "1px dashed var(--border)",
+      background: "var(--surface-2)",
+      borderRadius: "8px",
+      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "4px",
+    }}>
+      <span style={{ color: "var(--ink-4)", fontSize: "0.58rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>Publicité</span>
+      <span style={{ color: "var(--ink-4)", fontSize: "0.5rem", opacity: 0.6 }}>{dim.label}</span>
+    </div>
+  );
+}
+
 const THEME_MAP: Record<string, { label: string; backHref: string; locale: string }> = {
   economy:   { label: "Économie",  backHref: "/map/economy",   locale: "fr-FR" },
   epidemics: { label: "Épidémies", backHref: "/map/epidemics", locale: "fr-FR" },
@@ -135,7 +153,22 @@ export default async function ArticlePage({ params }: PageProps) {
         </div>
       )}
 
-      <article className="max-w-3xl mx-auto px-6 py-10">
+      {/* Ad + Article layout */}
+      <div className="flex justify-center gap-6">
+        {/* Left ad — desktop only */}
+        <aside className="hidden xl:flex flex-col flex-shrink-0 pt-10" style={{ width: "160px" }}>
+          <AdSlot format="vertical" />
+        </aside>
+
+        {/* Article content column */}
+        <div className="w-full min-w-0" style={{ maxWidth: "48rem" }}>
+
+          {/* Mobile top ad */}
+          <div className="xl:hidden px-6 pt-6">
+            <AdSlot format="horizontal" />
+          </div>
+
+      <article className="px-6 py-10">
         {/* Back link */}
         <Link
           href={themeConfig.backHref}
@@ -260,20 +293,35 @@ export default async function ArticlePage({ params }: PageProps) {
         </div>
       </article>
 
+          {/* Mobile bottom ad */}
+          <div className="xl:hidden px-6 pb-6">
+            <AdSlot format="horizontal" />
+          </div>
+
+        </div>{/* end article content column */}
+
+        {/* Right ad — desktop only */}
+        <aside className="hidden xl:flex flex-col flex-shrink-0 pt-10" style={{ width: "160px" }}>
+          <AdSlot format="vertical" />
+        </aside>
+      </div>{/* end ad + article layout */}
+
       {/* Related articles */}
       {related.length > 0 && (
         <div className="border-t" style={{ borderColor: "var(--border)" }}>
-          <ArticleCarousel
-            articles={related}
-            title={article.theme === "empires" ? "Related analysis" : "À lire aussi"}
-            subtitle={
-              article.theme === "economy"
-                ? "Autres analyses économiques et données mondiales."
-                : article.theme === "epidemics"
-                ? "Autres analyses sur les épidémies et la santé mondiale."
-                : "More editorial analysis on the empires theme."
-            }
-          />
+          <div className="max-w-3xl mx-auto px-6 py-8">
+            <ArticleCarousel
+              articles={related}
+              title={article.theme === "empires" ? "Related analysis" : "À lire aussi"}
+              subtitle={
+                article.theme === "economy"
+                  ? "Autres analyses économiques et données mondiales."
+                  : article.theme === "epidemics"
+                  ? "Autres analyses sur les épidémies et la santé mondiale."
+                  : "More editorial analysis on the empires theme."
+              }
+            />
+          </div>
         </div>
       )}
     </Layout>
