@@ -213,7 +213,7 @@ export function EconomyMapView() {
 
           {/* Slider row + En direct button */}
           <div className="flex items-center gap-3">
-            <div className="relative flex flex-col gap-1 flex-1">
+            <div className="relative flex flex-col gap-0 flex-1">
               <input
                 type="range"
                 min={SLIDER_MIN}
@@ -226,27 +226,49 @@ export function EconomyMapView() {
                   handleYearChange(findNearestDataYear(val));
                   setYtdMode(false);
                 }}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer"
+                className="w-full appearance-none cursor-pointer"
                 style={{
+                  height: "6px",
+                  borderRadius: "9999px",
                   background: `linear-gradient(to right, #0D7A40 0%, #0D7A40 ${((sliderYear - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)) * 100}%, var(--surface-2) ${((sliderYear - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)) * 100}%, var(--surface-2) 100%)`,
                   outline: "none",
                   accentColor: "#0D7A40",
                 }}
               />
-              {/* Tick marks at data years only */}
-              <div className="relative h-3.5">
-                {ECONOMY_YEAR_VALUES.map((y) => {
+              {/* Year ticks: mini mark every year, label every 5 years + data years */}
+              <div className="relative mt-1" style={{ height: "18px" }}>
+                {Array.from({ length: SLIDER_MAX - SLIDER_MIN + 1 }, (_, i) => SLIDER_MIN + i).map((y) => {
                   const pct = ((y - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)) * 100;
+                  const isDataYear = ECONOMY_YEAR_VALUES.includes(y);
                   const isActive = y === year && !ytdMode;
+                  const showLabel = y % 5 === 0 || y === 2023;
                   return (
                     <button
                       key={y}
-                      onClick={() => { setSliderYear(y); handleYearChange(y); setYtdMode(false); }}
-                      className="absolute transform -translate-x-1/2 transition-all"
-                      style={{ left: `${pct}%`, color: isActive ? "#0D7A40" : "var(--ink-4)", fontWeight: isActive ? 700 : 400, fontSize: "0.55rem", top: 0 }}
-                      title={`Aller en ${y}`}
+                      onClick={() => { setSliderYear(y); handleYearChange(findNearestDataYear(y)); setYtdMode(false); }}
+                      className="absolute transform -translate-x-1/2"
+                      style={{ left: `${pct}%`, top: 0, padding: 0, lineHeight: 1 }}
+                      title={`${y}${!isDataYear ? ` → données ${findNearestDataYear(y)}` : ""}`}
                     >
-                      {y}
+                      {showLabel ? (
+                        <span style={{
+                          fontSize: "0.52rem",
+                          fontWeight: isActive ? 700 : isDataYear ? 600 : 400,
+                          color: isActive ? "#0D7A40" : isDataYear ? "var(--ink-3)" : "var(--ink-4)",
+                          display: "block",
+                        }}>
+                          {y}
+                        </span>
+                      ) : (
+                        <span style={{
+                          display: "block",
+                          width: isDataYear ? "3px" : "1px",
+                          height: isDataYear ? "5px" : "3px",
+                          borderRadius: "1px",
+                          background: isActive ? "#0D7A40" : isDataYear ? "var(--ink-3)" : "var(--border)",
+                          marginTop: "2px",
+                        }} />
+                      )}
                     </button>
                   );
                 })}
