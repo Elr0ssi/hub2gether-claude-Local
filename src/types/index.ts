@@ -99,6 +99,13 @@ export type ArticleSection =
       items: { text: string; note?: string }[];
     };
 
+export interface ArticleSource {
+  title: string;
+  outlet?: string;
+  year?: string;
+  url?: string;
+}
+
 export interface Article {
   slug: string;
   title: string;
@@ -111,6 +118,7 @@ export interface Article {
   heroImage?: string;
   heroCaption?: string;
   body?: ArticleSection[];
+  sources?: ArticleSource[];
 }
 
 export interface FAQItem {

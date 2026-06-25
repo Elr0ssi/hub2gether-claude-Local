@@ -272,6 +272,13 @@ export const EMPIRES_ARTICLES: Article[] = [
         ],
       },
     ],
+    sources: [
+        { title: "Barrington Atlas of the Greek and Roman World", outlet: "Princeton University Press", year: "2000" },
+        { title: "AWMC Digital Mapping Project", outlet: "Ancient World Mapping Center, UNC Chapel Hill", url: "https://awmc.unc.edu" },
+        { title: "The Roman Empire — A Very Short Introduction", outlet: "Cambridge University Press", year: "2006" },
+        { title: "Cambridge Ancient History, Vol. XI: The High Empire", outlet: "Cambridge University Press", year: "2000" },
+        { title: "Trajan: Optimus Princeps", outlet: "Julian Bennett, Routledge", year: "1997" },
+    ],
   },
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -498,6 +505,13 @@ export const EMPIRES_ARTICLES: Article[] = [
         ],
       },
     ],
+    sources: [
+        { title: "The Roman Economy: Scale, Growth and Distribution", outlet: "Walter Scheidel & Sitta von Reden, Edinburgh University Press", year: "2002" },
+        { title: "AWMC Digital Mapping — Trade Routes", outlet: "Ancient World Mapping Center", url: "https://awmc.unc.edu" },
+        { title: "The Cambridge Economic History of the Greco-Roman World", outlet: "Cambridge University Press", year: "2007" },
+        { title: "Ports of Trade: The Ancient Mediterranean Economy", outlet: "Oxford Journal of Archaeology", year: "2019" },
+        { title: "Rome: An Empire's Story", outlet: "Greg Woolf, Oxford University Press", year: "2012" },
+    ],
   },
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -713,6 +727,13 @@ export const EMPIRES_ARTICLES: Article[] = [
           "St. Jerome, writing from Bethlehem on hearing of the Visigothic sack of Rome, 410 AD",
       },
     ],
+    sources: [
+        { title: "The Fall of the Roman Empire: A New History", outlet: "Peter Heather, Macmillan", year: "2006" },
+        { title: "The Fate of Rome: Climate, Disease, and the End of an Empire", outlet: "Kyle Harper, Princeton University Press", year: "2017" },
+        { title: "How Rome Fell: Death of a Superpower", outlet: "Adrian Goldsworthy, Yale University Press", year: "2009" },
+        { title: "AWMC — Late Antique Mapping Project", outlet: "Ancient World Mapping Center", url: "https://awmc.unc.edu" },
+        { title: "The Decline of Rome and the Rise of Mediaeval Europe", outlet: "Solomon Katz, Cornell University Press", year: "1955" },
+    ],
   },
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -895,6 +916,13 @@ export const EMPIRES_ARTICLES: Article[] = [
         source:
           "Attributed to Napoleon Bonaparte — but a principle the Roman army mastered 1,800 years earlier",
       },
+    ],
+    sources: [
+        { title: "The Roman Army: A Social and Institutional History", outlet: "Pat Southern, ABC-Clio", year: "2006" },
+        { title: "Rome's Wars in Parthia: Blood in the Sand", outlet: "Adrian Goldsworthy, Pen & Sword", year: "2018" },
+        { title: "Trajan's Column: A Study of the Dacian Wars", outlet: "L. Rossi, Thames & Hudson", year: "1971" },
+        { title: "The Supply of the Roman Army: Papers of the Oxford Roman Economy Project", outlet: "Oxford Roman Economy Project", year: "2012" },
+        { title: "AWMC — Roman Military Infrastructure", outlet: "Ancient World Mapping Center", url: "https://awmc.unc.edu" },
     ],
   },
 
@@ -1129,6 +1157,13 @@ export const EMPIRES_ARTICLES: Article[] = [
         text: "The fall of Constantinople is more than an event in Byzantine or Ottoman history. It is the end of an era — the last act of Roman history, a thread running unbroken from the Senate of the Republic to the breach in the Theodosian Walls.",
         source: "John Julius Norwich, A Short History of Byzantium, 1997",
       },
+    ],
+    sources: [
+        { title: "The Byzantine Empire: A History", outlet: "Judith Herrin, Princeton University Press", year: "2007" },
+        { title: "Byzantium: The Surprising Life of a Medieval Empire", outlet: "Judith Herrin, Princeton University Press", year: "2007" },
+        { title: "The Oxford History of Byzantium", outlet: "Cyril Mango (ed.), Oxford University Press", year: "2002" },
+        { title: "AWMC — Byzantine Period Mapping", outlet: "Ancient World Mapping Center", url: "https://awmc.unc.edu" },
+        { title: "The Byzantine Economy", outlet: "Angeliki Laiou & Cécile Morrison, Cambridge University Press", year: "2007" },
     ],
   },
 
@@ -1365,6 +1400,13 @@ export const EMPIRES_ARTICLES: Article[] = [
         source:
           "Constantine XI Palaiologos, last Emperor of Byzantium — his final words, as reported by Sphrantzes, his secretary and eyewitness, 29 May 1453",
       },
+    ],
+    sources: [
+        { title: "The Fall of Constantinople, 1453", outlet: "Steven Runciman, Cambridge University Press", year: "1965" },
+        { title: "The Last Hours of Byzantium — Sphrantzes Chronicle", outlet: "Georgios Sphrantzes, translated by M. Philippides", year: "1980" },
+        { title: "Mehmed the Conqueror and His Time", outlet: "Franz Babinger, Princeton University Press", year: "1978" },
+        { title: "Lost to the West: The Forgotten Byzantine Empire", outlet: "Lars Brownworth, Crown Publishers", year: "2009" },
+        { title: "AWMC Digital Mapping — Late Antiquity and Byzantium", outlet: "Ancient World Mapping Center", url: "https://awmc.unc.edu" },
     ],
   },
 ];

@@ -144,6 +144,13 @@ export const MILITARY_ARTICLES: Article[] = [
           "La question n'est plus de savoir si le réarmement est nécessaire, mais de savoir si les économies démocratiques peuvent le soutenir dans la durée. Les États-Unis consacrent déjà 3,4 % de leur PIB à la défense. La Russie y engloutit 6,7 % — un effort de guerre total qui pèse sur sa population. La Chine avance de manière opaque, mais son budget officiel augmente d'environ 7 % par an depuis quinze ans. La grande question du XXIe siècle militaire sera peut-être celle de l'endurance économique.",
       },
     ],
+    sources: [
+        { title: "SIPRI Military Expenditure Database 2024", outlet: "SIPRI", year: "2024", url: "https://www.sipri.org/databases/milex" },
+        { title: "SIPRI Yearbook 2024: Armaments, Disarmament and International Security", outlet: "SIPRI", year: "2024" },
+        { title: "NATO Defence Expenditure — 2024 Data", outlet: "OTAN / NATO", year: "2024", url: "https://www.nato.int/cps/en/natohq/topics_49198.htm" },
+        { title: "The Military Balance 2024", outlet: "IISS", year: "2024" },
+        { title: "Global military spending hits record high", outlet: "Reuters", year: "2024" },
+    ],
   },
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -270,6 +277,13 @@ export const MILITARY_ARTICLES: Article[] = [
         content:
           "La leçon ukrainienne accélère le développement des prochaines générations de blindés. Le MGCS franco-allemand (Main Ground Combat System), le Leopard 3 en développement, et le programme T-14 Armata russe (dont la production reste confidentielle) intègreront tous des systèmes de protection active, des drones embarqués et des assistants IA pour la gestion du champ de bataille. L'ère du « char seul roi » est révolue ; celle du système de combat terrestre connecté commence.",
       },
+    ],
+    sources: [
+        { title: "The Military Balance 2024 — Ground Forces", outlet: "IISS", year: "2024" },
+        { title: "Russia-Ukraine War — Tank losses assessment", outlet: "Oryx Open Source Intelligence", year: "2024", url: "https://www.oryxspioenkop.com" },
+        { title: "NATO Tanks to Ukraine — Tracking deliveries", outlet: "Kiel Institute for the World Economy", year: "2024" },
+        { title: "Armoured warfare in Ukraine: lessons", outlet: "Royal United Services Institute (RUSI)", year: "2024" },
+        { title: "SIPRI — Arms transfers database", outlet: "SIPRI", year: "2024", url: "https://www.sipri.org/databases/armstransfers" },
     ],
   },
 
@@ -403,6 +417,13 @@ export const MILITARY_ARTICLES: Article[] = [
         source: "Dr. T.X. Hammes, expert en stratégie militaire, National Defense University (Washington)",
       },
     ],
+    sources: [
+        { title: "SIPRI — Uncrewed aerial vehicles in military operations", outlet: "SIPRI", year: "2024" },
+        { title: "The Military Balance 2024 — Emerging technologies", outlet: "IISS", year: "2024" },
+        { title: "Lethal Autonomous Weapons: Policy Brief", outlet: "Human Rights Watch", year: "2023" },
+        { title: "AI in Military Applications", outlet: "RAND Corporation", year: "2023", url: "https://www.rand.org" },
+        { title: "Drone warfare in Ukraine — Bureau of Investigative Journalism", outlet: "Bureau of Investigative Journalism", year: "2024" },
+    ],
   },
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -532,6 +553,13 @@ export const MILITARY_ARTICLES: Article[] = [
         text: "L'ambition navale de la Chine n'est pas défensive. Elle vise à établir la suprématie dans la « première chaîne d'îles » d'ici 2027 et dans la « deuxième chaîne » d'ici 2049.",
         source: "Amiral Philip Davidson, ancien commandant de l'INDOPACOM, témoignage au Sénat américain (2021)",
       },
+    ],
+    sources: [
+        { title: "The Military Balance 2024 — Naval Forces Asia-Pacific", outlet: "IISS", year: "2024" },
+        { title: "SIPRI — Naval armaments Asia 2024", outlet: "SIPRI", year: "2024" },
+        { title: "China's Naval Expansion and the Indo-Pacific", outlet: "US Congressional Research Service", year: "2024" },
+        { title: "Taiwan Strait tensions — risk assessment", outlet: "RAND Corporation", year: "2024" },
+        { title: "South China Sea — CSIS Asia Maritime Transparency Initiative", outlet: "CSIS", year: "2024", url: "https://amti.csis.org" },
     ],
   },
 
@@ -666,6 +694,13 @@ export const MILITARY_ARTICLES: Article[] = [
         text: "Nous avons vendu nos casernes, réduit nos effectifs, arrêté de produire des obus. Maintenant nous redécouvrons que l'Europe a des frontières et que les frontières ont besoin d'être défendues.",
         source: "Thierry Breton, ancien Commissaire européen au Marché intérieur, sur le réarmement européen (2024)",
       },
+    ],
+    sources: [
+        { title: "NATO Defence Expenditure 2024 — Member State Compliance", outlet: "OTAN / NATO", year: "2024", url: "https://www.nato.int" },
+        { title: "SIPRI European military spending 2024", outlet: "SIPRI", year: "2024", url: "https://www.sipri.org/databases/milex" },
+        { title: "EU Defence: rearmament and the European Defence Fund", outlet: "Commission européenne", year: "2024" },
+        { title: "Germany's Zeitenwende: a year of rearmament", outlet: "Financial Times", year: "2023" },
+        { title: "Eastern Europe military build-up since 2022", outlet: "Reuters", year: "2024" },
     ],
   },
 
@@ -844,6 +879,13 @@ export const MILITARY_ARTICLES: Article[] = [
         text: "J'ignore comment la Troisième Guerre mondiale sera combattue, mais la Quatrième le sera avec des bâtons et des pierres.",
         source: "Albert Einstein, 1949",
       },
+    ],
+    sources: [
+        { title: "SIPRI Yearbook 2024 — Nuclear Forces Data", outlet: "SIPRI", year: "2024", url: "https://www.sipri.org/yearbook" },
+        { title: "Nuclear Weapons: Who Has What at a Glance", outlet: "Arms Control Association", year: "2024", url: "https://www.armscontrol.org/factsheets/Nuclearweaponswhohaswhat" },
+        { title: "The Military Balance 2024 — Nuclear Postures", outlet: "IISS", year: "2024" },
+        { title: "Doomsday Clock Statement 2024", outlet: "Bulletin of the Atomic Scientists", year: "2024", url: "https://thebulletin.org/doomsday-clock/" },
+        { title: "New START Treaty — Status and Suspension (Russia)", outlet: "Arms Control Association", year: "2023" },
     ],
   },
 ];

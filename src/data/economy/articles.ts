@@ -250,6 +250,12 @@ export const ECONOMY_ARTICLES: Article[] = [
         ],
       },
     ],
+    sources: [
+        { title: "World Economic Outlook, April 2025", outlet: "FMI", year: "2025", url: "https://www.imf.org/en/Publications/WEO" },
+        { title: "World Development Indicators", outlet: "Banque mondiale", year: "2024", url: "https://data.worldbank.org" },
+        { title: "GDP and main aggregates — National accounts", outlet: "Eurostat", year: "2025" },
+        { title: "Perspectives de l'économie mondiale", outlet: "OCDE", year: "2025", url: "https://stats.oecd.org" },
+    ],
   },
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -430,6 +436,13 @@ export const ECONOMY_ARTICLES: Article[] = [
           },
         ],
       },
+    ],
+    sources: [
+        { title: "Fiscal Monitor: Putting a Lid on Public Debt", outlet: "FMI", year: "2024", url: "https://www.imf.org/en/Publications/FM" },
+        { title: "General government debt — % of GDP", outlet: "OCDE", year: "2025", url: "https://stats.oecd.org" },
+        { title: "Projet de loi de finances 2025 — Rapport économique", outlet: "Ministère de l'Économie français", year: "2024" },
+        { title: "Global Debt Database", outlet: "FMI", year: "2024" },
+        { title: "Zone euro : soutenabilité des dettes souveraines", outlet: "BCE — Banque centrale européenne", year: "2024" },
     ],
   },
 
@@ -619,6 +632,13 @@ export const ECONOMY_ARTICLES: Article[] = [
         source: "Paul Kennedy, « The Rise and Fall of the Great Powers », actualisé 2024",
       },
     ],
+    sources: [
+        { title: "World Economic Outlook — Database April 2025", outlet: "FMI", year: "2025", url: "https://www.imf.org/en/Publications/WEO" },
+        { title: "GDP (current US$) by country", outlet: "Banque mondiale", year: "2024", url: "https://data.worldbank.org" },
+        { title: "Géopolitique économique : rapports de force", outlet: "OCDE", year: "2024" },
+        { title: "Asian Development Outlook 2024", outlet: "Asian Development Bank", year: "2024" },
+        { title: "China GDP growth slows — Perspectives 2025", outlet: "Financial Times", year: "2024" },
+    ],
   },
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -778,6 +798,13 @@ export const ECONOMY_ARTICLES: Article[] = [
         source: "FMI, Fiscal Monitor, octobre 2024",
       },
     ],
+    sources: [
+        { title: "Fiscal Monitor 2024 — Appendix Tables", outlet: "FMI", year: "2024", url: "https://www.imf.org/en/Publications/FM" },
+        { title: "General Government Gross Debt — OECD Data", outlet: "OCDE", year: "2025" },
+        { title: "Japan's Debt — sustainability analysis", outlet: "FMI Article IV Japan", year: "2024" },
+        { title: "EU Excessive Deficit Procedure — Member States", outlet: "Commission européenne", year: "2024" },
+        { title: "Global Debt Database 2024", outlet: "FMI", year: "2024" },
+    ],
   },
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -931,6 +958,13 @@ export const ECONOMY_ARTICLES: Article[] = [
         text: "Le plein emploi n'est pas qu'un objectif économique. C'est un fondement de la cohésion sociale. Les pays qui maintiennent durablement un chômage élevé — notamment chez les jeunes — paient une facture sociale et politique qui dépasse de loin le coût des allocations versées.",
         source: "OIT, Rapport mondial sur l'emploi et les questions sociales 2025",
       },
+    ],
+    sources: [
+        { title: "World Employment and Social Outlook 2024", outlet: "Organisation Internationale du Travail (OIT)", year: "2024", url: "https://www.ilo.org" },
+        { title: "Unemployment rate by country — OECD Statistics", outlet: "OCDE", year: "2025" },
+        { title: "World Development Report 2024 — Inequality", outlet: "Banque mondiale", year: "2024" },
+        { title: "Labour market statistics — Eurostat", outlet: "Eurostat", year: "2025" },
+        { title: "Global Inequality Report — Oxfam 2024", outlet: "Oxfam International", year: "2024" },
     ],
   },
 
@@ -1124,6 +1158,13 @@ export const ECONOMY_ARTICLES: Article[] = [
         source: "Graham Allison, Harvard Kennedy School, « Destined for War », réédition 2024",
       },
     ],
+    sources: [
+        { title: "World Economic Outlook — US-China tensions", outlet: "FMI", year: "2025", url: "https://www.imf.org/en/Publications/WEO" },
+        { title: "US-China Economic and Trade Relations", outlet: "Congressional Research Service", year: "2024" },
+        { title: "OECD Economic Surveys — China 2024", outlet: "OCDE", year: "2024" },
+        { title: "The Great Decoupling: how US-China rivalry reshapes global trade", outlet: "Financial Times", year: "2024" },
+        { title: "China Trade Statistics 2024", outlet: "General Administration of Customs China / Reuters", year: "2024" },
+    ],
   },
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -1284,6 +1325,13 @@ export const ECONOMY_ARTICLES: Article[] = [
         text: "Nous ne sommes plus dans le capitalisme industriel du XXe siècle. Nous sommes dans un capitalisme de plateformes où les effets réseau créent des monopoles naturels que la régulation traditionnelle est incapable de démanteler.",
         source: "Margrethe Vestager, ancienne commissaire européenne à la Concurrence, 2024",
       },
+    ],
+    sources: [
+        { title: "Fortune Global 500 — 2024 Rankings", outlet: "Fortune Magazine", year: "2024", url: "https://fortune.com/global500/" },
+        { title: "Global largest companies by market cap", outlet: "S&P Global / Bloomberg", year: "2024" },
+        { title: "World Investment Report 2024 — TNCs", outlet: "CNUCED / UNCTAD", year: "2024" },
+        { title: "Amazon, Microsoft, Nvidia: the rise of US tech giants", outlet: "Financial Times", year: "2024" },
+        { title: "Saudi Aramco, ADNOC: state oil companies rankings", outlet: "Reuters", year: "2024" },
     ],
   },
 
@@ -1501,6 +1549,13 @@ export const ECONOMY_ARTICLES: Article[] = [
         text: "La COVID-19 n'a pas seulement causé une récession. Elle a redéfini ce que signifie être un État : la capacité de protéger ses citoyens de chocs exogènes est désormais une composante centrale de la légitimité politique.",
         source: "Kristalina Georgieva, Directrice générale du FMI, 2021",
       },
+    ],
+    sources: [
+        { title: "World Economic Outlook, October 2021 — Recovery During a Pandemic", outlet: "FMI", year: "2021", url: "https://www.imf.org/en/Publications/WEO" },
+        { title: "Global Economic Prospects — Post-COVID Recovery", outlet: "Banque mondiale", year: "2022" },
+        { title: "COVID-19 fiscal measures and economic impact", outlet: "FMI — Fiscal Monitor", year: "2021" },
+        { title: "Our World in Data — COVID and GDP", outlet: "Our World in Data / University of Oxford", year: "2022", url: "https://ourworldindata.org/covid-gdp" },
+        { title: "The economic fallout of COVID-19 in numbers", outlet: "OCDE", year: "2022" },
     ],
   },
 ];

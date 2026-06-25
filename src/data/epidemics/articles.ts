@@ -144,6 +144,13 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         source: "Dr. Maria Van Kerkhove, OMS, conférence de presse, février 2025",
       },
     ],
+    sources: [
+        { title: "Human Metapneumovirus — Factsheet", outlet: "CDC", url: "https://www.cdc.gov/human-metapneumovirus/" },
+        { title: "ECDC Communicable Disease Threats Report — HMPV 2024-2025", outlet: "ECDC", year: "2025", url: "https://www.ecdc.europa.eu" },
+        { title: "China hMPV surveillance — National Influenza Sentinel Hospitals", outlet: "OMS / CCDC China", year: "2025" },
+        { title: "Human metapneumovirus and lower respiratory disease in children", outlet: "New England Journal of Medicine", year: "2004" },
+        { title: "OMS — HMPV Risk Assessment 2025", outlet: "OMS / WHO", year: "2025" },
+    ],
   },
   {
     slug: "carte-epidemies-monde-comparaison-historique",
@@ -273,6 +280,13 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         text: "Les épidémies ne créent pas les inégalités. Elles les révèlent.",
         source: "Dr. Paul Farmer, médecin anthropologue, fondateur de Partners in Health",
       },
+    ],
+    sources: [
+        { title: "Historical Pandemics — Timeline and Data", outlet: "Our World in Data", url: "https://ourworldindata.org/historical-pandemics" },
+        { title: "Plagues and Peoples", outlet: "William H. McNeill, Anchor Books", year: "1976" },
+        { title: "Epidemics and Society: From the Black Death to the Present", outlet: "Frank Snowden, Yale University Press", year: "2019" },
+        { title: "WHO — Disease Outbreak News Archive", outlet: "OMS / WHO", url: "https://www.who.int/csr/don/en/" },
+        { title: "Cambridge World History of Human Disease", outlet: "Cambridge University Press", year: "1993" },
     ],
   },
   {
@@ -416,6 +430,13 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         source: "Larry Brilliant, épidémiologiste, auteur de 'Sometimes Brilliant', 2020",
       },
     ],
+    sources: [
+        { title: "WHO COVID-19 Dashboard — Epidemiological data 2020", outlet: "OMS / WHO", year: "2020", url: "https://covid19.who.int" },
+        { title: "COVID-19 — The First 100 Days Report", outlet: "Johns Hopkins Bloomberg School of Public Health", year: "2020" },
+        { title: "COVID-19 Data Explorer", outlet: "Our World in Data", url: "https://ourworldindata.org/covid-cases" },
+        { title: "SARS-CoV-2 phylogenetic analysis — early spread", outlet: "Nature Medicine", year: "2020" },
+        { title: "China's COVID response: timeline and data", outlet: "Reuters / WHO Mission Report", year: "2020" },
+    ],
   },
   {
     slug: "peste-noire-europe-medievale",
@@ -550,6 +571,13 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         text: "Si mourir était horrible, voir mourir l'était encore plus. Et si voir mourir était horrible, vivre avec les morts l'était plus encore.",
         source: "Giovanni Boccace, Décaméron, 1353 — récit de la Peste de Florence",
       },
+    ],
+    sources: [
+        { title: "The Black Death", outlet: "Philip Ziegler, Collins", year: "1969" },
+        { title: "The Great Mortality: An Intimate History of the Black Death", outlet: "John Kelly, HarperCollins", year: "2005" },
+        { title: "Historical mortality estimates — European Black Death", outlet: "Our World in Data / J.-N. Biraben", url: "https://ourworldindata.org/historical-pandemics" },
+        { title: "Ancient Yersinia pestis genomics and the Black Death", outlet: "Nature Communications", year: "2022" },
+        { title: "The Cambridge World History of Human Disease — Plague", outlet: "Cambridge University Press", year: "1993" },
     ],
   },
   {
@@ -698,6 +726,13 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         source: "Winnie Byanyima, Directrice exécutive ONUSIDA, Conférence mondiale sur le SIDA, 2023",
       },
     ],
+    sources: [
+        { title: "Global AIDS Update 2024 — The Urgency of Now", outlet: "UNAIDS", year: "2024", url: "https://www.unaids.org/en/resources/documents/2024" },
+        { title: "HIV/AIDS Data and Statistics", outlet: "OMS / WHO", url: "https://www.who.int/data/gho/data/themes/hiv-aids" },
+        { title: "HIV Data — Our World in Data", outlet: "Our World in Data / Global Burden of Disease", url: "https://ourworldindata.org/hiv-aids" },
+        { title: "UNAIDS Fact Sheet 2024 — Sub-Saharan Africa", outlet: "UNAIDS", year: "2024" },
+        { title: "The Lancet HIV — Antiretroviral therapy coverage Sub-Saharan Africa", outlet: "The Lancet HIV", year: "2023" },
+    ],
   },
   {
     slug: "hantavirus-rongeurs-vecteurs-silencieux",
@@ -825,6 +860,13 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         text: "Nous ne détruisons pas les réservoirs d'agents pathogènes. Nous les perturbons. Et un réservoir perturbé déverse son contenu.",
         source: "David Quammen, auteur de 'Spillover', interview Nature, 2020",
       },
+    ],
+    sources: [
+        { title: "Hantavirus — Epidemiology and Factsheet", outlet: "CDC", url: "https://www.cdc.gov/hantavirus/" },
+        { title: "Hantavirus in the Americas — PAHO Surveillance", outlet: "PAHO / OPS", url: "https://www.paho.org/en/topics/hantavirus" },
+        { title: "Hantavirus Disease — Global Surveillance", outlet: "ECDC", url: "https://www.ecdc.europa.eu/en/hantavirus-infection" },
+        { title: "OMS Hantavirus Disease Fact Sheet", outlet: "OMS / WHO", url: "https://www.who.int/news-room/fact-sheets/detail/hantavirus-disease" },
+        { title: "Sin Nombre Virus: The Four Corners Outbreak — NEJM", outlet: "New England Journal of Medicine", year: "1994" },
     ],
   },
   {
@@ -962,6 +1004,13 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         text: "Nous avons construit une architecture de sécurité sanitaire mondiale. Malheureusement, c'est une architecture de papier.",
         source: "Gro Harlem Brundtland, ancienne Directrice générale OMS, Financial Times, 2021",
       },
+    ],
+    sources: [
+        { title: "International Health Regulations (IHR) 2005", outlet: "OMS / WHO", year: "2016", url: "https://www.who.int/publications/i/item/9789241580496" },
+        { title: "Global Health Security Index 2023", outlet: "NTI / Johns Hopkins Bloomberg School of Public Health", year: "2023", url: "https://www.ghsindex.org" },
+        { title: "COVID-19 and national security", outlet: "SIPRI", year: "2021" },
+        { title: "Epidemics and politics: border closures and health governance", outlet: "The Lancet", year: "2020" },
+        { title: "Spillover: Animal Infections and the Next Human Pandemic", outlet: "David Quammen, Norton", year: "2012" },
     ],
   },
   {
@@ -1109,6 +1158,14 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         text: "Personne n'est en sécurité tant que tout le monde ne l'est pas. Ce n'est pas de la compassion — c'est de la biologie.",
         source: "Tedros Adhanom Ghebreyesus, Directeur général OMS, Assemblée Mondiale de la Santé, mai 2021",
       },
+    ],
+    sources: [
+        { title: "COVAX Facility — Delivering on the Promise", outlet: "GAVI / OMS / CEPI", year: "2022", url: "https://www.gavi.org/covax-facility" },
+        { title: "The People's Vaccine: COVID-19 access inequalities", outlet: "Oxfam International", year: "2021" },
+        { title: "TRIPS Waiver negotiations — WTO", outlet: "Organisation Mondiale du Commerce (OMC)", year: "2022" },
+        { title: "Vaccine equity: the pandemic's unresolved crisis", outlet: "The Lancet", year: "2022" },
+        { title: "MSF — Access to COVID-19 Vaccines Tracker", outlet: "Médecins Sans Frontières", year: "2022" },
+        { title: "COVID-19 vaccination gap: who got vaccinated?", outlet: "Our World in Data", url: "https://ourworldindata.org/covid-vaccinations" },
     ],
   },
 ];
