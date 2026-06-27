@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Clock, Tag } from "lucide-react";
+import { ArrowLeft, Clock, Tag, ExternalLink, Info } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
 import { ArticleBody } from "@/components/articles/ArticleBody";
@@ -222,10 +222,20 @@ export default async function ArticlePage({ params }: PageProps) {
               </p>
             </div>
           </div>
-          <span className="flex items-center gap-1 text-xs" style={{ color: "var(--ink-4)" }}>
-            <Clock size={11} />
-            {article.readingTime} min de lecture
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1 text-xs" style={{ color: "var(--ink-4)" }}>
+              <Clock size={11} />
+              {article.readingTime} min de lecture
+            </span>
+            <span
+              className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
+              style={{ background: "rgba(57,255,136,0.12)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)" }}
+              title="Contenu synthétisé par IA à partir de sources vérifiées — Conformité EU AI Act"
+            >
+              <Info size={9} />
+              Synthèse IA
+            </span>
+          </div>
         </div>
 
         {/* Hero caption */}
@@ -290,6 +300,70 @@ export default async function ArticlePage({ params }: PageProps) {
               {tag}
             </span>
           ))}
+        </div>
+
+        {/* AI Disclosure + Sources — EU AI Act compliance */}
+        <div
+          className="mt-8 p-5 rounded-2xl"
+          style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}
+        >
+          <div className="flex items-start gap-3 mb-4">
+            <span
+              className="flex-shrink-0 flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full"
+              style={{ background: "rgba(57,255,136,0.15)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.4)" }}
+            >
+              <Info size={10} />
+              EU AI Act
+            </span>
+            <p className="text-xs leading-relaxed" style={{ color: "var(--ink-3)" }}>
+              Cet article est une <strong>synthèse éditoriale assistée par IA</strong>, construite à partir de sources médiatiques mondiales vérifiées. Son objectif est d'offrir une vision impartiale, multi-perspectives et actualisée. Les données chiffrées proviennent d'institutions internationales reconnues (FMI, OMS, Banque mondiale, etc.).{" "}
+              <Link href="/methodology" className="underline underline-offset-2" style={{ color: "var(--ink-2)" }}>
+                Voir notre méthodologie →
+              </Link>
+            </p>
+          </div>
+
+          {article.sources && article.sources.length > 0 && (
+            <>
+              <p className="text-xs font-semibold mb-3" style={{ color: "var(--ink-2)" }}>
+                Sources citées dans cet article
+              </p>
+              <ol className="space-y-1.5">
+                {article.sources.map((src, i) => (
+                  <li key={i} className="flex items-start gap-2 text-xs" style={{ color: "var(--ink-3)" }}>
+                    <span
+                      className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center font-bold text-[0.6rem]"
+                      style={{ background: "var(--border)", color: "var(--ink-2)" }}
+                    >
+                      {i + 1}
+                    </span>
+                    <span>
+                      {src.url ? (
+                        <a
+                          href={src.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:underline inline-flex items-center gap-1"
+                          style={{ color: "var(--ink-2)" }}
+                        >
+                          {src.title}
+                          <ExternalLink size={9} />
+                        </a>
+                      ) : (
+                        <span style={{ color: "var(--ink-2)" }}>{src.title}</span>
+                      )}
+                      {(src.outlet || src.year) && (
+                        <span style={{ color: "var(--ink-4)" }}>
+                          {" — "}
+                          {[src.outlet, src.year].filter(Boolean).join(", ")}
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </>
+          )}
         </div>
       </article>
 
