@@ -8,8 +8,10 @@ import { EconomyMapViewLoader } from "@/components/map/EconomyMapViewLoader";
 import { PoliticsMapViewLoader } from "@/components/map/PoliticsMapViewLoader";
 import { MilitaryMapViewLoader } from "@/components/map/MilitaryMapViewLoader";
 import { FAQSection } from "@/components/faq/FAQSection";
+import { ArticleGrid } from "@/components/articles/ArticleGrid";
 import { getThemeById } from "@/data/themes";
 import { getFaqsByTheme } from "@/data/faqs";
+import { getArticlesByTheme } from "@/data/articles";
 import { Skeleton } from "@/components/ui/Skeleton";
 import type { ThemeId } from "@/types";
 
@@ -197,6 +199,7 @@ export default async function MapPage({ params, searchParams }: PageProps) {
   }
 
   const faqs = getFaqsByTheme(theme);
+  const themeArticles = getArticlesByTheme(theme);
   const initialYear = year ? parseInt(year) : 117;
 
   const isEpidemics = theme === "epidemics";
@@ -271,6 +274,37 @@ export default async function MapPage({ params, searchParams }: PageProps) {
           )}
         </Suspense>
       </div>
+
+      {/* Articles */}
+      {themeArticles.length > 0 && (
+        <div className="border-t" style={{ borderColor: "var(--border)" }}>
+          <ArticleGrid
+            articles={themeArticles}
+            title={
+              isEconomy
+                ? "Analyses économiques"
+                : isEpidemics
+                ? "Analyses épidémiologiques"
+                : isMilitary
+                ? "Analyses militaires"
+                : theme === "empires"
+                ? "Historical analyses"
+                : "Analyses approfondies"
+            }
+            subtitle={
+              isEconomy
+                ? "Décryptages éditoriaux sur le PIB mondial, la dette, les inégalités et les grandes rivalités économiques du siècle."
+                : isEpidemics
+                ? "Décryptages éditoriaux sur les grandes épidémies, leurs origines, leur impact géopolitique et les inégalités d'accès aux soins."
+                : isMilitary
+                ? "Décryptages éditoriaux sur le réarmement mondial, la course aux technologies militaires et les conflits actifs."
+                : theme === "empires"
+                ? "In-depth editorial analysis on the rise and fall of empires, mechanics of expansion, and lessons of history."
+                : "Analyses approfondies et décryptages éditoriaux."
+            }
+          />
+        </div>
+      )}
 
       {/* FAQ */}
       {faqs.length > 0 && <FAQSection items={faqs} />}
