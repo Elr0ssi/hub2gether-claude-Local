@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { RotateCcw, Check } from "lucide-react";
 import type { ArticleSection } from "@/types";
+import { ArticleRankingTable } from "./ArticleRankingTable";
 
 const ArticleWorldMap = dynamic(
   () => import("./ArticleWorldMap").then(m => m.ArticleWorldMap),
@@ -323,57 +324,27 @@ function QuoteSection({ text, source }: { text: string; source: string }) {
 }
 
 // ── Horizontal bar chart ──────────────────────────────────────────────────────
-function ChartSection({
-  title, subtitle, unit,
-  bars,
-}: {
+function ChartSection({ title, subtitle, unit, bars }: {
   title: string; subtitle?: string; unit?: string;
   bars: { label: string; flag?: string; value: number; color?: string; note?: string }[];
 }) {
   const max = Math.max(...bars.map(b => b.value));
   return (
-    <div className="my-8 p-5 rounded-2xl" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-      <div className="mb-4">
-        <p className="text-sm font-bold" style={{ color: "var(--ink)" }}>{title}</p>
-        {subtitle && <p className="text-xs mt-0.5" style={{ color: "var(--ink-4)" }}>{subtitle}</p>}
-      </div>
-      <div className="flex flex-col gap-2.5">
-        {bars.map((bar, i) => {
-          const pct = max > 0 ? (bar.value / max) * 100 : 0;
-          const color = bar.color ?? "#0D7A40";
-          return (
-            <div key={bar.label} className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 shrink-0" style={{ width: "130px" }}>
-                {bar.flag && (
-                  <img
-                    src={`https://flagcdn.com/20x15/${bar.flag}.png`}
-                    alt="" width={16} height={12}
-                    style={{ borderRadius: "2px", objectFit: "cover", flexShrink: 0 }}
-                  />
-                )}
-                <span className="text-xs font-medium truncate" style={{ color: "var(--ink-2)" }}>{bar.label}</span>
-              </div>
-              <div className="flex-1 relative h-5 flex items-center">
-                <div className="absolute inset-0 rounded-full" style={{ background: "var(--surface)" }} />
-                <motion.div
-                  className="absolute left-0 top-0 h-full rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${pct}%` }}
-                  transition={{ duration: 0.7, delay: i * 0.05, ease: "easeOut" }}
-                  style={{ background: color, opacity: 0.85 }}
-                />
-              </div>
-              <div className="shrink-0 text-right" style={{ minWidth: "80px" }}>
-                <span className="text-xs font-bold tabular-nums" style={{ color }}>
-                  {bar.value.toLocaleString("fr-FR")}
-                </span>
-                {unit && <span className="text-xs ml-1" style={{ color: "var(--ink-4)" }}>{unit}</span>}
-                {bar.note && <span className="block text-xs" style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>{bar.note}</span>}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+    <div className="my-8">
+      <ArticleRankingTable
+        title={title}
+        subtitle={subtitle}
+        unit={unit}
+        maxValue={max}
+        rows={bars.map((b, i) => ({
+          rank: i + 1,
+          label: b.label,
+          flag: b.flag,
+          value: b.value,
+          color: b.color,
+          note: b.note,
+        }))}
+      />
     </div>
   );
 }
