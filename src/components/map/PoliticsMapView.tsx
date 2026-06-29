@@ -9,12 +9,10 @@ import { ThemeDropdown } from "./ThemeDropdown";
 import { getAllPoliticsForYear, getPoliticsForYear, POLITICS_MIN_YEAR, POLITICS_MAX_YEAR } from "@/data/politics/politics";
 import { ORIENTATION_COLORS, ORIENTATION_LABELS } from "@/lib/politicsColors";
 import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
-import { getArticlesByTheme, ARTICLES } from "@/data/articles";
+import { ARTICLES } from "@/data/articles";
 import { useDragScroll } from "@/hooks/useDragScroll";
 
 const KEY_YEARS = [1933, 1939, 1945, 1950, 1960, 1970, 1980, 1989, 1991, 2000, 2008, 2016, 2020, 2025];
-
-const politicsArticles = getArticlesByTheme("politics");
 
 export function PoliticsMapView() {
   const [sidePanelOpen, setSidePanelOpen] = useState(true);
@@ -221,12 +219,12 @@ export function PoliticsMapView() {
         })}
       </div>
 
-      {/* Article carousels */}
-      <div
-        className="mt-6 rounded-2xl p-5 flex flex-col gap-6"
-        style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-      >
-        {selectedCountry && (
+      {/* Country-specific articles */}
+      {selectedCountry && (
+        <div
+          className="mt-6 rounded-2xl p-5"
+          style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+        >
           <ArticleCarousel
             articles={countryArticles}
             title={`Recommandations — ${selectedCountry}`}
@@ -234,15 +232,8 @@ export function PoliticsMapView() {
             emptyMessage={`Aucun article spécifique pour ${selectedCountry} pour l'instant.`}
             icon="pin"
           />
-        )}
-        <ArticleCarousel
-          articles={politicsArticles}
-          title="Analyses politiques"
-          subtitle="Tous les articles de l'onglet Politique"
-          emptyMessage="Aucun article disponible pour cet onglet."
-          icon="newspaper"
-        />
-      </div>
+        </div>
+      )}
 
       {/* Municipal elections */}
       <MunicipalElectionsSection />

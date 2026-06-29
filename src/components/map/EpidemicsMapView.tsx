@@ -9,11 +9,9 @@ import { EpidemicsSidePanel } from "@/components/sidebar/EpidemicsSidePanel";
 import { ThemeDropdown } from "./ThemeDropdown";
 import { EPIDEMICS, getDiseaseById } from "@/data/epidemics/epidemics";
 import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
-import { getArticlesByTheme, ARTICLES } from "@/data/articles";
+import { ARTICLES } from "@/data/articles";
 import { useDragScroll } from "@/hooks/useDragScroll";
 import type { EpidemicDiseaseId, EpidemicDisease } from "@/types";
-
-const epidemicsArticles = getArticlesByTheme("epidemics");
 
 function computeYtdDisease(disease: EpidemicDisease): EpidemicDisease {
   const today = new Date();
@@ -322,12 +320,12 @@ export function EpidemicsMapView() {
         </div>
       </div>
 
-      {/* Article carousels */}
-      <div
-        className="mt-6 rounded-2xl p-5 flex flex-col gap-6"
-        style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-      >
-        {selectedCountry && (
+      {/* Country-specific articles */}
+      {selectedCountry && (
+        <div
+          className="mt-6 rounded-2xl p-5"
+          style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+        >
           <ArticleCarousel
             articles={countryArticles}
             title={`Recommandations — ${selectedCountry}`}
@@ -335,15 +333,8 @@ export function EpidemicsMapView() {
             emptyMessage={`Aucun article spécifique pour ${selectedCountry} pour l'instant.`}
             icon="pin"
           />
-        )}
-        <ArticleCarousel
-          articles={epidemicsArticles}
-          title="Analyses épidémiques"
-          subtitle="Tous les articles de l'onglet Épidémies"
-          emptyMessage="Aucun article disponible pour cet onglet."
-          icon="newspaper"
-        />
-      </div>
+        </div>
+      )}
     </>
   );
 }

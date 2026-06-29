@@ -6,8 +6,6 @@ import { MilitaryInteractiveMap } from "./MilitaryInteractiveMap";
 import { MilitaryRankingsTable } from "./MilitaryRankingsTable";
 import { MilitarySidePanel } from "@/components/sidebar/MilitarySidePanel";
 import { ThemeDropdown } from "./ThemeDropdown";
-import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
-import { MILITARY_ARTICLES } from "@/data/military/articles";
 import { useDragScroll } from "@/hooks/useDragScroll";
 import {
   MILITARY_METRICS,
@@ -205,17 +203,6 @@ export function MilitaryMapView() {
         selectedCountry={selectedCountry}
         onCountryClick={name => { setSelectedCountry(name); setSidePanelOpen(true); }}
       />
-
-      {/* Military articles carousel */}
-      <div className="mt-4 rounded-2xl p-5" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-        <ArticleCarousel
-          articles={MILITARY_ARTICLES}
-          title="Analyses militaires"
-          subtitle="Dépenses, équipements, conflits et géopolitique"
-          emptyMessage="Aucun article disponible."
-          icon="newspaper"
-        />
-      </div>
 
       <style>{`
         input[type=range]::-webkit-slider-thumb {
