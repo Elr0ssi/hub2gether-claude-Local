@@ -8,6 +8,7 @@ export interface Theme {
   available: boolean;
   icon: string;
   comingSoonLabel?: string;
+  hidden?: boolean;
 }
 
 export interface EmpireStats {

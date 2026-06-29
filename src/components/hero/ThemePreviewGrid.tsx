@@ -38,7 +38,7 @@ export function ThemePreviewGrid({ themes }: ThemePreviewGridProps) {
         >
           <p className="section-title mb-3">Explorer par thème</p>
           <h2 className="text-heading-1 mb-4" style={{ color: "var(--ink)" }}>
-            Cinq grandes lectures du monde
+            Quatre grandes lectures du monde
           </h2>
           <p className="text-body mx-auto" style={{ maxWidth: "520px", color: "var(--ink-3)" }}>
             Chaque thème offre un prisme analytique distinct pour comprendre
@@ -48,7 +48,7 @@ export function ThemePreviewGrid({ themes }: ThemePreviewGridProps) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
-        {themes.map((theme, i) => {
+        {themes.filter((t) => !t.hidden).map((theme, i) => {
           const Icon = ICONS[theme.icon] ?? Crown;
           const preview = THEME_PREVIEWS[theme.id];
 

@@ -9,6 +9,7 @@ export const THEMES: Theme[] = [
     slug: "empires",
     available: true,
     icon: "Crown",
+    hidden: true,
   },
   {
     id: "economy",
