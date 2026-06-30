@@ -15,6 +15,12 @@ import type { EconomyMetricId, EconomyYear } from "@/types";
 const SLIDER_MIN = 2000;
 const SLIDER_MAX = 2025;
 
+// Top toolbar only ever showed these 4 metrics. PIB/hab. and Balance commerciale are
+// switched from the side panel's GDP-family boxes instead (see EconomySidePanel).
+const TOOLBAR_METRICS = ECONOMY_METRICS.filter(
+  (m) => m.id !== "gdp_per_capita" && m.id !== "trade_balance"
+);
+
 function findNearestDataYear(target: number): number {
   return ECONOMY_YEAR_VALUES.reduce((prev, curr) =>
     Math.abs(curr - target) < Math.abs(prev - target) ? curr : prev
@@ -132,7 +138,7 @@ export function EconomyMapView() {
 
             {/* Metric selector */}
             <div className="flex items-center gap-1 flex-wrap">
-              {ECONOMY_METRICS.map((m) => (
+              {TOOLBAR_METRICS.map((m) => (
                 <button
                   key={m.id}
                   onClick={() => handleMetricChange(m.id)}
@@ -333,6 +339,7 @@ export function EconomyMapView() {
             metric={metric}
             open={sidePanelOpen}
             onClose={() => setSidePanelOpen(false)}
+            onMetricChange={handleMetricChange}
           />
         </div>
       </div>

@@ -35,15 +35,15 @@ export const ECONOMY_METRICS: EconomyMetric[] = [
     id: "gdp_per_capita",
     label: "PIB par habitant",
     shortLabel: "PIB/hab.",
-    unit: "$ US",
-    description: "Produit Intérieur Brut par habitant, en dollars US courants (PIB total ÷ population).",
+    unit: "€",
+    description: "Produit Intérieur Brut par habitant, en euros (équivalent USD courants, PIB total ÷ population).",
   },
   {
     id: "trade_balance",
     label: "Balance commerciale",
     shortLabel: "Balance",
-    unit: "Mds $",
-    description: "Balance extérieure de biens et services : exportations moins importations, en milliards de dollars US courants. Positif = excédent, négatif = déficit.",
+    unit: "Mds €",
+    description: "Balance extérieure de biens et services : exportations moins importations, en milliards d'euros (équivalent USD courants). Positif = excédent, négatif = déficit.",
   },
 ];
 
