@@ -7,11 +7,12 @@ import type { EconomyMetricId } from "@/types";
 import { ECONOMY_METRICS, ECONOMY_YEARS } from "@/data/economy/economy";
 import { getDebtByCountry } from "@/data/economy/debtData";
 import { getLaborByCountry } from "@/data/economy/laborData";
-import { getTradeByCountry, fmtTradeBalance } from "@/data/economy/tradeData";
 import { COMPARISON_COUNTRIES } from "@/data/comparison/comparisonData";
 import type { CountryEconomyData } from "@/types";
 
 const _compIndex = new Map(COMPARISON_COUNTRIES.map(c => [c.name, c]));
+
+const GDP_FAMILY: EconomyMetricId[] = ["gdp", "gdp_per_capita", "trade_balance"];
 
 interface EconomySidePanelProps {
   countryName: string | null;
@@ -19,6 +20,7 @@ interface EconomySidePanelProps {
   metric: EconomyMetricId;
   open: boolean;
   onClose: () => void;
+  onMetricChange?: (id: EconomyMetricId) => void;
 }
 
 function fmtNumber(v: number): string {
@@ -29,8 +31,8 @@ function fmtMetric(v: number | undefined, metric: EconomyMetricId): string {
   if (v === undefined) return "—";
   if (metric === "gdp")             return `${fmtNumber(v)} Mds€`;
   if (metric === "companies")       return `${fmtNumber(v)} k`;
-  if (metric === "gdp_per_capita")  return `${fmtNumber(Math.round(v))} $`;
-  if (metric === "trade_balance")   return `${v > 0 ? "+" : ""}${fmtNumber(Math.round(v))} Mds$`;
+  if (metric === "gdp_per_capita")  return `${fmtNumber(Math.round(v))} €`;
+  if (metric === "trade_balance")   return `${v > 0 ? "+" : ""}${fmtNumber(Math.round(v))} Mds€`;
   return `${v.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`;
 }
 
@@ -69,7 +71,7 @@ function getTrendRange(countryName: string, metric: EconomyMetricId): { min: num
 // ─────────────────────────────────────────────────────────────
 // View: GDP or DEBT
 // ─────────────────────────────────────────────────────────────
-function EconomicView({ countryName, yearData, metric }: { countryName: string; yearData: EconomySidePanelProps["yearData"]; metric: EconomyMetricId }) {
+function EconomicView({ countryName, yearData, metric, onMetricChange }: { countryName: string; yearData: EconomySidePanelProps["yearData"]; metric: EconomyMetricId; onMetricChange?: (id: EconomyMetricId) => void }) {
   const data = yearData?.countries[countryName];
   const debt = getDebtByCountry(countryName);
   if (!data) return null;
@@ -94,29 +96,35 @@ function EconomicView({ countryName, yearData, metric }: { countryName: string; 
         )}
       </div>
 
-      {/* GDP context grid */}
-      {metric === "gdp" && (() => {
-        const comp = _compIndex.get(countryName);
-        const trade = getTradeByCountry(countryName);
+      {/* GDP family selector: click PIB/hab. or Balance comm. to switch the active map metric */}
+      {GDP_FAMILY.includes(metric) && (() => {
+        const others = GDP_FAMILY.filter((id) => id !== metric);
         return (
           <div className="grid grid-cols-2 gap-2">
-            <div className="rounded-xl px-3 py-2.5" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-              <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>PIB / habitant</p>
-              <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>
-                {comp ? `${comp.gdp_per_capita_usd.toLocaleString("fr-FR")} €` : "—"}
-              </p>
-              <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>par personne</p>
-            </div>
-            <div className="rounded-xl px-3 py-2.5" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-              <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>Balance commerciale</p>
-              <p
-                className="text-sm font-bold tabular-nums mt-0.5"
-                style={{ color: trade ? (trade.balance_bn >= 0 ? "#16a34a" : "#dc2626") : "var(--ink)" }}
-              >
-                {trade ? fmtTradeBalance(trade.balance_bn) : "—"}
-              </p>
-              <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>exports − imports</p>
-            </div>
+            {others.map((id) => {
+              const v = data[id] as number | undefined;
+              const def = ECONOMY_METRICS.find((m) => m.id === id);
+              const isTradeBalance = id === "trade_balance";
+              const valueColor = isTradeBalance && v !== undefined
+                ? (v >= 0 ? "#16a34a" : "#dc2626")
+                : "var(--ink)";
+              return (
+                <button
+                  key={id}
+                  onClick={() => onMetricChange?.(id)}
+                  className="rounded-xl px-3 py-2.5 text-left transition-colors"
+                  style={{ background: "var(--surface-2)", border: "1px solid var(--border)", cursor: onMetricChange ? "pointer" : "default" }}
+                >
+                  <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>{def?.label}</p>
+                  <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: valueColor }}>
+                    {fmtMetric(v, id)}
+                  </p>
+                  <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>
+                    {id === "gdp_per_capita" ? "par personne" : "exports − imports"}
+                  </p>
+                </button>
+              );
+            })}
           </div>
         );
       })()}
@@ -326,7 +334,7 @@ function CompaniesView({ countryName, yearData }: { countryName: string; yearDat
 // ─────────────────────────────────────────────────────────────
 // Main panel
 // ─────────────────────────────────────────────────────────────
-export function EconomySidePanel({ countryName, yearData, metric, open, onClose }: EconomySidePanelProps) {
+export function EconomySidePanel({ countryName, yearData, metric, open, onClose, onMetricChange }: EconomySidePanelProps) {
   const hasData = Boolean(countryName && yearData?.countries[countryName ?? ""]);
 
   return (
@@ -360,7 +368,7 @@ export function EconomySidePanel({ countryName, yearData, metric, open, onClose 
             ) : metric === "unemployment" ? (
               <UnemploymentView countryName={countryName!} yearData={yearData} />
             ) : (
-              <EconomicView countryName={countryName!} yearData={yearData} metric={metric} />
+              <EconomicView countryName={countryName!} yearData={yearData} metric={metric} onMetricChange={onMetricChange} />
             )}
           </div>
         </motion.aside>

@@ -57,8 +57,8 @@ function formatValue(value: number | undefined, metricId: EconomyMetricId): stri
   if (metricId === "debt_ratio") return `${value.toFixed(1)} %`;
   if (metricId === "unemployment") return `${value.toFixed(1)} %`;
   if (metricId === "companies") return `${value.toLocaleString("fr-FR")} k`;
-  if (metricId === "gdp_per_capita") return `${Math.round(value).toLocaleString("fr-FR")} $`;
-  if (metricId === "trade_balance") return `${value > 0 ? "+" : ""}${value.toLocaleString("fr-FR")} Mds`;
+  if (metricId === "gdp_per_capita") return `${Math.round(value).toLocaleString("fr-FR")} €`;
+  if (metricId === "trade_balance") return `${value > 0 ? "+" : ""}${value.toLocaleString("fr-FR")} Mds€`;
   return String(value);
 }
 
@@ -90,7 +90,7 @@ interface ColDef {
 
 function gdpPerCapitaCol(): ColDef {
   return {
-    key: "gdp_per_capita", header: "PIB / hab.", unit: "$ US",
+    key: "gdp_per_capita", header: "PIB / hab.", unit: "€",
     getValue: (d) => d.gdp_per_capita ?? -Infinity,
     format: (d) => formatValue(d.gdp_per_capita, "gdp_per_capita"),
     sortDir: "desc",
@@ -99,7 +99,7 @@ function gdpPerCapitaCol(): ColDef {
 
 function tradeBalanceCol(): ColDef {
   return {
-    key: "trade_balance", header: "Balance comm.", unit: "Mds USD",
+    key: "trade_balance", header: "Balance comm.", unit: "Mds €",
     getValue: (d) => d.trade_balance ?? -Infinity,
     format: (d) => formatValue(d.trade_balance, "trade_balance"),
     sortDir: "desc",
