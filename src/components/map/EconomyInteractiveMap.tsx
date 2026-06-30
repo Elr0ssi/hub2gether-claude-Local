@@ -123,8 +123,12 @@ export function EconomyInteractiveMap({ economyYear, metric, selectedCountry, on
         </p>
         <div className="h-2 rounded-full mb-1" style={{ background: GRADIENT_CSS }} />
         <div className="flex justify-between">
-          <span style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>Faible</span>
-          <span style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>Élevé</span>
+          <span style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>
+            {metric === "trade_balance" ? "Déficit" : "Faible"}
+          </span>
+          <span style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>
+            {metric === "trade_balance" ? "Excédent" : "Élevé"}
+          </span>
         </div>
         <p style={{ color: "var(--ink-4)", fontSize: "0.58rem", marginTop: "5px" }}>
           Gris = données insuffisantes

@@ -3,23 +3,21 @@ import Link from "next/link";
 import { Layout } from "@/components/layout/Layout";
 import { HeroSection } from "@/components/hero/HeroSection";
 import { ThemePreviewGrid } from "@/components/hero/ThemePreviewGrid";
-import { ArticleGrid } from "@/components/articles/ArticleGrid";
+import { HomeDataBento } from "@/components/home/HomeDataBento";
 import { FAQSection } from "@/components/faq/FAQSection";
 import { THEMES } from "@/data/themes";
-import { getFeaturedArticles } from "@/data/articles";
 import { FAQS_EMPIRES } from "@/data/faqs";
 
 export const metadata: Metadata = {
-  title: "The Essential Data — Cartes géopolitiques interactives PIB, Épidémies, Empires",
+  title: "The Essential Data — Cartes géopolitiques interactives PIB, Épidémies, Politique",
   description:
-    "Explorez le PIB par pays 2025, les épidémies mondiales et les grands empires historiques grâce à des cartes interactives. Données FMI, Banque mondiale, OMS. Data journalism géopolitique de référence.",
+    "Explorez le PIB par pays 2025, les épidémies mondiales, les régimes politiques et les forces militaires grâce à des cartes interactives. Données FMI, Banque mondiale, OMS. Data journalism géopolitique de référence.",
   keywords: [
     "carte PIB monde 2025",
     "PIB par pays 2025",
     "carte géopolitique interactive",
     "données économiques mondiales",
-    "empires historiques carte",
-    "empire romain carte interactif",
+    "régimes politiques carte",
     "épidémies mondiales carte",
     "world GDP map",
     "geopolitical data journalism",
@@ -28,14 +26,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "The Essential Data — Cartes géopolitiques interactives",
     description:
-      "PIB par pays 2025, épidémies mondiales (COVID, VIH, Peste Noire), empires historiques. Cartes interactives avec données FMI, Banque mondiale et OMS.",
+      "PIB par pays 2025, épidémies mondiales (COVID, VIH, Peste Noire), régimes politiques, puissances militaires. Cartes interactives avec données FMI, Banque mondiale et OMS.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "The Essential Data — Cartes géopolitiques interactives",
     description:
-      "PIB par pays 2025, épidémies mondiales, empires historiques. Data journalism géopolitique.",
+      "PIB par pays 2025, épidémies mondiales, régimes politiques. Data journalism géopolitique.",
   },
 };
 
@@ -71,13 +69,13 @@ function AITransparencyBanner() {
             </h2>
             <p className="text-sm leading-relaxed mb-3" style={{ color: "var(--ink-2)" }}>
               The Essential Data est un <strong>agrégateur éditorial assisté par intelligence artificielle</strong>.
-              Chaque article est une synthèse d'<strong>articles médiatiques du monde entier</strong> — presse internationale,
-              rapports d'institutions (FMI, Banque mondiale, OMS, SIPRI…) et recherches académiques — condensés pour offrir
+              Chaque article est une synthèse d&apos;<strong>articles médiatiques du monde entier</strong> — presse internationale,
+              rapports d&apos;institutions (FMI, Banque mondiale, OMS, SIPRI…) et recherches académiques — condensés pour offrir
               une <strong>vision impartiale, avec des points de vue multiples</strong>, en temps réel.
             </p>
             <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--ink-3)" }}>
-              Conformément au règlement européen sur l'intelligence artificielle (EU AI Act), nous indiquons explicitement
-              lorsqu'un contenu est généré ou synthétisé par IA, et nous citons l'intégralité des sources utilisées dans
+              Conformément au règlement européen sur l&apos;intelligence artificielle (EU AI Act), nous indiquons explicitement
+              lorsqu&apos;un contenu est généré ou synthétisé par IA, et nous citons l&apos;intégralité des sources utilisées dans
               chaque article.
             </p>
             <div className="flex flex-wrap gap-3">
@@ -104,18 +102,12 @@ function AITransparencyBanner() {
 }
 
 export default function HomePage() {
-  const featuredArticles = getFeaturedArticles("empires", 6);
-
   return (
     <Layout>
       <HeroSection />
       <AITransparencyBanner />
       <ThemePreviewGrid themes={THEMES} />
-      <ArticleGrid
-        articles={featuredArticles}
-        title="Analyses approfondies"
-        subtitle="Décryptages éditoriaux sur la montée et la chute des empires, les mécaniques de l'expansion et les leçons de l'histoire."
-      />
+      <HomeDataBento />
       <FAQSection items={FAQS_EMPIRES} />
     </Layout>
   );

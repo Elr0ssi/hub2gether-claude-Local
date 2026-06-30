@@ -57,6 +57,8 @@ function formatValue(value: number | undefined, metricId: EconomyMetricId): stri
   if (metricId === "debt_ratio") return `${value.toFixed(1)} %`;
   if (metricId === "unemployment") return `${value.toFixed(1)} %`;
   if (metricId === "companies") return `${value.toLocaleString("fr-FR")} k`;
+  if (metricId === "gdp_per_capita") return `${Math.round(value).toLocaleString("fr-FR")} $`;
+  if (metricId === "trade_balance") return `${value > 0 ? "+" : ""}${value.toLocaleString("fr-FR")} Mds`;
   return String(value);
 }
 
@@ -65,10 +67,12 @@ function getMetricValue(data: EconomyYear["countries"][string], metricId: Econom
   if (metricId === "debt_ratio") return data.debt_ratio;
   if (metricId === "unemployment") return data.unemployment;
   if (metricId === "companies") return data.companies;
+  if (metricId === "gdp_per_capita") return data.gdp_per_capita ?? 0;
+  if (metricId === "trade_balance") return data.trade_balance ?? 0;
   return 0;
 }
 
-// Sort direction: GDP/Companies → bigger is "better" → desc by default
+// Sort direction: GDP/Companies/PIB per capita/Balance → bigger is "better" → desc by default
 // Debt/Unemployment → smaller is "better" → asc by default
 function defaultSortDir(metricId: EconomyMetricId): "asc" | "desc" {
   return metricId === "debt_ratio" || metricId === "unemployment" ? "asc" : "desc";
@@ -84,37 +88,70 @@ interface ColDef {
   sortDir: "asc" | "desc";
 }
 
-function getColDefs(metric: EconomyMetricId): ColDef[] {
-  if (metric === "gdp") return [{
-    key: "gdp", header: "PIB", unit: "Mds USD",
-    getValue: (d) => d.gdp,
-    format: (d) => formatValue(d.gdp, "gdp"),
+function gdpPerCapitaCol(): ColDef {
+  return {
+    key: "gdp_per_capita", header: "PIB / hab.", unit: "$ US",
+    getValue: (d) => d.gdp_per_capita ?? -Infinity,
+    format: (d) => formatValue(d.gdp_per_capita, "gdp_per_capita"),
     sortDir: "desc",
-  }];
-  if (metric === "debt_ratio") return [
-    {
-      key: "debt_ratio", header: "% Dette / PIB", unit: "%",
-      getValue: (d) => d.debt_ratio,
-      format: (d) => `${d.debt_ratio.toFixed(1)} %`,
+  };
+}
+
+function tradeBalanceCol(): ColDef {
+  return {
+    key: "trade_balance", header: "Balance comm.", unit: "Mds USD",
+    getValue: (d) => d.trade_balance ?? -Infinity,
+    format: (d) => formatValue(d.trade_balance, "trade_balance"),
+    sortDir: "desc",
+  };
+}
+
+function getColDefs(metric: EconomyMetricId): ColDef[] {
+  let primary: ColDef[] = [];
+  if (metric === "gdp") {
+    primary = [{
+      key: "gdp", header: "PIB", unit: "Mds USD",
+      getValue: (d) => d.gdp,
+      format: (d) => formatValue(d.gdp, "gdp"),
       sortDir: "desc",
-    },
-    {
-      key: "debt_abs", header: "Montant dette", unit: "Mds USD",
-      getValue: (d) => Math.round(d.gdp * d.debt_ratio / 100),
-      format: (d) => {
-        const v = Math.round(d.gdp * d.debt_ratio / 100);
-        return formatValue(v, "gdp");
+    }];
+  } else if (metric === "debt_ratio") {
+    primary = [
+      {
+        key: "debt_ratio", header: "% Dette / PIB", unit: "%",
+        getValue: (d) => d.debt_ratio,
+        format: (d) => `${d.debt_ratio.toFixed(1)} %`,
+        sortDir: "desc",
       },
-      sortDir: "desc",
-    },
-  ];
-  if (metric === "unemployment") return [{
-    key: "unemployment", header: "Chômage", unit: "%",
-    getValue: (d) => d.unemployment,
-    format: (d) => `${d.unemployment.toFixed(1)} %`,
-    sortDir: "asc",
-  }];
-  return [];
+      {
+        key: "debt_abs", header: "Montant dette", unit: "Mds USD",
+        getValue: (d) => Math.round(d.gdp * d.debt_ratio / 100),
+        format: (d) => {
+          const v = Math.round(d.gdp * d.debt_ratio / 100);
+          return formatValue(v, "gdp");
+        },
+        sortDir: "desc",
+      },
+    ];
+  } else if (metric === "unemployment") {
+    primary = [{
+      key: "unemployment", header: "Chômage", unit: "%",
+      getValue: (d) => d.unemployment,
+      format: (d) => `${d.unemployment.toFixed(1)} %`,
+      sortDir: "asc",
+    }];
+  } else if (metric === "gdp_per_capita") {
+    primary = [gdpPerCapitaCol()];
+  } else if (metric === "trade_balance") {
+    primary = [tradeBalanceCol()];
+  } else {
+    return [];
+  }
+
+  const extras: ColDef[] = [];
+  if (metric !== "gdp_per_capita") extras.push(gdpPerCapitaCol());
+  if (metric !== "trade_balance") extras.push(tradeBalanceCol());
+  return [...primary, ...extras];
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────

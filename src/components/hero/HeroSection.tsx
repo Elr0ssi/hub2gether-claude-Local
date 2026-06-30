@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Globe, TrendingUp, Swords } from "lucide-react";
+import { ArrowRight, Globe, TrendingUp, Shield } from "lucide-react";
 
 const BLOB_SHAPES = [
   "60% 40% 30% 70% / 60% 30% 70% 40%",
@@ -48,9 +48,9 @@ function MorphingBlob({
 }
 
 const STATS = [
-  { value: "6", label: "Grands empires", icon: Globe },
-  { value: "50+", label: "Périodes historiques", icon: TrendingUp },
-  { value: "13,5M km²", label: "Plus grand empire colonial", icon: Swords },
+  { value: "195+", label: "Pays analysés", icon: Globe },
+  { value: "5", label: "Thèmes géopolitiques", icon: TrendingUp },
+  { value: "30+", label: "Puissances militaires", icon: Shield },
 ];
 
 export function HeroSection() {
@@ -144,15 +144,15 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.65, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
         >
-          <Link href="/map/empires" className="btn-primary gap-2 text-sm px-5 py-2.5">
+          <Link href="/map/economy" className="btn-primary gap-2 text-sm px-5 py-2.5">
             Explorer la carte
             <ArrowRight size={15} />
           </Link>
           <Link
-            href="/map/empires?empire=napoleonic&year=1812"
+            href="/map/politics"
             className="btn-secondary gap-2 text-sm px-5 py-2.5"
           >
-            Empire napoléonien 1812
+            Régimes politiques 1900–2025
           </Link>
         </motion.div>
 
@@ -201,12 +201,12 @@ export function HeroSection() {
               style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
             >
               <div className="flex items-center gap-3">
-                <span className="accent-badge text-xs">Empires</span>
+                <span className="accent-badge text-xs">Économie</span>
                 <span className="text-small font-semibold" style={{ color: "var(--ink-2)" }}>
-                  Empire napoléonien — 1812
+                  PIB mondial — Projections 2025
                 </span>
               </div>
-              <span className="text-caption hidden sm:block">Extension maximale · 130 départements</span>
+              <span className="text-caption hidden sm:block">Source FMI · 195 pays · YTD</span>
             </div>
 
             {/* Map preview with SVG illustration */}
@@ -275,12 +275,12 @@ export function HeroSection() {
                   Carte interactive
                 </div>
                 <p className="text-sm font-semibold mb-0.5" style={{ color: "var(--ink-2)" }}>
-                  6 empires · 50+ périodes historiques
+                  195 pays · PIB, dette, chômage
                 </p>
                 <p className="text-caption mb-4">
-                  Roman, Napoléon, Mongol, Ottoman, Macédonien, Colonial
+                  FMI · Banque mondiale · données 2000–2025
                 </p>
-                <Link href="/map/empires" className="btn-primary text-xs gap-1.5 inline-flex">
+                <Link href="/map/economy" className="btn-primary text-xs gap-1.5 inline-flex">
                   Ouvrir la carte
                   <ArrowRight size={13} />
                 </Link>
@@ -293,10 +293,10 @@ export function HeroSection() {
               style={{ borderTop: "1px solid var(--border)", background: "var(--surface-2)" }}
             >
               {[
-                { label: "Surface", value: "750 000 km²" },
-                { label: "Population", value: "44 millions" },
-                { label: "Capitale", value: "Paris" },
-                { label: "Système", value: "Empire absolu" },
+                { label: "PIB USA", value: "$28,8T" },
+                { label: "PIB Chine", value: "$18,5T" },
+                { label: "PIB UE", value: "$18,4T" },
+                { label: "Croissance 2025", value: "+3,2 %" },
               ].map(({ label, value }) => (
                 <div key={label} className="text-center">
                   <p className="text-caption">{label}</p>

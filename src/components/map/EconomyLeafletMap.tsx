@@ -78,7 +78,7 @@ export function EconomyLeafletMap({
     if (isSelected) {
       return { fillColor: "#39FF88", fillOpacity: 0.9, color: "#39FF88", weight: 2 };
     }
-    if (t === 0) {
+    if (t === null) {
       return {
         fillColor: tileStyle === "satellite" ? "transparent" : "#EBEBEB",
         fillOpacity: tileStyle === "satellite" ? 0 : 0.55,
@@ -168,8 +168,12 @@ export function EconomyLeafletMap({
         </p>
         <div className="h-2 rounded-full mb-1" style={{ background: GRADIENT_CSS }} />
         <div className="flex justify-between">
-          <span style={{ color: "#888", fontSize: "0.6rem" }}>Faible</span>
-          <span style={{ color: "#888", fontSize: "0.6rem" }}>Élevé</span>
+          <span style={{ color: "#888", fontSize: "0.6rem" }}>
+            {metric === "trade_balance" ? "Déficit" : "Faible"}
+          </span>
+          <span style={{ color: "#888", fontSize: "0.6rem" }}>
+            {metric === "trade_balance" ? "Excédent" : "Élevé"}
+          </span>
         </div>
         <p style={{ color: "#aaa", fontSize: "0.58rem", marginTop: "5px" }}>
           Transparent = données insuffisantes
