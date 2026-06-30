@@ -141,7 +141,11 @@ export type EconomyMetricId =
   | "unemployment"
   | "companies"
   | "gdp_per_capita"
-  | "trade_balance";
+  | "trade_balance"
+  | "debt_amount"
+  | "inflation"
+  | "active_population"
+  | "retirement_age";
 
 export interface TopCompany {
   name: string;
@@ -156,6 +160,10 @@ export interface CountryEconomyData {
   companies: number;
   gdp_per_capita?: number;
   trade_balance?: number;
+  debt_amount?: number;
+  inflation?: number;
+  active_population?: number;
+  retirement_age?: number;
   top_companies?: TopCompany[];
 }
 

@@ -90,6 +90,15 @@ interface ColDef {
   sortDir: "asc" | "desc";
 }
 
+function gdpCol(): ColDef {
+  return {
+    key: "gdp", header: "PIB", unit: "Mds USD",
+    getValue: (d) => d.gdp,
+    format: (d) => formatValue(d.gdp, "gdp"),
+    sortDir: "desc",
+  };
+}
+
 function gdpPerCapitaCol(): ColDef {
   return {
     key: "gdp_per_capita", header: "PIB / hab.", unit: "€",
@@ -111,12 +120,7 @@ function tradeBalanceCol(): ColDef {
 function getColDefs(metric: EconomyMetricId): ColDef[] {
   let primary: ColDef[] = [];
   if (metric === "gdp") {
-    primary = [{
-      key: "gdp", header: "PIB", unit: "Mds USD",
-      getValue: (d) => d.gdp,
-      format: (d) => formatValue(d.gdp, "gdp"),
-      sortDir: "desc",
-    }];
+    primary = [gdpCol()];
   } else if (metric === "debt_ratio") {
     primary = [
       {
@@ -154,6 +158,7 @@ function getColDefs(metric: EconomyMetricId): ColDef[] {
   // they should not leak into the Dette/Chômage tables.
   const extras: ColDef[] = [];
   if (GDP_FAMILY.includes(metric)) {
+    if (metric !== "gdp") extras.push(gdpCol());
     if (metric !== "gdp_per_capita") extras.push(gdpPerCapitaCol());
     if (metric !== "trade_balance") extras.push(tradeBalanceCol());
   }

@@ -39,8 +39,8 @@ export function getValueIntensity(
     return (v - min) / (max - min);
   }
   if (v === 0) return null;
-  // log scale for GDP and companies (huge range), linear for ratios/percentages
-  if (metric === "gdp" || metric === "companies") {
+  // log scale for GDP/companies/debt amount (huge range), linear for ratios/percentages
+  if (metric === "gdp" || metric === "companies" || metric === "debt_amount") {
     return Math.log10(v + 1) / Math.log10(maxValue + 1);
   }
   return Math.min(v / maxValue, 1);

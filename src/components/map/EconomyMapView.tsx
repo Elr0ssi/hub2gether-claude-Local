@@ -15,10 +15,14 @@ import type { EconomyMetricId, EconomyYear } from "@/types";
 const SLIDER_MIN = 2000;
 const SLIDER_MAX = 2025;
 
-// Top toolbar only ever showed these 4 metrics. PIB/hab. and Balance commerciale are
-// switched from the side panel's GDP-family boxes instead (see EconomySidePanel).
+// Top toolbar only ever showed the 4 main metrics. Their family sub-metrics (PIB/hab.,
+// Balance commerciale, Montant dette, Inflation, Pop. active, Âge retraite) are switched
+// from the side panel's clickable boxes instead (see EconomySidePanel).
+const SIDE_PANEL_ONLY_METRICS: EconomyMetricId[] = [
+  "gdp_per_capita", "trade_balance", "debt_amount", "inflation", "active_population", "retirement_age",
+];
 const TOOLBAR_METRICS = ECONOMY_METRICS.filter(
-  (m) => m.id !== "gdp_per_capita" && m.id !== "trade_balance"
+  (m) => !SIDE_PANEL_ONLY_METRICS.includes(m.id)
 );
 
 function findNearestDataYear(target: number): number {
