@@ -25,9 +25,12 @@ function fmtNumber(v: number): string {
   return v.toLocaleString("fr-FR");
 }
 
-function fmtMetric(v: number, metric: EconomyMetricId): string {
-  if (metric === "gdp")         return `${fmtNumber(v)} Mds€`;
-  if (metric === "companies")   return `${fmtNumber(v)} k`;
+function fmtMetric(v: number | undefined, metric: EconomyMetricId): string {
+  if (v === undefined) return "—";
+  if (metric === "gdp")             return `${fmtNumber(v)} Mds€`;
+  if (metric === "companies")       return `${fmtNumber(v)} k`;
+  if (metric === "gdp_per_capita")  return `${fmtNumber(Math.round(v))} $`;
+  if (metric === "trade_balance")   return `${v > 0 ? "+" : ""}${fmtNumber(Math.round(v))} Mds$`;
   return `${v.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`;
 }
 
@@ -46,6 +49,23 @@ function getMaxForTrend(countryName: string, metric: EconomyMetricId): number {
   return max;
 }
 
+// Min-max range across years for signed/optional metrics (e.g. trade balance can be negative)
+function getTrendRange(countryName: string, metric: EconomyMetricId): { min: number; max: number } {
+  let min = metric === "trade_balance" ? Infinity : 0;
+  let max = metric === "trade_balance" ? -Infinity : 1;
+  for (const yr of ECONOMY_YEARS) {
+    const d = yr.countries[countryName];
+    const v = d ? (d[metric] as number | undefined) : undefined;
+    if (v === undefined) continue;
+    if (v < min) min = v;
+    if (v > max) max = v;
+  }
+  if (min === Infinity) min = 0;
+  if (max === -Infinity) max = 1;
+  if (max === min) max = min + 1;
+  return { min, max };
+}
+
 // ─────────────────────────────────────────────────────────────
 // View: GDP or DEBT
 // ─────────────────────────────────────────────────────────────
@@ -53,7 +73,7 @@ function EconomicView({ countryName, yearData, metric }: { countryName: string; 
   const data = yearData?.countries[countryName];
   const debt = getDebtByCountry(countryName);
   if (!data) return null;
-  const maxVal = getMaxForTrend(countryName, metric);
+  const trendRange = getTrendRange(countryName, metric);
 
   return (
     <div className="px-4 py-4 flex flex-col gap-5">
@@ -67,7 +87,7 @@ function EconomicView({ countryName, yearData, metric }: { countryName: string; 
         <span className="text-2xl font-bold tabular-nums" style={{ color: "#0D7A40" }}>
           {metric === "debt_ratio"
             ? fmtDebtAmount(data.gdp, data.debt_ratio)
-            : fmtMetric(data[metric] as number, metric)}
+            : fmtMetric(data[metric] as number | undefined, metric)}
         </span>
         {metric === "debt_ratio" && debt && (
           <span className="text-xs mt-1" style={{ color: "#0D7A40", opacity: 0.8 }}>{debt.creditor}</span>
@@ -126,14 +146,15 @@ function EconomicView({ countryName, yearData, metric }: { countryName: string; 
         <div className="flex flex-col gap-1.5">
           {ECONOMY_YEARS.map((yr) => {
             const d = yr.countries[countryName];
-            if (!d) return null;
-            const v = d[metric] as number;
+            const v = d ? (d[metric] as number | undefined) : undefined;
+            if (v === undefined) return null;
             const isCurrent = yr.year === yearData?.year;
+            const pct = Math.min(Math.max(((v - trendRange.min) / (trendRange.max - trendRange.min)) * 100, 0), 100);
             return (
               <div key={yr.year} className="flex items-center gap-2">
                 <span className="text-xs tabular-nums" style={{ color: isCurrent ? "#0D7A40" : "var(--ink-3)", fontWeight: isCurrent ? 700 : 400, minWidth: 36 }}>{yr.year}</span>
                 <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--surface-2)" }}>
-                  <div className="h-full rounded-full" style={{ width: `${Math.min((v / maxVal) * 100, 100)}%`, background: isCurrent ? "#39FF88" : "var(--ink-4)", transition: "width 0.4s ease" }} />
+                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: isCurrent ? "#39FF88" : "var(--ink-4)", transition: "width 0.4s ease" }} />
                 </div>
                 <span className="text-xs tabular-nums text-right" style={{ color: isCurrent ? "#0D7A40" : "var(--ink-3)", minWidth: 72 }}>{fmtMetric(v, metric)}</span>
               </div>

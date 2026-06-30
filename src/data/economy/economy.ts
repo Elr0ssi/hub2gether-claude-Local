@@ -1,4 +1,6 @@
 import type { EconomyYear, EconomyMetric } from "@/types";
+import { getPopulationMillions } from "./populationData";
+import { getTradeBalanceBn } from "./tradeBalanceHistory";
 
 export const ECONOMY_METRICS: EconomyMetric[] = [
   {
@@ -28,6 +30,20 @@ export const ECONOMY_METRICS: EconomyMetric[] = [
     shortLabel: "Entreprises",
     unit: "milliers",
     description: "Nombre d'entreprises enregistrées (en milliers), estimation World Bank.",
+  },
+  {
+    id: "gdp_per_capita",
+    label: "PIB par habitant",
+    shortLabel: "PIB/hab.",
+    unit: "$ US",
+    description: "Produit Intérieur Brut par habitant, en dollars US courants (PIB total ÷ population).",
+  },
+  {
+    id: "trade_balance",
+    label: "Balance commerciale",
+    shortLabel: "Balance",
+    unit: "Mds $",
+    description: "Balance extérieure de biens et services : exportations moins importations, en milliards de dollars US courants. Positif = excédent, négatif = déficit.",
   },
 ];
 
@@ -950,6 +966,19 @@ export const ECONOMY_YEARS: EconomyYear[] = [
     },
   },
 ];
+
+for (const yr of ECONOMY_YEARS) {
+  for (const [countryName, data] of Object.entries(yr.countries)) {
+    const population = getPopulationMillions(countryName, yr.year);
+    if (population) {
+      data.gdp_per_capita = Math.round((data.gdp * 1000) / population);
+    }
+    const tradeBalance = getTradeBalanceBn(countryName, yr.year);
+    if (tradeBalance !== undefined) {
+      data.trade_balance = tradeBalance;
+    }
+  }
+}
 
 export function getYearData(year: number): EconomyYear | undefined {
   return ECONOMY_YEARS.find((y) => y.year === year);

@@ -135,7 +135,13 @@ export interface BreadcrumbItem {
 
 // ── Economy ───────────────────────────────────────────────────────────────────
 
-export type EconomyMetricId = "gdp" | "debt_ratio" | "unemployment" | "companies";
+export type EconomyMetricId =
+  | "gdp"
+  | "debt_ratio"
+  | "unemployment"
+  | "companies"
+  | "gdp_per_capita"
+  | "trade_balance";
 
 export interface TopCompany {
   name: string;
@@ -148,6 +154,8 @@ export interface CountryEconomyData {
   debt_ratio: number;
   unemployment: number;
   companies: number;
+  gdp_per_capita?: number;
+  trade_balance?: number;
   top_companies?: TopCompany[];
 }
 
