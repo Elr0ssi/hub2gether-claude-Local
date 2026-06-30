@@ -6,6 +6,8 @@ import { Search, ChevronUp, ChevronDown, ChevronsUpDown, TrendingUp, TrendingDow
 import { ECONOMY_METRICS, ECONOMY_YEARS } from "@/data/economy/economy";
 import type { EconomyMetricId, EconomyYear } from "@/types";
 
+const GDP_FAMILY: EconomyMetricId[] = ["gdp", "gdp_per_capita", "trade_balance"];
+
 // ── Country flags ─────────────────────────────────────────────────────────────
 const FLAGS: Record<string, string> = {
   "United States of America": "🇺🇸", "China": "🇨🇳", "Japan": "🇯🇵",
@@ -148,9 +150,13 @@ function getColDefs(metric: EconomyMetricId): ColDef[] {
     return [];
   }
 
+  // PIB/hab. and Balance comm. are only shown alongside PIB family metrics —
+  // they should not leak into the Dette/Chômage tables.
   const extras: ColDef[] = [];
-  if (metric !== "gdp_per_capita") extras.push(gdpPerCapitaCol());
-  if (metric !== "trade_balance") extras.push(tradeBalanceCol());
+  if (GDP_FAMILY.includes(metric)) {
+    if (metric !== "gdp_per_capita") extras.push(gdpPerCapitaCol());
+    if (metric !== "trade_balance") extras.push(tradeBalanceCol());
+  }
   return [...primary, ...extras];
 }
 

@@ -74,8 +74,17 @@ function getTrendRange(countryName: string, metric: EconomyMetricId): { min: num
 function EconomicView({ countryName, yearData, metric, onMetricChange }: { countryName: string; yearData: EconomySidePanelProps["yearData"]; metric: EconomyMetricId; onMetricChange?: (id: EconomyMetricId) => void }) {
   const data = yearData?.countries[countryName];
   const debt = getDebtByCountry(countryName);
+  const [debtFocus, setDebtFocus] = useState<"amount" | "ratio" | "inflation">("amount");
   if (!data) return null;
   const trendRange = getTrendRange(countryName, metric);
+
+  const debtStats: { id: "amount" | "ratio" | "inflation"; label: string; value: string; sub?: string }[] = [
+    { id: "amount", label: `Montant de la dette ${yearData?.year}`, value: fmtDebtAmount(data.gdp, data.debt_ratio), sub: debt?.creditor },
+    { id: "ratio", label: "% Dette / PIB", value: `${data.debt_ratio.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`, sub: String(yearData?.year ?? "") },
+    ...(debt ? [{ id: "inflation" as const, label: "Inflation 2024", value: `${debt.inflation_2024} %` }] : []),
+  ];
+  const activeDebtStat = debtStats.find((s) => s.id === debtFocus) ?? debtStats[0];
+  const otherDebtStats = debtStats.filter((s) => s.id !== activeDebtStat.id);
 
   return (
     <div className="px-4 py-4 flex flex-col gap-5">
@@ -84,15 +93,15 @@ function EconomicView({ countryName, yearData, metric, onMetricChange }: { count
       {/* Active metric highlighted */}
       <div className="rounded-xl px-4 py-4 flex flex-col gap-1" style={{ background: "var(--accent-dim)", border: "1px solid rgba(57,255,136,0.3)" }}>
         <span className="text-xs font-semibold" style={{ color: "#0D7A40" }}>
-          {metric === "debt_ratio" ? `Montant de la dette ${yearData?.year}` : ECONOMY_METRICS.find(m => m.id === metric)?.label}
+          {metric === "debt_ratio" ? activeDebtStat.label : ECONOMY_METRICS.find(m => m.id === metric)?.label}
         </span>
         <span className="text-2xl font-bold tabular-nums" style={{ color: "#0D7A40" }}>
           {metric === "debt_ratio"
-            ? fmtDebtAmount(data.gdp, data.debt_ratio)
+            ? activeDebtStat.value
             : fmtMetric(data[metric] as number | undefined, metric)}
         </span>
-        {metric === "debt_ratio" && debt && (
-          <span className="text-xs mt-1" style={{ color: "#0D7A40", opacity: 0.8 }}>{debt.creditor}</span>
+        {metric === "debt_ratio" && activeDebtStat.sub && (
+          <span className="text-xs mt-1" style={{ color: "#0D7A40", opacity: 0.8 }}>{activeDebtStat.sub}</span>
         )}
       </div>
 
@@ -129,20 +138,21 @@ function EconomicView({ countryName, yearData, metric, onMetricChange }: { count
         );
       })()}
 
-      {/* Debt context grid */}
-      {metric === "debt_ratio" && debt && (
+      {/* Debt context grid: click Inflation or % Dette/PIB to bring it forward */}
+      {metric === "debt_ratio" && otherDebtStats.length > 0 && (
         <div className="grid grid-cols-2 gap-2">
-          <div className="rounded-xl px-3 py-2.5" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>Inflation 2024</p>
-            <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>{debt.inflation_2024} %</p>
-          </div>
-          <div className="rounded-xl px-3 py-2.5" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>% Dette / PIB</p>
-            <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>
-              {data.debt_ratio.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %
-            </p>
-            <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>{yearData?.year}</p>
-          </div>
+          {otherDebtStats.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => setDebtFocus(s.id)}
+              className="rounded-xl px-3 py-2.5 text-left transition-colors"
+              style={{ background: "var(--surface-2)", border: "1px solid var(--border)", cursor: "pointer" }}
+            >
+              <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>{s.label}</p>
+              <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>{s.value}</p>
+              {s.sub && <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>{s.sub}</p>}
+            </button>
+          ))}
         </div>
       )}
 
@@ -177,39 +187,52 @@ function EconomicView({ countryName, yearData, metric, onMetricChange }: { count
 // ─────────────────────────────────────────────────────────────
 // View: UNEMPLOYMENT
 // ─────────────────────────────────────────────────────────────
+type UnemploymentStatId = "rate" | "active_pop" | "retirement_age";
+
 function UnemploymentView({ countryName, yearData }: { countryName: string; yearData: EconomySidePanelProps["yearData"] }) {
   const data = yearData?.countries[countryName];
   const labor = getLaborByCountry(countryName);
   const maxVal = getMaxForTrend(countryName, "unemployment");
+  const [focus, setFocus] = useState<UnemploymentStatId>("rate");
   if (!data) return null;
+
+  const stats: { id: UnemploymentStatId; label: string; value: string; sub: string }[] = [
+    { id: "rate", label: "Taux de chômage", value: `${data.unemployment.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`, sub: "" },
+    ...(labor ? [
+      { id: "active_pop" as const, label: "Pop. active", value: `${labor.active_population_millions.toLocaleString("fr-FR")} M`, sub: "personnes" },
+      { id: "retirement_age" as const, label: "Âge retraite", value: `${labor.retirement_age} ans`, sub: "officiel" },
+    ] : []),
+  ];
+  const activeStat = stats.find((s) => s.id === focus) ?? stats[0];
+  const otherStats = stats.filter((s) => s.id !== activeStat.id);
 
   return (
     <div className="px-4 py-4 flex flex-col gap-5">
       <p className="text-xs" style={{ color: "var(--ink-4)" }}>Données {yearData?.year}</p>
 
-      {/* Main rate */}
+      {/* Active stat highlighted: click Pop. active or Âge retraite to bring it forward */}
       <div className="rounded-xl px-4 py-4 flex flex-col gap-1" style={{ background: "var(--accent-dim)", border: "1px solid rgba(57,255,136,0.3)" }}>
-        <span className="text-xs font-semibold" style={{ color: "#0D7A40" }}>Taux de chômage</span>
-        <span className="text-3xl font-bold tabular-nums" style={{ color: "#0D7A40" }}>{data.unemployment.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %</span>
+        <span className="text-xs font-semibold" style={{ color: "#0D7A40" }}>{activeStat.label}</span>
+        <span className="text-3xl font-bold tabular-nums" style={{ color: "#0D7A40" }}>{activeStat.value}</span>
       </div>
 
-      {/* Active population + retirement */}
-      <div className="grid grid-cols-2 gap-2">
-        <div className="rounded-xl px-3 py-3 flex flex-col gap-1" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-          <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>Pop. active</p>
-          <p className="text-base font-bold tabular-nums" style={{ color: "var(--ink)" }}>
-            {labor ? `${labor.active_population_millions.toLocaleString("fr-FR")} M` : "—"}
-          </p>
-          <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>personnes</p>
+      {/* Other stats */}
+      {otherStats.length > 0 && (
+        <div className="grid grid-cols-2 gap-2">
+          {otherStats.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => setFocus(s.id)}
+              className="rounded-xl px-3 py-3 flex flex-col gap-1 text-left transition-colors"
+              style={{ background: "var(--surface-2)", border: "1px solid var(--border)", cursor: "pointer" }}
+            >
+              <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>{s.label}</p>
+              <p className="text-base font-bold tabular-nums" style={{ color: "var(--ink)" }}>{s.value}</p>
+              {s.sub && <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>{s.sub}</p>}
+            </button>
+          ))}
         </div>
-        <div className="rounded-xl px-3 py-3 flex flex-col gap-1" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-          <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>Âge retraite</p>
-          <p className="text-base font-bold tabular-nums" style={{ color: "var(--ink)" }}>
-            {labor ? `${labor.retirement_age} ans` : "—"}
-          </p>
-          <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>officiel</p>
-        </div>
-      </div>
+      )}
 
       {/* Trend */}
       <div>
