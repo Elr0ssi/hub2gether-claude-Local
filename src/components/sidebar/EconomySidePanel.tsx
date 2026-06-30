@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { X, TrendingUp, Percent, Users, Building2, ChevronDown, ChevronUp, MapPin } from "lucide-react";
-import { useState } from "react";
 import type { EconomyMetricId } from "@/types";
 import { ECONOMY_METRICS, ECONOMY_YEARS } from "@/data/economy/economy";
 import { getDebtByCountry } from "@/data/economy/debtData";
@@ -13,6 +12,8 @@ import type { CountryEconomyData } from "@/types";
 const _compIndex = new Map(COMPARISON_COUNTRIES.map(c => [c.name, c]));
 
 const GDP_FAMILY: EconomyMetricId[] = ["gdp", "gdp_per_capita", "trade_balance"];
+const DEBT_FAMILY: EconomyMetricId[] = ["debt_ratio", "debt_amount", "inflation"];
+const UNEMPLOYMENT_FAMILY: EconomyMetricId[] = ["unemployment", "active_population", "retirement_age"];
 
 interface EconomySidePanelProps {
   countryName: string | null;
@@ -29,17 +30,14 @@ function fmtNumber(v: number): string {
 
 function fmtMetric(v: number | undefined, metric: EconomyMetricId): string {
   if (v === undefined) return "—";
-  if (metric === "gdp")             return `${fmtNumber(v)} Mds€`;
-  if (metric === "companies")       return `${fmtNumber(v)} k`;
-  if (metric === "gdp_per_capita")  return `${fmtNumber(Math.round(v))} €`;
-  if (metric === "trade_balance")   return `${v > 0 ? "+" : ""}${fmtNumber(Math.round(v))} Mds€`;
+  if (metric === "gdp")               return `${fmtNumber(v)} Mds€`;
+  if (metric === "companies")         return `${fmtNumber(v)} k`;
+  if (metric === "gdp_per_capita")    return `${fmtNumber(Math.round(v))} €`;
+  if (metric === "trade_balance")     return `${v > 0 ? "+" : ""}${fmtNumber(Math.round(v))} Mds€`;
+  if (metric === "debt_amount")       return v >= 1000 ? `${(v / 1000).toFixed(1)} T€` : `${fmtNumber(Math.round(v))} Mds€`;
+  if (metric === "active_population") return `${v.toLocaleString("fr-FR")} M`;
+  if (metric === "retirement_age")    return `${v} ans`;
   return `${v.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`;
-}
-
-function fmtDebtAmount(gdp: number, debtRatio: number): string {
-  const amount = Math.round(gdp * debtRatio / 100);
-  if (amount >= 1000) return `${(amount / 1000).toFixed(1)} T€`;
-  return `${fmtNumber(amount)} Mds€`;
 }
 
 function getMaxForTrend(countryName: string, metric: EconomyMetricId): number {
@@ -74,17 +72,9 @@ function getTrendRange(countryName: string, metric: EconomyMetricId): { min: num
 function EconomicView({ countryName, yearData, metric, onMetricChange }: { countryName: string; yearData: EconomySidePanelProps["yearData"]; metric: EconomyMetricId; onMetricChange?: (id: EconomyMetricId) => void }) {
   const data = yearData?.countries[countryName];
   const debt = getDebtByCountry(countryName);
-  const [debtFocus, setDebtFocus] = useState<"amount" | "ratio" | "inflation">("amount");
   if (!data) return null;
   const trendRange = getTrendRange(countryName, metric);
-
-  const debtStats: { id: "amount" | "ratio" | "inflation"; label: string; value: string; sub?: string }[] = [
-    { id: "amount", label: `Montant de la dette ${yearData?.year}`, value: fmtDebtAmount(data.gdp, data.debt_ratio), sub: debt?.creditor },
-    { id: "ratio", label: "% Dette / PIB", value: `${data.debt_ratio.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`, sub: String(yearData?.year ?? "") },
-    ...(debt ? [{ id: "inflation" as const, label: "Inflation 2024", value: `${debt.inflation_2024} %` }] : []),
-  ];
-  const activeDebtStat = debtStats.find((s) => s.id === debtFocus) ?? debtStats[0];
-  const otherDebtStats = debtStats.filter((s) => s.id !== activeDebtStat.id);
+  const isDebtFamily = DEBT_FAMILY.includes(metric);
 
   return (
     <div className="px-4 py-4 flex flex-col gap-5">
@@ -93,15 +83,13 @@ function EconomicView({ countryName, yearData, metric, onMetricChange }: { count
       {/* Active metric highlighted */}
       <div className="rounded-xl px-4 py-4 flex flex-col gap-1" style={{ background: "var(--accent-dim)", border: "1px solid rgba(57,255,136,0.3)" }}>
         <span className="text-xs font-semibold" style={{ color: "#0D7A40" }}>
-          {metric === "debt_ratio" ? activeDebtStat.label : ECONOMY_METRICS.find(m => m.id === metric)?.label}
+          {ECONOMY_METRICS.find(m => m.id === metric)?.label}
         </span>
         <span className="text-2xl font-bold tabular-nums" style={{ color: "#0D7A40" }}>
-          {metric === "debt_ratio"
-            ? activeDebtStat.value
-            : fmtMetric(data[metric] as number | undefined, metric)}
+          {fmtMetric(data[metric] as number | undefined, metric)}
         </span>
-        {metric === "debt_ratio" && activeDebtStat.sub && (
-          <span className="text-xs mt-1" style={{ color: "#0D7A40", opacity: 0.8 }}>{activeDebtStat.sub}</span>
+        {metric === "debt_amount" && debt?.creditor && (
+          <span className="text-xs mt-1" style={{ color: "#0D7A40", opacity: 0.8 }}>{debt.creditor}</span>
         )}
       </div>
 
@@ -138,23 +126,29 @@ function EconomicView({ countryName, yearData, metric, onMetricChange }: { count
         );
       })()}
 
-      {/* Debt context grid: click Inflation or % Dette/PIB to bring it forward */}
-      {metric === "debt_ratio" && otherDebtStats.length > 0 && (
-        <div className="grid grid-cols-2 gap-2">
-          {otherDebtStats.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setDebtFocus(s.id)}
-              className="rounded-xl px-3 py-2.5 text-left transition-colors"
-              style={{ background: "var(--surface-2)", border: "1px solid var(--border)", cursor: "pointer" }}
-            >
-              <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>{s.label}</p>
-              <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>{s.value}</p>
-              {s.sub && <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>{s.sub}</p>}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Debt family selector: click % Dette/PIB, Montant ou Inflation to switch the active map metric */}
+      {isDebtFamily && (() => {
+        const others = DEBT_FAMILY.filter((id) => id !== metric);
+        return (
+          <div className="grid grid-cols-2 gap-2">
+            {others.map((id) => {
+              const v = data[id] as number | undefined;
+              const def = ECONOMY_METRICS.find((m) => m.id === id);
+              return (
+                <button
+                  key={id}
+                  onClick={() => onMetricChange?.(id)}
+                  className="rounded-xl px-3 py-2.5 text-left transition-colors"
+                  style={{ background: "var(--surface-2)", border: "1px solid var(--border)", cursor: onMetricChange ? "pointer" : "default" }}
+                >
+                  <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>{def?.label}</p>
+                  <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>{fmtMetric(v, id)}</p>
+                </button>
+              );
+            })}
+          </div>
+        );
+      })()}
 
       {/* Year trend */}
       <div>
@@ -187,69 +181,67 @@ function EconomicView({ countryName, yearData, metric, onMetricChange }: { count
 // ─────────────────────────────────────────────────────────────
 // View: UNEMPLOYMENT
 // ─────────────────────────────────────────────────────────────
-type UnemploymentStatId = "rate" | "active_pop" | "retirement_age";
-
-function UnemploymentView({ countryName, yearData }: { countryName: string; yearData: EconomySidePanelProps["yearData"] }) {
+function UnemploymentView({ countryName, yearData, metric, onMetricChange }: { countryName: string; yearData: EconomySidePanelProps["yearData"]; metric: EconomyMetricId; onMetricChange?: (id: EconomyMetricId) => void }) {
   const data = yearData?.countries[countryName];
-  const labor = getLaborByCountry(countryName);
-  const maxVal = getMaxForTrend(countryName, "unemployment");
-  const [focus, setFocus] = useState<UnemploymentStatId>("rate");
+  const trendRange = getTrendRange(countryName, metric);
   if (!data) return null;
 
-  const stats: { id: UnemploymentStatId; label: string; value: string; sub: string }[] = [
-    { id: "rate", label: "Taux de chômage", value: `${data.unemployment.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`, sub: "" },
-    ...(labor ? [
-      { id: "active_pop" as const, label: "Pop. active", value: `${labor.active_population_millions.toLocaleString("fr-FR")} M`, sub: "personnes" },
-      { id: "retirement_age" as const, label: "Âge retraite", value: `${labor.retirement_age} ans`, sub: "officiel" },
-    ] : []),
-  ];
-  const activeStat = stats.find((s) => s.id === focus) ?? stats[0];
-  const otherStats = stats.filter((s) => s.id !== activeStat.id);
+  const others = UNEMPLOYMENT_FAMILY.filter((id) => id !== metric);
 
   return (
     <div className="px-4 py-4 flex flex-col gap-5">
       <p className="text-xs" style={{ color: "var(--ink-4)" }}>Données {yearData?.year}</p>
 
-      {/* Active stat highlighted: click Pop. active or Âge retraite to bring it forward */}
+      {/* Active metric highlighted */}
       <div className="rounded-xl px-4 py-4 flex flex-col gap-1" style={{ background: "var(--accent-dim)", border: "1px solid rgba(57,255,136,0.3)" }}>
-        <span className="text-xs font-semibold" style={{ color: "#0D7A40" }}>{activeStat.label}</span>
-        <span className="text-3xl font-bold tabular-nums" style={{ color: "#0D7A40" }}>{activeStat.value}</span>
+        <span className="text-xs font-semibold" style={{ color: "#0D7A40" }}>
+          {ECONOMY_METRICS.find(m => m.id === metric)?.label}
+        </span>
+        <span className="text-3xl font-bold tabular-nums" style={{ color: "#0D7A40" }}>
+          {fmtMetric(data[metric] as number | undefined, metric)}
+        </span>
       </div>
 
-      {/* Other stats */}
-      {otherStats.length > 0 && (
+      {/* Unemployment family selector: click Pop. active ou Âge retraite to switch the active map metric */}
+      {others.length > 0 && (
         <div className="grid grid-cols-2 gap-2">
-          {otherStats.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setFocus(s.id)}
-              className="rounded-xl px-3 py-3 flex flex-col gap-1 text-left transition-colors"
-              style={{ background: "var(--surface-2)", border: "1px solid var(--border)", cursor: "pointer" }}
-            >
-              <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>{s.label}</p>
-              <p className="text-base font-bold tabular-nums" style={{ color: "var(--ink)" }}>{s.value}</p>
-              {s.sub && <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>{s.sub}</p>}
-            </button>
-          ))}
+          {others.map((id) => {
+            const v = data[id] as number | undefined;
+            const def = ECONOMY_METRICS.find((m) => m.id === id);
+            return (
+              <button
+                key={id}
+                onClick={() => onMetricChange?.(id)}
+                className="rounded-xl px-3 py-3 flex flex-col gap-1 text-left transition-colors"
+                style={{ background: "var(--surface-2)", border: "1px solid var(--border)", cursor: onMetricChange ? "pointer" : "default" }}
+              >
+                <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>{def?.label}</p>
+                <p className="text-base font-bold tabular-nums" style={{ color: "var(--ink)" }}>{fmtMetric(v, id)}</p>
+              </button>
+            );
+          })}
         </div>
       )}
 
       {/* Trend */}
       <div>
-        <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>Évolution du chômage</p>
+        <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
+          Évolution — {ECONOMY_METRICS.find(m => m.id === metric)?.label}
+        </p>
         <div className="flex flex-col gap-1.5">
           {ECONOMY_YEARS.map((yr) => {
             const d = yr.countries[countryName];
-            if (!d) return null;
-            const v = d.unemployment;
+            const v = d ? (d[metric] as number | undefined) : undefined;
+            if (v === undefined) return null;
             const isCurrent = yr.year === yearData?.year;
+            const pct = Math.min(Math.max(((v - trendRange.min) / (trendRange.max - trendRange.min)) * 100, 0), 100);
             return (
               <div key={yr.year} className="flex items-center gap-2">
                 <span className="text-xs tabular-nums" style={{ color: isCurrent ? "#0D7A40" : "var(--ink-3)", fontWeight: isCurrent ? 700 : 400, minWidth: 36 }}>{yr.year}</span>
                 <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--surface-2)" }}>
-                  <div className="h-full rounded-full" style={{ width: `${Math.min((v / maxVal) * 100, 100)}%`, background: isCurrent ? "#39FF88" : "var(--ink-4)", transition: "width 0.4s ease" }} />
+                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: isCurrent ? "#39FF88" : "var(--ink-4)", transition: "width 0.4s ease" }} />
                 </div>
-                <span className="text-xs tabular-nums text-right" style={{ color: isCurrent ? "#0D7A40" : "var(--ink-3)", minWidth: 48 }}>{v.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %</span>
+                <span className="text-xs tabular-nums text-right" style={{ color: isCurrent ? "#0D7A40" : "var(--ink-3)", minWidth: 72 }}>{fmtMetric(v, metric)}</span>
               </div>
             );
           })}
@@ -388,8 +380,8 @@ export function EconomySidePanel({ countryName, yearData, metric, open, onClose,
               </div>
             ) : metric === "companies" ? (
               <CompaniesView countryName={countryName!} yearData={yearData} />
-            ) : metric === "unemployment" ? (
-              <UnemploymentView countryName={countryName!} yearData={yearData} />
+            ) : UNEMPLOYMENT_FAMILY.includes(metric) ? (
+              <UnemploymentView countryName={countryName!} yearData={yearData} metric={metric} onMetricChange={onMetricChange} />
             ) : (
               <EconomicView countryName={countryName!} yearData={yearData} metric={metric} onMetricChange={onMetricChange} />
             )}

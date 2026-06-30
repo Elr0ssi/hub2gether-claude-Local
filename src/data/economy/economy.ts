@@ -1,6 +1,8 @@
 import type { EconomyYear, EconomyMetric } from "@/types";
 import { getPopulationMillions } from "./populationData";
 import { getTradeBalanceBn } from "./tradeBalanceHistory";
+import { getDebtByCountry } from "./debtData";
+import { getLaborByCountry } from "./laborData";
 
 export const ECONOMY_METRICS: EconomyMetric[] = [
   {
@@ -44,6 +46,34 @@ export const ECONOMY_METRICS: EconomyMetric[] = [
     shortLabel: "Balance",
     unit: "Mds €",
     description: "Balance extérieure de biens et services : exportations moins importations, en milliards d'euros (équivalent USD courants). Positif = excédent, négatif = déficit.",
+  },
+  {
+    id: "debt_amount",
+    label: "Montant de la dette",
+    shortLabel: "Dette (Mds)",
+    unit: "Mds €",
+    description: "Dette publique brute en valeur absolue, en milliards d'euros (équivalent USD courants, PIB × ratio de dette).",
+  },
+  {
+    id: "inflation",
+    label: "Inflation",
+    shortLabel: "Inflation",
+    unit: "%",
+    description: "Taux d'inflation annuel le plus récent disponible (2024). Valeur ponctuelle appliquée à l'ensemble de la période faute de série historique par année.",
+  },
+  {
+    id: "active_population",
+    label: "Population active",
+    shortLabel: "Pop. active",
+    unit: "M",
+    description: "Population active, en millions de personnes (estimation 2023). Valeur ponctuelle appliquée à l'ensemble de la période faute de série historique par année.",
+  },
+  {
+    id: "retirement_age",
+    label: "Âge de la retraite",
+    shortLabel: "Âge retraite",
+    unit: "ans",
+    description: "Âge légal de départ à la retraite (estimation 2023). Valeur ponctuelle appliquée à l'ensemble de la période faute de série historique par année.",
   },
 ];
 
@@ -976,6 +1006,18 @@ for (const yr of ECONOMY_YEARS) {
     const tradeBalance = getTradeBalanceBn(countryName, yr.year);
     if (tradeBalance !== undefined) {
       data.trade_balance = tradeBalance;
+    }
+    data.debt_amount = Math.round((data.gdp * data.debt_ratio) / 100);
+    // Inflation, population active and âge de la retraite are single-snapshot
+    // values (no per-year history available) — applied flatly across every year.
+    const debt = getDebtByCountry(countryName);
+    if (debt) {
+      data.inflation = debt.inflation_2024;
+    }
+    const labor = getLaborByCountry(countryName);
+    if (labor) {
+      data.active_population = labor.active_population_millions;
+      data.retirement_age = labor.retirement_age;
     }
   }
 }
