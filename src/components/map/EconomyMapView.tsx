@@ -25,6 +25,14 @@ const TOOLBAR_METRICS = ECONOMY_METRICS.filter(
   (m) => !SIDE_PANEL_ONLY_METRICS.includes(m.id)
 );
 
+// When a side-panel sub-metric is active, highlight its parent toolbar button
+function getToolbarParent(metric: EconomyMetricId): EconomyMetricId {
+  if (metric === "gdp_per_capita" || metric === "trade_balance") return "gdp";
+  if (metric === "debt_amount" || metric === "inflation") return "debt_ratio";
+  if (metric === "active_population" || metric === "retirement_age") return "unemployment";
+  return metric;
+}
+
 function findNearestDataYear(target: number): number {
   return ECONOMY_YEAR_VALUES.reduce((prev, curr) =>
     Math.abs(curr - target) < Math.abs(prev - target) ? curr : prev
@@ -142,20 +150,25 @@ export function EconomyMapView() {
 
             {/* Metric selector */}
             <div className="flex items-center gap-1 flex-wrap">
-              {TOOLBAR_METRICS.map((m) => (
-                <button
-                  key={m.id}
-                  onClick={() => handleMetricChange(m.id)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
-                  style={
-                    m.id === metric
-                      ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
-                      : { background: "transparent", color: "var(--ink-3)", border: "1px solid transparent" }
-                  }
-                >
-                  {m.shortLabel}
-                </button>
-              ))}
+              {TOOLBAR_METRICS.map((m) => {
+                const isActive = m.id === getToolbarParent(metric);
+                const isSubMetric = isActive && m.id !== metric;
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => handleMetricChange(m.id)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200"
+                    style={
+                      isActive
+                        ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700, opacity: isSubMetric ? 0.7 : 1 }
+                        : { background: "transparent", color: "var(--ink-3)", border: "1px solid transparent" }
+                    }
+                  >
+                    {m.shortLabel}
+                    {isSubMetric && <span style={{ fontSize: "0.55rem", marginLeft: 3, opacity: 0.8 }}>▾</span>}
+                  </button>
+                );
+              })}
             </div>
 
           </div>
