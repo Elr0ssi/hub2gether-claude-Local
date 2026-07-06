@@ -6,7 +6,7 @@ import { Plus, Minus, Maximize } from "lucide-react";
 import type { EpidemicDisease } from "@/types";
 import { getMaxDeaths, getCountryFillColor, GRADIENT_CSS } from "@/lib/epidemicsColors";
 
-const WORLD_MAP_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+const WORLD_MAP_URL = "/geo/countries-110m.json";
 
 interface EpidemicsInteractiveMapProps {
   disease: EpidemicDisease;

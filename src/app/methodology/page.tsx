@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "Méthodologie — The Essential Data",
   description:
     "Découvrez comment The Essential Data collecte, synthétise et vérifie ses données. Transparence totale sur nos sources, notre approche éditoriale et notre conformité EU AI Act.",
+  alternates: {
+    canonical: "/methodology",
+  },
 };
 
 const sections = [

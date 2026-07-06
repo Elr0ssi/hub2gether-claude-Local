@@ -14,7 +14,7 @@ import {
 
 // Natural Earth 110m countries GeoJSON — same source as world-atlas, with `name` field
 const GEO_URL =
-  "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_110m_admin_0_countries.geojson";
+  "/geo/ne_110m_admin_0_countries.geojson";
 
 const TILES = {
   standard: {

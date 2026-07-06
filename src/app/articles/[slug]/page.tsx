@@ -2,10 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Clock, Tag, ExternalLink, Info } from "lucide-react";
+import Image from "next/image";
 import { Layout } from "@/components/layout/Layout";
 import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
 import { ArticleBody } from "@/components/articles/ArticleBody";
 import { ARTICLES, getArticleBySlug, getArticlesByTheme } from "@/data/articles";
+import { jsonLdString } from "@/lib/schema";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theessentialdata.com";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -87,39 +91,43 @@ export default async function ArticlePage({ params }: PageProps) {
 
   const articleSchema = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "NewsArticle",
     headline: article.title,
     description: article.excerpt,
     datePublished: article.publishedAt,
+    dateModified: article.publishedAt,
     image: article.heroImage,
-    author: { "@type": "Organization", name: "The Essential Data" },
-    publisher: { "@type": "Organization", name: "The Essential Data" },
+    author: { "@type": "Organization", name: "The Essential Data", url: siteUrl },
+    publisher: { "@type": "Organization", name: "The Essential Data", url: siteUrl },
     keywords: article.tags.join(", "),
+    url: `${siteUrl}/articles/${slug}`,
   };
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Accueil", item: "/" },
-      { "@type": "ListItem", position: 2, name: themeConfig.label, item: themeConfig.backHref },
-      { "@type": "ListItem", position: 3, name: article.title },
+      { "@type": "ListItem", position: 1, name: "Accueil", item: `${siteUrl}/` },
+      { "@type": "ListItem", position: 2, name: themeConfig.label, item: `${siteUrl}${themeConfig.backHref}` },
+      { "@type": "ListItem", position: 3, name: article.title, item: `${siteUrl}/articles/${slug}` },
     ],
   };
 
   return (
     <Layout>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(articleSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbSchema) }} />
 
       {/* Hero image */}
       {article.heroImage && (
         <div className="relative w-full overflow-hidden" style={{ height: "380px" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+            <Image
             src={article.heroImage}
             alt={article.heroCaption ?? article.title}
-            className="w-full h-full object-cover"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
             style={{ filter: "brightness(0.55)" }}
           />
           {/* Title overlay */}

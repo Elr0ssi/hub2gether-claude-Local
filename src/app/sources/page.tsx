@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "Sources de données — The Essential Data",
   description:
     "Toutes les sources de données utilisées par The Essential Data : FMI, Banque mondiale, OMS, SIPRI, AWMC et médias internationaux de référence.",
+  alternates: {
+    canonical: "/sources",
+  },
 };
 
 type SourceCategory = {

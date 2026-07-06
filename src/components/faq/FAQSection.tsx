@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
+import { jsonLdString } from "@/lib/schema";
 import type { FAQItem } from "@/types";
 
 interface FAQSectionProps {
@@ -33,7 +34,7 @@ export function FAQSection({
     <section className="max-w-3xl mx-auto px-6 py-16">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(schema) }}
       />
 
       <div className="mb-10">

@@ -6,7 +6,7 @@ import { Plus, Minus } from "lucide-react";
 import type { MilitaryMetricId, MilitaryCountryData } from "@/data/military/military";
 import { getColorForMilitary } from "@/data/military/military";
 
-const WORLD_MAP_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+const WORLD_MAP_URL = "/geo/countries-110m.json";
 
 interface MilitaryInteractiveMapProps {
   data: Record<string, MilitaryCountryData>;

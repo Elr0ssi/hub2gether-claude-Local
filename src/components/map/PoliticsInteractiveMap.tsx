@@ -6,7 +6,7 @@ import { Plus, Minus, Maximize } from "lucide-react";
 import type { PoliticalOrientation, PoliticalPeriod } from "@/data/politics/politics";
 import { getCountryFillColorPolitics, ORIENTATION_COLORS, ORIENTATION_LABELS, ORIENTATION_ORDER } from "@/lib/politicsColors";
 
-const WORLD_MAP_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+const WORLD_MAP_URL = "/geo/countries-110m.json";
 const HIDDEN_FILL = "#D4D4D4";
 
 interface PoliticsInteractiveMapProps {
