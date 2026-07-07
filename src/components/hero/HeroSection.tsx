@@ -3,16 +3,18 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRef } from "react";
-import { motion, useReducedMotion, useScroll, useTransform, MotionValue } from "framer-motion";
-import { ArrowRight, Globe2, TrendingUp, Shield, Map } from "lucide-react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  MotionValue,
+} from "framer-motion";
+import { ArrowRight, ChevronDown } from "lucide-react";
 
 const GlobeCanvas = dynamic(() => import("@/components/globe/GlobeCanvas"), {
   ssr: false,
-  loading: () => (
-    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ width: 56, height: 56, borderRadius: "50%", border: "1.5px solid rgba(57,255,136,0.4)", animation: "spin 2s linear infinite" }} />
-    </div>
-  ),
+  loading: () => null,
 });
 
 const MiniMap = dynamic(() => import("@/components/hero/MiniMap"), { ssr: false });
@@ -22,98 +24,81 @@ const THEMES = [
     id: "economy",
     label: "Économie mondiale",
     accent: "#10B981",
-    accentBg: "rgba(16,185,129,0.08)",
-    stat: "$105T PIB mondial",
-    sub: "Projections FMI 2025",
+    dim: "rgba(16,185,129,0.12)",
+    stat: "$105T",
+    statLabel: "PIB mondial 2025",
+    source: "Projections FMI",
     href: "/map/economy",
   },
   {
     id: "politics",
     label: "Régimes politiques",
     accent: "#8B5CF6",
-    accentBg: "rgba(139,92,246,0.08)",
-    stat: "44,8% en démocratie",
-    sub: "V-Dem 2024",
+    dim: "rgba(139,92,246,0.12)",
+    stat: "44,8%",
+    statLabel: "En démocratie",
+    source: "V-Dem 2024",
     href: "/map/politics",
   },
   {
     id: "epidemics",
-    label: "Épidémies & santé",
+    label: "Épidémies & Santé",
     accent: "#EF4444",
-    accentBg: "rgba(239,68,68,0.08)",
-    stat: "7,04M décès COVID",
-    sub: "OMS — cumulatif",
+    dim: "rgba(239,68,68,0.12)",
+    stat: "7,04M",
+    statLabel: "Décès COVID",
+    source: "OMS 2024",
     href: "/map/epidemics",
   },
   {
     id: "military",
     label: "Puissances militaires",
     accent: "#F59E0B",
-    accentBg: "rgba(245,158,11,0.08)",
-    stat: "2 443 Mds€ défense",
-    sub: "SIPRI 2024",
+    dim: "rgba(245,158,11,0.12)",
+    stat: "2 443 Mds€",
+    statLabel: "Dépenses défense",
+    source: "SIPRI 2024",
     href: "/map/military",
   },
   {
     id: "empires",
-    label: "Empires & histoire",
+    label: "Empires & Histoire",
     accent: "#06B6D4",
-    accentBg: "rgba(6,182,212,0.08)",
-    stat: "500 ans d'évolution",
-    sub: "1453 — 2025",
+    dim: "rgba(6,182,212,0.12)",
+    stat: "500 ans",
+    statLabel: "D'évolution mondiale",
+    source: "1453 — 2025",
     href: "/map/empires",
   },
-];
+] as const;
 
-const BOTTOM_STATS = [
-  { value: "195+", label: "Pays analysés", Icon: Globe2 },
-  { value: "5", label: "Thèmes géopolitiques", Icon: TrendingUp },
-  { value: "30+", label: "Puissances militaires", Icon: Shield },
-];
-
-const EASE = [0.16, 1, 0.3, 1] as const;
+type Theme = (typeof THEMES)[number];
 const CARD_COUNT = THEMES.length;
 
+// Phase boundaries (fraction of total scroll 0→1)
+const PH_EXIT_START = 0.14;  // globe starts fading
+const PH_EXIT_END   = 0.30;  // globe gone, cards fully visible
+const PH_CARDS_END  = 0.94;  // last card reached
+
+// ── Card in the stack ────────────────────────────────────────────────────────
+
 interface StackCardProps {
-  theme: typeof THEMES[number];
+  theme: Theme;
   index: number;
-  scrollProgress: MotionValue<number>;
-  reduced: boolean | null;
+  cardProgress: MotionValue<number>;
 }
 
-function StackCard({ theme, index, scrollProgress, reduced }: StackCardProps) {
-  const offset = useTransform(scrollProgress, [0, 1], [0, CARD_COUNT]);
+function StackCard({ theme, index, cardProgress }: StackCardProps) {
+  const dist = useTransform(cardProgress, (v) => v - index);
 
-  const cardActive = useTransform(offset, (v) => {
-    const dist = v - index;
-    return dist;
+  // y: future cards slightly below, active at 0, past cards exit upward
+  const y = useTransform(dist, [-2, -1, 0, 0.55, 1], ["10%", "4%", "0%", "-4%", "-120%"]);
+  const scale = useTransform(dist, [-2, -1, 0, 1], [0.88, 0.94, 1, 1]);
+  const opacity = useTransform(dist, [-2, -1.3, 0, 0.85, 1.15], [0, 0.7, 1, 1, 0]);
+  const zIndex = useTransform(dist, (v) => {
+    if (v > 1.0) return 4;
+    return Math.max(4, Math.round(50 + v * 6));
   });
-
-  const y = useTransform(cardActive, [-1, 0, 1], ["-105%", "0%", "8%"]);
-  const scale = useTransform(cardActive, [-1, 0, 0.5, 1], [1, 1, 0.96, 0.92]);
-  const opacity = useTransform(cardActive, [-1.2, -1, 0, 0.8, 1.2], [0, 1, 1, 0.7, 0]);
-  const zIndex = useTransform(cardActive, (v) => Math.round(100 - Math.abs(v) * 10));
-
-  if (reduced) {
-    const isActive = index === 0;
-    return (
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          display: isActive ? "flex" : "none",
-          flexDirection: "column",
-          borderRadius: 20,
-          overflow: "hidden",
-          background: "#fff",
-          border: "1.5px solid #E8E8E8",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.08)",
-        }}
-      >
-        <CardContent theme={theme} />
-      </div>
-    );
-  }
 
   return (
     <motion.div
@@ -124,63 +109,65 @@ function StackCard({ theme, index, scrollProgress, reduced }: StackCardProps) {
         scale,
         opacity,
         zIndex,
-        borderRadius: 20,
+        borderRadius: 16,
         overflow: "hidden",
         background: "#fff",
-        border: "1.5px solid #E8E8E8",
-        boxShadow: "0 8px 40px rgba(0,0,0,0.08)",
+        boxShadow: "0 28px 72px rgba(0,0,0,0.6), 0 4px 18px rgba(0,0,0,0.35)",
         willChange: "transform",
         transformOrigin: "bottom center",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-      <CardContent theme={theme} />
-    </motion.div>
-  );
-}
-
-function CardContent({ theme }: { theme: typeof THEMES[number] }) {
-  return (
-    <>
-      {/* Colored header strip */}
+      {/* Accent strip */}
       <div
         style={{
-          height: 5,
+          height: 4,
           background: theme.accent,
-          boxShadow: `0 0 16px ${theme.accent}66`,
+          flexShrink: 0,
+          boxShadow: `0 0 28px ${theme.accent}aa`,
         }}
       />
 
       {/* Map area */}
-      <div style={{ flex: 1, position: "relative", minHeight: 0, height: "calc(100% - 5px - 88px)", overflow: "hidden" }}>
+      <div style={{ flex: 1, position: "relative", minHeight: 0 }}>
         <MiniMap themeId={theme.id} />
 
-        {/* Theme label overlay */}
+        {/* Theme badge */}
         <div
           style={{
             position: "absolute",
-            top: 14,
-            left: 14,
+            top: 12,
+            left: 12,
             display: "flex",
             alignItems: "center",
-            gap: 7,
-            padding: "5px 12px",
+            gap: 6,
+            padding: "4px 10px",
             borderRadius: 100,
-            background: theme.accentBg,
+            background: theme.dim,
             border: `1px solid ${theme.accent}44`,
             backdropFilter: "blur(8px)",
           }}
         >
           <div
             style={{
-              width: 6,
-              height: 6,
+              width: 5,
+              height: 5,
               borderRadius: "50%",
               background: theme.accent,
-              boxShadow: `0 0 8px ${theme.accent}`,
+              boxShadow: `0 0 6px ${theme.accent}`,
               flexShrink: 0,
             }}
           />
-          <span style={{ fontSize: "0.65rem", fontWeight: 700, color: theme.accent, letterSpacing: "0.07em", textTransform: "uppercase" }}>
+          <span
+            style={{
+              fontSize: "0.6rem",
+              fontWeight: 700,
+              color: theme.accent,
+              letterSpacing: "0.07em",
+              textTransform: "uppercase",
+            }}
+          >
             {theme.label}
           </span>
         </div>
@@ -189,21 +176,33 @@ function CardContent({ theme }: { theme: typeof THEMES[number] }) {
       {/* Footer */}
       <div
         style={{
-          height: 88,
+          height: 76,
           padding: "0 18px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           borderTop: "1px solid #F0F0F0",
+          flexShrink: 0,
           gap: 12,
         }}
       >
         <div>
-          <div style={{ fontSize: "1rem", fontWeight: 800, color: "#0A0A0A", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
-            {theme.stat}
+          <div
+            style={{
+              fontSize: "1.05rem",
+              fontWeight: 800,
+              color: "#0A0A0A",
+              letterSpacing: "-0.02em",
+              lineHeight: 1.2,
+            }}
+          >
+            {theme.stat}{" "}
+            <span style={{ fontSize: "0.72rem", fontWeight: 500, color: "#6B6B6B" }}>
+              {theme.statLabel}
+            </span>
           </div>
-          <div style={{ fontSize: "0.7rem", color: "#9B9B9B", marginTop: 3 }}>
-            {theme.sub}
+          <div style={{ fontSize: "0.62rem", color: "#9B9B9B", marginTop: 2 }}>
+            {theme.source}
           </div>
         </div>
         <Link
@@ -211,364 +210,136 @@ function CardContent({ theme }: { theme: typeof THEMES[number] }) {
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: 6,
-            padding: "8px 14px",
-            borderRadius: 10,
-            background: theme.accentBg,
+            gap: 5,
+            padding: "7px 13px",
+            borderRadius: 9,
+            background: theme.dim,
             border: `1px solid ${theme.accent}33`,
             color: theme.accent,
-            fontSize: "0.75rem",
+            fontSize: "0.7rem",
             fontWeight: 700,
             textDecoration: "none",
             whiteSpace: "nowrap",
             flexShrink: 0,
           }}
         >
-          Explorer <ArrowRight size={12} />
+          Explorer <ArrowRight size={10} />
         </Link>
       </div>
-    </>
+    </motion.div>
   );
 }
 
-export function HeroSection() {
-  const reduced = useReducedMotion();
-  const sectionRef = useRef<HTMLDivElement>(null);
+// ── Left panel: active card info (changes with scroll) ───────────────────────
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"],
-  });
+interface CardInfoItemProps {
+  theme: Theme;
+  index: number;
+  cardProgress: MotionValue<number>;
+}
 
-  // Map 0→1 scroll to 0→(CARD_COUNT-1) card index
-  const cardProgress = useTransform(scrollYProgress, [0, 0.95], [0, CARD_COUNT - 1]);
-
-  // Progress dots: 0 to CARD_COUNT-1
-  const dotIndex = useTransform(cardProgress, (v) => Math.round(v));
+function CardInfoItem({ theme, index, cardProgress }: CardInfoItemProps) {
+  const distance = useTransform(cardProgress, (v) => Math.abs(v - index));
+  const opacity = useTransform(distance, [0, 0.3, 0.7], [1, 1, 0]);
+  const y = useTransform(distance, [0, 0.8], ["0px", "14px"]);
 
   return (
-    <section
-      ref={sectionRef}
-      className="hero-section-wrapper"
+    <motion.div
+      style={{
+        position: "absolute",
+        inset: 0,
+        opacity,
+        y,
+        pointerEvents: "none",
+      }}
     >
-      {/* Sticky viewport — fills 100vh and sticks */}
-      <div className="hero-sticky">
-        {/* Background */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
         <div
           style={{
-            position: "absolute",
-            inset: 0,
-            background: "#FAFAFA",
-            zIndex: 0,
+            width: 8,
+            height: 8,
+            borderRadius: "50%",
+            background: theme.accent,
+            boxShadow: `0 0 12px ${theme.accent}`,
+            flexShrink: 0,
           }}
         />
-
-        {/* Subtle grid pattern */}
-        <div
-          aria-hidden="true"
+        <span
           style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage: "linear-gradient(rgba(57,255,136,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,136,0.04) 1px, transparent 1px)",
-            backgroundSize: "48px 48px",
-            zIndex: 0,
-          }}
-        />
-
-        {/* Main 2-col grid */}
-        <div
-          className="hero-grid"
-          style={{
-            position: "relative",
-            zIndex: 1,
-            maxWidth: "1280px",
-            margin: "0 auto",
-            width: "100%",
-            height: "100%",
-            padding: "0 32px",
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: "40px",
-            alignItems: "center",
+            fontSize: "0.67rem",
+            fontWeight: 700,
+            color: theme.accent,
+            letterSpacing: "0.09em",
+            textTransform: "uppercase",
           }}
         >
-          {/* ── LEFT COLUMN ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 0, paddingTop: 80 }}>
-            {/* Eyebrow badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: EASE }}
-              style={{ marginBottom: 24 }}
-            >
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 7,
-                  padding: "5px 13px",
-                  borderRadius: 100,
-                  background: "#0A0A0A",
-                  color: "#39FF88",
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                }}
-              >
-                <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#39FF88", boxShadow: "0 0 8px rgba(57,255,136,0.9)", flexShrink: 0 }} />
-                Data journalism géopolitique
-              </span>
-            </motion.div>
-
-            {/* Left green bar + H1 */}
-            <motion.div
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.65, delay: 0.1, ease: EASE }}
-              style={{ display: "flex", gap: 14, marginBottom: 20 }}
-            >
-              <div
-                style={{
-                  width: 4,
-                  borderRadius: 3,
-                  background: "linear-gradient(180deg, #39FF88 0%, #10B981 100%)",
-                  boxShadow: "0 0 16px rgba(57,255,136,0.5)",
-                  flexShrink: 0,
-                  alignSelf: "stretch",
-                }}
-              />
-              <h1
-                style={{
-                  fontSize: "clamp(2.6rem, 5vw, 5rem)",
-                  fontWeight: 900,
-                  letterSpacing: "-0.04em",
-                  lineHeight: 1.05,
-                  color: "#0A0A0A",
-                }}
-              >
-                L&apos;histoire du monde,{" "}
-                <span
-                  style={{
-                    color: "#39FF88",
-                    WebkitTextStroke: "0px",
-                    textShadow: "none",
-                    background: "linear-gradient(135deg, #39FF88 0%, #10B981 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  cartographiée
-                </span>
-              </h1>
-            </motion.div>
-
-            {/* Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, delay: 0.2, ease: EASE }}
-              style={{
-                fontSize: "1rem",
-                color: "#6B6B6B",
-                lineHeight: 1.7,
-                maxWidth: 440,
-                marginBottom: 28,
-              }}
-            >
-              Empires, économies, épidémies — visualisez les grandes forces qui ont façonné le monde à travers le temps.
-            </motion.p>
-
-            {/* CTAs */}
-            <motion.div
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, delay: 0.3, ease: EASE }}
-              style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 36 }}
-            >
-              <Link href="/map/economy" className="btn-primary">
-                Explorer la carte <ArrowRight size={14} />
-              </Link>
-              <Link
-                href="/map/politics"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 7,
-                  padding: "10px 18px",
-                  borderRadius: 12,
-                  background: "#fff",
-                  border: "1.5px solid #E8E8E8",
-                  color: "#3A3A3A",
-                  fontSize: "0.875rem",
-                  fontWeight: 500,
-                  textDecoration: "none",
-                  boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-                  transition: "all 0.2s ease",
-                }}
-              >
-                <Map size={14} style={{ color: "#6B6B6B" }} />
-                Régimes politiques
-              </Link>
-            </motion.div>
-
-            {/* Stats grid */}
-            <motion.div
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, delay: 0.4, ease: EASE }}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: 12,
-                marginBottom: 36,
-              }}
-            >
-              {BOTTOM_STATS.map(({ value, label, Icon }) => (
-                <div
-                  key={label}
-                  style={{
-                    padding: "14px 16px",
-                    borderRadius: 14,
-                    background: "#fff",
-                    border: "1.5px solid #E8E8E8",
-                    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                    <div
-                      style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: 7,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        background: "rgba(57,255,136,0.1)",
-                        border: "1px solid rgba(57,255,136,0.22)",
-                      }}
-                    >
-                      <Icon size={12} style={{ color: "#10B981" }} />
-                    </div>
-                  </div>
-                  <div style={{ fontSize: "1.1rem", fontWeight: 800, color: "#0A0A0A", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
-                    {value}
-                  </div>
-                  <div style={{ fontSize: "0.68rem", color: "#9B9B9B", marginTop: 2, lineHeight: 1.3 }}>
-                    {label}
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-
-            {/* Small globe — dark container */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.55, ease: EASE }}
-              style={{
-                width: 120,
-                height: 120,
-                borderRadius: "50%",
-                background: "radial-gradient(circle, #0c0c1a 0%, #080810 100%)",
-                border: "1.5px solid rgba(57,255,136,0.25)",
-                boxShadow: "0 0 30px rgba(57,255,136,0.12), inset 0 0 30px rgba(57,255,136,0.05)",
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
-              <GlobeCanvas />
-            </motion.div>
-          </div>
-
-          {/* ── RIGHT COLUMN — Card Stack ── */}
-          <div
-            className="hero-globe-col"
-            style={{ position: "relative", height: "72vh" }}
-          >
-            {/* Card stack container */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.9, delay: 0.35, ease: EASE }}
-              style={{ position: "relative", width: "100%", height: "100%" }}
-            >
-              {THEMES.map((theme, index) => (
-                <StackCard
-                  key={theme.id}
-                  theme={theme}
-                  index={index}
-                  scrollProgress={cardProgress}
-                  reduced={reduced}
-                />
-              ))}
-            </motion.div>
-
-            {/* Progress dots */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              style={{
-                position: "absolute",
-                bottom: -36,
-                left: "50%",
-                transform: "translateX(-50%)",
-                display: "flex",
-                gap: 6,
-                alignItems: "center",
-              }}
-            >
-              {THEMES.map((theme, i) => (
-                <ProgressDot key={theme.id} index={i} dotIndex={dotIndex} accent={theme.accent} />
-              ))}
-            </motion.div>
-
-            {/* Scroll hint */}
-            {!reduced && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.2 }}
-                style={{
-                  position: "absolute",
-                  bottom: -64,
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 4,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                <span style={{ fontSize: "0.65rem", color: "#C4C4C4", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                  Scrollez pour explorer
-                </span>
-                <motion.div
-                  animate={{ y: [0, 5, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                  style={{ width: 1, height: 20, background: "linear-gradient(to bottom, #C4C4C4, transparent)" }}
-                />
-              </motion.div>
-            )}
-          </div>
-        </div>
+          {theme.label}
+        </span>
       </div>
-    </section>
+
+      <div
+        style={{
+          fontSize: "clamp(2.4rem, 4.5vw, 3.8rem)",
+          fontWeight: 900,
+          color: "#fff",
+          letterSpacing: "-0.04em",
+          lineHeight: 1.05,
+          marginBottom: 10,
+        }}
+      >
+        {theme.stat}
+      </div>
+
+      <div
+        style={{
+          fontSize: "0.88rem",
+          color: "rgba(255,255,255,0.48)",
+          marginBottom: 26,
+          lineHeight: 1.5,
+        }}
+      >
+        {theme.statLabel}
+        <span style={{ margin: "0 6px", opacity: 0.4 }}>·</span>
+        {theme.source}
+      </div>
+
+      <Link
+        href={theme.href}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 7,
+          padding: "9px 18px",
+          borderRadius: 10,
+          background: theme.dim,
+          border: `1px solid ${theme.accent}40`,
+          color: theme.accent,
+          fontSize: "0.78rem",
+          fontWeight: 700,
+          textDecoration: "none",
+          pointerEvents: "auto",
+        }}
+      >
+        Explorer la carte <ArrowRight size={12} />
+      </Link>
+    </motion.div>
   );
 }
+
+// ── Progress dot ─────────────────────────────────────────────────────────────
 
 interface ProgressDotProps {
   index: number;
-  dotIndex: MotionValue<number>;
+  cardProgress: MotionValue<number>;
   accent: string;
 }
 
-function ProgressDot({ index, dotIndex, accent }: ProgressDotProps) {
-  const scale = useTransform(dotIndex, (v) => (Math.round(v) === index ? 1.4 : 1));
-  const opacity = useTransform(dotIndex, (v) => (Math.round(v) === index ? 1 : 0.3));
-  const bg = useTransform(dotIndex, (v) => (Math.round(v) === index ? accent : "#D1D5DB"));
+function ProgressDot({ index, cardProgress, accent }: ProgressDotProps) {
+  const scale = useTransform(cardProgress, (v) => (Math.round(v) === index ? 1.6 : 1));
+  const opacity = useTransform(cardProgress, (v) => (Math.round(v) === index ? 1 : 0.28));
+  const bg = useTransform(cardProgress, (v) =>
+    Math.round(v) === index ? accent : "rgba(255,255,255,0.22)"
+  );
 
   return (
     <motion.div
@@ -581,5 +352,304 @@ function ProgressDot({ index, dotIndex, accent }: ProgressDotProps) {
         backgroundColor: bg,
       }}
     />
+  );
+}
+
+// ── Main Section ─────────────────────────────────────────────────────────────
+
+export function HeroSection() {
+  const reduced = useReducedMotion();
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  const globeOpacity = useTransform(scrollYProgress, [PH_EXIT_START, PH_EXIT_END], [1, 0]);
+  const sloganOpacity = useTransform(scrollYProgress, [PH_EXIT_START, PH_EXIT_END], [1, 0]);
+  const cardsOpacity = useTransform(
+    scrollYProgress,
+    [PH_EXIT_START + 0.05, PH_EXIT_END],
+    [0, 1]
+  );
+  const cardInfoOpacity = useTransform(
+    scrollYProgress,
+    [PH_EXIT_START + 0.05, PH_EXIT_END],
+    [0, 1]
+  );
+  const cardProgress = useTransform(
+    scrollYProgress,
+    [PH_EXIT_END, PH_CARDS_END],
+    [0, CARD_COUNT - 1]
+  );
+
+  const EASE = [0.16, 1, 0.3, 1] as const;
+
+  return (
+    <section ref={sectionRef} className="hero-section-wrapper">
+      <div
+        className="hero-sticky"
+        style={{
+          background: "linear-gradient(160deg, #060608 0%, #08080f 55%, #060608 100%)",
+          overflow: "hidden",
+        }}
+      >
+        {/* Ambient glows */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            top: -260,
+            right: -120,
+            width: 720,
+            height: 720,
+            background:
+              "radial-gradient(circle, rgba(57,255,136,0.07) 0%, transparent 58%)",
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            bottom: -80,
+            left: -120,
+            width: 540,
+            height: 540,
+            background:
+              "radial-gradient(circle, rgba(80,100,240,0.06) 0%, transparent 58%)",
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Main 2-col layout */}
+        <div
+          className="hero-grid"
+          style={{
+            position: "relative",
+            zIndex: 1,
+            maxWidth: 1280,
+            margin: "0 auto",
+            width: "100%",
+            height: "100%",
+            padding: "0 40px",
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            alignItems: "center",
+          }}
+        >
+          {/* ── LEFT COLUMN ── */}
+          <div
+            style={{
+              position: "relative",
+              paddingTop: 70,
+              paddingBottom: 60,
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            {/* Brand label */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE }}
+              style={{ marginBottom: 22 }}
+            >
+              <span
+                style={{
+                  fontSize: "0.62rem",
+                  fontWeight: 700,
+                  color: "#39FF88",
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                }}
+              >
+                The Essential Data
+              </span>
+            </motion.div>
+
+            {/* Main title */}
+            <motion.h1
+              initial={{ opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.08, ease: EASE }}
+              style={{
+                fontSize: "clamp(3rem, 5.5vw, 6.2rem)",
+                fontWeight: 900,
+                color: "#fff",
+                letterSpacing: "-0.04em",
+                lineHeight: 1.04,
+                marginBottom: 32,
+              }}
+            >
+              Explore the world
+              <br />
+              <span
+                style={{
+                  background:
+                    "linear-gradient(135deg, #39FF88 0%, #10B981 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
+                from the sky.
+              </span>
+            </motion.h1>
+
+            {/* Globe phase: CTA + scroll hint */}
+            <motion.div style={{ opacity: sloganOpacity, flexShrink: 0 }}>
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.22, ease: EASE }}
+              >
+                <Link
+                  href="/map/economy"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 9,
+                    padding: "12px 24px",
+                    borderRadius: 13,
+                    background: "#39FF88",
+                    color: "#000",
+                    fontSize: "0.9rem",
+                    fontWeight: 700,
+                    textDecoration: "none",
+                    boxShadow:
+                      "0 0 28px rgba(57,255,136,0.35), 0 2px 8px rgba(0,0,0,0.2)",
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  Explorer <ArrowRight size={15} />
+                </Link>
+              </motion.div>
+
+              {!reduced && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.5 }}
+                  style={{
+                    marginTop: 44,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 7,
+                  }}
+                >
+                  <motion.div
+                    animate={{ y: [0, 5, 0] }}
+                    transition={{ duration: 1.9, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <ChevronDown
+                      size={14}
+                      style={{ color: "rgba(255,255,255,0.18)" }}
+                    />
+                  </motion.div>
+                  <span
+                    style={{
+                      fontSize: "0.6rem",
+                      color: "rgba(255,255,255,0.18)",
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Scroll pour explorer
+                  </span>
+                </motion.div>
+              )}
+            </motion.div>
+
+            {/* Cards phase: active card info */}
+            <motion.div
+              style={{
+                opacity: cardInfoOpacity,
+                position: "absolute",
+                top: "clamp(180px, 26vh, 260px)",
+                left: 0,
+                right: 0,
+              }}
+            >
+              <div style={{ position: "relative", height: 220 }}>
+                {THEMES.map((theme, i) => (
+                  <CardInfoItem
+                    key={theme.id}
+                    theme={theme}
+                    index={i}
+                    cardProgress={cardProgress}
+                  />
+                ))}
+              </div>
+
+              {/* Progress dots */}
+              <div style={{ display: "flex", gap: 7, marginTop: 18 }}>
+                {THEMES.map((theme, i) => (
+                  <ProgressDot
+                    key={theme.id}
+                    index={i}
+                    cardProgress={cardProgress}
+                    accent={theme.accent}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </div>
+
+          {/* ── RIGHT COLUMN ── */}
+          <div
+            className="hero-globe-col"
+            style={{ position: "relative", height: "100%" }}
+          >
+            {/* Globe */}
+            {!reduced && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  opacity: globeOpacity,
+                }}
+              >
+                <GlobeCanvas />
+              </motion.div>
+            )}
+
+            {/* Cards stack */}
+            <motion.div
+              style={{
+                position: "absolute",
+                inset: 0,
+                opacity: cardsOpacity,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "20px 8px",
+              }}
+            >
+              {/* Landscape container: wider than tall */}
+              <div
+                style={{
+                  position: "relative",
+                  width: "100%",
+                  height: "min(380px, 50vh)",
+                }}
+              >
+                {THEMES.map((theme, i) => (
+                  <StackCard
+                    key={theme.id}
+                    theme={theme}
+                    index={i}
+                    cardProgress={cardProgress}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

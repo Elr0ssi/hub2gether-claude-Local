@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 
 const GLOBE_RADIUS = 2.2;
-const DOT_COUNT = 3800;
+const DOT_COUNT = 4200;
 
 const CITIES: [number, number][] = [
   [48.85, 2.35],
@@ -54,7 +54,7 @@ export default function GlobeCanvas() {
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    // --- Dots ---
+    // --- White dot matrix ---
     const positions = new Float32Array(DOT_COUNT * 3);
     const colors = new Float32Array(DOT_COUNT * 3);
     const golden = Math.PI * (3 - Math.sqrt(5));
@@ -69,12 +69,15 @@ export default function GlobeCanvas() {
       positions[i * 3 + 2] = GLOBE_RADIUS * r * Math.sin(theta);
 
       const rnd = Math.random();
-      if (rnd < 0.55) {
-        colors[i * 3] = 0.04; colors[i * 3 + 1] = 0.22; colors[i * 3 + 2] = 0.10;
-      } else if (rnd < 0.88) {
-        colors[i * 3] = 0.07; colors[i * 3 + 1] = 0.55; colors[i * 3 + 2] = 0.24;
+      if (rnd < 0.48) {
+        // muted blue-white
+        colors[i * 3] = 0.65; colors[i * 3 + 1] = 0.70; colors[i * 3 + 2] = 0.80;
+      } else if (rnd < 0.82) {
+        // medium white
+        colors[i * 3] = 0.80; colors[i * 3 + 1] = 0.84; colors[i * 3 + 2] = 0.92;
       } else {
-        colors[i * 3] = 0.14; colors[i * 3 + 1] = 0.92; colors[i * 3 + 2] = 0.42;
+        // bright white
+        colors[i * 3] = 0.95; colors[i * 3 + 1] = 0.97; colors[i * 3 + 2] = 1.00;
       }
     }
 
@@ -82,27 +85,27 @@ export default function GlobeCanvas() {
     dotsGeom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
     dotsGeom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
     const dotsMat = new THREE.PointsMaterial({
-      size: 0.038,
+      size: 0.034,
       vertexColors: true,
       transparent: true,
-      opacity: 0.82,
+      opacity: 0.90,
       sizeAttenuation: true,
     });
     globeGroup.add(new THREE.Points(dotsGeom, dotsMat));
 
-    // --- Atmosphere glow ---
-    const atmosGeom = new THREE.SphereGeometry(GLOBE_RADIUS + 0.2, 32, 32);
+    // --- Atmosphere glow (cool blue-white) ---
+    const atmosGeom = new THREE.SphereGeometry(GLOBE_RADIUS + 0.22, 32, 32);
     const atmosMat = new THREE.MeshBasicMaterial({
-      color: 0x39ff88,
+      color: 0xc8e8ff,
       transparent: true,
-      opacity: 0.045,
+      opacity: 0.06,
       side: THREE.BackSide,
     });
     globeGroup.add(new THREE.Mesh(atmosGeom, atmosMat));
 
-    // --- Hotspot cities ---
-    const hotspotGeom = new THREE.SphereGeometry(0.048, 8, 8);
-    const hotspotMat = new THREE.MeshBasicMaterial({ color: 0x39ff88 });
+    // --- City hotspots (bright white) ---
+    const hotspotGeom = new THREE.SphereGeometry(0.044, 8, 8);
+    const hotspotMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
     CITIES.forEach(([lat, lon]) => {
       const [x, y, z] = latLonTo3D(lat, lon, GLOBE_RADIUS);
       const mesh = new THREE.Mesh(hotspotGeom, hotspotMat);
@@ -127,9 +130,9 @@ export default function GlobeCanvas() {
             for (let i = 1; i < ring.length; i++) {
               const [lon0, lat0] = ring[i - 1];
               const [lon1, lat1] = ring[i];
-              if (Math.abs(lon1 - lon0) > 90) continue; // skip antimeridian segments
-              const [x0, y0, z0] = latLonTo3D(lat0, lon0, GLOBE_RADIUS + 0.012);
-              const [x1, y1, z1] = latLonTo3D(lat1, lon1, GLOBE_RADIUS + 0.012);
+              if (Math.abs(lon1 - lon0) > 90) continue;
+              const [x0, y0, z0] = latLonTo3D(lat0, lon0, GLOBE_RADIUS + 0.014);
+              const [x1, y1, z1] = latLonTo3D(lat1, lon1, GLOBE_RADIUS + 0.014);
               verts.push(x0, y0, z0, x1, y1, z1);
             }
           }
@@ -143,31 +146,24 @@ export default function GlobeCanvas() {
         const borderMat = new THREE.LineBasicMaterial({
           color: 0x39ff88,
           transparent: true,
-          opacity: 0.55,
+          opacity: 0.70,
         });
         globeGroup.add(new THREE.LineSegments(borderGeom, borderMat));
       })
-      .catch(() => {/* silently skip if fetch fails */});
+      .catch(() => {/* silently skip */});
 
     // --- Interaction ---
     let isDragging = false;
     let prevX = 0;
     let prevY = 0;
     let vX = 0;
-    const AUTO_SPEED = prefersReduced ? 0 : 0.0028;
+    const AUTO_SPEED = prefersReduced ? 0 : 0.0022;
 
-    const onDown = (cx: number, cy: number) => {
-      isDragging = true;
-      prevX = cx;
-      prevY = cy;
-      vX = 0;
-    };
+    const onDown = (cx: number, cy: number) => { isDragging = true; prevX = cx; prevY = cy; vX = 0; };
     const onMove = (cx: number, cy: number) => {
       if (!isDragging) return;
-      const dx = cx - prevX;
-      const dy = cy - prevY;
-      prevX = cx;
-      prevY = cy;
+      const dx = cx - prevX; const dy = cy - prevY;
+      prevX = cx; prevY = cy;
       globeGroup.rotation.y += dx * 0.009;
       globeGroup.rotation.x += dy * 0.004;
       vX = dx * 0.009;
@@ -190,18 +186,14 @@ export default function GlobeCanvas() {
     let frameId: number;
     const animate = () => {
       frameId = requestAnimationFrame(animate);
-      if (!isDragging) {
-        vX *= 0.94;
-        globeGroup.rotation.y += AUTO_SPEED + vX;
-      }
+      if (!isDragging) { vX *= 0.94; globeGroup.rotation.y += AUTO_SPEED + vX; }
       renderer.render(scene, camera);
     };
     animate();
 
     // --- Resize ---
     const ro = new ResizeObserver(() => {
-      const w = mount.clientWidth;
-      const h = mount.clientHeight;
+      const w = mount.clientWidth; const h = mount.clientHeight;
       if (!w || !h) return;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
@@ -209,7 +201,6 @@ export default function GlobeCanvas() {
     });
     ro.observe(mount);
 
-    // --- Cleanup ---
     return () => {
       cancelAnimationFrame(frameId);
       ro.disconnect();
