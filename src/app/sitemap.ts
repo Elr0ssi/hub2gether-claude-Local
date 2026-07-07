@@ -4,10 +4,12 @@ import { ARTICLES } from "@/data/articles";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theessentialdata.com";
 
+const LAST_MODIFIED_STATIC = new Date("2025-07-01");
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const entityPages = ROMAN_TIMELINE.map((entry) => ({
     url: `${siteUrl}/map/empires/roman-empire-${entry.slug}`,
-    lastModified: new Date(),
+    lastModified: LAST_MODIFIED_STATIC,
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
@@ -22,33 +24,63 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: siteUrl,
-      lastModified: new Date(),
+      lastModified: LAST_MODIFIED_STATIC,
       changeFrequency: "weekly",
       priority: 1.0,
     },
     {
       url: `${siteUrl}/map/economy`,
-      lastModified: new Date(),
+      lastModified: LAST_MODIFIED_STATIC,
       changeFrequency: "daily",
       priority: 0.95,
     },
     {
       url: `${siteUrl}/map/epidemics`,
-      lastModified: new Date(),
+      lastModified: LAST_MODIFIED_STATIC,
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
       url: `${siteUrl}/map/empires`,
-      lastModified: new Date(),
+      lastModified: LAST_MODIFIED_STATIC,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    {
+      url: `${siteUrl}/map/politics`,
+      lastModified: LAST_MODIFIED_STATIC,
+      changeFrequency: "monthly",
+      priority: 0.85,
+    },
+    {
+      url: `${siteUrl}/map/military`,
+      lastModified: LAST_MODIFIED_STATIC,
       changeFrequency: "monthly",
       priority: 0.85,
     },
     {
       url: `${siteUrl}/comparaison`,
-      lastModified: new Date(),
+      lastModified: LAST_MODIFIED_STATIC,
       changeFrequency: "weekly",
       priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/articles`,
+      lastModified: LAST_MODIFIED_STATIC,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/methodology`,
+      lastModified: LAST_MODIFIED_STATIC,
+      changeFrequency: "yearly",
+      priority: 0.5,
+    },
+    {
+      url: `${siteUrl}/sources`,
+      lastModified: LAST_MODIFIED_STATIC,
+      changeFrequency: "yearly",
+      priority: 0.5,
     },
     ...entityPages,
     ...articlePages,

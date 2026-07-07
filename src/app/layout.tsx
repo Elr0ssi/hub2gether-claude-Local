@@ -1,5 +1,14 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { jsonLdString } from "@/lib/schema";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theessentialdata.com";
 
@@ -33,9 +42,6 @@ export const metadata: Metadata = {
     "Black Death map",
   ],
   metadataBase: new URL(siteUrl),
-  alternates: {
-    canonical: siteUrl,
-  },
   openGraph: {
     type: "website",
     siteName: "The Essential Data",
@@ -84,32 +90,32 @@ export default function RootLayout({
       name: "The Essential Data",
       url: siteUrl,
     },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${siteUrl}/map/{theme}`,
-      },
-      "query-input": "required name=theme",
-    },
+  };
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "The Essential Data",
+    url: siteUrl,
+    description:
+      "Média de data-journalisme géopolitique. Cartes interactives mondiales : PIB, épidémies, empires historiques, régimes politiques et puissances militaires.",
+    sameAs: [],
   };
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="fr" suppressHydrationWarning className={inter.variable}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-          rel="stylesheet"
-        />
         <meta name="theme-color" content="#FAFAFA" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(websiteSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdString(organizationSchema) }}
         />
       </head>
-      <body style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+      <body style={{ fontFamily: "var(--font-inter), 'Inter', system-ui, sans-serif" }}>
         {children}
       </body>
     </html>

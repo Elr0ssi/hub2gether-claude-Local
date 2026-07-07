@@ -7,7 +7,7 @@ import type { EconomyYear, EconomyMetricId } from "@/types";
 import { getMaxMetricValue, getCountryFillColorEconomy, GRADIENT_CSS } from "@/lib/economyColors";
 import { ECONOMY_METRICS } from "@/data/economy/economy";
 
-const WORLD_MAP_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+const WORLD_MAP_URL = "/geo/countries-110m.json";
 
 interface EconomyInteractiveMapProps {
   economyYear: EconomyYear;

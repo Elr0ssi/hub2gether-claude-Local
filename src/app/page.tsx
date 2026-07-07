@@ -23,6 +23,9 @@ export const metadata: Metadata = {
     "geopolitical data journalism",
     "comparaison pays économie",
   ],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "The Essential Data — Cartes géopolitiques interactives",
     description:

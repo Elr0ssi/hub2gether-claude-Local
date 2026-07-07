@@ -9,6 +9,8 @@ import { PoliticsMapViewLoader } from "@/components/map/PoliticsMapViewLoader";
 import { MilitaryMapViewLoader } from "@/components/map/MilitaryMapViewLoader";
 import { FAQSection } from "@/components/faq/FAQSection";
 import { ArticleGrid } from "@/components/articles/ArticleGrid";
+import { ServerDataSummary } from "@/components/seo/ServerDataSummary";
+import { DATASET_SCHEMAS, jsonLdString } from "@/lib/schema";
 import { getThemeById } from "@/data/themes";
 import { getFaqsByTheme } from "@/data/faqs";
 import { getArticlesByTheme } from "@/data/articles";
@@ -148,46 +150,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-const DATASET_SCHEMAS: Record<string, object> = {
-  economy: {
-    "@context": "https://schema.org",
-    "@type": "Dataset",
-    name: "Données économiques mondiales 2000–2025",
-    description:
-      "PIB nominal, dette publique (% PIB), taux de chômage et nombre d'entreprises pour 70+ pays de 2000 à 2025. Source : FMI WEO avril 2025, Banque mondiale.",
-    url: "https://theessentialdata.com/map/economy",
-    keywords: ["PIB", "dette publique", "chômage", "économie mondiale", "FMI", "Banque mondiale"],
-    creator: { "@type": "Organization", name: "The Essential Data" },
-    temporalCoverage: "2000/2025",
-    spatialCoverage: "World",
-    license: "https://creativecommons.org/licenses/by/4.0/",
-  },
-  epidemics: {
-    "@context": "https://schema.org",
-    "@type": "Dataset",
-    name: "Données épidémies mondiales — COVID-19, VIH, Peste Noire, Hantavirus, HMPV",
-    description:
-      "Cas confirmés et décès pour 5 grandes épidémies par pays : Peste Noire (1347–1353), COVID-19 (2020–2024), VIH/SIDA, Hantavirus, HMPV 2025. Sources : OMS, ONUSIDA, CDC.",
-    url: "https://theessentialdata.com/map/epidemics",
-    keywords: ["COVID-19", "VIH", "épidémies", "pandémie", "mortalité", "santé mondiale"],
-    creator: { "@type": "Organization", name: "The Essential Data" },
-    spatialCoverage: "World",
-    license: "https://creativecommons.org/licenses/by/4.0/",
-  },
-  empires: {
-    "@context": "https://schema.org",
-    "@type": "Dataset",
-    name: "Empire romain — données géographiques et historiques 500 BC – 1453 AD",
-    description:
-      "Extension territoriale de l'Empire romain en 7 périodes clés de 500 av. J.-C. à 1453 ap. J.-C. Données démographiques et géographiques issues de la recherche académique.",
-    url: "https://theessentialdata.com/map/empires",
-    keywords: ["Empire romain", "Rome", "antiquité", "histoire", "géographie historique"],
-    creator: { "@type": "Organization", name: "The Essential Data" },
-    temporalCoverage: "-500/1453",
-    spatialCoverage: "Mediterranean",
-    license: "https://creativecommons.org/licenses/by/4.0/",
-  },
-};
 
 export default async function MapPage({ params, searchParams }: PageProps) {
   const { theme } = await params;
@@ -213,7 +175,7 @@ export default async function MapPage({ params, searchParams }: PageProps) {
       {datasetSchema && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetSchema) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdString(datasetSchema) }}
         />
       )}
       {/* Page header */}
@@ -305,6 +267,9 @@ export default async function MapPage({ params, searchParams }: PageProps) {
           />
         </div>
       )}
+
+      {/* Data summary for crawlers */}
+      <ServerDataSummary theme={theme} />
 
       {/* FAQ */}
       {faqs.length > 0 && <FAQSection items={faqs} />}

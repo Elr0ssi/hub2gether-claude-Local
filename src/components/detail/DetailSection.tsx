@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, MapPin, Users, Building, Calendar } from "lucide-react";
 import { formatYear, formatNumber } from "@/lib/utils";
+import { jsonLdString } from "@/lib/schema";
 import type { TimelineEntry } from "@/types";
 
 interface DetailSectionProps {
@@ -37,11 +38,11 @@ export function DetailSection({ entry, prev, next }: DetailSectionProps) {
     <article className="max-w-4xl mx-auto px-6 py-16">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetSchema) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(datasetSchema) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbSchema) }}
       />
 
       {/* Breadcrumb */}
