@@ -4,7 +4,6 @@ import { Layout } from "@/components/layout/Layout";
 import { HeroSection } from "@/components/hero/HeroSection";
 import { ThemePreviewGrid } from "@/components/hero/ThemePreviewGrid";
 import { HomeDataBento } from "@/components/home/HomeDataBento";
-import { DashboardSection } from "@/components/home/DashboardSection";
 import { FAQSection } from "@/components/faq/FAQSection";
 import { THEMES } from "@/data/themes";
 import { FAQS_EMPIRES } from "@/data/faqs";
@@ -109,7 +108,6 @@ export default function HomePage() {
   return (
     <Layout>
       <HeroSection />
-      <DashboardSection />
       <AITransparencyBanner />
       <ThemePreviewGrid themes={THEMES} />
       <HomeDataBento />
