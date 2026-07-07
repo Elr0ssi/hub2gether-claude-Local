@@ -14,8 +14,8 @@ const GlobeCanvas = dynamic(() => import("@/components/globe/GlobeCanvas"), {
 
 const THEMES = [
   {
-    id: "economy",
-    label: "Économie mondiale",
+    id: "pib",
+    label: "PIB mondial",
     accent: "#10B981",
     dim: "rgba(16,185,129,0.07)",
     glow: "rgba(16,185,129,0.12)",
@@ -25,7 +25,18 @@ const THEMES = [
     textDark: false,
   },
   {
-    id: "politics",
+    id: "chomage",
+    label: "Chômage",
+    accent: "#F59E0B",
+    dim: "rgba(245,158,11,0.07)",
+    glow: "rgba(245,158,11,0.14)",
+    stat: "~5% de chômage moyen",
+    source: "BIT · OIT · données 2024",
+    href: "/map/economy",
+    textDark: true,
+  },
+  {
+    id: "politique",
     label: "Régimes politiques",
     accent: "#8B5CF6",
     dim: "rgba(139,92,246,0.07)",
@@ -36,37 +47,15 @@ const THEMES = [
     textDark: false,
   },
   {
-    id: "epidemics",
-    label: "Épidémies & Santé",
-    accent: "#EF4444",
-    dim: "rgba(239,68,68,0.07)",
-    glow: "rgba(239,68,68,0.14)",
-    stat: "7,04M décès COVID",
-    source: "OMS · données 2020–2024",
-    href: "/map/epidemics",
+    id: "demographie",
+    label: "Démographie mondiale",
+    accent: "#3B82F6",
+    dim: "rgba(59,130,246,0.07)",
+    glow: "rgba(59,130,246,0.14)",
+    stat: "8,1 milliards d'habitants",
+    source: "ONU · DESA · 2024",
+    href: "/map/economy",
     textDark: false,
-  },
-  {
-    id: "military",
-    label: "Puissances militaires",
-    accent: "#F59E0B",
-    dim: "rgba(245,158,11,0.07)",
-    glow: "rgba(245,158,11,0.14)",
-    stat: "2 443 Mds€ de défense",
-    source: "SIPRI · Record absolu 2024",
-    href: "/map/military",
-    textDark: true,
-  },
-  {
-    id: "empires",
-    label: "Empires & Histoire",
-    accent: "#39FF88",
-    dim: "rgba(57,255,136,0.07)",
-    glow: "rgba(57,255,136,0.14)",
-    stat: "500 ans d'évolution",
-    source: "1453 — 2025 · Atlas mondial",
-    href: "/map/empires",
-    textDark: true,
   },
 ] as const;
 
@@ -74,19 +63,18 @@ type ThemeId = (typeof THEMES)[number]["id"];
 
 // Scroll phase breakpoints (fraction 0→1 through the 500vh wrapper)
 const SCROLL_PHASES: { end: number; theme: ThemeId | null }[] = [
-  { end: 0.16, theme: null },
-  { end: 0.33, theme: "economy" },
-  { end: 0.51, theme: "politics" },
-  { end: 0.69, theme: "epidemics" },
-  { end: 0.85, theme: "military" },
-  { end: 1.00, theme: "empires" },
+  { end: 0.15, theme: null },
+  { end: 0.37, theme: "pib" },
+  { end: 0.59, theme: "chomage" },
+  { end: 0.78, theme: "politique" },
+  { end: 1.00, theme: "demographie" },
 ];
 
 function themeForProgress(p: number): ThemeId | null {
   for (const ph of SCROLL_PHASES) {
     if (p < ph.end) return ph.theme;
   }
-  return "empires";
+  return "demographie";
 }
 
 const EASE = [0.16, 1, 0.3, 1] as const;
