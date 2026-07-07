@@ -367,6 +367,29 @@ body {
   padding: 20px 22px;
 }
 
+/* Hero section scroll driver: mobile = normal flow, desktop = sticky scroll-driven */
+.hero-section-wrapper {
+  height: 100vh;
+  position: relative;
+}
+
+.hero-sticky {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+@media (min-width: 900px) {
+  .hero-section-wrapper {
+    height: 500vh;
+  }
+
+  .hero-sticky {
+    position: sticky;
+    top: 0;
+  }
+}
+
 /* Hero responsive 2-column grid */
 @media (min-width: 900px) {
   .hero-grid {

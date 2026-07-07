@@ -2,56 +2,66 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Globe2, TrendingUp, Shield } from "lucide-react";
-import { StatsCarousel } from "./StatsCarousel";
+import { useRef } from "react";
+import { motion, useReducedMotion, useScroll, useTransform, MotionValue } from "framer-motion";
+import { ArrowRight, Globe2, TrendingUp, Shield, Map } from "lucide-react";
 
 const GlobeCanvas = dynamic(() => import("@/components/globe/GlobeCanvas"), {
   ssr: false,
   loading: () => (
-    <div
-      style={{
-        position: "absolute",
-        inset: 0,
-        borderRadius: "50%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background:
-          "radial-gradient(circle, rgba(57,255,136,0.06) 0%, transparent 65%)",
-      }}
-    >
-      <div
-        style={{
-          width: "80px",
-          height: "80px",
-          borderRadius: "50%",
-          border: "1px solid rgba(57,255,136,0.2)",
-          animation: "spin 2s linear infinite",
-        }}
-      />
+    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ width: 56, height: 56, borderRadius: "50%", border: "1.5px solid rgba(57,255,136,0.4)", animation: "spin 2s linear infinite" }} />
     </div>
   ),
 });
 
-const GLASS_STATS = [
+const MiniMap = dynamic(() => import("@/components/hero/MiniMap"), { ssr: false });
+
+const THEMES = [
   {
-    value: "$105T",
-    label: "PIB mondial 2025",
-    sub: "Projections FMI",
-    color: "#10B981",
+    id: "economy",
+    label: "Économie mondiale",
+    accent: "#10B981",
+    accentBg: "rgba(16,185,129,0.08)",
+    stat: "$105T PIB mondial",
+    sub: "Projections FMI 2025",
+    href: "/map/economy",
   },
   {
-    value: "195+",
-    label: "Pays couverts",
-    sub: "Éco · Politique · Santé",
-    color: "#39FF88",
+    id: "politics",
+    label: "Régimes politiques",
+    accent: "#8B5CF6",
+    accentBg: "rgba(139,92,246,0.08)",
+    stat: "44,8% en démocratie",
+    sub: "V-Dem 2024",
+    href: "/map/politics",
   },
   {
-    value: "7,04M",
-    label: "Décès COVID",
-    sub: "OMS — données cumulées",
-    color: "#EF4444",
+    id: "epidemics",
+    label: "Épidémies & santé",
+    accent: "#EF4444",
+    accentBg: "rgba(239,68,68,0.08)",
+    stat: "7,04M décès COVID",
+    sub: "OMS — cumulatif",
+    href: "/map/epidemics",
+  },
+  {
+    id: "military",
+    label: "Puissances militaires",
+    accent: "#F59E0B",
+    accentBg: "rgba(245,158,11,0.08)",
+    stat: "2 443 Mds€ défense",
+    sub: "SIPRI 2024",
+    href: "/map/military",
+  },
+  {
+    id: "empires",
+    label: "Empires & histoire",
+    accent: "#06B6D4",
+    accentBg: "rgba(6,182,212,0.08)",
+    stat: "500 ans d'évolution",
+    sub: "1453 — 2025",
+    href: "/map/empires",
   },
 ];
 
@@ -62,364 +72,514 @@ const BOTTOM_STATS = [
 ];
 
 const EASE = [0.16, 1, 0.3, 1] as const;
+const CARD_COUNT = THEMES.length;
 
-export function HeroSection() {
-  const reduced = useReducedMotion();
+interface StackCardProps {
+  theme: typeof THEMES[number];
+  index: number;
+  scrollProgress: MotionValue<number>;
+  reduced: boolean | null;
+}
 
-  return (
-    <section
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(160deg, #080810 0%, #0c0c1a 55%, #080810 100%)",
-        position: "relative",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      {/* ── Ambient glows ── */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          top: "-220px",
-          right: "-80px",
-          width: "720px",
-          height: "720px",
-          background:
-            "radial-gradient(circle, rgba(57,255,136,0.11) 0%, transparent 58%)",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          bottom: 80,
-          left: "-160px",
-          width: "520px",
-          height: "520px",
-          background:
-            "radial-gradient(circle, rgba(57,255,136,0.055) 0%, transparent 58%)",
-          pointerEvents: "none",
-        }}
-      />
+function StackCard({ theme, index, scrollProgress, reduced }: StackCardProps) {
+  const offset = useTransform(scrollProgress, [0, 1], [0, CARD_COUNT]);
 
-      {/* ── Dot grid ── */}
+  const cardActive = useTransform(offset, (v) => {
+    const dist = v - index;
+    return dist;
+  });
+
+  const y = useTransform(cardActive, [-1, 0, 1], ["-105%", "0%", "8%"]);
+  const scale = useTransform(cardActive, [-1, 0, 0.5, 1], [1, 1, 0.96, 0.92]);
+  const opacity = useTransform(cardActive, [-1.2, -1, 0, 0.8, 1.2], [0, 1, 1, 0.7, 0]);
+  const zIndex = useTransform(cardActive, (v) => Math.round(100 - Math.abs(v) * 10));
+
+  if (reduced) {
+    const isActive = index === 0;
+    return (
       <div
-        aria-hidden="true"
         style={{
           position: "absolute",
           inset: 0,
-          backgroundImage:
-            "radial-gradient(circle, rgba(57,255,136,0.18) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-          opacity: 0.28,
-          pointerEvents: "none",
+          display: isActive ? "flex" : "none",
+          flexDirection: "column",
+          borderRadius: 20,
+          overflow: "hidden",
+          background: "#fff",
+          border: "1.5px solid #E8E8E8",
+          boxShadow: "0 8px 40px rgba(0,0,0,0.08)",
+        }}
+      >
+        <CardContent theme={theme} />
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      style={{
+        position: "absolute",
+        inset: 0,
+        y,
+        scale,
+        opacity,
+        zIndex,
+        borderRadius: 20,
+        overflow: "hidden",
+        background: "#fff",
+        border: "1.5px solid #E8E8E8",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.08)",
+        willChange: "transform",
+        transformOrigin: "bottom center",
+      }}
+    >
+      <CardContent theme={theme} />
+    </motion.div>
+  );
+}
+
+function CardContent({ theme }: { theme: typeof THEMES[number] }) {
+  return (
+    <>
+      {/* Colored header strip */}
+      <div
+        style={{
+          height: 5,
+          background: theme.accent,
+          boxShadow: `0 0 16px ${theme.accent}66`,
         }}
       />
 
-      {/* ── Main 2-column grid ── */}
-      <div
-        className="hero-grid"
-        style={{
-          flex: 1,
-          maxWidth: "1280px",
-          margin: "0 auto",
-          width: "100%",
-          padding: "120px 24px 60px",
-          display: "grid",
-          gridTemplateColumns: "1fr",
-          gap: "40px",
-          alignItems: "center",
-        }}
-      >
-        {/* LEFT ─ Text + glass panel + carousel */}
-        <div>
-          {/* Eyebrow */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: EASE }}
-            style={{ marginBottom: "26px" }}
-          >
-            <span className="hero-badge">
-              <span className="hero-badge-dot" />
-              Data journalism géopolitique
-            </span>
-          </motion.div>
+      {/* Map area */}
+      <div style={{ flex: 1, position: "relative", minHeight: 0, height: "calc(100% - 5px - 88px)", overflow: "hidden" }}>
+        <MiniMap themeId={theme.id} />
 
-          {/* H1 */}
-          <motion.h1
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.1, ease: EASE }}
-            style={{
-              fontSize: "clamp(2.8rem, 6vw, 6rem)",
-              fontWeight: 900,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.04,
-              color: "#fff",
-              marginBottom: "18px",
-            }}
-          >
-            L&apos;histoire du monde,
-            <br />
-            <span
-              style={{
-                color: "#39FF88",
-                textShadow:
-                  "0 0 60px rgba(57,255,136,0.45), 0 0 120px rgba(57,255,136,0.15)",
-              }}
-            >
-              cartographiée
-            </span>
-          </motion.h1>
-
-          {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.2, ease: EASE }}
-            style={{
-              fontSize: "1.05rem",
-              color: "rgba(255,255,255,0.52)",
-              lineHeight: 1.7,
-              maxWidth: "460px",
-              marginBottom: "30px",
-            }}
-          >
-            Empires, économies, épidémies — visualisez les grandes forces
-            qui ont façonné le monde à travers le temps.
-          </motion.p>
-
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.3, ease: EASE }}
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "12px",
-              marginBottom: "36px",
-            }}
-          >
-            <Link href="/map/economy" className="btn-primary gap-2 text-sm px-5 py-2.5">
-              Explorer la carte
-              <ArrowRight size={15} />
-            </Link>
-            <Link href="/map/politics" className="hero-btn-ghost">
-              Régimes politiques 1900–2025
-            </Link>
-          </motion.div>
-
-          {/* Glassmorphism data panel */}
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.4, ease: EASE }}
-            className="glass-panel-dark"
-            style={{ marginBottom: "20px" }}
-          >
-            {GLASS_STATS.map((stat, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "14px",
-                  paddingTop: i > 0 ? "14px" : 0,
-                  marginTop: i > 0 ? "14px" : 0,
-                  borderTop: i > 0 ? "1px solid rgba(255,255,255,0.07)" : "none",
-                }}
-              >
-                <div
-                  style={{
-                    width: "3px",
-                    height: "38px",
-                    borderRadius: "2px",
-                    flexShrink: 0,
-                    background: stat.color,
-                    boxShadow: `0 0 10px ${stat.color}55`,
-                  }}
-                />
-                <div>
-                  <div
-                    style={{
-                      fontSize: "1.25rem",
-                      fontWeight: 800,
-                      color: "#fff",
-                      letterSpacing: "-0.02em",
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {stat.value}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "0.72rem",
-                      color: "rgba(255,255,255,0.48)",
-                      marginTop: "2px",
-                    }}
-                  >
-                    {stat.label}
-                    <span style={{ margin: "0 5px", opacity: 0.4 }}>·</span>
-                    {stat.sub}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </motion.div>
-
-          {/* Vertical stats carousel */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.55, ease: EASE }}
-          >
-            <StatsCarousel bgColor="#080810" />
-          </motion.div>
-        </div>
-
-        {/* RIGHT ─ Globe (hidden on mobile via CSS class) */}
+        {/* Theme label overlay */}
         <div
-          className="hero-globe-col"
-          style={{ position: "relative", height: "520px" }}
+          style={{
+            position: "absolute",
+            top: 14,
+            left: 14,
+            display: "flex",
+            alignItems: "center",
+            gap: 7,
+            padding: "5px 12px",
+            borderRadius: 100,
+            background: theme.accentBg,
+            border: `1px solid ${theme.accent}44`,
+            backdropFilter: "blur(8px)",
+          }}
         >
-          <motion.div
-            initial={reduced ? false : { opacity: 0, scale: 0.88 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.3, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            style={{ position: "relative", width: "100%", height: "100%" }}
-          >
-            {/* Glow halo behind globe */}
-            <div
-              aria-hidden="true"
-              style={{
-                position: "absolute",
-                inset: "8%",
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(circle, rgba(57,255,136,0.09) 0%, transparent 68%)",
-                filter: "blur(28px)",
-              }}
-            />
-            {/* Three.js canvas */}
-            <GlobeCanvas />
-          </motion.div>
-
-          {/* "Globe interactif" label */}
           <div
             style={{
-              position: "absolute",
-              bottom: "8px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              padding: "4px 14px",
-              borderRadius: "100px",
-              background: "rgba(57,255,136,0.08)",
-              border: "1px solid rgba(57,255,136,0.22)",
-              whiteSpace: "nowrap",
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              background: theme.accent,
+              boxShadow: `0 0 8px ${theme.accent}`,
+              flexShrink: 0,
             }}
-          >
-            <span
-              style={{
-                width: "5px",
-                height: "5px",
-                borderRadius: "50%",
-                background: "#39FF88",
-                boxShadow: "0 0 6px rgba(57,255,136,0.9)",
-                flexShrink: 0,
-              }}
-            />
-            <span
-              style={{
-                fontSize: "0.62rem",
-                color: "rgba(57,255,136,0.85)",
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-              }}
-            >
-              Globe interactif — 195 pays
-            </span>
-          </div>
+          />
+          <span style={{ fontSize: "0.65rem", fontWeight: 700, color: theme.accent, letterSpacing: "0.07em", textTransform: "uppercase" }}>
+            {theme.label}
+          </span>
         </div>
       </div>
 
-      {/* ── Bottom stats strip ── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.75, ease: EASE }}
+      {/* Footer */}
+      <div
         style={{
-          borderTop: "1px solid rgba(255,255,255,0.07)",
-          borderBottom: "1px solid rgba(255,255,255,0.07)",
-          padding: "16px 24px",
+          height: 88,
+          padding: "0 18px",
           display: "flex",
-          justifyContent: "center",
-          gap: "40px",
-          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderTop: "1px solid #F0F0F0",
+          gap: 12,
         }}
       >
-        {BOTTOM_STATS.map(({ value, label, Icon }) => (
-          <div
-            key={label}
-            style={{ display: "flex", alignItems: "center", gap: "10px" }}
-          >
-            <div
+        <div>
+          <div style={{ fontSize: "1rem", fontWeight: 800, color: "#0A0A0A", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
+            {theme.stat}
+          </div>
+          <div style={{ fontSize: "0.7rem", color: "#9B9B9B", marginTop: 3 }}>
+            {theme.sub}
+          </div>
+        </div>
+        <Link
+          href={theme.href}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "8px 14px",
+            borderRadius: 10,
+            background: theme.accentBg,
+            border: `1px solid ${theme.accent}33`,
+            color: theme.accent,
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            textDecoration: "none",
+            whiteSpace: "nowrap",
+            flexShrink: 0,
+          }}
+        >
+          Explorer <ArrowRight size={12} />
+        </Link>
+      </div>
+    </>
+  );
+}
+
+export function HeroSection() {
+  const reduced = useReducedMotion();
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Map 0→1 scroll to 0→(CARD_COUNT-1) card index
+  const cardProgress = useTransform(scrollYProgress, [0, 0.95], [0, CARD_COUNT - 1]);
+
+  // Progress dots: 0 to CARD_COUNT-1
+  const dotIndex = useTransform(cardProgress, (v) => Math.round(v));
+
+  return (
+    <section
+      ref={sectionRef}
+      className="hero-section-wrapper"
+    >
+      {/* Sticky viewport — fills 100vh and sticks */}
+      <div className="hero-sticky">
+        {/* Background */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "#FAFAFA",
+            zIndex: 0,
+          }}
+        />
+
+        {/* Subtle grid pattern */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: "linear-gradient(rgba(57,255,136,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,136,0.04) 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+            zIndex: 0,
+          }}
+        />
+
+        {/* Main 2-col grid */}
+        <div
+          className="hero-grid"
+          style={{
+            position: "relative",
+            zIndex: 1,
+            maxWidth: "1280px",
+            margin: "0 auto",
+            width: "100%",
+            height: "100%",
+            padding: "0 32px",
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            gap: "40px",
+            alignItems: "center",
+          }}
+        >
+          {/* ── LEFT COLUMN ── */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 0, paddingTop: 80 }}>
+            {/* Eyebrow badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE }}
+              style={{ marginBottom: 24 }}
+            >
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 7,
+                  padding: "5px 13px",
+                  borderRadius: 100,
+                  background: "#0A0A0A",
+                  color: "#39FF88",
+                  fontSize: "0.65rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                }}
+              >
+                <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#39FF88", boxShadow: "0 0 8px rgba(57,255,136,0.9)", flexShrink: 0 }} />
+                Data journalism géopolitique
+              </span>
+            </motion.div>
+
+            {/* Left green bar + H1 */}
+            <motion.div
+              initial={{ opacity: 0, x: -16 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.65, delay: 0.1, ease: EASE }}
+              style={{ display: "flex", gap: 14, marginBottom: 20 }}
+            >
+              <div
+                style={{
+                  width: 4,
+                  borderRadius: 3,
+                  background: "linear-gradient(180deg, #39FF88 0%, #10B981 100%)",
+                  boxShadow: "0 0 16px rgba(57,255,136,0.5)",
+                  flexShrink: 0,
+                  alignSelf: "stretch",
+                }}
+              />
+              <h1
+                style={{
+                  fontSize: "clamp(2.6rem, 5vw, 5rem)",
+                  fontWeight: 900,
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1.05,
+                  color: "#0A0A0A",
+                }}
+              >
+                L&apos;histoire du monde,{" "}
+                <span
+                  style={{
+                    color: "#39FF88",
+                    WebkitTextStroke: "0px",
+                    textShadow: "none",
+                    background: "linear-gradient(135deg, #39FF88 0%, #10B981 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  cartographiée
+                </span>
+              </h1>
+            </motion.div>
+
+            {/* Subtitle */}
+            <motion.p
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.2, ease: EASE }}
               style={{
-                width: "28px",
-                height: "28px",
-                borderRadius: "8px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "rgba(57,255,136,0.1)",
-                border: "1px solid rgba(57,255,136,0.22)",
-                flexShrink: 0,
+                fontSize: "1rem",
+                color: "#6B6B6B",
+                lineHeight: 1.7,
+                maxWidth: 440,
+                marginBottom: 28,
               }}
             >
-              <Icon size={13} style={{ color: "#39FF88" }} />
-            </div>
-            <div>
-              <p
-                style={{
-                  fontSize: "0.875rem",
-                  fontWeight: 700,
-                  color: "#fff",
-                  lineHeight: 1.2,
-                }}
-              >
-                {value}
-              </p>
-              <p
-                style={{
-                  fontSize: "0.7rem",
-                  color: "rgba(255,255,255,0.42)",
-                  lineHeight: 1.2,
-                }}
-              >
-                {label}
-              </p>
-            </div>
-          </div>
-        ))}
-      </motion.div>
+              Empires, économies, épidémies — visualisez les grandes forces qui ont façonné le monde à travers le temps.
+            </motion.p>
 
-      {/* ── Gradient fade to page background ── */}
-      <div
-        aria-hidden="true"
-        style={{
-          height: "120px",
-          background: "linear-gradient(to bottom, #080810 0%, #FAFAFA 100%)",
-          flexShrink: 0,
-        }}
-      />
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.3, ease: EASE }}
+              style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 36 }}
+            >
+              <Link href="/map/economy" className="btn-primary">
+                Explorer la carte <ArrowRight size={14} />
+              </Link>
+              <Link
+                href="/map/politics"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 7,
+                  padding: "10px 18px",
+                  borderRadius: 12,
+                  background: "#fff",
+                  border: "1.5px solid #E8E8E8",
+                  color: "#3A3A3A",
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  textDecoration: "none",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <Map size={14} style={{ color: "#6B6B6B" }} />
+                Régimes politiques
+              </Link>
+            </motion.div>
+
+            {/* Stats grid */}
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.4, ease: EASE }}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: 12,
+                marginBottom: 36,
+              }}
+            >
+              {BOTTOM_STATS.map(({ value, label, Icon }) => (
+                <div
+                  key={label}
+                  style={{
+                    padding: "14px 16px",
+                    borderRadius: 14,
+                    background: "#fff",
+                    border: "1.5px solid #E8E8E8",
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
+                    <div
+                      style={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: 7,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "rgba(57,255,136,0.1)",
+                        border: "1px solid rgba(57,255,136,0.22)",
+                      }}
+                    >
+                      <Icon size={12} style={{ color: "#10B981" }} />
+                    </div>
+                  </div>
+                  <div style={{ fontSize: "1.1rem", fontWeight: 800, color: "#0A0A0A", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
+                    {value}
+                  </div>
+                  <div style={{ fontSize: "0.68rem", color: "#9B9B9B", marginTop: 2, lineHeight: 1.3 }}>
+                    {label}
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* Small globe — dark container */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.55, ease: EASE }}
+              style={{
+                width: 120,
+                height: 120,
+                borderRadius: "50%",
+                background: "radial-gradient(circle, #0c0c1a 0%, #080810 100%)",
+                border: "1.5px solid rgba(57,255,136,0.25)",
+                boxShadow: "0 0 30px rgba(57,255,136,0.12), inset 0 0 30px rgba(57,255,136,0.05)",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <GlobeCanvas />
+            </motion.div>
+          </div>
+
+          {/* ── RIGHT COLUMN — Card Stack ── */}
+          <div
+            className="hero-globe-col"
+            style={{ position: "relative", height: "72vh" }}
+          >
+            {/* Card stack container */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.9, delay: 0.35, ease: EASE }}
+              style={{ position: "relative", width: "100%", height: "100%" }}
+            >
+              {THEMES.map((theme, index) => (
+                <StackCard
+                  key={theme.id}
+                  theme={theme}
+                  index={index}
+                  scrollProgress={cardProgress}
+                  reduced={reduced}
+                />
+              ))}
+            </motion.div>
+
+            {/* Progress dots */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              style={{
+                position: "absolute",
+                bottom: -36,
+                left: "50%",
+                transform: "translateX(-50%)",
+                display: "flex",
+                gap: 6,
+                alignItems: "center",
+              }}
+            >
+              {THEMES.map((theme, i) => (
+                <ProgressDot key={theme.id} index={i} dotIndex={dotIndex} accent={theme.accent} />
+              ))}
+            </motion.div>
+
+            {/* Scroll hint */}
+            {!reduced && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.2 }}
+                style={{
+                  position: "absolute",
+                  bottom: -64,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 4,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                <span style={{ fontSize: "0.65rem", color: "#C4C4C4", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                  Scrollez pour explorer
+                </span>
+                <motion.div
+                  animate={{ y: [0, 5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  style={{ width: 1, height: 20, background: "linear-gradient(to bottom, #C4C4C4, transparent)" }}
+                />
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </div>
     </section>
+  );
+}
+
+interface ProgressDotProps {
+  index: number;
+  dotIndex: MotionValue<number>;
+  accent: string;
+}
+
+function ProgressDot({ index, dotIndex, accent }: ProgressDotProps) {
+  const scale = useTransform(dotIndex, (v) => (Math.round(v) === index ? 1.4 : 1));
+  const opacity = useTransform(dotIndex, (v) => (Math.round(v) === index ? 1 : 0.3));
+  const bg = useTransform(dotIndex, (v) => (Math.round(v) === index ? accent : "#D1D5DB"));
+
+  return (
+    <motion.div
+      style={{
+        width: 6,
+        height: 6,
+        borderRadius: "50%",
+        scale,
+        opacity,
+        backgroundColor: bg,
+      }}
+    />
   );
 }

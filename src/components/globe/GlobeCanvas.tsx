@@ -41,7 +41,6 @@ export default function GlobeCanvas() {
     const W = mount.clientWidth || 460;
     const H = mount.clientHeight || 460;
 
-    // --- Renderer ---
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(W, H);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -52,7 +51,6 @@ export default function GlobeCanvas() {
     const camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 100);
     camera.position.z = 6.8;
 
-    // --- Globe group (all children rotate together) ---
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
@@ -111,6 +109,45 @@ export default function GlobeCanvas() {
       mesh.position.set(x, y, z);
       globeGroup.add(mesh);
     });
+
+    // --- Country borders from GeoJSON ---
+    let borderGeom: THREE.BufferGeometry | null = null;
+    fetch("/geo/ne_110m_admin_0_countries.geojson")
+      .then((r) => r.json())
+      .then((geojson: GeoJSON.FeatureCollection) => {
+        const verts: number[] = [];
+        for (const feature of geojson.features) {
+          const geom = feature.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon;
+          const rings =
+            geom.type === "Polygon"
+              ? geom.coordinates
+              : (geom.coordinates as GeoJSON.Position[][][]).flat(1);
+
+          for (const ring of rings) {
+            for (let i = 1; i < ring.length; i++) {
+              const [lon0, lat0] = ring[i - 1];
+              const [lon1, lat1] = ring[i];
+              if (Math.abs(lon1 - lon0) > 90) continue; // skip antimeridian segments
+              const [x0, y0, z0] = latLonTo3D(lat0, lon0, GLOBE_RADIUS + 0.012);
+              const [x1, y1, z1] = latLonTo3D(lat1, lon1, GLOBE_RADIUS + 0.012);
+              verts.push(x0, y0, z0, x1, y1, z1);
+            }
+          }
+        }
+
+        borderGeom = new THREE.BufferGeometry();
+        borderGeom.setAttribute(
+          "position",
+          new THREE.BufferAttribute(new Float32Array(verts), 3)
+        );
+        const borderMat = new THREE.LineBasicMaterial({
+          color: 0x39ff88,
+          transparent: true,
+          opacity: 0.55,
+        });
+        globeGroup.add(new THREE.LineSegments(borderGeom, borderMat));
+      })
+      .catch(() => {/* silently skip if fetch fails */});
 
     // --- Interaction ---
     let isDragging = false;
@@ -191,6 +228,7 @@ export default function GlobeCanvas() {
           else mat.dispose();
         }
       });
+      if (borderGeom) borderGeom.dispose();
       renderer.dispose();
       if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
     };
