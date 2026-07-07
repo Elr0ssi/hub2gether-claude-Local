@@ -1,314 +1,425 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Globe, TrendingUp, Shield } from "lucide-react";
+import { ArrowRight, Globe2, TrendingUp, Shield } from "lucide-react";
+import { StatsCarousel } from "./StatsCarousel";
 
-const BLOB_SHAPES = [
-  "60% 40% 30% 70% / 60% 30% 70% 40%",
-  "40% 60% 55% 45% / 35% 65% 45% 65%",
-  "50% 50% 70% 30% / 45% 55% 35% 65%",
-  "70% 30% 45% 55% / 65% 35% 60% 40%",
-  "35% 65% 60% 40% / 50% 50% 65% 35%",
-  "60% 40% 30% 70% / 60% 30% 70% 40%",
-];
-
-const BLOB_SHAPES_B = [
-  "45% 55% 65% 35% / 55% 45% 55% 45%",
-  "65% 35% 40% 60% / 40% 60% 40% 60%",
-  "35% 65% 55% 45% / 60% 40% 65% 35%",
-  "55% 45% 70% 30% / 35% 65% 45% 55%",
-  "70% 30% 50% 50% / 50% 50% 40% 60%",
-  "45% 55% 65% 35% / 55% 45% 55% 45%",
-];
-
-function MorphingBlob({
-  shapes, size, color, style, duration,
-}: {
-  shapes: string[]; size: number; color: string; style?: React.CSSProperties; duration: number;
-}) {
-  const reduced = useReducedMotion();
-  if (reduced) return null;
-  return (
-    <motion.div
-      aria-hidden="true"
-      animate={{ borderRadius: shapes }}
-      transition={{ duration, repeat: Infinity, ease: "easeInOut", repeatType: "loop" }}
+const GlobeCanvas = dynamic(() => import("@/components/globe/GlobeCanvas"), {
+  ssr: false,
+  loading: () => (
+    <div
       style={{
         position: "absolute",
-        width: size, height: size,
-        background: color,
-        filter: "blur(48px)",
-        pointerEvents: "none",
-        willChange: "border-radius",
-        ...style,
+        inset: 0,
+        borderRadius: "50%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background:
+          "radial-gradient(circle, rgba(57,255,136,0.06) 0%, transparent 65%)",
       }}
-    />
-  );
-}
+    >
+      <div
+        style={{
+          width: "80px",
+          height: "80px",
+          borderRadius: "50%",
+          border: "1px solid rgba(57,255,136,0.2)",
+          animation: "spin 2s linear infinite",
+        }}
+      />
+    </div>
+  ),
+});
 
-const STATS = [
-  { value: "195+", label: "Pays analysés", icon: Globe },
-  { value: "5", label: "Thèmes géopolitiques", icon: TrendingUp },
-  { value: "30+", label: "Puissances militaires", icon: Shield },
+const GLASS_STATS = [
+  {
+    value: "$105T",
+    label: "PIB mondial 2025",
+    sub: "Projections FMI",
+    color: "#10B981",
+  },
+  {
+    value: "195+",
+    label: "Pays couverts",
+    sub: "Éco · Politique · Santé",
+    color: "#39FF88",
+  },
+  {
+    value: "7,04M",
+    label: "Décès COVID",
+    sub: "OMS — données cumulées",
+    color: "#EF4444",
+  },
 ];
 
-export function HeroSection() {
-  return (
-    <section className="relative overflow-hidden" style={{ minHeight: "92vh" }}>
-      {/* Morphing blob — top right */}
-      <MorphingBlob
-        shapes={BLOB_SHAPES}
-        size={680}
-        color="rgba(57,255,136,0.13)"
-        duration={10}
-        style={{ top: "-200px", right: "-180px" }}
-      />
-      {/* Morphing blob — bottom left */}
-      <MorphingBlob
-        shapes={BLOB_SHAPES_B}
-        size={440}
-        color="rgba(57,255,136,0.09)"
-        duration={13}
-        style={{ bottom: "-80px", left: "-120px" }}
-      />
-      {/* Morphing blob — center accent */}
-      <MorphingBlob
-        shapes={BLOB_SHAPES_B.slice().reverse()}
-        size={320}
-        color="rgba(57,255,136,0.06)"
-        duration={16}
-        style={{ top: "30%", left: "30%" }}
-      />
+const BOTTOM_STATS = [
+  { value: "195+", label: "Pays analysés", Icon: Globe2 },
+  { value: "5", label: "Thèmes géopolitiques", Icon: TrendingUp },
+  { value: "30+", label: "Puissances militaires", Icon: Shield },
+];
 
-      {/* Subtle dot-grid background */}
+const EASE = [0.16, 1, 0.3, 1] as const;
+
+export function HeroSection() {
+  const reduced = useReducedMotion();
+
+  return (
+    <section
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(160deg, #080810 0%, #0c0c1a 55%, #080810 100%)",
+        position: "relative",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* ── Ambient glows ── */}
       <div
-        className="absolute inset-0 pointer-events-none"
+        aria-hidden="true"
         style={{
-          backgroundImage: `radial-gradient(circle, var(--border) 1px, transparent 1px)`,
-          backgroundSize: "32px 32px",
-          opacity: 0.55,
+          position: "absolute",
+          top: "-220px",
+          right: "-80px",
+          width: "720px",
+          height: "720px",
+          background:
+            "radial-gradient(circle, rgba(57,255,136,0.11) 0%, transparent 58%)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          bottom: 80,
+          left: "-160px",
+          width: "520px",
+          height: "520px",
+          background:
+            "radial-gradient(circle, rgba(57,255,136,0.055) 0%, transparent 58%)",
+          pointerEvents: "none",
         }}
       />
 
-      <div className="relative max-w-5xl mx-auto px-6 pt-28 pb-16 flex flex-col items-center text-center">
-        {/* Eyebrow badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-8"
-        >
-          <span className="accent-badge text-xs inline-flex items-center gap-1.5">
-            <span className="accent-dot" />
-            Data journalism géopolitique
-          </span>
-        </motion.div>
+      {/* ── Dot grid ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage:
+            "radial-gradient(circle, rgba(57,255,136,0.18) 1px, transparent 1px)",
+          backgroundSize: "32px 32px",
+          opacity: 0.28,
+          pointerEvents: "none",
+        }}
+      />
 
-        {/* Main headline */}
-        <motion.h1
-          className="text-display text-center mb-5"
-          style={{ color: "var(--ink)", maxWidth: "820px", lineHeight: 1.08 }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        >
-          L&apos;histoire du monde,{" "}
-          <br />
-          <span
+      {/* ── Main 2-column grid ── */}
+      <div
+        className="hero-grid"
+        style={{
+          flex: 1,
+          maxWidth: "1280px",
+          margin: "0 auto",
+          width: "100%",
+          padding: "120px 24px 60px",
+          display: "grid",
+          gridTemplateColumns: "1fr",
+          gap: "40px",
+          alignItems: "center",
+        }}
+      >
+        {/* LEFT ─ Text + glass panel + carousel */}
+        <div>
+          {/* Eyebrow */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: EASE }}
+            style={{ marginBottom: "26px" }}
+          >
+            <span className="hero-badge">
+              <span className="hero-badge-dot" />
+              Data journalism géopolitique
+            </span>
+          </motion.div>
+
+          {/* H1 */}
+          <motion.h1
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.1, ease: EASE }}
             style={{
-              color: "var(--accent)",
-              textShadow: "0 0 50px rgba(57,255,136,0.35), 0 0 100px rgba(57,255,136,0.15)",
+              fontSize: "clamp(2.8rem, 6vw, 6rem)",
+              fontWeight: 900,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.04,
+              color: "#fff",
+              marginBottom: "18px",
             }}
           >
-            cartographiée
-          </span>
-        </motion.h1>
+            L&apos;histoire du monde,
+            <br />
+            <span
+              style={{
+                color: "#39FF88",
+                textShadow:
+                  "0 0 60px rgba(57,255,136,0.45), 0 0 120px rgba(57,255,136,0.15)",
+              }}
+            >
+              cartographiée
+            </span>
+          </motion.h1>
 
-        {/* Subtitle */}
-        <motion.p
-          className="text-body text-center mb-10"
-          style={{ maxWidth: "580px", color: "var(--ink-3)", fontSize: "1.05rem", lineHeight: 1.65 }}
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        >
-          Empires, économies, épidémies — visualisez les grandes forces
-          qui ont façonné le monde à travers le temps.
-        </motion.p>
-
-        {/* CTAs */}
-        <motion.div
-          className="flex flex-col sm:flex-row items-center gap-3 mb-16"
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <Link href="/map/economy" className="btn-primary gap-2 text-sm px-5 py-2.5">
-            Explorer la carte
-            <ArrowRight size={15} />
-          </Link>
-          <Link
-            href="/map/politics"
-            className="btn-secondary gap-2 text-sm px-5 py-2.5"
-          >
-            Régimes politiques 1900–2025
-          </Link>
-        </motion.div>
-
-        {/* Stats bar */}
-        <motion.div
-          className="flex flex-wrap justify-center gap-6 mb-16"
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.65, delay: 0.38, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {STATS.map(({ value, label, icon: Icon }) => (
-            <div key={label} className="flex items-center gap-2.5">
-              <div
-                className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                style={{ background: "var(--accent-dim)", border: "1px solid var(--accent-border)" }}
-              >
-                <Icon size={13} style={{ color: "#0D7A40" }} />
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-bold leading-tight" style={{ color: "var(--ink)" }}>
-                  {value}
-                </p>
-                <p className="text-caption leading-tight">{label}</p>
-              </div>
-            </div>
-          ))}
-        </motion.div>
-
-        {/* Map preview card */}
-        <motion.div
-          className="w-full max-w-3xl"
-          initial={{ opacity: 0, y: 28 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div
-            className="rounded-2xl border overflow-hidden"
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.2, ease: EASE }}
             style={{
-              borderColor: "var(--border)",
-              boxShadow: "0 24px 80px rgba(0,0,0,0.09), 0 0 0 1px var(--border)",
+              fontSize: "1.05rem",
+              color: "rgba(255,255,255,0.52)",
+              lineHeight: 1.7,
+              maxWidth: "460px",
+              marginBottom: "30px",
             }}
           >
-            {/* Card header */}
-            <div
-              className="px-5 py-3 border-b flex items-center justify-between"
-              style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
-            >
-              <div className="flex items-center gap-3">
-                <span className="accent-badge text-xs">Économie</span>
-                <span className="text-small font-semibold" style={{ color: "var(--ink-2)" }}>
-                  PIB mondial — Projections 2025
-                </span>
-              </div>
-              <span className="text-caption hidden sm:block">Source FMI · 195 pays · YTD</span>
-            </div>
+            Empires, économies, épidémies — visualisez les grandes forces
+            qui ont façonné le monde à travers le temps.
+          </motion.p>
 
-            {/* Map preview with SVG illustration */}
-            <div
-              className="relative flex items-center justify-center overflow-hidden"
-              style={{ height: "300px", background: "#EEF0F5" }}
-            >
-              {/* Stylized Europe SVG placeholder */}
-              <svg
-                viewBox="0 0 900 480"
-                className="absolute inset-0 w-full h-full"
-                style={{ opacity: 0.18 }}
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.3, ease: EASE }}
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "12px",
+              marginBottom: "36px",
+            }}
+          >
+            <Link href="/map/economy" className="btn-primary gap-2 text-sm px-5 py-2.5">
+              Explorer la carte
+              <ArrowRight size={15} />
+            </Link>
+            <Link href="/map/politics" className="hero-btn-ghost">
+              Régimes politiques 1900–2025
+            </Link>
+          </motion.div>
+
+          {/* Glassmorphism data panel */}
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, delay: 0.4, ease: EASE }}
+            className="glass-panel-dark"
+            style={{ marginBottom: "20px" }}
+          >
+            {GLASS_STATS.map((stat, i) => (
+              <div
+                key={i}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                  paddingTop: i > 0 ? "14px" : 0,
+                  marginTop: i > 0 ? "14px" : 0,
+                  borderTop: i > 0 ? "1px solid rgba(255,255,255,0.07)" : "none",
+                }}
               >
-                {/* Rough Europe outline */}
-                <path
-                  d="M100,200 Q150,160 200,150 Q240,140 260,130 Q280,120 310,115 Q340,110 370,118 Q410,125 440,120 Q480,115 510,125 Q540,130 570,140 Q600,150 620,160 Q640,170 650,185 Q660,200 655,215 Q645,235 630,245 Q610,258 590,265 Q560,275 540,285 Q510,295 490,305 Q460,318 440,330 Q410,345 380,355 Q350,362 320,358 Q290,352 265,340 Q235,325 210,308 Q185,290 165,270 Q140,245 120,225 Q108,212 100,200Z"
-                  fill="none"
-                  stroke="var(--border)"
-                  strokeWidth="1.5"
-                />
-                {/* Grid lines */}
-                {[120, 200, 280, 360, 440, 520, 600, 680, 760].map((x) => (
-                  <line key={x} x1={x} y1="60" x2={x} y2="420" stroke="var(--border)" strokeWidth="0.5" />
-                ))}
-                {[80, 160, 240, 320, 400].map((y) => (
-                  <line key={y} x1="80" y1={y} x2="820" y2={y} stroke="var(--border)" strokeWidth="0.5" />
-                ))}
-              </svg>
-
-              {/* Neon glow overlay */}
-              <div
-                className="absolute inset-0"
-                style={{
-                  background: "radial-gradient(ellipse 60% 50% at 42% 52%, rgba(57,255,136,0.12) 0%, transparent 70%)",
-                }}
-              />
-
-              {/* Empire territory hint */}
-              <div
-                className="absolute"
-                style={{
-                  left: "18%",
-                  top: "22%",
-                  width: "42%",
-                  height: "52%",
-                  background: "rgba(57,255,136,0.14)",
-                  borderRadius: "30% 40% 35% 45%",
-                  border: "1.5px solid rgba(57,255,136,0.35)",
-                  filter: "blur(4px)",
-                }}
-              />
-
-              <div className="relative z-10 text-center px-4">
                 <div
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-3"
                   style={{
-                    background: "rgba(57,255,136,0.12)",
-                    border: "1px solid rgba(57,255,136,0.3)",
-                    color: "#0D7A40",
+                    width: "3px",
+                    height: "38px",
+                    borderRadius: "2px",
+                    flexShrink: 0,
+                    background: stat.color,
+                    boxShadow: `0 0 10px ${stat.color}55`,
                   }}
-                >
-                  <span
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{ background: "#39FF88", boxShadow: "0 0 6px rgba(57,255,136,0.8)" }}
-                  />
-                  Carte interactive
+                />
+                <div>
+                  <div
+                    style={{
+                      fontSize: "1.25rem",
+                      fontWeight: 800,
+                      color: "#fff",
+                      letterSpacing: "-0.02em",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {stat.value}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "0.72rem",
+                      color: "rgba(255,255,255,0.48)",
+                      marginTop: "2px",
+                    }}
+                  >
+                    {stat.label}
+                    <span style={{ margin: "0 5px", opacity: 0.4 }}>·</span>
+                    {stat.sub}
+                  </div>
                 </div>
-                <p className="text-sm font-semibold mb-0.5" style={{ color: "var(--ink-2)" }}>
-                  195 pays · PIB, dette, chômage
-                </p>
-                <p className="text-caption mb-4">
-                  FMI · Banque mondiale · données 2000–2025
-                </p>
-                <Link href="/map/economy" className="btn-primary text-xs gap-1.5 inline-flex">
-                  Ouvrir la carte
-                  <ArrowRight size={13} />
-                </Link>
               </div>
-            </div>
+            ))}
+          </motion.div>
 
-            {/* Bottom info strip */}
+          {/* Vertical stats carousel */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.55, ease: EASE }}
+          >
+            <StatsCarousel bgColor="#080810" />
+          </motion.div>
+        </div>
+
+        {/* RIGHT ─ Globe (hidden on mobile via CSS class) */}
+        <div
+          className="hero-globe-col"
+          style={{ position: "relative", height: "520px" }}
+        >
+          <motion.div
+            initial={reduced ? false : { opacity: 0, scale: 0.88 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.3, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            style={{ position: "relative", width: "100%", height: "100%" }}
+          >
+            {/* Glow halo behind globe */}
             <div
-              className="px-5 py-3 flex items-center justify-between gap-4 flex-wrap"
-              style={{ borderTop: "1px solid var(--border)", background: "var(--surface-2)" }}
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                inset: "8%",
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(circle, rgba(57,255,136,0.09) 0%, transparent 68%)",
+                filter: "blur(28px)",
+              }}
+            />
+            {/* Three.js canvas */}
+            <GlobeCanvas />
+          </motion.div>
+
+          {/* "Globe interactif" label */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: "8px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "4px 14px",
+              borderRadius: "100px",
+              background: "rgba(57,255,136,0.08)",
+              border: "1px solid rgba(57,255,136,0.22)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <span
+              style={{
+                width: "5px",
+                height: "5px",
+                borderRadius: "50%",
+                background: "#39FF88",
+                boxShadow: "0 0 6px rgba(57,255,136,0.9)",
+                flexShrink: 0,
+              }}
+            />
+            <span
+              style={{
+                fontSize: "0.62rem",
+                color: "rgba(57,255,136,0.85)",
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+              }}
             >
-              {[
-                { label: "PIB USA", value: "$28,8T" },
-                { label: "PIB Chine", value: "$18,5T" },
-                { label: "PIB UE", value: "$18,4T" },
-                { label: "Croissance 2025", value: "+3,2 %" },
-              ].map(({ label, value }) => (
-                <div key={label} className="text-center">
-                  <p className="text-caption">{label}</p>
-                  <p className="text-xs font-semibold" style={{ color: "var(--ink-2)" }}>
-                    {value}
-                  </p>
-                </div>
-              ))}
+              Globe interactif — 195 pays
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Bottom stats strip ── */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.75, ease: EASE }}
+        style={{
+          borderTop: "1px solid rgba(255,255,255,0.07)",
+          borderBottom: "1px solid rgba(255,255,255,0.07)",
+          padding: "16px 24px",
+          display: "flex",
+          justifyContent: "center",
+          gap: "40px",
+          flexWrap: "wrap",
+        }}
+      >
+        {BOTTOM_STATS.map(({ value, label, Icon }) => (
+          <div
+            key={label}
+            style={{ display: "flex", alignItems: "center", gap: "10px" }}
+          >
+            <div
+              style={{
+                width: "28px",
+                height: "28px",
+                borderRadius: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "rgba(57,255,136,0.1)",
+                border: "1px solid rgba(57,255,136,0.22)",
+                flexShrink: 0,
+              }}
+            >
+              <Icon size={13} style={{ color: "#39FF88" }} />
+            </div>
+            <div>
+              <p
+                style={{
+                  fontSize: "0.875rem",
+                  fontWeight: 700,
+                  color: "#fff",
+                  lineHeight: 1.2,
+                }}
+              >
+                {value}
+              </p>
+              <p
+                style={{
+                  fontSize: "0.7rem",
+                  color: "rgba(255,255,255,0.42)",
+                  lineHeight: 1.2,
+                }}
+              >
+                {label}
+              </p>
             </div>
           </div>
-        </motion.div>
-      </div>
+        ))}
+      </motion.div>
+
+      {/* ── Gradient fade to page background ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          height: "120px",
+          background: "linear-gradient(to bottom, #080810 0%, #FAFAFA 100%)",
+          flexShrink: 0,
+        }}
+      />
     </section>
   );
 }
