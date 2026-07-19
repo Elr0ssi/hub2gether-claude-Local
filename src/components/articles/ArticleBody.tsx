@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { RotateCcw, Check } from "lucide-react";
 import type { ArticleSection } from "@/types";
 import { ArticleRankingTable } from "./ArticleRankingTable";
+import { ReadingLanguageBar } from "@/components/learning/ReadingLanguageBar";
+import { TranslationBubble } from "@/components/learning/TranslationBubble";
 
 const ArticleWorldMap = dynamic(
   () => import("./ArticleWorldMap").then(m => m.ArticleWorldMap),
@@ -483,8 +485,46 @@ function ListSection({
 
 // ── Main renderer ─────────────────────────────────────────────────────────────
 export function ArticleBody({ sections }: { sections: ArticleSection[] }) {
+  const [learningEnabled, setLearningEnabled] = useState(true);
+  const [targetLang, setTargetLang] = useState("en");
+  const [selection, setSelection] = useState<{ text: string; rect: DOMRect } | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleMouseUp = () => {
+      if (!learningEnabled) { setSelection(null); return; }
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || sel.rangeCount === 0) { setSelection(null); return; }
+      const text = sel.toString().trim();
+      if (!text || text.length < 2) { setSelection(null); return; }
+      const range = sel.getRangeAt(0);
+      if (!containerRef.current?.contains(range.commonAncestorContainer)) { setSelection(null); return; }
+      setSelection({ text, rect: range.getBoundingClientRect() });
+    };
+
+    const handleScroll = () => setSelection(null);
+    const handleKeyDown = (e: KeyboardEvent) => { if (e.key === "Escape") setSelection(null); };
+
+    document.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [learningEnabled]);
+
   return (
-    <div className="article-body">
+    <>
+      <ReadingLanguageBar
+        fromLang="fr"
+        toLang={targetLang}
+        onToLangChange={setTargetLang}
+        enabled={learningEnabled}
+        onToggle={() => { setLearningEnabled((e) => !e); setSelection(null); }}
+      />
+      <div ref={containerRef} className="article-body">
       {sections.map((section, i) => {
         switch (section.type) {
           case "lead":
@@ -564,6 +604,15 @@ export function ArticleBody({ sections }: { sections: ArticleSection[] }) {
             return null;
         }
       })}
-    </div>
+      </div>
+      {selection && (
+        <TranslationBubble
+          text={selection.text}
+          rect={selection.rect}
+          fromLang="fr"
+          toLang={targetLang}
+        />
+      )}
+    </>
   );
 }
