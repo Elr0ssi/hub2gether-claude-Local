@@ -8,8 +8,8 @@ import { EpidemicsLeafletMap, type LeafletTileStyle } from "./EpidemicsLeafletMa
 import { EpidemicsSidePanel } from "@/components/sidebar/EpidemicsSidePanel";
 import { ThemeDropdown } from "./ThemeDropdown";
 import { EPIDEMICS, getDiseaseById } from "@/data/epidemics/epidemics";
-import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
-import { ARTICLES } from "@/data/articles";
+import { MapArticleSection } from "@/components/articles/MapArticleSection";
+import { EPIDEMICS_ARTICLES } from "@/data/articles";
 import { useDragScroll } from "@/hooks/useDragScroll";
 import type { EpidemicDiseaseId, EpidemicDisease } from "@/types";
 
@@ -85,16 +85,6 @@ export function EpidemicsMapView() {
     setSelectedCountry(countryName);
     setSidePanelOpen(true);
   }, []);
-
-  const countryArticles = useMemo(() => {
-    if (!selectedCountry) return [];
-    const q = selectedCountry.toLowerCase();
-    return ARTICLES.filter(
-      (a) =>
-        a.title.toLowerCase().includes(q) ||
-        a.tags.some((t) => t.toLowerCase().includes(q))
-    );
-  }, [selectedCountry]);
 
   return (
     <>
@@ -258,10 +248,21 @@ export function EpidemicsMapView() {
             isYtd={ytdMode && !!disease.ongoing}
           />
         </div>
+
+        {/* Source note */}
+        <div
+          className="px-5 py-1.5 border-t flex items-center justify-end"
+          style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+        >
+          <p style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>
+            {disease.dataNote}
+            {ytdMode && disease.ongoing && " · Vue 2026 : prorata annuel 2024 × jours écoulés / 365."}
+          </p>
+        </div>
       </div>
 
       {/* Disease info blocks */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
         <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
           <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
             À propos de {disease.label}
@@ -306,35 +307,13 @@ export function EpidemicsMapView() {
             </div>
           </div>
         </div>
-
-        <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-          <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-            Source des données
-          </p>
-          <p className="text-small leading-relaxed" style={{ color: "var(--ink-4)" }}>
-            {disease.dataNote}
-            {ytdMode && disease.ongoing && (
-              <> · <span style={{ color: "var(--accent)" }}>Vue 2026 : prorata annuel 2024 × jours écoulés / 365.</span></>
-            )}
-          </p>
-        </div>
       </div>
 
-      {/* Country-specific articles */}
-      {selectedCountry && (
-        <div
-          className="mt-6 rounded-2xl p-5"
-          style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-        >
-          <ArticleCarousel
-            articles={countryArticles}
-            title={`Recommandations — ${selectedCountry}`}
-            subtitle="Articles liés au pays sélectionné"
-            emptyMessage={`Aucun article spécifique pour ${selectedCountry} pour l'instant.`}
-            icon="pin"
-          />
-        </div>
-      )}
+      <MapArticleSection
+        themeArticles={EPIDEMICS_ARTICLES}
+        selectedCountry={selectedCountry}
+        themeLabel="Épidémies & Santé"
+      />
     </>
   );
 }

@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Maximize2, Minimize2, ChevronLeft, PenLine, Map, Navigation, Satellite } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 import { EconomyInteractiveMap } from "./EconomyInteractiveMap";
 import { EconomyLeafletMap, type LeafletTileStyle } from "./EconomyLeafletMap";
 import { EconomySidePanel } from "@/components/sidebar/EconomySidePanel";
@@ -11,6 +10,8 @@ import { EconomyRankingsTable } from "./EconomyRankingsTable";
 import { ThemeDropdown } from "./ThemeDropdown";
 import { ECONOMY_METRICS, ECONOMY_YEARS, ECONOMY_YEAR_VALUES, getYearData, DEFAULT_YEAR } from "@/data/economy/economy";
 import type { EconomyMetricId, EconomyYear } from "@/types";
+import { MapArticleSection } from "@/components/articles/MapArticleSection";
+import { ECONOMY_ARTICLES } from "@/data/articles";
 
 const SLIDER_MIN = 2000;
 const SLIDER_MAX = 2025;
@@ -129,8 +130,6 @@ export function EconomyMapView() {
     setSelectedCountry(name);
     setSidePanelOpen(true);
   }, []);
-
-  const currentMetric = ECONOMY_METRICS.find((m) => m.id === metric) ?? ECONOMY_METRICS[0];
 
   return (
     <>
@@ -359,72 +358,17 @@ export function EconomyMapView() {
             onMetricChange={handleMetricChange}
           />
         </div>
-      </div>
 
-      {/* Info blocks */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={`${metric}-${year}`}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.25 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4"
+        {/* Source note */}
+        <div
+          className="px-5 py-1.5 border-t flex items-center justify-end"
+          style={{ borderColor: "var(--border)", background: "var(--surface)" }}
         >
-          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              Indicateur affiché
-            </p>
-            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>{currentMetric.label}</p>
-            <p className="text-small leading-relaxed" style={{ color: "var(--ink-2)" }}>{currentMetric.description}</p>
-          </div>
-
-          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              Période
-            </p>
-            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
-              {ytdMode && isCurrentYear
-                ? `${year} · ${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}`
-                : year}
-            </p>
-            <p className="text-small" style={{ color: "var(--ink-3)" }}>
-              {ytdMode && isCurrentYear
-                ? `PIB généré depuis le 1er janvier ${year} — prorata au jour actuel`
-                : year === 2020
-                ? "Année COVID-19 — forte contraction mondiale"
-                : year === 2025
-                ? "Projections FMI avril 2025 — données les plus récentes"
-                : `Données économiques mondiales ${year}`}
-            </p>
-          </div>
-
-          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              Couverture
-            </p>
-            <div className="space-y-2 mt-1">
-              {ECONOMY_METRICS.map((m) => (
-                <div key={m.id} className="flex items-center justify-between gap-2">
-                  <span className="text-small" style={{ color: "var(--ink-3)" }}>{m.label}</span>
-                  <span className="text-small font-semibold" style={{ color: m.id === metric ? "var(--accent)" : "var(--ink)" }}>
-                    {m.unit}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-            <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-              Source des données
-            </p>
-            <p className="text-small leading-relaxed" style={{ color: "var(--ink-4)" }}>
-              {activeEconomyYear.dataNote}
-            </p>
-          </div>
-        </motion.div>
-      </AnimatePresence>
+          <p style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>
+            {activeEconomyYear.dataNote}
+          </p>
+        </div>
+      </div>
 
       {/* Rankings table */}
       <EconomyRankingsTable
@@ -436,6 +380,12 @@ export function EconomyMapView() {
           setSelectedCountry(name);
           setSidePanelOpen(true);
         }}
+      />
+
+      <MapArticleSection
+        themeArticles={ECONOMY_ARTICLES}
+        selectedCountry={selectedCountry}
+        themeLabel="Économie mondiale"
       />
     </>
   );

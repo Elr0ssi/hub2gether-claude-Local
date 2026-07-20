@@ -6,6 +6,8 @@ import { MilitaryInteractiveMap } from "./MilitaryInteractiveMap";
 import { MilitaryRankingsTable } from "./MilitaryRankingsTable";
 import { MilitarySidePanel } from "@/components/sidebar/MilitarySidePanel";
 import { ThemeDropdown } from "./ThemeDropdown";
+import { MapArticleSection } from "@/components/articles/MapArticleSection";
+import { MILITARY_ARTICLES } from "@/data/articles";
 import { useDragScroll } from "@/hooks/useDragScroll";
 import {
   MILITARY_METRICS,
@@ -202,6 +204,12 @@ export function MilitaryMapView() {
         onRankMetricChange={setRankMetric}
         selectedCountry={selectedCountry}
         onCountryClick={name => { setSelectedCountry(name); setSidePanelOpen(true); }}
+      />
+
+      <MapArticleSection
+        themeArticles={MILITARY_ARTICLES}
+        selectedCountry={selectedCountry}
+        themeLabel="Puissances militaires"
       />
 
       <style>{`
