@@ -59,6 +59,7 @@ export function FAQSection({
               style={{
                 borderColor: isOpen ? "rgba(57,255,136,0.3)" : undefined,
                 transition: "border-color 0.2s",
+                gridColumn: isOpen ? "1 / -1" : "auto",
               }}
               role="listitem"
             >

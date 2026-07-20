@@ -261,54 +261,6 @@ export function EpidemicsMapView() {
         </div>
       </div>
 
-      {/* Disease info blocks */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
-        <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-          <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-            À propos de {disease.label}
-          </p>
-          <p className="text-small leading-relaxed" style={{ color: "var(--ink-2)" }}>
-            {disease.description}
-          </p>
-        </div>
-
-        <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-          <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-            Agent pathogène
-          </p>
-          <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
-            {disease.pathogen}
-          </p>
-        </div>
-
-        <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-          <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-            {ytdMode && disease.ongoing
-              ? `Cas depuis le 1er jan. ${new Date().getFullYear()}`
-              : "Chiffres mondiaux"}
-          </p>
-          <div className="space-y-2 mt-1">
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-small" style={{ color: "var(--ink-3)" }}>
-                {ytdMode && disease.ongoing ? "Cas estimés 2026" : "Cas totaux"}
-              </span>
-              <span className="text-small font-semibold" style={{ color: "var(--ink)" }}>
-                {ytdMode && disease.ongoing && totalYtdCases !== null
-                  ? totalYtdCases.toLocaleString("fr-FR")
-                  : disease.globalCases}
-              </span>
-            </div>
-            <div style={{ height: "1px", background: "var(--border)" }} />
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-small" style={{ color: "var(--ink-3)" }}>
-                {ytdMode && disease.ongoing ? "Décès estimés 2026" : "Décès totaux"}
-              </span>
-              <span className="text-small font-semibold" style={{ color: "var(--accent)" }}>{disease.globalDeaths}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <MapArticleSection
         themeArticles={EPIDEMICS_ARTICLES}
         selectedCountry={selectedCountry}

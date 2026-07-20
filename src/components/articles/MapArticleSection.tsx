@@ -2,9 +2,64 @@
 
 import { useRef, useState, useMemo, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Search, MapPin, Clock, ArrowRight } from "lucide-react";
-import { useDragScroll } from "@/hooks/useDragScroll";
+import { Search, MapPin, Clock, ArrowRight, BookOpen } from "lucide-react";
 import type { Article } from "@/types";
+
+const SECTION_STYLE: React.CSSProperties = {
+  borderRadius: 16,
+  padding: "16px 20px",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
+  display: "flex",
+  flexDirection: "column",
+  gap: 12,
+};
+
+function cardEnter(el: HTMLElement) {
+  el.style.borderColor = "rgba(57,255,136,0.4)";
+  el.style.boxShadow = "0 8px 28px rgba(57,255,136,0.18), 0 2px 8px rgba(0,0,0,0.07)";
+  el.style.transform = "translateY(-3px)";
+}
+function cardLeave(el: HTMLElement) {
+  el.style.borderColor = "var(--border)";
+  el.style.boxShadow = "0 2px 8px rgba(0,0,0,0.07)";
+  el.style.transform = "translateY(0)";
+}
+
+// ─── Shared search bar ────────────────────────────────────────────────────────
+function ArticleSearch({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 7,
+        padding: "5px 10px",
+        borderRadius: 8,
+        background: "var(--surface-2)",
+        border: "1px solid var(--border)",
+        minWidth: 190,
+      }}
+    >
+      <Search size={11} style={{ color: "var(--ink-4)", flexShrink: 0 }} />
+      <input
+        type="text"
+        placeholder="Rechercher un article…"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{
+          background: "transparent",
+          border: "none",
+          outline: "none",
+          color: "var(--ink-2)",
+          fontSize: "0.68rem",
+          width: "100%",
+        }}
+      />
+    </div>
+  );
+}
 
 // ─── Card for the recommendation drag-carousel ────────────────────────────────
 function RecommendedCard({ article }: { article: Article }) {
@@ -14,21 +69,15 @@ function RecommendedCard({ article }: { article: Article }) {
         flexShrink: 0,
         width: 256,
         borderRadius: 14,
-        background: "var(--surface-2)",
+        background: "var(--surface)",
         border: "1px solid var(--border)",
         overflow: "hidden",
-        transition: "border-color 0.18s, box-shadow 0.18s",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
+        transition: "border-color 0.18s, box-shadow 0.18s, transform 0.18s",
+        userSelect: "none",
       }}
-      onMouseEnter={(e) => {
-        const el = e.currentTarget as HTMLElement;
-        el.style.borderColor = "rgba(57,255,136,0.35)";
-        el.style.boxShadow = "0 4px 18px rgba(0,0,0,0.1)";
-      }}
-      onMouseLeave={(e) => {
-        const el = e.currentTarget as HTMLElement;
-        el.style.borderColor = "var(--border)";
-        el.style.boxShadow = "none";
-      }}
+      onMouseEnter={(e) => cardEnter(e.currentTarget as HTMLElement)}
+      onMouseLeave={(e) => cardLeave(e.currentTarget as HTMLElement)}
     >
       <div style={{ height: 3, background: "var(--accent)", opacity: 0.5 }} />
       <div style={{ padding: "12px 14px", display: "flex", flexDirection: "column", gap: 7 }}>
@@ -120,10 +169,12 @@ function AutoScrollCard({ article }: { article: Article }) {
           display: "flex",
           flexDirection: "column",
           gap: 6,
-          transition: "border-color 0.18s",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
+          transition: "border-color 0.18s, box-shadow 0.18s, transform 0.18s",
           userSelect: "none",
-          pointerEvents: "none",
         }}
+        onMouseEnter={(e) => cardEnter(e.currentTarget as HTMLElement)}
+        onMouseLeave={(e) => cardLeave(e.currentTarget as HTMLElement)}
       >
         <div style={{ height: 2, background: "var(--accent)", opacity: 0.35, borderRadius: 2 }} />
         <span
@@ -180,11 +231,11 @@ function AutoScrollRow({
   const offsetRef = useRef(0);
   const isHovering = useRef(false);
   const isDragging = useRef(false);
+  const hasDragged = useRef(false);
   const dragStartX = useRef(0);
   const offsetAtDrag = useRef(0);
   const [grabbing, setGrabbing] = useState(false);
 
-  // Double the articles for seamless loop
   const doubled = useMemo(() => [...articles, ...articles], [articles]);
 
   useEffect(() => {
@@ -222,27 +273,32 @@ function AutoScrollRow({
   const handleMouseLeave = useCallback(() => {
     isHovering.current = false;
     isDragging.current = false;
+    hasDragged.current = false;
     setGrabbing(false);
   }, []);
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     isDragging.current = true;
+    hasDragged.current = false;
     dragStartX.current = e.clientX;
     offsetAtDrag.current = offsetRef.current;
     setGrabbing(true);
-    e.preventDefault();
   }, []);
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (!isDragging.current || !trackRef.current) return;
-      const dx = e.clientX - dragStartX.current;
-      offsetRef.current = offsetAtDrag.current + dx;
-      trackRef.current.style.transform = `translateX(${offsetRef.current}px)`;
-    },
-    []
-  );
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDragging.current || !trackRef.current) return;
+    const dx = e.clientX - dragStartX.current;
+    if (Math.abs(dx) > 5) hasDragged.current = true;
+    offsetRef.current = offsetAtDrag.current + dx;
+    trackRef.current.style.transform = `translateX(${offsetRef.current}px)`;
+  }, []);
   const handleMouseUp = useCallback(() => {
     isDragging.current = false;
     setGrabbing(false);
+  }, []);
+  const handleClickCapture = useCallback((e: React.MouseEvent) => {
+    if (hasDragged.current) {
+      e.stopPropagation();
+      hasDragged.current = false;
+    }
   }, []);
 
   if (articles.length === 0) return null;
@@ -250,6 +306,7 @@ function AutoScrollRow({
   return (
     <div
       style={{ overflow: "hidden", cursor: grabbing ? "grabbing" : "grab" }}
+      onClickCapture={handleClickCapture}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseDown={handleMouseDown}
@@ -277,14 +334,19 @@ export function MapArticleSection({
   selectedCountry,
   themeLabel,
 }: MapArticleSectionProps) {
-  const [search, setSearch] = useState("");
-  const { ref, onMouseDown, onMouseUp, onMouseLeave, onMouseMove } = useDragScroll();
+  const [recoSearch, setRecoSearch] = useState("");
+  const [allSearch, setAllSearch] = useState("");
+  const recoRef = useRef<HTMLDivElement>(null);
+  const recoIsDragging = useRef(false);
+  const recoHasDragged = useRef(false);
+  const recoStartClientX = useRef(0);
+  const recoStartScrollLeft = useRef(0);
+  const recoStartElemX = useRef(0);
 
   const recommendedArticles = useMemo(() => {
     const countryQ = selectedCountry?.toLowerCase() ?? "";
-    const searchQ = search.trim().toLowerCase();
+    const searchQ = recoSearch.trim().toLowerCase();
 
-    // When no country selected and no search, show all theme articles
     if (!countryQ && !searchQ) return themeArticles;
 
     return themeArticles.filter(
@@ -297,35 +359,66 @@ export function MapArticleSection({
           a.excerpt.toLowerCase().includes(searchQ) ||
           a.tags.some((t) => t.toLowerCase().includes(searchQ)))
     );
-  }, [themeArticles, selectedCountry, search]);
+  }, [themeArticles, selectedCountry, recoSearch]);
+
+  const allArticles = useMemo(() => {
+    const q = allSearch.trim().toLowerCase();
+    if (!q) return themeArticles;
+    return themeArticles.filter(
+      (a) =>
+        a.title.toLowerCase().includes(q) ||
+        a.excerpt.toLowerCase().includes(q) ||
+        a.tags.some((t) => t.toLowerCase().includes(q))
+    );
+  }, [themeArticles, allSearch]);
 
   const reversed = useMemo(() => [...themeArticles].reverse(), [themeArticles]);
+
+  const recoOnMouseDown = useCallback((e: React.MouseEvent) => {
+    const el = recoRef.current;
+    if (!el) return;
+    recoIsDragging.current = true;
+    recoHasDragged.current = false;
+    recoStartClientX.current = e.pageX;
+    recoStartElemX.current = e.pageX - el.getBoundingClientRect().left;
+    recoStartScrollLeft.current = el.scrollLeft;
+    el.style.cursor = "grabbing";
+  }, []);
+
+  const recoOnMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!recoIsDragging.current || !recoRef.current) return;
+    e.preventDefault();
+    const el = recoRef.current;
+    if (Math.abs(e.pageX - recoStartClientX.current) > 5) recoHasDragged.current = true;
+    const x = e.pageX - el.getBoundingClientRect().left;
+    const walk = (x - recoStartElemX.current) * 1.5;
+    el.scrollLeft = recoStartScrollLeft.current - walk;
+  }, []);
+
+  const recoOnMouseUp = useCallback(() => {
+    recoIsDragging.current = false;
+    if (recoRef.current) recoRef.current.style.cursor = "grab";
+  }, []);
+
+  const recoOnMouseLeave = useCallback(() => {
+    recoIsDragging.current = false;
+    recoHasDragged.current = false;
+    if (recoRef.current) recoRef.current.style.cursor = "grab";
+  }, []);
+
+  const recoOnClickCapture = useCallback((e: React.MouseEvent) => {
+    if (recoHasDragged.current) {
+      e.stopPropagation();
+      recoHasDragged.current = false;
+    }
+  }, []);
 
   return (
     <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       {/* ── Recommendation banner ── */}
-      <div
-        style={{
-          borderRadius: 16,
-          padding: "16px 20px",
-          background: "var(--surface)",
-          border: "1px solid var(--border)",
-          display: "flex",
-          flexDirection: "column",
-          gap: 12,
-        }}
-      >
-        {/* Header */}
+      <div style={SECTION_STYLE}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 7,
-              flex: 1,
-              minWidth: 150,
-            }}
-          >
+          <div style={{ display: "flex", alignItems: "center", gap: 7, flex: 1, minWidth: 150 }}>
             <MapPin size={13} style={{ color: "#39FF88", flexShrink: 0 }} />
             <span
               style={{
@@ -354,44 +447,13 @@ export function MapArticleSection({
               </span>
             )}
             {!selectedCountry && themeLabel && (
-              <span style={{ fontSize: "0.6rem", color: "var(--ink-4)" }}>
-                — {themeLabel}
-              </span>
+              <span style={{ fontSize: "0.6rem", color: "var(--ink-4)" }}>— {themeLabel}</span>
             )}
           </div>
 
-          {/* Search input */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 7,
-              padding: "5px 10px",
-              borderRadius: 8,
-              background: "var(--surface-2)",
-              border: "1px solid var(--border)",
-              minWidth: 190,
-            }}
-          >
-            <Search size={11} style={{ color: "var(--ink-4)", flexShrink: 0 }} />
-            <input
-              type="text"
-              placeholder="Rechercher un article…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{
-                background: "transparent",
-                border: "none",
-                outline: "none",
-                color: "var(--ink-2)",
-                fontSize: "0.68rem",
-                width: "100%",
-              }}
-            />
-          </div>
+          <ArticleSearch value={recoSearch} onChange={setRecoSearch} />
         </div>
 
-        {/* Drag carousel */}
         {recommendedArticles.length === 0 ? (
           <div
             style={{
@@ -410,7 +472,7 @@ export function MapArticleSection({
           </div>
         ) : (
           <div
-            ref={ref}
+            ref={recoRef}
             style={{
               display: "flex",
               gap: 12,
@@ -419,10 +481,11 @@ export function MapArticleSection({
               scrollbarWidth: "none",
               cursor: "grab",
             }}
-            onMouseDown={onMouseDown}
-            onMouseUp={onMouseUp}
-            onMouseLeave={onMouseLeave}
-            onMouseMove={onMouseMove}
+            onClickCapture={recoOnClickCapture}
+            onMouseDown={recoOnMouseDown}
+            onMouseMove={recoOnMouseMove}
+            onMouseUp={recoOnMouseUp}
+            onMouseLeave={recoOnMouseLeave}
           >
             {recommendedArticles.map((article) => (
               <RecommendedCard key={article.slug} article={article} />
@@ -431,23 +494,59 @@ export function MapArticleSection({
         )}
       </div>
 
-      {/* ── Two auto-scroll rows ── */}
+      {/* ── Tous les articles ── */}
       {themeArticles.length > 0 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <p
-            style={{
-              fontSize: "0.58rem",
-              fontWeight: 700,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: "var(--ink-4)",
-              marginBottom: 2,
-            }}
-          >
-            Tous les articles · passez la souris pour faire une pause
-          </p>
-          <AutoScrollRow articles={themeArticles} direction="left" />
-          <AutoScrollRow articles={reversed} direction="right" />
+        <div style={SECTION_STYLE}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 7, flex: 1, minWidth: 150 }}>
+              <BookOpen size={13} style={{ color: "#39FF88", flexShrink: 0 }} />
+              <span
+                style={{
+                  fontSize: "0.6rem",
+                  fontWeight: 800,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "#0D7A40",
+                }}
+              >
+                Tous les articles
+              </span>
+              <span style={{ fontSize: "0.6rem", color: "var(--ink-4)" }}>
+                · passez la souris pour faire une pause
+              </span>
+            </div>
+
+            <ArticleSearch value={allSearch} onChange={setAllSearch} />
+          </div>
+
+          {allSearch.trim() ? (
+            allArticles.length === 0 ? (
+              <div
+                style={{
+                  padding: "20px",
+                  textAlign: "center",
+                  borderRadius: 10,
+                  background: "var(--surface-2)",
+                  border: "1px dashed var(--border)",
+                }}
+              >
+                <p style={{ fontSize: "0.72rem", color: "var(--ink-4)" }}>
+                  Aucun article trouvé
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                {allArticles.map((article) => (
+                  <AutoScrollCard key={article.slug} article={article} />
+                ))}
+              </div>
+            )
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <AutoScrollRow articles={themeArticles} direction="left" />
+              <AutoScrollRow articles={reversed} direction="right" />
+            </div>
+          )}
         </div>
       )}
     </div>
