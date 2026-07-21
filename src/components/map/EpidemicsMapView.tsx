@@ -8,8 +8,8 @@ import { EpidemicsLeafletMap, type LeafletTileStyle } from "./EpidemicsLeafletMa
 import { EpidemicsSidePanel } from "@/components/sidebar/EpidemicsSidePanel";
 import { ThemeDropdown } from "./ThemeDropdown";
 import { EPIDEMICS, getDiseaseById } from "@/data/epidemics/epidemics";
-import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
-import { ARTICLES } from "@/data/articles";
+import { MapArticleSection } from "@/components/articles/MapArticleSection";
+import { EPIDEMICS_ARTICLES } from "@/data/articles";
 import { useDragScroll } from "@/hooks/useDragScroll";
 import type { EpidemicDiseaseId, EpidemicDisease } from "@/types";
 
@@ -85,16 +85,6 @@ export function EpidemicsMapView() {
     setSelectedCountry(countryName);
     setSidePanelOpen(true);
   }, []);
-
-  const countryArticles = useMemo(() => {
-    if (!selectedCountry) return [];
-    const q = selectedCountry.toLowerCase();
-    return ARTICLES.filter(
-      (a) =>
-        a.title.toLowerCase().includes(q) ||
-        a.tags.some((t) => t.toLowerCase().includes(q))
-    );
-  }, [selectedCountry]);
 
   return (
     <>
@@ -258,83 +248,24 @@ export function EpidemicsMapView() {
             isYtd={ytdMode && !!disease.ongoing}
           />
         </div>
-      </div>
 
-      {/* Disease info blocks */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
-        <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-          <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-            À propos de {disease.label}
-          </p>
-          <p className="text-small leading-relaxed" style={{ color: "var(--ink-2)" }}>
-            {disease.description}
-          </p>
-        </div>
-
-        <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-          <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-            Agent pathogène
-          </p>
-          <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
-            {disease.pathogen}
-          </p>
-        </div>
-
-        <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-          <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-            {ytdMode && disease.ongoing
-              ? `Cas depuis le 1er jan. ${new Date().getFullYear()}`
-              : "Chiffres mondiaux"}
-          </p>
-          <div className="space-y-2 mt-1">
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-small" style={{ color: "var(--ink-3)" }}>
-                {ytdMode && disease.ongoing ? "Cas estimés 2026" : "Cas totaux"}
-              </span>
-              <span className="text-small font-semibold" style={{ color: "var(--ink)" }}>
-                {ytdMode && disease.ongoing && totalYtdCases !== null
-                  ? totalYtdCases.toLocaleString("fr-FR")
-                  : disease.globalCases}
-              </span>
-            </div>
-            <div style={{ height: "1px", background: "var(--border)" }} />
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-small" style={{ color: "var(--ink-3)" }}>
-                {ytdMode && disease.ongoing ? "Décès estimés 2026" : "Décès totaux"}
-              </span>
-              <span className="text-small font-semibold" style={{ color: "var(--accent)" }}>{disease.globalDeaths}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-xl px-4 py-4 flex flex-col gap-2" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-          <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700 }}>
-            Source des données
-          </p>
-          <p className="text-small leading-relaxed" style={{ color: "var(--ink-4)" }}>
-            {disease.dataNote}
-            {ytdMode && disease.ongoing && (
-              <> · <span style={{ color: "var(--accent)" }}>Vue 2026 : prorata annuel 2024 × jours écoulés / 365.</span></>
-            )}
-          </p>
-        </div>
-      </div>
-
-      {/* Country-specific articles */}
-      {selectedCountry && (
+        {/* Source note */}
         <div
-          className="mt-6 rounded-2xl p-5"
-          style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+          className="px-5 py-1.5 border-t flex items-center justify-end"
+          style={{ borderColor: "var(--border)", background: "var(--surface)" }}
         >
-          <ArticleCarousel
-            articles={countryArticles}
-            title={`Recommandations — ${selectedCountry}`}
-            subtitle="Articles liés au pays sélectionné"
-            emptyMessage={`Aucun article spécifique pour ${selectedCountry} pour l'instant.`}
-            icon="pin"
-          />
+          <p style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>
+            {disease.dataNote}
+            {ytdMode && disease.ongoing && " · Vue 2026 : prorata annuel 2024 × jours écoulés / 365."}
+          </p>
         </div>
-      )}
+      </div>
+
+      <MapArticleSection
+        themeArticles={EPIDEMICS_ARTICLES}
+        selectedCountry={selectedCountry}
+        themeLabel="Épidémies & Santé"
+      />
     </>
   );
 }

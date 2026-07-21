@@ -8,8 +8,8 @@ import { MunicipalElectionsSection } from "./MunicipalElectionsSection";
 import { ThemeDropdown } from "./ThemeDropdown";
 import { getAllPoliticsForYear, getPoliticsForYear, POLITICS_MIN_YEAR, POLITICS_MAX_YEAR } from "@/data/politics/politics";
 import { ORIENTATION_COLORS, ORIENTATION_LABELS } from "@/lib/politicsColors";
-import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
-import { ARTICLES } from "@/data/articles";
+import { MapArticleSection } from "@/components/articles/MapArticleSection";
+import { POLITICS_ARTICLES } from "@/data/articles";
 import { useDragScroll } from "@/hooks/useDragScroll";
 
 const KEY_YEARS = [1933, 1939, 1945, 1950, 1960, 1970, 1980, 1989, 1991, 2000, 2008, 2016, 2020, 2025];
@@ -26,16 +26,6 @@ export function PoliticsMapView() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-
-  const countryArticles = useMemo(() => {
-    if (!selectedCountry) return [];
-    const q = selectedCountry.toLowerCase();
-    return ARTICLES.filter(
-      (a) =>
-        a.title.toLowerCase().includes(q) ||
-        a.tags.some((t) => t.toLowerCase().includes(q))
-    );
-  }, [selectedCountry]);
 
   const politicsData = useMemo(() => getAllPoliticsForYear(year), [year]);
 
@@ -219,21 +209,11 @@ export function PoliticsMapView() {
         })}
       </div>
 
-      {/* Country-specific articles */}
-      {selectedCountry && (
-        <div
-          className="mt-6 rounded-2xl p-5"
-          style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-        >
-          <ArticleCarousel
-            articles={countryArticles}
-            title={`Recommandations — ${selectedCountry}`}
-            subtitle="Articles liés au pays sélectionné"
-            emptyMessage={`Aucun article spécifique pour ${selectedCountry} pour l'instant.`}
-            icon="pin"
-          />
-        </div>
-      )}
+      <MapArticleSection
+        themeArticles={POLITICS_ARTICLES}
+        selectedCountry={selectedCountry}
+        themeLabel="Politique mondiale"
+      />
 
       {/* Municipal elections */}
       <MunicipalElectionsSection />

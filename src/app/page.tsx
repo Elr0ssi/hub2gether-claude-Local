@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Layout } from "@/components/layout/Layout";
 import { HeroSection } from "@/components/hero/HeroSection";
-import { ThemePreviewGrid } from "@/components/hero/ThemePreviewGrid";
-import { HomeDataBento } from "@/components/home/HomeDataBento";
+import { KeyStatsSection } from "@/components/home/KeyStatsSection";
+import { EditorialSection } from "@/components/home/EditorialSection";
 import { FAQSection } from "@/components/faq/FAQSection";
-import { THEMES } from "@/data/themes";
 import { FAQS_EMPIRES } from "@/data/faqs";
 
 export const metadata: Metadata = {
@@ -108,9 +107,9 @@ export default function HomePage() {
   return (
     <Layout>
       <HeroSection />
+      <KeyStatsSection />
+      <EditorialSection />
       <AITransparencyBanner />
-      <ThemePreviewGrid themes={THEMES} />
-      <HomeDataBento />
       <FAQSection items={FAQS_EMPIRES} />
     </Layout>
   );

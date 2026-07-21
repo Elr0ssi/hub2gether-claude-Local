@@ -237,33 +237,13 @@ export default async function MapPage({ params, searchParams }: PageProps) {
         </Suspense>
       </div>
 
-      {/* Articles */}
-      {themeArticles.length > 0 && (
+      {/* Articles — only for empires; other themes use MapArticleSection built into their map views */}
+      {themeArticles.length > 0 && !isEconomy && !isEpidemics && !isPolitics && !isMilitary && (
         <div className="border-t" style={{ borderColor: "var(--border)" }}>
           <ArticleGrid
             articles={themeArticles}
-            title={
-              isEconomy
-                ? "Analyses économiques"
-                : isEpidemics
-                ? "Analyses épidémiologiques"
-                : isMilitary
-                ? "Analyses militaires"
-                : theme === "empires"
-                ? "Historical analyses"
-                : "Analyses approfondies"
-            }
-            subtitle={
-              isEconomy
-                ? "Décryptages éditoriaux sur le PIB mondial, la dette, les inégalités et les grandes rivalités économiques du siècle."
-                : isEpidemics
-                ? "Décryptages éditoriaux sur les grandes épidémies, leurs origines, leur impact géopolitique et les inégalités d'accès aux soins."
-                : isMilitary
-                ? "Décryptages éditoriaux sur le réarmement mondial, la course aux technologies militaires et les conflits actifs."
-                : theme === "empires"
-                ? "In-depth editorial analysis on the rise and fall of empires, mechanics of expansion, and lessons of history."
-                : "Analyses approfondies et décryptages éditoriaux."
-            }
+            title="Historical analyses"
+            subtitle="In-depth editorial analysis on the rise and fall of empires, mechanics of expansion, and lessons of history."
           />
         </div>
       )}
