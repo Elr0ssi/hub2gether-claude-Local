@@ -381,23 +381,11 @@ body {
 
 @media (min-width: 900px) {
   .hero-section-wrapper {
-    height: 500vh;
+    height: 400vh;
   }
   .hero-sticky {
     position: sticky;
     top: 0;
-  }
-  .hero-grid {
-    grid-template-columns: 42% 58% !important;
-  }
-  .hero-articles-col {
-    display: flex !important;
-  }
-}
-
-@media (max-width: 899px) {
-  .hero-articles-col {
-    display: none !important;
   }
 }
 
