@@ -107,35 +107,43 @@ export function HeroGlobePreview() {
           </p>
         </motion.div>
 
-        {/* Globe stage */}
-        <motion.div
+        {/* Globe stage — outer div handles base centering, inner motion.div handles scroll-driven offset */}
+        <div
           style={{
             position: "absolute",
             left: "50%",
-            top: "50%",
-            x: "-50%",
-            y: globeY,
-            scale: globeScale,
-            width: "min(640px, 78vw)",
+            top: "58%",
+            transform: "translate(-50%, -50%)",
+            width: "min(560px, 60vh, 78vw)",
             aspectRatio: "1 / 1",
             zIndex: 1,
           }}
         >
-          <div
+          <motion.div
             style={{
-              position: "absolute",
-              left: "50%",
-              bottom: "2%",
-              transform: "translateX(-50%)",
-              width: "72%",
-              height: "10%",
-              borderRadius: "50%",
-              background: "radial-gradient(ellipse, rgba(16,24,20,0.16) 0%, transparent 72%)",
-              filter: "blur(4px)",
+              width: "100%",
+              height: "100%",
+              position: "relative",
+              y: globeY,
+              scale: globeScale,
             }}
-          />
-          <InteractiveGlobeIcons />
-        </motion.div>
+          >
+            <div
+              style={{
+                position: "absolute",
+                left: "50%",
+                bottom: "2%",
+                transform: "translateX(-50%)",
+                width: "72%",
+                height: "10%",
+                borderRadius: "50%",
+                background: "radial-gradient(ellipse, rgba(16,24,20,0.16) 0%, transparent 72%)",
+                filter: "blur(4px)",
+              }}
+            />
+            <InteractiveGlobeIcons />
+          </motion.div>
+        </div>
 
         {/* Stats panel — rises from below and covers the globe's lower half */}
         <motion.div

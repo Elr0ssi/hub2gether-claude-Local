@@ -114,40 +114,49 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 export function ThemeStorySections() {
   return (
-    <section
-      style={{
-        position: "relative",
-        maxWidth: 1280,
-        margin: "0 auto",
-        padding: "0 clamp(16px, 3.5vw, 40px) clamp(60px, 8vh, 100px)",
-      }}
-    >
+    <section style={{ position: "relative" }}>
       {SECTIONS.map((s, i) => (
+        // Each section reserves a full viewport of scroll distance so the sticky
+        // card below is fully opaque and covers the previous one edge-to-edge —
+        // only one section is ever visible at a time.
         <div
           key={s.id}
           style={{
-            position: "sticky",
-            top: "calc(var(--navbar-height) + clamp(10px, 2vh, 24px))",
-            zIndex: i + 1,
-            paddingTop: i === 0 ? 0 : "clamp(10px, 2vh, 24px)",
+            height: "calc(100vh - var(--navbar-height))",
+            position: "relative",
           }}
         >
-          <motion.div
-            initial={{ opacity: 0, y: 48 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-15% 0px -15% 0px" }}
-            transition={{ duration: 0.6, ease: EASE }}
+          <div
             style={{
-              borderRadius: 26,
-              overflow: "hidden",
-              background: "#fff",
-              border: "1.5px solid #F0F0F0",
-              boxShadow: "0 20px 50px rgba(10,20,15,0.10)",
-              minHeight: "clamp(430px, 60vh, 560px)",
+              position: "sticky",
+              top: "var(--navbar-height)",
+              height: "calc(100vh - var(--navbar-height))",
+              zIndex: i + 1,
+              background: "var(--bg)",
               display: "flex",
-              flexDirection: "column",
+              alignItems: "center",
+              padding: "clamp(10px, 2vh, 24px) clamp(16px, 3.5vw, 40px)",
             }}
           >
+            <motion.div
+              initial={{ opacity: 0, y: 48 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-15% 0px -15% 0px" }}
+              transition={{ duration: 0.6, ease: EASE }}
+              style={{
+                width: "100%",
+                maxWidth: 1280,
+                margin: "0 auto",
+                borderRadius: 26,
+                overflow: "hidden",
+                background: "#fff",
+                border: "1.5px solid #F0F0F0",
+                boxShadow: "0 20px 50px rgba(10,20,15,0.10)",
+                height: "clamp(430px, 78vh, 560px)",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
             <div
               style={{
                 display: "grid",
@@ -342,7 +351,8 @@ export function ThemeStorySections() {
                 );
               })}
             </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
       ))}
 
