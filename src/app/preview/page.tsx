@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Layout } from "@/components/layout/Layout";
 import { HeroGlobePreview } from "@/components/hero/HeroGlobePreview";
-import { KeyStatsSection } from "@/components/home/KeyStatsSection";
-import { EditorialSection } from "@/components/home/EditorialSection";
+import { ThemeStorySections } from "@/components/home/ThemeStorySections";
 import { FAQSection } from "@/components/faq/FAQSection";
 import { FAQS_EMPIRES } from "@/data/faqs";
 
@@ -15,8 +14,7 @@ export default function PreviewPage() {
   return (
     <Layout>
       <HeroGlobePreview />
-      <KeyStatsSection />
-      <EditorialSection />
+      <ThemeStorySections />
       <FAQSection items={FAQS_EMPIRES} />
     </Layout>
   );
