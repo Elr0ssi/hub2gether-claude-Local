@@ -15,6 +15,9 @@ import { getThemeById } from "@/data/themes";
 import { getFaqsByTheme } from "@/data/faqs";
 import { getArticlesByTheme } from "@/data/articles";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { CategoryHero } from "@/components/category/CategoryHero";
+import { hasCategoryHero } from "@/data/categoryHeroes";
 import type { ThemeId } from "@/types";
 
 interface PageProps {
@@ -168,6 +171,7 @@ export default async function MapPage({ params, searchParams }: PageProps) {
   const isEconomy = theme === "economy";
   const isPolitics = theme === "politics";
   const isMilitary = theme === "military";
+  const showCategoryHero = hasCategoryHero(theme);
   const datasetSchema = DATASET_SCHEMAS[theme];
 
   return (
@@ -178,7 +182,13 @@ export default async function MapPage({ params, searchParams }: PageProps) {
           dangerouslySetInnerHTML={{ __html: jsonLdString(datasetSchema) }}
         />
       )}
-      {/* Page header */}
+      {/* Full-viewport category introduction — themes with a hero configuration
+          get the globe scene, the others keep the compact text header. */}
+      {showCategoryHero && <CategoryHero themeId={theme} />}
+
+      {/* Page header — replaced by the hero above when one is configured, so
+          the page keeps exactly one H1. */}
+      {!showCategoryHero && (
       <div className="max-w-7xl mx-auto px-6 pt-10 pb-6">
         <div className="mb-2">
           <span className="accent-badge text-xs capitalize">{themeData.label}</span>
@@ -210,9 +220,10 @@ export default async function MapPage({ params, searchParams }: PageProps) {
             : themeData.description}
         </p>
       </div>
+      )}
 
       {/* Interactive map */}
-      <div className="max-w-7xl mx-auto px-6 pb-8">
+      <ScrollReveal className="max-w-7xl mx-auto px-6 pb-8">
         <Suspense
           fallback={
             <div
@@ -235,7 +246,7 @@ export default async function MapPage({ params, searchParams }: PageProps) {
             <MapViewLoader theme={themeData.id as ThemeId} initialYear={initialYear} />
           )}
         </Suspense>
-      </div>
+      </ScrollReveal>
 
       {/* Articles — only for empires; other themes use MapArticleSection built into their map views */}
       {themeArticles.length > 0 && !isEconomy && !isEpidemics && !isPolitics && !isMilitary && (

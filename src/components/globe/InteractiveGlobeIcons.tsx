@@ -5,13 +5,16 @@ import * as THREE from "three";
 import { DollarSign, Euro, JapaneseYen, Landmark, BarChart3, Coins, type LucideIcon } from "lucide-react";
 
 const GLOBE_RADIUS = 2.2;
+// Sampling budget for a ~500px globe. Larger mounts scale up so continents keep
+// the same apparent dot density instead of thinning out.
 const DOT_SAMPLES = 9000;
+const DOT_SAMPLES_MAX = 46000;
 const CAMERA_Z = 7.6;
 const MASK_W = 1024;
 const MASK_H = 512;
-const ACCENT = 0x10b981;
+const DEFAULT_ACCENT = "#10B981";
 
-interface Marker {
+export interface GlobeMarker {
   id: string;
   lat: number;
   lon: number;
@@ -19,7 +22,7 @@ interface Marker {
 }
 
 // Country-anchored icon badges, positioned by real lat/lon so they travel with globe rotation.
-const MARKERS: Marker[] = [
+const DEFAULT_MARKERS: GlobeMarker[] = [
   { id: "usd", lat: 39, lon: -98, icon: DollarSign }, // United States
   { id: "eur", lat: 50, lon: 12, icon: Euro }, // Europe
   { id: "jpy", lat: 36, lon: 138, icon: JapaneseYen }, // Japan
@@ -41,6 +44,18 @@ function latLonTo3D(lat: number, lon: number, r: number): THREE.Vector3 {
 function smoothstep(edge0: number, edge1: number, x: number): number {
   const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
   return t * t * (3 - 2 * t);
+}
+
+// Land dots use three tints of the accent so continents read as a gradient
+// rather than a flat mass. Derived from the accent instead of hardcoded, which
+// is what makes the globe reusable across categories.
+function buildDotPalette(accent: string): [number, number, number][] {
+  const base = new THREE.Color(accent);
+  const white = new THREE.Color(0xffffff);
+  return [0.36, 0.17, 0].map((mix) => {
+    const c = base.clone().lerp(white, mix);
+    return [c.r, c.g, c.b] as [number, number, number];
+  });
 }
 
 function buildLandMask(geojson: GeoJSON.FeatureCollection): ImageData {
@@ -90,9 +105,31 @@ function isLand(lat: number, lon: number, mask: ImageData): boolean {
   return mask.data[idx] < 128;
 }
 
-export default function InteractiveGlobeIcons() {
+export interface InteractiveGlobeIconsProps {
+  /** Category icon badges anchored to real coordinates. */
+  markers?: GlobeMarker[];
+  /** Category colour — drives land dots, coastlines, atmosphere and badges. */
+  accent?: string;
+  /** Badge diameter (any CSS length). */
+  markerSize?: string;
+  /** Set to false to skip rendering entirely (e.g. once scrolled past). */
+  active?: boolean;
+}
+
+export default function InteractiveGlobeIcons({
+  markers = DEFAULT_MARKERS,
+  accent = DEFAULT_ACCENT,
+  markerSize = "clamp(38px, 5.2vw, 56px)",
+  active = true,
+}: InteractiveGlobeIconsProps = {}) {
   const mountRef = useRef<HTMLDivElement>(null);
   const markerElsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const markerGlowsRef = useRef<(HTMLSpanElement | null)[]>([]);
+  const activeRef = useRef(active);
+
+  useEffect(() => {
+    activeRef.current = active;
+  }, [active]);
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -100,8 +137,24 @@ export default function InteractiveGlobeIcons() {
 
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const W = mount.clientWidth || 500;
-    const H = mount.clientHeight || 500;
+    const accentColor = new THREE.Color(accent);
+    // Brighter, more saturated sibling of the accent — used for the rim light
+    // and the atmosphere halo.
+    const glowColor = accentColor.clone();
+    const hsl = { h: 0, s: 0, l: 0 };
+    glowColor.getHSL(hsl);
+    glowColor.setHSL(hsl.h, Math.min(1, hsl.s + 0.16), Math.min(0.66, hsl.l + 0.22));
+    const dotPalette = buildDotPalette(accent);
+
+    let W = mount.clientWidth || 500;
+    let H = mount.clientHeight || 500;
+    // Dots cover a surface, so the budget follows the rendered area rather than
+    // the width, and each dot shrinks to keep a constant apparent size.
+    const sizeRatio = Math.max(1, W / 500);
+    const dotSamples = Math.min(DOT_SAMPLES_MAX, Math.round(DOT_SAMPLES * Math.pow(sizeRatio, 1.7)));
+    // Dots stay a touch larger than a pure inverse scale, so continents read as
+    // a dense matrix rather than a dusting.
+    const dotScale = Math.max(0.72, 1 / Math.sqrt(sizeRatio));
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(W, H);
@@ -123,7 +176,7 @@ export default function InteractiveGlobeIcons() {
     const keyLight = new THREE.DirectionalLight(0xffffff, 3.4);
     keyLight.position.set(-4, 5, 6);
     scene.add(keyLight);
-    const fillLight = new THREE.DirectionalLight(0x39ff88, 0.6);
+    const fillLight = new THREE.DirectionalLight(glowColor.getHex(), 0.6);
     fillLight.position.set(3, -4, -2);
     scene.add(fillLight);
 
@@ -139,16 +192,16 @@ export default function InteractiveGlobeIcons() {
     // --- Soft outer atmosphere ---
     const atmosGeom = new THREE.SphereGeometry(GLOBE_RADIUS + 0.16, 32, 32);
     const atmosMat = new THREE.MeshBasicMaterial({
-      color: 0x39ff88,
+      color: glowColor.getHex(),
       transparent: true,
-      opacity: 0.06,
+      opacity: 0.06 * Math.min(1, 620 / W),
       side: THREE.BackSide,
     });
     globeGroup.add(new THREE.Mesh(atmosGeom, atmosMat));
 
     // --- Land dot matrix (filled in once geo data is ready) ---
     const dotsMat = new THREE.PointsMaterial({
-      size: 0.032,
+      size: 0.032 * dotScale,
       vertexColors: true,
       transparent: true,
       opacity: 0,
@@ -160,7 +213,7 @@ export default function InteractiveGlobeIcons() {
 
     // --- Coastline outline ---
     const borderMat = new THREE.LineBasicMaterial({
-      color: ACCENT,
+      color: accentColor.getHex(),
       transparent: true,
       opacity: 0,
     });
@@ -170,7 +223,7 @@ export default function InteractiveGlobeIcons() {
     let dotsFadeTarget = 0;
     let bordersFadeTarget = 0;
     let markersReady = false;
-    const markerBasePositions = MARKERS.map((m) => latLonTo3D(m.lat, m.lon, GLOBE_RADIUS + 0.02));
+    const markerBasePositions = markers.map((m) => latLonTo3D(m.lat, m.lon, GLOBE_RADIUS + 0.02));
 
     fetch("/geo/ne_110m_admin_0_countries.geojson")
       .then((r) => r.json())
@@ -181,8 +234,8 @@ export default function InteractiveGlobeIcons() {
         const dotPositions: number[] = [];
         const dotColors: number[] = [];
         const golden = Math.PI * (3 - Math.sqrt(5));
-        for (let i = 0; i < DOT_SAMPLES; i++) {
-          const y = 1 - (i / (DOT_SAMPLES - 1)) * 2;
+        for (let i = 0; i < dotSamples; i++) {
+          const y = 1 - (i / (dotSamples - 1)) * 2;
           const rr = Math.sqrt(Math.max(0, 1 - y * y));
           const th = golden * i;
           const x = rr * Math.cos(th);
@@ -197,13 +250,8 @@ export default function InteractiveGlobeIcons() {
           dotPositions.push(GLOBE_RADIUS * 1.006 * x, GLOBE_RADIUS * 1.006 * y, GLOBE_RADIUS * 1.006 * z);
 
           const rnd = (i * 1.618033) % 1;
-          if (rnd < 0.45) {
-            dotColors.push(0.66, 0.87, 0.78); // light mint
-          } else if (rnd < 0.8) {
-            dotColors.push(0.31, 0.75, 0.55); // mid green
-          } else {
-            dotColors.push(0.06, 0.72, 0.51); // accent green
-          }
+          const tint = rnd < 0.45 ? dotPalette[0] : rnd < 0.8 ? dotPalette[1] : dotPalette[2];
+          dotColors.push(tint[0], tint[1], tint[2]);
         }
 
         const dotsGeom = dotsPoints.geometry;
@@ -232,7 +280,9 @@ export default function InteractiveGlobeIcons() {
           }
         }
         borderLines.geometry.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
-        bordersFadeTarget = 0.35;
+        // On a large globe a full-strength coastline turns the sphere into an
+        // outline map — let the dot matrix carry it instead.
+        bordersFadeTarget = 0.35 * Math.min(1, 640 / W);
 
         markersReady = true;
       })
@@ -272,8 +322,27 @@ export default function InteractiveGlobeIcons() {
       mount.style.cursor = "grab";
     };
 
+    // Badge hover is resolved from the pointer position against each badge's
+    // projected centre rather than with pointer events, so hovering an icon
+    // never steals the drag gesture from the globe underneath.
+    let rect = mount.getBoundingClientRect();
+    let pointerX = -9999;
+    let pointerY = -9999;
+    const hoverFactors = markers.map(() => 0);
+    const refreshRect = () => {
+      rect = mount.getBoundingClientRect();
+    };
+
     const onMouseDown = (e: MouseEvent) => onPointerDown(e.clientX, e.clientY);
-    const onMouseMove = (e: MouseEvent) => onPointerMove(e.clientX, e.clientY);
+    const onMouseMove = (e: MouseEvent) => {
+      pointerX = e.clientX - rect.left;
+      pointerY = e.clientY - rect.top;
+      onPointerMove(e.clientX, e.clientY);
+    };
+    const onMouseLeave = () => {
+      pointerX = -9999;
+      pointerY = -9999;
+    };
     const onMouseUp = () => onPointerUp();
     const onTouchStart = (e: TouchEvent) => onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
     const onTouchMove = (e: TouchEvent) => onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
@@ -282,6 +351,9 @@ export default function InteractiveGlobeIcons() {
     mount.addEventListener("mousedown", onMouseDown);
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
+    mount.addEventListener("mouseleave", onMouseLeave);
+    window.addEventListener("scroll", refreshRect, { passive: true });
+    window.addEventListener("resize", refreshRect);
     mount.addEventListener("touchstart", onTouchStart, { passive: true });
     mount.addEventListener("touchmove", onTouchMove, { passive: true });
     mount.addEventListener("touchend", onTouchEnd);
@@ -291,9 +363,16 @@ export default function InteractiveGlobeIcons() {
     const animate = () => {
       frameId = requestAnimationFrame(animate);
 
+      if (!activeRef.current) return;
+
+      const t = performance.now();
+
       if (!isDragging) {
+        // Inertia bleeds off, then an almost imperceptible drift keeps the
+        // globe alive; the tilt eases back to its resting horizon.
         velX *= 0.94;
         globeGroup.rotation.y += AUTO_SPEED + velX;
+        globeGroup.rotation.x += (0 - globeGroup.rotation.x) * 0.006;
       }
 
       dotsMat.opacity += (dotsFadeTarget - dotsMat.opacity) * 0.04;
@@ -310,10 +389,29 @@ export default function InteractiveGlobeIcons() {
           const x = (ndc.x * 0.5 + 0.5) * W;
           const y = (-ndc.y * 0.5 + 0.5) * H;
           const opacity = smoothstep(-0.32, 0.05, front);
-          const scale = 0.82 + 0.22 * Math.max(0, front);
-          el.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${scale})`;
+
+          // Barely-there float, phase-shifted per badge.
+          const floatY = prefersReduced ? 0 : Math.sin(t / 2600 + i * 1.7) * 2.6;
+          const floatX = prefersReduced ? 0 : Math.cos(t / 3400 + i * 2.3) * 1.6;
+
+          // Hover: only badges facing the camera can be picked up.
+          const half = el.offsetWidth / 2 || 24;
+          const near =
+            opacity > 0.5 &&
+            Math.abs(pointerX - x) < half + 4 &&
+            Math.abs(pointerY - y) < half + 4;
+          hoverFactors[i] += ((near ? 1 : 0) - hoverFactors[i]) * 0.14;
+          const h = hoverFactors[i];
+
+          const scale = 0.82 + 0.22 * Math.max(0, front) + 0.07 * h;
+          el.style.transform = `translate(-50%, -50%) translate(${x + floatX}px, ${
+            y + floatY - 4 * h
+          }px) scale(${scale})`;
           el.style.opacity = String(opacity);
-          el.style.zIndex = String(Math.round(front * 100) + 100);
+          el.style.zIndex = String(Math.round(front * 100) + 100 + Math.round(h * 40));
+
+          const glow = markerGlowsRef.current[i];
+          if (glow) glow.style.opacity = String(h);
         });
       }
 
@@ -325,9 +423,12 @@ export default function InteractiveGlobeIcons() {
       const w = mount.clientWidth;
       const h = mount.clientHeight;
       if (!w || !h) return;
+      W = w;
+      H = h;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
+      refreshRect();
     });
     ro.observe(mount);
 
@@ -337,6 +438,9 @@ export default function InteractiveGlobeIcons() {
       mount.removeEventListener("mousedown", onMouseDown);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
+      mount.removeEventListener("mouseleave", onMouseLeave);
+      window.removeEventListener("scroll", refreshRect);
+      window.removeEventListener("resize", refreshRect);
       mount.removeEventListener("touchstart", onTouchStart);
       mount.removeEventListener("touchmove", onTouchMove);
       mount.removeEventListener("touchend", onTouchEnd);
@@ -352,14 +456,16 @@ export default function InteractiveGlobeIcons() {
       renderer.dispose();
       if (mount.contains(renderer.domElement)) mount.removeChild(renderer.domElement);
     };
-  }, []);
+    // `markers` / `accent` are expected to be module-level constants (see
+    // src/data/categoryHeroes.ts) so the scene is built once per category.
+  }, [markers, accent]);
 
   return (
     <div
       ref={mountRef}
       style={{ position: "absolute", inset: 0, cursor: "grab" }}
     >
-      {MARKERS.map((marker, i) => {
+      {markers.map((marker, i) => {
         const Icon = marker.icon;
         return (
           <div
@@ -371,8 +477,8 @@ export default function InteractiveGlobeIcons() {
               position: "absolute",
               left: 0,
               top: 0,
-              width: "clamp(38px, 5.2vw, 56px)",
-              height: "clamp(38px, 5.2vw, 56px)",
+              width: markerSize,
+              height: markerSize,
               borderRadius: "50%",
               background: "#fff",
               boxShadow: "0 8px 22px rgba(16,24,20,0.16), 0 0 0 1px rgba(16,24,20,0.04)",
@@ -384,7 +490,22 @@ export default function InteractiveGlobeIcons() {
               willChange: "transform, opacity",
             }}
           >
-            <Icon size={18} color="#10B981" strokeWidth={2.3} />
+            {/* Hover halo — opacity is driven per frame, which keeps the
+                highlight on the compositor rather than triggering repaints. */}
+            <span
+              ref={(el) => {
+                markerGlowsRef.current[i] = el;
+              }}
+              style={{
+                position: "absolute",
+                inset: -7,
+                borderRadius: "50%",
+                background: `radial-gradient(circle, ${accent}2E 0%, ${accent}00 72%)`,
+                opacity: 0,
+                pointerEvents: "none",
+              }}
+            />
+            <Icon size={18} color={accent} strokeWidth={2.3} style={{ position: "relative" }} />
           </div>
         );
       })}
