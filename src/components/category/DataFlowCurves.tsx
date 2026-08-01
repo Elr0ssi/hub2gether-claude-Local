@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import type { LucideIcon } from "lucide-react";
 
 export type CurveLayer = "back" | "front";
@@ -19,17 +19,24 @@ interface DataFlowCurvesProps {
   /** Category colour — a few strands are tinted with it, the rest stay neutral. */
   accent: string;
   /**
-   * `back` is the main band, `front` a sparser set of secondary strands drawn
-   * a little higher. Both stay inside the same band above the globe.
+   * `back` is the main sheaf hugging the globe, `front` a few secondary
+   * strands running higher above it.
    */
   layer?: CurveLayer;
   /** Badges to pin onto the strands. Only the `back` layer carries them. */
   icons?: FlowIcon[];
+  /** The globe's square container — the strands are traced from its real rect. */
+  globeRef: RefObject<HTMLElement | null>;
 }
 
 interface Curve {
-  /** Offset inside the band, -1 (top) to 1 (bottom). */
-  offset: number;
+  /** Clearance above the globe's silhouette, in px. */
+  margin: number;
+  /** Apex shift as a fraction of the radius — breaks the symmetry. */
+  skew: number;
+  /** Slight hollow over the middle of the dome, in px. */
+  sag: number;
+  /** Free undulation along the path, in px. */
   amp: number;
   freq: number;
   phase: number;
@@ -40,31 +47,32 @@ interface Curve {
   dots: number[];
 }
 
-interface Ripple {
-  x: number;
-  y: number;
+interface Pulse {
+  curve: number;
+  x0: number;
+  dir: 1 | -1;
   born: number;
 }
 
-// --- Band geometry, as fractions of the stage height -------------------------
-// The strands arc over the globe: highest in the middle, sloping away towards
-// the edges, so they accompany the dome's curvature without ever crossing it,
-// the title above it or the panel below.
-const BAND_APEX = 0.36;
-const BAND_EDGE_DROP = 0.19;
-const BAND_THICKNESS = 0.075;
+// --- Path shape --------------------------------------------------------------
+// Up to TAIL_START the strand is a circle concentric with the globe, so it
+// traces the silhouette at a constant clearance. Past it, it peels off
+// tangentially and settles onto a near-horizontal course towards the edges of
+// the screen, rather than diving with the sphere down behind the panel.
+const TAIL_START = 0.78;
 
 // --- Pointer response --------------------------------------------------------
-// Not a wave: a short, local shiver. A couple of pixels, a few oscillations,
-// gone in under half a second.
-const RIPPLE_LIFE = 440; // ms from tap to rest
-const RIPPLE_RADIUS = 40; // px — beyond this the strand is untouched
-const RIPPLE_LIFT = 2.4; // px peak displacement
-const RIPPLE_TRAVEL = 52; // px the shiver creeps outward
-const CURSOR_LIFT = 1.2; // px of standing swell under the cursor
-const CURSOR_RADIUS = 46;
-const MAX_RIPPLES = 6;
-const SAMPLES = 74;
+// No wave: the strand under the cursor brightens over a short span, a pulse of
+// light runs along it, and the line itself barely moves.
+const NEAR_SIGMA = 7; // px — vertical falloff; neighbours react far less
+const HOVER_SPAN = 190; // px — half-length of the brightened stretch
+const HOVER_GAIN = 0.26; // extra alpha at the centre of that stretch
+const HOVER_BEND = 1.8; // px — the whole of the strand's displacement
+const PULSE_SPAN = 62; // px — half-length of the travelling glint
+const PULSE_SPEED = 250; // px per second
+const PULSE_LIFE = 1000; // ms
+const PULSE_GAP = 1100; // ms between two pulses on the same strand
+const SAMPLES = 96;
 
 // Deterministic pseudo-random so server and client agree and the field looks
 // identical on every reload.
@@ -76,27 +84,31 @@ function rand(seed: number): () => number {
   };
 }
 
+// Irregular but controlled spacing: the lowest strand almost grazes the globe,
+// the others fan out above it with widening gaps.
+// The whole sheaf has to fit between the globe's crown and the subtitle, so
+// the topmost strand never rises past roughly a quarter of a radius above it.
+const BACK_MARGINS = [6, 14, 24, 36, 50, 66, 84];
+const FRONT_MARGINS = [96, 110, 124];
+
 function buildCurves(layer: CurveLayer): Curve[] {
   const next = rand(layer === "back" ? 20250729 : 78123401);
-  const count = layer === "back" ? 7 : 3;
-  const curves: Curve[] = [];
+  const margins = layer === "back" ? BACK_MARGINS : FRONT_MARGINS;
 
-  for (let i = 0; i < count; i++) {
-    const spread = i / (count - 1);
-    curves.push({
-      offset: layer === "back" ? spread * 2 - 1 : spread * 1.1 - 1.5,
-      amp: 0.008 + next() * 0.013,
-      freq: 0.8 + next() * 1.1,
-      phase: next() * Math.PI * 2,
-      drift: (0.04 + next() * 0.07) * (next() > 0.5 ? 1 : -1),
-      width: layer === "back" ? 0.9 + next() * 0.6 : 0.8 + next() * 0.5,
-      alpha: layer === "back" ? 0.14 + next() * 0.12 : 0.06 + next() * 0.05,
-      tinted: next() > 0.4,
-      // Data nodes riding the strand, at fixed positions along it.
-      dots: Array.from({ length: Math.round(next() * 2.4) }, () => 0.08 + next() * 0.84),
-    });
-  }
-  return curves;
+  return margins.map((margin, i) => ({
+    margin,
+    skew: (next() - 0.5) * 0.12,
+    sag: 3 + next() * 9,
+    amp: 2.5 + next() * 5,
+    freq: 0.7 + next() * 1.1,
+    phase: next() * Math.PI * 2,
+    drift: (0.04 + next() * 0.07) * (next() > 0.5 ? 1 : -1),
+    width: layer === "back" ? 0.85 + (i < 3 ? 0.5 : 0.2) + next() * 0.3 : 0.7 + next() * 0.3,
+    alpha: layer === "back" ? 0.34 - i * 0.03 + next() * 0.05 : 0.07 + next() * 0.04,
+    tinted: next() > 0.38,
+    // Data nodes riding the strand, at fixed positions along it.
+    dots: Array.from({ length: Math.round(next() * 2.4) }, () => 0.16 + next() * 0.68),
+  }));
 }
 
 function hexToRgb(hex: string): [number, number, number] {
@@ -109,7 +121,12 @@ function hexToRgb(hex: string): [number, number, number] {
   ];
 }
 
-export function DataFlowCurves({ accent, layer = "back", icons = [] }: DataFlowCurvesProps) {
+export function DataFlowCurves({
+  accent,
+  layer = "back",
+  icons = [],
+  globeRef,
+}: DataFlowCurvesProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nodeRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
@@ -124,21 +141,43 @@ export function DataFlowCurves({ accent, layer = "back", icons = [] }: DataFlowC
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const curves = buildCurves(layer);
     const [ar, ag, ab] = hexToRgb(accent);
+    const tint = (a: number) => `rgba(${ar},${ag},${ab},${a})`;
+    const grey = (a: number) => `rgba(110,122,116,${a})`;
 
     let W = 0;
     let H = 0;
-    // Amplitude follows the narrower of the two axes: on a phone, scaling off
-    // height alone turns gentle flows into scribbles.
-    let ampScale = 0;
     let visible = curves;
     let rect = parent.getBoundingClientRect();
 
-    const resize = () => {
+    // --- Globe-relative geometry --------------------------------------------
+    // Centre and radius of the sphere, in canvas coordinates. Everything the
+    // strands do is expressed against these, so the sheaf keeps hugging the
+    // globe at any viewport size without a single hardcoded coordinate.
+    let cx = 0;
+    let cy = 0;
+    let R = 0;
+
+    const measure = () => {
       rect = parent.getBoundingClientRect();
       W = rect.width;
       H = rect.height;
-      ampScale = Math.min(H, W * 0.55);
+
+      const g = globeRef.current?.getBoundingClientRect();
+      if (g && g.width > 0) {
+        R = g.width / 2;
+        cx = g.left + g.width / 2 - rect.left;
+        cy = g.top + g.height / 2 - rect.top;
+      } else {
+        R = Math.min(W * 0.45, H * 0.58);
+        cx = W / 2;
+        cy = H * 0.4 + R;
+      }
+
       visible = W < 660 ? curves.filter((_, i) => i % 2 === 0) : curves;
+    };
+
+    const resize = () => {
+      measure();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
@@ -148,130 +187,157 @@ export function DataFlowCurves({ accent, layer = "back", icons = [] }: DataFlowC
     };
     resize();
 
+    /**
+     * Resting height of a strand at abscissa `x`.
+     *
+     * Inside the dome it is a circle of radius `R + margin` centred on the
+     * globe: the line runs parallel to the silhouette, the innermost one a few
+     * pixels off it. A shallow sag hollows the middle, a skew moves the apex
+     * off-centre, and a slow undulation keeps the sheaf from looking machined.
+     */
+    const strandY = (c: Curve, x: number, t: number): number => {
+      const rm = R + c.margin;
+      const k = (x - (cx + c.skew * R)) / rm;
+      const a = Math.abs(k);
+
+      let drop: number;
+      if (a <= TAIL_START) {
+        drop = rm * (1 - Math.sqrt(1 - k * k));
+      } else {
+        // Leaves on the circle's own tangent, then eases onto an asymptote a
+        // few dozen pixels lower — so the strand still reaches the edge of the
+        // screen instead of plunging behind the statistics panel.
+        const dTail = rm * (1 - Math.sqrt(1 - TAIL_START * TAIL_START));
+        const slope = TAIL_START / Math.sqrt(1 - TAIL_START * TAIL_START);
+        const over = a - TAIL_START;
+        // Inner strands get more room to fall away than outer ones, so the
+        // sheaf keeps fanning out instead of converging at the edges.
+        const room = 26 + (BACK_MARGINS[BACK_MARGINS.length - 1] + 46 - c.margin) * 0.35;
+        drop = dTail + room * (1 - Math.exp((-rm * slope * over) / room));
+      }
+
+      const sag = c.sag * Math.exp(-3.2 * k * k);
+      const wave = Math.sin((x / Math.max(1, W)) * Math.PI * 2 * c.freq + c.phase + t * c.drift) * c.amp;
+      return cy - rm + drop + sag + wave;
+    };
+
     // --- Pointer state -------------------------------------------------------
-    const ripples: Ripple[] = [];
-    let cursorX = -9999;
-    let cursorY = -9999;
-    let cursorFade = 0;
-    let lastSpawnX = -9999;
-    let lastSpawnY = -9999;
-    let lastSpawnAt = 0;
+    let pointerX = -9999;
+    let pointerY = -9999;
+    const near = curves.map(() => 0); // smoothed proximity, per strand
+    const lastPulseAt = curves.map(() => 0);
+    const pulses: Pulse[] = [];
 
     const onMove = (e: MouseEvent) => {
-      cursorX = e.clientX - rect.left;
-      cursorY = e.clientY - rect.top;
-      if (cursorX < -40 || cursorY < -40 || cursorX > W + 40 || cursorY > H + 40) {
-        cursorX = -9999;
-        cursorY = -9999;
-        return;
-      }
-      // Small, frequent taps along the pointer's path — the trail of a
-      // fingertip grazing the surface rather than a stone dropped in it.
-      const now = performance.now();
-      const dx = cursorX - lastSpawnX;
-      const dy = cursorY - lastSpawnY;
-      if (now - lastSpawnAt > 55 && dx * dx + dy * dy > 180) {
-        ripples.push({ x: cursorX, y: cursorY, born: now });
-        if (ripples.length > MAX_RIPPLES) ripples.shift();
-        lastSpawnX = cursorX;
-        lastSpawnY = cursorY;
-        lastSpawnAt = now;
+      pointerX = e.clientX - rect.left;
+      pointerY = e.clientY - rect.top;
+      if (pointerX < -60 || pointerY < -60 || pointerX > W + 60 || pointerY > H + 60) {
+        pointerX = -9999;
+        pointerY = -9999;
       }
     };
 
-    // --- Displacement field --------------------------------------------------
-    // Each tap is a damped oscillation confined to its own small disc: the
-    // strand shivers for a moment and settles straight back. Strands are
-    // near-horizontal, so displacing on Y alone reads as a ripple.
-    const displace = (px: number, py: number, now: number): number => {
-      let d = 0;
-
-      for (const r of ripples) {
-        const age = (now - r.born) / RIPPLE_LIFE;
-        if (age >= 1) continue;
-        const dx = px - r.x;
-        const dy = py - r.y;
-        const dist2 = dx * dx + dy * dy;
-        if (dist2 > RIPPLE_RADIUS * RIPPLE_RADIUS * 6) continue;
-        const dist = Math.sqrt(dist2);
-        const reach = Math.exp(-dist2 / (2 * RIPPLE_RADIUS * RIPPLE_RADIUS));
-        // Phase lags with distance, so the shiver creeps outward a little.
-        const osc = Math.sin((dist / RIPPLE_TRAVEL - age * 2.4) * Math.PI * 2);
-        const decay = (1 - age) * (1 - age);
-        d += RIPPLE_LIFT * reach * decay * osc;
-      }
-
-      if (cursorFade > 0.01) {
-        const dx = px - cursorX;
-        const dy = py - cursorY;
-        const swell = Math.exp(-(dx * dx + dy * dy) / (2 * CURSOR_RADIUS * CURSOR_RADIUS));
-        d += CURSOR_LIFT * swell * cursorFade * (dy / Math.max(18, Math.abs(dy)));
-      }
-
-      return d;
-    };
-
-    // Resting shape of a strand at horizontal position `u`, in px: the arc over
-    // the globe, plus two detuned harmonics so it never looks like a plain sine.
-    const curveY = (c: Curve, u: number, t: number): number => {
-      const s = (u - 0.5) * 2;
-      const arc = (BAND_APEX + (c.offset * BAND_THICKNESS) / 2) * H + BAND_EDGE_DROP * H * s * s;
-      const wave =
-        Math.sin(u * Math.PI * 2 * c.freq + c.phase + t * c.drift) * c.amp +
-        Math.sin(u * Math.PI * 2 * c.freq * 1.9 + c.phase * 1.4 - t * c.drift * 0.6) * c.amp * 0.34;
-      return arc + wave * ampScale;
+    /** The strand leans a hair towards the cursor — 2px at most, nothing else. */
+    const bend = (c: Curve, index: number, x: number, y: number): number => {
+      const n = near[index];
+      if (n < 0.02 || pointerX < -1000) return 0;
+      const dx = x - pointerX;
+      const falloff = Math.exp(-(dx * dx) / (2 * 80 * 80));
+      const dir = Math.sign(pointerY - y) || 1;
+      return HOVER_BEND * n * falloff * dir;
     };
 
     // --- Icon nodes ----------------------------------------------------------
     // Pinned to their strand: the badge rests on the line, its lower edge
-    // sitting on it, and it inherits whatever the ripple does to that point.
+    // sitting on it, and it inherits whatever the strand does.
     const placeNodes = (t: number, now: number) => {
       icons.forEach((item, i) => {
         const el = nodeRefs.current[i];
-        const c = curves[item.curve % curves.length];
+        const ci = item.curve % curves.length;
+        const c = curves[ci];
         if (!el || !c) return;
         const x = item.u * W;
-        const line = curveY(c, item.u, t);
-        const y = line + displace(x, line, now);
+        const line = strandY(c, x, t);
+        const y = line + bend(c, ci, x, line);
         const r = (el.offsetWidth || 48) / 2;
         // Barely-there breathing, secondary to the strand's own motion.
-        const bob = prefersReduced ? 0 : Math.sin(now / 2900 + i * 1.9) * 1.6;
+        const bob = prefersReduced ? 0 : Math.sin(now / 2900 + i * 1.9) * 1.4;
         el.style.transform = `translate(-50%, -50%) translate(${x}px, ${y - r + 2 + bob}px)`;
       });
+    };
+
+    /**
+     * Vertical ramp that dissolves a strand as it dives towards the lower part
+     * of the stage: the flow reads as flowing away rather than running under
+     * the statistics panel and out of the bottom corners.
+     */
+    const fadeOut = (color: (a: number) => string, alpha: number) => {
+      const grad = ctx.createLinearGradient(0, H * 0.6, 0, H * 0.78);
+      grad.addColorStop(0, color(alpha));
+      grad.addColorStop(1, color(0));
+      return grad;
+    };
+
+    /** Horizontal alpha ramp centred on `x` — used for the glow and the pulse. */
+    const bandGradient = (x: number, span: number, peak: number) => {
+      const grad = ctx.createLinearGradient(x - span, 0, x + span, 0);
+      grad.addColorStop(0, tint(0));
+      grad.addColorStop(0.5, tint(peak));
+      grad.addColorStop(1, tint(0));
+      return grad;
     };
 
     const draw = (now: number) => {
       ctx.clearRect(0, 0, W, H);
       const t = prefersReduced ? 0 : now / 1000;
 
-      for (const c of visible) {
-        const stroke = c.tinted
-          ? `rgba(${ar},${ag},${ab},${c.alpha})`
-          : `rgba(110,122,116,${c.alpha * 0.75})`;
+      visible.forEach((c) => {
+        const index = curves.indexOf(c);
 
+        // Trace once, re-stroke for the highlights: the glow can never drift
+        // away from the line it belongs to.
         ctx.beginPath();
         for (let i = 0; i <= SAMPLES; i++) {
-          const u = i / SAMPLES;
-          const px = u * W;
-          const py = curveY(c, u, t);
-          const y = py + displace(px, py, now);
-          if (i === 0) ctx.moveTo(px, y);
-          else ctx.lineTo(px, y);
+          const x = (i / SAMPLES) * W;
+          const y = strandY(c, x, t);
+          const py = y + bend(c, index, x, y);
+          if (i === 0) ctx.moveTo(x, py);
+          else ctx.lineTo(x, py);
         }
-        ctx.strokeStyle = stroke;
-        ctx.lineWidth = c.width;
         ctx.lineCap = "round";
+        ctx.lineWidth = c.width;
+        ctx.strokeStyle = fadeOut(c.tinted ? tint : grey, c.tinted ? c.alpha : c.alpha * 0.7);
         ctx.stroke();
 
+        // Local brightening around the cursor.
+        const n = near[index];
+        if (n > 0.02 && pointerX > -1000) {
+          ctx.lineWidth = c.width + 0.35;
+          ctx.strokeStyle = bandGradient(pointerX, HOVER_SPAN, HOVER_GAIN * n);
+          ctx.stroke();
+        }
+
+        // Glints running along it.
+        for (const p of pulses) {
+          if (p.curve !== index) continue;
+          const age = (now - p.born) / PULSE_LIFE;
+          if (age >= 1) continue;
+          const x = p.x0 + p.dir * PULSE_SPEED * age * (PULSE_LIFE / 1000);
+          const env = Math.sin(age * Math.PI); // fades in and out
+          ctx.lineWidth = c.width + 0.5;
+          ctx.strokeStyle = bandGradient(x, PULSE_SPAN, 0.4 * env);
+          ctx.stroke();
+        }
+
         for (const u of c.dots) {
-          const px = u * W;
-          const py = curveY(c, u, t);
+          const x = u * W;
+          const y = strandY(c, x, t);
           ctx.beginPath();
-          ctx.arc(px, py + displace(px, py, now), 1.7, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${ar},${ag},${ab},${Math.min(0.6, c.alpha * 3.2)})`;
+          ctx.arc(x, y + bend(c, index, x, y), 1.7, 0, Math.PI * 2);
+          ctx.fillStyle = tint(Math.min(0.55, c.alpha * 2.4));
           ctx.fill();
         }
-      }
+      });
 
       placeNodes(t, now);
     };
@@ -282,8 +348,31 @@ export function DataFlowCurves({ accent, layer = "back", icons = [] }: DataFlowC
     const tick = () => {
       frame = requestAnimationFrame(tick);
       const now = performance.now();
-      cursorFade += ((cursorX > -1000 ? 1 : 0) - cursorFade) * 0.1;
-      while (ripples.length && now - ripples[0].born > RIPPLE_LIFE) ripples.shift();
+
+      // Proximity per strand: quick to answer, slow to let go.
+      visible.forEach((c) => {
+        const index = curves.indexOf(c);
+        let target = 0;
+        if (pointerX > -1000) {
+          const y = strandY(c, pointerX, now / 1000);
+          const dv = pointerY - y;
+          target = Math.exp(-(dv * dv) / (2 * NEAR_SIGMA * NEAR_SIGMA));
+        }
+        const k = target > near[index] ? 0.22 : 0.07;
+        near[index] += (target - near[index]) * k;
+
+        if (target > 0.45 && now - lastPulseAt[index] > PULSE_GAP) {
+          lastPulseAt[index] = now;
+          pulses.push({
+            curve: index,
+            x0: pointerX,
+            dir: pointerX > cx ? 1 : -1,
+            born: now,
+          });
+        }
+      });
+
+      while (pulses.length && now - pulses[0].born > PULSE_LIFE) pulses.shift();
       draw(now);
     };
 
@@ -315,9 +404,7 @@ export function DataFlowCurves({ accent, layer = "back", icons = [] }: DataFlowC
     io.observe(parent);
     const ro = new ResizeObserver(resize);
     ro.observe(parent);
-    const onScroll = () => {
-      rect = parent.getBoundingClientRect();
-    };
+    const onScroll = () => measure();
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
     start();
@@ -329,7 +416,7 @@ export function DataFlowCurves({ accent, layer = "back", icons = [] }: DataFlowC
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("scroll", onScroll);
     };
-  }, [accent, layer, icons]);
+  }, [accent, layer, icons, globeRef]);
 
   return (
     <>
@@ -354,7 +441,7 @@ export function DataFlowCurves({ accent, layer = "back", icons = [] }: DataFlowC
             <span className="cat-node-badge">
               <span
                 className="cat-node-halo"
-                style={{ background: `radial-gradient(circle, ${accent}33 0%, ${accent}00 70%)` }}
+                style={{ background: `radial-gradient(circle, ${accent}2B 0%, ${accent}00 70%)` }}
               />
               <Icon size={19} color={accent} strokeWidth={2.2} style={{ position: "relative" }} />
             </span>
@@ -395,9 +482,10 @@ export function DataFlowCurves({ accent, layer = "back", icons = [] }: DataFlowC
             opacity: 0;
             transition: opacity 380ms var(--ease-smooth);
           }
+          /* Glow first, movement almost none. */
           .cat-node-badge:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 13px 28px rgba(16,24,20,0.14), 0 0 0 1px rgba(16,24,20,0.05);
+            transform: scale(1.03);
+            box-shadow: 0 10px 24px rgba(16,24,20,0.12), 0 0 0 1px rgba(16,24,20,0.05);
           }
           .cat-node-badge:hover .cat-node-halo { opacity: 1; }
 

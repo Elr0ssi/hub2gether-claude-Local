@@ -39,6 +39,8 @@ interface CategoryHeroProps {
 export function CategoryHero({ themeId }: CategoryHeroProps) {
   const config = getCategoryHero(themeId);
   const trackRef = useRef<HTMLDivElement>(null);
+  // Measured by the flow field so the strands trace the sphere itself.
+  const globeRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const [globeActive, setGlobeActive] = useState(true);
 
@@ -86,13 +88,13 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
   return (
     <div ref={trackRef} className="cat-hero-track">
       <div className="cat-hero-stage">
-        {/* Secondary strands, a touch higher and much fainter */}
+        {/* Secondary strands, running higher and much fainter */}
         <motion.div className="cat-hero-layer" style={{ opacity: curvesOpacity, zIndex: 1 }}>
-          <DataFlowCurves accent={accent} layer="front" />
+          <DataFlowCurves accent={accent} layer="front" globeRef={globeRef} />
         </motion.div>
 
         {/* Globe — oversized on purpose, its lower half runs past the fold */}
-        <div className="cat-hero-globe-anchor" style={{ zIndex: 2 }}>
+        <div ref={globeRef} className="cat-hero-globe-anchor" style={{ zIndex: 2 }}>
           <motion.div className="cat-hero-globe" style={{ opacity: globeOpacity }}>
             {/* Badges ride the flow strands above, not the sphere: with the
                 globe this large, surface-anchored ones would fall past the fold. */}
@@ -100,11 +102,11 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
           </motion.div>
         </div>
 
-        {/* Main band of flows, arcing over the globe, carrying the icon nodes.
-            Above the globe in z so the badges stay hoverable — the strands
-            never cross the sphere, so nothing is hidden by it. */}
-        <motion.div className="cat-hero-layer" style={{ opacity: curvesOpacity, zIndex: 6 }}>
-          <DataFlowCurves accent={accent} layer="back" icons={config.icons} />
+        {/* Main sheaf, wrapping the top of the globe and carrying the icon
+            nodes. Above the globe so the badges stay hoverable, below the
+            title and the panel so it can never cut across either. */}
+        <motion.div className="cat-hero-layer" style={{ opacity: curvesOpacity, zIndex: 3 }}>
+          <DataFlowCurves accent={accent} layer="back" icons={config.icons} globeRef={globeRef} />
         </motion.div>
 
         {/* Title */}

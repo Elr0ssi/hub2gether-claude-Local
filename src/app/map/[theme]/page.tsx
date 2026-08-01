@@ -223,7 +223,7 @@ export default async function MapPage({ params, searchParams }: PageProps) {
       )}
 
       {/* Interactive map */}
-      <ScrollReveal className="max-w-7xl mx-auto px-6 pb-8">
+      <ScrollReveal className="max-w-7xl mx-auto px-6 pb-8" offset={showCategoryHero ? 0 : undefined}>
         <Suspense
           fallback={
             <div

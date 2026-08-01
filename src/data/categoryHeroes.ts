@@ -112,20 +112,20 @@ const ECONOMY_HERO: CategoryHeroConfig = {
   subtitle: "Données économiques mondiales, comparables et actualisées en temps réel.",
   accent: "#10B981",
   accentInk: "#0C8F5F",
-  // Each badge rides a strand of the flow: `u` is its position along the
-  // width, `curve` the strand it rests on (higher index = lower in the band).
-  // The middle of the band uses the lower strands so the badges clear the
-  // subtitle above and the globe's crown below.
+  // Each badge rides a strand of the sheaf: `u` is its position across the
+  // width, `curve` the strand it rests on — index 0 hugs the globe, higher
+  // indices run further above it. Badges near the shoulders sit on the upper
+  // strands so they stay clear of the panel as the flow dives away.
   icons: [
-    { id: "usd", icon: DollarSign, curve: 5, u: 0.06 },
-    { id: "eur", icon: Euro, curve: 2, u: 0.16 },
-    { id: "bank", icon: Landmark, curve: 6, u: 0.27 },
-    { id: "markets", icon: BarChart3, curve: 4, u: 0.38 },
+    { id: "eur", icon: Euro, curve: 6, u: 0.235 },
+    { id: "usd", icon: DollarSign, curve: 4, u: 0.3 },
+    { id: "bank", icon: Landmark, curve: 5, u: 0.37 },
+    { id: "markets", icon: BarChart3, curve: 2, u: 0.435 },
     { id: "population", icon: Users, curve: 6, u: 0.5 },
-    { id: "energy", icon: Droplet, curve: 5, u: 0.61 },
-    { id: "jpy", icon: JapaneseYen, curve: 2, u: 0.72 },
-    { id: "industry", icon: Factory, curve: 6, u: 0.84 },
-    { id: "agriculture", icon: Sprout, curve: 3, u: 0.94 },
+    { id: "energy", icon: Droplet, curve: 3, u: 0.565 },
+    { id: "jpy", icon: JapaneseYen, curve: 5, u: 0.63 },
+    { id: "industry", icon: Factory, curve: 2, u: 0.7 },
+    { id: "agriculture", icon: Sprout, curve: 6, u: 0.765 },
   ],
   stats: [
     {
