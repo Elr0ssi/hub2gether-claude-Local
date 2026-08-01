@@ -16,7 +16,10 @@ interface AnimatedKpiProps {
 // every scroll tick.
 export function AnimatedKpi({ target, decimals = 0, prefix = "", suffix = "", duration = 900 }: AnimatedKpiProps) {
   const reduced = useReducedMotion();
-  const [display, setDisplay] = useState(reduced ? target : 0);
+  // Always starts at 0: `reduced` is only known on the client, so seeding the
+  // state from it would make the first client render disagree with the server's
+  // HTML. The effect below jumps straight to `target` in that case.
+  const [display, setDisplay] = useState(0);
   const frameRef = useRef<number>(0);
 
   useEffect(() => {

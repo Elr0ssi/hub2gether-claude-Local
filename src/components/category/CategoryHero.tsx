@@ -12,7 +12,6 @@ import {
 import { useMotionNumber } from "@/hooks/useMotionNumber";
 import { AnimatedKpi } from "@/components/presentation2/AnimatedKpi";
 import { DataFlowCurves } from "./DataFlowCurves";
-import { FloatingIconField } from "./FloatingIconField";
 import { getCategoryHero } from "@/data/categoryHeroes";
 
 const InteractiveGlobeIcons = dynamic(() => import("@/components/globe/InteractiveGlobeIcons"), {
@@ -52,38 +51,31 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
     offset: ["start start", "end start"],
   });
 
-  // Scene exit — transform and opacity only. The layers leave in sequence:
-  // title, then flows, icons, panel, and finally the globe.
+  // Scene exit. Each layer dissolves over the stretch of scroll during which
+  // it is itself leaving the top of the viewport — never earlier — so the
+  // scene is always complete above the map and no emptied band is left behind.
+  // Opacity only, apart from the title, which is on its way out anyway.
   //
-  // With reduced motion the scene just scrolls away with the page — no
-  // parallax, no dissolve. Ranges collapse to their start value so the hook
-  // order stays identical either way.
+  // With reduced motion the scene simply scrolls away with the page. Ranges
+  // collapse to their start value so the hook order stays identical.
   const still = <T,>(from: T, to: T): [T, T] => (reduced ? [from, from] : [from, to]);
   const fade = still(1, 0);
 
-  const titleY = useTransform(p, [0, 0.22], still(0, -56), { clamp: true });
-  const titleOpacityMv = useTransform(p, [0, 0.15], fade, { clamp: true });
-  const curvesOpacityMv = useTransform(p, [0.02, 0.22], fade, { clamp: true });
-  const iconsOpacityMv = useTransform(p, [0.03, 0.24], fade, { clamp: true });
-  // The panel and the globe leave last. Translating the globe down against the
-  // page's own upward motion keeps it in frame a beat longer, so it reads as
-  // sinking out of the viewport rather than being scrolled off it.
-  const globeY = useTransform(p, [0, 0.5], still("0vh", "26vh"), { clamp: true });
-  const globeScale = useTransform(p, [0, 0.5], still(1, 0.93), { clamp: true });
-  const globeOpacityMv = useTransform(p, [0.1, 0.42], fade, { clamp: true });
-  const statsY = useTransform(p, [0, 0.5], still("0vh", "18vh"), { clamp: true });
-  const statsOpacityMv = useTransform(p, [0.03, 0.28], fade, { clamp: true });
+  const titleY = useTransform(p, [0, 0.26], still(0, -56), { clamp: true });
+  const titleOpacityMv = useTransform(p, [0.06, 0.26], fade, { clamp: true });
+  const curvesOpacityMv = useTransform(p, [0.26, 0.5], fade, { clamp: true });
+  const globeOpacityMv = useTransform(p, [0.5, 0.92], fade, { clamp: true });
+  const statsOpacityMv = useTransform(p, [0.5, 0.78], fade, { clamp: true });
 
   // Opacity is mirrored through React state — see useMotionNumber.
   const titleOpacity = useMotionNumber(titleOpacityMv);
   const curvesOpacity = useMotionNumber(curvesOpacityMv);
-  const iconsOpacity = useMotionNumber(iconsOpacityMv);
   const globeOpacity = useMotionNumber(globeOpacityMv);
   const statsOpacity = useMotionNumber(statsOpacityMv);
 
   // Once the scene has cleared, stop rendering the WebGL frame entirely.
   useMotionValueEvent(p, "change", (v) => {
-    const shouldRender = v < 0.46;
+    const shouldRender = v < 0.95;
     setGlobeActive((current) => (current === shouldRender ? current : shouldRender));
   });
 
@@ -94,31 +86,25 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
   return (
     <div ref={trackRef} className="cat-hero-track">
       <div className="cat-hero-stage">
-        {/* Data flows behind the globe */}
+        {/* Secondary strands, a touch higher and much fainter */}
         <motion.div className="cat-hero-layer" style={{ opacity: curvesOpacity, zIndex: 1 }}>
-          <DataFlowCurves accent={accent} layer="back" />
+          <DataFlowCurves accent={accent} layer="front" />
         </motion.div>
 
         {/* Globe — oversized on purpose, its lower half runs past the fold */}
         <div className="cat-hero-globe-anchor" style={{ zIndex: 2 }}>
-          <motion.div
-            className="cat-hero-globe"
-            style={{ y: globeY, scale: globeScale, opacity: globeOpacity }}
-          >
-            {/* Badges live in the icon field above, not on the sphere: with the
+          <motion.div className="cat-hero-globe" style={{ opacity: globeOpacity }}>
+            {/* Badges ride the flow strands above, not the sphere: with the
                 globe this large, surface-anchored ones would fall past the fold. */}
             <InteractiveGlobeIcons markers={NO_GLOBE_MARKERS} accent={accent} active={globeActive} />
           </motion.div>
         </div>
 
-        {/* Category icons floating around the globe */}
-        <motion.div className="cat-hero-layer" style={{ opacity: iconsOpacity, zIndex: 6 }}>
-          <FloatingIconField icons={config.icons} accent={accent} />
-        </motion.div>
-
-        {/* Data flows crossing in front of the globe */}
-        <motion.div className="cat-hero-layer" style={{ opacity: curvesOpacity, zIndex: 3 }}>
-          <DataFlowCurves accent={accent} layer="front" />
+        {/* Main band of flows, arcing over the globe, carrying the icon nodes.
+            Above the globe in z so the badges stay hoverable — the strands
+            never cross the sphere, so nothing is hidden by it. */}
+        <motion.div className="cat-hero-layer" style={{ opacity: curvesOpacity, zIndex: 6 }}>
+          <DataFlowCurves accent={accent} layer="back" icons={config.icons} />
         </motion.div>
 
         {/* Title */}
@@ -126,16 +112,6 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
           className="cat-hero-head"
           style={{ y: titleY, opacity: titleOpacity, zIndex: 4 }}
         >
-          <span
-            className="cat-hero-eyebrow"
-            style={{
-              color: accentInk,
-              background: `${accent}14`,
-              border: `1px solid ${accent}3D`,
-            }}
-          >
-            {config.eyebrow}
-          </span>
           <h1 className="cat-hero-title">
             {config.title} <span style={{ color: accentInk }}>{config.titleAccent}</span>
           </h1>
@@ -145,7 +121,7 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
         {/* Floating indicators */}
         <motion.div
           className="cat-hero-stats-anchor"
-          style={{ y: statsY, opacity: statsOpacity, zIndex: 5 }}
+          style={{ opacity: statsOpacity, zIndex: 5 }}
         >
           <div className="cat-hero-stats">
             {config.stats.map((stat) => {
@@ -196,7 +172,7 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
         .cat-hero-globe-anchor {
           position: absolute;
           left: 50%;
-          top: 34%;
+          top: 40%;
           transform: translateX(-50%);
           width: min(900px, 118vw);
           aspect-ratio: 1 / 1;
@@ -205,23 +181,14 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
 
         .cat-hero-head {
           position: absolute;
-          top: clamp(22px, 5vh, 60px);
+          top: clamp(26px, 5.5vh, 66px);
           left: 0;
           right: 0;
           padding: 0 clamp(20px, 5vw, 56px);
           text-align: center;
         }
-        .cat-hero-eyebrow {
-          display: inline-block;
-          padding: 4px 11px;
-          border-radius: 999px;
-          font-size: 0.68rem;
-          font-weight: 700;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-        }
         .cat-hero-title {
-          margin: 14px 0 0;
+          margin: 0;
           font-size: clamp(2.3rem, 6vw, 4.6rem);
           font-weight: 900;
           line-height: 1.02;
@@ -297,7 +264,7 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
           .cat-hero-stats { grid-template-columns: repeat(2, 1fr); }
           .cat-hero-stat:nth-child(2n + 1) { border-left: none; }
           .cat-hero-stat:nth-child(n + 3) { border-top: 1px solid var(--border-light); }
-          .cat-hero-globe-anchor { top: 40%; width: min(700px, 145vw); }
+          .cat-hero-globe-anchor { top: 44%; width: min(700px, 145vw); }
         }
         @media (max-width: 560px) {
           .cat-hero-stat { padding: 13px 10px; }

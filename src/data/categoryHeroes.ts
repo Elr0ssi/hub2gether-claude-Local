@@ -1,7 +1,5 @@
 import {
   BarChart3,
-  Coins,
-  Cpu,
   DollarSign,
   Droplet,
   Euro,
@@ -13,7 +11,7 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
-import type { FloatingIcon } from "@/components/category/FloatingIconField";
+import type { FlowIcon } from "@/components/category/DataFlowCurves";
 import { ECONOMY_YEARS } from "@/data/economy/economy";
 import { getPopulationMillions } from "@/data/economy/populationData";
 import { TRADE_DATA } from "@/data/economy/tradeData";
@@ -40,7 +38,6 @@ export interface CategoryHeroStat {
 }
 
 export interface CategoryHeroConfig {
-  eyebrow: string;
   /** Leading words of the H1, in ink. */
   title: string;
   /** Trailing word(s) of the H1, in the category colour. */
@@ -50,8 +47,8 @@ export interface CategoryHeroConfig {
   accent: string;
   /** Darker sibling used for text, where the accent alone lacks contrast. */
   accentInk: string;
-  /** Icon badges scattered around the globe, positioned in % of the hero. */
-  icons: FloatingIcon[];
+  /** Icon badges pinned onto the flow strands arcing above the globe. */
+  icons: FlowIcon[];
   stats: CategoryHeroStat[];
   sourceNote: string;
 }
@@ -110,25 +107,25 @@ const POP_LATEST = sumFor(populationOf, LATEST, LATEST_COUNTRIES);
 const EXPORTS = TRADE_DATA.reduce((total, e) => total + e.exports_bn, 0);
 
 const ECONOMY_HERO: CategoryHeroConfig = {
-  eyebrow: "Économie",
   title: "Économie",
   titleAccent: "mondiale",
   subtitle: "Données économiques mondiales, comparables et actualisées en temps réel.",
   accent: "#10B981",
   accentInk: "#0C8F5F",
-  // Laid out around the globe, clear of the title block and of the panel.
+  // Each badge rides a strand of the flow: `u` is its position along the
+  // width, `curve` the strand it rests on (higher index = lower in the band).
+  // The middle of the band uses the lower strands so the badges clear the
+  // subtitle above and the globe's crown below.
   icons: [
-    { id: "usd", icon: DollarSign, x: 10, y: 34 },
-    { id: "eur", icon: Euro, x: 7.5, y: 54 },
-    { id: "gold", icon: Coins, x: 15.5, y: 70 },
-    { id: "bank", icon: Landmark, x: 21.5, y: 46 },
-    { id: "markets", icon: BarChart3, x: 37, y: 39 },
-    { id: "population", icon: Users, x: 50, y: 37 },
-    { id: "tech", icon: Cpu, x: 64, y: 40 },
-    { id: "jpy", icon: JapaneseYen, x: 81, y: 36 },
-    { id: "energy", icon: Droplet, x: 77.5, y: 53 },
-    { id: "industry", icon: Factory, x: 93, y: 43 },
-    { id: "agriculture", icon: Sprout, x: 85, y: 66 },
+    { id: "usd", icon: DollarSign, curve: 5, u: 0.06 },
+    { id: "eur", icon: Euro, curve: 2, u: 0.16 },
+    { id: "bank", icon: Landmark, curve: 6, u: 0.27 },
+    { id: "markets", icon: BarChart3, curve: 4, u: 0.38 },
+    { id: "population", icon: Users, curve: 6, u: 0.5 },
+    { id: "energy", icon: Droplet, curve: 5, u: 0.61 },
+    { id: "jpy", icon: JapaneseYen, curve: 2, u: 0.72 },
+    { id: "industry", icon: Factory, curve: 6, u: 0.84 },
+    { id: "agriculture", icon: Sprout, curve: 3, u: 0.94 },
   ],
   stats: [
     {
