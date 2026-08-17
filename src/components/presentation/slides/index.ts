@@ -30,6 +30,14 @@ import {
   RoadmapSlide,
   ConclusionSlide,
 } from "./partTwo";
+import {
+  PartThreeOpenerSlide,
+  AudienceNowSlide,
+  BenchmarkSlide,
+  TrajectorySlide,
+  RevenueChannelsSlide,
+  RevenueModelSlide,
+} from "./partThree";
 
 /**
  * Slide id → view. Keys must match `SLIDES[].id` in presentationData.ts:
@@ -62,6 +70,15 @@ export const SLIDE_VIEWS: Record<string, ComponentType> = {
   agilite: AgiliteSlide,
   paradoxe: ParadoxeSlide,
   "modele-cible": ModeleCibleSlide,
+
+  // Part III — audience & modèle économique
+  "part-three": PartThreeOpenerSlide,
+  audience: AudienceNowSlide,
+  benchmark: BenchmarkSlide,
+  trajectory: TrajectorySlide,
+  "revenue-channels": RevenueChannelsSlide,
+  "revenue-model": RevenueModelSlide,
+
   apprentissages: ApprentissagesSlide,
   phases: PhasesSlide,
   "a-prouver": AProuverSlide,

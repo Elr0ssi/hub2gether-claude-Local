@@ -894,7 +894,7 @@ export function ApprentissagesSlide() {
   return (
     <>
       <SlideBody padding="96px 120px">
-        <Eyebrow index="§ 19">Enseignements</Eyebrow>
+        <Eyebrow index="§ 24">Enseignements</Eyebrow>
 
         <Rise delay={0.28} y={18} duration={DUR.slow}>
           <h2
@@ -980,7 +980,7 @@ export function PhasesSlide() {
           }}
         >
           <div>
-            <Eyebrow index="§ 20">État d&apos;avancement</Eyebrow>
+            <Eyebrow index="§ 25">État d&apos;avancement</Eyebrow>
             <Rise delay={0.28} y={18} duration={DUR.slow}>
               <h2
                 className="t-h1"
@@ -1016,7 +1016,7 @@ export function AProuverSlide() {
   return (
     <>
       <SlideBody padding="96px 120px">
-        <Eyebrow index="§ 21">Risques assumés</Eyebrow>
+        <Eyebrow index="§ 26">Risques assumés</Eyebrow>
 
         <Rise delay={0.28} y={18} duration={DUR.slow}>
           <h2
@@ -1130,7 +1130,7 @@ export function JurySlide() {
         >
           {/* Left — the ask */}
           <div>
-            <Eyebrow index="§ 22">Regards extérieurs</Eyebrow>
+            <Eyebrow index="§ 27">Regards extérieurs</Eyebrow>
 
             <Rise delay={0.28} y={20} duration={DUR.slow}>
               <h2
@@ -1229,7 +1229,7 @@ export function RoadmapSlide() {
           }}
         >
           <div>
-            <Eyebrow index="§ 23">Roadmap</Eyebrow>
+            <Eyebrow index="§ 28">Roadmap</Eyebrow>
             <Rise delay={0.28} y={18} duration={DUR.slow}>
               <h2
                 className="t-h1"

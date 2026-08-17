@@ -462,10 +462,13 @@ function Overview({
   onSelect: (i: number) => void;
   onClose: () => void;
 }) {
-  const partI = SLIDES.map((s, i) => ({ s, i })).filter(({ s }) => s.part === "I");
-  const partII = SLIDES.map((s, i) => ({ s, i })).filter(
-    ({ s }) => s.part !== "I"
+  const indexed = SLIDES.map((s, i) => ({ s, i }));
+  // The pivot slide belongs to Part II's column, where it actually leads.
+  const partI = indexed.filter(({ s }) => s.part === "I");
+  const partII = indexed.filter(
+    ({ s }) => s.part === "II" || s.part === "transition"
   );
+  const partIII = indexed.filter(({ s }) => s.part === "III");
 
   return (
     <motion.div
@@ -512,10 +515,13 @@ function Overview({
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 46 }}>
+      <div
+        style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 40 }}
+      >
         {[
           { title: "Partie I — Pitch entrepreneurial", rows: partI },
           { title: "Partie II — Approfondissement", rows: partII },
+          { title: "Partie III — Audience & modèle", rows: partIII },
         ].map((col) => (
           <div key={col.title}>
             <div

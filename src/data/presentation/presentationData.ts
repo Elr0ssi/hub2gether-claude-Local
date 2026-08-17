@@ -12,7 +12,7 @@
  *     repository is left as a placeholder for manual completion.
  */
 
-export type SlidePart = "I" | "II" | "transition";
+export type SlidePart = "I" | "II" | "III" | "transition";
 
 /** Visual act — drives the density of the recurring data-flow motif. */
 export type Act = 1 | 2 | 3 | 4;
@@ -771,6 +771,61 @@ export const SLIDES: SlideMeta[] = [
       "Répartition automatisation / humain. Ne pas donner de pourcentage : la frontière est mouvante et se décide processus par processus.",
   },
   {
+    id: "part-three",
+    part: "III",
+    act: 4,
+    label: "Audience & modèle économique",
+    minutes: 0.25,
+    tone: "dark",
+    speakerNotes:
+      "Ouverture de la troisième partie. Annoncer les trois questions : où en est l’audience, où elle peut aller, ce qu’elle rapporte.",
+  },
+  {
+    id: "audience",
+    part: "III",
+    act: 4,
+    label: "Où en est l’audience",
+    minutes: 1,
+    speakerNotes:
+      "Donner les chiffres mesurés, sans les habiller. Rappeler qu’ils sont relevés pendant une phase d’acquisition volontairement mise en retrait : c’est un socle, pas un plafond.",
+  },
+  {
+    id: "benchmark",
+    part: "III",
+    act: 4,
+    label: "Benchmark concurrence",
+    minutes: 1.5,
+    speakerNotes:
+      "Situer l’ordre de grandeur du marché. Ne pas se comparer en valeur absolue : montrer que la niche data existe et qu’elle est occupée par des structures parfois très petites. Citer la source et sa date.",
+  },
+  {
+    id: "trajectory",
+    part: "III",
+    act: 4,
+    label: "Prévisionnel d’audience",
+    minutes: 1.5,
+    speakerNotes:
+      "Trois jalons, trois leviers. Assumer que la courbe est une cible conditionnée à la livraison de la refonte, et non une projection statistique.",
+  },
+  {
+    id: "revenue-channels",
+    part: "III",
+    act: 4,
+    label: "Trois canaux de revenus",
+    minutes: 1.5,
+    speakerNotes:
+      "Site, réseaux sociaux, partenariats. Insister sur le fait que les trois reposent sur le même actif : la confiance dans la donnée publiée. Sans elle, aucun des trois ne tient.",
+  },
+  {
+    id: "revenue-model",
+    part: "III",
+    act: 4,
+    label: "Ce que cela rapporte",
+    minutes: 1.5,
+    speakerNotes:
+      "Présenter des formules avant des montants. Si le jury demande un chiffre, donner l’hypothèse unitaire et la variable qui la fait bouger plutôt qu’un total inventé.",
+  },
+  {
     id: "apprentissages",
     part: "II",
     act: 4,
@@ -828,3 +883,172 @@ export const SLIDES: SlideMeta[] = [
 ];
 
 export const TOTAL_MINUTES = SLIDES.reduce((sum, s) => sum + s.minutes, 0);
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PART III — AUDIENCE & MODÈLE ÉCONOMIQUE
+   ───────────────────────────────────────────────────────────────────────────
+   Every figure below is deliberately null. Fill a `value` and the slide stops
+   rendering a {DATA_TO_FILL} slot and starts rendering the number; fill the
+   chart series and the bars and the trajectory draw themselves.
+
+   Nothing here is estimated on your behalf: audience, competitor traffic and
+   revenue are exactly the numbers a jury will press on, and an invented one is
+   worse than an empty one.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const PART_THREE_OPENER = {
+  part: "Partie III",
+  title: "Audience & modèle économique",
+  lead: "Ce que nous mesurons aujourd’hui, ce que nous visons, et ce que cela peut rapporter.",
+} as const;
+
+/* A — OÙ EN EST L’AUDIENCE ──────────────────────────────────────────────── */
+
+export const AUDIENCE_NOW = {
+  headline: "Où en est l’audience.",
+  kpis: [
+    { id: "visitors", label: "Visiteurs / mois", value: null, hint: "analytics" },
+    { id: "pageviews", label: "Pages vues / mois", value: null, hint: "analytics" },
+    { id: "sessions", label: "Sessions / mois", value: null, hint: "analytics" },
+    { id: "duration", label: "Durée moyenne", value: null, hint: "analytics" },
+    { id: "articles", label: "Articles publiés", value: null, hint: "src/data" },
+    { id: "indexed", label: "Pages indexées", value: null, hint: "Search Console" },
+  ] as Kpi[],
+  note: "Chiffres mesurés pendant une phase où l’acquisition est volontairement mise en retrait : ils décrivent un socle, pas un plafond.",
+} as const;
+
+/* B — BENCHMARK CONCURRENTIEL ───────────────────────────────────────────── */
+
+export interface BenchmarkRow {
+  /** Rename freely — these are proposed comparables, not a fixed list. */
+  name: string;
+  /** Monthly visits. null → the bar renders as a slot to fill. */
+  monthlyVisits: number | null;
+  /** Marks the row as us: highlighted, always last. */
+  isUs?: boolean;
+}
+
+export const BENCHMARK = {
+  headline: "Où nous nous situons.",
+  unit: "visites / mois",
+  /** e.g. "SimilarWeb, janvier 2026" — cite the tool and the date. */
+  source: null as string | null,
+  rows: [
+    { name: "Our World in Data", monthlyVisits: null },
+    { name: "Statista", monthlyVisits: null },
+    { name: "Visual Capitalist", monthlyVisits: null },
+    { name: "Les Décodeurs — Le Monde", monthlyVisits: null },
+    { name: "The Essential Data", monthlyVisits: null, isUs: true },
+  ] as BenchmarkRow[],
+  caption:
+    "L’écart d’audience n’est pas l’objectif : il donne l’ordre de grandeur du marché sur lequel une petite structure peut prendre une place.",
+} as const;
+
+/* C — PRÉVISIONNEL D’AUDIENCE ───────────────────────────────────────────── */
+
+export interface TrajectoryPoint {
+  label: string;
+  /** Visitors per month. null → renders as a milestone slot. */
+  value: number | null;
+  state: "actual" | "target";
+}
+
+export const TRAJECTORY = {
+  headline: "Prévisionnel d’audience.",
+  unit: "visiteurs / mois",
+  points: [
+    { label: "Aujourd’hui", value: null, state: "actual" },
+    { label: "Fin d’année", value: null, state: "target" },
+    { label: "Année + 1", value: null, state: "target" },
+    { label: "Année + 2", value: null, state: "target" },
+  ] as TrajectoryPoint[],
+  /** The levers behind the curve — stated as mechanisms, not as multipliers. */
+  levers: [
+    {
+      index: "01",
+      title: "Réactivation du pipeline",
+      body: "Reprise de la publication et de l’actualisation automatisées une fois la nouvelle architecture fiabilisée.",
+    },
+    {
+      index: "02",
+      title: "SEO & profondeur de catalogue",
+      body: "Chaque sujet couvert reste indexé et continue d’attirer du trafic bien après sa publication.",
+    },
+    {
+      index: "03",
+      title: "Distribution sociale",
+      body: "Les visualisations sont nativement partageables : elles circulent sans dépendre uniquement du référencement.",
+    },
+  ],
+  note: "Trajectoire cible, à valider par les hypothèses ci-dessus. Aucune date n’est engagée tant que la refonte n’est pas livrée.",
+} as const;
+
+/* D — LES TROIS CANAUX DE REVENUS ───────────────────────────────────────── */
+
+export const REVENUE_CHANNELS = [
+  {
+    index: "01",
+    name: "Site",
+    role: "Le socle",
+    mechanics: [
+      "Display & programmatique",
+      "Contenus sponsorisés identifiés",
+      "Accès premium aux données",
+    ],
+    driver: "Pages vues",
+    status: "En attente de la refonte",
+  },
+  {
+    index: "02",
+    name: "Réseaux sociaux",
+    role: "L’accélérateur",
+    mechanics: [
+      "Formats data natifs",
+      "Programmes de monétisation des plateformes",
+      "Marques & campagnes",
+    ],
+    driver: "Portée & engagement",
+    status: "À structurer",
+  },
+  {
+    index: "03",
+    name: "Partenariats",
+    role: "Le levier de marge",
+    mechanics: [
+      "Institutions & médias",
+      "Études et data sur mesure",
+      "Syndication de contenus",
+    ],
+    driver: "Contrats",
+    status: "À amorcer",
+  },
+] as const;
+
+export const REVENUE_CHANNELS_HEADLINE = "Trois canaux de revenus.";
+export const REVENUE_CHANNELS_NOTE =
+  "Trois canaux qui reposent sur le même actif : une audience qui fait confiance à la donnée publiée.";
+
+/* E — CE QUE CELA PEUT RAPPORTER ────────────────────────────────────────── */
+
+export interface RevenueRow {
+  channel: string;
+  /** What the revenue is a function of. */
+  driver: string;
+  /** Unit economics, e.g. an RPM or an average contract value. */
+  unit: string | null;
+  /** Resulting revenue for the horizon below. */
+  revenue: string | null;
+}
+
+export const REVENUE_MODEL = {
+  headline: "Ce que cela peut rapporter.",
+  /** e.g. "Horizon 12 mois" */
+  horizon: "Horizon à définir",
+  rows: [
+    { channel: "Site", driver: "Pages vues × RPM", unit: null, revenue: null },
+    { channel: "Réseaux sociaux", driver: "Portée × rémunération plateforme", unit: null, revenue: null },
+    { channel: "Partenariats", driver: "Nombre de contrats × panier moyen", unit: null, revenue: null },
+  ] as RevenueRow[],
+  total: null as string | null,
+  note: "Le modèle est volontairement présenté en formules plutôt qu’en montants : les hypothèses unitaires ne seront crédibles qu’une fois l’audience remesurée après la refonte.",
+} as const;
