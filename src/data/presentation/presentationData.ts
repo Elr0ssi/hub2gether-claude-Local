@@ -887,14 +887,32 @@ export const TOTAL_MINUTES = SLIDES.reduce((sum, s) => sum + s.minutes, 0);
 /* ═══════════════════════════════════════════════════════════════════════════
    PART III — AUDIENCE & MODÈLE ÉCONOMIQUE
    ───────────────────────────────────────────────────────────────────────────
-   Every figure below is deliberately null. Fill a `value` and the slide stops
-   rendering a {DATA_TO_FILL} slot and starts rendering the number; fill the
-   chart series and the bars and the trajectory draw themselves.
+   DEMONSTRATION DATA
+   Every figure in this part carries two fields: `value` (your real number,
+   null until you have it) and `demo` (a plausible stand-in used only to show
+   what the slide looks like once populated).
 
-   Nothing here is estimated on your behalf: audience, competitor traffic and
-   revenue are exactly the numbers a jury will press on, and an invented one is
-   worse than an empty one.
+   Real data always wins. `demo` is a fallback and only appears while
+   DEMO_DATA is true — and while it is true, every affected slide carries a
+   visible "données de démonstration" badge, so a fictional number can never be
+   presented to a jury by accident.
+
+   To go live: fill the `value` fields and set DEMO_DATA to false.
    ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Master switch for the stand-in figures of Part III. Set to false to ship. */
+export const DEMO_DATA = true;
+
+/** Real value if you have it, otherwise the stand-in while DEMO_DATA is on. */
+export function resolve<T>(value: T | null, demo: T | null): T | null {
+  if (value !== null && value !== undefined) return value;
+  return DEMO_DATA ? demo : null;
+}
+
+/** True when the figure on screen is a stand-in rather than a measurement. */
+export function isDemo<T>(value: T | null): boolean {
+  return DEMO_DATA && (value === null || value === undefined);
+}
 
 export const PART_THREE_OPENER = {
   part: "Partie III",
@@ -904,17 +922,41 @@ export const PART_THREE_OPENER = {
 
 /* A — OÙ EN EST L’AUDIENCE ──────────────────────────────────────────────── */
 
+export interface Stat {
+  id: string;
+  label: string;
+  value: string | null;
+  demo: string | null;
+  hint?: string;
+}
+
 export const AUDIENCE_NOW = {
   headline: "Où en est l’audience.",
-  kpis: [
-    { id: "visitors", label: "Visiteurs / mois", value: null, hint: "analytics" },
-    { id: "pageviews", label: "Pages vues / mois", value: null, hint: "analytics" },
-    { id: "sessions", label: "Sessions / mois", value: null, hint: "analytics" },
-    { id: "duration", label: "Durée moyenne", value: null, hint: "analytics" },
-    { id: "articles", label: "Articles publiés", value: null, hint: "src/data" },
-    { id: "indexed", label: "Pages indexées", value: null, hint: "Search Console" },
-  ] as Kpi[],
-  note: "Chiffres mesurés pendant une phase où l’acquisition est volontairement mise en retrait : ils décrivent un socle, pas un plafond.",
+  /** The headline figure, given the full weight of the slide. */
+  hero: {
+    id: "visitors",
+    label: "Visiteurs / mois",
+    value: null as string | null,
+    demo: "8 400",
+    hint: "analytics",
+  },
+  /** Twelve months of visitors, driving the sparkline under the hero number. */
+  heroSeries: null as number[] | null,
+  heroSeriesDemo: [
+    5200, 5900, 6400, 7100, 7800, 9200, 10400, 9800, 8900, 8200, 8100, 8400,
+  ],
+  heroTrend: {
+    value: null as string | null,
+    demo: "12 derniers mois",
+  },
+  stats: [
+    { id: "pageviews", label: "Pages vues / mois", value: null, demo: "21 500", hint: "analytics" },
+    { id: "sessions", label: "Sessions / mois", value: null, demo: "11 200", hint: "analytics" },
+    { id: "duration", label: "Durée moyenne", value: null, demo: "2 min 40 s", hint: "analytics" },
+    { id: "articles", label: "Articles publiés", value: null, demo: "35", hint: "src/data" },
+    { id: "indexed", label: "Pages indexées", value: null, demo: "180", hint: "Search Console" },
+  ] as Stat[],
+  note: "Chiffres relevés pendant une phase où l’acquisition est volontairement mise en retrait : ils décrivent un socle, pas un plafond.",
 } as const;
 
 /* B — BENCHMARK CONCURRENTIEL ───────────────────────────────────────────── */
@@ -922,8 +964,9 @@ export const AUDIENCE_NOW = {
 export interface BenchmarkRow {
   /** Rename freely — these are proposed comparables, not a fixed list. */
   name: string;
-  /** Monthly visits. null → the bar renders as a slot to fill. */
+  /** Monthly visits. */
   monthlyVisits: number | null;
+  demo: number | null;
   /** Marks the row as us: highlighted, always last. */
   isUs?: boolean;
 }
@@ -933,23 +976,24 @@ export const BENCHMARK = {
   unit: "visites / mois",
   /** e.g. "SimilarWeb, janvier 2026" — cite the tool and the date. */
   source: null as string | null,
+  sourceDemo: "SimilarWeb — estimation",
   rows: [
-    { name: "Our World in Data", monthlyVisits: null },
-    { name: "Statista", monthlyVisits: null },
-    { name: "Visual Capitalist", monthlyVisits: null },
-    { name: "Les Décodeurs — Le Monde", monthlyVisits: null },
-    { name: "The Essential Data", monthlyVisits: null, isUs: true },
+    { name: "Statista", monthlyVisits: null, demo: 9_100_000 },
+    { name: "Our World in Data", monthlyVisits: null, demo: 4_200_000 },
+    { name: "Visual Capitalist", monthlyVisits: null, demo: 1_800_000 },
+    { name: "Les Décodeurs — Le Monde", monthlyVisits: null, demo: 950_000 },
+    { name: "The Essential Data", monthlyVisits: null, demo: 8_400, isUs: true },
   ] as BenchmarkRow[],
   caption:
-    "L’écart d’audience n’est pas l’objectif : il donne l’ordre de grandeur du marché sur lequel une petite structure peut prendre une place.",
+    "L’écart n’est pas une faiblesse à masquer : c’est la taille du marché sur lequel une petite structure peut prendre une place.",
 } as const;
 
 /* C — PRÉVISIONNEL D’AUDIENCE ───────────────────────────────────────────── */
 
 export interface TrajectoryPoint {
   label: string;
-  /** Visitors per month. null → renders as a milestone slot. */
   value: number | null;
+  demo: number | null;
   state: "actual" | "target";
 }
 
@@ -957,12 +1001,11 @@ export const TRAJECTORY = {
   headline: "Prévisionnel d’audience.",
   unit: "visiteurs / mois",
   points: [
-    { label: "Aujourd’hui", value: null, state: "actual" },
-    { label: "Fin d’année", value: null, state: "target" },
-    { label: "Année + 1", value: null, state: "target" },
-    { label: "Année + 2", value: null, state: "target" },
+    { label: "Aujourd’hui", value: null, demo: 8_400, state: "actual" },
+    { label: "Fin d’année", value: null, demo: 45_000, state: "target" },
+    { label: "Année + 1", value: null, demo: 140_000, state: "target" },
+    { label: "Année + 2", value: null, demo: 320_000, state: "target" },
   ] as TrajectoryPoint[],
-  /** The levers behind the curve — stated as mechanisms, not as multipliers. */
   levers: [
     {
       index: "01",
@@ -980,7 +1023,7 @@ export const TRAJECTORY = {
       body: "Les visualisations sont nativement partageables : elles circulent sans dépendre uniquement du référencement.",
     },
   ],
-  note: "Trajectoire cible, à valider par les hypothèses ci-dessus. Aucune date n’est engagée tant que la refonte n’est pas livrée.",
+  note: "Trajectoire cible conditionnée à la livraison de la refonte, et non projection statistique.",
 } as const;
 
 /* D — LES TROIS CANAUX DE REVENUS ───────────────────────────────────────── */
@@ -1034,21 +1077,43 @@ export interface RevenueRow {
   channel: string;
   /** What the revenue is a function of. */
   driver: string;
-  /** Unit economics, e.g. an RPM or an average contract value. */
+  /** Unit economics — an RPM, a rate, an average contract value. */
   unit: string | null;
-  /** Resulting revenue for the horizon below. */
-  revenue: string | null;
+  unitDemo: string | null;
+  /** Annual revenue in euros, feeding both the table and the mix bar. */
+  revenue: number | null;
+  revenueDemo: number | null;
 }
 
 export const REVENUE_MODEL = {
   headline: "Ce que cela peut rapporter.",
-  /** e.g. "Horizon 12 mois" */
-  horizon: "Horizon à définir",
+  horizon: "Horizon 12 mois",
+  currency: "€",
   rows: [
-    { channel: "Site", driver: "Pages vues × RPM", unit: null, revenue: null },
-    { channel: "Réseaux sociaux", driver: "Portée × rémunération plateforme", unit: null, revenue: null },
-    { channel: "Partenariats", driver: "Nombre de contrats × panier moyen", unit: null, revenue: null },
+    {
+      channel: "Site",
+      driver: "Pages vues × RPM",
+      unit: null,
+      unitDemo: "RPM 12 €",
+      revenue: null,
+      revenueDemo: 38_000,
+    },
+    {
+      channel: "Réseaux sociaux",
+      driver: "Portée × rémunération plateforme",
+      unit: null,
+      unitDemo: "≈ 0,9 € / 1 000 vues",
+      revenue: null,
+      revenueDemo: 22_000,
+    },
+    {
+      channel: "Partenariats",
+      driver: "Nombre de contrats × panier moyen",
+      unit: null,
+      unitDemo: "6 × 7 500 €",
+      revenue: null,
+      revenueDemo: 45_000,
+    },
   ] as RevenueRow[],
-  total: null as string | null,
-  note: "Le modèle est volontairement présenté en formules plutôt qu’en montants : les hypothèses unitaires ne seront crédibles qu’une fois l’audience remesurée après la refonte.",
+  note: "Le modèle est présenté en formules avant de l’être en montants : ce sont les hypothèses unitaires qui se discutent, pas le total.",
 } as const;
