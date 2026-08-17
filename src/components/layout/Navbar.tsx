@@ -35,7 +35,8 @@ export function Navbar() {
         </Link>
 
         {/* Theme navigation */}
-        <nav className="hidden md:flex items-center gap-1">
+        {/* nowrap keeps the row a single line once the eighth tab appears at xl */}
+        <nav className="hidden md:flex items-center gap-1 whitespace-nowrap">
           <Link
             href="/preview"
             className={cn(
@@ -64,6 +65,27 @@ export function Navbar() {
           >
             Présentation 2
             {pathname === "/presentation-2" && (
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
+                style={{ background: "var(--accent)" }}
+              />
+            )}
+          </Link>
+          <Link
+            href="/presentation"
+            className={cn(
+              // The navbar already runs past the viewport below ~1100px with
+              // seven tabs; an eighth would push "Comparer" further off. The
+              // deck is an internal tool, so its tab only appears where there
+              // is room — below lg the navbar is exactly as it was.
+              "relative hidden xl:inline-block px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
+              pathname === "/presentation"
+                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
+                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
+            )}
+          >
+            Soutenance
+            {pathname === "/presentation" && (
               <span
                 className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
                 style={{ background: "var(--accent)" }}
