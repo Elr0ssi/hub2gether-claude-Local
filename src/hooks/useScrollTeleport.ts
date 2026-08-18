@@ -2,6 +2,16 @@
 
 import { useEffect } from "react";
 
+/** Fired on `window` right after the page jumps to a section. */
+export const TELEPORT_EVENT = "eco-teleport";
+
+export interface TeleportDetail {
+  /** Index of the arriving section, or -1 for the hero above them. */
+  index: number;
+  /** 1 when moving down the page, -1 when moving up. */
+  dir: 1 | -1;
+}
+
 /** Gestures land on the next stop no sooner than this, in ms. */
 const COOLDOWN = 380;
 /** Wheel deltas below this are treated as noise, not as a page gesture. */
@@ -112,6 +122,15 @@ export function useScrollTeleport({ selector, offset, enabled = true }: Options)
       last = now;
 
       window.scrollTo({ top: s.tops[next], behavior: "instant" as ScrollBehavior });
+      // The page moved in one frame, so nothing about the move is visible on
+      // its own. Announce it instead, and let the section that just arrived
+      // play its own entrance — see SectionArrival and SectionFlowCurves.
+      window.dispatchEvent(
+        new CustomEvent<TeleportDetail>(TELEPORT_EVENT, {
+          // `next` counts the hero as stop 0, sections start at 1.
+          detail: { index: next - 1, dir },
+        })
+      );
       return true;
     };
 

@@ -522,12 +522,18 @@ html:has(.eco-snap) {
 .eco-section-body {
   position: relative;
   z-index: 1;
+  width: 100%;
+  padding: 0 clamp(16px, 3vw, 40px);
+}
+
+/* The row inside the arrival wrapper is what actually holds the three
+   columns; the wrapper between them is only there to animate. */
+.eco-section-row {
   display: flex;
   align-items: stretch;
   justify-content: center;
   gap: 28px;
   width: 100%;
-  padding: 0 clamp(16px, 3vw, 40px);
 }
 
 .eco-section-main {

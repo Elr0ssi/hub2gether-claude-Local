@@ -153,16 +153,9 @@ export function EconomyYearTimeline({
       </div>
 
       {/* Rail */}
-      {/* The rail is sized to its content rather than stretched across the
-          card: twenty-six marks need nowhere near the full width. */}
       <div
         className="flex items-stretch gap-4 rounded-xl px-4 py-2"
-        style={{
-          border: "1px solid var(--border)",
-          background: "var(--surface)",
-          maxWidth: 720,
-          width: "100%",
-        }}
+        style={{ border: "1px solid var(--border)", background: "var(--surface)", width: "100%" }}
       >
         {/* The track is inset from the box so the 2000 and 2025 labels, which
             are centred on their marks, are not clipped by the border. */}

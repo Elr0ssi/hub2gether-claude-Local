@@ -14,6 +14,7 @@ import type { EconomyMetricId, EconomyYear } from "@/types";
 import { MapArticleSection } from "@/components/articles/MapArticleSection";
 import { AdRail } from "@/components/layout/AdRail";
 import { SectionFlowCurves } from "./SectionFlowCurves";
+import { SectionArrival } from "./SectionArrival";
 import { useScrollTeleport } from "@/hooks/useScrollTeleport";
 import { ECONOMY_ARTICLES } from "@/data/articles";
 
@@ -158,8 +159,10 @@ export function EconomyMapView() {
         ref={mapSectionRef}
         className={isFullscreen ? undefined : "eco-section eco-snap-target"}
       >
-        {!isFullscreen && <SectionFlowCurves sectionRef={mapSectionRef} />}
+        {!isFullscreen && <SectionFlowCurves sectionRef={mapSectionRef} index={0} />}
         <div className="eco-section-body">
+          <SectionArrival index={0}>
+          <div className="eco-section-row">
           <AdRail side="left" />
           <div className="eco-section-main">
       {/* Map card */}
@@ -309,13 +312,17 @@ export function EconomyMapView() {
 
           </div>
           <AdRail side="right" />
+          </div>
+          </SectionArrival>
         </div>
       </section>
 
       {/* ── Classement mondial ── */}
       <section ref={rankSectionRef} className="eco-section eco-snap-target">
-        <SectionFlowCurves sectionRef={rankSectionRef} />
+        <SectionFlowCurves sectionRef={rankSectionRef} index={1} />
         <div className="eco-section-body">
+          <SectionArrival index={1}>
+          <div className="eco-section-row">
           <AdRail side="left" />
           <div className="eco-section-main">
             <EconomyRankingsTable
@@ -330,13 +337,17 @@ export function EconomyMapView() {
             />
           </div>
           <AdRail side="right" />
+          </div>
+          </SectionArrival>
         </div>
       </section>
 
       {/* ── Articles ── */}
       <section ref={articleSectionRef} className="eco-section eco-snap-target">
-        <SectionFlowCurves sectionRef={articleSectionRef} />
+        <SectionFlowCurves sectionRef={articleSectionRef} index={2} />
         <div className="eco-section-body">
+          <SectionArrival index={2}>
+          <div className="eco-section-row">
           <AdRail side="left" />
           <div className="eco-section-main">
             <MapArticleSection
@@ -347,6 +358,8 @@ export function EconomyMapView() {
             />
           </div>
           <AdRail side="right" />
+          </div>
+          </SectionArrival>
         </div>
       </section>
     </div>
