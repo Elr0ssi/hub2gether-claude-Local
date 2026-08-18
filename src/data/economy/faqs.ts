@@ -1,4 +1,4 @@
-import type { FAQItem } from "@/types";
+import type { EconomyYear, FAQItem } from "@/types";
 
 export const FAQS_ECONOMY: FAQItem[] = [
   {
@@ -80,3 +80,71 @@ export const FAQS_ECONOMY: FAQItem[] = [
     category: "Utilisation",
   },
 ];
+
+// ── Données de référence, servies dans la FAQ ────────────────────────────────
+// Les tableaux de référence qui vivaient sous la carte ont été retirés de
+// l'écran : leur contenu est rendu ici, en texte, et repart donc dans le
+// balisage FAQPage (JSON-LD) de la page — un signal SEO plus fort qu'un
+// tableau muet, et une lecture plus naturelle pour un visiteur.
+
+function fmt(n: number): string {
+  return n.toLocaleString("fr-FR");
+}
+
+/**
+ * Questions dérivées du jeu de données économique lui-même : classements PIB,
+ * dette et chômage de l'année de référence. Régénérées à chaque build, donc
+ * toujours alignées sur les chiffres affichés par la carte.
+ */
+export function buildEconomyDataFaqs(year: EconomyYear | undefined): FAQItem[] {
+  if (!year) return [];
+  const entries = Object.entries(year.countries);
+  if (entries.length === 0) return [];
+
+  const topGdp = [...entries].sort((a, b) => b[1].gdp - a[1].gdp).slice(0, 15);
+  const topDebt = [...entries]
+    .filter(([, d]) => d.debt_ratio != null)
+    .sort((a, b) => b[1].debt_ratio - a[1].debt_ratio)
+    .slice(0, 15);
+  const topUnemployment = [...entries]
+    .filter(([, d]) => d.unemployment != null)
+    .sort((a, b) => b[1].unemployment - a[1].unemployment)
+    .slice(0, 8);
+  const lowUnemployment = [...entries]
+    .filter(([, d]) => d.unemployment != null)
+    .sort((a, b) => a[1].unemployment - b[1].unemployment)
+    .slice(0, 8);
+
+  return [
+    {
+      question: `Quel est le classement des 15 premières économies mondiales en ${year.year} ?`,
+      answer:
+        `Classement par PIB nominal ${year.year} : ` +
+        topGdp
+          .map(([name, d], i) => `${i + 1}. ${name} — ${fmt(d.gdp)} Mds € (dette ${d.debt_ratio} % du PIB, chômage ${d.unemployment} %)`)
+          .join(" ; ") +
+        `. ${year.dataNote}`,
+      category: "Données de référence",
+    },
+    {
+      question: `Quels pays affichent la dette publique la plus élevée en ${year.year} ?`,
+      answer:
+        `Ratios dette publique / PIB les plus élevés en ${year.year} : ` +
+        topDebt
+          .map(([name, d], i) => `${i + 1}. ${name} — ${d.debt_ratio} % du PIB` + (d.debt_amount ? ` (${fmt(d.debt_amount)} Mds €)` : ""))
+          .join(" ; ") +
+        `. Un ratio élevé ne vaut pas crise : ce qui compte est la capacité de refinancement, la devise d'émission et la croissance. ${year.dataNote}`,
+      category: "Données de référence",
+    },
+    {
+      question: `Quels sont les taux de chômage les plus élevés et les plus faibles en ${year.year} ?`,
+      answer:
+        `Taux de chômage les plus élevés en ${year.year} : ` +
+        topUnemployment.map(([name, d]) => `${name} ${d.unemployment} %`).join(", ") +
+        `. Les plus faibles : ` +
+        lowUnemployment.map(([name, d]) => `${name} ${d.unemployment} %`).join(", ") +
+        `. Les méthodologies nationales diffèrent — la mesure retenue ici suit la définition de l'OIT. ${year.dataNote}`,
+      category: "Données de référence",
+    },
+  ];
+}

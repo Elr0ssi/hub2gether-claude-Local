@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Search, ChevronUp, ChevronDown, ChevronsUpDown, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { ECONOMY_METRICS, ECONOMY_YEARS } from "@/data/economy/economy";
 import type { EconomyMetricId, EconomyYear } from "@/types";
@@ -184,6 +184,7 @@ export function EconomyRankingsTable({
   const [sortColKey, setSortColKey] = useState<string>(metric);
   const [sortDir, setSortDir] = useState<"asc" | "desc">(defaultSortDir(metric));
   const [search, setSearch] = useState("");
+  const reduced = useReducedMotion();
 
   // No ranking for companies
   const cols = getColDefs(metric);
@@ -250,7 +251,7 @@ export function EconomyRankingsTable({
 
   return (
     <div
-      className="rounded-2xl overflow-hidden mt-6"
+      className="rounded-2xl overflow-hidden"
       style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
     >
       {/* Table header */}
@@ -333,10 +334,21 @@ export function EconomyRankingsTable({
               {filtered.map(({ name, data, rank, delta }, idx) => {
                 const isEven = idx % 2 === 1;
                 return (
-                  <tr
+                  // Countries land one after another. The delay is capped so a
+                  // re-sort of seventy-odd rows still resolves in under a
+                  // second — only the rows on screen carry the cascade.
+                  <motion.tr
                     key={name}
                     onClick={() => onCountryClick?.(name)}
                     className="transition-colors"
+                    initial={reduced ? false : { opacity: 0, x: -10 }}
+                    whileInView={reduced ? undefined : { opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0 }}
+                    transition={{
+                      duration: 0.34,
+                      delay: Math.min(idx, 16) * 0.045,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
                     style={{
                       background: isEven ? "var(--surface-2)" : "var(--surface)",
                       borderBottom: "1px solid var(--border-light)",
@@ -390,7 +402,7 @@ export function EconomyRankingsTable({
                         {col.format(data)}
                       </td>
                     ))}
-                  </tr>
+                  </motion.tr>
                 );
               })}
             </motion.tbody>

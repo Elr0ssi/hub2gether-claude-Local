@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -26,7 +26,6 @@ const SECTION_STYLE: React.CSSProperties = {
 };
 
 const PAGE_SIZE = 12;
-const RECO_PREVIEW = 5;
 
 function cardEnter(el: HTMLElement) {
   el.style.borderColor = "rgba(57,255,136,0.4)";
@@ -164,6 +163,9 @@ function RecommendedCard({
   return (
     <article
       style={{
+        flex: "0 0 auto",
+        width: 268,
+        scrollSnapAlign: "start",
         borderRadius: 14,
         background: "var(--surface)",
         border: "1px solid var(--border)",
@@ -173,7 +175,7 @@ function RecommendedCard({
         display: "flex",
         flexDirection: "column",
         gap: 8,
-        minWidth: 0,
+        userSelect: "none",
       }}
       onMouseEnter={(e) => cardEnter(e.currentTarget as HTMLElement)}
       onMouseLeave={(e) => cardLeave(e.currentTarget as HTMLElement)}
@@ -389,17 +391,61 @@ interface MapArticleSectionProps {
   themeArticles: Article[];
   selectedCountry: string | null;
   themeLabel?: string;
+  /** Gap above the block. Views that already band the section pass 0. */
+  spacing?: number;
 }
 
 export function MapArticleSection({
   themeArticles,
   selectedCountry,
   themeLabel,
+  spacing = 24,
 }: MapArticleSectionProps) {
   const [allSearch, setAllSearch] = useState("");
-  const [showAllReco, setShowAllReco] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [saved, setSaved] = useState<string[]>([]);
+
+  // Recommendation carousel — native lateral scroll (trackpad, shift+wheel)
+  // plus a click-and-drag grab for mice without a horizontal axis.
+  const railRef = useRef<HTMLDivElement>(null);
+  const allSectionRef = useRef<HTMLElement>(null);
+  const dragging = useRef(false);
+  const dragged = useRef(false);
+  const dragStartX = useRef(0);
+  const dragStartScroll = useRef(0);
+
+  const onRailDown = useCallback((e: React.MouseEvent) => {
+    const el = railRef.current;
+    if (!el) return;
+    dragging.current = true;
+    dragged.current = false;
+    dragStartX.current = e.pageX;
+    dragStartScroll.current = el.scrollLeft;
+    el.style.cursor = "grabbing";
+  }, []);
+
+  const onRailMove = useCallback((e: React.MouseEvent) => {
+    const el = railRef.current;
+    if (!dragging.current || !el) return;
+    e.preventDefault();
+    const dx = e.pageX - dragStartX.current;
+    if (Math.abs(dx) > 5) dragged.current = true;
+    el.scrollLeft = dragStartScroll.current - dx;
+  }, []);
+
+  const endDrag = useCallback(() => {
+    dragging.current = false;
+    if (railRef.current) railRef.current.style.cursor = "grab";
+  }, []);
+
+  // A drag that ends on a card must not open it.
+  const onRailClickCapture = useCallback((e: React.MouseEvent) => {
+    if (dragged.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      dragged.current = false;
+    }
+  }, []);
 
   const toggleSave = useCallback((slug: string) => {
     setSaved((prev) =>
@@ -429,9 +475,6 @@ export function MapArticleSection({
     );
   }, [themeArticles, allSearch]);
 
-  const shownReco = showAllReco
-    ? recommendedArticles
-    : recommendedArticles.slice(0, RECO_PREVIEW);
   const shownAll = allArticles.slice(0, visibleCount);
   const hasMore = allArticles.length > shownAll.length;
 
@@ -441,7 +484,7 @@ export function MapArticleSection({
   }, []);
 
   return (
-    <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 16 }}>
+    <div style={{ marginTop: spacing, display: "flex", flexDirection: "column", gap: 16 }}>
       {/* ── Recommandations ── */}
       <section style={SECTION_STYLE}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
@@ -468,10 +511,12 @@ export function MapArticleSection({
             )}
           </div>
 
-          {recommendedArticles.length > RECO_PREVIEW && (
+          {recommendedArticles.length > 0 && (
             <button
               type="button"
-              onClick={() => setShowAllReco((v) => !v)}
+              onClick={() =>
+                allSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+              }
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -485,13 +530,13 @@ export function MapArticleSection({
                 color: "#0D7A40",
               }}
             >
-              {showAllReco ? "Réduire les recommandations" : "Voir toutes les recommandations"}
+              Voir toutes les recommandations
               <ArrowRight size={11} />
             </button>
           )}
         </div>
 
-        {shownReco.length === 0 ? (
+        {recommendedArticles.length === 0 ? (
           <EmptyState
             label={
               selectedCountry
@@ -501,14 +546,24 @@ export function MapArticleSection({
           />
         ) : (
           <div
+            ref={railRef}
+            className="reco-rail"
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              display: "flex",
               gap: 12,
+              overflowX: "auto",
               alignItems: "stretch",
+              paddingBottom: 4,
+              cursor: "grab",
+              scrollSnapType: "x proximity",
             }}
+            onMouseDown={onRailDown}
+            onMouseMove={onRailMove}
+            onMouseUp={endDrag}
+            onMouseLeave={endDrag}
+            onClickCapture={onRailClickCapture}
           >
-            {shownReco.map((article) => (
+            {recommendedArticles.map((article) => (
               <RecommendedCard
                 key={article.slug}
                 article={article}
@@ -522,7 +577,7 @@ export function MapArticleSection({
 
       {/* ── Tous les articles ── */}
       {themeArticles.length > 0 && (
-        <section style={SECTION_STYLE}>
+        <section ref={allSectionRef} style={SECTION_STYLE}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 7, flex: 1, minWidth: 150 }}>
               <BookOpen size={13} style={{ color: "#39FF88", flexShrink: 0 }} />

@@ -132,7 +132,13 @@ export function EconomyMapView() {
   }, []);
 
   return (
-    <>
+    // Three banded stops. Each section carries its own pale mint ground and is
+    // a scroll-snap target, so one gesture takes the reader from the hero to
+    // the map, from the map to the ranking, and from the ranking to the
+    // articles instead of leaving them between two blocks.
+    <div className="eco-snap flex flex-col gap-6">
+      {/* ── Carte interactive ── */}
+      <section className={isFullscreen ? undefined : "eco-band eco-snap-target"}>
       {/* Map card */}
       <div
         className={`border rounded-2xl overflow-hidden${isFullscreen ? " fixed inset-0 z-[9999] rounded-none flex flex-col" : ""}`}
@@ -370,23 +376,31 @@ export function EconomyMapView() {
         </div>
       </div>
 
-      {/* Rankings table */}
-      <EconomyRankingsTable
-        metric={metric}
-        year={year}
-        activeEconomyYear={activeEconomyYear}
-        ytdMode={ytdMode}
-        onCountryClick={(name) => {
-          setSelectedCountry(name);
-          setSidePanelOpen(true);
-        }}
-      />
+      </section>
 
-      <MapArticleSection
-        themeArticles={ECONOMY_ARTICLES}
-        selectedCountry={selectedCountry}
-        themeLabel="Économie mondiale"
-      />
-    </>
+      {/* ── Classement mondial ── */}
+      <section className="eco-band eco-snap-target">
+        <EconomyRankingsTable
+          metric={metric}
+          year={year}
+          activeEconomyYear={activeEconomyYear}
+          ytdMode={ytdMode}
+          onCountryClick={(name) => {
+            setSelectedCountry(name);
+            setSidePanelOpen(true);
+          }}
+        />
+      </section>
+
+      {/* ── Articles ── */}
+      <section className="eco-band eco-snap-target">
+        <MapArticleSection
+          themeArticles={ECONOMY_ARTICLES}
+          selectedCountry={selectedCountry}
+          themeLabel="Économie mondiale"
+          spacing={0}
+        />
+      </section>
+    </div>
   );
 }

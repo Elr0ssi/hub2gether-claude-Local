@@ -13,6 +13,8 @@ import { ServerDataSummary } from "@/components/seo/ServerDataSummary";
 import { DATASET_SCHEMAS, jsonLdString } from "@/lib/schema";
 import { getThemeById } from "@/data/themes";
 import { getFaqsByTheme } from "@/data/faqs";
+import { buildEconomyDataFaqs } from "@/data/economy/faqs";
+import { ECONOMY_YEARS, DEFAULT_YEAR } from "@/data/economy/economy";
 import { getArticlesByTheme } from "@/data/articles";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
@@ -163,12 +165,21 @@ export default async function MapPage({ params, searchParams }: PageProps) {
     notFound();
   }
 
-  const faqs = getFaqsByTheme(theme);
   const themeArticles = getArticlesByTheme(theme);
   const initialYear = year ? parseInt(year) : 117;
 
   const isEpidemics = theme === "epidemics";
   const isEconomy = theme === "economy";
+
+  // The economy page drops the reference tables that used to sit under the
+  // map; the same figures are carried by the FAQ instead, where they land in
+  // the FAQPage structured data rather than in a table crawlers skim past.
+  const faqs = isEconomy
+    ? [
+        ...getFaqsByTheme(theme),
+        ...buildEconomyDataFaqs(ECONOMY_YEARS.find((y) => y.year === DEFAULT_YEAR)),
+      ]
+    : getFaqsByTheme(theme);
   const isPolitics = theme === "politics";
   const isMilitary = theme === "military";
   const showCategoryHero = hasCategoryHero(theme);
@@ -259,8 +270,9 @@ export default async function MapPage({ params, searchParams }: PageProps) {
         </div>
       )}
 
-      {/* Data summary for crawlers */}
-      <ServerDataSummary theme={theme} />
+      {/* Data summary for crawlers — economy serves the same figures through
+          its FAQ, so the table block is not rendered twice. */}
+      {!isEconomy && <ServerDataSummary theme={theme} />}
 
       {/* FAQ */}
       {faqs.length > 0 && <FAQSection items={faqs} />}

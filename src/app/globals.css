@@ -490,3 +490,49 @@ html:has(.p2-snap) {
 @media (prefers-reduced-motion: reduce) {
   html:has(.p2-snap) { scroll-snap-type: none; }
 }
+
+/* ============================================
+   Economy category — banded, snap-aligned sections
+   The map, the ranking table and the articles each sit on their own pale
+   mint band, and each band is a scroll-snap stop: one scroll gesture moves
+   from one to the next instead of drifting between them.
+   ============================================ */
+
+html:has(.eco-snap) {
+  scroll-snap-type: y proximity;
+}
+
+.eco-snap-target {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  scroll-margin-top: calc(var(--navbar-height) + 12px);
+}
+
+.eco-band {
+  border-radius: 28px;
+  padding: clamp(12px, 1.5vw, 22px);
+  background: linear-gradient(
+    180deg,
+    rgba(57, 255, 136, 0.11) 0%,
+    rgba(57, 255, 136, 0.035) 100%
+  );
+  border: 1px solid rgba(57, 255, 136, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(.eco-snap) { scroll-snap-type: none; }
+}
+
+/* Recommendation carousel — a slim rail so the horizontal overflow is
+   discoverable without the scrollbar sitting on top of the cards. */
+.reco-rail {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(57, 255, 136, 0.45) transparent;
+}
+.reco-rail::-webkit-scrollbar { height: 6px; }
+.reco-rail::-webkit-scrollbar-track { background: transparent; }
+.reco-rail::-webkit-scrollbar-thumb {
+  background: rgba(57, 255, 136, 0.45);
+  border-radius: 100px;
+}
+.reco-rail::-webkit-scrollbar-thumb:hover { background: rgba(57, 255, 136, 0.7); }
