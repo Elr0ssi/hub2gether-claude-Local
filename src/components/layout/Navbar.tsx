@@ -72,6 +72,25 @@ export function Navbar() {
             )}
           </Link>
           <Link
+            href="/soutenance-2"
+            className={cn(
+              // Same reasoning as the tab below: the deck is an internal tool,
+              // so it only claims a slot where the navbar has room to spare.
+              "relative hidden 2xl:inline-block px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
+              pathname === "/soutenance-2"
+                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
+                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
+            )}
+          >
+            Soutenance 2
+            {pathname === "/soutenance-2" && (
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
+                style={{ background: "var(--accent)" }}
+              />
+            )}
+          </Link>
+          <Link
             href="/presentation"
             className={cn(
               // The navbar already runs past the viewport below ~1100px with
