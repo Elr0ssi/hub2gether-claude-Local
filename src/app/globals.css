@@ -500,13 +500,11 @@ html:has(.p2-snap) {
    snap below is the fallback when that stands down.
    ============================================ */
 
-html:has(.eco-snap) {
-  scroll-snap-type: y proximity;
-}
-
+/* No CSS scroll snapping here. The roll animates the scroll position over
+   ~1.7s; snapping would treat every frame of that as a scroll that has ended
+   and yank the page onto the nearest stop, which is exactly the drop the roll
+   exists to remove. The anchors stay as position markers for the hook. */
 .eco-snap-target {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
   scroll-margin-top: var(--navbar-height);
 }
 
@@ -570,10 +568,6 @@ html:has(.eco-snap) {
   overflow: hidden;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html:has(.eco-snap) { scroll-snap-type: none; }
-}
-
 /* Recommendation carousel — a slim rail so the horizontal overflow is
    discoverable without the scrollbar sitting on top of the cards. */
 .reco-rail {
@@ -608,12 +602,12 @@ html:has(.eco-snap) {
   position: relative;
   z-index: 1;
   height: calc(var(--p2-story-vh, 500) * 1vh);
-  /* Pulled up under the hero's tail. Without this the scene only rises into
-     view once the hero's panel has scrolled out entirely, which costs the
-     reader most of a screen of empty surface before the first map appears.
-     Overlapped, the content emerges from behind the hero's lower edge — and
-     since both grounds are the same green, that edge is invisible. */
-  margin-top: -45vh;
+  /* Pulled up by exactly one sticky panel, so this scene pins in the very box
+     the hero's pane occupied, at the very frame the hero unpins. The pane and
+     the real panel then show the same content in the same place: the hero
+     slides up over an identical image and the swap cannot be seen. Any other
+     offset and the reader watches two copies of the section pass each other. */
+  margin-top: calc(-100vh + var(--navbar-height));
 }
 
 .p2-story-stage {

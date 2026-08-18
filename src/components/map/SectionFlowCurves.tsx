@@ -10,7 +10,6 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { TELEPORT_EVENT, type TeleportDetail } from "@/hooks/useScrollTeleport";
 
 /** Rounded so the server and the browser agree on every coordinate. */
 const q = (n: number): number => Math.round(n * 100) / 100;
@@ -103,7 +102,7 @@ function pointAt(s: Strand, u: number): [number, number] {
 interface SectionFlowCurvesProps {
   /** The section the strands belong to — their drift is read from its scroll. */
   sectionRef: RefObject<HTMLElement | null>;
-  /** Index of that section, so it can answer its own arrival. */
+  /** Only used to keep the gradient ids unique between sections. */
   index: number;
 }
 
@@ -118,7 +117,6 @@ interface SectionFlowCurvesProps {
  *  - the pointer, which each strand answers by its own depth, so the sheaf
  *    opens out instead of sliding as one sheet;
  *  - an idle sway, so the section is never completely still.
- * A jump to this section adds a one-off kick that settles back to rest.
  */
 export function SectionFlowCurves({ sectionRef, index }: SectionFlowCurvesProps) {
   const reduced = useReducedMotion();
@@ -136,9 +134,6 @@ export function SectionFlowCurves({ sectionRef, index }: SectionFlowCurvesProps)
   const pyRaw = useMotionValue(0);
   const px = useSpring(pxRaw, { stiffness: 60, damping: 20, mass: 0.9 });
   const py = useSpring(pyRaw, { stiffness: 60, damping: 20, mass: 0.9 });
-
-  // -1..1, driven to ±1 on arrival and released back to 0.
-  const kick = useMotionValue(0);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -159,20 +154,6 @@ export function SectionFlowCurves({ sectionRef, index }: SectionFlowCurvesProps)
       el.removeEventListener("mouseleave", onLeave);
     };
   }, [sectionRef, reduced, pxRaw, pyRaw]);
-
-  useEffect(() => {
-    if (reduced) return;
-    const onTeleport = (e: Event) => {
-      const detail = (e as CustomEvent<TeleportDetail>).detail;
-      if (detail.index !== index) return;
-      // The sheaf is thrown in the direction the page came from and swings
-      // back — the flight the instant jump cannot show on its own.
-      kick.set(-detail.dir);
-      animate(kick, 0, { type: "spring", stiffness: 120, damping: 15, mass: 1.1 });
-    };
-    window.addEventListener(TELEPORT_EVENT, onTeleport);
-    return () => window.removeEventListener(TELEPORT_EVENT, onTeleport);
-  }, [index, kick, reduced]);
 
   return (
     <div
@@ -205,7 +186,6 @@ export function SectionFlowCurves({ sectionRef, index }: SectionFlowCurvesProps)
             drift={drift}
             px={px}
             py={py}
-            kick={kick}
             reduced={!!reduced}
             idBase={idRef.current}
           />
@@ -222,7 +202,6 @@ function StrandLine({
   drift,
   px,
   py,
-  kick,
   reduced,
   idBase,
 }: {
@@ -230,7 +209,6 @@ function StrandLine({
   drift: MV;
   px: MV;
   py: MV;
-  kick: MV;
   reduced: boolean;
   idBase: string;
 }) {
@@ -252,13 +230,12 @@ function StrandLine({
   const depth = reduced ? 0 : strand.depth;
 
   const x = useTransform<number, number>(
-    [drift, px, kick, sway],
-    ([dv, pv, kv, sv]: number[]) =>
-      (dv - 0.5) * travel + pv * depth * 34 + kv * travel * 0.55 + sv
+    [drift, px, sway],
+    ([dv, pv, sv]: number[]) => (dv - 0.5) * travel + pv * depth * 34 + sv
   );
   const y = useTransform<number, number>(
-    [py, kick],
-    ([pv, kv]: number[]) => pv * depth * 16 + kv * depth * 26
+    [py],
+    ([pv]: number[]) => pv * depth * 16
   );
 
   const stroke = strand.tinted ? `url(#${idBase}-tint)` : `url(#${idBase}-plain)`;

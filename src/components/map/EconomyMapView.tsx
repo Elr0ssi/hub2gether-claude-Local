@@ -14,7 +14,6 @@ import type { EconomyMetricId, EconomyYear } from "@/types";
 import { MapArticleSection } from "@/components/articles/MapArticleSection";
 import { AdRail } from "@/components/layout/AdRail";
 import { SectionFlowCurves } from "./SectionFlowCurves";
-import { SectionRoll } from "./SectionRoll";
 import { useScrollTeleport } from "@/hooks/useScrollTeleport";
 import { ECONOMY_ARTICLES } from "@/data/articles";
 
@@ -161,7 +160,6 @@ export function EconomyMapView() {
       >
         {!isFullscreen && <SectionFlowCurves sectionRef={mapSectionRef} index={0} />}
         <div className="eco-section-body">
-          <SectionRoll index={0}>
           <div className="eco-section-row">
           <AdRail side="left" />
           <div className="eco-section-main">
@@ -313,7 +311,6 @@ export function EconomyMapView() {
           </div>
           <AdRail side="right" />
           </div>
-          </SectionRoll>
         </div>
       </section>
 
@@ -321,7 +318,6 @@ export function EconomyMapView() {
       <section ref={rankSectionRef} className="eco-section eco-snap-target">
         <SectionFlowCurves sectionRef={rankSectionRef} index={1} />
         <div className="eco-section-body">
-          <SectionRoll index={1}>
           <div className="eco-section-row">
           <AdRail side="left" />
           <div className="eco-section-main">
@@ -338,7 +334,6 @@ export function EconomyMapView() {
           </div>
           <AdRail side="right" />
           </div>
-          </SectionRoll>
         </div>
       </section>
 
@@ -346,7 +341,6 @@ export function EconomyMapView() {
       <section ref={articleSectionRef} className="eco-section eco-snap-target">
         <SectionFlowCurves sectionRef={articleSectionRef} index={2} />
         <div className="eco-section-body">
-          <SectionRoll index={2}>
           <div className="eco-section-row">
           <AdRail side="left" />
           <div className="eco-section-main">
@@ -359,7 +353,6 @@ export function EconomyMapView() {
           </div>
           <AdRail side="right" />
           </div>
-          </SectionRoll>
         </div>
       </section>
     </div>

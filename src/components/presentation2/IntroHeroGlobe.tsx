@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useRef } from "react";
 import { motion, useScroll, useTransform, useMotionTemplate } from "framer-motion";
 import { useMotionNumber } from "@/hooks/useMotionNumber";
-import { HeroSurfaceLines } from "./HeroSurfaceLines";
+import { StoryPreview, STORY_PREVIEW_WIDTH } from "./StoryPreview";
 
 const InteractiveGlobeIcons = dynamic(() => import("@/components/globe/InteractiveGlobeIcons"), {
   ssr: false,
@@ -49,25 +49,16 @@ export function IntroHeroGlobe() {
     offset: ["start start", "end end"],
   });
 
-  // ── Globe ────────────────────────────────────────────────────────────────
-  // It recentres as it descends, so it is over the surface, not beside it.
-  const globeLeft = useTransform(
-    p,
-    [0, T.introEnd, T.toHeroEnd, T.globeDrop, T.globeIn],
-    ["50%", "50%", "68%", "68%", "50%"]
-  );
-  const globeTop = useTransform(p, [0, T.globeDrop, T.globeIn], ["52%", "52%", "58%"]);
-  const globeScale = useTransform(
-    p,
-    [0, T.introEnd, T.toHeroEnd, T.globeDrop, T.globeIn],
-    [0.32, 0.32, 1, 1, 0.58]
-  );
-  const globeOpacityMv = useTransform(p, [0, T.globeFade, T.globeGone], [1, 1, 0]);
+  // ── Hero exit ────────────────────────────────────────────────────────────
+  // Title and globe leave together, straight up, holding their positions:
+  // nothing slides sideways, nothing sinks. The hero simply travels off the
+  // top of the frame while the pane comes up from the bottom to take its
+  // place. One movement, two directions.
+  const heroY = useTransform(p, [T.heroHold, 1], [0, -760], { clamp: true });
 
-  // As it sinks, its lower edge softens — it is going *into* the surface, not
-  // sitting on top of it.
-  const maskStop = useTransform(p, [T.globeDrop, T.globeIn], [108, 62], { clamp: true });
-  const globeMask = useMotionTemplate`linear-gradient(to bottom, #000 38%, rgba(0,0,0,0.92) ${maskStop}%, transparent 100%)`;
+  const globeLeft = useTransform(p, [0, T.introEnd, T.toHeroEnd], ["50%", "50%", "68%"]);
+  const globeScale = useTransform(p, [0, T.introEnd, T.toHeroEnd], [0.32, 0.32, 1]);
+  const globeOpacityMv = useTransform(p, [0, T.globeFade, T.globeGone], [1, 1, 0]);
 
   const loadingOpacityMv = useTransform(p, [0, 0.055, 0.125], [1, 1, 0]);
   const loadingScale = useTransform(p, [0, 0.125], [1, 0.85]);
@@ -78,11 +69,7 @@ export function IntroHeroGlobe() {
     [0.28, T.toHeroEnd + 0.08, T.titleOut, T.titleGone],
     [0, 1, 1, 0]
   );
-  const titleY = useTransform(
-    p,
-    [0.28, T.toHeroEnd + 0.08, T.titleOut, T.titleGone],
-    [24, 0, 0, -30]
-  );
+  const titleY = useTransform(p, [0.28, T.toHeroEnd + 0.08], [24, 0], { clamp: true });
 
   // ── Surface ──────────────────────────────────────────────────────────────
   // A real geometric expansion — width, height, corner radius and position all
@@ -130,13 +117,30 @@ export function IntroHeroGlobe() {
     [T.surfaceIn, T.surfaceSeen, T.surfaceMid, T.surfaceFull],
     [0, 0.9, 0.9, 0]
   );
-  // The trajectories inside the surface hand over to the section's own content.
-  const linesOpacityMv = useTransform(p, [0.58, 0.7, 0.9, 1], [0, 0.9, 0.9, 0]);
+  // The next section is inside the pane from the first frame, scaled down.
+  // It grows with the pane rather than being faded in once the pane is full,
+  // so what the reader watches opening out is the section itself.
+  const previewScale = useTransform(
+    p,
+    [T.surfaceIn, T.surfaceMid, T.surfaceFull],
+    // 0.93 is not arbitrary: the preview is drawn at 1240 and the real scene
+    // renders at max-width 1280 less its gutters, so this is the scale at
+    // which the two are the same size when the handover happens.
+    [0.34, 0.62, 0.93]
+  );
+  const previewOpacityMv = useTransform(p, [T.surfaceIn, T.surfaceSeen], [0, 1]);
 
   // The page itself takes the surface's colour just as the surface reaches the
   // edges of the screen, so the inset dissolves instead of snapping shut and
   // the scene underneath can take over on the same ground.
   const stageBg = useTransform(p, [0.86, 0.98], ["#ffffff", SURFACE]);
+
+  // The whole stage goes out over the last breath of the runway. At that exact
+  // frame the real scene is pinned behind it, showing the same panel in the
+  // same place — measured to within a few pixels — so the fade cannot be seen,
+  // and the hero's slide out of the top happens transparent. Without it the
+  // reader watches two copies of the section pass each other.
+  const stageOpacityMv = useTransform(p, [0.965, 1], [1, 0], { clamp: true });
 
   // See useMotionNumber: opacity specifically needs to be mirrored through
   // React state to actually reach the DOM in this environment.
@@ -145,7 +149,8 @@ export function IntroHeroGlobe() {
   const titleOpacity = useMotionNumber(titleOpacityMv);
   const surfaceOpacity = useMotionNumber(surfaceOpacityMv);
   const haloOpacity = useMotionNumber(haloOpacityMv);
-  const linesOpacity = useMotionNumber(linesOpacityMv);
+  const previewOpacity = useMotionNumber(previewOpacityMv);
+  const stageOpacity = useMotionNumber(stageOpacityMv);
 
   // Reduced motion: `.p2-hero-runway` collapses to a single viewport, so the
   // same scroll-linked transforms above resolve almost immediately instead of
@@ -160,6 +165,7 @@ export function IntroHeroGlobe() {
           height: "calc(100vh - var(--navbar-height))",
           overflow: "hidden",
           background: stageBg,
+          opacity: stageOpacity,
         }}
       >
         {/* Halo — a breath of colour under the surface as it appears, gone by
@@ -204,8 +210,25 @@ export function IntroHeroGlobe() {
             pointerEvents: "none",
           }}
         >
-          <motion.div style={{ position: "absolute", inset: 0, opacity: linesOpacity }}>
-            <HeroSurfaceLines />
+          {/* The section that follows, already here. */}
+          <motion.div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "grid",
+              placeItems: "center",
+              opacity: previewOpacity,
+            }}
+          >
+            <motion.div
+              style={{
+                width: STORY_PREVIEW_WIDTH,
+                scale: previewScale,
+                transformOrigin: "center center",
+              }}
+            >
+              <StoryPreview />
+            </motion.div>
           </motion.div>
         </motion.div>
 
@@ -217,25 +240,25 @@ export function IntroHeroGlobe() {
           style={{
             position: "absolute",
             left: globeLeft,
-            top: globeTop,
+            top: "52%",
             transform: "translate(-50%, -50%)",
             width: "min(620px, 62vh, 74vw)",
             aspectRatio: "1 / 1",
             zIndex: 2,
           }}
         >
-          <motion.div
-            style={{
-              width: "100%",
-              height: "100%",
-              position: "relative",
-              scale: globeScale,
-              opacity: globeOpacity,
-              maskImage: globeMask,
-              WebkitMaskImage: globeMask,
-            }}
-          >
-            <InteractiveGlobeIcons />
+          <motion.div style={{ y: heroY }}>
+            <motion.div
+              style={{
+                width: "100%",
+                aspectRatio: "1 / 1",
+                position: "relative",
+                scale: globeScale,
+                opacity: globeOpacity,
+              }}
+            >
+              <InteractiveGlobeIcons />
+            </motion.div>
           </motion.div>
         </motion.div>
 
@@ -260,6 +283,7 @@ export function IntroHeroGlobe() {
               padding: "0 clamp(20px, 4vw, 64px)",
             }}
           >
+          <motion.div style={{ y: heroY }}>
           <motion.div style={{ y: titleY, opacity: titleOpacity, maxWidth: 460, pointerEvents: "auto" }}>
             <h1
               style={{
@@ -295,6 +319,7 @@ export function IntroHeroGlobe() {
             >
               Le monde à portée de main.
             </p>
+          </motion.div>
           </motion.div>
           </div>
         </div>
