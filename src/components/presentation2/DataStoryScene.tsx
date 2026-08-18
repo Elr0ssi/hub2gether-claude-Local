@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion, useScroll } from "framer-motion";
 
-import { DataMapPanel, type MapTooltipContent } from "./DataMapPanel";
+import { DataMapPanel, type MapCallout } from "./DataMapPanel";
 import { AnimatedKpi } from "./AnimatedKpi";
 import { COUNTRIES } from "@/data/countryData";
 
@@ -29,12 +29,18 @@ interface Category {
   highlight: { name: string; coordinates: [number, number] };
   callout: { label: string; value: string; delta?: string; source?: string };
   kpis: Kpi[];
-  getTooltip: (countryName: string) => MapTooltipContent;
+  /** Same shape as `callout`: the card never changes layout, only content. */
+  getCountryCallout: (countryName: string) => MapCallout;
 }
 
-const fallbackTooltip = (countryName: string, note: string): MapTooltipContent => ({
-  title: countryName,
-  lines: [note],
+/** Unknown metric → N/A, so the card keeps its shape until the data exists. */
+const NA = "N/A";
+
+const noData = (countryName: string, metric: string, source?: string): MapCallout => ({
+  label: `${countryName} · ${metric}`,
+  value: NA,
+  delta: NA,
+  source,
 });
 
 const CATEGORIES: Category[] = [
@@ -56,13 +62,15 @@ const CATEGORIES: Category[] = [
       { target: 30.3, decimals: 1, prefix: "$", suffix: " T", label: "Échanges mondiaux", delta: "+2,1% vs 2024" },
       { target: 2.44, decimals: 2, prefix: "$", suffix: " T", label: "Dépenses militaires", delta: "Record 2024" },
     ],
-    getTooltip: (name) => {
-      const entry = COUNTRIES[name];
-      if (!entry?.economy) return fallbackTooltip(name, "Données non disponibles");
-      const lines = [`PIB : ${entry.economy.gdp}`];
-      if (entry.economy.gdpPC) lines.push(`PIB/hab. : ${entry.economy.gdpPC}`);
-      if (entry.economy.rank) lines.push(`Rang mondial : #${entry.economy.rank}`);
-      return { title: name, lines };
+    getCountryCallout: (name) => {
+      const e = COUNTRIES[name]?.economy;
+      if (!e) return noData(name, "PIB nominal 2025", "FMI");
+      return {
+        label: `${name} · PIB nominal 2025`,
+        value: e.gdp ?? NA,
+        delta: e.gdpPC ? `PIB/hab. ${e.gdpPC}` : NA,
+        source: e.rank ? `FMI · #${e.rank} mondial` : "FMI",
+      };
     },
   },
   {
@@ -83,10 +91,15 @@ const CATEGORIES: Category[] = [
       { target: 73.4, decimals: 1, suffix: " ans", label: "Espérance de vie", delta: "+0,3 an vs 2024" },
       { target: 57, decimals: 0, suffix: "%", label: "Population urbaine", delta: "+1,2% vs 2024" },
     ],
-    getTooltip: (name) => {
-      const entry = COUNTRIES[name];
-      if (!entry?.demographie) return fallbackTooltip(name, "Données non disponibles");
-      return { title: name, lines: [`Population : ${entry.demographie.population}`] };
+    getCountryCallout: (name) => {
+      const d = COUNTRIES[name]?.demographie;
+      if (!d) return noData(name, "Population 2025", "ONU");
+      return {
+        label: `${name} · Population 2025`,
+        value: d.population ?? NA,
+        delta: NA,
+        source: "ONU",
+      };
     },
   },
   {
@@ -108,7 +121,7 @@ const CATEGORIES: Category[] = [
       { target: 34, decimals: 0, suffix: "%", label: "Terres agricoles", delta: "Du territoire mondial" },
     ],
     // No resources dataset exists yet in the project — tooltip is honest about that.
-    getTooltip: (name) => fallbackTooltip(name, "Aucun jeu de données ressources dans le projet"),
+    getCountryCallout: (name) => noData(name, "Réserves de pétrole", "BP"),
   },
   {
     id: "politics",
@@ -128,12 +141,18 @@ const CATEGORIES: Category[] = [
       { target: 18, decimals: 0, suffix: "e année", label: "De recul consécutif", delta: "EIU 2024" },
       { target: 8.8, decimals: 2, suffix: " /10", label: "Meilleur score (Allemagne)", delta: "" },
     ],
-    getTooltip: (name) => {
-      const entry = COUNTRIES[name];
-      if (!entry?.politics) return fallbackTooltip(name, "Données non disponibles");
-      const lines = [entry.politics.regime];
-      if (entry.politics.score != null) lines.push(`Score : ${entry.politics.score.toFixed(2)} / 10`);
-      return { title: name, lines };
+    getCountryCallout: (name) => {
+      const pol = COUNTRIES[name]?.politics;
+      if (!pol) return noData(name, "Indice démocratique", "EIU");
+      return {
+        label: `${name} · Régime politique`,
+        value: pol.regime ?? NA,
+        delta:
+          pol.score != null
+            ? `Indice ${pol.score.toFixed(2).replace(".", ",")} / 10`
+            : NA,
+        source: "EIU",
+      };
     },
   },
   {
@@ -154,7 +173,7 @@ const CATEGORIES: Category[] = [
       { target: 6.8, decimals: 1, suffix: "%", label: "Croissance des budgets", delta: "Vs 2023" },
       { target: 9, decimals: 0, label: "Puissances nucléaires", delta: "Déclarées" },
     ],
-    getTooltip: (name) => fallbackTooltip(name, "Données non disponibles pour cette catégorie"),
+    getCountryCallout: (name) => noData(name, "Dépenses militaires", "SIPRI"),
   },
 ];
 
@@ -287,7 +306,7 @@ export function DataStoryScene() {
                   oceanFill="#FAFCFB"
                   highlight={active.highlight}
                   callout={active.callout}
-                  getTooltip={active.getTooltip}
+                  getCountryCallout={active.getCountryCallout}
                 />
               </motion.div>
             </AnimatePresence>

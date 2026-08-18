@@ -32,11 +32,11 @@ export function IntroHeroGlobe() {
     ["50%", "50%", "68%", "68%", "62%"]
   );
   const globeScale = useTransform(p, [0, T.introEnd, T.toHeroEnd, T.heroEnd, 1], [0.32, 0.32, 1, 1, 0.92]);
-  const globeOpacityMv = useTransform(p, [0, 0.82, 1], [1, 1, 0]);
+  const globeOpacityMv = useTransform(p, [0, 0.72, 0.92], [1, 1, 0]);
   const loadingOpacityMv = useTransform(p, [0, 0.07, 0.16], [1, 1, 0]);
   const loadingScale = useTransform(p, [0, 0.16], [1, 0.85]);
 
-  const titleOpacityMv = useTransform(p, [0.3, T.toHeroEnd, T.heroEnd, 0.85], [0, 1, 1, 0]);
+  const titleOpacityMv = useTransform(p, [0.3, T.toHeroEnd, T.heroEnd, 0.8], [0, 1, 1, 0]);
   const titleY = useTransform(p, [0.3, T.toHeroEnd], [24, 0], { clamp: true });
 
   // See useMotionNumber: opacity specifically needs to be mirrored through
@@ -49,7 +49,7 @@ export function IntroHeroGlobe() {
   // scroll-linked transforms above resolve almost immediately instead of
   // being disabled outright — content and final layout stay identical.
   return (
-    <div ref={wrapperRef} style={{ height: reduced ? "100vh" : "340vh", position: "relative" }}>
+    <div ref={wrapperRef} style={{ height: reduced ? "100vh" : "240vh", position: "relative" }}>
       <div
         style={{
           position: "sticky",
@@ -65,14 +65,22 @@ export function IntroHeroGlobe() {
         <div
           style={{
             position: "absolute",
-            left: "clamp(24px, 6vw, 88px)",
-            top: "50%",
-            transform: "translateY(-50%)",
+            inset: 0,
             zIndex: 2,
-            maxWidth: 460,
+            display: "flex",
+            alignItems: "center",
+            pointerEvents: "none",
           }}
         >
-          <motion.div style={{ y: titleY, opacity: titleOpacity }}>
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 1280,
+              margin: "0 auto",
+              padding: "0 clamp(20px, 4vw, 64px)",
+            }}
+          >
+          <motion.div style={{ y: titleY, opacity: titleOpacity, maxWidth: 460, pointerEvents: "auto" }}>
             <h1
               style={{
                 fontSize: "clamp(2.4rem, 6vw, 4.6rem)",
@@ -108,6 +116,7 @@ export function IntroHeroGlobe() {
               Le monde à portée de main.
             </p>
           </motion.div>
+          </div>
         </div>
 
         {/* Globe stage — outer motion.div owns the scroll-driven horizontal slide
