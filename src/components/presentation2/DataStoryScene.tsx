@@ -184,6 +184,17 @@ export function DataStoryScene() {
   const { scrollYProgress } = useScroll({ target: wrapperRef, offset: ["start start", "end end"] });
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // Which category is on screen: the runway is one viewport per category, so
+  // the progress through it maps straight onto the index.
+  useEffect(
+    () =>
+      scrollYProgress.on("change", (v) => {
+        const idx = Math.min(CATEGORIES.length - 1, Math.max(0, Math.floor(v * CATEGORIES.length)));
+        setActiveIndex(idx);
+      }),
+    [scrollYProgress]
+  );
+
   // No entrance animation. The hero's pane already shows this scene, scaled
   // down and growing; by the time the scene itself takes over, the reader is
   // looking at the same frame. Fading it in here would make it flicker out and
