@@ -202,8 +202,8 @@ export function DataStoryScene() {
   // Tuned against the hero: the surface is edge to edge shortly before this
   // window opens, so the reader gets a beat of empty surface — then the
   // content builds up inside it as it rises into view.
-  const revealFrom = 0.46;
-  const revealTo = 0.88;
+  const revealFrom = 0.34;
+  const revealTo = 0.82;
   const step = 0.045;
   const mapOpacityMv = useTransform(entry, [revealFrom, revealTo], [0, 1], { clamp: true });
   const mapY = useTransform(entry, [revealFrom, revealTo], [40, 0], { clamp: true });
@@ -255,6 +255,24 @@ export function DataStoryScene() {
           }}
         />
       ))}
+
+      {/* The last category is one end of the locked pair with the articles
+          section below — see the run mounted in ArticlesShowcase. Its own
+          anchor, with no height: a stop taller than the viewport is read by
+          scrolling rather than jumped to, which is the opposite of the point
+          here. */}
+      <div
+        aria-hidden="true"
+        className="p2-lock"
+        style={{
+          position: "absolute",
+          top: `${(CATEGORIES.length - 1) * 100}vh`,
+          left: 0,
+          width: 1,
+          height: 0,
+          pointerEvents: "none",
+        }}
+      />
 
       <div
         className="p2-story-stage"

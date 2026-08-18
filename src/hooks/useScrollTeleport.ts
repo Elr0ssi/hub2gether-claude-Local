@@ -12,8 +12,10 @@ export interface TeleportDetail {
   dir: 1 | -1;
 }
 
+/** How long the page takes to roll from one stop to the next, in ms. */
+const ROLL_MS = 540;
 /** Gestures land on the next stop no sooner than this, in ms. */
-const COOLDOWN = 380;
+const COOLDOWN = ROLL_MS + 60;
 /** Wheel deltas below this are treated as noise, not as a page gesture. */
 const WHEEL_THRESHOLD = 8;
 /** Vertical travel a touch drag needs before it counts as a gesture. */
@@ -27,6 +29,13 @@ interface Options {
   /** Space kept above a stop — the fixed navbar. */
   offset: number;
   enabled?: boolean;
+  /**
+   * `"top"` (default) treats the top of the page as the first stop, so the
+   * run starts from whatever sits above the first matched section.
+   * `"first"` starts the run at the first matched section and leaves
+   * everything above it to ordinary scrolling.
+   */
+  startAt?: "top" | "first";
 }
 
 /**
@@ -43,15 +52,43 @@ interface Options {
  *  - it stands down entirely when the reader asks for reduced motion, which
  *    leaves the CSS scroll-snap fallback in charge.
  */
-export function useScrollTeleport({ selector, offset, enabled = true }: Options) {
+export function useScrollTeleport({ selector, offset, enabled = true, startAt = "top" }: Options) {
   useEffect(() => {
     if (!enabled) return;
     if (typeof window === "undefined") return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     let last = 0;
+    let rollFrame = 0;
 
-    const stops = (): { tops: number[]; heights: number[]; end: number } | null => {
+    // The page rolls to the next stop rather than cutting to it: one gesture
+    // still resolves to exactly one section, but the movement between them is
+    // visible, so the sections read as a single strip passing by instead of a
+    // sequence of jump cuts. A new gesture retargets the roll in flight.
+    const easeInOutCubic = (t: number) =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    const rollTo = (target: number) => {
+      cancelAnimationFrame(rollFrame);
+      const from = window.scrollY;
+      const delta = target - from;
+      if (Math.abs(delta) < 2) {
+        window.scrollTo({ top: target, behavior: "instant" as ScrollBehavior });
+        return;
+      }
+      const started = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - started) / ROLL_MS);
+        window.scrollTo({
+          top: from + delta * easeInOutCubic(t),
+          behavior: "instant" as ScrollBehavior,
+        });
+        if (t < 1) rollFrame = requestAnimationFrame(step);
+      };
+      rollFrame = requestAnimationFrame(step);
+    };
+
+    const stops = (): { tops: number[]; heights: number[]; end: number; floor: number } | null => {
       const els = Array.from(document.querySelectorAll<HTMLElement>(selector));
       if (els.length === 0) return null;
       const tops: number[] = [];
@@ -61,10 +98,14 @@ export function useScrollTeleport({ selector, offset, enabled = true }: Options)
         tops.push(Math.round(r.top + window.scrollY - offset));
         heights.push(Math.round(r.height));
       }
-      // The hero above the first section is a stop too, and so is whatever
-      // follows the last one — otherwise the page would be sealed shut.
+      // Whatever follows the last section is a stop too, otherwise the page
+      // would be sealed shut. Under "top", so is the page's own top, which is
+      // where the hero above the first section lives.
       const end = tops[tops.length - 1] + heights[heights.length - 1];
-      return { tops: [0, ...tops, end], heights: [0, ...heights, 0], end };
+      if (startAt === "first") {
+        return { tops: [...tops, end], heights: [...heights, 0], end, floor: tops[0] };
+      }
+      return { tops: [0, ...tops, end], heights: [0, ...heights, 0], end, floor: 0 };
     };
 
     // An inner scroller under the pointer wins: the ranking table scrolls to
@@ -94,7 +135,7 @@ export function useScrollTeleport({ selector, offset, enabled = true }: Options)
       const viewport = window.innerHeight - offset;
 
       // Outside the run of sections — hand the page back.
-      if (y < -EPSILON || y > s.end + EPSILON) return false;
+      if (y < s.floor - EPSILON || y > s.end + EPSILON) return false;
 
       let i = 0;
       for (let k = 0; k < s.tops.length; k++) {
@@ -121,14 +162,12 @@ export function useScrollTeleport({ selector, offset, enabled = true }: Options)
       if (now - last < COOLDOWN) return true; // swallow, do not stack jumps
       last = now;
 
-      window.scrollTo({ top: s.tops[next], behavior: "instant" as ScrollBehavior });
-      // The page moved in one frame, so nothing about the move is visible on
-      // its own. Announce it instead, and let the section that just arrived
-      // play its own entrance — see SectionArrival and SectionFlowCurves.
+      rollTo(s.tops[next]);
+      // Announce the move so the arriving section can answer it — see
+      // SectionFlowCurves, which throws its sheaf the other way.
       window.dispatchEvent(
         new CustomEvent<TeleportDetail>(TELEPORT_EVENT, {
-          // `next` counts the hero as stop 0, sections start at 1.
-          detail: { index: next - 1, dir },
+          detail: { index: startAt === "first" ? next : next - 1, dir },
         })
       );
       return true;
@@ -171,11 +210,12 @@ export function useScrollTeleport({ selector, offset, enabled = true }: Options)
     window.addEventListener("touchend", onTouchEnd, { passive: true });
     window.addEventListener("keydown", onKey);
     return () => {
+      cancelAnimationFrame(rollFrame);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
       window.removeEventListener("keydown", onKey);
     };
-  }, [selector, offset, enabled]);
+  }, [selector, offset, enabled, startAt]);
 }

@@ -63,6 +63,15 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
   const still = <T,>(from: T, to: T): [T, T] => (reduced ? [from, from] : [from, to]);
   const fade = still(1, 0);
 
+  // The globe and its sheaf leave as one body: a single wrapper lifts them
+  // faster than the page scrolls, so the scene rises out of the top rather
+  // than being scrolled past. The strands stay locked to the sphere because
+  // they move with it — nothing is re-measured.
+  const sceneY = useTransform(p, [0, 1], still(0, -260), { clamp: true });
+  // At the same time the sheaf closes in around the globe, scaled about the
+  // sphere's own centre, so the strands finish wrapped around it.
+  const curvesScale = useTransform(p, [0, 0.85], still(1, 0.88), { clamp: true });
+
   const titleY = useTransform(p, [0, 0.26], still(0, -56), { clamp: true });
   const titleOpacityMv = useTransform(p, [0.06, 0.26], fade, { clamp: true });
   const curvesOpacityMv = useTransform(p, [0.26, 0.5], fade, { clamp: true });
@@ -88,25 +97,34 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
   return (
     <div ref={trackRef} className="cat-hero-track">
       <div className="cat-hero-stage">
-        {/* Secondary strands, running higher and much fainter */}
-        <motion.div className="cat-hero-layer" style={{ opacity: curvesOpacity, zIndex: 1 }}>
-          <DataFlowCurves accent={accent} layer="front" globeRef={globeRef} />
-        </motion.div>
-
-        {/* Globe — oversized on purpose, its lower half runs past the fold */}
-        <div ref={globeRef} className="cat-hero-globe-anchor" style={{ zIndex: 2 }}>
-          <motion.div className="cat-hero-globe" style={{ opacity: globeOpacity }}>
-            {/* Badges ride the flow strands above, not the sphere: with the
-                globe this large, surface-anchored ones would fall past the fold. */}
-            <InteractiveGlobeIcons markers={NO_GLOBE_MARKERS} accent={accent} active={globeActive} />
+        {/* Globe and sheaf ride together — one wrapper, one lift. */}
+        <motion.div className="cat-hero-scene" style={{ y: sceneY }}>
+          {/* Secondary strands, running higher and much fainter */}
+          <motion.div
+            className="cat-hero-layer cat-hero-curves"
+            style={{ opacity: curvesOpacity, scale: curvesScale, zIndex: 1 }}
+          >
+            <DataFlowCurves accent={accent} layer="front" globeRef={globeRef} />
           </motion.div>
-        </div>
 
-        {/* Main sheaf, wrapping the top of the globe and carrying the icon
-            nodes. Above the globe so the badges stay hoverable, below the
-            title and the panel so it can never cut across either. */}
-        <motion.div className="cat-hero-layer" style={{ opacity: curvesOpacity, zIndex: 3 }}>
-          <DataFlowCurves accent={accent} layer="back" icons={config.icons} globeRef={globeRef} />
+          {/* Globe — oversized on purpose, its lower half runs past the fold */}
+          <div ref={globeRef} className="cat-hero-globe-anchor" style={{ zIndex: 2 }}>
+            <motion.div className="cat-hero-globe" style={{ opacity: globeOpacity }}>
+              {/* Badges ride the flow strands above, not the sphere: with the
+                  globe this large, surface-anchored ones would fall past the fold. */}
+              <InteractiveGlobeIcons markers={NO_GLOBE_MARKERS} accent={accent} active={globeActive} />
+            </motion.div>
+          </div>
+
+          {/* Main sheaf, wrapping the top of the globe and carrying the icon
+              nodes. Above the globe so the badges stay hoverable, below the
+              title and the panel so it can never cut across either. */}
+          <motion.div
+            className="cat-hero-layer cat-hero-curves"
+            style={{ opacity: curvesOpacity, scale: curvesScale, zIndex: 3 }}
+          >
+            <DataFlowCurves accent={accent} layer="back" icons={config.icons} globeRef={globeRef} />
+          </motion.div>
         </motion.div>
 
         {/* Title */}
@@ -170,6 +188,11 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
           background: var(--bg);
         }
         .cat-hero-layer { position: absolute; inset: 0; pointer-events: none; }
+        .cat-hero-scene { position: absolute; inset: 0; }
+        /* The sheaf closes about the sphere's centre, not the stage's — the
+           globe anchor sits at 50% across and its centre a little below the
+           middle of the stage. */
+        .cat-hero-curves { transform-origin: 50% 76%; }
 
         .cat-hero-globe-anchor {
           position: absolute;

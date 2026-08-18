@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Clock, Zap, BarChart3, ShieldCheck } from "lucide-react";
 import { getArticleBySlug } from "@/data/articles";
+import { useScrollTeleport } from "@/hooks/useScrollTeleport";
 
 // Real, already-published articles — no fabricated headlines.
 const CAROUSEL_SLUGS = [
@@ -19,6 +20,12 @@ const SIDEBAR_SLUGS = ["chine-russie-regimes-autoritaires-21e-siecle", "europe-r
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 export function ArticlesShowcase() {
+  // The last category and this section are a locked pair: one gesture rolls
+  // from one to the other and settles there, in both directions, with nothing
+  // in between. `startAt: "first"` keeps the run off everything above the
+  // last category, which scrolls as it always did.
+  useScrollTeleport({ selector: ".p2-lock", offset: 64, startAt: "first" });
+
   const carousel = CAROUSEL_SLUGS.map(getArticleBySlug).filter((a): a is NonNullable<typeof a> => Boolean(a));
   const sidebar = SIDEBAR_SLUGS.map(getArticleBySlug).filter((a): a is NonNullable<typeof a> => Boolean(a));
   const [index, setIndex] = useState(0);
@@ -35,7 +42,7 @@ export function ArticlesShowcase() {
   if (!featured) return null;
 
   return (
-    <section className="p2-snap-target" style={{ background: "#fff", padding: "clamp(56px, 9vh, 100px) clamp(20px, 4vw, 64px)" }}>
+    <section className="p2-snap-target p2-lock" style={{ background: "#fff", padding: "clamp(56px, 9vh, 100px) clamp(20px, 4vw, 64px)" }}>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}

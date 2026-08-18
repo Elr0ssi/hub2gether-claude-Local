@@ -279,8 +279,16 @@ export default async function MapPage({ params, searchParams }: PageProps) {
           its FAQ, so the table block is not rendered twice. */}
       {!isEconomy && <ServerDataSummary theme={theme} />}
 
-      {/* FAQ */}
-      {faqs.length > 0 && <FAQSection items={faqs} />}
+      {/* FAQ — on the economy page it is the last stop of the scroll run, so
+          it carries the same anchor class as the sections above it. */}
+      {faqs.length > 0 &&
+        (isEconomy ? (
+          <div className="eco-snap-target">
+            <FAQSection items={faqs} />
+          </div>
+        ) : (
+          <FAQSection items={faqs} />
+        ))}
     </Layout>
   );
 }

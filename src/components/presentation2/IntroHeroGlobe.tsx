@@ -20,23 +20,23 @@ const InteractiveGlobeIcons = dynamic(() => import("@/components/globe/Interacti
 // below. The two are one continuous scroll: there is no point at which the
 // hero ends and something else starts.
 const T = {
-  introEnd: 0.11, // small loading globe holds
-  toHeroEnd: 0.3, // grows + slides into hero position
-  heroHold: 0.44, // hero reads normally until here
+  introEnd: 0.13, // small loading globe holds
+  toHeroEnd: 0.34, // grows + slides into hero position
+  heroHold: 0.46, // hero reads normally until here
 
-  surfaceIn: 0.44, // the surface starts to fade up under the globe
-  surfaceSeen: 0.53, // fully opaque, still a floating card
-  surfaceMid: 0.66, // halfway through its expansion
-  surfaceFull: 0.92, // as wide and tall as the viewport allows
-  surfaceClose: 1.0, // inset, corner and shadow gone — it is the ground now
+  surfaceIn: 0.46, // the surface starts to rise from the bottom of the frame
+  surfaceSeen: 0.56, // fully opaque, still a floating card
+  surfaceMid: 0.72, // halfway through its expansion
+  surfaceFull: 0.9, // as wide and tall as the viewport allows
+  surfaceClose: 0.97, // inset, corner and shadow gone — it is the ground now
 
-  titleOut: 0.56, // the title only leaves once the surface is established
-  titleGone: 0.7,
+  titleOut: 0.58, // the title only leaves once the surface is established
+  titleGone: 0.72,
 
-  globeDrop: 0.62, // the globe begins to settle into the surface
+  globeDrop: 0.64, // the globe begins to settle into the surface
   globeIn: 0.88, // it has fully entered
   globeFade: 0.8, // and is the last hero element to go
-  globeGone: 0.95,
+  globeGone: 0.94,
 };
 
 /** Where the surface ends up — the ground the next section is built on. */
@@ -102,8 +102,15 @@ export function IntroHeroGlobe() {
     [T.surfaceIn, T.surfaceMid, T.surfaceFull, T.surfaceClose],
     ["30%", "62%", "94%", "100%"]
   );
-  const surfaceLeft = useTransform(p, [T.surfaceIn, T.surfaceFull], ["66%", "50%"]);
-  const surfaceTop = useTransform(p, [T.surfaceIn, T.surfaceFull], ["82%", "50%"]);
+  // Centred from the first pixel and rising from below the fold: the pane
+  // arrives as the next section coming up to meet the reader, not as a card
+  // tucked behind the globe's shoulder.
+  const surfaceLeft = "50%";
+  const surfaceTop = useTransform(
+    p,
+    [T.surfaceIn, T.surfaceSeen, T.surfaceMid, T.surfaceFull],
+    ["124%", "96%", "72%", "50%"]
+  );
   const surfaceRadius = useTransform(
     p,
     [T.surfaceIn, T.surfaceMid, T.surfaceFull, T.surfaceClose],
@@ -124,12 +131,12 @@ export function IntroHeroGlobe() {
     [0, 0.9, 0.9, 0]
   );
   // The trajectories inside the surface hand over to the section's own content.
-  const linesOpacityMv = useTransform(p, [0.55, 0.66, 0.86, 0.99], [0, 0.9, 0.9, 0]);
+  const linesOpacityMv = useTransform(p, [0.58, 0.7, 0.86, 0.97], [0, 0.9, 0.9, 0]);
 
   // The page itself takes the surface's colour just as the surface reaches the
   // edges of the screen, so the inset dissolves instead of snapping shut and
   // the scene underneath can take over on the same ground.
-  const stageBg = useTransform(p, [0.86, 0.98], ["#ffffff", SURFACE]);
+  const stageBg = useTransform(p, [0.84, 0.95], ["#ffffff", SURFACE]);
 
   // See useMotionNumber: opacity specifically needs to be mirrored through
   // React state to actually reach the DOM in this environment.
