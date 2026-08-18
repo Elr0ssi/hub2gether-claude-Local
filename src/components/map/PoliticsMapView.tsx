@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Maximize2, Minimize2, ChevronLeft } from "lucide-react";
+import dynamic from "next/dynamic";
+import { Maximize2, Minimize2, ChevronLeft, Map, Globe } from "lucide-react";
 import { PoliticsInteractiveMap } from "./PoliticsInteractiveMap";
 import { PoliticsSidePanel } from "@/components/sidebar/PoliticsSidePanel";
 import { MunicipalElectionsSection } from "./MunicipalElectionsSection";
@@ -9,6 +10,12 @@ import { ThemeDropdown } from "./ThemeDropdown";
 import { getAllPoliticsForYear, getPoliticsForYear, POLITICS_MIN_YEAR, POLITICS_MAX_YEAR } from "@/data/politics/politics";
 import { ORIENTATION_COLORS, ORIENTATION_LABELS } from "@/lib/politicsColors";
 import { MapArticleSection } from "@/components/articles/MapArticleSection";
+
+// WebGL and the world file are only paid for when the reader asks for the globe.
+const PoliticsGlobe = dynamic(
+  () => import("./PoliticsGlobe").then((m) => m.PoliticsGlobe),
+  { ssr: false, loading: () => null }
+);
 import { POLITICS_ARTICLES } from "@/data/articles";
 import { useDragScroll } from "@/hooks/useDragScroll";
 
@@ -19,6 +26,7 @@ export function PoliticsMapView() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [year, setYear] = useState(2025);
+  const [view, setView] = useState<"map" | "globe">("map");
   const { ref: yearBtnsRef, onMouseDown: onYearBtnsDown, onMouseUp: onYearBtnsUp, onMouseLeave: onYearBtnsLeave, onMouseMove: onYearBtnsMove } = useDragScroll();
 
   useEffect(() => {
@@ -58,6 +66,31 @@ export function PoliticsMapView() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Flat map or globe — same data, same click, two readings of it. */}
+            <div
+              className="flex items-center rounded-lg overflow-hidden"
+              style={{ border: "1px solid var(--border)" }}
+            >
+              {([
+                { id: "map" as const, label: "Carte", Icon: Map },
+                { id: "globe" as const, label: "Globe", Icon: Globe },
+              ]).map(({ id, label, Icon }) => (
+                <button
+                  key={id}
+                  onClick={() => setView(id)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium transition-all duration-150"
+                  style={
+                    view === id
+                      ? { background: "var(--accent-dim)", color: "#0D7A40", fontWeight: 700 }
+                      : { background: "transparent", color: "var(--ink-3)" }
+                  }
+                  aria-pressed={view === id}
+                >
+                  <Icon size={13} />
+                  <span className="hidden sm:inline">{label}</span>
+                </button>
+              ))}
+            </div>
             {sidePanelOpen ? (
               <button onClick={() => setSidePanelOpen(false)} className="btn-ghost px-2.5 py-1.5 text-xs gap-1.5">
                 <ChevronLeft size={13} /> Réduire
@@ -159,11 +192,19 @@ export function PoliticsMapView() {
         {/* Map + Side panel */}
         <div className={`flex flex-col lg:flex-row${isFullscreen ? " flex-1 overflow-hidden" : ""}`} style={isFullscreen ? {} : { minHeight: "480px" }}>
           <div className="flex-1 overflow-hidden" style={{ minWidth: 0 }}>
-            <PoliticsInteractiveMap
-              politicsData={politicsData}
-              selectedCountry={selectedCountry}
-              onCountryClick={handleCountryClick}
-            />
+            {view === "globe" ? (
+              <PoliticsGlobe
+                politicsData={politicsData}
+                selectedCountry={selectedCountry}
+                onCountryClick={handleCountryClick}
+              />
+            ) : (
+              <PoliticsInteractiveMap
+                politicsData={politicsData}
+                selectedCountry={selectedCountry}
+                onCountryClick={handleCountryClick}
+              />
+            )}
           </div>
 
           <PoliticsSidePanel
