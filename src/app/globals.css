@@ -470,3 +470,23 @@ body {
 .rsm-geography:focus {
   outline: none;
 }
+
+/* ============================================
+   PRÉSENTATION 2 — snap between scrollytelling acts
+   Scoped with :has() so the rule is inert on every other page. `proximity`
+   (not `mandatory`) so it only pulls near a boundary and never fights the
+   long sticky runways in between.
+   ============================================ */
+
+html:has(.p2-snap) {
+  scroll-snap-type: y proximity;
+}
+
+.p2-snap-target {
+  scroll-snap-align: start;
+  scroll-margin-top: var(--navbar-height);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(.p2-snap) { scroll-snap-type: none; }
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
+import { useRef, useState } from "react";
 import { ComposableMap, Geographies, Geography, Marker, type GeographyItem } from "react-simple-maps";
 import { Plus, Minus, Maximize } from "lucide-react";
 
@@ -30,15 +30,10 @@ interface DataMapPanelProps {
 export function DataMapPanel({ accent, landFill, oceanFill, highlight, callout, getTooltip }: DataMapPanelProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [hovered, setHovered] = useState<string | null>(null);
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const [mapScale, setMapScale] = useState(1);
 
-  const updateTooltipPos = (e: ReactMouseEvent) => {
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    setTooltipPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
-
+  // The top-left card is the single readout: hovering a country rewrites it
+  // rather than opening a second floating panel over the map.
   const tooltip = hovered ? getTooltip(hovered) : null;
 
   return (
@@ -79,16 +74,9 @@ export function DataMapPanel({ accent, landFill, oceanFill, highlight, callout, 
                     fill={isHovered ? accent : landFill}
                     stroke={oceanFill}
                     strokeWidth={0.5}
-                    onMouseEnter={(e) => {
-                      setHovered(name);
-                      updateTooltipPos(e);
-                    }}
-                    onMouseMove={updateTooltipPos}
+                    onMouseEnter={() => setHovered(name)}
                     onMouseLeave={() => setHovered(null)}
-                    onClick={(e) => {
-                      setHovered((prev) => (prev === name ? null : name));
-                      updateTooltipPos(e);
-                    }}
+                    onClick={() => setHovered((prev) => (prev === name ? null : name))}
                     style={{
                       default: { outline: "none", cursor: "pointer", transition: "fill 0.15s ease" },
                       hover: { outline: "none", cursor: "pointer" },
@@ -143,18 +131,20 @@ export function DataMapPanel({ accent, landFill, oceanFill, highlight, callout, 
         ))}
       </div>
 
-      {/* Floating callout card */}
+      {/* Readout card — the default highlight, replaced live by whatever
+          country is under the pointer. One panel, never two. */}
       <div
         style={{
           position: "absolute",
           top: 14,
           left: 14,
-          maxWidth: 190,
+          width: 210,
           background: "#fff",
           borderRadius: 14,
           padding: "12px 15px",
           boxShadow: "0 10px 26px rgba(10,20,15,0.14)",
           zIndex: 4,
+          transition: "box-shadow 0.2s ease",
         }}
       >
         <p
@@ -165,49 +155,46 @@ export function DataMapPanel({ accent, landFill, oceanFill, highlight, callout, 
             textTransform: "uppercase",
             color: accent,
             marginBottom: 4,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
           }}
         >
-          {callout.label}
+          {tooltip ? tooltip.title : callout.label}
         </p>
-        <p style={{ fontSize: "1.15rem", fontWeight: 900, color: "#0A0A0A", letterSpacing: "-0.02em" }}>
-          {callout.value}
-        </p>
-        {callout.delta && (
-          <p style={{ fontSize: "0.64rem", fontWeight: 600, color: accent, marginTop: 2 }}>{callout.delta}</p>
-        )}
-        {callout.source && (
-          <p style={{ fontSize: "0.58rem", color: "#9B9B9B", marginTop: 3 }}>Source : {callout.source}</p>
+
+        {tooltip ? (
+          <div style={{ display: "grid", gap: 2 }}>
+            {tooltip.lines.map((line, i) => (
+              <p
+                key={i}
+                style={{
+                  fontSize: i === 0 ? "0.95rem" : "0.68rem",
+                  fontWeight: i === 0 ? 800 : 500,
+                  color: i === 0 ? "#0A0A0A" : "#6B6B6B",
+                  letterSpacing: i === 0 ? "-0.01em" : undefined,
+                  lineHeight: 1.45,
+                }}
+              >
+                {line}
+              </p>
+            ))}
+          </div>
+        ) : (
+          <>
+            <p style={{ fontSize: "1.15rem", fontWeight: 900, color: "#0A0A0A", letterSpacing: "-0.02em" }}>
+              {callout.value}
+            </p>
+            {callout.delta && (
+              <p style={{ fontSize: "0.64rem", fontWeight: 600, color: accent, marginTop: 2 }}>{callout.delta}</p>
+            )}
+            {callout.source && (
+              <p style={{ fontSize: "0.58rem", color: "#9B9B9B", marginTop: 3 }}>Source : {callout.source}</p>
+            )}
+          </>
         )}
       </div>
 
-      {/* Hover / tap tooltip */}
-      {tooltip && (
-        <div
-          style={{
-            position: "absolute",
-            left: tooltipPos.x,
-            top: tooltipPos.y,
-            transform: "translate(-50%, -115%)",
-            pointerEvents: "none",
-            background: "#0A0A0A",
-            color: "#fff",
-            borderRadius: 10,
-            padding: "8px 11px",
-            fontSize: "0.68rem",
-            lineHeight: 1.5,
-            zIndex: 5,
-            whiteSpace: "nowrap",
-            boxShadow: "0 8px 20px rgba(0,0,0,0.25)",
-          }}
-        >
-          <p style={{ fontWeight: 700, marginBottom: 2 }}>{tooltip.title}</p>
-          {tooltip.lines.map((line, i) => (
-            <p key={i} style={{ color: "rgba(255,255,255,0.75)" }}>
-              {line}
-            </p>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

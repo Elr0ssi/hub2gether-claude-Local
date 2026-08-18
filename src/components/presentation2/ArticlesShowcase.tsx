@@ -35,7 +35,7 @@ export function ArticlesShowcase() {
   if (!featured) return null;
 
   return (
-    <section style={{ background: "#fff", padding: "clamp(56px, 9vh, 100px) clamp(20px, 4vw, 64px)" }}>
+    <section className="p2-snap-target" style={{ background: "#fff", padding: "clamp(56px, 9vh, 100px) clamp(20px, 4vw, 64px)" }}>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -54,7 +54,7 @@ export function ArticlesShowcase() {
               margin: 0,
             }}
           >
-            Ce que le monde
+            Ce qui bouge
             <br />
             <em
               style={{
@@ -67,7 +67,7 @@ export function ArticlesShowcase() {
                 backgroundClip: "text",
               }}
             >
-              bouge aujourd&apos;hui.
+              dans le monde aujourd&apos;hui.
             </em>
           </h2>
           <Link

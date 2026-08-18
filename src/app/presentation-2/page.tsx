@@ -13,9 +13,12 @@ export const metadata: Metadata = {
 export default function Presentation2Page() {
   return (
     <Layout>
-      <IntroHeroGlobe />
-      <DataStoryScene />
-      <ArticlesShowcase />
+      {/* .p2-snap turns on scroll snapping for this page only */}
+      <div className="p2-snap">
+        <IntroHeroGlobe />
+        <DataStoryScene />
+        <ArticlesShowcase />
+      </div>
     </Layout>
   );
 }

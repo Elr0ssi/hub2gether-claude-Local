@@ -3,33 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion, useScroll } from "framer-motion";
-import {
-  TrendingUp,
-  PiggyBank,
-  ArrowLeftRight,
-  Shield,
-  Users,
-  Baby,
-  HeartPulse,
-  Building2,
-  Fuel,
-  Zap,
-  Droplet,
-  Wheat,
-  Vote,
-  Globe as GlobeIcon,
-  TrendingDown,
-  Award,
-  Swords,
-  Atom,
-  type LucideIcon,
-} from "lucide-react";
+
 import { DataMapPanel, type MapTooltipContent } from "./DataMapPanel";
 import { AnimatedKpi } from "./AnimatedKpi";
 import { COUNTRIES } from "@/data/countryData";
 
 interface Kpi {
-  icon: LucideIcon;
   target: number;
   decimals: number;
   prefix?: string;
@@ -72,10 +51,10 @@ const CATEGORIES: Category[] = [
     highlight: { name: "Chine", coordinates: [104.1954, 35.8617] },
     callout: { label: "Chine · PIB nominal 2025", value: "19,53 T$", delta: "+4,2% vs 2024", source: "FMI" },
     kpis: [
-      { icon: TrendingUp, target: 105, decimals: 0, prefix: "$", suffix: " T", label: "PIB mondial 2025", delta: "+3,3% vs 2024" },
-      { icon: PiggyBank, target: 19.53, decimals: 2, prefix: "$", suffix: " T", label: "PIB Chine 2025", delta: "+4,2% vs 2024" },
-      { icon: ArrowLeftRight, target: 30.3, decimals: 1, prefix: "$", suffix: " T", label: "Échanges mondiaux", delta: "+2,1% vs 2024" },
-      { icon: Shield, target: 2.44, decimals: 2, prefix: "$", suffix: " T", label: "Dépenses militaires", delta: "Record 2024" },
+      { target: 105, decimals: 0, prefix: "$", suffix: " T", label: "PIB mondial 2025", delta: "+3,3% vs 2024" },
+      { target: 19.53, decimals: 2, prefix: "$", suffix: " T", label: "PIB Chine 2025", delta: "+4,2% vs 2024" },
+      { target: 30.3, decimals: 1, prefix: "$", suffix: " T", label: "Échanges mondiaux", delta: "+2,1% vs 2024" },
+      { target: 2.44, decimals: 2, prefix: "$", suffix: " T", label: "Dépenses militaires", delta: "Record 2024" },
     ],
     getTooltip: (name) => {
       const entry = COUNTRIES[name];
@@ -99,10 +78,10 @@ const CATEGORIES: Category[] = [
     highlight: { name: "Inde", coordinates: [78.9629, 20.5937] },
     callout: { label: "Inde · Population 2025", value: "1,46 Md", delta: "+0,9% cette année", source: "ONU" },
     kpis: [
-      { icon: Users, target: 8.2, decimals: 2, suffix: " Md", label: "Population mondiale", delta: "+0,8% vs 2024" },
-      { icon: Baby, target: 17, decimals: 0, label: "Naissances / 1 000 hab.", delta: "Moyenne mondiale" },
-      { icon: HeartPulse, target: 73.4, decimals: 1, suffix: " ans", label: "Espérance de vie", delta: "+0,3 an vs 2024" },
-      { icon: Building2, target: 57, decimals: 0, suffix: "%", label: "Population urbaine", delta: "+1,2% vs 2024" },
+      { target: 8.2, decimals: 2, suffix: " Md", label: "Population mondiale", delta: "+0,8% vs 2024" },
+      { target: 17, decimals: 0, label: "Naissances / 1 000 hab.", delta: "Moyenne mondiale" },
+      { target: 73.4, decimals: 1, suffix: " ans", label: "Espérance de vie", delta: "+0,3 an vs 2024" },
+      { target: 57, decimals: 0, suffix: "%", label: "Population urbaine", delta: "+1,2% vs 2024" },
     ],
     getTooltip: (name) => {
       const entry = COUNTRIES[name];
@@ -123,10 +102,10 @@ const CATEGORIES: Category[] = [
     highlight: { name: "Arabie saoudite", coordinates: [45.0792, 23.8859] },
     callout: { label: "Arabie saoudite · Réserves de pétrole", value: "267 Md barils", delta: "18% des réserves mondiales", source: "BP" },
     kpis: [
-      { icon: Fuel, target: 267, decimals: 0, suffix: " Md barils", label: "Réserves de pétrole", delta: "18% du total mondial" },
-      { icon: Zap, target: 2814, decimals: 0, suffix: " T", label: "Production d'énergie", delta: "+2,4% vs 2023" },
-      { icon: Droplet, target: 3.2, decimals: 1, suffix: " Md m³", label: "Eau douce / hab. / an", delta: "Renouvelable" },
-      { icon: Wheat, target: 34, decimals: 0, suffix: "%", label: "Terres agricoles", delta: "Du territoire mondial" },
+      { target: 267, decimals: 0, suffix: " Md barils", label: "Réserves de pétrole", delta: "18% du total mondial" },
+      { target: 2814, decimals: 0, suffix: " T", label: "Production d'énergie", delta: "+2,4% vs 2023" },
+      { target: 3.2, decimals: 1, suffix: " Md m³", label: "Eau douce / hab. / an", delta: "Renouvelable" },
+      { target: 34, decimals: 0, suffix: "%", label: "Terres agricoles", delta: "Du territoire mondial" },
     ],
     // No resources dataset exists yet in the project — tooltip is honest about that.
     getTooltip: (name) => fallbackTooltip(name, "Aucun jeu de données ressources dans le projet"),
@@ -144,10 +123,10 @@ const CATEGORIES: Category[] = [
     highlight: { name: "Allemagne", coordinates: [10.4515, 51.1657] },
     callout: { label: "Allemagne · Indice démocratique", value: "8,80 / 10", delta: "Meilleur score mondial", source: "EIU" },
     kpis: [
-      { icon: Vote, target: 44.8, decimals: 1, suffix: "%", label: "Population en démocratie", delta: "-0,8% vs 2024" },
-      { icon: GlobeIcon, target: 72, decimals: 0, suffix: " pays", label: "En recul démocratique", delta: "Sur 167 évalués" },
-      { icon: TrendingDown, target: 18, decimals: 0, suffix: "e année", label: "De recul consécutif", delta: "EIU 2024" },
-      { icon: Award, target: 8.8, decimals: 2, suffix: " /10", label: "Meilleur score (Allemagne)", delta: "" },
+      { target: 44.8, decimals: 1, suffix: "%", label: "Population en démocratie", delta: "-0,8% vs 2024" },
+      { target: 72, decimals: 0, suffix: " pays", label: "En recul démocratique", delta: "Sur 167 évalués" },
+      { target: 18, decimals: 0, suffix: "e année", label: "De recul consécutif", delta: "EIU 2024" },
+      { target: 8.8, decimals: 2, suffix: " /10", label: "Meilleur score (Allemagne)", delta: "" },
     ],
     getTooltip: (name) => {
       const entry = COUNTRIES[name];
@@ -170,10 +149,10 @@ const CATEGORIES: Category[] = [
     highlight: { name: "États-Unis", coordinates: [-95.7129, 37.0902] },
     callout: { label: "États-Unis · Dépenses militaires", value: "886 Mds€", delta: "36% du total mondial", source: "SIPRI" },
     kpis: [
-      { icon: Shield, target: 2.44, decimals: 2, prefix: "$", suffix: " T", label: "Dépenses militaires mondiales", delta: "Record 2024" },
-      { icon: Swords, target: 47, decimals: 0, label: "Conflits armés actifs", delta: "+4 vs 2023" },
-      { icon: TrendingUp, target: 6.8, decimals: 1, suffix: "%", label: "Croissance des budgets", delta: "Vs 2023" },
-      { icon: Atom, target: 9, decimals: 0, label: "Puissances nucléaires", delta: "Déclarées" },
+      { target: 2.44, decimals: 2, prefix: "$", suffix: " T", label: "Dépenses militaires mondiales", delta: "Record 2024" },
+      { target: 47, decimals: 0, label: "Conflits armés actifs", delta: "+4 vs 2023" },
+      { target: 6.8, decimals: 1, suffix: "%", label: "Croissance des budgets", delta: "Vs 2023" },
+      { target: 9, decimals: 0, label: "Puissances nucléaires", delta: "Déclarées" },
     ],
     getTooltip: (name) => fallbackTooltip(name, "Données non disponibles pour cette catégorie"),
   },
@@ -200,6 +179,25 @@ export function DataStoryScene() {
 
   return (
     <div ref={wrapperRef} style={{ height: reduced ? undefined : `${CATEGORIES.length * 100}vh`, position: "relative" }}>
+      {/* One snap anchor per category: zero-width, out of the flow, purely a
+          position for scroll-snap to resolve against. */}
+      {!reduced &&
+        CATEGORIES.map((c, i) => (
+          <div
+            key={`snap-${c.id}`}
+            aria-hidden="true"
+            className="p2-snap-target"
+            style={{
+              position: "absolute",
+              top: `${i * 100}vh`,
+              left: 0,
+              width: 1,
+              height: "100vh",
+              pointerEvents: "none",
+            }}
+          />
+        ))}
+
       <div
         style={{
           position: reduced ? "relative" : "sticky",
@@ -309,20 +307,18 @@ export function DataStoryScene() {
                   transition={{ duration: 0.45, ease: EASE }}
                   style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "center" }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                  {/* White card, matching the KPI row beneath the map */}
+                  <div style={{ marginBottom: 16 }}>
                     <span
                       style={{
-                        width: 7,
-                        height: 7,
-                        borderRadius: "50%",
-                        background: active.accent,
-                        boxShadow: `0 0 8px ${active.accent}`,
-                      }}
-                    />
-                    <span
-                      style={{
-                        fontSize: "0.62rem",
-                        fontWeight: 700,
+                        display: "inline-block",
+                        padding: "9px 16px",
+                        background: "#fff",
+                        borderRadius: 12,
+                        border: "1px solid rgba(10,20,15,0.06)",
+                        boxShadow: "0 10px 26px rgba(10,20,15,0.06)",
+                        fontSize: "0.68rem",
+                        fontWeight: 800,
                         letterSpacing: "0.12em",
                         textTransform: "uppercase",
                         color: active.accent,
@@ -378,47 +374,27 @@ export function DataStoryScene() {
             }}
             className="p2-kpi-row"
           >
-            {active.kpis.map((kpi, i) => {
-              const Icon = kpi.icon;
-              return (
-                <div
-                  key={`${active.id}-${i}`}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    padding: "16px clamp(12px, 1.6vw, 20px)",
-                    borderLeft: i === 0 ? "none" : "1px solid rgba(10,20,15,0.06)",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: 10,
-                      background: active.bg,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <Icon size={15} style={{ color: active.accent }} />
-                  </div>
-                  <div style={{ minWidth: 0 }}>
-                    <p style={{ fontSize: "0.92rem", fontWeight: 800, color: "#0A0A0A", letterSpacing: "-0.02em", whiteSpace: "nowrap" }}>
-                      <AnimatedKpi target={kpi.target} decimals={kpi.decimals} prefix={kpi.prefix} suffix={kpi.suffix} />
-                    </p>
-                    <p style={{ fontSize: "0.66rem", color: "#8A8A8A", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {kpi.label}
-                    </p>
-                    {kpi.delta && (
-                      <p style={{ fontSize: "0.6rem", fontWeight: 600, color: active.accent, marginTop: 1 }}>{kpi.delta}</p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+            {active.kpis.map((kpi, i) => (
+              // No icon: the figure carries the cell on its own.
+              <div
+                key={`${active.id}-${i}`}
+                style={{
+                  padding: "18px clamp(12px, 1.6vw, 20px)",
+                  borderLeft: i === 0 ? "none" : "1px solid rgba(10,20,15,0.06)",
+                  minWidth: 0,
+                }}
+              >
+                <p style={{ fontSize: "clamp(1.25rem, 1.9vw, 1.6rem)", fontWeight: 900, color: "#0A0A0A", letterSpacing: "-0.03em", whiteSpace: "nowrap", lineHeight: 1.1 }}>
+                  <AnimatedKpi target={kpi.target} decimals={kpi.decimals} prefix={kpi.prefix} suffix={kpi.suffix} />
+                </p>
+                <p style={{ fontSize: "0.72rem", color: "#8A8A8A", marginTop: 5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {kpi.label}
+                </p>
+                {kpi.delta && (
+                  <p style={{ fontSize: "0.64rem", fontWeight: 600, color: active.accent, marginTop: 3 }}>{kpi.delta}</p>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
