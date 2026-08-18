@@ -2,8 +2,9 @@
 
 import dynamic from "next/dynamic";
 import { useRef } from "react";
-import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionTemplate } from "framer-motion";
 import { useMotionNumber } from "@/hooks/useMotionNumber";
+import { HeroSurfaceLines } from "./HeroSurfaceLines";
 
 const InteractiveGlobeIcons = dynamic(() => import("@/components/globe/InteractiveGlobeIcons"), {
   ssr: false,
@@ -11,54 +12,226 @@ const InteractiveGlobeIcons = dynamic(() => import("@/components/globe/Interacti
 });
 
 // Scroll phases, expressed as fractions of this component's own scroll range.
+//
+// The first half is the hero as it was: the globe grows out of the loading
+// state, slides right, the title arrives, and the composition holds. The
+// second half is the handover — a surface emerges under the globe and grows
+// until it *is* the next section, rather than the next section arriving from
+// below. The two are one continuous scroll: there is no point at which the
+// hero ends and something else starts.
 const T = {
-  introEnd: 0.14, // small loading globe holds
-  toHeroEnd: 0.4, // grows + slides into hero position
-  heroEnd: 0.68, // hero holds
-  // 0.68 -> 1: fades out, handing off to the data story scene
+  introEnd: 0.11, // small loading globe holds
+  toHeroEnd: 0.3, // grows + slides into hero position
+  heroHold: 0.44, // hero reads normally until here
+
+  surfaceIn: 0.44, // the surface starts to fade up under the globe
+  surfaceSeen: 0.53, // fully opaque, still a floating card
+  surfaceMid: 0.66, // halfway through its expansion
+  surfaceFull: 0.92, // as wide and tall as the viewport allows
+  surfaceClose: 1.0, // inset, corner and shadow gone — it is the ground now
+
+  titleOut: 0.56, // the title only leaves once the surface is established
+  titleGone: 0.7,
+
+  globeDrop: 0.62, // the globe begins to settle into the surface
+  globeIn: 0.88, // it has fully entered
+  globeFade: 0.8, // and is the last hero element to go
+  globeGone: 0.95,
 };
+
+/** Where the surface ends up — the ground the next section is built on. */
+const SURFACE = "#EEFBF4";
 
 export function IntroHeroGlobe() {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
   const { scrollYProgress: p } = useScroll({
     target: wrapperRef,
     offset: ["start start", "end end"],
   });
 
-  const leftPercent = useTransform(
+  // ── Globe ────────────────────────────────────────────────────────────────
+  // It recentres as it descends, so it is over the surface, not beside it.
+  const globeLeft = useTransform(
     p,
-    [0, T.introEnd, T.toHeroEnd, T.heroEnd, 1],
-    ["50%", "50%", "68%", "68%", "62%"]
+    [0, T.introEnd, T.toHeroEnd, T.globeDrop, T.globeIn],
+    ["50%", "50%", "68%", "68%", "50%"]
   );
-  const globeScale = useTransform(p, [0, T.introEnd, T.toHeroEnd, T.heroEnd, 1], [0.32, 0.32, 1, 1, 0.92]);
-  const globeOpacityMv = useTransform(p, [0, 0.72, 0.92], [1, 1, 0]);
-  const loadingOpacityMv = useTransform(p, [0, 0.07, 0.16], [1, 1, 0]);
-  const loadingScale = useTransform(p, [0, 0.16], [1, 0.85]);
+  const globeTop = useTransform(p, [0, T.globeDrop, T.globeIn], ["52%", "52%", "58%"]);
+  const globeScale = useTransform(
+    p,
+    [0, T.introEnd, T.toHeroEnd, T.globeDrop, T.globeIn],
+    [0.32, 0.32, 1, 1, 0.58]
+  );
+  const globeOpacityMv = useTransform(p, [0, T.globeFade, T.globeGone], [1, 1, 0]);
 
-  const titleOpacityMv = useTransform(p, [0.3, T.toHeroEnd, T.heroEnd, 0.8], [0, 1, 1, 0]);
-  const titleY = useTransform(p, [0.3, T.toHeroEnd], [24, 0], { clamp: true });
+  // As it sinks, its lower edge softens — it is going *into* the surface, not
+  // sitting on top of it.
+  const maskStop = useTransform(p, [T.globeDrop, T.globeIn], [108, 62], { clamp: true });
+  const globeMask = useMotionTemplate`linear-gradient(to bottom, #000 38%, rgba(0,0,0,0.92) ${maskStop}%, transparent 100%)`;
+
+  const loadingOpacityMv = useTransform(p, [0, 0.055, 0.125], [1, 1, 0]);
+  const loadingScale = useTransform(p, [0, 0.125], [1, 0.85]);
+
+  // ── Title ────────────────────────────────────────────────────────────────
+  const titleOpacityMv = useTransform(
+    p,
+    [0.28, T.toHeroEnd + 0.08, T.titleOut, T.titleGone],
+    [0, 1, 1, 0]
+  );
+  const titleY = useTransform(
+    p,
+    [0.28, T.toHeroEnd + 0.08, T.titleOut, T.titleGone],
+    [24, 0, 0, -30]
+  );
+
+  // ── Surface ──────────────────────────────────────────────────────────────
+  // A real geometric expansion — width, height, corner radius and position all
+  // interpolate, so it reads as a pane unfolding rather than a scaled sprite.
+  // Single unit per property: mixing vw with calc() would break interpolation.
+  // The last stretch closes the inset entirely — edge to edge, no corner, no
+  // shadow. By the time the pane stops being an object it is indistinguishable
+  // from the ground the next scene is built on, so the handover has no seam to
+  // give it away.
+  const surfaceWidth = useTransform(
+    p,
+    [T.surfaceIn, T.surfaceMid, T.surfaceFull, T.surfaceClose],
+    ["44%", "74%", "98%", "100%"]
+  );
+  const surfaceHeight = useTransform(
+    p,
+    [T.surfaceIn, T.surfaceMid, T.surfaceFull, T.surfaceClose],
+    ["30%", "62%", "94%", "100%"]
+  );
+  const surfaceLeft = useTransform(p, [T.surfaceIn, T.surfaceFull], ["66%", "50%"]);
+  const surfaceTop = useTransform(p, [T.surfaceIn, T.surfaceFull], ["82%", "50%"]);
+  const surfaceRadius = useTransform(
+    p,
+    [T.surfaceIn, T.surfaceMid, T.surfaceFull, T.surfaceClose],
+    [44, 34, 26, 0]
+  );
+  const shadowAlpha = useTransform(p, [T.surfaceFull, T.surfaceClose], [0.07, 0], { clamp: true });
+  const shadowBlur = useTransform(p, [T.surfaceFull, T.surfaceClose], [80, 0], { clamp: true });
+  const surfaceShadow = useMotionTemplate`0 30px ${shadowBlur}px rgba(10,60,35,${shadowAlpha})`;
+  const surfaceOpacityMv = useTransform(p, [T.surfaceIn, T.surfaceSeen], [0, 1]);
+  const surfaceBorder = useTransform(
+    p,
+    [T.surfaceIn, T.surfaceFull, T.surfaceClose],
+    ["rgba(20,160,95,0.14)", "rgba(20,160,95,0.10)", "rgba(20,160,95,0)"]
+  );
+  const haloOpacityMv = useTransform(
+    p,
+    [T.surfaceIn, T.surfaceSeen, T.surfaceMid, T.surfaceFull],
+    [0, 0.9, 0.9, 0]
+  );
+  // The trajectories inside the surface hand over to the section's own content.
+  const linesOpacityMv = useTransform(p, [0.55, 0.66, 0.86, 0.99], [0, 0.9, 0.9, 0]);
+
+  // The page itself takes the surface's colour just as the surface reaches the
+  // edges of the screen, so the inset dissolves instead of snapping shut and
+  // the scene underneath can take over on the same ground.
+  const stageBg = useTransform(p, [0.86, 0.98], ["#ffffff", SURFACE]);
 
   // See useMotionNumber: opacity specifically needs to be mirrored through
   // React state to actually reach the DOM in this environment.
   const globeOpacity = useMotionNumber(globeOpacityMv);
   const loadingOpacity = useMotionNumber(loadingOpacityMv);
   const titleOpacity = useMotionNumber(titleOpacityMv);
+  const surfaceOpacity = useMotionNumber(surfaceOpacityMv);
+  const haloOpacity = useMotionNumber(haloOpacityMv);
+  const linesOpacity = useMotionNumber(linesOpacityMv);
 
-  // Reduced motion: the wrapper collapses to a single viewport, so the same
-  // scroll-linked transforms above resolve almost immediately instead of
-  // being disabled outright — content and final layout stay identical.
+  // Reduced motion: `.p2-hero-runway` collapses to a single viewport, so the
+  // same scroll-linked transforms above resolve almost immediately instead of
+  // being disabled outright — content and final layout stay identical, and the
+  // preference never has to be asked during render.
   return (
-    <div ref={wrapperRef} style={{ height: reduced ? "100vh" : "240vh", position: "relative" }}>
-      <div
+    <div ref={wrapperRef} className="p2-hero-runway">
+      <motion.div
         style={{
           position: "sticky",
           top: "var(--navbar-height)",
           height: "calc(100vh - var(--navbar-height))",
           overflow: "hidden",
-          background: "#fff",
+          background: stageBg,
         }}
       >
+        {/* Halo — a breath of colour under the surface as it appears, gone by
+            the time the surface is large enough to carry itself. */}
+        <motion.div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            left: surfaceLeft,
+            top: surfaceTop,
+            width: "120%",
+            height: "120%",
+            transform: "translate(-50%, -50%)",
+            opacity: haloOpacity,
+            background:
+              "radial-gradient(circle, rgba(57,255,136,0.08) 0%, rgba(57,255,136,0) 65%)",
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* The surface. It emerges behind the globe's lower half as a floating
+            pane and grows until it is the whole viewport — the next section
+            arriving as an object of this one rather than as a new block. */}
+        <motion.div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            left: surfaceLeft,
+            top: surfaceTop,
+            width: surfaceWidth,
+            height: surfaceHeight,
+            transform: "translate(-50%, -50%)",
+            borderRadius: surfaceRadius,
+            background: SURFACE,
+            border: "1px solid",
+            borderColor: surfaceBorder,
+            boxShadow: surfaceShadow,
+            opacity: surfaceOpacity,
+            overflow: "hidden",
+            zIndex: 1,
+            pointerEvents: "none",
+          }}
+        >
+          <motion.div style={{ position: "absolute", inset: 0, opacity: linesOpacity }}>
+            <HeroSurfaceLines />
+          </motion.div>
+        </motion.div>
+
+        {/* Globe stage — outer motion.div owns the scroll-driven position plus a
+            constant centering transform; inner motion.div owns scale/opacity and
+            the mask, so the two never clash. Above the surface: it is the last
+            piece of the hero on screen, and it sinks into the pane. */}
+        <motion.div
+          style={{
+            position: "absolute",
+            left: globeLeft,
+            top: globeTop,
+            transform: "translate(-50%, -50%)",
+            width: "min(620px, 62vh, 74vw)",
+            aspectRatio: "1 / 1",
+            zIndex: 2,
+          }}
+        >
+          <motion.div
+            style={{
+              width: "100%",
+              height: "100%",
+              position: "relative",
+              scale: globeScale,
+              opacity: globeOpacity,
+              maskImage: globeMask,
+              WebkitMaskImage: globeMask,
+            }}
+          >
+            <InteractiveGlobeIcons />
+          </motion.div>
+        </motion.div>
+
         {/* Hero title — left side, fades in as the globe settles into place.
             Outer div owns static vertical centering; inner motion.div owns the
             scroll-driven slide/opacity so the two transforms never fight. */}
@@ -66,7 +239,7 @@ export function IntroHeroGlobe() {
           style={{
             position: "absolute",
             inset: 0,
-            zIndex: 2,
+            zIndex: 3,
             display: "flex",
             alignItems: "center",
             pointerEvents: "none",
@@ -119,33 +292,6 @@ export function IntroHeroGlobe() {
           </div>
         </div>
 
-        {/* Globe stage — outer motion.div owns the scroll-driven horizontal slide
-            (left) plus a constant centering transform; inner motion.div owns
-            scale/opacity, so the two never clash. */}
-        <motion.div
-          style={{
-            position: "absolute",
-            left: leftPercent,
-            top: "52%",
-            transform: "translate(-50%, -50%)",
-            width: "min(620px, 62vh, 74vw)",
-            aspectRatio: "1 / 1",
-            zIndex: 1,
-          }}
-        >
-          <motion.div
-            style={{
-              width: "100%",
-              height: "100%",
-              position: "relative",
-              scale: globeScale,
-              opacity: globeOpacity,
-            }}
-          >
-            <InteractiveGlobeIcons />
-          </motion.div>
-        </motion.div>
-
         {/* Intro loading indicator — fades out almost immediately on first scroll */}
         <motion.div
           style={{
@@ -155,7 +301,7 @@ export function IntroHeroGlobe() {
             x: "-50%",
             opacity: loadingOpacity,
             scale: loadingScale,
-            zIndex: 3,
+            zIndex: 4,
             display: "flex",
             alignItems: "center",
             gap: 8,
@@ -169,8 +315,8 @@ export function IntroHeroGlobe() {
               borderRadius: "50%",
               background: "#10B981",
               boxShadow: "0 0 8px rgba(16,185,129,0.8)",
-              animation: reduced ? "none" : "presentation2-pulse 1.6s ease-in-out infinite",
             }}
+            className="p2-loading-dot"
           />
           <span
             style={{
@@ -190,8 +336,12 @@ export function IntroHeroGlobe() {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.35; transform: scale(0.72); }
           }
+          .p2-loading-dot { animation: presentation2-pulse 1.6s ease-in-out infinite; }
+          @media (prefers-reduced-motion: reduce) {
+            .p2-loading-dot { animation: none; }
+          }
         `}</style>
-      </div>
+      </motion.div>
     </div>
   );
 }

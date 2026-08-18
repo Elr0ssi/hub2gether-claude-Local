@@ -587,3 +587,33 @@ html:has(.eco-snap) {
   border-radius: 100px;
 }
 .reco-rail::-webkit-scrollbar-thumb:hover { background: rgba(57, 255, 136, 0.7); }
+
+/* ============================================
+   Présentation 2 — scroll runways
+   The reduced-motion collapse lives here rather than in a JS branch: asking
+   `useReducedMotion` during render makes the server markup and the first
+   client render disagree, which is a hydration error on precisely the
+   machines that asked for less motion.
+   ============================================ */
+
+.p2-hero-runway {
+  position: relative;
+  height: 300vh;
+}
+
+.p2-story-runway {
+  position: relative;
+  height: calc(var(--p2-story-vh, 500) * 1vh);
+}
+
+.p2-story-stage {
+  position: sticky;
+  top: var(--navbar-height);
+  height: calc(100vh - var(--navbar-height));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p2-hero-runway { height: 100vh; }
+  .p2-story-runway { height: auto; }
+  .p2-story-stage { position: relative; top: auto; height: auto; }
+}

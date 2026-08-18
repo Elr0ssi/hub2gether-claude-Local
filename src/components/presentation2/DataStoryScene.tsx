@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion, useScroll } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { useMotionNumber } from "@/hooks/useMotionNumber";
+import { useSettledReducedMotion } from "@/hooks/useSettledReducedMotion";
 
 import { DataMapPanel, type MapCallout } from "./DataMapPanel";
 import { AnimatedKpi } from "./AnimatedKpi";
@@ -181,9 +183,42 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 export function DataStoryScene() {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
+  // Layout under reduced motion is handled by `.p2-story-runway` /
+  // `.p2-story-stage`; this only gates the reveal, and waits a commit so the
+  // server and the first client render agree.
+  const reduced = useSettledReducedMotion();
   const { scrollYProgress } = useScroll({ target: wrapperRef, offset: ["start start", "end end"] });
   const [activeIndex, setActiveIndex] = useState(0);
+
+  // Entrance. This range covers the last viewport before the scene pins —
+  // exactly the stretch over which the hero's surface finishes expanding. The
+  // content therefore materialises *inside* that surface rather than riding in
+  // on a new block, and the two scenes never look like separate sections.
+  const { scrollYProgress: entry } = useScroll({
+    target: wrapperRef,
+    offset: ["start end", "start start"],
+  });
+  // Staggered by block: the map, then the editorial column, then the figures.
+  // Tuned against the hero: the surface is edge to edge shortly before this
+  // window opens, so the reader gets a beat of empty surface — then the
+  // content builds up inside it as it rises into view.
+  const revealFrom = 0.46;
+  const revealTo = 0.88;
+  const step = 0.045;
+  const mapOpacityMv = useTransform(entry, [revealFrom, revealTo], [0, 1], { clamp: true });
+  const mapY = useTransform(entry, [revealFrom, revealTo], [40, 0], { clamp: true });
+  const mapScale = useTransform(entry, [revealFrom, revealTo], [0.97, 1], { clamp: true });
+  const textOpacityMv = useTransform(entry, [revealFrom + step, revealTo + step], [0, 1], { clamp: true });
+  const textY = useTransform(entry, [revealFrom + step, revealTo + step], [40, 0], { clamp: true });
+  const kpiOpacityMv = useTransform(entry, [revealFrom + step * 2, revealTo + step * 2], [0, 1], { clamp: true });
+  const kpiY = useTransform(entry, [revealFrom + step * 2, revealTo + step * 2], [40, 0], { clamp: true });
+  const railOpacityMv = useTransform(entry, [revealFrom + step * 3, revealTo + step * 3], [0, 1], { clamp: true });
+
+  // See useMotionNumber: opacity needs mirroring through React state here.
+  const mapOpacity = useMotionNumber(mapOpacityMv);
+  const textOpacity = useMotionNumber(textOpacityMv);
+  const kpiOpacity = useMotionNumber(kpiOpacityMv);
+  const railOpacity = useMotionNumber(railOpacityMv);
 
   useEffect(
     () =>
@@ -197,31 +232,33 @@ export function DataStoryScene() {
   const active = CATEGORIES[activeIndex];
 
   return (
-    <div ref={wrapperRef} style={{ height: reduced ? undefined : `${CATEGORIES.length * 100}vh`, position: "relative" }}>
+    <div
+      ref={wrapperRef}
+      className="p2-story-runway"
+      style={{ ["--p2-story-vh" as string]: CATEGORIES.length * 100 }}
+    >
       {/* One snap anchor per category: zero-width, out of the flow, purely a
-          position for scroll-snap to resolve against. */}
-      {!reduced &&
-        CATEGORIES.map((c, i) => (
-          <div
-            key={`snap-${c.id}`}
-            aria-hidden="true"
-            className="p2-snap-target"
-            style={{
-              position: "absolute",
-              top: `${i * 100}vh`,
-              left: 0,
-              width: 1,
-              height: "100vh",
-              pointerEvents: "none",
-            }}
-          />
-        ))}
+          position for scroll-snap to resolve against. Harmless under reduced
+          motion, where the page's snap type is turned off in CSS. */}
+      {CATEGORIES.map((c, i) => (
+        <div
+          key={`snap-${c.id}`}
+          aria-hidden="true"
+          className="p2-snap-target"
+          style={{
+            position: "absolute",
+            top: `${i * 100}vh`,
+            left: 0,
+            width: 1,
+            height: "100vh",
+            pointerEvents: "none",
+          }}
+        />
+      ))}
 
       <div
+        className="p2-story-stage"
         style={{
-          position: reduced ? "relative" : "sticky",
-          top: "var(--navbar-height)",
-          height: reduced ? undefined : "calc(100vh - var(--navbar-height))",
           overflow: "hidden",
           display: "flex",
           alignItems: "center",
@@ -238,9 +275,10 @@ export function DataStoryScene() {
           }}
         >
           {/* Progress indicator — hidden on mobile via .p2-progress (no room beside the stacked layout) */}
-          <div
+          <motion.div
             className="p2-progress"
             style={{
+              opacity: reduced ? 1 : railOpacity,
               position: "absolute",
               left: "clamp(8px, 1.6vw, 22px)",
               top: "50%",
@@ -277,10 +315,22 @@ export function DataStoryScene() {
                 )}
               </div>
             ))}
-          </div>
+          </motion.div>
 
           <div className="p2-story-grid" style={{ display: "grid", gridTemplateColumns: "1.05fr 1fr", gap: "clamp(20px, 3vw, 44px)" }}>
-            {/* Map */}
+            {/* Map — the reveal wrapper is outside AnimatePresence so the
+                per-category crossfade and the entrance never fight over the
+                same element. */}
+            <motion.div
+              style={{
+                gridColumn: 1,
+                gridRow: 1,
+                display: "grid",
+                opacity: reduced ? 1 : mapOpacity,
+                y: reduced ? 0 : mapY,
+                scale: reduced ? 1 : mapScale,
+              }}
+            >
             <AnimatePresence mode="sync">
               <motion.div
                 key={active.id}
@@ -310,13 +360,21 @@ export function DataStoryScene() {
                 />
               </motion.div>
             </AnimatePresence>
+            </motion.div>
 
             {/* Editorial text — position:relative cell + absolute-filled motion.div so the
                 exiting and entering text overlap instead of sitting side by side.
                 No explicit gridColumn here: it auto-places into column 2 on the desktop
                 2-column grid (since column 1 is taken by the map), and wraps into its own
                 row when the grid collapses to a single column on mobile. */}
-            <div style={{ position: "relative", minHeight: 260 }}>
+            <motion.div
+              style={{
+                position: "relative",
+                minHeight: 260,
+                opacity: reduced ? 1 : textOpacity,
+                y: reduced ? 0 : textY,
+              }}
+            >
               <AnimatePresence mode="sync">
                 <motion.div
                   key={active.id}
@@ -377,12 +435,14 @@ export function DataStoryScene() {
                   </Link>
                 </motion.div>
               </AnimatePresence>
-            </div>
+            </motion.div>
           </div>
 
           {/* KPI row — re-keyed per category so counters restart on entry */}
-          <div
+          <motion.div
             style={{
+              opacity: reduced ? 1 : kpiOpacity,
+              y: reduced ? 0 : kpiY,
               marginTop: "clamp(18px, 3vh, 30px)",
               background: "#fff",
               borderRadius: 18,
@@ -414,7 +474,7 @@ export function DataStoryScene() {
                 )}
               </div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
 
