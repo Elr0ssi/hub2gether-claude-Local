@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Layout } from "@/components/layout/Layout";
-import { HeroSection } from "@/components/hero/HeroSection";
+import { EssentialDataJourney } from "@/components/home/EssentialDataJourney";
 import { KeyStatsSection } from "@/components/home/KeyStatsSection";
 import { EditorialSection } from "@/components/home/EditorialSection";
 import { FAQSection } from "@/components/faq/FAQSection";
@@ -106,7 +106,7 @@ function AITransparencyBanner() {
 export default function HomePage() {
   return (
     <Layout>
-      <HeroSection />
+      <EssentialDataJourney />
       <KeyStatsSection />
       <EditorialSection />
       <AITransparencyBanner />

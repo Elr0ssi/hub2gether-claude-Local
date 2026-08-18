@@ -367,37 +367,318 @@ body {
   padding: 20px 22px;
 }
 
-/* Hero section: scroll-driven — mobile single viewport, desktop 500vh sticky */
-.hero-section-wrapper {
-  height: 100vh;
+/* ── Scroll journey: intro (title + globe) → interactive map → ranking ──────
+   One sticky stage driven by a single scroll progress. The rectangle is a real
+   card that already contains the map section; it is only ever scaled, never
+   populated mid-scroll. Everything animated here is transform/opacity so the
+   descent stays on the compositor and never stutters. */
+.journey-wrapper {
   position: relative;
+  height: 400vh;
 }
 
-.hero-sticky {
-  position: relative;
+.journey-sticky {
+  position: sticky;
+  top: 0;
   height: 100vh;
+  overflow: hidden;
+  background: #fff;
+}
+
+.journey-intro,
+.journey-frame {
+  position: absolute;
+  top: var(--navbar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-inline: max(clamp(24px, 4vw, 64px), calc((100vw - 1480px) / 2));
+}
+
+.journey-intro {
+  display: grid;
+  grid-template-columns: 46% 54%;
+  align-items: center;
+  gap: clamp(20px, 3vw, 56px);
+  transform-origin: 50% 30%;
+  will-change: transform, opacity;
+}
+
+.journey-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.journey-brand {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #10b981;
+}
+
+.journey-title {
+  font-size: clamp(2rem, 4.2vw, 3.9rem);
+  font-weight: 900;
+  color: #0a0a0a;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+}
+
+.journey-title-accent {
+  background: linear-gradient(125deg, #39ff88 0%, #10b981 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.journey-lede {
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: #6b6b6b;
+  max-width: 46ch;
+}
+
+.journey-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.journey-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: 100px;
+  border: 1px solid #ececec;
+  background: #fafafa;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #3a3a3a;
+  text-decoration: none;
+  transition: border-color 0.18s, background 0.18s;
+}
+
+.journey-link:hover {
+  border-color: rgba(57, 255, 136, 0.5);
+  background: #fff;
+}
+
+.journey-link-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.journey-cue {
+  margin-top: 10px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #c4c4c4;
+}
+
+.journey-globe {
+  position: relative;
+  height: min(66vh, 660px);
+  min-height: 0;
+}
+
+/* The growing rectangle */
+.journey-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+
+.journey-card {
+  width: 100%;
+  max-width: 1480px;
+  height: calc(100% - 26px);
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  background: var(--surface);
   overflow: hidden;
 }
 
-@media (min-width: 900px) {
-  .hero-section-wrapper {
-    height: 500vh;
-  }
-  .hero-sticky {
-    position: sticky;
-    top: 0;
-  }
-  .hero-grid {
-    grid-template-columns: 42% 58% !important;
-  }
-  .hero-articles-col {
-    display: flex !important;
-  }
+.journey-stack {
+  height: 200%;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  will-change: transform;
+}
+
+.journey-panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.journey-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px clamp(14px, 1.6vw, 22px);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.journey-eyebrow {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-bottom: 3px;
+}
+
+.journey-panel-title {
+  font-size: clamp(0.95rem, 1.4vw, 1.3rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+.journey-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.journey-chip {
+  padding: 6px 12px;
+  border-radius: 9px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+.journey-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--ink-3);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.journey-open:hover {
+  color: #0d7a40;
+}
+
+.journey-map-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.journey-map-body > * {
+  width: 100%;
+}
+
+.journey-panel-foot {
+  padding: 6px clamp(14px, 1.6vw, 22px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.journey-panel-foot p {
+  font-size: 0.6rem;
+  color: var(--ink-4);
+}
+
+.journey-panel--rank {
+  padding: clamp(12px, 1.6vw, 20px) clamp(14px, 1.8vw, 26px) 0;
+}
+
+.journey-rank-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+/* The ranking card fills its panel exactly, so the glide from map to ranking
+   never opens a band of dead space. */
+.journey-rank-body > div {
+  width: 100%;
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.journey-rank-foot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 2px;
+}
+
+/* Inside the pinned stage the table must not capture the wheel — the page is
+   the scroller here. The full, scrollable ranking lives on /map/economy. */
+.journey-wrapper .journey-rank-body > div > .overflow-y-auto {
+  flex: 1;
+  min-height: 0;
+  max-height: none !important;
+  overflow-y: hidden !important;
+}
+
+/* Mobile / reduced-motion: same content, plain document flow */
+.journey-intro--static {
+  position: static;
+  grid-template-columns: 1fr;
+  padding-block: clamp(28px, 6vh, 56px) clamp(20px, 4vh, 40px);
+  transform: none;
+}
+
+.journey-globe--static {
+  height: min(46vh, 380px);
+}
+
+.journey-static-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 0 clamp(16px, 4vw, 40px) clamp(28px, 6vh, 56px);
+}
+
+.journey-card--static {
+  height: auto;
+  max-width: 1480px;
+  margin: 0 auto;
+  width: 100%;
+  box-shadow: var(--shadow-float);
+}
+
+.journey-card--static .journey-panel {
+  overflow: visible;
+}
+
+.journey-card--static .journey-panel--rank {
+  padding: 0;
 }
 
 @media (max-width: 899px) {
-  .hero-articles-col {
-    display: none !important;
+  .journey-intro--static {
+    padding-inline: clamp(16px, 4vw, 40px);
   }
 }
 
