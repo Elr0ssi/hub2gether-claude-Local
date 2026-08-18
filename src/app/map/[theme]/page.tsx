@@ -233,8 +233,13 @@ export default async function MapPage({ params, searchParams }: PageProps) {
       </div>
       )}
 
-      {/* Interactive map */}
-      <ScrollReveal className="max-w-7xl mx-auto px-6 pb-8" offset={showCategoryHero ? 0 : undefined}>
+      {/* Interactive map — the economy view lays out its own full-bleed
+          sections (mint ground edge to edge, ad rails in the margins), so it
+          is not wrapped in the centred content column the other themes use. */}
+      <ScrollReveal
+        className={isEconomy ? undefined : "max-w-7xl mx-auto px-6 pb-8"}
+        offset={showCategoryHero ? 0 : undefined}
+      >
         <Suspense
           fallback={
             <div

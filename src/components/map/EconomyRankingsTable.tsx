@@ -287,7 +287,7 @@ export function EconomyRankingsTable({
       </div>
 
       {/* Table — translate="no" prevents browser auto-translation of units (Mds, k, %) */}
-      <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "460px" }} translate="no">
+      <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "min(640px, calc(100vh - 290px))" }} translate="no">
         <table className="w-full" style={{ borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border-light)", background: "var(--surface-2)" }}>

@@ -7,10 +7,12 @@ import { EconomyInteractiveMap } from "./EconomyInteractiveMap";
 import { EconomyLeafletMap, type LeafletTileStyle } from "./EconomyLeafletMap";
 import { EconomySidePanel } from "@/components/sidebar/EconomySidePanel";
 import { EconomyRankingsTable } from "./EconomyRankingsTable";
+import { EconomyYearTimeline } from "./EconomyYearTimeline";
 import { ThemeDropdown } from "./ThemeDropdown";
 import { ECONOMY_METRICS, ECONOMY_YEARS, ECONOMY_YEAR_VALUES, getYearData, DEFAULT_YEAR } from "@/data/economy/economy";
 import type { EconomyMetricId, EconomyYear } from "@/types";
 import { MapArticleSection } from "@/components/articles/MapArticleSection";
+import { AdRail } from "@/components/layout/AdRail";
 import { ECONOMY_ARTICLES } from "@/data/articles";
 
 const SLIDER_MIN = 2000;
@@ -89,8 +91,13 @@ export function EconomyMapView() {
   const economyYear = getYearData(year) ?? ECONOMY_YEARS[ECONOMY_YEARS.length - 1];
   const isCurrentYear = year === DEFAULT_YEAR;
 
-  // Keep slider in sync when URL year changes externally
-  useEffect(() => { setSliderYear(year); }, [year]);
+  // Keep the rail in sync when the URL year changes from somewhere else, but
+  // never overwrite a pick the reader just made: a year the dataset does not
+  // cover resolves to a neighbouring data year, and re-seeding from that year
+  // would silently snap the rail back off the mark they aimed at.
+  useEffect(() => {
+    setSliderYear((prev) => (findNearestDataYear(prev) === year ? prev : year));
+  }, [year]);
 
   // For "En direct": use previous year as base for prorating (2024 → live 2025 estimate)
   const prevEconomyYear = useMemo(
@@ -132,13 +139,16 @@ export function EconomyMapView() {
   }, []);
 
   return (
-    // Three banded stops. Each section carries its own pale mint ground and is
-    // a scroll-snap target, so one gesture takes the reader from the hero to
-    // the map, from the map to the ranking, and from the ranking to the
-    // articles instead of leaving them between two blocks.
-    <div className="eco-snap flex flex-col gap-6">
+    // Three full-bleed stops. Each section owns a viewport: its mint ground
+    // runs edge to edge, it holds at least the full height under the navbar,
+    // and it is a scroll-snap target — so arriving at one means seeing only
+    // that one, never the tail of the block before it.
+    <div className="eco-snap">
       {/* ── Carte interactive ── */}
-      <section className={isFullscreen ? undefined : "eco-band eco-snap-target"}>
+      <section className={isFullscreen ? undefined : "eco-section eco-snap-target"}>
+        <div className="eco-section-body">
+          <AdRail side="left" />
+          <div className="eco-section-main">
       {/* Map card */}
       <div
         className={`border rounded-2xl overflow-hidden${isFullscreen ? " fixed inset-0 z-[9999] rounded-none flex flex-col" : ""}`}
@@ -220,118 +230,26 @@ export function EconomyMapView() {
         </div>
 
         {/* Year selector */}
-        <div className="px-5 py-3 border-b flex flex-col gap-2"
-          style={{ borderColor: "var(--border)", background: "var(--surface)" }}
-        >
-          {/* Top row: label / displayed year / count */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold" style={{ color: "var(--ink-3)" }}>Année :</span>
-            <span className="text-sm font-bold tabular-nums" style={{ color: "var(--ink)" }}>
-              {ytdMode ? "En direct" : sliderYear}
-            </span>
-            {sliderYear !== year && !ytdMode && (
-              <span className="text-xs" style={{ color: "var(--ink-4)" }}>
-                (données {year})
-              </span>
-            )}
-            <span className="text-xs ml-auto" style={{ color: "var(--ink-4)" }}>
-              {Object.keys(activeEconomyYear.countries).length} pays
-            </span>
-          </div>
-
-          {/* Slider row + En direct button */}
-          <div className="flex items-center gap-3">
-            <div className="relative flex flex-col gap-0 flex-1">
-              <input
-                type="range"
-                min={SLIDER_MIN}
-                max={SLIDER_MAX}
-                step={1}
-                value={sliderYear}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value);
-                  setSliderYear(val);
-                  handleYearChange(findNearestDataYear(val));
-                  setYtdMode(false);
-                }}
-                className="w-full appearance-none cursor-pointer"
-                style={{
-                  height: "6px",
-                  borderRadius: "9999px",
-                  background: `linear-gradient(to right, #0D7A40 0%, #0D7A40 ${((sliderYear - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)) * 100}%, var(--surface-2) ${((sliderYear - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)) * 100}%, var(--surface-2) 100%)`,
-                  outline: "none",
-                  accentColor: "#0D7A40",
-                }}
-              />
-              {/* Year ticks: mini mark every year, label every 5 years + data years */}
-              <div className="relative mt-1" style={{ height: "18px" }}>
-                {Array.from({ length: SLIDER_MAX - SLIDER_MIN + 1 }, (_, i) => SLIDER_MIN + i).map((y) => {
-                  const pct = ((y - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)) * 100;
-                  const isDataYear = ECONOMY_YEAR_VALUES.includes(y);
-                  const isActive = y === year && !ytdMode;
-                  const showLabel = y % 5 === 0 || y === 2023;
-                  return (
-                    <button
-                      key={y}
-                      onClick={() => { setSliderYear(y); handleYearChange(findNearestDataYear(y)); setYtdMode(false); }}
-                      className="absolute transform -translate-x-1/2"
-                      style={{ left: `${pct}%`, top: 0, padding: 0, lineHeight: 1 }}
-                      title={`${y}${!isDataYear ? ` → données ${findNearestDataYear(y)}` : ""}`}
-                    >
-                      {showLabel ? (
-                        <span style={{
-                          fontSize: "0.52rem",
-                          fontWeight: isActive ? 700 : isDataYear ? 600 : 400,
-                          color: isActive ? "#0D7A40" : isDataYear ? "var(--ink-3)" : "var(--ink-4)",
-                          display: "block",
-                        }}>
-                          {y}
-                        </span>
-                      ) : (
-                        <span style={{
-                          display: "block",
-                          width: isDataYear ? "3px" : "1px",
-                          height: isDataYear ? "5px" : "3px",
-                          borderRadius: "1px",
-                          background: isActive ? "#0D7A40" : isDataYear ? "var(--ink-3)" : "var(--border)",
-                          marginTop: "2px",
-                        }} />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* "En direct" button — always visible, right of slider */}
-            <button
-              onClick={() => { setSliderYear(DEFAULT_YEAR); handleYearChange(DEFAULT_YEAR); setYtdMode(true); }}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-200 shrink-0"
-              title="Prorata des données depuis le 1er janvier — PIB au jour actuel"
-              style={
-                ytdMode
-                  ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
-                  : { background: "transparent", color: "var(--ink-3)", border: "1px solid var(--border)" }
-              }
-            >
-              <span
-                className="w-1.5 h-1.5 rounded-full shrink-0"
-                style={{
-                  background: ytdMode ? "#39FF88" : "var(--ink-4)",
-                  boxShadow: ytdMode ? "0 0 6px rgba(57,255,136,0.8)" : "none",
-                  animation: ytdMode ? "pulse-glow 2s ease-in-out infinite" : "none",
-                }}
-              />
-              En direct
-            </button>
-          </div>
-
-          {ytdMode && (
-            <span className="text-xs" style={{ color: "var(--ink-4)" }}>
-              Prorata au {new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
-            </span>
-          )}
-        </div>
+        <EconomyYearTimeline
+          min={SLIDER_MIN}
+          max={SLIDER_MAX}
+          dataYears={ECONOMY_YEAR_VALUES}
+          value={sliderYear}
+          dataYear={year}
+          onChange={(y) => {
+            setSliderYear(y);
+            const target = findNearestDataYear(y);
+            if (target !== year) handleYearChange(target);
+            setYtdMode(false);
+          }}
+          countryCount={Object.keys(activeEconomyYear.countries).length}
+          liveMode={ytdMode}
+          onLive={() => {
+            setSliderYear(DEFAULT_YEAR);
+            handleYearChange(DEFAULT_YEAR);
+            setYtdMode(true);
+          }}
+        />
 
         {/* Map + Side panel */}
         <div className={`flex flex-col lg:flex-row${isFullscreen ? " flex-1 overflow-hidden" : ""}`} style={isFullscreen ? {} : { minHeight: "480px" }}>
@@ -376,30 +294,45 @@ export function EconomyMapView() {
         </div>
       </div>
 
+          </div>
+          <AdRail side="right" />
+        </div>
       </section>
 
       {/* ── Classement mondial ── */}
-      <section className="eco-band eco-snap-target">
-        <EconomyRankingsTable
-          metric={metric}
-          year={year}
-          activeEconomyYear={activeEconomyYear}
-          ytdMode={ytdMode}
-          onCountryClick={(name) => {
-            setSelectedCountry(name);
-            setSidePanelOpen(true);
-          }}
-        />
+      <section className="eco-section eco-snap-target">
+        <div className="eco-section-body">
+          <AdRail side="left" />
+          <div className="eco-section-main">
+            <EconomyRankingsTable
+              metric={metric}
+              year={year}
+              activeEconomyYear={activeEconomyYear}
+              ytdMode={ytdMode}
+              onCountryClick={(name) => {
+                setSelectedCountry(name);
+                setSidePanelOpen(true);
+              }}
+            />
+          </div>
+          <AdRail side="right" />
+        </div>
       </section>
 
       {/* ── Articles ── */}
-      <section className="eco-band eco-snap-target">
-        <MapArticleSection
-          themeArticles={ECONOMY_ARTICLES}
-          selectedCountry={selectedCountry}
-          themeLabel="Économie mondiale"
-          spacing={0}
-        />
+      <section className="eco-section eco-snap-target">
+        <div className="eco-section-body">
+          <AdRail side="left" />
+          <div className="eco-section-main">
+            <MapArticleSection
+              themeArticles={ECONOMY_ARTICLES}
+              selectedCountry={selectedCountry}
+              themeLabel="Économie mondiale"
+              spacing={0}
+            />
+          </div>
+          <AdRail side="right" />
+        </div>
       </section>
     </div>
   );
