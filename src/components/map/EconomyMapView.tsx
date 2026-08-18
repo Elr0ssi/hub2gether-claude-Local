@@ -13,6 +13,8 @@ import { ECONOMY_METRICS, ECONOMY_YEARS, ECONOMY_YEAR_VALUES, getYearData, DEFAU
 import type { EconomyMetricId, EconomyYear } from "@/types";
 import { MapArticleSection } from "@/components/articles/MapArticleSection";
 import { AdRail } from "@/components/layout/AdRail";
+import { SectionFlowCurves } from "./SectionFlowCurves";
+import { useScrollTeleport } from "@/hooks/useScrollTeleport";
 import { ECONOMY_ARTICLES } from "@/data/articles";
 
 const SLIDER_MIN = 2000;
@@ -83,6 +85,9 @@ export function EconomyMapView() {
   const [mapStyle, setMapStyle] = useState<MapStyle>("editorial");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ytdMode, setYtdMode] = useState(false);
+  const mapSectionRef = useRef<HTMLElement>(null);
+  const rankSectionRef = useRef<HTMLElement>(null);
+  const articleSectionRef = useRef<HTMLElement>(null);
   // Local slider position: 2000-2025 (continuous), separate from data year
   const [sliderYear, setSliderYear] = useState(DEFAULT_YEAR);
 
@@ -109,6 +114,10 @@ export function EconomyMapView() {
     () => (ytdMode && isCurrentYear ? computeLiveYearData(prevEconomyYear) : economyYear),
     [economyYear, ytdMode, isCurrentYear, prevEconomyYear]
   );
+
+  // One gesture, one section — see the hook for what it deliberately leaves
+  // alone. Suspended in fullscreen, where the page is not what is being read.
+  useScrollTeleport({ selector: ".eco-snap-target", offset: 64, enabled: !isFullscreen });
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setIsFullscreen(false); };
@@ -145,7 +154,11 @@ export function EconomyMapView() {
     // that one, never the tail of the block before it.
     <div className="eco-snap">
       {/* ── Carte interactive ── */}
-      <section className={isFullscreen ? undefined : "eco-section eco-snap-target"}>
+      <section
+        ref={mapSectionRef}
+        className={isFullscreen ? undefined : "eco-section eco-snap-target"}
+      >
+        {!isFullscreen && <SectionFlowCurves sectionRef={mapSectionRef} />}
         <div className="eco-section-body">
           <AdRail side="left" />
           <div className="eco-section-main">
@@ -300,7 +313,8 @@ export function EconomyMapView() {
       </section>
 
       {/* ── Classement mondial ── */}
-      <section className="eco-section eco-snap-target">
+      <section ref={rankSectionRef} className="eco-section eco-snap-target">
+        <SectionFlowCurves sectionRef={rankSectionRef} />
         <div className="eco-section-body">
           <AdRail side="left" />
           <div className="eco-section-main">
@@ -320,7 +334,8 @@ export function EconomyMapView() {
       </section>
 
       {/* ── Articles ── */}
-      <section className="eco-section eco-snap-target">
+      <section ref={articleSectionRef} className="eco-section eco-snap-target">
+        <SectionFlowCurves sectionRef={articleSectionRef} />
         <div className="eco-section-body">
           <AdRail side="left" />
           <div className="eco-section-main">

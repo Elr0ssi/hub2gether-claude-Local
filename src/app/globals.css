@@ -492,11 +492,12 @@ html:has(.p2-snap) {
 }
 
 /* ============================================
-   Economy category — full-bleed, snap-aligned sections
-   The map, the ranking table and the articles each own a viewport: a mint
-   ground that runs edge to edge, at least the full height under the navbar,
-   and a scroll-snap stop, so arriving at one section means seeing only that
-   section. The margins outside the content column carry the ad rails.
+   Economy category — full-height sections
+   The map, the ranking table and the articles each own a viewport. The ground
+   stays the page's own, and the only decoration is the sheaf of curves drawn
+   behind each card, which drifts with the scroll. A scroll gesture inside the
+   run moves to the next section in one step (see useScrollTeleport); the CSS
+   snap below is the fallback when that stands down.
    ============================================ */
 
 html:has(.eco-snap) {
@@ -510,26 +511,17 @@ html:has(.eco-snap) {
 }
 
 .eco-section {
+  position: relative;
   display: flex;
   align-items: center;
   width: 100%;
   min-height: calc(100vh - var(--navbar-height));
   padding: clamp(20px, 3.5vh, 44px) 0;
-  background:
-    radial-gradient(120% 80% at 50% 0%, rgba(57, 255, 136, 0.16) 0%, rgba(57, 255, 136, 0) 62%),
-    linear-gradient(180deg, #EEFBF3 0%, #E4F7EC 100%);
-  border-top: 1px solid rgba(57, 255, 136, 0.22);
-}
-
-/* Alternating ground keeps the boundary between two stops readable even when
-   both happen to be short. */
-.eco-section:nth-of-type(even) {
-  background:
-    radial-gradient(120% 80% at 50% 100%, rgba(57, 255, 136, 0.14) 0%, rgba(57, 255, 136, 0) 60%),
-    linear-gradient(180deg, #E7F8EE 0%, #F1FCF5 100%);
 }
 
 .eco-section-body {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -545,7 +537,7 @@ html:has(.eco-snap) {
 }
 
 /* ── Ad rails ─────────────────────────────────────────────────────────────
-   Reserved margin slots. Hidden below the width at which they would start
+   Reserved margin slots, hidden below the width at which they would start
    eating into the content column. */
 .eco-ad-rail {
   display: none;
@@ -562,32 +554,14 @@ html:has(.eco-snap) {
   top: calc(var(--navbar-height) + 24px);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
   width: 160px;
   height: 600px;
   max-height: calc(100vh - var(--navbar-height) - 96px);
-  border-radius: 14px;
-  border: 1px dashed rgba(13, 122, 64, 0.28);
-  background: rgba(255, 255, 255, 0.55);
-  text-align: center;
-  padding: 12px;
-}
-
-.eco-ad-slot-label {
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(13, 122, 64, 0.65);
-  line-height: 1.4;
-}
-
-.eco-ad-slot-size {
-  font-size: 0.6rem;
-  color: var(--ink-4);
-  font-variant-numeric: tabular-nums;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {

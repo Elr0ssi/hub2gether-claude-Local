@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { CalendarDays, Globe } from "lucide-react";
 
@@ -46,12 +46,25 @@ export function EconomyYearTimeline({
   const years = Array.from({ length: max - min + 1 }, (_, i) => min + i);
   const span = max - min;
 
-  // Labels: every decade, the endpoints, and whichever year is selected — so
-  // the reader can always read the year they are pointing at.
-  const isLabelled = useCallback(
-    (y: number) => dataYears.includes(y) || y % 10 === 0 || y === min || y === max || y === value,
-    [dataYears, min, max, value]
-  );
+  // Labels: the endpoints, the selection, every decade and every covered year
+  // — but never two close enough to collide. Candidates are taken in order of
+  // importance and a later one is dropped if a kept label is already within
+  // MIN_LABEL_GAP years of it.
+  const MIN_LABEL_GAP = 2;
+  const labelled = useMemo(() => {
+    const kept: number[] = [];
+    const take = (y: number) => {
+      if (y < min || y > max) return;
+      if (kept.some((k) => Math.abs(k - y) < MIN_LABEL_GAP)) return;
+      kept.push(y);
+    };
+    take(value);
+    take(min);
+    take(max);
+    for (let y = min; y <= max; y++) if (y % 10 === 0) take(y);
+    for (const y of dataYears) take(y);
+    return new Set(kept);
+  }, [dataYears, min, max, value]);
 
   const yearAtClientX = useCallback(
     (clientX: number) => {
@@ -106,22 +119,22 @@ export function EconomyYearTimeline({
 
   return (
     <div
-      className="px-5 py-4 border-b flex flex-col gap-3"
+      className="px-5 py-2.5 border-b flex flex-col gap-2"
       style={{ borderColor: "var(--border)", background: "var(--surface)" }}
     >
       {/* Header */}
       <div className="flex items-center gap-3">
         <span
-          className="flex items-center justify-center rounded-xl shrink-0"
-          style={{ width: 34, height: 34, background: "rgba(57,255,136,0.14)" }}
+          className="flex items-center justify-center rounded-lg shrink-0"
+          style={{ width: 26, height: 26, background: "rgba(57,255,136,0.14)" }}
         >
-          <CalendarDays size={16} style={{ color: "#0D7A40" }} />
+          <CalendarDays size={13} style={{ color: "#0D7A40" }} />
         </span>
         <div className="flex items-baseline gap-2 min-w-0">
-          <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
+          <span className="text-xs font-bold" style={{ color: "var(--ink)" }}>
             Sélection année
           </span>
-          <span className="text-sm font-bold tabular-nums" style={{ color: "#0D7A40" }}>
+          <span className="text-sm font-extrabold tabular-nums" style={{ color: "#0D7A40" }}>
             {liveMode ? "En direct" : value}
           </span>
           {!liveMode && dataYear !== value && (
@@ -131,22 +144,29 @@ export function EconomyYearTimeline({
           )}
         </div>
         <span
-          className="ml-auto flex items-center gap-1.5 text-sm font-semibold shrink-0"
+          className="ml-auto flex items-center gap-1.5 text-xs font-semibold shrink-0"
           style={{ color: "var(--ink-2)" }}
         >
-          <Globe size={15} style={{ color: "var(--ink-4)" }} />
+          <Globe size={13} style={{ color: "var(--ink-4)" }} />
           <span className="tabular-nums">{countryCount}</span> pays
         </span>
       </div>
 
       {/* Rail */}
+      {/* The rail is sized to its content rather than stretched across the
+          card: twenty-six marks need nowhere near the full width. */}
       <div
-        className="flex items-stretch gap-5 rounded-2xl px-5 py-3"
-        style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+        className="flex items-stretch gap-4 rounded-xl px-4 py-2"
+        style={{
+          border: "1px solid var(--border)",
+          background: "var(--surface)",
+          maxWidth: 720,
+          width: "100%",
+        }}
       >
         {/* The track is inset from the box so the 2000 and 2025 labels, which
             are centred on their marks, are not clipped by the border. */}
-        <div className="relative flex-1" style={{ height: 62, minWidth: 0 }}>
+        <div className="relative flex-1" style={{ height: 42, minWidth: 0 }}>
         <div
           ref={railRef}
           role="slider"
@@ -163,8 +183,8 @@ export function EconomyYearTimeline({
           onPointerCancel={endScrub}
           className="absolute select-none"
           style={{
-            left: 24,
-            right: 24,
+            left: 20,
+            right: 20,
             top: 0,
             bottom: 0,
             cursor: scrubbing ? "grabbing" : "pointer",
@@ -172,8 +192,8 @@ export function EconomyYearTimeline({
           }}
         >
           {/* Labels */}
-          <div className="absolute inset-x-0 top-0" style={{ height: 22 }}>
-            {years.filter(isLabelled).map((y) => {
+          <div className="absolute inset-x-0 top-0" style={{ height: 15 }}>
+            {years.filter((y) => labelled.has(y)).map((y) => {
               const pct = ((y - min) / span) * 100;
               const active = y === value && !liveMode;
               return (
@@ -183,7 +203,7 @@ export function EconomyYearTimeline({
                   style={{
                     left: `${pct}%`,
                     transform: "translateX(-50%)",
-                    fontSize: "0.78rem",
+                    fontSize: "0.66rem",
                     fontWeight: active ? 700 : 600,
                     color: active ? "#0D7A40" : "var(--ink-3)",
                     whiteSpace: "nowrap",
@@ -196,8 +216,8 @@ export function EconomyYearTimeline({
           </div>
 
           {/* Tick stems under the labelled years */}
-          <div className="absolute inset-x-0" style={{ top: 24, height: 8 }}>
-            {years.filter(isLabelled).map((y) => (
+          <div className="absolute inset-x-0" style={{ top: 16, height: 6 }}>
+            {years.filter((y) => labelled.has(y)).map((y) => (
               <span
                 key={`stem-${y}`}
                 className="absolute"
@@ -205,7 +225,7 @@ export function EconomyYearTimeline({
                   left: `${((y - min) / span) * 100}%`,
                   transform: "translateX(-50%)",
                   width: 1,
-                  height: 8,
+                  height: 6,
                   background: y === value && !liveMode ? "#0D7A40" : "var(--border)",
                 }}
               />
@@ -213,14 +233,14 @@ export function EconomyYearTimeline({
           </div>
 
           {/* Marks */}
-          <div className="absolute inset-x-0" style={{ top: 36 }}>
+          <div className="absolute inset-x-0" style={{ top: 30 }}>
             {years.map((y) => {
               const pct = ((y - min) / span) * 100;
               const covered = dataYears.includes(y);
               const active = y === value && !liveMode;
               // The selection always carries a full mark, covered year or
               // not, so the ring never closes around an empty spot.
-              const size = covered || active ? 13 : 5;
+              const size = covered || active ? 10 : 4;
               return (
                 <span
                   key={`mark-${y}`}
@@ -249,8 +269,8 @@ export function EconomyYearTimeline({
                 transition={glide}
                 style={{
                   transform: "translate(-50%, -50%)",
-                  width: 26,
-                  height: 26,
+                  width: 20,
+                  height: 20,
                   border: "2px solid rgba(13,122,64,0.45)",
                   background: "rgba(57,255,136,0.10)",
                 }}
