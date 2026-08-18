@@ -13,7 +13,7 @@ export interface TeleportDetail {
 }
 
 /** How long the page takes to roll from one stop to the next, in ms. */
-const ROLL_MS = 540;
+const ROLL_MS = 1150;
 /** Gestures land on the next stop no sooner than this, in ms. */
 const COOLDOWN = ROLL_MS + 60;
 /** Wheel deltas below this are treated as noise, not as a page gesture. */
@@ -65,8 +65,12 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
     // still resolves to exactly one section, but the movement between them is
     // visible, so the sections read as a single strip passing by instead of a
     // sequence of jump cuts. A new gesture retargets the roll in flight.
-    const easeInOutCubic = (t: number) =>
-      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    //
+    // Smootherstep rather than a cubic ease: its first and second derivatives
+    // are both zero at each end, so the roll has no kick leaving a section and
+    // no thump arriving at the next. Over a second, a cubic's hard middle
+    // reads as being dropped; this reads as the next section climbing up.
+    const smootherstep = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
 
     const rollTo = (target: number) => {
       cancelAnimationFrame(rollFrame);
@@ -80,7 +84,7 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
       const step = (now: number) => {
         const t = Math.min(1, (now - started) / ROLL_MS);
         window.scrollTo({
-          top: from + delta * easeInOutCubic(t),
+          top: from + delta * smootherstep(t),
           behavior: "instant" as ScrollBehavior,
         });
         if (t < 1) rollFrame = requestAnimationFrame(step);

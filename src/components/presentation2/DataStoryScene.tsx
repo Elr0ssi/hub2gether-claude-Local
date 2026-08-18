@@ -199,11 +199,12 @@ export function DataStoryScene() {
     offset: ["start end", "start start"],
   });
   // Staggered by block: the map, then the editorial column, then the figures.
-  // Tuned against the hero: the surface is edge to edge shortly before this
-  // window opens, so the reader gets a beat of empty surface — then the
-  // content builds up inside it as it rises into view.
-  const revealFrom = 0.34;
-  const revealTo = 0.82;
+  // Tuned against the hero: its pane is still finishing its expansion as this
+  // window opens, so the content starts building from the first pixel of the
+  // handover instead of asking for another screen of scrolling on an empty
+  // surface. It is fully in place around two thirds of the way through.
+  const revealFrom = 0.0;
+  const revealTo = 0.62;
   const step = 0.045;
   const mapOpacityMv = useTransform(entry, [revealFrom, revealTo], [0, 1], { clamp: true });
   const mapY = useTransform(entry, [revealFrom, revealTo], [40, 0], { clamp: true });

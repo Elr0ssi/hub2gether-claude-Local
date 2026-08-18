@@ -598,12 +598,22 @@ html:has(.eco-snap) {
 
 .p2-hero-runway {
   position: relative;
-  height: 230vh;
+  height: 190vh;
+  /* Above the story scene, which is pulled up underneath it: the hero's pane
+     always paints over the scene until it has scrolled out. */
+  z-index: 2;
 }
 
 .p2-story-runway {
   position: relative;
+  z-index: 1;
   height: calc(var(--p2-story-vh, 500) * 1vh);
+  /* Pulled up under the hero's tail. Without this the scene only rises into
+     view once the hero's panel has scrolled out entirely, which costs the
+     reader most of a screen of empty surface before the first map appears.
+     Overlapped, the content emerges from behind the hero's lower edge — and
+     since both grounds are the same green, that edge is invisible. */
+  margin-top: -45vh;
 }
 
 .p2-story-stage {
@@ -614,6 +624,6 @@ html:has(.eco-snap) {
 
 @media (prefers-reduced-motion: reduce) {
   .p2-hero-runway { height: 100vh; }
-  .p2-story-runway { height: auto; }
+  .p2-story-runway { height: auto; margin-top: 0; }
   .p2-story-stage { position: relative; top: auto; height: auto; }
 }

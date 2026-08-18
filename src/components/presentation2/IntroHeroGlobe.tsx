@@ -26,17 +26,17 @@ const T = {
 
   surfaceIn: 0.46, // the surface starts to rise from the bottom of the frame
   surfaceSeen: 0.56, // fully opaque, still a floating card
-  surfaceMid: 0.72, // halfway through its expansion
-  surfaceFull: 0.9, // as wide and tall as the viewport allows
-  surfaceClose: 0.97, // inset, corner and shadow gone — it is the ground now
+  surfaceMid: 0.74, // halfway through its expansion
+  surfaceFull: 0.97, // as wide and tall as the viewport allows
+  surfaceClose: 1.0, // inset, corner and shadow gone — it is the ground now
 
   titleOut: 0.58, // the title only leaves once the surface is established
   titleGone: 0.72,
 
   globeDrop: 0.64, // the globe begins to settle into the surface
-  globeIn: 0.88, // it has fully entered
-  globeFade: 0.8, // and is the last hero element to go
-  globeGone: 0.94,
+  globeIn: 0.9, // it has fully entered
+  globeFade: 0.84, // and is the last hero element to go
+  globeGone: 0.98,
 };
 
 /** Where the surface ends up — the ground the next section is built on. */
@@ -131,12 +131,12 @@ export function IntroHeroGlobe() {
     [0, 0.9, 0.9, 0]
   );
   // The trajectories inside the surface hand over to the section's own content.
-  const linesOpacityMv = useTransform(p, [0.58, 0.7, 0.86, 0.97], [0, 0.9, 0.9, 0]);
+  const linesOpacityMv = useTransform(p, [0.58, 0.7, 0.9, 1], [0, 0.9, 0.9, 0]);
 
   // The page itself takes the surface's colour just as the surface reaches the
   // edges of the screen, so the inset dissolves instead of snapping shut and
   // the scene underneath can take over on the same ground.
-  const stageBg = useTransform(p, [0.84, 0.95], ["#ffffff", SURFACE]);
+  const stageBg = useTransform(p, [0.86, 0.98], ["#ffffff", SURFACE]);
 
   // See useMotionNumber: opacity specifically needs to be mirrored through
   // React state to actually reach the DOM in this environment.
