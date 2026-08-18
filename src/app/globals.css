@@ -478,17 +478,13 @@ body {
    long sticky runways in between.
    ============================================ */
 
-html:has(.p2-snap) {
-  scroll-snap-type: y proximity;
-}
-
+/* No scroll snapping on the home page. Snapping between the hero and the map
+   scene pulled the reader down off the globe on its own, which read as the
+   page taking over; the descent is an ordinary scroll now. The anchors stay
+   as position markers — the locked pair between the last category and the
+   articles is driven in JS, not by CSS. */
 .p2-snap-target {
-  scroll-snap-align: start;
   scroll-margin-top: var(--navbar-height);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html:has(.p2-snap) { scroll-snap-type: none; }
 }
 
 /* ============================================

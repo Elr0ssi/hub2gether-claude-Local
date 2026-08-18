@@ -266,7 +266,27 @@ export function EconomyMapView() {
         />
 
         {/* Map + Side panel */}
-        <div className={`flex flex-col lg:flex-row${isFullscreen ? " flex-1 overflow-hidden" : ""}`} style={isFullscreen ? {} : { minHeight: "480px" }}>
+        {/* The map area gives way on short screens: the card also carries a
+            toolbar, the year rail and a source line, and the section around it
+            has its own padding, so a fixed height overflowed a 1440x800
+            laptop. */}
+        <div
+          className={`flex flex-col lg:flex-row${isFullscreen ? " flex-1 overflow-hidden" : ""}`}
+          style={
+            isFullscreen
+              ? {}
+              : {
+                  minHeight: 320,
+                  // The card also carries a toolbar, the year rail and a source
+                  // line, and the section around it has its own padding — 330px
+                  // in all. Left to its intrinsic height the map ran past the
+                  // bottom of a 1440x800 laptop; the 520 cap trims it slightly
+                  // everywhere else.
+                  maxHeight: "min(520px, calc(100vh - 330px))",
+                  overflow: "hidden",
+                }
+          }
+        >
           <div className="flex-1 overflow-hidden" style={{ minWidth: 0 }}>
             {mapStyle === "editorial" ? (
               <EconomyInteractiveMap

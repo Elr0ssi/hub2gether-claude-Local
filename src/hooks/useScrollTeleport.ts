@@ -13,7 +13,7 @@ export interface TeleportDetail {
 }
 
 /** How long the page takes to roll from one stop to the next, in ms. */
-const ROLL_MS = 1700;
+const ROLL_MS = 1050;
 /** Gestures land on the next stop no sooner than this, in ms. */
 const COOLDOWN = ROLL_MS + 60;
 /** Wheel deltas below this are treated as noise, not as a page gesture. */
@@ -68,9 +68,9 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
     //
     // Smootherstep: its first and second derivatives are both zero at each
     // end, so there is no kick leaving a section and no thump arriving at the
-    // next — the page just starts moving, glides, and comes to rest. Over
-    // nearly two seconds that reads as the page scrolling itself rather than
-    // as a cut with an ease painted on it.
+    // next — the page just starts moving, glides, and comes to rest. It reads
+    // as the page scrolling itself rather than as a cut with an ease painted
+    // on it, and the curve keeps that true at any duration.
     const smootherstep = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
 
     const rollTo = (target: number) => {
