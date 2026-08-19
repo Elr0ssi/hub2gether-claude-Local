@@ -38,16 +38,29 @@ const LAND_NO_DATA = "#A6C7B7";
 /**
  * Borders have to survive two neighbouring greens a class apart — and the
  * texture is minified about two to one on screen, so a line painted at a
- * hairline arrives softer than a hairline. Painted wide enough to land on a
- * crisp couple of pixels.
+ * hairline arrives softer than a hairline. Wide enough to land on a crisp
+ * couple of pixels, and no wider: past this an archipelago disappears inside
+ * its own outline.
  */
 const BORDER = "rgba(255,255,255,0.97)";
-const BORDER_WIDTH = 4.2;
+const BORDER_WIDTH = 3.2;
 const GRATICULE = "rgba(255,255,255,0.10)";
 const ACCENT = "#39FF88";
 /** Land raised off the water, in texels: white is land, black is sea. */
-const RELIEF_BLUR = 5;
-const RELIEF_SCALE = 0.022;
+const RELIEF_BLUR = 4;
+const RELIEF_SCALE = 0.028;
+/**
+ * NASA Blue Marble and its elevation companion — public-domain scientific
+ * rasters, not decoration. The photograph is not shown for its own sake: its
+ * luminosity is folded into the choropleth so a country carries its real
+ * deserts, forests, ice and mountains while keeping the colour of its class.
+ */
+const IMAGERY = "/geo/earth-blue-marble.jpg";
+const TOPOLOGY = "/geo/earth-topology.png";
+/** How much of the terrain's texture comes through the class colour. */
+const TERRAIN_AMOUNT = 0.66;
+/** How much of it textures the sea floor. */
+const BATHYMETRY_AMOUNT = 0.3;
 
 interface PickMap {
   data: Uint8ClampedArray;
@@ -96,7 +109,10 @@ function traceFeature(
  * A metric or year change is then a blit plus the countries that carry a
  * value, which is what keeps scrubbing the timeline smooth.
  */
-function buildBaseMap(geojson: GeoJSON.FeatureCollection): HTMLCanvasElement {
+function buildBaseMap(
+  geojson: GeoJSON.FeatureCollection,
+  topo: HTMLImageElement | null
+): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
   canvas.width = TEXTURE_W;
   canvas.height = TEXTURE_H;
@@ -112,6 +128,16 @@ function buildBaseMap(geojson: GeoJSON.FeatureCollection): HTMLCanvasElement {
   ocean.addColorStop(1, OCEAN_DEEP);
   ctx.fillStyle = ocean;
   ctx.fillRect(0, 0, TEXTURE_W, TEXTURE_H);
+
+  // The sea floor, from the elevation map: ridges, trenches and shelves show
+  // through the brand colour instead of one flat field of water.
+  if (topo) {
+    ctx.save();
+    ctx.globalCompositeOperation = "soft-light";
+    ctx.globalAlpha = BATHYMETRY_AMOUNT;
+    ctx.drawImage(topo, 0, 0, TEXTURE_W, TEXTURE_H);
+    ctx.restore();
+  }
 
   // Graticule every 15°, under the land.
   ctx.strokeStyle = GRATICULE;
@@ -151,27 +177,70 @@ function buildBaseMap(geojson: GeoJSON.FeatureCollection): HTMLCanvasElement {
   return canvas;
 }
 
-/**
- * A height field: white where there is land, black over the water, with the
- * coast softened just enough that the plateau has a wall rather than a cliff
- * of one texel. Drives both the vertex displacement — the countries really do
- * stand off the sphere — and the shading of the wall they stand on.
- */
-function buildReliefMap(geojson: GeoJSON.FeatureCollection): HTMLCanvasElement {
+/** Solid white over land, transparent over water. Masks everything else. */
+function buildLandMask(
+  geojson: GeoJSON.FeatureCollection,
+  w: number,
+  h: number
+): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
-  canvas.width = TEXTURE_W / 2;
-  canvas.height = TEXTURE_H / 2;
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d")!;
+  ctx.fillStyle = "#ffffff";
+  for (const feat of geojson.features) {
+    traceFeature(ctx, feat, w, h);
+    ctx.fill("evenodd");
+  }
+  return canvas;
+}
+
+/**
+ * A height field in two storeys. The lower one is the land itself, a plateau
+ * lifted off the water with a soft wall at the coast. The upper one is the
+ * real elevation map laid on top of it, so the Andes, the Himalayas and the
+ * Rift stand above their own continents rather than the whole landmass rising
+ * as one flat slab. Drives the vertex displacement and the shading together,
+ * which is what keeps the light on a ridge agreeing with its shape.
+ */
+function buildReliefMap(
+  geojson: GeoJSON.FeatureCollection,
+  topo: HTMLImageElement | null
+): HTMLCanvasElement {
+  const w = TEXTURE_W / 2;
+  const h = TEXTURE_H / 2;
+  const mask = buildLandMask(geojson, w, h);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
   const ctx = canvas.getContext("2d")!;
 
   ctx.fillStyle = "#000000";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.save();
   ctx.filter = `blur(${RELIEF_BLUR}px)`;
-  ctx.fillStyle = "#ffffff";
-  for (const feat of geojson.features) {
-    traceFeature(ctx, feat, canvas.width, canvas.height);
-    ctx.fill("evenodd");
+  ctx.globalAlpha = 0.6;
+  ctx.drawImage(mask, 0, 0);
+  ctx.restore();
+
+  if (topo) {
+    const relief = document.createElement("canvas");
+    relief.width = w;
+    relief.height = h;
+    const rc = relief.getContext("2d")!;
+    rc.drawImage(topo, 0, 0, w, h);
+    rc.globalCompositeOperation = "destination-in";
+    rc.drawImage(mask, 0, 0);
+
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    ctx.globalAlpha = 0.4;
+    ctx.drawImage(relief, 0, 0);
+    ctx.restore();
   }
-  ctx.filter = "none";
+
   return canvas;
 }
 
@@ -452,9 +521,57 @@ export function EconomyGlobe({
     // greens.
     const material = new THREE.MeshLambertMaterial({ map: texture });
 
+    // The satellite imagery is folded into the map in the shader rather than
+    // painted into the texture: a country keeps the colour of its class and
+    // gains the terrain's own texture — the Sahara reads as sand, Siberia as
+    // taiga, the Alps as ridges — at no cost when the year or the metric
+    // changes. Soft light because it modulates lightness around what is
+    // already there instead of replacing it: the classes stay apart.
+    //
+    // The uniform objects are created here and handed to the shader as they
+    // are, so filling them in once the rasters land reaches the live program.
+    const terrainUniforms = {
+      uTerrain: { value: null as THREE.Texture | null },
+      uTerrainMask: { value: null as THREE.Texture | null },
+      uTerrainAmount: { value: 0 },
+    };
+    material.onBeforeCompile = (shader) => {
+      Object.assign(shader.uniforms, terrainUniforms);
+      shader.fragmentShader = shader.fragmentShader
+        .replace(
+          "#include <common>",
+          `#include <common>
+           uniform sampler2D uTerrain;
+           uniform sampler2D uTerrainMask;
+           uniform float uTerrainAmount;`
+        )
+        .replace(
+          "#include <map_fragment>",
+          `#include <map_fragment>
+           if (uTerrainAmount > 0.0) {
+             float lum = dot(texture2D(uTerrain, vMapUv).rgb, vec3(0.2126, 0.7152, 0.0722));
+             float onLand = smoothstep(0.1, 0.5, texture2D(uTerrainMask, vMapUv).r);
+             vec3 b = diffuseColor.rgb;
+             // Centred on the imagery's own average rather than on mid-grey:
+             // the land is darker than mid-grey almost everywhere, so an
+             // uncentred soft light would crush the top of the ramp into
+             // black and cost the reader the classes it is there to show.
+             vec3 s = vec3(clamp(0.5 + (lum - 0.34) * 1.2, 0.0, 1.0));
+             vec3 soft = mix(
+               2.0 * b * s + b * b * (1.0 - 2.0 * s),
+               sqrt(b) * (2.0 * s - 1.0) + 2.0 * b * (1.0 - s),
+               step(0.5, s)
+             );
+             diffuseColor.rgb = mix(b, soft, uTerrainAmount * onLand);
+           }`
+        );
+    };
+
     // Enough segments that a country's outline survives the displacement —
-    // below this the raised edge follows the mesh rather than the coast.
-    const earth = new THREE.Mesh(new THREE.SphereGeometry(RADIUS, 512, 256), material);
+    // below this the raised edge follows the mesh rather than the coast, and
+    // the relief has to be faked in the shading, which is what leaves a globe
+    // looking soft rather than modelled.
+    const earth = new THREE.Mesh(new THREE.SphereGeometry(RADIUS, 768, 384), material);
     // SphereGeometry lays its UVs out with x and z inverted relative to the
     // lon/lat convention the texture, the outlines and the hit test all use.
     earth.rotation.y = Math.PI;
@@ -497,9 +614,23 @@ export function EconomyGlobe({
     ro.observe(mount);
 
     let cancelled = false;
-    fetch("/geo/ne_50m_countries.geojson")
-      .then((r) => r.json())
-      .then((geojson: GeoJSON.FeatureCollection) => {
+
+    /** A raster, or null if it will not come — the globe is drawn either way. */
+    const loadImage = (src: string): Promise<HTMLImageElement | null> =>
+      new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = src;
+      });
+
+    Promise.all([
+      fetch("/geo/ne_50m_countries.geojson").then((r) => r.json()),
+      loadImage(TOPOLOGY),
+      loadImage(IMAGERY),
+    ])
+      .then(([geojson, topo, imagery]: [GeoJSON.FeatureCollection, HTMLImageElement | null, HTMLImageElement | null]) => {
         if (cancelled) return;
 
         const byName = new Map<string, GeoJSON.Feature>();
@@ -509,19 +640,29 @@ export function EconomyGlobe({
         }
         byNameRef.current = byName;
 
-        baseMapRef.current = buildBaseMap(geojson);
+        baseMapRef.current = buildBaseMap(geojson, topo);
         pickRef.current = buildPickMap(geojson);
 
         // The same height field drives the geometry and its shading: the land
         // is pushed out along the normal, and the wall it now stands on is lit
         // from the field's own slope.
-        const relief = new THREE.CanvasTexture(buildReliefMap(geojson));
+        const relief = new THREE.CanvasTexture(buildReliefMap(geojson, topo));
         relief.colorSpace = THREE.NoColorSpace;
         relief.anisotropy = renderer.capabilities.getMaxAnisotropy();
         material.displacementMap = relief;
         material.displacementScale = RELIEF_SCALE;
         material.bumpMap = relief;
-        material.bumpScale = 14;
+        material.bumpScale = 3.5;
+
+        if (imagery) {
+          const terrain = new THREE.Texture(imagery);
+          terrain.colorSpace = THREE.SRGBColorSpace;
+          terrain.anisotropy = renderer.capabilities.getMaxAnisotropy();
+          terrain.needsUpdate = true;
+          terrainUniforms.uTerrain.value = terrain;
+          terrainUniforms.uTerrainMask.value = relief;
+          terrainUniforms.uTerrainAmount.value = TERRAIN_AMOUNT;
+        }
         material.needsUpdate = true;
 
         fillCanvas.getContext("2d")!.drawImage(baseMapRef.current, 0, 0);

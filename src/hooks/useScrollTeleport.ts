@@ -24,10 +24,11 @@ const WHEEL_THRESHOLD = 8;
  * A trackpad flick emits events for well over a second, so a cooldown alone
  * let one physical gesture spend itself on two sections — most visibly going
  * up, where the momentum tail is longest. A gesture now has to end before the
- * next one counts, and the gap is wide enough that a busy main thread
- * delaying the momentum tail cannot fake a gesture boundary.
+ * next one counts. Measured as idle time after the last event by a timer the
+ * wheel keeps restarting, so a busy main thread delays the end of a gesture
+ * rather than inventing a new one.
  */
-const GESTURE_GAP = 340;
+const GESTURE_GAP = 260;
 /** Vertical travel a touch drag needs before it counts as a gesture. */
 const TOUCH_THRESHOLD = 34;
 /** Slack when matching the current scroll position against a stop, in px. */
@@ -70,7 +71,6 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
 
     let last = 0;
     let rollFrame = 0;
-    let lastWheel = 0;
     let rolling = false;
     // Set the moment a gesture moves the page, cleared only once that gesture
     // has demonstrably ended. One gesture therefore buys exactly one section.
@@ -79,6 +79,16 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
     let owns = false;
     /** Wheel travel accumulated since the gesture began. */
     let travel = 0;
+    /**
+     * A gesture ends on a timer restarted by every wheel event, rather than on
+     * the gap between two of them. The difference matters on a busy main
+     * thread: a delayed *event* looks like the start of a new gesture, while a
+     * delayed *timer* simply keeps the current one open — and a flick that
+     * appears to end twice is exactly how one gesture spends itself on two
+     * sections.
+     */
+    let gestureOpen = false;
+    let gestureTimer = 0;
 
     // The page rolls to the next stop rather than cutting to it: one gesture
     // still resolves to exactly one section, but the movement between them is
@@ -98,6 +108,9 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
       const delta = target - from;
       if (Math.abs(delta) < 2) {
         window.scrollTo({ top: target, behavior: "instant" as ScrollBehavior });
+        // Already there. Still has to clear the flag: a roll cancelled on the
+        // frame before this one would otherwise leave the page locked.
+        rolling = false;
         return;
       }
       const started = performance.now();
@@ -233,14 +246,17 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
       // zooming, say. Whoever consumed it owns it; the page stays put.
       if (e.defaultPrevented) return;
 
-      const now = performance.now();
-      // A gesture is over once the wheel has been quiet for long enough — and
-      // never while the page is still travelling, since the momentum tail of
-      // the flick that started the roll is exactly what would otherwise be
-      // mistaken for the next gesture.
-      const fresh = !rolling && now - lastWheel >= GESTURE_GAP;
-      lastWheel = now;
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+
+      const fresh = !gestureOpen;
+      gestureOpen = true;
+      window.clearTimeout(gestureTimer);
+      gestureTimer = window.setTimeout(() => {
+        gestureOpen = false;
+        spent = false;
+        owns = false;
+        travel = 0;
+      }, GESTURE_GAP);
 
       if (fresh) {
         spent = false;
@@ -312,6 +328,7 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
     window.addEventListener("keydown", onKey);
     return () => {
       cancelAnimationFrame(rollFrame);
+      window.clearTimeout(gestureTimer);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
