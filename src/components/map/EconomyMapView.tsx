@@ -2,8 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Maximize2, Minimize2, ChevronLeft } from "lucide-react";
+import { Maximize2, Minimize2, ChevronLeft, Map, Globe } from "lucide-react";
 import { EconomyInteractiveMap } from "./EconomyInteractiveMap";
+import dynamic from "next/dynamic";
+
+// WebGL and the world file are only paid for when the reader asks for the globe.
+const EconomyGlobe = dynamic(() => import("./EconomyGlobe").then((m) => m.EconomyGlobe), {
+  ssr: false,
+  loading: () => null,
+});
 import { EconomySidePanel } from "@/components/sidebar/EconomySidePanel";
 import { EconomyRankingsTable } from "./EconomyRankingsTable";
 import { EconomyYearTimeline } from "./EconomyYearTimeline";
@@ -73,6 +80,7 @@ export function EconomyMapView() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ytdMode, setYtdMode] = useState(false);
+  const [view, setView] = useState<"map" | "globe">("map");
   const mapSectionRef = useRef<HTMLElement>(null);
   const rankSectionRef = useRef<HTMLElement>(null);
   const articleSectionRef = useRef<HTMLElement>(null);
@@ -189,6 +197,31 @@ export function EconomyMapView() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Flat map or globe — same data, same colours, same click. */}
+            <div
+              className="flex items-center rounded-lg overflow-hidden"
+              style={{ border: "1px solid var(--border)" }}
+            >
+              {([
+                { id: "map" as const, label: "Carte", Icon: Map },
+                { id: "globe" as const, label: "Globe", Icon: Globe },
+              ]).map(({ id, label, Icon }) => (
+                <button
+                  key={id}
+                  onClick={() => setView(id)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium transition-all duration-150"
+                  style={
+                    view === id
+                      ? { background: "var(--accent-dim)", color: "#0D7A40", fontWeight: 700 }
+                      : { background: "transparent", color: "var(--ink-3)" }
+                  }
+                  aria-pressed={view === id}
+                >
+                  <Icon size={13} />
+                  <span className="hidden sm:inline">{label}</span>
+                </button>
+              ))}
+            </div>
             {sidePanelOpen ? (
               <button onClick={() => setSidePanelOpen(false)} className="btn-ghost px-2.5 py-1.5 text-xs gap-1.5">
                 <ChevronLeft size={13} /> Réduire
@@ -242,24 +275,34 @@ export function EconomyMapView() {
             isFullscreen
               ? {}
               : {
-                  minHeight: 320,
-                  // The card also carries a toolbar, the year rail and a source
-                  // line, and the section around it has its own padding — 330px
-                  // in all. Left to its intrinsic height the map ran past the
-                  // bottom of a 1440x800 laptop; the 520 cap trims it slightly
-                  // everywhere else.
-                  maxHeight: "min(520px, calc(100vh - 330px))",
+                  // A definite height, not a range. The card also carries a
+                  // toolbar, the year rail and a source line, and the section
+                  // around it has its own padding — 330px in all, which is why
+                  // an intrinsic height ran past the bottom of a 1440x800
+                  // laptop. And with only a min and a max, selecting a country
+                  // grew the side panel, which grew the row, which resized the
+                  // globe's canvas: the sphere rescaled on every click.
+                  height: "clamp(320px, calc(100vh - 330px), 520px)",
                   overflow: "hidden",
                 }
           }
         >
           <div className="flex-1 overflow-hidden" style={{ minWidth: 0 }}>
-            <EconomyInteractiveMap
-              economyYear={activeEconomyYear}
-              metric={metric}
-              selectedCountry={selectedCountry}
-              onCountryClick={handleCountryClick}
-            />
+            {view === "globe" ? (
+              <EconomyGlobe
+                economyYear={activeEconomyYear}
+                metric={metric}
+                selectedCountry={selectedCountry}
+                onCountryClick={handleCountryClick}
+              />
+            ) : (
+              <EconomyInteractiveMap
+                economyYear={activeEconomyYear}
+                metric={metric}
+                selectedCountry={selectedCountry}
+                onCountryClick={handleCountryClick}
+              />
+            )}
           </div>
 
           <EconomySidePanel
