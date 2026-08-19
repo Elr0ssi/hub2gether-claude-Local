@@ -30,18 +30,24 @@ const PICK_H = 1024;
  * Brand palette. The water is a clear teal rather than a deep one: the map is
  * read for its greens, and a dark sea drags every one of them down with it.
  */
-const OCEAN_DEEP = "#144659";
-const OCEAN_MID = "#1A5D77";
-const OCEAN_SHELF = "#227390";
+const OCEAN_DEEP = "#2A4B55";
+const OCEAN_MID = "#335C68";
+const OCEAN_SHELF = "#3C6E7C";
 /** Not a class on the ramp: pale and washed out, so it never reads as one. */
 const LAND_NO_DATA = "#A6C7B7";
-/** Borders have to survive two neighbouring greens a class apart. */
-const BORDER = "rgba(255,255,255,0.96)";
-const BORDER_WIDTH = 3;
-const GRATICULE = "rgba(255,255,255,0.11)";
+/**
+ * Borders have to survive two neighbouring greens a class apart — and the
+ * texture is minified about two to one on screen, so a line painted at a
+ * hairline arrives softer than a hairline. Painted wide enough to land on a
+ * crisp couple of pixels.
+ */
+const BORDER = "rgba(255,255,255,0.97)";
+const BORDER_WIDTH = 4.2;
+const GRATICULE = "rgba(255,255,255,0.10)";
 const ACCENT = "#39FF88";
-/** Grayscale elevation, used as a bump map — relief without photorealism. */
-const TOPOLOGY = "/geo/earth-topology.png";
+/** Land raised off the water, in texels: white is land, black is sea. */
+const RELIEF_BLUR = 5;
+const RELIEF_SCALE = 0.022;
 
 interface PickMap {
   data: Uint8ClampedArray;
@@ -125,18 +131,14 @@ function buildBaseMap(geojson: GeoJSON.FeatureCollection): HTMLCanvasElement {
     ctx.stroke();
   }
 
-  // A whisper of shade under the coastlines: enough that the continents sit on
-  // the water rather than being cut out of it, not enough to read as a filter
-  // laid over the map.
-  ctx.save();
-  ctx.shadowColor = "rgba(9,44,58,0.34)";
-  ctx.shadowBlur = 9;
+  // No painted shade under the coastlines: the land is genuinely raised off
+  // the sphere now, so it casts its own edge and a blur would only soften
+  // what the relief draws sharply.
   ctx.fillStyle = LAND_NO_DATA;
   for (const feat of geojson.features) {
     traceFeature(ctx, feat, TEXTURE_W, TEXTURE_H);
     ctx.fill("evenodd");
   }
-  ctx.restore();
 
   ctx.strokeStyle = BORDER;
   ctx.lineWidth = BORDER_WIDTH;
@@ -146,6 +148,30 @@ function buildBaseMap(geojson: GeoJSON.FeatureCollection): HTMLCanvasElement {
     ctx.stroke();
   }
 
+  return canvas;
+}
+
+/**
+ * A height field: white where there is land, black over the water, with the
+ * coast softened just enough that the plateau has a wall rather than a cliff
+ * of one texel. Drives both the vertex displacement — the countries really do
+ * stand off the sphere — and the shading of the wall they stand on.
+ */
+function buildReliefMap(geojson: GeoJSON.FeatureCollection): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = TEXTURE_W / 2;
+  canvas.height = TEXTURE_H / 2;
+  const ctx = canvas.getContext("2d")!;
+
+  ctx.fillStyle = "#000000";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.filter = `blur(${RELIEF_BLUR}px)`;
+  ctx.fillStyle = "#ffffff";
+  for (const feat of geojson.features) {
+    traceFeature(ctx, feat, canvas.width, canvas.height);
+    ctx.fill("evenodd");
+  }
+  ctx.filter = "none";
   return canvas;
 }
 
@@ -362,9 +388,9 @@ export function EconomyGlobe({
 
     const outline = buildOutline(
       feat,
-      RADIUS * 1.006,
+      RADIUS + RELIEF_SCALE + 0.006,
       new THREE.Color(ACCENT).getHex(),
-      [{ width: 2.8, opacity: 1 }],
+      [{ width: 3.8, opacity: 1 }],
       resolutionRef.current,
       lineMatsRef.current
     );
@@ -410,22 +436,25 @@ export function EconomyGlobe({
     // for nothing else. A key light strong enough to model a sphere would lay
     // a terminator across a choropleth and darken the very countries being
     // compared — and the whole map would read as sitting under a filter.
-    scene.add(new THREE.AmbientLight(0xffffff, 2.95));
-    const key = new THREE.DirectionalLight(0xffffff, 0.22);
-    key.position.set(-1.2, 1.1, 2.6);
+    scene.add(new THREE.AmbientLight(0xffffff, 2.62));
+    // Two lights, both weak: one over the reader's shoulder to keep the map
+    // even, one grazing from the side so the raised coastlines catch a lit
+    // edge and cast a shaded one. Between them they model the relief without
+    // laying a terminator across the choropleth.
+    const key = new THREE.DirectionalLight(0xffffff, 0.5);
+    key.position.set(-1.5, 1.6, 1.1);
     scene.add(key);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.2);
+    fill.position.set(1.4, -0.6, 2.4);
+    scene.add(fill);
 
     // Lambert, not Phong: no specular term, so nothing lays a sheen over the
     // greens.
     const material = new THREE.MeshLambertMaterial({ map: texture });
-    new THREE.TextureLoader().load(TOPOLOGY, (topo) => {
-      topo.colorSpace = THREE.NoColorSpace;
-      material.bumpMap = topo;
-      material.bumpScale = 2.2;
-      material.needsUpdate = true;
-    });
 
-    const earth = new THREE.Mesh(new THREE.SphereGeometry(RADIUS, 160, 96), material);
+    // Enough segments that a country's outline survives the displacement —
+    // below this the raised edge follows the mesh rather than the coast.
+    const earth = new THREE.Mesh(new THREE.SphereGeometry(RADIUS, 512, 256), material);
     // SphereGeometry lays its UVs out with x and z inverted relative to the
     // lon/lat convention the texture, the outlines and the hit test all use.
     earth.rotation.y = Math.PI;
@@ -482,6 +511,18 @@ export function EconomyGlobe({
 
         baseMapRef.current = buildBaseMap(geojson);
         pickRef.current = buildPickMap(geojson);
+
+        // The same height field drives the geometry and its shading: the land
+        // is pushed out along the normal, and the wall it now stands on is lit
+        // from the field's own slope.
+        const relief = new THREE.CanvasTexture(buildReliefMap(geojson));
+        relief.colorSpace = THREE.NoColorSpace;
+        relief.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        material.displacementMap = relief;
+        material.displacementScale = RELIEF_SCALE;
+        material.bumpMap = relief;
+        material.bumpScale = 14;
+        material.needsUpdate = true;
 
         fillCanvas.getContext("2d")!.drawImage(baseMapRef.current, 0, 0);
         texture.needsUpdate = true;
@@ -575,16 +616,17 @@ export function EconomyGlobe({
       clearHover();
       if (!live) return;
 
-      // The country's own separation, drawn whiter and a touch wider. Nothing
-      // is added around it and nothing is recoloured: the border simply comes
-      // forward, which is all it takes to say "this one".
+      // The country's own separation, redrawn in the accent — the same green
+      // a click leaves behind, so the hover reads as the beginning of the
+      // gesture rather than as a different language. Lifted clear of the
+      // raised land, and the fill is never touched: the class colour stands.
       const feat = byNameRef.current.get(live);
       if (!feat) return;
       const outline = buildOutline(
         feat,
-        RADIUS * 1.008,
-        0xffffff,
-        [{ width: 2.4, opacity: 1 }],
+        RADIUS + RELIEF_SCALE + 0.004,
+        new THREE.Color(ACCENT).getHex(),
+        [{ width: 2.4, opacity: 0.9 }],
         resolutionRef.current,
         lineMatsRef.current
       );

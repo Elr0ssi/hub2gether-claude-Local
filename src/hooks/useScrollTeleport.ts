@@ -75,6 +75,10 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
     // Set the moment a gesture moves the page, cleared only once that gesture
     // has demonstrably ended. One gesture therefore buys exactly one section.
     let spent = false;
+    /** True while the run, rather than the browser, is answering the gesture. */
+    let owns = false;
+    /** Wheel travel accumulated since the gesture began. */
+    let travel = 0;
 
     // The page rolls to the next stop rather than cutting to it: one gesture
     // still resolves to exactly one section, but the movement between them is
@@ -130,12 +134,6 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
       return { tops: [0, ...tops, end], heights: [0, ...heights, 0], end, floor: 0 };
     };
 
-    /** True while the pointer is anywhere inside the run of sections. */
-    const withinRun = (target: EventTarget | null): boolean => {
-      const el = target instanceof Element ? target : null;
-      return Boolean(el?.closest(selector) ?? el?.closest(".eco-snap"));
-    };
-
     /**
      * Content the reader is meant to scroll through, marked in the markup.
      * Inside one of these the wheel belongs to the content and to nothing
@@ -166,37 +164,51 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
       return false;
     };
 
-    const jump = (dir: 1 | -1, target: EventTarget | null): boolean => {
+    /**
+     * Does this gesture belong to the run at all? Asked before the page has
+     * moved a pixel, so a gesture the run is going to answer can be taken off
+     * the browser from its very first event — otherwise the head of a flick
+     * nudges the page a few pixels and its momentum tail carries it past the
+     * stop, which is exactly what a reader sees as the page "jumping".
+     */
+    const owned = (dir: 1 | -1, target: EventTarget | null): number | null => {
       const s = stops();
-      if (!s) return false;
+      if (!s) return null;
 
       const y = window.scrollY;
       const viewport = window.innerHeight - offset;
 
       // Outside the run of sections — hand the page back.
-      if (y < s.floor - EPSILON || y > s.end + EPSILON) return false;
+      if (y < s.floor - EPSILON || y > s.end + EPSILON) return null;
 
       let i = 0;
       for (let k = 0; k < s.tops.length; k++) {
         if (y >= s.tops[k] - EPSILON) i = k;
       }
       const next = i + dir;
-      if (next < 0 || next >= s.tops.length) return false;
+      if (next < 0 || next >= s.tops.length) return null;
 
       // Past the last section: let the page below scroll normally.
-      if (dir > 0 && i === s.tops.length - 1) return false;
+      if (dir > 0 && i === s.tops.length - 1) return null;
 
-      if (insideScrollRegion(target)) return false;
-      if (innerCanScroll(target, dir)) return false;
+      if (insideScrollRegion(target)) return null;
+      if (innerCanScroll(target, dir)) return null;
 
       // A section that does not fit is read by scrolling, not by jumping —
       // until its far edge is on screen.
       const h = s.heights[i];
       if (h > viewport) {
         const bottom = s.tops[i] + h;
-        if (dir > 0 && y + viewport < bottom - EPSILON) return false;
-        if (dir < 0 && y > s.tops[i] + EPSILON) return false;
+        if (dir > 0 && y + viewport < bottom - EPSILON) return null;
+        if (dir < 0 && y > s.tops[i] + EPSILON) return null;
       }
+      return next;
+    };
+
+    const jump = (dir: 1 | -1, target: EventTarget | null): boolean => {
+      const s = stops();
+      const next = owned(dir, target);
+      if (!s || next === null) return false;
 
       const now = performance.now();
       // Locked while the page is still travelling, and until the gesture that
@@ -220,55 +232,68 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
       // Something nearer the pointer already answered this wheel — the globe
       // zooming, say. Whoever consumed it owns it; the page stays put.
       if (e.defaultPrevented) return;
+
       const now = performance.now();
       // A gesture is over once the wheel has been quiet for long enough — and
       // never while the page is still travelling, since the momentum tail of
       // the flick that started the roll is exactly what would otherwise be
       // mistaken for the next gesture.
-      if (spent && !rolling && now - lastWheel >= GESTURE_GAP) spent = false;
+      const fresh = !rolling && now - lastWheel >= GESTURE_GAP;
       lastWheel = now;
-
-      if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return;
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
 
-      const dir = e.deltaY > 0 ? 1 : -1;
-      // The tail of a flick is swallowed rather than acted on, so it cannot
-      // spend itself on a second section.
-      if (spent) {
-        if (rolling || withinRun(e.target)) e.preventDefault();
-        return;
+      if (fresh) {
+        spent = false;
+        travel = 0;
+        owns = owned(e.deltaY > 0 ? 1 : -1, e.target) !== null;
       }
-      if (jump(dir, e.target)) {
-        spent = true;
-        e.preventDefault();
-      }
+
+      // Owned means owned for the whole gesture: the browser never sees its
+      // head, so the page cannot creep before the roll starts, and never sees
+      // its tail, so the page cannot drift past the stop after it ends.
+      if (owns) e.preventDefault();
+      if (spent || !owns) return;
+
+      // Summed rather than tested event by event: a flick opens with a couple
+      // of pixels, and a slow drag never sends more than that at a time.
+      travel += e.deltaY;
+      if (Math.abs(travel) < WHEEL_THRESHOLD) return;
+      spent = true;
+      jump(travel > 0 ? 1 : -1, e.target);
     };
 
     let touchY: number | null = null;
     // A finger down is unambiguously the start of a new gesture.
     let touchSpent = false;
+    let touchOwns = false;
+    let touchDecided = false;
     const onTouchStart = (e: TouchEvent) => {
       touchY = e.touches[0]?.clientY ?? null;
       touchSpent = false;
+      touchOwns = false;
+      touchDecided = false;
     };
     const onTouchMove = (e: TouchEvent) => {
       if (e.defaultPrevented) return;
       if (touchY === null) return;
+      // Measured from where the finger landed, so one drag is one section
+      // however far it travels.
       const dy = touchY - (e.touches[0]?.clientY ?? touchY);
+      if (!touchDecided && Math.abs(dy) >= 4) {
+        touchDecided = true;
+        touchOwns = owned(dy > 0 ? 1 : -1, e.target) !== null;
+      }
+      if (touchOwns) e.preventDefault();
+      if (touchSpent || !touchOwns) return;
       if (Math.abs(dy) < TOUCH_THRESHOLD) return;
-      touchY = e.touches[0]?.clientY ?? null;
-      if (touchSpent) {
-        if (rolling || withinRun(e.target)) e.preventDefault();
-        return;
-      }
-      if (jump(dy > 0 ? 1 : -1, e.target)) {
-        touchSpent = true;
-        e.preventDefault();
-      }
+      touchSpent = true;
+      jump(dy > 0 ? 1 : -1, e.target);
     };
     const onTouchEnd = () => {
       touchY = null;
       touchSpent = false;
+      touchOwns = false;
+      touchDecided = false;
     };
 
     const onKey = (e: KeyboardEvent) => {
