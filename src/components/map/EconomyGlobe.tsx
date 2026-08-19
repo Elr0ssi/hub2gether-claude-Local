@@ -26,15 +26,19 @@ const TEXTURE_H = 2048;
 const PICK_W = 2048;
 const PICK_H = 1024;
 
-/** Brand palette. Deep enough that the ramp's own greens read against it. */
-const OCEAN_DEEP = "#0E3B4E";
-const OCEAN_MID = "#12506A";
-const OCEAN_SHELF = "#1A6B84";
-const LAND_NO_DATA = "#2C5F4A";
+/**
+ * Brand palette. The water is a clear teal rather than a deep one: the map is
+ * read for its greens, and a dark sea drags every one of them down with it.
+ */
+const OCEAN_DEEP = "#144659";
+const OCEAN_MID = "#1A5D77";
+const OCEAN_SHELF = "#227390";
+/** Not a class on the ramp: pale and washed out, so it never reads as one. */
+const LAND_NO_DATA = "#A6C7B7";
 /** Borders have to survive two neighbouring greens a class apart. */
-const BORDER = "rgba(255,255,255,0.82)";
-const BORDER_WIDTH = 3.2;
-const GRATICULE = "rgba(255,255,255,0.09)";
+const BORDER = "rgba(255,255,255,0.96)";
+const BORDER_WIDTH = 3;
+const GRATICULE = "rgba(255,255,255,0.11)";
 const ACCENT = "#39FF88";
 /** Grayscale elevation, used as a bump map — relief without photorealism. */
 const TOPOLOGY = "/geo/earth-topology.png";
@@ -121,11 +125,12 @@ function buildBaseMap(geojson: GeoJSON.FeatureCollection): HTMLCanvasElement {
     ctx.stroke();
   }
 
-  // A soft dark halo under the coastlines: the continents read as sitting on
-  // the water rather than being cut out of it.
+  // A whisper of shade under the coastlines: enough that the continents sit on
+  // the water rather than being cut out of it, not enough to read as a filter
+  // laid over the map.
   ctx.save();
-  ctx.shadowColor = "rgba(2,20,28,0.75)";
-  ctx.shadowBlur = 14;
+  ctx.shadowColor = "rgba(9,44,58,0.34)";
+  ctx.shadowBlur = 9;
   ctx.fillStyle = LAND_NO_DATA;
   for (const feat of geojson.features) {
     traceFeature(ctx, feat, TEXTURE_W, TEXTURE_H);
@@ -248,36 +253,6 @@ function disposeOutline(group: THREE.Group | null, registry: Set<LineMaterial>) 
   }
 }
 
-/** Rim light — the halo the sphere is set into. */
-function haloMaterial(): THREE.ShaderMaterial {
-  return new THREE.ShaderMaterial({
-    transparent: true,
-    side: THREE.BackSide,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-    uniforms: { uColor: { value: new THREE.Color(ACCENT) } },
-    vertexShader: `
-      varying vec3 vNormal;
-      varying vec3 vView;
-      void main() {
-        vNormal = normalize(normalMatrix * normal);
-        vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        vView = normalize(-mv.xyz);
-        gl_Position = projectionMatrix * mv;
-      }
-    `,
-    fragmentShader: `
-      uniform vec3 uColor;
-      varying vec3 vNormal;
-      varying vec3 vView;
-      void main() {
-        float rim = 1.0 - abs(dot(vNormal, vView));
-        gl_FragColor = vec4(uColor, pow(rim, 3.0) * 0.42);
-      }
-    `,
-  });
-}
-
 /** A tilted ring around the globe, with a light running along it. */
 function buildOrbit(radius: number, tilt: number, yaw: number) {
   const points: THREE.Vector3[] = [];
@@ -389,10 +364,7 @@ export function EconomyGlobe({
       feat,
       RADIUS * 1.006,
       new THREE.Color(ACCENT).getHex(),
-      [
-        { width: 6, opacity: 0.24 },
-        { width: 2.6, opacity: 1 },
-      ],
+      [{ width: 2.8, opacity: 1 }],
       resolutionRef.current,
       lineMatsRef.current
     );
@@ -433,23 +405,23 @@ export function EconomyGlobe({
     texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
     textureRef.current = texture;
 
-    // Ambient-dominant lighting: enough for the elevation map to raise the
-    // continents and dimple the sea floor, not enough to lay a terminator
-    // across a choropleth and darken the very countries being compared.
-    scene.add(new THREE.AmbientLight(0xffffff, 1.62));
-    const key = new THREE.DirectionalLight(0xffffff, 0.42);
+    // Almost entirely ambient: the map has to read at its own brightness, so
+    // the light is there to let the elevation map raise the continents and
+    // for nothing else. A key light strong enough to model a sphere would lay
+    // a terminator across a choropleth and darken the very countries being
+    // compared — and the whole map would read as sitting under a filter.
+    scene.add(new THREE.AmbientLight(0xffffff, 2.95));
+    const key = new THREE.DirectionalLight(0xffffff, 0.22);
     key.position.set(-1.2, 1.1, 2.6);
     scene.add(key);
 
-    const material = new THREE.MeshPhongMaterial({
-      map: texture,
-      shininess: 6,
-      specular: new THREE.Color(0x0f2f28),
-    });
+    // Lambert, not Phong: no specular term, so nothing lays a sheen over the
+    // greens.
+    const material = new THREE.MeshLambertMaterial({ map: texture });
     new THREE.TextureLoader().load(TOPOLOGY, (topo) => {
       topo.colorSpace = THREE.NoColorSpace;
       material.bumpMap = topo;
-      material.bumpScale = 3.4;
+      material.bumpScale = 2.2;
       material.needsUpdate = true;
     });
 
@@ -458,9 +430,6 @@ export function EconomyGlobe({
     // lon/lat convention the texture, the outlines and the hit test all use.
     earth.rotation.y = Math.PI;
     globe.add(earth);
-
-    const halo = new THREE.Mesh(new THREE.SphereGeometry(RADIUS * 1.06, 64, 48), haloMaterial());
-    scene.add(halo);
 
     const orbits = [buildOrbit(1.34, 1.16, 0.35), buildOrbit(1.26, -0.98, 1.9)];
     for (const o of orbits) scene.add(o.ring);
@@ -606,19 +575,16 @@ export function EconomyGlobe({
       clearHover();
       if (!live) return;
 
-      // A thick white border and a soft white glow just off the surface. The
-      // country keeps its own class colour — the outline is what says "this
-      // one", never a recolour that would misreport its value.
+      // The country's own separation, drawn whiter and a touch wider. Nothing
+      // is added around it and nothing is recoloured: the border simply comes
+      // forward, which is all it takes to say "this one".
       const feat = byNameRef.current.get(live);
       if (!feat) return;
       const outline = buildOutline(
         feat,
-        RADIUS * 1.009,
+        RADIUS * 1.008,
         0xffffff,
-        [
-          { width: 7, opacity: 0.17 },
-          { width: 3, opacity: 0.95 },
-        ],
+        [{ width: 2.4, opacity: 1 }],
         resolutionRef.current,
         lineMatsRef.current
       );
