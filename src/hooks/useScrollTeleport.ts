@@ -18,6 +18,16 @@ const ROLL_MS = 1050;
 const COOLDOWN = ROLL_MS + 60;
 /** Wheel deltas below this are treated as noise, not as a page gesture. */
 const WHEEL_THRESHOLD = 8;
+/**
+ * Quiet time that has to pass before a new wheel gesture is recognised.
+ *
+ * A trackpad flick emits events for well over a second, so a cooldown alone
+ * let one physical gesture spend itself on two sections — most visibly going
+ * up, where the momentum tail is longest. A gesture now has to end before the
+ * next one counts, and the gap is wide enough that a busy main thread
+ * delaying the momentum tail cannot fake a gesture boundary.
+ */
+const GESTURE_GAP = 340;
 /** Vertical travel a touch drag needs before it counts as a gesture. */
 const TOUCH_THRESHOLD = 34;
 /** Slack when matching the current scroll position against a stop, in px. */
@@ -60,6 +70,11 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
 
     let last = 0;
     let rollFrame = 0;
+    let lastWheel = 0;
+    let rolling = false;
+    // Set the moment a gesture moves the page, cleared only once that gesture
+    // has demonstrably ended. One gesture therefore buys exactly one section.
+    let spent = false;
 
     // The page rolls to the next stop rather than cutting to it: one gesture
     // still resolves to exactly one section, but the movement between them is
@@ -82,6 +97,7 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
         return;
       }
       const started = performance.now();
+      rolling = true;
       const step = (now: number) => {
         const t = Math.min(1, (now - started) / ROLL_MS);
         window.scrollTo({
@@ -89,6 +105,7 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
           behavior: "instant" as ScrollBehavior,
         });
         if (t < 1) rollFrame = requestAnimationFrame(step);
+        else rolling = false;
       };
       rollFrame = requestAnimationFrame(step);
     };
@@ -111,6 +128,23 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
         return { tops: [...tops, end], heights: [...heights, 0], end, floor: tops[0] };
       }
       return { tops: [0, ...tops, end], heights: [0, ...heights, 0], end, floor: 0 };
+    };
+
+    /** True while the pointer is anywhere inside the run of sections. */
+    const withinRun = (target: EventTarget | null): boolean => {
+      const el = target instanceof Element ? target : null;
+      return Boolean(el?.closest(selector) ?? el?.closest(".eco-snap"));
+    };
+
+    /**
+     * Content the reader is meant to scroll through, marked in the markup.
+     * Inside one of these the wheel belongs to the content and to nothing
+     * else — not even at its end, or the page would jump out from under a
+     * reader who simply reached the bottom of a table.
+     */
+    const insideScrollRegion = (target: EventTarget | null): boolean => {
+      const el = target instanceof Element ? target : null;
+      return Boolean(el?.closest("[data-scroll-region]"));
     };
 
     // An inner scroller under the pointer wins: the ranking table scrolls to
@@ -152,6 +186,7 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
       // Past the last section: let the page below scroll normally.
       if (dir > 0 && i === s.tops.length - 1) return false;
 
+      if (insideScrollRegion(target)) return false;
       if (innerCanScroll(target, dir)) return false;
 
       // A section that does not fit is read by scrolling, not by jumping —
@@ -164,7 +199,9 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
       }
 
       const now = performance.now();
-      if (now - last < COOLDOWN) return true; // swallow, do not stack jumps
+      // Locked while the page is still travelling, and until the gesture that
+      // started it has actually ended.
+      if (rolling || now - last < COOLDOWN) return true;
       last = now;
 
       rollTo(s.tops[next]);
@@ -180,24 +217,58 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
 
     const onWheel = (e: WheelEvent) => {
       if (e.ctrlKey) return; // pinch zoom
+      // Something nearer the pointer already answered this wheel — the globe
+      // zooming, say. Whoever consumed it owns it; the page stays put.
+      if (e.defaultPrevented) return;
+      const now = performance.now();
+      // A gesture is over once the wheel has been quiet for long enough — and
+      // never while the page is still travelling, since the momentum tail of
+      // the flick that started the roll is exactly what would otherwise be
+      // mistaken for the next gesture.
+      if (spent && !rolling && now - lastWheel >= GESTURE_GAP) spent = false;
+      lastWheel = now;
+
       if (Math.abs(e.deltaY) < WHEEL_THRESHOLD) return;
       if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-      if (jump(e.deltaY > 0 ? 1 : -1, e.target)) e.preventDefault();
+
+      const dir = e.deltaY > 0 ? 1 : -1;
+      // The tail of a flick is swallowed rather than acted on, so it cannot
+      // spend itself on a second section.
+      if (spent) {
+        if (rolling || withinRun(e.target)) e.preventDefault();
+        return;
+      }
+      if (jump(dir, e.target)) {
+        spent = true;
+        e.preventDefault();
+      }
     };
 
     let touchY: number | null = null;
+    // A finger down is unambiguously the start of a new gesture.
+    let touchSpent = false;
     const onTouchStart = (e: TouchEvent) => {
       touchY = e.touches[0]?.clientY ?? null;
+      touchSpent = false;
     };
     const onTouchMove = (e: TouchEvent) => {
+      if (e.defaultPrevented) return;
       if (touchY === null) return;
       const dy = touchY - (e.touches[0]?.clientY ?? touchY);
       if (Math.abs(dy) < TOUCH_THRESHOLD) return;
       touchY = e.touches[0]?.clientY ?? null;
-      if (jump(dy > 0 ? 1 : -1, e.target)) e.preventDefault();
+      if (touchSpent) {
+        if (rolling || withinRun(e.target)) e.preventDefault();
+        return;
+      }
+      if (jump(dy > 0 ? 1 : -1, e.target)) {
+        touchSpent = true;
+        e.preventDefault();
+      }
     };
     const onTouchEnd = () => {
       touchY = null;
+      touchSpent = false;
     };
 
     const onKey = (e: KeyboardEvent) => {

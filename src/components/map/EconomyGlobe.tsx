@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
+import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeometry.js";
+import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 import type { EconomyMetricId, EconomyYear } from "@/types";
 import { getCountryFillColorEconomy, getMaxMetricValue } from "@/lib/economyColors";
 
@@ -24,12 +27,17 @@ const PICK_W = 2048;
 const PICK_H = 1024;
 
 /** Brand palette. Deep enough that the ramp's own greens read against it. */
-const OCEAN_DEEP = "#06231A";
-const OCEAN_SHALLOW = "#0A3527";
-const LAND_NO_DATA = "#14402F";
-const BORDER = "rgba(255,255,255,0.42)";
-const GRATICULE = "rgba(255,255,255,0.07)";
+const OCEAN_DEEP = "#0E3B4E";
+const OCEAN_MID = "#12506A";
+const OCEAN_SHELF = "#1A6B84";
+const LAND_NO_DATA = "#2C5F4A";
+/** Borders have to survive two neighbouring greens a class apart. */
+const BORDER = "rgba(255,255,255,0.82)";
+const BORDER_WIDTH = 3.2;
+const GRATICULE = "rgba(255,255,255,0.09)";
 const ACCENT = "#39FF88";
+/** Grayscale elevation, used as a bump map — relief without photorealism. */
+const TOPOLOGY = "/geo/earth-topology.png";
 
 interface PickMap {
   data: Uint8ClampedArray;
@@ -84,10 +92,13 @@ function buildBaseMap(geojson: GeoJSON.FeatureCollection): HTMLCanvasElement {
   canvas.height = TEXTURE_H;
   const ctx = canvas.getContext("2d")!;
 
-  // Ocean: deeper at the poles, so the sphere has some depth of its own.
+  // Ocean: lighter and warmer towards the equator, deep at the poles, so the
+  // water has somewhere to go rather than reading as one flat field.
   const ocean = ctx.createLinearGradient(0, 0, 0, TEXTURE_H);
   ocean.addColorStop(0, OCEAN_DEEP);
-  ocean.addColorStop(0.5, OCEAN_SHALLOW);
+  ocean.addColorStop(0.3, OCEAN_MID);
+  ocean.addColorStop(0.5, OCEAN_SHELF);
+  ocean.addColorStop(0.7, OCEAN_MID);
   ocean.addColorStop(1, OCEAN_DEEP);
   ctx.fillStyle = ocean;
   ctx.fillRect(0, 0, TEXTURE_W, TEXTURE_H);
@@ -110,13 +121,23 @@ function buildBaseMap(geojson: GeoJSON.FeatureCollection): HTMLCanvasElement {
     ctx.stroke();
   }
 
+  // A soft dark halo under the coastlines: the continents read as sitting on
+  // the water rather than being cut out of it.
+  ctx.save();
+  ctx.shadowColor = "rgba(2,20,28,0.75)";
+  ctx.shadowBlur = 14;
   ctx.fillStyle = LAND_NO_DATA;
-  ctx.strokeStyle = BORDER;
-  ctx.lineWidth = 1.5;
-  ctx.lineJoin = "round";
   for (const feat of geojson.features) {
     traceFeature(ctx, feat, TEXTURE_W, TEXTURE_H);
     ctx.fill("evenodd");
+  }
+  ctx.restore();
+
+  ctx.strokeStyle = BORDER;
+  ctx.lineWidth = BORDER_WIDTH;
+  ctx.lineJoin = "round";
+  for (const feat of geojson.features) {
+    traceFeature(ctx, feat, TEXTURE_W, TEXTURE_H);
     ctx.stroke();
   }
 
@@ -152,6 +173,79 @@ function countryAt(pick: PickMap, lat: number, lon: number): string | null {
   const i = (py * pick.width + px) * 4;
   const id = (pick.data[i] << 16) | (pick.data[i + 1] << 8) | pick.data[i + 2];
   return id > 0 && id < pick.names.length ? pick.names[id] : null;
+}
+
+/** One country's rings as a flat list of segment endpoints on the sphere. */
+function outlineVerts(feature: GeoJSON.Feature, radius: number): number[] {
+  const verts: number[] = [];
+  for (const ring of ringsOf(feature)) {
+    for (let i = 0; i < ring.length - 1; i++) {
+      for (const [lon, lat] of [ring[i], ring[i + 1]]) {
+        const phi = ((90 - lat) * Math.PI) / 180;
+        const theta = ((lon + 180) * Math.PI) / 180;
+        verts.push(
+          radius * Math.sin(phi) * Math.cos(theta),
+          radius * Math.cos(phi),
+          -radius * Math.sin(phi) * Math.sin(theta)
+        );
+      }
+    }
+  }
+  return verts;
+}
+
+/** A stroke of a given screen width, plus a soft one under it. */
+interface OutlineLayer {
+  /** Width in screen pixels — WebGL's own lines are stuck at one. */
+  width: number;
+  opacity: number;
+}
+
+/**
+ * A country's border as screen-width strokes rather than as a hairline: a
+ * wide, faint pass reads as a glow lifting the country off the sphere, and a
+ * narrower opaque pass on top of it draws the border itself. Nothing here
+ * touches the country's fill, so its class colour survives untouched.
+ */
+function buildOutline(
+  feature: GeoJSON.Feature,
+  radius: number,
+  colour: number,
+  layers: OutlineLayer[],
+  resolution: THREE.Vector2,
+  registry: Set<LineMaterial>
+): THREE.Group | null {
+  const verts = outlineVerts(feature, radius);
+  if (verts.length === 0) return null;
+
+  const group = new THREE.Group();
+  for (const layer of layers) {
+    const geometry = new LineSegmentsGeometry();
+    geometry.setPositions(verts);
+    const material = new LineMaterial({
+      color: colour,
+      linewidth: layer.width,
+      transparent: true,
+      opacity: layer.opacity,
+    });
+    material.resolution.copy(resolution);
+    registry.add(material);
+    group.add(new LineSegments2(geometry, material));
+  }
+  return group;
+}
+
+/** Takes an outline out of the scene and gives its GPU memory back. */
+function disposeOutline(group: THREE.Group | null, registry: Set<LineMaterial>) {
+  if (!group) return;
+  group.parent?.remove(group);
+  for (const child of group.children) {
+    const mesh = child as LineSegments2;
+    mesh.geometry.dispose();
+    const material = mesh.material as LineMaterial;
+    registry.delete(material);
+    material.dispose();
+  }
 }
 
 /** Rim light — the halo the sphere is set into. */
@@ -234,7 +328,11 @@ export function EconomyGlobe({
   const textureRef = useRef<THREE.CanvasTexture | null>(null);
   const pickRef = useRef<PickMap | null>(null);
   const globeRef = useRef<THREE.Group | null>(null);
-  const outlineRef = useRef<THREE.LineSegments | null>(null);
+  const outlineRef = useRef<THREE.Group | null>(null);
+  const hoverRef = useRef<THREE.Group | null>(null);
+  /** Screen-width lines need the viewport size; it changes, they must follow. */
+  const resolutionRef = useRef<THREE.Vector2>(new THREE.Vector2(1, 1));
+  const lineMatsRef = useRef<Set<LineMaterial>>(new Set());
   const onClickRef = useRef(onCountryClick);
   const documentedRef = useRef<Set<string>>(new Set());
 
@@ -265,7 +363,7 @@ export function EconomyGlobe({
         traceFeature(ctx, feat, TEXTURE_W, TEXTURE_H);
         ctx.fill("evenodd");
         ctx.strokeStyle = BORDER;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = BORDER_WIDTH;
         ctx.stroke();
       }
 
@@ -280,41 +378,25 @@ export function EconomyGlobe({
     const byName = byNameRef.current;
     if (!globe) return;
 
-    if (outlineRef.current) {
-      globe.remove(outlineRef.current);
-      outlineRef.current.geometry.dispose();
-      (outlineRef.current.material as THREE.Material).dispose();
-      outlineRef.current = null;
-    }
+    disposeOutline(outlineRef.current, lineMatsRef.current);
+    outlineRef.current = null;
     if (!selectedCountry) return;
 
     const feat = byName.get(selectedCountry);
     if (!feat) return;
 
-    const verts: number[] = [];
-    for (const ring of ringsOf(feat)) {
-      for (let i = 0; i < ring.length - 1; i++) {
-        for (const [lon, lat] of [ring[i], ring[i + 1]]) {
-          const phi = ((90 - lat) * Math.PI) / 180;
-          const theta = ((lon + 180) * Math.PI) / 180;
-          const r = RADIUS * 1.006;
-          verts.push(
-            r * Math.sin(phi) * Math.cos(theta),
-            r * Math.cos(phi),
-            -r * Math.sin(phi) * Math.sin(theta)
-          );
-        }
-      }
-    }
-    if (verts.length === 0) return;
-
-    const outline = new THREE.LineSegments(
-      new THREE.BufferGeometry().setAttribute(
-        "position",
-        new THREE.Float32BufferAttribute(verts, 3)
-      ),
-      new THREE.LineBasicMaterial({ color: new THREE.Color(ACCENT), transparent: true, opacity: 1 })
+    const outline = buildOutline(
+      feat,
+      RADIUS * 1.006,
+      new THREE.Color(ACCENT).getHex(),
+      [
+        { width: 6, opacity: 0.24 },
+        { width: 2.6, opacity: 1 },
+      ],
+      resolutionRef.current,
+      lineMatsRef.current
     );
+    if (!outline) return;
     globe.add(outline);
     outlineRef.current = outline;
   }, [selectedCountry, ready]);
@@ -351,12 +433,27 @@ export function EconomyGlobe({
     texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
     textureRef.current = texture;
 
-    const earth = new THREE.Mesh(
-      new THREE.SphereGeometry(RADIUS, 160, 96),
-      // Unlit: the palette carries the reading, and a terminator over a
-      // choropleth would darken exactly the countries it is meant to compare.
-      new THREE.MeshBasicMaterial({ map: texture })
-    );
+    // Ambient-dominant lighting: enough for the elevation map to raise the
+    // continents and dimple the sea floor, not enough to lay a terminator
+    // across a choropleth and darken the very countries being compared.
+    scene.add(new THREE.AmbientLight(0xffffff, 1.62));
+    const key = new THREE.DirectionalLight(0xffffff, 0.42);
+    key.position.set(-1.2, 1.1, 2.6);
+    scene.add(key);
+
+    const material = new THREE.MeshPhongMaterial({
+      map: texture,
+      shininess: 6,
+      specular: new THREE.Color(0x0f2f28),
+    });
+    new THREE.TextureLoader().load(TOPOLOGY, (topo) => {
+      topo.colorSpace = THREE.NoColorSpace;
+      material.bumpMap = topo;
+      material.bumpScale = 3.4;
+      material.needsUpdate = true;
+    });
+
+    const earth = new THREE.Mesh(new THREE.SphereGeometry(RADIUS, 160, 96), material);
     // SphereGeometry lays its UVs out with x and z inverted relative to the
     // lon/lat convention the texture, the outlines and the hit test all use.
     earth.rotation.y = Math.PI;
@@ -368,12 +465,34 @@ export function EconomyGlobe({
     const orbits = [buildOrbit(1.34, 1.16, 0.35), buildOrbit(1.26, -0.98, 1.9)];
     for (const o of orbits) scene.add(o.ring);
 
+    // Distance is derived from the box rather than fixed: the sphere is framed
+    // by whichever of the two axes is tighter, so its whole circumference is
+    // always inside the frame with an even margin, at any aspect ratio.
+    const MARGIN = 1.18;
+    let baseDistance = 3.5;
+    let zoom = 1;
+    const ZOOM_MIN = 1;
+    // Capped where the 4096-wide texture still has texels to spare: past this
+    // the map stops gaining detail and only gains blur.
+    const ZOOM_MAX = 2.4;
+
+    const applyCamera = () => {
+      camera.position.z = (baseDistance * MARGIN) / zoom;
+      camera.updateProjectionMatrix();
+    };
+
     const resize = () => {
       const { width, height } = mount.getBoundingClientRect();
       if (!width || !height) return;
       renderer.setSize(width, height);
       camera.aspect = width / height;
-      camera.updateProjectionMatrix();
+      resolutionRef.current.set(width, height);
+      for (const mat of lineMatsRef.current) mat.resolution.copy(resolutionRef.current);
+
+      const vFov = (camera.fov * Math.PI) / 180;
+      const hFov = 2 * Math.atan(Math.tan(vFov / 2) * camera.aspect);
+      baseDistance = RADIUS / Math.sin(Math.min(vFov, hFov) / 2);
+      applyCamera();
     };
     resize();
     const ro = new ResizeObserver(resize);
@@ -469,14 +588,86 @@ export function EconomyGlobe({
       if (name && documentedRef.current.has(name)) onClickRef.current(name);
     };
 
+    let hoveredName: string | null = null;
+
+    const clearHover = () => {
+      disposeOutline(hoverRef.current, lineMatsRef.current);
+      hoverRef.current = null;
+    };
+
     const onHover = (e: PointerEvent) => {
       if (dragging) return;
       const name = hitTest(e.clientX, e.clientY);
-      renderer.domElement.style.cursor =
-        name && documentedRef.current.has(name) ? "pointer" : "grab";
+      const live = name && documentedRef.current.has(name) ? name : null;
+      renderer.domElement.style.cursor = live ? "pointer" : "grab";
+
+      if (live === hoveredName) return;
+      hoveredName = live;
+      clearHover();
+      if (!live) return;
+
+      // A thick white border and a soft white glow just off the surface. The
+      // country keeps its own class colour — the outline is what says "this
+      // one", never a recolour that would misreport its value.
+      const feat = byNameRef.current.get(live);
+      if (!feat) return;
+      const outline = buildOutline(
+        feat,
+        RADIUS * 1.009,
+        0xffffff,
+        [
+          { width: 7, opacity: 0.17 },
+          { width: 3, opacity: 0.95 },
+        ],
+        resolutionRef.current,
+        lineMatsRef.current
+      );
+      if (!outline) return;
+      globe.add(outline);
+      hoverRef.current = outline;
+    };
+
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      // Normalised so a trackpad and a mouse wheel travel at the same rate.
+      const step = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY) / 320, 0.18);
+      zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom * (1 - step)));
+      applyCamera();
+    };
+
+    // Pinch: two pointers, the distance between them drives the same zoom.
+    const active = new Map<number, { x: number; y: number }>();
+    let pinchStart = 0;
+    let pinchZoom = 1;
+
+    const onPinchDown = (e: PointerEvent) => {
+      active.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (active.size === 2) {
+        const [a, c] = [...active.values()];
+        pinchStart = Math.hypot(a.x - c.x, a.y - c.y);
+        pinchZoom = zoom;
+      }
+    };
+    const onPinchMove = (e: PointerEvent) => {
+      if (!active.has(e.pointerId)) return;
+      active.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (active.size !== 2 || pinchStart === 0) return;
+      const [a, c] = [...active.values()];
+      const d = Math.hypot(a.x - c.x, a.y - c.y);
+      zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, (pinchZoom * d) / pinchStart));
+      applyCamera();
+    };
+    const onPinchUp = (e: PointerEvent) => {
+      active.delete(e.pointerId);
+      if (active.size < 2) pinchStart = 0;
     };
 
     const el = renderer.domElement;
+    el.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("pointerdown", onPinchDown);
+    el.addEventListener("pointermove", onPinchMove);
+    el.addEventListener("pointerup", onPinchUp);
+    el.addEventListener("pointercancel", onPinchUp);
     el.addEventListener("pointerdown", onDown);
     el.addEventListener("pointermove", onMove);
     el.addEventListener("pointermove", onHover);
@@ -511,6 +702,11 @@ export function EconomyGlobe({
       cancelled = true;
       cancelAnimationFrame(frame);
       ro.disconnect();
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("pointerdown", onPinchDown);
+      el.removeEventListener("pointermove", onPinchMove);
+      el.removeEventListener("pointerup", onPinchUp);
+      el.removeEventListener("pointercancel", onPinchUp);
       el.removeEventListener("pointerdown", onDown);
       el.removeEventListener("pointermove", onMove);
       el.removeEventListener("pointermove", onHover);
@@ -526,8 +722,10 @@ export function EconomyGlobe({
       });
       renderer.dispose();
       if (el.parentNode === mount) mount.removeChild(el);
+      lineMatsRef.current.clear();
       globeRef.current = null;
       outlineRef.current = null;
+      hoverRef.current = null;
       textureRef.current = null;
       fillCanvasRef.current = null;
       baseMapRef.current = null;
@@ -538,6 +736,9 @@ export function EconomyGlobe({
   return (
     <div
       className="relative w-full"
+      // The wheel and the finger belong to the globe here — zoom and rotation,
+      // never the page moving on to the next section.
+      data-scroll-region
       style={{ aspectRatio: "16/9", minHeight: 320, height: "100%" }}
     >
       <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
@@ -559,7 +760,7 @@ export function EconomyGlobe({
           pointerEvents: "none",
         }}
       >
-        Faites tourner le globe · cliquez sur un pays
+        Faites tourner le globe · molette pour zoomer · cliquez sur un pays
       </div>
     </div>
   );

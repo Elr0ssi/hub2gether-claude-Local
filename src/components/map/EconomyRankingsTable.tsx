@@ -287,7 +287,16 @@ export function EconomyRankingsTable({
       </div>
 
       {/* Table — translate="no" prevents browser auto-translation of units (Mds, k, %) */}
-      <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "min(640px, calc(100vh - 290px))" }} translate="no">
+      <div
+        className="overflow-x-auto overflow-y-auto"
+        // The wheel belongs to this table while the pointer is over it: the
+        // page's section-to-section run steps aside for anything marked as a
+        // scroll region, so reaching the last country does not throw the
+        // reader into the next section.
+        data-scroll-region
+        style={{ maxHeight: "min(640px, calc(100vh - 290px))" }}
+        translate="no"
+      >
         <table className="w-full" style={{ borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border-light)", background: "var(--surface-2)" }}>
