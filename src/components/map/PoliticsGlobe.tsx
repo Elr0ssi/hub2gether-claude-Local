@@ -7,45 +7,114 @@ import { getCountryFillColorPolitics } from "@/lib/politicsColors";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    POLITICS GLOBE
-   A clickable sphere carrying the same reading as the flat map: one colour
-   per political orientation, one country per click.
+   A sphere seen from orbit, carrying the same reading as the flat map: one
+   colour per political orientation, one country per click.
 
-   Why not GlobeCanvas — it reads `properties.NAME`, `LABEL_X` and `LABEL_Y`,
-   none of which exist in the world file this project ships (`properties.name`
-   and geometry only). Its fills therefore never paint and its click
-   resolution has no centroids to match against. Rather than change a
-   component the legacy home still mounts, the geometry work is redone here
-   against the file as it actually is, with the two things the flat map has
-   and a globe needs: categorical colour and a hit test.
+   Three things decide whether it feels real rather than diagrammatic — the
+   shapes are drawn from the 50m Natural Earth outlines rather than the coarse
+   110m ones, the sphere is lit rather than flat-shaded, and nothing about the
+   frame is allowed to stutter. The last one is the hardest and most of the
+   work below is about it: the base map is painted once and cached, only the
+   handful of documented countries are repainted when the year changes, the
+   selection is a separate outline in 3D rather than a repaint of the texture,
+   and a click never disturbs the rotation.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const RADIUS = 1;
+/** Fill texture. At the size the sphere is drawn this is already about twice
+ *  oversampled at the equator; four thousand pixels wide only cost repaint
+ *  time on every year change without adding anything the eye can see. */
 const TEXTURE_W = 2048;
 const TEXTURE_H = 1024;
-/** Picking resolution — half a degree per pixel is finer than any click. */
-const PICK_W = 1440;
-const PICK_H = 720;
-const NO_DATA_FILL = "#EDEDED";
-const OCEAN = "#FAFCFB";
+/** Picking resolution — finer than a click can be. */
+const PICK_W = 2048;
+const PICK_H = 1024;
 
-/**
- * Country lookup by pixel.
- *
- * A second, never-displayed painting of the world where each country is
- * filled with a unique flat colour. A click is resolved by converting the
- * point on the sphere to a texture pixel and reading that colour back, so the
- * answer is the country actually under the cursor — borders included — rather
- * than whichever centroid happened to be nearest.
- */
+const LAND_NEUTRAL = "#E8EBE9";
+const LAND_STROKE = "rgba(10,20,15,0.20)";
+const OCEAN_TOP = "#EAF3F7";
+const OCEAN_BOTTOM = "#DCE9EF";
+
 interface PickMap {
   data: Uint8ClampedArray;
   width: number;
   height: number;
-  /** id → country name. The id is packed into r,g,b. */
+  /** id → country name; the id is packed into r,g,b. */
   names: string[];
 }
 
-/** Equirectangular paint used only for picking — one flat colour per country. */
+/** Every ring of a feature, as [lon, lat] pairs. */
+function ringsOf(feature: GeoJSON.Feature): GeoJSON.Position[][] {
+  const geom = feature.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
+  if (!geom) return [];
+  return geom.type === "Polygon"
+    ? (geom.coordinates as GeoJSON.Position[][])
+    : (geom.coordinates as GeoJSON.Position[][][]).flat(1);
+}
+
+/** Trace a feature's rings into a 2D context, in equirectangular pixels. */
+function traceFeature(
+  ctx: CanvasRenderingContext2D,
+  feature: GeoJSON.Feature,
+  w: number,
+  h: number
+) {
+  const geom = feature.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
+  if (!geom) return;
+  const polygons: GeoJSON.Position[][][] =
+    geom.type === "Polygon"
+      ? [geom.coordinates as GeoJSON.Position[][]]
+      : (geom.coordinates as GeoJSON.Position[][][]);
+
+  ctx.beginPath();
+  for (const polygon of polygons) {
+    for (const ring of polygon) {
+      ring.forEach(([lon, lat], i) => {
+        const px = ((lon + 180) / 360) * w;
+        const py = ((90 - lat) / 180) * h;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      });
+      ctx.closePath();
+    }
+  }
+}
+
+/**
+ * The ocean and every landmass in a neutral tone, painted once.
+ *
+ * Everything a year change needs is a blit of this plus a couple of dozen
+ * fills, which is the difference between a scrub of the timeline being smooth
+ * and it being a slideshow.
+ */
+function buildBaseMap(geojson: GeoJSON.FeatureCollection): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = TEXTURE_W;
+  canvas.height = TEXTURE_H;
+  const ctx = canvas.getContext("2d")!;
+
+  const ocean = ctx.createLinearGradient(0, 0, 0, TEXTURE_H);
+  ocean.addColorStop(0, OCEAN_TOP);
+  ocean.addColorStop(0.5, OCEAN_BOTTOM);
+  ocean.addColorStop(1, OCEAN_TOP);
+  ctx.fillStyle = ocean;
+  ctx.fillRect(0, 0, TEXTURE_W, TEXTURE_H);
+
+  ctx.fillStyle = LAND_NEUTRAL;
+  ctx.strokeStyle = LAND_STROKE;
+  ctx.lineWidth = 0.9;
+  ctx.lineJoin = "round";
+
+  for (const feat of geojson.features) {
+    traceFeature(ctx, feat, TEXTURE_W, TEXTURE_H);
+    ctx.fill("evenodd");
+    ctx.stroke();
+  }
+
+  return canvas;
+}
+
+/** One flat colour per country, never displayed — the click resolver. */
 function buildPickMap(geojson: GeoJSON.FeatureCollection): PickMap {
   const canvas = document.createElement("canvas");
   canvas.width = PICK_W;
@@ -53,47 +122,24 @@ function buildPickMap(geojson: GeoJSON.FeatureCollection): PickMap {
   const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
   ctx.imageSmoothingEnabled = false;
 
-  // id 0 is "nothing here", so names[0] is never read.
+  // id 0 means "no country here", so names[0] is never read.
   const names: string[] = [""];
 
   for (const feat of geojson.features) {
     const name = feat.properties?.name as string | undefined;
     if (!name) continue;
-
     const id = names.length;
     names.push(name);
-    // 24 bits is far more than the ~180 countries in the file, so ids stay
-    // exact through the canvas round trip.
+    // 24 bits, against ~231 countries: ids survive the canvas round trip exactly.
     ctx.fillStyle = `rgb(${(id >> 16) & 0xff},${(id >> 8) & 0xff},${id & 0xff})`;
-
-    const geom = feat.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
-    if (!geom) continue;
-    const polygons: GeoJSON.Position[][][] =
-      geom.type === "Polygon"
-        ? [geom.coordinates as GeoJSON.Position[][]]
-        : (geom.coordinates as GeoJSON.Position[][][]);
-
-    for (const polygon of polygons) {
-      ctx.beginPath();
-      for (const ring of polygon) {
-        ring.forEach(([lon, lat], i) => {
-          const px = ((lon + 180) / 360) * PICK_W;
-          const py = ((90 - lat) / 180) * PICK_H;
-          if (i === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        });
-        ctx.closePath();
-      }
-      // evenodd so lakes and enclaves punch through instead of being claimed.
-      ctx.fill("evenodd");
-    }
+    traceFeature(ctx, feat, PICK_W, PICK_H);
+    ctx.fill("evenodd");
   }
 
   const { data } = ctx.getImageData(0, 0, PICK_W, PICK_H);
   return { data, width: PICK_W, height: PICK_H, names };
 }
 
-/** The country at a lat/lon, or null over water. */
 function countryAt(pick: PickMap, lat: number, lon: number): string | null {
   const px = Math.floor(((lon + 180) / 360) * pick.width);
   const py = Math.floor(((90 - lat) / 180) * pick.height);
@@ -103,75 +149,35 @@ function countryAt(pick: PickMap, lat: number, lon: number): string | null {
   return id > 0 && id < pick.names.length ? pick.names[id] : null;
 }
 
-/** Equirectangular paint of every country in its orientation colour. */
-function paintFills(
-  geojson: GeoJSON.FeatureCollection,
-  politicsData: Record<string, PoliticalPeriod>,
-  selected: string | null,
-  hidden: ReadonlySet<string>
-): HTMLCanvasElement {
-  const canvas = document.createElement("canvas");
-  canvas.width = TEXTURE_W;
-  canvas.height = TEXTURE_H;
-  const ctx = canvas.getContext("2d")!;
-
-  ctx.fillStyle = OCEAN;
-  ctx.fillRect(0, 0, TEXTURE_W, TEXTURE_H);
-
-  for (const feat of geojson.features) {
-    const name = feat.properties?.name as string | undefined;
-    if (!name) continue;
-
-    const period = politicsData[name];
-    const orientationHidden = period ? hidden.has(period.orientation) : false;
-    ctx.fillStyle = orientationHidden
-      ? NO_DATA_FILL
-      : period
-      ? getCountryFillColorPolitics(name, politicsData)
-      : NO_DATA_FILL;
-
-    const geom = feat.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
-    if (!geom) continue;
-    const polygons: GeoJSON.Position[][][] =
-      geom.type === "Polygon"
-        ? [geom.coordinates as GeoJSON.Position[][]]
-        : (geom.coordinates as GeoJSON.Position[][][]);
-
-    for (const polygon of polygons) {
-      for (const ring of polygon) {
-        ctx.beginPath();
-        ring.forEach(([lon, lat], i) => {
-          const px = ((lon + 180) / 360) * TEXTURE_W;
-          const py = ((90 - lat) / 180) * TEXTURE_H;
-          if (i === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        });
-        ctx.closePath();
-        ctx.fill();
+/** Rim light: a shell lit only where it turns away from the camera. */
+function atmosphereMaterial(): THREE.ShaderMaterial {
+  return new THREE.ShaderMaterial({
+    transparent: true,
+    side: THREE.BackSide,
+    depthWrite: false,
+    blending: THREE.NormalBlending,
+    uniforms: { uColor: { value: new THREE.Color("#8FD3B4") } },
+    vertexShader: `
+      varying vec3 vNormal;
+      varying vec3 vView;
+      void main() {
+        vNormal = normalize(normalMatrix * normal);
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vView = normalize(-mv.xyz);
+        gl_Position = projectionMatrix * mv;
       }
-
-      // The selection is outlined rather than recoloured, so its orientation
-      // stays readable while it is picked out.
-      if (name === selected) {
-        ctx.save();
-        ctx.strokeStyle = "#0A0A0A";
-        ctx.lineWidth = 3.5;
-        ctx.beginPath();
-        const ring = polygon[0];
-        ring?.forEach(([lon, lat], i) => {
-          const px = ((lon + 180) / 360) * TEXTURE_W;
-          const py = ((90 - lat) / 180) * TEXTURE_H;
-          if (i === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        });
-        ctx.closePath();
-        ctx.stroke();
-        ctx.restore();
+    `,
+    fragmentShader: `
+      uniform vec3 uColor;
+      varying vec3 vNormal;
+      varying vec3 vView;
+      void main() {
+        float rim = 1.0 - abs(dot(vNormal, vView));
+        float a = pow(rim, 3.2) * 0.55;
+        gl_FragColor = vec4(uColor, a);
       }
-    }
-  }
-
-  return canvas;
+    `,
+  });
 }
 
 interface Props {
@@ -191,36 +197,105 @@ export function PoliticsGlobe({
   const mountRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
 
-  // Everything the render loop needs that changes from the outside, held in
-  // refs so the scene is built exactly once.
+  // Everything the render loop needs from outside, in refs: the scene is
+  // built exactly once, and a React render never disturbs it.
   const geojsonRef = useRef<GeoJSON.FeatureCollection | null>(null);
+  const byNameRef = useRef<Map<string, GeoJSON.Feature>>(new Map());
+  const baseMapRef = useRef<HTMLCanvasElement | null>(null);
+  const fillCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const textureRef = useRef<THREE.CanvasTexture | null>(null);
   const pickRef = useRef<PickMap | null>(null);
-  const fillMeshRef = useRef<THREE.Mesh | null>(null);
+  const globeRef = useRef<THREE.Group | null>(null);
+  const outlineRef = useRef<THREE.LineSegments | null>(null);
   const onClickRef = useRef(onCountryClick);
-  const dataRef = useRef(politicsData);
-  const selectedRef = useRef(selectedCountry);
-  const hiddenRef = useRef<ReadonlySet<string>>(hiddenOrientations ?? new Set());
+  /** Countries the selected year actually documents. */
+  const documentedRef = useRef<Set<string>>(new Set());
 
   onClickRef.current = onCountryClick;
+  documentedRef.current = new Set(Object.keys(politicsData));
 
-  /* ── Repaint when the year, the selection or the legend changes ───────── */
+  /* ── Repaint: base blit, then only the documented countries ───────────── */
   useEffect(() => {
-    dataRef.current = politicsData;
-    selectedRef.current = selectedCountry;
-    hiddenRef.current = hiddenOrientations ?? new Set();
+    const base = baseMapRef.current;
+    const canvas = fillCanvasRef.current;
+    const texture = textureRef.current;
+    const byName = byNameRef.current;
+    if (!base || !canvas || !texture) return;
 
-    const geo = geojsonRef.current;
-    const mesh = fillMeshRef.current;
-    if (!geo || !mesh) return;
+    // Coalesced to one frame. Dragging the year slider fires a change per
+    // pixel of travel; without this the globe would repaint a four-megapixel
+    // texture for each of them and the scrub would judder.
+    const handle = requestAnimationFrame(() => repaint());
+    return () => cancelAnimationFrame(handle);
 
-    const canvas = paintFills(geo, politicsData, selectedCountry, hiddenRef.current);
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.colorSpace = THREE.SRGBColorSpace;
-    const material = mesh.material as THREE.MeshBasicMaterial;
-    material.map?.dispose();
-    material.map = texture;
-    material.needsUpdate = true;
-  }, [politicsData, selectedCountry, hiddenOrientations]);
+    function repaint() {
+    const ctx = canvas!.getContext("2d")!;
+    ctx.drawImage(base!, 0, 0);
+
+    const hidden = hiddenOrientations ?? new Set<string>();
+    for (const [name, period] of Object.entries(politicsData)) {
+      if (hidden.has(period.orientation)) continue;
+      const feat = byName.get(name);
+      if (!feat) continue;
+      ctx.fillStyle = getCountryFillColorPolitics(name, politicsData);
+      traceFeature(ctx, feat, TEXTURE_W, TEXTURE_H);
+      ctx.fill("evenodd");
+      ctx.strokeStyle = "rgba(10,20,15,0.28)";
+      ctx.lineWidth = 0.9;
+      ctx.stroke();
+    }
+
+    // Reusing the same canvas and texture: allocating a new CanvasTexture on
+    // every year meant a fresh upload and a collection, which is what the
+    // globe was hitching on.
+    texture!.needsUpdate = true;
+    }
+  }, [politicsData, hiddenOrientations, ready]);
+
+  /* ── Selection: an outline in 3D, so picking never repaints the map ───── */
+  useEffect(() => {
+    const globe = globeRef.current;
+    const byName = byNameRef.current;
+    if (!globe) return;
+
+    if (outlineRef.current) {
+      globe.remove(outlineRef.current);
+      outlineRef.current.geometry.dispose();
+      (outlineRef.current.material as THREE.Material).dispose();
+      outlineRef.current = null;
+    }
+    if (!selectedCountry) return;
+
+    const feat = byName.get(selectedCountry);
+    if (!feat) return;
+
+    const verts: number[] = [];
+    for (const ring of ringsOf(feat)) {
+      for (let i = 0; i < ring.length - 1; i++) {
+        for (const [lon, lat] of [ring[i], ring[i + 1]]) {
+          const phi = ((90 - lat) * Math.PI) / 180;
+          const theta = ((lon + 180) * Math.PI) / 180;
+          const r = RADIUS * 1.006;
+          verts.push(
+            r * Math.sin(phi) * Math.cos(theta),
+            r * Math.cos(phi),
+            -r * Math.sin(phi) * Math.sin(theta)
+          );
+        }
+      }
+    }
+    if (verts.length === 0) return;
+
+    const outline = new THREE.LineSegments(
+      new THREE.BufferGeometry().setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(verts, 3)
+      ),
+      new THREE.LineBasicMaterial({ color: 0x0a0a0a, transparent: true, opacity: 0.9 })
+    );
+    globe.add(outline);
+    outlineRef.current = outline;
+  }, [selectedCountry, ready]);
 
   /* ── Scene ────────────────────────────────────────────────────────────── */
   useEffect(() => {
@@ -228,56 +303,60 @@ export function PoliticsGlobe({
     if (!mount) return;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-    camera.position.z = 3.1;
+    const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
+    camera.position.z = 3.35;
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     mount.appendChild(renderer.domElement);
     renderer.domElement.style.display = "block";
     renderer.domElement.style.cursor = "grab";
+    renderer.domElement.style.touchAction = "none";
 
     const globe = new THREE.Group();
-    // A slight tilt so the sphere reads as a globe and not as a disc, and an
-    // opening rotation that puts Europe and Africa in front: most of the
-    // documented countries are on that face, so the globe arrives with
-    // something to click rather than showing the empty Pacific.
-    globe.rotation.x = 0.28;
+    // A slight tilt so the sphere reads as a globe, and an opening rotation
+    // that puts Europe and Africa in front — most of the documented countries
+    // are on that face.
+    globe.rotation.x = 0.26;
     globe.rotation.y = 1.4;
     scene.add(globe);
+    globeRef.current = globe;
 
-    // Fill sphere — the country colours live on its texture.
-    const fillMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(RADIUS, 96, 64),
-      new THREE.MeshBasicMaterial({ transparent: false })
+    // Lit rather than flat: a key light gives the sphere its roundness and a
+    // terminator, which is most of what separates a globe from a disc.
+    scene.add(new THREE.AmbientLight(0xffffff, 1.42));
+    const key = new THREE.DirectionalLight(0xffffff, 0.62);
+    key.position.set(-1.5, 0.8, 2.4);
+    scene.add(key);
+
+    const fillCanvas = document.createElement("canvas");
+    fillCanvas.width = TEXTURE_W;
+    fillCanvas.height = TEXTURE_H;
+    fillCanvasRef.current = fillCanvas;
+
+    const texture = new THREE.CanvasTexture(fillCanvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    textureRef.current = texture;
+
+    const earth = new THREE.Mesh(
+      new THREE.SphereGeometry(RADIUS, 160, 96),
+      new THREE.MeshLambertMaterial({ map: texture })
     );
     // SphereGeometry lays its UVs out with x and z inverted relative to the
-    // lon/lat convention the borders, the texture and the hit test all use:
-    // without this half turn the painted countries sit on the opposite side of
-    // the globe from their own outlines, which reads as two maps at once and
-    // makes every click land on the wrong country.
-    fillMesh.rotation.y = Math.PI;
-    globe.add(fillMesh);
-    fillMeshRef.current = fillMesh;
+    // lon/lat convention the texture, the outlines and the hit test all use.
+    earth.rotation.y = Math.PI;
+    globe.add(earth);
 
-    // A hairline sphere over it, so borders and the terminator read.
-    const shell = new THREE.Mesh(
-      new THREE.SphereGeometry(RADIUS * 1.002, 64, 48),
-      new THREE.MeshBasicMaterial({
-        color: 0x0a140f,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.06,
-      })
+    const atmosphere = new THREE.Mesh(
+      new THREE.SphereGeometry(RADIUS * 1.045, 64, 48),
+      atmosphereMaterial()
     );
-    globe.add(shell);
+    scene.add(atmosphere);
 
     const resize = () => {
       const { width, height } = mount.getBoundingClientRect();
       if (!width || !height) return;
-      // `updateStyle` left at its default: without the CSS size the canvas
-      // displays at its drawing-buffer size, which the pixel ratio has already
-      // doubled — the sphere rendered twice as large as its box.
       renderer.setSize(width, height);
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
@@ -286,62 +365,27 @@ export function PoliticsGlobe({
     const ro = new ResizeObserver(resize);
     ro.observe(mount);
 
-    /* ── Country outlines, and the pick map the hit test reads ─────────── */
+    /* ── World file ─────────────────────────────────────────────────────── */
     let cancelled = false;
-    fetch("/geo/ne_110m_admin_0_countries.geojson")
+    fetch("/geo/ne_50m_countries.geojson")
       .then((r) => r.json())
       .then((geojson: GeoJSON.FeatureCollection) => {
         if (cancelled) return;
         geojsonRef.current = geojson;
 
-        const verts: number[] = [];
-
+        const byName = new Map<string, GeoJSON.Feature>();
         for (const feat of geojson.features) {
-          const geom = feat.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
-          if (!geom) continue;
-          const rings =
-            geom.type === "Polygon"
-              ? (geom.coordinates as GeoJSON.Position[][])
-              : (geom.coordinates as GeoJSON.Position[][][]).flat(1);
-
-          for (const ring of rings) {
-            for (let i = 0; i < ring.length - 1; i++) {
-              for (const [lon, lat] of [ring[i], ring[i + 1]]) {
-                const phi = ((90 - lat) * Math.PI) / 180;
-                const theta = ((lon + 180) * Math.PI) / 180;
-                const r = RADIUS * 1.003;
-                verts.push(
-                  r * Math.sin(phi) * Math.cos(theta),
-                  r * Math.cos(phi),
-                  -r * Math.sin(phi) * Math.sin(theta)
-                );
-              }
-            }
-          }
+          const name = feat.properties?.name as string | undefined;
+          if (name) byName.set(name, feat);
         }
+        byNameRef.current = byName;
 
+        baseMapRef.current = buildBaseMap(geojson);
         pickRef.current = buildPickMap(geojson);
 
-        const lines = new THREE.LineSegments(
-          new THREE.BufferGeometry().setAttribute(
-            "position",
-            new THREE.Float32BufferAttribute(verts, 3)
-          ),
-          new THREE.LineBasicMaterial({ color: 0x0a140f, transparent: true, opacity: 0.26 })
-        );
-        globe.add(lines);
-
-        const canvas = paintFills(
-          geojson,
-          dataRef.current,
-          selectedRef.current,
-          hiddenRef.current
-        );
-        const texture = new THREE.CanvasTexture(canvas);
-        texture.colorSpace = THREE.SRGBColorSpace;
-        const material = fillMesh.material as THREE.MeshBasicMaterial;
-        material.map = texture;
-        material.needsUpdate = true;
+        // First paint; the effects above take over from here.
+        fillCanvas.getContext("2d")!.drawImage(baseMapRef.current, 0, 0);
+        texture.needsUpdate = true;
 
         setReady(true);
       })
@@ -349,19 +393,19 @@ export function PoliticsGlobe({
         /* The globe stays empty; the flat map is one click away. */
       });
 
-    /* ── Drag to turn, with inertia ─────────────────────────────────────── */
+    /* ── Turning ────────────────────────────────────────────────────────── */
     let dragging = false;
     let prevX = 0;
     let prevY = 0;
     let startX = 0;
     let startY = 0;
-    let velocity = 0;
+    let spin = 0;
 
     const onDown = (e: PointerEvent) => {
       dragging = true;
       prevX = startX = e.clientX;
       prevY = startY = e.clientY;
-      velocity = 0;
+      spin = 0;
       renderer.domElement.style.cursor = "grabbing";
       renderer.domElement.setPointerCapture(e.pointerId);
     };
@@ -372,10 +416,10 @@ export function PoliticsGlobe({
       const dy = e.clientY - prevY;
       prevX = e.clientX;
       prevY = e.clientY;
-      globe.rotation.y += dx * 0.008;
+      globe.rotation.y += dx * 0.0062;
       // Clamped so the globe can never roll past its own poles.
-      globe.rotation.x = Math.max(-0.9, Math.min(0.9, globe.rotation.x + dy * 0.004));
-      velocity = dx * 0.008;
+      globe.rotation.x = Math.max(-0.85, Math.min(0.85, globe.rotation.x + dy * 0.0034));
+      spin = dx * 0.0062;
     };
 
     const hitTest = (clientX: number, clientY: number): string | null => {
@@ -396,9 +440,7 @@ export function PoliticsGlobe({
       }
 
       // Back into the geojson frame: undo the globe's own rotation.
-      point.applyQuaternion(
-        new THREE.Quaternion().setFromEuler(globe.rotation).invert()
-      );
+      point.applyQuaternion(new THREE.Quaternion().setFromEuler(globe.rotation).invert());
 
       const lat = 90 - (Math.acos(Math.max(-1, Math.min(1, point.y / RADIUS))) * 180) / Math.PI;
       let theta = Math.atan2(-point.z, point.x);
@@ -412,17 +454,22 @@ export function PoliticsGlobe({
       const moved = Math.hypot(e.clientX - startX, e.clientY - startY);
       dragging = false;
       renderer.domElement.style.cursor = "grab";
-      // A turn is not a click.
-      if (moved > 6) return;
+
+      if (moved > 5) return; // a turn, not a click
+      // A click leaves no residual spin: the globe must not lurch under the
+      // finger the moment a country is selected.
+      spin = 0;
       const name = hitTest(e.clientX, e.clientY);
-      if (name && dataRef.current[name]) onClickRef.current(name);
+      // Countries the selected year does not document stay inert, as they do
+      // on the flat map — the side panel would have nothing to show.
+      if (name && documentedRef.current.has(name)) onClickRef.current(name);
     };
 
     const onHover = (e: PointerEvent) => {
       if (dragging) return;
       const name = hitTest(e.clientX, e.clientY);
       renderer.domElement.style.cursor =
-        name && dataRef.current[name] ? "pointer" : "grab";
+        name && documentedRef.current.has(name) ? "pointer" : "grab";
     };
 
     const el = renderer.domElement;
@@ -430,15 +477,16 @@ export function PoliticsGlobe({
     el.addEventListener("pointermove", onMove);
     el.addEventListener("pointermove", onHover);
     el.addEventListener("pointerup", onUp);
+    el.addEventListener("pointercancel", onUp);
 
     /* ── Loop ───────────────────────────────────────────────────────────── */
     let frame = 0;
     const tick = () => {
       if (!dragging) {
-        // Idle drift, plus whatever spin the last drag left behind.
-        globe.rotation.y += 0.0006 + velocity;
-        velocity *= 0.94;
-        if (Math.abs(velocity) < 0.00002) velocity = 0;
+        // A slow orbit, plus whatever spin the last turn left behind.
+        globe.rotation.y += 0.00042 + spin;
+        spin *= 0.955;
+        if (Math.abs(spin) < 0.00002) spin = 0;
       }
       renderer.render(scene, camera);
       frame = requestAnimationFrame(tick);
@@ -453,6 +501,7 @@ export function PoliticsGlobe({
       el.removeEventListener("pointermove", onMove);
       el.removeEventListener("pointermove", onHover);
       el.removeEventListener("pointerup", onUp);
+      el.removeEventListener("pointercancel", onUp);
       scene.traverse((o) => {
         if (o instanceof THREE.Mesh || o instanceof THREE.LineSegments) {
           o.geometry.dispose();
@@ -463,7 +512,11 @@ export function PoliticsGlobe({
       });
       renderer.dispose();
       if (el.parentNode === mount) mount.removeChild(el);
-      fillMeshRef.current = null;
+      globeRef.current = null;
+      outlineRef.current = null;
+      textureRef.current = null;
+      fillCanvasRef.current = null;
+      baseMapRef.current = null;
       geojsonRef.current = null;
       pickRef.current = null;
     };
