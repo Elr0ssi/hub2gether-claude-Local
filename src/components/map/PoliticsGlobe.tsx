@@ -22,69 +22,85 @@ import { getCountryFillColorPolitics } from "@/lib/politicsColors";
 const RADIUS = 1;
 const TEXTURE_W = 2048;
 const TEXTURE_H = 1024;
+/** Picking resolution — half a degree per pixel is finer than any click. */
+const PICK_W = 1440;
+const PICK_H = 720;
 const NO_DATA_FILL = "#EDEDED";
 const OCEAN = "#FAFCFB";
-/** Angular distance, in radians, past which a click counts as a miss. */
-const HIT_TOLERANCE = 0.42;
 
-interface Centroid {
-  name: string;
-  lat: number;
-  lon: number;
+/**
+ * Country lookup by pixel.
+ *
+ * A second, never-displayed painting of the world where each country is
+ * filled with a unique flat colour. A click is resolved by converting the
+ * point on the sphere to a texture pixel and reading that colour back, so the
+ * answer is the country actually under the cursor — borders included — rather
+ * than whichever centroid happened to be nearest.
+ */
+interface PickMap {
+  data: Uint8ClampedArray;
+  width: number;
+  height: number;
+  /** id → country name. The id is packed into r,g,b. */
+  names: string[];
 }
 
-/** Ring centroid weighted by area — good enough to pick the nearest country. */
-function centroidOf(feature: GeoJSON.Feature): { lat: number; lon: number } | null {
-  const geom = feature.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
-  if (!geom) return null;
+/** Equirectangular paint used only for picking — one flat colour per country. */
+function buildPickMap(geojson: GeoJSON.FeatureCollection): PickMap {
+  const canvas = document.createElement("canvas");
+  canvas.width = PICK_W;
+  canvas.height = PICK_H;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
+  ctx.imageSmoothingEnabled = false;
 
-  const polygons: GeoJSON.Position[][][] =
-    geom.type === "Polygon"
-      ? [geom.coordinates as GeoJSON.Position[][]]
-      : (geom.coordinates as GeoJSON.Position[][][]);
+  // id 0 is "nothing here", so names[0] is never read.
+  const names: string[] = [""];
 
-  let bestArea = -1;
-  let best: { lat: number; lon: number } | null = null;
+  for (const feat of geojson.features) {
+    const name = feat.properties?.name as string | undefined;
+    if (!name) continue;
 
-  // The largest ring wins: island nations should not have their centroid
-  // dragged into the sea by a scatter of small outlying territories.
-  for (const polygon of polygons) {
-    const ring = polygon[0];
-    if (!ring || ring.length < 3) continue;
+    const id = names.length;
+    names.push(name);
+    // 24 bits is far more than the ~180 countries in the file, so ids stay
+    // exact through the canvas round trip.
+    ctx.fillStyle = `rgb(${(id >> 16) & 0xff},${(id >> 8) & 0xff},${id & 0xff})`;
 
-    let area = 0;
-    let cx = 0;
-    let cy = 0;
-    for (let i = 0; i < ring.length - 1; i++) {
-      const [x0, y0] = ring[i];
-      const [x1, y1] = ring[i + 1];
-      const cross = x0 * y1 - x1 * y0;
-      area += cross;
-      cx += (x0 + x1) * cross;
-      cy += (y0 + y1) * cross;
-    }
-    area /= 2;
-    if (Math.abs(area) < 1e-9) continue;
-    const a = Math.abs(area);
-    if (a > bestArea) {
-      bestArea = a;
-      best = { lon: cx / (6 * area), lat: cy / (6 * area) };
+    const geom = feat.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
+    if (!geom) continue;
+    const polygons: GeoJSON.Position[][][] =
+      geom.type === "Polygon"
+        ? [geom.coordinates as GeoJSON.Position[][]]
+        : (geom.coordinates as GeoJSON.Position[][][]);
+
+    for (const polygon of polygons) {
+      ctx.beginPath();
+      for (const ring of polygon) {
+        ring.forEach(([lon, lat], i) => {
+          const px = ((lon + 180) / 360) * PICK_W;
+          const py = ((90 - lat) / 180) * PICK_H;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        });
+        ctx.closePath();
+      }
+      // evenodd so lakes and enclaves punch through instead of being claimed.
+      ctx.fill("evenodd");
     }
   }
 
-  return best;
+  const { data } = ctx.getImageData(0, 0, PICK_W, PICK_H);
+  return { data, width: PICK_W, height: PICK_H, names };
 }
 
-/** Great-circle angle between two lat/lon pairs, in radians. */
-function haversineAngle(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) ** 2;
-  return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+/** The country at a lat/lon, or null over water. */
+function countryAt(pick: PickMap, lat: number, lon: number): string | null {
+  const px = Math.floor(((lon + 180) / 360) * pick.width);
+  const py = Math.floor(((90 - lat) / 180) * pick.height);
+  if (px < 0 || py < 0 || px >= pick.width || py >= pick.height) return null;
+  const i = (py * pick.width + px) * 4;
+  const id = (pick.data[i] << 16) | (pick.data[i + 1] << 8) | pick.data[i + 2];
+  return id > 0 && id < pick.names.length ? pick.names[id] : null;
 }
 
 /** Equirectangular paint of every country in its orientation colour. */
@@ -178,7 +194,7 @@ export function PoliticsGlobe({
   // Everything the render loop needs that changes from the outside, held in
   // refs so the scene is built exactly once.
   const geojsonRef = useRef<GeoJSON.FeatureCollection | null>(null);
-  const centroidsRef = useRef<Centroid[]>([]);
+  const pickRef = useRef<PickMap | null>(null);
   const fillMeshRef = useRef<THREE.Mesh | null>(null);
   const onClickRef = useRef(onCountryClick);
   const dataRef = useRef(politicsData);
@@ -235,6 +251,12 @@ export function PoliticsGlobe({
       new THREE.SphereGeometry(RADIUS, 96, 64),
       new THREE.MeshBasicMaterial({ transparent: false })
     );
+    // SphereGeometry lays its UVs out with x and z inverted relative to the
+    // lon/lat convention the borders, the texture and the hit test all use:
+    // without this half turn the painted countries sit on the opposite side of
+    // the globe from their own outlines, which reads as two maps at once and
+    // makes every click land on the wrong country.
+    fillMesh.rotation.y = Math.PI;
     globe.add(fillMesh);
     fillMeshRef.current = fillMesh;
 
@@ -264,7 +286,7 @@ export function PoliticsGlobe({
     const ro = new ResizeObserver(resize);
     ro.observe(mount);
 
-    /* ── Country outlines, and the centroids the hit test needs ─────────── */
+    /* ── Country outlines, and the pick map the hit test reads ─────────── */
     let cancelled = false;
     fetch("/geo/ne_110m_admin_0_countries.geojson")
       .then((r) => r.json())
@@ -273,15 +295,8 @@ export function PoliticsGlobe({
         geojsonRef.current = geojson;
 
         const verts: number[] = [];
-        const centroids: Centroid[] = [];
 
         for (const feat of geojson.features) {
-          const name = feat.properties?.name as string | undefined;
-          if (name) {
-            const c = centroidOf(feat);
-            if (c) centroids.push({ name, lat: c.lat, lon: c.lon });
-          }
-
           const geom = feat.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
           if (!geom) continue;
           const rings =
@@ -305,7 +320,7 @@ export function PoliticsGlobe({
           }
         }
 
-        centroidsRef.current = centroids;
+        pickRef.current = buildPickMap(geojson);
 
         const lines = new THREE.LineSegments(
           new THREE.BufferGeometry().setAttribute(
@@ -364,8 +379,8 @@ export function PoliticsGlobe({
     };
 
     const hitTest = (clientX: number, clientY: number): string | null => {
-      const centroids = centroidsRef.current;
-      if (centroids.length === 0) return null;
+      const pick = pickRef.current;
+      if (!pick) return null;
 
       const rect = mount.getBoundingClientRect();
       const ndc = new THREE.Vector2(
@@ -390,16 +405,7 @@ export function PoliticsGlobe({
       if (theta < 0) theta += 2 * Math.PI;
       const lon = theta * (180 / Math.PI) - 180;
 
-      let nearest: Centroid | null = null;
-      let best = Infinity;
-      for (const c of centroids) {
-        const d = haversineAngle(lat, lon, c.lat, c.lon);
-        if (d < best) {
-          best = d;
-          nearest = c;
-        }
-      }
-      return nearest && best < HIT_TOLERANCE ? nearest.name : null;
+      return countryAt(pick, lat, lon);
     };
 
     const onUp = (e: PointerEvent) => {
@@ -459,7 +465,7 @@ export function PoliticsGlobe({
       if (el.parentNode === mount) mount.removeChild(el);
       fillMeshRef.current = null;
       geojsonRef.current = null;
-      centroidsRef.current = [];
+      pickRef.current = null;
     };
   }, []);
 

@@ -536,25 +536,127 @@ body {
   max-width: 1280px;
 }
 
-/* ── Ad rails ─────────────────────────────────────────────────────────────
-   Reserved margin slots, hidden below the width at which they would start
-   eating into the content column. */
-.eco-ad-rail {
-  display: none;
-  flex: 0 0 160px;
-  width: 160px;
+/* Tighter gutters and gaps below the desktop breakpoint, so the rails and the
+   content both fit on a laptop instead of the rails being dropped. */
+@media (max-width: 1439px) {
+  .eco-section-body { padding: 0 clamp(12px, 1.6vw, 24px); }
+  .eco-section-row { gap: 18px; }
 }
 
-@media (min-width: 1640px) {
-  .eco-ad-rail { display: block; }
+/* ── Ad slots ─────────────────────────────────────────────────────────────
+   Two shapes for one job. Above 1180px the margins carry vertical rails; the
+   content column gives way instead of forcing them off screen, which is why
+   they used to vanish on a laptop and only appear on an external display.
+   Below that the same slot lies down above the block it belongs to, so the
+   reader keeps the full width for the map, the ranking and the articles. */
+.eco-ad-rail {
+  display: none;
+  flex: 0 0 140px;
+  width: 140px;
+}
+
+.eco-ad-banner { display: block; width: 100%; margin-bottom: 16px; }
+
+@media (min-width: 1180px) {
+  .eco-ad-rail { display: block; flex-basis: 140px; width: 140px; }
+  .eco-ad-banner { display: none; }
+}
+
+@media (min-width: 1440px) {
+  .eco-ad-rail { flex-basis: 160px; width: 160px; }
+  .eco-ad-slot { width: 160px; }
+}
+
+.eco-ad-banner-slot {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  width: 100%;
+  max-width: 970px;
+  margin: 0 auto;
+  height: 90px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.eco-ad-banner-visual {
+  position: relative;
+  flex: 0 0 34%;
+  max-width: 260px;
+  background: linear-gradient(120deg, #0B2F1D 0%, #114A2C 60%, #0D7A40 100%);
+}
+
+.eco-ad-banner-tag {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  padding: 2px 7px;
+  border-radius: 100px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(57, 255, 136, 0.35);
+  color: #39ff88;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.eco-ad-banner-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.eco-ad-banner-title {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #0d7a40;
+}
+
+.eco-ad-banner-rules { display: flex; flex-direction: column; gap: 6px; }
+.eco-ad-banner-rules > span {
+  height: 6px;
+  border-radius: 100px;
+  background: var(--surface-2);
+}
+
+.eco-ad-banner-size {
+  flex: 0 0 auto;
+  align-self: center;
+  margin-right: 14px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+  color: var(--ink-4);
+  font-size: 0.58rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* On a phone the visual half would leave no room for anything else. */
+@media (max-width: 560px) {
+  .eco-ad-banner-slot { height: 76px; gap: 12px; }
+  .eco-ad-banner-visual { flex-basis: 38%; }
+  .eco-ad-banner-size { display: none; }
+  .eco-ad-banner-title { font-size: 0.58rem; letter-spacing: 0.06em; }
+  .eco-ad-banner-copy { padding-right: 12px; }
 }
 
 .eco-ad-slot {
+  width: 140px;
   position: sticky;
   top: calc(var(--navbar-height) + 24px);
   display: flex;
   flex-direction: column;
-  width: 160px;
   height: 600px;
   max-height: calc(100vh - var(--navbar-height) - 96px);
   border-radius: 16px;

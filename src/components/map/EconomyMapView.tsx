@@ -12,7 +12,7 @@ import { ThemeDropdown } from "./ThemeDropdown";
 import { ECONOMY_METRICS, ECONOMY_YEARS, ECONOMY_YEAR_VALUES, getYearData, DEFAULT_YEAR } from "@/data/economy/economy";
 import type { EconomyMetricId, EconomyYear } from "@/types";
 import { MapArticleSection } from "@/components/articles/MapArticleSection";
-import { AdRail } from "@/components/layout/AdRail";
+import { AdRail, AdBanner } from "@/components/layout/AdRail";
 import { SectionFlowCurves } from "./SectionFlowCurves";
 import { useScrollTeleport } from "@/hooks/useScrollTeleport";
 import { ECONOMY_ARTICLES } from "@/data/articles";
@@ -163,6 +163,7 @@ export function EconomyMapView() {
           <div className="eco-section-row">
           <AdRail side="left" />
           <div className="eco-section-main">
+            <AdBanner />
       {/* Map card */}
       <div
         className={`border rounded-2xl overflow-hidden${isFullscreen ? " fixed inset-0 z-[9999] rounded-none flex flex-col" : ""}`}
@@ -341,6 +342,7 @@ export function EconomyMapView() {
           <div className="eco-section-row">
           <AdRail side="left" />
           <div className="eco-section-main">
+            <AdBanner />
             <EconomyRankingsTable
               metric={metric}
               year={year}
@@ -364,6 +366,7 @@ export function EconomyMapView() {
           <div className="eco-section-row">
           <AdRail side="left" />
           <div className="eco-section-main">
+            <AdBanner />
             <MapArticleSection
               themeArticles={ECONOMY_ARTICLES}
               selectedCountry={selectedCountry}

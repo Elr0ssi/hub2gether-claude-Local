@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { CalendarDays, Globe } from "lucide-react";
 
@@ -41,16 +41,31 @@ export function EconomyYearTimeline({
 }: EconomyYearTimelineProps) {
   const railRef = useRef<HTMLDivElement>(null);
   const [scrubbing, setScrubbing] = useState(false);
+  const [railWidth, setRailWidth] = useState(0);
+
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+    const measure = () => setRailWidth(el.getBoundingClientRect().width);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
   const reduced = useReducedMotion();
 
   const years = Array.from({ length: max - min + 1 }, (_, i) => min + i);
   const span = max - min;
 
   // Labels: the endpoints, the selection, every decade and every covered year
-  // — but never two close enough to collide. Candidates are taken in order of
-  // importance and a later one is dropped if a kept label is already within
-  // MIN_LABEL_GAP years of it.
-  const MIN_LABEL_GAP = 2;
+  // — but never two close enough to collide. The spacing has to be measured,
+  // not assumed: two years is comfortable on a desktop rail and overlapping
+  // mush on a phone, where the same span is a fifth of the width.
+  const MIN_LABEL_GAP = useMemo(() => {
+    if (!railWidth) return 2;
+    const perYear = railWidth / Math.max(1, max - min);
+    return Math.max(2, Math.ceil(46 / perYear));
+  }, [railWidth, min, max]);
   const labelled = useMemo(() => {
     const kept: number[] = [];
     const take = (y: number) => {
@@ -64,7 +79,7 @@ export function EconomyYearTimeline({
     for (let y = min; y <= max; y++) if (y % 10 === 0) take(y);
     for (const y of dataYears) take(y);
     return new Set(kept);
-  }, [dataYears, min, max, value]);
+  }, [dataYears, min, max, value, MIN_LABEL_GAP]);
 
   const yearAtClientX = useCallback(
     (clientX: number) => {

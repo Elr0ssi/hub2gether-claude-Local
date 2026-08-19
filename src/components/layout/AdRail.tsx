@@ -137,3 +137,47 @@ export function AdRail({ side }: { side: "left" | "right" }) {
     </aside>
   );
 }
+
+/**
+ * The same slot laid on its side, for viewports too narrow to give up 160px
+ * of margin on each side. It sits above the block it belongs to rather than
+ * squeezing the content, so the reader keeps the full width for the map, the
+ * ranking or the articles.
+ */
+export function AdBanner({ label = "Emplacement publicitaire" }: { label?: string }) {
+  return (
+    <aside className="eco-ad-banner" aria-label={label}>
+      <div className="eco-ad-banner-slot">
+        <span className="eco-ad-banner-visual" aria-hidden="true">
+          <svg viewBox="0 0 240 90" preserveAspectRatio="xMidYMid slice" style={{ width: "100%", height: "100%" }}>
+            <circle cx="196" cy="26" r="30" fill="#39FF88" fillOpacity="0.18" />
+            <circle cx="196" cy="26" r="16" fill="#39FF88" fillOpacity="0.24" />
+            <path
+              d="M -10 70 C 30 46, 66 84, 104 58 S 176 40, 250 56"
+              fill="none"
+              stroke="#39FF88"
+              strokeOpacity="0.5"
+              strokeWidth="2"
+            />
+            <rect x="18" y="34" width="18" height="30" rx="3" fill="#39FF88" fillOpacity="0.32" />
+            <rect x="44" y="22" width="18" height="42" rx="3" fill="#39FF88" fillOpacity="0.46" />
+            <rect x="70" y="42" width="18" height="22" rx="3" fill="#39FF88" fillOpacity="0.24" />
+          </svg>
+          <span className="eco-ad-banner-tag">Publicité</span>
+        </span>
+
+        <span className="eco-ad-banner-copy">
+          <span className="eco-ad-banner-title">Emplacement publicitaire</span>
+          <span aria-hidden="true" className="eco-ad-banner-rules">
+            <span style={{ width: "100%" }} />
+            <span style={{ width: "72%" }} />
+          </span>
+        </span>
+
+        <span aria-hidden="true" className="eco-ad-banner-size">
+          970 × 90
+        </span>
+      </div>
+    </aside>
+  );
+}

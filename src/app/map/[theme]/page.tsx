@@ -8,6 +8,7 @@ import { EconomyMapViewLoader } from "@/components/map/EconomyMapViewLoader";
 import { PoliticsMapViewLoader } from "@/components/map/PoliticsMapViewLoader";
 import { MilitaryMapViewLoader } from "@/components/map/MilitaryMapViewLoader";
 import { FAQSection } from "@/components/faq/FAQSection";
+import { AdBanner } from "@/components/layout/AdRail";
 import { ArticleGrid } from "@/components/articles/ArticleGrid";
 import { ServerDataSummary } from "@/components/seo/ServerDataSummary";
 import { DATASET_SCHEMAS, jsonLdString } from "@/lib/schema";
@@ -283,8 +284,17 @@ export default async function MapPage({ params, searchParams }: PageProps) {
           it carries the same anchor class as the sections above it. */}
       {faqs.length > 0 &&
         (isEconomy ? (
+          // The FAQ is the last stop of the run, so it takes a banner on both
+          // sides where the margin rails cannot fit — nothing follows it to
+          // carry one.
           <div className="eco-snap-target">
+            <div className="max-w-7xl mx-auto px-6">
+              <AdBanner />
+            </div>
             <FAQSection items={faqs} />
+            <div className="max-w-7xl mx-auto px-6 pb-10">
+              <AdBanner />
+            </div>
           </div>
         ) : (
           <FAQSection items={faqs} />
