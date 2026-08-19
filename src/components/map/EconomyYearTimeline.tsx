@@ -77,9 +77,14 @@ export function EconomyYearTimeline({
     take(min);
     take(max);
     for (let y = min; y <= max; y++) if (y % 10 === 0) take(y);
-    for (const y of dataYears) take(y);
     return new Set(kept);
-  }, [dataYears, min, max, value, MIN_LABEL_GAP]);
+  }, [min, max, value, MIN_LABEL_GAP]);
+
+  /** Decades and the endpoints — the ruler the eye counts along. */
+  const isDecade = useCallback(
+    (y: number) => y % 10 === 0 || y === min || y === max,
+    [min, max]
+  );
 
   const yearAtClientX = useCallback(
     (clientX: number) => {
@@ -240,15 +245,30 @@ export function EconomyYearTimeline({
             ))}
           </div>
 
-          {/* Marks */}
+          {/* Marks, on a baseline that runs the length of the rail */}
           <div className="absolute inset-x-0" style={{ top: 30 }}>
+            <span
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                top: -1,
+                height: 1,
+                background: "var(--border)",
+              }}
+            />
             {years.map((y) => {
               const pct = ((y - min) / span) * 100;
               const covered = dataYears.includes(y);
+              const decade = isDecade(y);
               const active = y === value && !liveMode;
-              // The selection always carries a full mark, covered year or
-              // not, so the ring never closes around an empty spot.
-              const size = covered || active ? 10 : 4;
+              // Decades are the ruler. Covered years are called out by colour
+              // rather than size, so the reader can see at a glance where the
+              // dataset actually has figures without losing the count of ten.
+              // The selection always carries a full mark, so the ring never
+              // closes around an empty spot.
+              const size = decade || active ? 10 : covered ? 7 : 4;
               return (
                 <span
                   key={`mark-${y}`}
@@ -262,6 +282,8 @@ export function EconomyYearTimeline({
                       ? "#0D7A40"
                       : covered
                       ? "#166534"
+                      : decade
+                      ? "var(--ink-4)"
                       : "var(--border)",
                     transition: "background 0.2s",
                   }}

@@ -2,13 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Maximize2, Minimize2, ChevronLeft, PenLine, Map, Navigation, Satellite } from "lucide-react";
+import { Maximize2, Minimize2, ChevronLeft } from "lucide-react";
 import { EconomyInteractiveMap } from "./EconomyInteractiveMap";
-import { EconomyLeafletMap, type LeafletTileStyle } from "./EconomyLeafletMap";
 import { EconomySidePanel } from "@/components/sidebar/EconomySidePanel";
 import { EconomyRankingsTable } from "./EconomyRankingsTable";
 import { EconomyYearTimeline } from "./EconomyYearTimeline";
-import { ThemeDropdown } from "./ThemeDropdown";
 import { ECONOMY_METRICS, ECONOMY_YEARS, ECONOMY_YEAR_VALUES, getYearData, DEFAULT_YEAR } from "@/data/economy/economy";
 import type { EconomyMetricId, EconomyYear } from "@/types";
 import { MapArticleSection } from "@/components/articles/MapArticleSection";
@@ -17,7 +15,7 @@ import { SectionFlowCurves } from "./SectionFlowCurves";
 import { useScrollTeleport } from "@/hooks/useScrollTeleport";
 import { ECONOMY_ARTICLES } from "@/data/articles";
 
-const SLIDER_MIN = 2000;
+const SLIDER_MIN = 1950;
 const SLIDER_MAX = 2025;
 
 // Top toolbar only ever showed the 4 main metrics. Their family sub-metrics (PIB/hab.,
@@ -67,22 +65,12 @@ function computeLiveYearData(baseYear: EconomyYear): EconomyYear {
   };
 }
 
-type MapStyle = "editorial" | LeafletTileStyle;
-
-const MAP_STYLES: { id: MapStyle; label: string; Icon: React.ElementType }[] = [
-  { id: "editorial", label: "Éditorial",  Icon: PenLine   },
-  { id: "standard",  label: "Standard",   Icon: Map       },
-  { id: "detailed",  label: "Détaillé",   Icon: Navigation },
-  { id: "satellite", label: "Satellite",  Icon: Satellite  },
-];
-
 export function EconomyMapView() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [sidePanelOpen, setSidePanelOpen] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-  const [mapStyle, setMapStyle] = useState<MapStyle>("editorial");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ytdMode, setYtdMode] = useState(false);
   const mapSectionRef = useRef<HTMLElement>(null);
@@ -175,9 +163,6 @@ export function EconomyMapView() {
           style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
         >
           <div className="flex items-center gap-3 flex-wrap">
-            <ThemeDropdown currentTheme="economy" />
-            <div className="h-4 w-px" style={{ background: "var(--border)" }} />
-
             {/* Metric selector */}
             <div className="flex items-center gap-1 flex-wrap">
               {TOOLBAR_METRICS.map((m) => {
@@ -204,26 +189,6 @@ export function EconomyMapView() {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Map style switcher */}
-            <div className="flex items-center rounded-lg overflow-hidden" style={{ border: "1px solid var(--border)" }}>
-              {MAP_STYLES.map(({ id, label, Icon }) => (
-                <button
-                  key={id}
-                  onClick={() => setMapStyle(id)}
-                  title={label}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium transition-all duration-150"
-                  style={
-                    id === mapStyle
-                      ? { background: "var(--accent-dim)", color: "#0D7A40", borderRight: "1px solid rgba(57,255,136,0.2)" }
-                      : { background: "var(--surface-2)", color: "var(--ink-3)", borderRight: "1px solid var(--border)" }
-                  }
-                >
-                  <Icon size={12} />
-                  <span className="hidden sm:inline">{label}</span>
-                </button>
-              ))}
-            </div>
-
             {sidePanelOpen ? (
               <button onClick={() => setSidePanelOpen(false)} className="btn-ghost px-2.5 py-1.5 text-xs gap-1.5">
                 <ChevronLeft size={13} /> Réduire
@@ -289,23 +254,12 @@ export function EconomyMapView() {
           }
         >
           <div className="flex-1 overflow-hidden" style={{ minWidth: 0 }}>
-            {mapStyle === "editorial" ? (
-              <EconomyInteractiveMap
-                economyYear={activeEconomyYear}
-                metric={metric}
-                selectedCountry={selectedCountry}
-                onCountryClick={handleCountryClick}
-              />
-            ) : (
-              <EconomyLeafletMap
-                economyYear={activeEconomyYear}
-                metric={metric}
-                selectedCountry={selectedCountry}
-                onCountryClick={handleCountryClick}
-                tileStyle={mapStyle}
-                fillHeight={isFullscreen}
-              />
-            )}
+            <EconomyInteractiveMap
+              economyYear={activeEconomyYear}
+              metric={metric}
+              selectedCountry={selectedCountry}
+              onCountryClick={handleCountryClick}
+            />
           </div>
 
           <EconomySidePanel
