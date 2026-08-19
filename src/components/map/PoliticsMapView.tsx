@@ -190,7 +190,22 @@ export function PoliticsMapView() {
         </div>
 
         {/* Map + Side panel */}
-        <div className={`flex flex-col lg:flex-row${isFullscreen ? " flex-1 overflow-hidden" : ""}`} style={isFullscreen ? {} : { minHeight: "480px" }}>
+        {/* A definite height, not just a floor. With only a minimum, selecting a
+            country grew the side panel, which grew the row, which resized the
+            globe's canvas — read as the globe zooming on every click. The panel
+            scrolls inside instead. */}
+        <div
+          className={`flex flex-col lg:flex-row${isFullscreen ? " flex-1 overflow-hidden" : ""}`}
+          style={
+            isFullscreen
+              ? {}
+              : {
+                  minHeight: 320,
+                  height: "min(560px, calc(100vh - 300px))",
+                  overflow: "hidden",
+                }
+          }
+        >
           <div className="flex-1 overflow-hidden" style={{ minWidth: 0 }}>
             {view === "globe" ? (
               <PoliticsGlobe

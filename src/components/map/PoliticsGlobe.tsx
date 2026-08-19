@@ -21,19 +21,20 @@ import { getCountryFillColorPolitics } from "@/lib/politicsColors";
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const RADIUS = 1;
-/** Fill texture. At the size the sphere is drawn this is already about twice
- *  oversampled at the equator; four thousand pixels wide only cost repaint
- *  time on every year change without adding anything the eye can see. */
-const TEXTURE_W = 2048;
-const TEXTURE_H = 1024;
+/** Fill texture, matched to the imagery it carries. */
+const TEXTURE_W = 4096;
+const TEXTURE_H = 2048;
+/** NASA Blue Marble, cloud-free — public domain. The relief and the colour of
+ *  the land come from the photograph, not from anything drawn here. */
+const EARTH_TEXTURE = "/geo/earth-blue-marble.jpg";
 /** Picking resolution — finer than a click can be. */
 const PICK_W = 2048;
 const PICK_H = 1024;
 
-const LAND_NEUTRAL = "#E8EBE9";
-const LAND_STROKE = "rgba(10,20,15,0.20)";
-const OCEAN_TOP = "#EAF3F7";
-const OCEAN_BOTTOM = "#DCE9EF";
+/** Borders over the imagery: enough to read a country, not enough to draw on it. */
+const BORDER_STROKE = "rgba(255,255,255,0.34)";
+/** Orientation colours sit over the photograph, so the relief shows through. */
+const TINT_ALPHA = 0.62;
 
 interface PickMap {
   data: Uint8ClampedArray;
@@ -81,33 +82,28 @@ function traceFeature(
 }
 
 /**
- * The ocean and every landmass in a neutral tone, painted once.
+ * The Earth photograph with country borders drawn over it, painted once.
  *
  * Everything a year change needs is a blit of this plus a couple of dozen
- * fills, which is the difference between a scrub of the timeline being smooth
+ * tints, which is the difference between a scrub of the timeline being smooth
  * and it being a slideshow.
  */
-function buildBaseMap(geojson: GeoJSON.FeatureCollection): HTMLCanvasElement {
+function buildBaseMap(
+  geojson: GeoJSON.FeatureCollection,
+  earth: HTMLImageElement
+): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
   canvas.width = TEXTURE_W;
   canvas.height = TEXTURE_H;
   const ctx = canvas.getContext("2d")!;
 
-  const ocean = ctx.createLinearGradient(0, 0, 0, TEXTURE_H);
-  ocean.addColorStop(0, OCEAN_TOP);
-  ocean.addColorStop(0.5, OCEAN_BOTTOM);
-  ocean.addColorStop(1, OCEAN_TOP);
-  ctx.fillStyle = ocean;
-  ctx.fillRect(0, 0, TEXTURE_W, TEXTURE_H);
+  ctx.drawImage(earth, 0, 0, TEXTURE_W, TEXTURE_H);
 
-  ctx.fillStyle = LAND_NEUTRAL;
-  ctx.strokeStyle = LAND_STROKE;
-  ctx.lineWidth = 0.9;
+  ctx.strokeStyle = BORDER_STROKE;
+  ctx.lineWidth = 1.4;
   ctx.lineJoin = "round";
-
   for (const feat of geojson.features) {
     traceFeature(ctx, feat, TEXTURE_W, TEXTURE_H);
-    ctx.fill("evenodd");
     ctx.stroke();
   }
 
@@ -156,7 +152,7 @@ function atmosphereMaterial(): THREE.ShaderMaterial {
     side: THREE.BackSide,
     depthWrite: false,
     blending: THREE.NormalBlending,
-    uniforms: { uColor: { value: new THREE.Color("#8FD3B4") } },
+    uniforms: { uColor: { value: new THREE.Color("#BFE8FF") } },
     vertexShader: `
       varying vec3 vNormal;
       varying vec3 vView;
@@ -173,7 +169,7 @@ function atmosphereMaterial(): THREE.ShaderMaterial {
       varying vec3 vView;
       void main() {
         float rim = 1.0 - abs(dot(vNormal, vView));
-        float a = pow(rim, 3.2) * 0.55;
+        float a = pow(rim, 4.0) * 0.32;
         gl_FragColor = vec4(uColor, a);
       }
     `,
@@ -237,11 +233,16 @@ export function PoliticsGlobe({
       if (hidden.has(period.orientation)) continue;
       const feat = byName.get(name);
       if (!feat) continue;
+      ctx.save();
+      // Partly transparent, so the terrain underneath stays visible: the
+      // colour says which orientation, the photograph says where you are.
+      ctx.globalAlpha = TINT_ALPHA;
       ctx.fillStyle = getCountryFillColorPolitics(name, politicsData);
       traceFeature(ctx, feat, TEXTURE_W, TEXTURE_H);
       ctx.fill("evenodd");
-      ctx.strokeStyle = "rgba(10,20,15,0.28)";
-      ctx.lineWidth = 0.9;
+      ctx.restore();
+      ctx.strokeStyle = "rgba(255,255,255,0.55)";
+      ctx.lineWidth = 1.6;
       ctx.stroke();
     }
 
@@ -291,7 +292,7 @@ export function PoliticsGlobe({
         "position",
         new THREE.Float32BufferAttribute(verts, 3)
       ),
-      new THREE.LineBasicMaterial({ color: 0x0a0a0a, transparent: true, opacity: 0.9 })
+      new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.95 })
     );
     globe.add(outline);
     outlineRef.current = outline;
@@ -322,13 +323,6 @@ export function PoliticsGlobe({
     scene.add(globe);
     globeRef.current = globe;
 
-    // Lit rather than flat: a key light gives the sphere its roundness and a
-    // terminator, which is most of what separates a globe from a disc.
-    scene.add(new THREE.AmbientLight(0xffffff, 1.42));
-    const key = new THREE.DirectionalLight(0xffffff, 0.62);
-    key.position.set(-1.5, 0.8, 2.4);
-    scene.add(key);
-
     const fillCanvas = document.createElement("canvas");
     fillCanvas.width = TEXTURE_W;
     fillCanvas.height = TEXTURE_H;
@@ -341,7 +335,10 @@ export function PoliticsGlobe({
 
     const earth = new THREE.Mesh(
       new THREE.SphereGeometry(RADIUS, 160, 96),
-      new THREE.MeshLambertMaterial({ map: texture })
+      // Unlit: the imagery carries its own relief and daylight. A scene light
+      // over it would lay a terminator across the map, which reads as a
+      // shadow dropped on the countries rather than as a globe.
+      new THREE.MeshBasicMaterial({ map: texture })
     );
     // SphereGeometry lays its UVs out with x and z inverted relative to the
     // lon/lat convention the texture, the outlines and the hit test all use.
@@ -349,7 +346,7 @@ export function PoliticsGlobe({
     globe.add(earth);
 
     const atmosphere = new THREE.Mesh(
-      new THREE.SphereGeometry(RADIUS * 1.045, 64, 48),
+      new THREE.SphereGeometry(RADIUS * 1.03, 64, 48),
       atmosphereMaterial()
     );
     scene.add(atmosphere);
@@ -367,9 +364,21 @@ export function PoliticsGlobe({
 
     /* ── World file ─────────────────────────────────────────────────────── */
     let cancelled = false;
-    fetch("/geo/ne_50m_countries.geojson")
-      .then((r) => r.json())
-      .then((geojson: GeoJSON.FeatureCollection) => {
+
+    const loadEarth = () =>
+      new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = EARTH_TEXTURE;
+      });
+
+    Promise.all([
+      fetch("/geo/ne_50m_countries.geojson").then((r) => r.json()),
+      loadEarth(),
+    ])
+      .then(([geojson, earth]: [GeoJSON.FeatureCollection, HTMLImageElement]) => {
         if (cancelled) return;
         geojsonRef.current = geojson;
 
@@ -380,7 +389,7 @@ export function PoliticsGlobe({
         }
         byNameRef.current = byName;
 
-        baseMapRef.current = buildBaseMap(geojson);
+        baseMapRef.current = buildBaseMap(geojson, earth);
         pickRef.current = buildPickMap(geojson);
 
         // First paint; the effects above take over from here.
