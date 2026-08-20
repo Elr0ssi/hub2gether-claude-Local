@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo, useCallback, useRef } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
+  ChevronUp,
   Search,
   MapPin,
   Clock,
@@ -25,7 +26,12 @@ const SECTION_STYLE: React.CSSProperties = {
   gap: 14,
 };
 
-const PAGE_SIZE = 12;
+/**
+ * How many rows the grid opens on. One: the section announces itself with a
+ * single line of articles and hands the reader the choice of seeing the rest,
+ * rather than spending three screens of height before they have asked.
+ */
+const ROWS_COLLAPSED = 1;
 
 function cardEnter(el: HTMLElement) {
   el.style.borderColor = "rgba(57,255,136,0.4)";
@@ -402,7 +408,15 @@ export function MapArticleSection({
   spacing = 24,
 }: MapArticleSectionProps) {
   const [allSearch, setAllSearch] = useState("");
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [expanded, setExpanded] = useState(false);
+  /**
+   * Columns the grid actually resolved to. Read from the grid rather than
+   * derived from a breakpoint: the track list is `auto-fill`, so only the
+   * browser knows how many fitted, and one row has to stay one row at every
+   * width the section is used at.
+   */
+  const [columns, setColumns] = useState(1);
+  const allGridRef = useRef<HTMLDivElement>(null);
   const [saved, setSaved] = useState<string[]>([]);
 
   // Recommendation carousel — native lateral scroll (trackpad, shift+wheel)
@@ -475,13 +489,26 @@ export function MapArticleSection({
     );
   }, [themeArticles, allSearch]);
 
-  const shownAll = allArticles.slice(0, visibleCount);
+  const shownAll = expanded ? allArticles : allArticles.slice(0, columns * ROWS_COLLAPSED);
   const hasMore = allArticles.length > shownAll.length;
 
   const onSearch = useCallback((v: string) => {
     setAllSearch(v);
-    setVisibleCount(PAGE_SIZE);
+    setExpanded(false);
   }, []);
+
+  useEffect(() => {
+    const grid = allGridRef.current;
+    if (!grid) return;
+    const measure = () => {
+      const tracks = getComputedStyle(grid).gridTemplateColumns.split(" ").filter(Boolean);
+      setColumns(Math.max(1, tracks.length));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(grid);
+    return () => ro.disconnect();
+  }, [allArticles.length]);
 
   return (
     <div style={{ marginTop: spacing, display: "flex", flexDirection: "column", gap: 16 }}>
@@ -595,6 +622,7 @@ export function MapArticleSection({
           ) : (
             <>
               <div
+                ref={allGridRef}
                 style={{
                   display: "grid",
                   gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
@@ -612,11 +640,12 @@ export function MapArticleSection({
                 ))}
               </div>
 
-              {hasMore && (
+              {(hasMore || expanded) && (
                 <div style={{ display: "flex", justifyContent: "center", paddingTop: 2 }}>
                   <button
                     type="button"
-                    onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                    onClick={() => setExpanded((v) => !v)}
+                    aria-expanded={expanded}
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
@@ -631,7 +660,17 @@ export function MapArticleSection({
                       color: "var(--ink-2)",
                     }}
                   >
-                    Charger plus d&apos;articles <ChevronDown size={12} />
+                    {expanded ? (
+                      <>
+                        Voir moins <ChevronUp size={12} />
+                      </>
+                    ) : (
+                      <>
+                        Voir plus · {allArticles.length - shownAll.length} article
+                        {allArticles.length - shownAll.length > 1 ? "s" : ""}
+                        <ChevronDown size={12} />
+                      </>
+                    )}
                   </button>
                 </div>
               )}

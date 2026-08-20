@@ -30,9 +30,9 @@ const PICK_H = 1024;
  * Brand palette. The water is a clear teal rather than a deep one: the map is
  * read for its greens, and a dark sea drags every one of them down with it.
  */
-const OCEAN_DEEP = "#2A4B55";
-const OCEAN_MID = "#335C68";
-const OCEAN_SHELF = "#3C6E7C";
+const OCEAN_DEEP = "#4E808F";
+const OCEAN_MID = "#5C93A4";
+const OCEAN_SHELF = "#6BA7B9";
 /** Not a class on the ramp: pale and washed out, so it never reads as one. */
 const LAND_NO_DATA = "#A6C7B7";
 /**
@@ -50,6 +50,13 @@ const ACCENT = "#39FF88";
 const RELIEF_BLUR = 4;
 const RELIEF_SCALE = 0.028;
 /**
+ * Where the land's own surface sits, so a highlight is drawn *on* the country
+ * rather than hovering above it. Clearing the full displacement left the
+ * outline detached from the ground at the limb — a ring in the air around a
+ * country instead of a border drawn on it.
+ */
+const PLATEAU_TOP = RELIEF_SCALE * 0.62 + 0.0012;
+/**
  * NASA Blue Marble and its elevation companion — public-domain scientific
  * rasters, not decoration. The photograph is not shown for its own sake: its
  * luminosity is folded into the choropleth so a country carries its real
@@ -59,8 +66,10 @@ const IMAGERY = "/geo/earth-blue-marble.jpg";
 const TOPOLOGY = "/geo/earth-topology.png";
 /** How much of the terrain's texture comes through the class colour. */
 const TERRAIN_AMOUNT = 0.66;
-/** How much of it textures the sea floor. */
-const BATHYMETRY_AMOUNT = 0.3;
+/** How much of the elevation map textures the sea floor. */
+const BATHYMETRY_AMOUNT = 0.56;
+/** Amplitude of the sea floor in the height field: shading, not displacement. */
+const OCEAN_RELIEF = 0.26;
 
 interface PickMap {
   data: Uint8ClampedArray;
@@ -218,6 +227,17 @@ function buildReliefMap(
 
   ctx.fillStyle = "#000000";
   ctx.fillRect(0, 0, w, h);
+
+  // The sea floor first, at a shallow amplitude. It barely displaces the
+  // surface — the ocean has to stay at sea level — but it carries enough
+  // slope for the light to find the ridges, the trenches and the shelves,
+  // which is what makes water read as water rather than as a flat field.
+  if (topo) {
+    ctx.save();
+    ctx.globalAlpha = OCEAN_RELIEF;
+    ctx.drawImage(topo, 0, 0, w, h);
+    ctx.restore();
+  }
 
   ctx.save();
   ctx.filter = `blur(${RELIEF_BLUR}px)`;
@@ -457,7 +477,7 @@ export function EconomyGlobe({
 
     const outline = buildOutline(
       feat,
-      RADIUS + RELIEF_SCALE + 0.006,
+      RADIUS + PLATEAU_TOP,
       new THREE.Color(ACCENT).getHex(),
       [{ width: 3.8, opacity: 1 }],
       resolutionRef.current,
@@ -550,7 +570,7 @@ export function EconomyGlobe({
           `#include <map_fragment>
            if (uTerrainAmount > 0.0) {
              float lum = dot(texture2D(uTerrain, vMapUv).rgb, vec3(0.2126, 0.7152, 0.0722));
-             float onLand = smoothstep(0.1, 0.5, texture2D(uTerrainMask, vMapUv).r);
+             float onLand = smoothstep(0.3, 0.58, texture2D(uTerrainMask, vMapUv).r);
              vec3 b = diffuseColor.rgb;
              // Centred on the imagery's own average rather than on mid-grey:
              // the land is darker than mid-grey almost everywhere, so an
@@ -765,7 +785,7 @@ export function EconomyGlobe({
       if (!feat) return;
       const outline = buildOutline(
         feat,
-        RADIUS + RELIEF_SCALE + 0.004,
+        RADIUS + PLATEAU_TOP,
         new THREE.Color(ACCENT).getHex(),
         [{ width: 2.4, opacity: 0.9 }],
         resolutionRef.current,

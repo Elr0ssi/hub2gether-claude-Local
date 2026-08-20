@@ -36,11 +36,11 @@ export function Navbar() {
 
         {/* Theme navigation */}
         {/* nowrap keeps the row a single line once the eighth tab appears at xl */}
-        <nav className="hidden md:flex items-center gap-1 whitespace-nowrap">
+        <nav className="hidden md:flex items-center gap-0.5 whitespace-nowrap">
           <Link
             href="/preview"
             className={cn(
-              "relative px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150",
+              "relative px-2.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-150",
               pathname === "/preview"
                 ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
                 : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
@@ -57,9 +57,7 @@ export function Navbar() {
           <Link
             href="/soutenance-2"
             className={cn(
-              // Same reasoning as the tab below: the deck is an internal tool,
-              // so it only claims a slot where the navbar has room to spare.
-              "relative hidden 2xl:inline-block px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
+              "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
               pathname === "/soutenance-2"
                 ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
                 : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
@@ -74,13 +72,30 @@ export function Navbar() {
             )}
           </Link>
           <Link
+            href="/test-article"
+            className={cn(
+              "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
+              pathname.startsWith("/test-article")
+                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
+                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
+            )}
+          >
+            Test Article
+            {pathname.startsWith("/test-article") && (
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
+                style={{ background: "var(--accent)" }}
+              />
+            )}
+          </Link>
+          <Link
             href="/presentation"
             className={cn(
               // The navbar already runs past the viewport below ~1100px with
               // seven tabs; an eighth would push "Comparer" further off. The
               // deck is an internal tool, so its tab only appears where there
               // is room — below lg the navbar is exactly as it was.
-              "relative hidden xl:inline-block px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
+              "relative hidden xl:inline-block px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
               pathname === "/presentation"
                 ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
                 : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
@@ -103,7 +118,7 @@ export function Navbar() {
               return (
                 <div
                   key={theme.id}
-                  className="relative px-3 py-1.5 rounded-lg text-sm font-medium cursor-not-allowed opacity-50 flex items-center gap-1.5"
+                  className="relative px-2.5 py-1.5 rounded-lg text-sm font-medium cursor-not-allowed opacity-50 flex items-center gap-1.5"
                   style={{ color: "var(--ink-4)" }}
                   title={`${theme.label} — Bientôt disponible ${theme.comingSoonLabel ?? ""}`}
                 >
@@ -127,7 +142,7 @@ export function Navbar() {
                 key={theme.id}
                 href={`/map/${theme.slug}`}
                 className={cn(
-                  "relative px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150",
+                  "relative px-2.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-150",
                   isActive
                     ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
                     : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"

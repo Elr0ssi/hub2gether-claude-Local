@@ -719,3 +719,32 @@ body {
   .p2-story-runway { height: auto; margin-top: 0; }
   .p2-story-stage { position: relative; top: auto; height: auto; }
 }
+
+/* ── Test article — the format under trial ────────────────────────────────
+   Three two-column rows that all collapse at the same width, so the reading
+   column never has to hold a chart and a commentary side by side once there
+   is no room for both. */
+.ta-open-row,
+.ta-chart-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 26px;
+  align-items: start;
+}
+
+.ta-perspective-row,
+.ta-source-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+@media (min-width: 760px) {
+  .ta-source-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 900px) {
+  .ta-open-row { grid-template-columns: minmax(0, 1fr) 300px; gap: 34px; }
+  .ta-chart-row { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 32px; }
+  .ta-perspective-row { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+}
