@@ -30,9 +30,9 @@ const PICK_H = 1024;
  * Brand palette. The water is a clear teal rather than a deep one: the map is
  * read for its greens, and a dark sea drags every one of them down with it.
  */
-const OCEAN_DEEP = "#4E808F";
-const OCEAN_MID = "#5C93A4";
-const OCEAN_SHELF = "#6BA7B9";
+const OCEAN_DEEP = "#7DB4C4";
+const OCEAN_MID = "#8DC3D2";
+const OCEAN_SHELF = "#9DD1DE";
 /** Not a class on the ramp: pale and washed out, so it never reads as one. */
 const LAND_NO_DATA = "#A6C7B7";
 /**
@@ -65,11 +65,29 @@ const PLATEAU_TOP = RELIEF_SCALE * 0.62 + 0.0012;
 const IMAGERY = "/geo/earth-blue-marble.jpg";
 const TOPOLOGY = "/geo/earth-topology.png";
 /** How much of the terrain's texture comes through the class colour. */
-const TERRAIN_AMOUNT = 0.66;
-/** How much of the elevation map textures the sea floor. */
-const BATHYMETRY_AMOUNT = 0.56;
-/** Amplitude of the sea floor in the height field: shading, not displacement. */
-const OCEAN_RELIEF = 0.26;
+const TERRAIN_AMOUNT = 0.78;
+/**
+ * How much the sea's own surface colours the water.
+ *
+ * Not bathymetry: the elevation raster shipped with the globe holds the
+ * ocean at zero everywhere — it carries land only. Anything the water shows
+ * has to be built, not read.
+ */
+const SEA_TINT_AMOUNT = 0.38;
+/**
+ * Amplitude of the sea floor in the *displacement* field. Kept tiny on
+ * purpose: the ocean has to stay at sea level. Its relief is carried by the
+ * shading field below, which the light reads and the geometry does not.
+ */
+const OCEAN_RELIEF = 0.06;
+/** Strength of the surface the light is shaded from. */
+const BUMP_SCALE = 8;
+/** Sea state — swell stretched along the wind, then a finer chop over it. */
+/** Sea state: a long swell running with the wind, then a chop across it. */
+const SWELL_CELLS = 90;
+const SWELL_STRETCH = 4.5;
+const CHOP_CELLS = 300;
+const CHOP_STRETCH = 2.2;
 
 interface PickMap {
   data: Uint8ClampedArray;
@@ -118,10 +136,7 @@ function traceFeature(
  * A metric or year change is then a blit plus the countries that carry a
  * value, which is what keeps scrubbing the timeline smooth.
  */
-function buildBaseMap(
-  geojson: GeoJSON.FeatureCollection,
-  topo: HTMLImageElement | null
-): HTMLCanvasElement {
+function buildBaseMap(geojson: GeoJSON.FeatureCollection): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
   canvas.width = TEXTURE_W;
   canvas.height = TEXTURE_H;
@@ -138,15 +153,11 @@ function buildBaseMap(
   ctx.fillStyle = ocean;
   ctx.fillRect(0, 0, TEXTURE_W, TEXTURE_H);
 
-  // The sea floor, from the elevation map: ridges, trenches and shelves show
-  // through the brand colour instead of one flat field of water.
-  if (topo) {
-    ctx.save();
-    ctx.globalCompositeOperation = "soft-light";
-    ctx.globalAlpha = BATHYMETRY_AMOUNT;
-    ctx.drawImage(topo, 0, 0, TEXTURE_W, TEXTURE_H);
-    ctx.restore();
-  }
+  // The water, given a surface. Broad slow variation so the sea is never one
+  // flat field of colour, then the swell itself, faint — the light does most
+  // of the work on the water and the colour only has to stop being uniform.
+  grain(ctx, TEXTURE_W, TEXTURE_H, 26, 3.4, SEA_TINT_AMOUNT, "soft-light");
+  grain(ctx, TEXTURE_W, TEXTURE_H, SWELL_CELLS, SWELL_STRETCH, SEA_TINT_AMOUNT * 0.6, "soft-light");
 
   // Graticule every 15°, under the land.
   ctx.strokeStyle = GRATICULE;
@@ -260,6 +271,133 @@ function buildReliefMap(
     ctx.drawImage(relief, 0, 0);
     ctx.restore();
   }
+
+  return canvas;
+}
+
+/**
+ * Soft procedural grain, built by letting the browser upscale a small field of
+ * random values. Cheaper than a per-pixel loop over eight million texels, and
+ * the bilinear filter does the smoothing for free — which is what turns noise
+ * into swell rather than static.
+ *
+ * `stretch` squashes the source horizontally before it is blown up, so the
+ * result runs in bands: read on water, that is wind.
+ */
+function grain(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  cells: number,
+  stretch: number,
+  alpha: number,
+  mode: GlobalCompositeOperation = "source-over"
+) {
+  const small = document.createElement("canvas");
+  small.width = Math.max(2, Math.round(cells / stretch));
+  small.height = Math.max(2, cells);
+  const sc = small.getContext("2d")!;
+  const img = sc.createImageData(small.width, small.height);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const v = Math.round(Math.random() * 255);
+    img.data[i] = v;
+    img.data[i + 1] = v;
+    img.data[i + 2] = v;
+    img.data[i + 3] = 255;
+  }
+  sc.putImageData(img, 0, 0);
+
+  ctx.save();
+  ctx.globalCompositeOperation = mode;
+  ctx.globalAlpha = alpha;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(small, 0, 0, w, h);
+  ctx.restore();
+}
+
+/** The image, kept only where the mask is opaque. */
+function maskedTo(
+  source: CanvasImageSource,
+  mask: HTMLCanvasElement,
+  w: number,
+  h: number
+): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(source, 0, 0, w, h);
+  ctx.globalCompositeOperation = "destination-in";
+  ctx.drawImage(mask, 0, 0, w, h);
+  return canvas;
+}
+
+/**
+ * The surface the light is shaded from — a real relief globe's own material,
+ * before any colour is put on it.
+ *
+ * The elevation raster goes down whole, so the sea floor keeps its ridges and
+ * trenches and the land keeps its ranges. On top of the water goes a sea
+ * state: a long swell stretched along the wind, then a finer chop across it.
+ * On the land goes a much finer grain, the tooth of rock.
+ *
+ * Deliberately a different field from the one that displaces the geometry.
+ * Shading a trench costs nothing; displacing one would lift the ocean off sea
+ * level, and the globe would read as a relief map of the sea rather than as
+ * the sea.
+ */
+function buildShadingMap(
+  geojson: GeoJSON.FeatureCollection,
+  topo: HTMLImageElement | null
+): HTMLCanvasElement {
+  const w = TEXTURE_W / 2;
+  const h = TEXTURE_H / 2;
+  const mask = buildLandMask(geojson, w, h);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d")!;
+  ctx.fillStyle = "#808080";
+  ctx.fillRect(0, 0, w, h);
+
+  /* ── The sea's surface ──────────────────────────────────────────────────
+     Built, not read. Two octaves: a long swell stretched along the wind, and
+     a shorter chop lying across it. Blended toward mid-grey rather than
+     replacing it, so the amplitude stays a sea and not a static field. */
+  const sea = document.createElement("canvas");
+  sea.width = w;
+  sea.height = h;
+  const sc = sea.getContext("2d")!;
+  sc.fillStyle = "#808080";
+  sc.fillRect(0, 0, w, h);
+  grain(sc, w, h, SWELL_CELLS, SWELL_STRETCH, 0.66);
+  grain(sc, w, h, CHOP_CELLS, CHOP_STRETCH, 0.52);
+
+  /* ── The land's ─────────────────────────────────────────────────────────
+     Read, not built. The raster holds every range, plateau and rift above sea
+     level; the grain over it is only the tooth of rock, laid in soft light so
+     it seasons the relief instead of replacing it. */
+  const land = document.createElement("canvas");
+  land.width = w;
+  land.height = h;
+  const lc = land.getContext("2d")!;
+  lc.fillStyle = "#404040";
+  lc.fillRect(0, 0, w, h);
+  if (topo) lc.drawImage(topo, 0, 0, w, h);
+  grain(lc, w, h, 820, 1, 0.55, "soft-light");
+
+  ctx.drawImage(sea, 0, 0);
+  ctx.drawImage(maskedTo(land, mask, w, h), 0, 0);
+
+  // The coast, reinforced: the land stands on a wall the light has to find.
+  ctx.save();
+  ctx.filter = `blur(${RELIEF_BLUR}px)`;
+  ctx.globalCompositeOperation = "lighter";
+  ctx.globalAlpha = 0.34;
+  ctx.drawImage(mask, 0, 0, w, h);
+  ctx.restore();
 
   return canvas;
 }
@@ -525,13 +663,13 @@ export function EconomyGlobe({
     // for nothing else. A key light strong enough to model a sphere would lay
     // a terminator across a choropleth and darken the very countries being
     // compared — and the whole map would read as sitting under a filter.
-    scene.add(new THREE.AmbientLight(0xffffff, 2.62));
+    scene.add(new THREE.AmbientLight(0xffffff, 2.32));
     // Two lights, both weak: one over the reader's shoulder to keep the map
     // even, one grazing from the side so the raised coastlines catch a lit
     // edge and cast a shaded one. Between them they model the relief without
     // laying a terminator across the choropleth.
-    const key = new THREE.DirectionalLight(0xffffff, 0.5);
-    key.position.set(-1.5, 1.6, 1.1);
+    const key = new THREE.DirectionalLight(0xffffff, 0.86);
+    key.position.set(-1.5, 1.5, 0.75);
     scene.add(key);
     const fill = new THREE.DirectionalLight(0xffffff, 0.2);
     fill.position.set(1.4, -0.6, 2.4);
@@ -660,7 +798,7 @@ export function EconomyGlobe({
         }
         byNameRef.current = byName;
 
-        baseMapRef.current = buildBaseMap(geojson, topo);
+        baseMapRef.current = buildBaseMap(geojson);
         pickRef.current = buildPickMap(geojson);
 
         // The same height field drives the geometry and its shading: the land
@@ -671,8 +809,15 @@ export function EconomyGlobe({
         relief.anisotropy = renderer.capabilities.getMaxAnisotropy();
         material.displacementMap = relief;
         material.displacementScale = RELIEF_SCALE;
-        material.bumpMap = relief;
-        material.bumpScale = 3.5;
+
+        // The light is shaded from its own surface, not from the field that
+        // lifts the land: the sea can have a floor and a swell without the
+        // ocean itself rising off sea level.
+        const shading = new THREE.CanvasTexture(buildShadingMap(geojson, topo));
+        shading.colorSpace = THREE.NoColorSpace;
+        shading.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        material.bumpMap = shading;
+        material.bumpScale = BUMP_SCALE;
 
         if (imagery) {
           const terrain = new THREE.Texture(imagery);
