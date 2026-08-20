@@ -26,7 +26,7 @@ import {
   S2_TOTAL_SECONDS,
   type Act,
 } from "@/data/soutenance2/soutenance2Data";
-import { useDeck } from "./useDeck";
+import { SlideStepProvider, useDeck } from "./useDeck";
 import { S2_VIEWS } from "./slides";
 import { ANNEX_VIEWS } from "./annexes";
 import {
@@ -38,6 +38,9 @@ import {
 // chrome. It is imported, never edited: V1 must keep behaving exactly as it
 // does today.
 import "@/components/presentation/presentation.css";
+
+/** States held by the slide at `index` — see `Slide2.steps`. */
+const stepsAt = (index: number) => S2_SLIDES[index]?.steps ?? 1;
 
 const STAGE_W = 1920;
 const STAGE_H = 1080;
@@ -51,9 +54,10 @@ interface DeckShellProps {
 }
 
 export function DeckShell({ initialSlide, presenter = false }: DeckShellProps) {
-  const deck = useDeck(S2_SLIDES.length, S2_ANNEXES.length, initialSlide);
+  const deck = useDeck(S2_SLIDES.length, S2_ANNEXES.length, initialSlide, stepsAt);
   const {
     index,
+    step,
     direction,
     next,
     prev,
@@ -188,7 +192,9 @@ export function DeckShell({ initialSlide, presenter = false }: DeckShellProps) {
                 aria-roledescription="slide"
                 aria-label={`${index + 1} sur ${S2_SLIDES.length} — ${slide.label}`}
               >
-                <ToneProvider value={tone}>{View ? <View /> : null}</ToneProvider>
+                <ToneProvider value={tone}>
+                  <SlideStepProvider value={step}>{View ? <View /> : null}</SlideStepProvider>
+                </ToneProvider>
               </motion.div>
             </AnimatePresence>
 

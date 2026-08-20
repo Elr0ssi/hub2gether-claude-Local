@@ -52,6 +52,13 @@ export interface Slide2 {
   /** Indicative budget, in seconds. Never shown to the audience. */
   seconds: number;
   tone?: Tone;
+  /**
+   * Internal states the slide walks through before the deck moves on. One
+   * scene that transforms rather than several slides that replace each other:
+   * → and ← step inside it exactly as they step between slides. Absent means
+   * a single state, which is every other slide in the deck.
+   */
+  steps?: number;
   /** Main idea, the figure to comment, the handover, the trap to avoid. */
   speakerNotes: string;
 }
@@ -120,6 +127,17 @@ export const S2_SLIDES: readonly Slide2[] = [
     speakerNotes:
       "L'actualité crée la demande, la donnée crée le trafic. Les réseaux sociaux sont le canal principal du plan : TikTok et Instagram en priorité, X pour l'actualité continue. Laisser la boucle tourner une fois avant de conclure.",
   },
+  {
+    id: "ia",
+    label: "L'IA comme canal",
+    act: "pitch",
+    seconds: 110,
+    tone: "dark",
+    steps: 6,
+    speakerNotes:
+      "La séquence la plus stratégique du pitch. Six états, six respirations : avancer avec →, ne jamais enchaîner deux états sans laisser le jury lire. État 2, marquer le silence sur « et si l'utilisateur ne venait plus jusqu'au média ». État 3, dire clairement ce qui est en ligne et ce qui est au plan — les nœuds en pointillé ne sont pas encore construits. État 5, ne jamais présenter l'API ni les licences comme existantes : ce sont des pistes. Phrase à ne pas rater : l'IA donne la réponse, The Essential Data permet de l'explorer.",
+  },
+
   {
     id: "modele",
     label: "Modèle économique",
@@ -456,7 +474,163 @@ export const ACQUISITION = {
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   08 — MODÈLE ÉCONOMIQUE
+   08 — L'IA COMME CANAL
+
+   One scene, six states. The honesty rule of this file applies with extra
+   force here: the deck must never let a strategy be heard as a fact. Every
+   item below is tagged `live` for what the site serves today or `planned`
+   for what the plan intends to build, and the components render the two
+   differently — solid against dashed, never the same pill.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export interface AiShiftState {
+  id: string;
+  /** Shown as the state counter, e.g. "01". */
+  ordinal: string;
+  /** The one line that carries the state. */
+  title: string;
+  /** A single sentence under the composition. Kept short on purpose. */
+  caption: string;
+}
+
+export const AI_SHIFT = {
+  label: "L'IA comme canal",
+
+  states: [
+    {
+      id: "search",
+      ordinal: "01",
+      title: "Le trafic passait par le moteur.",
+      caption: "L'utilisateur cherche, le moteur oriente, le média répond.",
+    },
+    {
+      id: "rupture",
+      ordinal: "02",
+      title: "L'IA répond avant le clic.",
+      caption: "Une part des réponses ne passe plus par une visite.",
+    },
+    {
+      id: "source",
+      ordinal: "03",
+      title: "Devenir la source que l'IA cite.",
+      caption: "Une base structurée, sourcée, datée — lisible par une machine.",
+    },
+    {
+      id: "return",
+      ordinal: "04",
+      title: "La réponse ne remplace pas l'exploration.",
+      caption: "La citation ramène le lecteur là où la donnée se manipule.",
+    },
+    {
+      id: "flows",
+      ordinal: "05",
+      title: "Un canal d'acquisition, une piste de revenus.",
+      caption: "Ce qui existe déjà, et ce qui reste à construire.",
+    },
+    {
+      id: "close",
+      ordinal: "06",
+      title: "",
+      caption: "",
+    },
+  ] as readonly AiShiftState[],
+
+  /** The chain's nodes. The same pills move between states. */
+  chain: {
+    user: "Utilisateur",
+    google: "Google",
+    ted: "The Essential Data",
+    info: "Information",
+    ai: "IA",
+    answer: "Réponse",
+    data: "Data",
+  },
+
+  /** Named small and flat: the engines are context, not a logo wall. */
+  engines: ["ChatGPT", "Gemini", "Perplexity"],
+
+  tension: "Et si l'utilisateur ne venait plus jusqu'au média ?",
+
+  /* ── The structured base ────────────────────────────────────────────────
+     `live` is what /map serves today. `planned` is in the plan and nowhere
+     else — it is drawn dashed and labelled as such. */
+  dataset: {
+    liveLabel: "En ligne",
+    live: [
+      "PIB",
+      "Dette",
+      "Chômage",
+      "Commerce",
+      "Défense",
+      "Politique",
+      "Épidémies",
+      "Sources",
+      "Historique",
+    ],
+    plannedLabel: "Au plan",
+    planned: ["Dépenses publiques", "Énergie", "Démographie"],
+  },
+
+  /** Answer, proof, exploration — the three tiers of one citation. */
+  answer: {
+    tiers: [
+      { key: "Answer", items: ["France — Dette publique — 2025"] },
+      {
+        key: "Proof",
+        items: ["Source primaire", "Année", "Méthodologie", "Dernière mise à jour"],
+      },
+      { key: "Explore", items: ["Carte", "Historique", "Comparaison", "Article"] },
+    ],
+    citation: "Source : The Essential Data ↗",
+  },
+
+  /** What the site already does that a paragraph of text does not. */
+  gestures: [
+    { label: "Explorer", note: "Carte mondiale interactive" },
+    { label: "Comparer", note: "Pays contre pays" },
+    { label: "Visualiser", note: "Évolution dans le temps" },
+    { label: "Vérifier", note: "Sources primaires et méthodologie" },
+  ],
+  gestureStatement: ["L'IA donne la réponse.", "The Essential Data permet de l'explorer."],
+
+  /** Three flows, each labelled with what it actually is today. */
+  flows: [
+    {
+      id: "trafic",
+      title: "IA → Trafic",
+      status: "À optimiser",
+      planned: false,
+      steps: ["Citation dans les réponses IA", "Visite du site", "Audience et publicité"],
+    },
+    {
+      id: "licences",
+      title: "Data → Licences",
+      status: "À construire",
+      planned: true,
+      steps: ["Données structurées", "API et accès aux données", "Licences, revenus B2B"],
+    },
+    {
+      id: "experience",
+      title: "Expérience → Fidélisation",
+      status: "Déjà en ligne",
+      planned: false,
+      steps: ["Exploration", "Comparaison", "Retour direct"],
+    },
+  ],
+
+  flowsNote:
+    "Aucun revenu d'API ni de licence n'est constaté : le plan les identifie comme des pistes.",
+
+  close: {
+    center: "The Essential Data",
+    facets: ["Média", "Data", "Exploration", "AI-ready"],
+    statement: ["Ne pas concurrencer l'IA.", "Devenir une source qu'elle utilise."],
+    coda: "Et une expérience que l'utilisateur veut explorer.",
+  },
+} as const;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   09 — MODÈLE ÉCONOMIQUE
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const REVENUE = {

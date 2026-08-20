@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 /**
  * Deck controller for Soutenance 2.
@@ -13,8 +13,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * Keys: → / ↓ / Space / n next · ← / ↑ / p previous · Home / End ·
  * F fullscreen · O summary · A annexes · Esc close overlay.
  */
+/* ── Step within the current slide ──────────────────────────────────────────
+   A slide can hold several states — one scene that transforms rather than
+   several slides that replace each other. The step is published through a
+   context so a slide reads it without every slide having to take a prop. */
+const SlideStepContext = createContext(0);
+export const SlideStepProvider = SlideStepContext.Provider;
+export const useSlideStep = () => useContext(SlideStepContext);
+
 export interface DeckController {
   index: number;
+  /** State within the current slide; 0 for every single-state slide. */
+  step: number;
   /** +1 forward, -1 backward — drives the direction of the slide transition. */
   direction: number;
   next: () => void;
@@ -32,7 +42,13 @@ export interface DeckController {
   closeAnnex: () => void;
 }
 
-export function useDeck(total: number, annexCount: number, initialSlide?: number): DeckController {
+export function useDeck(
+  total: number,
+  annexCount: number,
+  initialSlide?: number,
+  /** States held by the slide at `index`. Defaults to one. */
+  stepsAt: (index: number) => number = () => 1
+): DeckController {
   const last = Math.max(0, total - 1);
 
   const clamp = useCallback(
@@ -43,6 +59,7 @@ export function useDeck(total: number, annexCount: number, initialSlide?: number
   const [index, setIndex] = useState(() =>
     typeof initialSlide === "number" ? Math.min(Math.max(initialSlide - 1, 0), last) : 0
   );
+  const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [fullscreen, setFullscreen] = useState(false);
   const [overviewOpen, setOverviewOpen] = useState(false);
@@ -51,6 +68,10 @@ export function useDeck(total: number, annexCount: number, initialSlide?: number
   // Refs so the keyboard handler never needs to be re-bound.
   const indexRef = useRef(index);
   indexRef.current = index;
+  const stepRef = useRef(step);
+  stepRef.current = step;
+  const stepsRef = useRef(stepsAt);
+  stepsRef.current = stepsAt;
   const overlayRef = useRef(false);
   overlayRef.current = overviewOpen || annexIndex !== null;
   const annexRef = useRef(annexIndex);
@@ -61,18 +82,37 @@ export function useDeck(total: number, annexCount: number, initialSlide?: number
       const c = clamp(target);
       setDirection(c >= indexRef.current ? 1 : -1);
       setIndex(c);
+      setStep(0);
     },
     [clamp]
   );
 
+  // Forward walks the current slide's states before it walks to the next
+  // slide, so one scene can hold a sequence without splitting into several.
   const next = useCallback(() => {
+    const i = indexRef.current;
+    if (stepRef.current < stepsRef.current(i) - 1) {
+      setStep((n) => n + 1);
+      return;
+    }
+    if (i >= last) return;
     setDirection(1);
-    setIndex((i) => Math.min(i + 1, last));
+    setIndex(i + 1);
+    setStep(0);
   }, [last]);
 
+  // Backward is its mirror: stepping out of a slide lands on the last state
+  // of the one before, which is where the presenter left it.
   const prev = useCallback(() => {
+    const i = indexRef.current;
+    if (stepRef.current > 0) {
+      setStep((n) => n - 1);
+      return;
+    }
+    if (i <= 0) return;
     setDirection(-1);
-    setIndex((i) => Math.max(i - 1, 0));
+    setIndex(i - 1);
+    setStep(Math.max(0, stepsRef.current(i - 1) - 1));
   }, []);
 
   const openAnnex = useCallback(
@@ -175,6 +215,7 @@ export function useDeck(total: number, annexCount: number, initialSlide?: number
 
   return {
     index,
+    step,
     direction,
     next,
     prev,

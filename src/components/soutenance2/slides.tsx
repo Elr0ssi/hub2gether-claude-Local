@@ -1,9 +1,11 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
 import {
   DUR,
+  EASE as DECK_EASE,
   Eyebrow,
   Fade,
   Rise,
@@ -13,6 +15,7 @@ import {
 } from "@/components/presentation/primitives";
 import {
   ACQUISITION,
+  AI_SHIFT,
   ARTICLE_FORMAT,
   AUDIENCE,
   COMPETITION,
@@ -46,6 +49,8 @@ import {
   StatusTimeline,
   useAccent,
 } from "./visuals";
+import { AiShiftScene } from "./visuals/AiShift";
+import { useSlideStep } from "./useDeck";
 
 /** The globe is the deck's signature — cover, product, expansion, close. */
 const PresentationGlobe = dynamic(
@@ -511,7 +516,90 @@ function AcquisitionSlide() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   08 — MODÈLE ÉCONOMIQUE
+   08 — L'IA COMME CANAL
+   Six states in one scene. The header changes a line, the composition below
+   it transforms; nothing here is a new slide, which is what lets the chain's
+   nodes travel instead of being replaced.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+function AiShiftSlide() {
+  const ink = useInk();
+  const accent = useAccent();
+  const step = useSlideStep();
+  const state = AI_SHIFT.states[Math.min(step, AI_SHIFT.states.length - 1)];
+
+  return (
+    <SlideBody style={{ paddingTop: 72, paddingBottom: 78 }}>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+        <Eyebrow index="§ 07">{AI_SHIFT.label}</Eyebrow>
+
+        {/* State counter — the presenter's place in the sequence, and the
+            audience's. Deliberately quiet. */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          {AI_SHIFT.states.map((s, i) => (
+            <span
+              key={s.id}
+              style={{
+                width: i === step ? 22 : 6,
+                height: 2,
+                borderRadius: 2,
+                background: i === step ? accent : ink.rule,
+                transition: "width .45s cubic-bezier(0.16,1,0.3,1), background .45s",
+              }}
+            />
+          ))}
+          <span className="t-index" style={{ color: ink.faint, marginLeft: 8 }}>
+            {state.ordinal} / {AI_SHIFT.states.length.toString().padStart(2, "0")}
+          </span>
+        </div>
+      </div>
+
+      {/* One line, swapped rather than stacked. */}
+      <div style={{ marginTop: 22, height: 74 }}>
+        <AnimatePresence mode="wait">
+          {state.title && (
+            <motion.div
+              key={state.id}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.45, ease: DECK_EASE }}
+              className="t-h2"
+              style={{ color: ink.primary, letterSpacing: "-0.032em" }}
+            >
+              {state.title}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      <div style={{ flex: 1, display: "grid", placeItems: "center", marginTop: 8 }}>
+        <AiShiftScene step={step} />
+      </div>
+
+      <div style={{ height: 34 }}>
+        <AnimatePresence mode="wait">
+          {state.caption && (
+            <motion.div
+              key={`${state.id}-caption`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, ease: DECK_EASE }}
+              className="t-small"
+              style={{ color: ink.faint }}
+            >
+              {state.caption}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </SlideBody>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   09 — MODÈLE ÉCONOMIQUE
    ═══════════════════════════════════════════════════════════════════════ */
 
 function RevenueSlide() {
@@ -520,7 +608,7 @@ function RevenueSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 07">Modèle économique</Eyebrow>
+      <Eyebrow index="§ 08">Modèle économique</Eyebrow>
 
       <div style={{ marginTop: 34, maxWidth: 1080 }}>
         <StatementTitle lines={REVENUE.title} delay={0.1} />
@@ -614,7 +702,7 @@ function CrossCheckSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 08">Le travail de recoupement</Eyebrow>
+      <Eyebrow index="§ 09">Le travail de recoupement</Eyebrow>
 
       <Rise delay={0.1} y={22}>
         <h2
@@ -669,7 +757,7 @@ function PipelineSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 09">Comment naît un article</Eyebrow>
+      <Eyebrow index="§ 10">Comment naît un article</Eyebrow>
 
       <div style={{ marginTop: 46 }}>
         <ArticlePipeline steps={PIPELINE.steps} startDelay={0.25} />
@@ -709,7 +797,7 @@ function ArticleSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 10">Le format article</Eyebrow>
+      <Eyebrow index="§ 11">Le format article</Eyebrow>
 
       <div style={{ marginTop: 28 }}>
         {ARTICLE_FORMAT.title.map((line, i) => (
@@ -820,7 +908,7 @@ function StatusSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 11">Où en est le projet</Eyebrow>
+      <Eyebrow index="§ 12">Où en est le projet</Eyebrow>
 
       <div style={{ marginTop: 30, maxWidth: 1080 }}>
         <StatementTitle lines={STATUS.title} delay={0.1} />
@@ -917,7 +1005,7 @@ function FinanceSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 12">Chiffres clés du business plan</Eyebrow>
+      <Eyebrow index="§ 13">Chiffres clés du business plan</Eyebrow>
 
       <div style={{ marginTop: 30, maxWidth: 1080 }}>
         <StatementTitle lines={FINANCE_SLIDE.title} delay={0.1} />
@@ -1010,7 +1098,7 @@ function RoadmapSlide() {
       </div>
 
       <div style={{ position: "relative", zIndex: 2 }}>
-        <Eyebrow index="§ 13">Roadmap</Eyebrow>
+        <Eyebrow index="§ 14">Roadmap</Eyebrow>
 
         <div style={{ marginTop: 28, display: "flex", gap: 26 }}>
           {ROADMAP.title.map((word, i) => (
@@ -1058,7 +1146,7 @@ function ConclusionSlide() {
       </div>
 
       <div style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", height: "100%" }}>
-        <Eyebrow index="§ 14">Conclusion</Eyebrow>
+        <Eyebrow index="§ 15">Conclusion</Eyebrow>
 
         <div style={{ marginTop: 24, maxWidth: 1180 }}>
           <StatementTitle lines={CONCLUSION.lines} delay={0.1} size="t-h3" />
@@ -1133,6 +1221,7 @@ export const S2_VIEWS: Record<string, ComponentType> = {
   marche: MarketSlide,
   concurrence: CompetitionSlide,
   acquisition: AcquisitionSlide,
+  ia: AiShiftSlide,
   modele: RevenueSlide,
   pivot: PivotSlide,
   recoupement: CrossCheckSlide,
