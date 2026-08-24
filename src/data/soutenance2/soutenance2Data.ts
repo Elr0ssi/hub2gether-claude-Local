@@ -128,6 +128,16 @@ export const S2_SLIDES: readonly Slide2[] = [
       "L'actualité crée la demande, la donnée crée le trafic. Les réseaux sociaux sont le canal principal du plan : TikTok et Instagram en priorité, X pour l'actualité continue. Laisser la boucle tourner une fois avant de conclure.",
   },
   {
+    id: "publications",
+    label: "Nos publications",
+    act: "pitch",
+    seconds: 60,
+    tone: "light",
+    speakerNotes:
+      "Montrer ce qui a été publié, pas seulement décrire le moteur. Les captures parlent d'elles-mêmes : formats courts, sujets d'actualité économique, un chiffre par publication. Les compteurs d'audience sont des emplacements tant qu'ils ne sont pas relevés dans l'analytics — ne jamais improviser un chiffre de vues devant le jury. Enchaîner sur les partenariats possibles sans les présenter comme acquis.",
+  },
+
+  {
     id: "ia",
     label: "L'IA comme canal",
     act: "pitch",
@@ -136,6 +146,26 @@ export const S2_SLIDES: readonly Slide2[] = [
     steps: 6,
     speakerNotes:
       "La séquence la plus stratégique du pitch. Six états, six respirations : avancer avec →, ne jamais enchaîner deux états sans laisser le jury lire. État 2, marquer le silence sur « et si l'utilisateur ne venait plus jusqu'au média ». État 3, dire clairement ce qui est en ligne et ce qui est au plan — les nœuds en pointillé ne sont pas encore construits. État 5, ne jamais présenter l'API ni les licences comme existantes : ce sont des pistes. Phrase à ne pas rater : l'IA donne la réponse, The Essential Data permet de l'explorer.",
+  },
+
+  {
+    id: "geo",
+    label: "GEO — être lisible par les moteurs",
+    act: "pitch",
+    seconds: 70,
+    tone: "light",
+    speakerNotes:
+      "La suite opérationnelle de la slide précédente : là c'était la stratégie, ici c'est le chantier. Insister sur le fait que le GEO n'est pas du SEO renommé — un moteur de réponse choisit ce qu'il cite, pas ce qu'il classe. Dire clairement que rien de tout cela n'est mesuré aujourd'hui : ce sont des chantiers, pas des résultats.",
+  },
+
+  {
+    id: "partenaires",
+    label: "Sélection des partenaires",
+    act: "pitch",
+    seconds: 60,
+    tone: "light",
+    speakerNotes:
+      "Quatre critères, dans l'ordre, et un droit de veto : une source qui ne peut pas être citée n'entre pas. Le jury cherchera à savoir si des partenariats existent — répondre franchement : aucun n'est signé, la grille sert à ne pas prendre le premier venu. Transition vers le modèle économique : « voilà ce qui alimente les trois flux ».",
   },
 
   {
@@ -176,6 +206,16 @@ export const S2_SLIDES: readonly Slide2[] = [
     speakerNotes:
       "La slide la plus importante. Six étapes, et une seule idée : des dizaines de sources, un seul point d'entrée. Insister sur l'étape 5, traçabilité — c'est elle qui sépare le projet d'un site généré automatiquement.",
   },
+  {
+    id: "automatisation",
+    label: "L'automatisation",
+    act: "depth",
+    seconds: 80,
+    tone: "dark",
+    speakerNotes:
+      "La slide précédente montre ce que produit la chaîne ; celle-ci montre la chaîne. Lire le graphe de gauche à droite en nommant les étapes, puis s'arrêter sur les deux points de contrôle humains — ce sont eux qui distinguent le projet d'un site généré automatiquement. Dire clairement ce qui tourne et ce qui est en reconstruction ; ne jamais laisser croire que tout est branché.",
+  },
+
   {
     id: "article",
     label: "Le format article",
@@ -474,6 +514,100 @@ export const ACQUISITION = {
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   07 — NOS PUBLICATIONS
+
+   The screenshots are supplied by hand: drop the files named below into
+   `public/soutenance/publications/` and they appear. Until a file is there the
+   slide shows a slot at the exact aspect ratio it will occupy, so the layout
+   never moves when the images land.
+
+   Every audience figure is TO_CONFIRM. Nothing about reach is written here
+   that has not been read off an analytics screen.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export interface Publication {
+  id: string;
+  /** Shown under the capture. */
+  title: string;
+  /** The figure the post is built on — the editorial hook, not an audience. */
+  hook: string;
+  format: string;
+  /** File in `public/soutenance/publications/`. */
+  image: string;
+  /** Measured reach. Null until it is read off the analytics. */
+  reach: string | null;
+}
+
+export const PUBLICATIONS = {
+  title: ["Ce que nous publions déjà.", "Un chiffre, un format, une source."],
+  intro:
+    "Même promesse que le site — une donnée, sa source, de quoi aller plus loin — dans un format qui circule là où le lecteur est déjà.",
+
+  items: [
+    {
+      id: "communication",
+      title: "Les dépenses de communication de l'État",
+      hook: "1 milliard d'euros",
+      format: "Carrousel · 6 volets",
+      image: "/soutenance/publications/pub-01.png",
+      reach: null,
+    },
+    {
+      id: "pub-02",
+      title: TO_CONFIRM,
+      hook: TO_CONFIRM,
+      format: "Carrousel",
+      image: "/soutenance/publications/pub-02.png",
+      reach: null,
+    },
+    {
+      id: "pub-03",
+      title: TO_CONFIRM,
+      hook: TO_CONFIRM,
+      format: "Carrousel",
+      image: "/soutenance/publications/pub-03.png",
+      reach: null,
+    },
+  ] as readonly Publication[],
+
+  /** What the audience counters would carry, once they are read. */
+  audience: {
+    label: "Audience",
+    note: "Relevés dans l'analytics avant la soutenance.",
+    metrics: [
+      { label: "Vues cumulées", value: null },
+      { label: "Taux d'engagement", value: null },
+      { label: "Clics vers le site", value: null },
+      { label: "Abonnés", value: null },
+    ] as readonly { label: string; value: string | null }[],
+  },
+
+  /** Partnerships that the format makes possible. None is signed. */
+  partnerships: {
+    label: "Partenariats possibles",
+    disclaimer: "Aucun partenariat n'est signé à ce jour. Cette liste décrit des pistes.",
+    items: [
+      {
+        kind: "Médias spécialisés",
+        body: "Reprise d'un visuel contre citation et lien. Coût nul, audience croisée.",
+      },
+      {
+        kind: "Institutions et statistique publique",
+        body: "Mise en forme de données publiques : une lecture grand public contre une source primaire.",
+      },
+      {
+        kind: "Écoles et recherche",
+        body: "Accès aux jeux de données contre relecture méthodologique.",
+      },
+      {
+        kind: "Marques et annonceurs",
+        body: "Formats sponsorisés identifiés, hors des contenus de données. Le mur est la condition.",
+      },
+    ],
+  },
+} as const;
+
+/* ═══════════════════════════════════════════════════════════════════════════
    08 — L'IA COMME CANAL
 
    One scene, six states. The honesty rule of this file applies with extra
@@ -630,7 +764,135 @@ export const AI_SHIFT = {
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   09 — MODÈLE ÉCONOMIQUE
+   09 — GEO — ÊTRE LISIBLE PAR LES MOTEURS
+
+   The operational half of the AI slide. Every item here is a worksite, not a
+   result: nothing about citation rates or engine coverage is measured, and the
+   slide says so on its face.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const GEO = {
+  title: ["Ne pas courir après l'IA.", "Être ce qu'elle a besoin de citer."],
+  definition:
+    "Un moteur de recherche classe des pages. Un moteur de réponse choisit des sources. L'optimisation qui gagne l'un ne gagne pas l'autre.",
+
+  /** SEO on the left, GEO on the right — the same column, two objects. */
+  contrast: [
+    { seo: "Se placer dans un classement", geo: "Être retenu dans une réponse" },
+    { seo: "Mots-clés et backlinks", geo: "Faits datés et sources primaires" },
+    { seo: "Une page par intention", geo: "Une donnée par question" },
+    { seo: "Le clic est la récompense", geo: "La citation est la porte d'entrée" },
+  ],
+
+  /** What has to be built. Ordered by what unlocks the rest. */
+  worksites: [
+    {
+      n: "01",
+      label: "Structurer",
+      body: "Pays, indicateur, année, unité, source : ce qu'une machine sait reprendre sans se tromper.",
+      state: "En cours" as const,
+    },
+    {
+      n: "02",
+      label: "Baliser",
+      body: "Des données structurées sur les pages, pour que la source soit explicite et attribuable.",
+      state: "À construire" as const,
+    },
+    {
+      n: "03",
+      label: "Dater",
+      body: "Millésime et mise à jour visibles partout : une donnée qui assume son âge en vaut deux.",
+      state: "En cours" as const,
+    },
+    {
+      n: "04",
+      label: "Ouvrir",
+      body: "Un accès propre aux séries : export, puis interface de programmation.",
+      state: "À construire" as const,
+    },
+    {
+      n: "05",
+      label: "Mesurer",
+      body: "Suivre où le site est cité, pour piloter le reste sur autre chose qu'une intuition.",
+      state: "À construire" as const,
+    },
+  ],
+
+  /** The one thing an engine cannot reproduce by quoting. */
+  moat: {
+    label: "Ce qu'une réponse ne reproduit pas",
+    items: ["La carte", "La comparaison", "La série dans le temps", "Le chemin vers la source"],
+    statement: "Citer nous rend visibles. Explorer nous rend nécessaires.",
+  },
+
+  caveat:
+    "Aucun de ces chantiers n'est mesuré aujourd'hui : ce sont des objectifs, pas des résultats.",
+} as const;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   10 — SÉLECTION DES PARTENAIRES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const PARTNERS = {
+  title: ["Une source entre par la porte", "ou elle n'entre pas."],
+  intro:
+    "Le projet vaut ce que valent ses sources. La grille s'applique dans l'ordre : un critère manqué arrête l'examen.",
+
+  criteria: [
+    {
+      n: "01",
+      label: "Citabilité",
+      question: "Peut-on nommer la source et y renvoyer ?",
+      body: "Une donnée qu'on ne peut pas attribuer ne sert ni au lecteur, ni à un moteur.",
+      veto: true,
+    },
+    {
+      n: "02",
+      label: "Méthode publiée",
+      question: "Sait-on comment le chiffre a été produit ?",
+      body: "Sans méthode publiée, deux chiffres qui se ressemblent ne mesurent pas la même chose.",
+      veto: false,
+    },
+    {
+      n: "03",
+      label: "Stabilité",
+      question: "La série tiendra-t-elle dans le temps ?",
+      body: "Une définition qui change chaque année casse la comparaison. Mieux vaut moins fin et continu.",
+      veto: false,
+    },
+    {
+      n: "04",
+      label: "Indépendance du récit",
+      question: "La source a-t-elle intérêt au résultat ?",
+      body: "Une source partie prenante n'est pas exclue : elle est signalée comme telle.",
+      veto: false,
+    },
+  ],
+
+  /** Where a partner sits once it has passed. */
+  tiers: [
+    {
+      tier: "Socle",
+      body: "Statistique publique et organisations multilatérales. Portent les séries de référence.",
+      examples: "INSEE, Eurostat, FMI, Banque mondiale, OCDE, OMS",
+    },
+    {
+      tier: "Complément",
+      body: "Médias spécialisés et instituts. Servent au recoupement et au contexte, jamais seuls.",
+      examples: "Panel du plan : 10 titres français, 15 internationaux prévus",
+    },
+    {
+      tier: "Signalé",
+      body: "Sources engagées ou intéressées. Utilisables, à condition d'être identifiées comme telles dans l'article.",
+      examples: "Fédérations, entreprises, groupes de plaidoyer",
+    },
+  ],
+
+  note: "Aucun accord commercial n'est signé avec une source. La relation est celle du citant au cité.",
+} as const;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   11 — MODÈLE ÉCONOMIQUE
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const REVENUE = {
@@ -747,7 +1009,70 @@ export const PIPELINE = {
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   11 — LE FORMAT ARTICLE
+   15 — L'AUTOMATISATION
+
+   The machinery under the pipeline, drawn as the node graph the team actually
+   works in. `state` is what the deck must be honest about: V1 ran, and the
+   rebuild suspended part of it — see STATUS. A node marked "rebuild" is not
+   running today and the slide has to say so.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export type NodeState = "live" | "rebuild" | "planned";
+
+export interface FlowNode {
+  id: string;
+  label: string;
+  /** One line, on the node. */
+  detail: string;
+  state: NodeState;
+  /** Human hands on the wire — the two places a person decides. */
+  human?: boolean;
+}
+
+export const AUTOMATION = {
+  title: ["Une chaîne, pas un bouton.", "Et deux mains dessus."],
+  intro:
+    "Un enchaînement de tâches connectées, dans la logique d'un Make ou d'un n8n : chaque nœud fait une chose, passe le résultat, et laisse une trace.",
+
+  nodes: [
+    { id: "veille", label: "Veille", detail: "Flux, institutions, jeux de données", state: "live" as const },
+    { id: "collecte", label: "Collecte", detail: "Récupération et normalisation", state: "live" as const },
+    { id: "recoupement", label: "Recoupement", detail: "Convergences et divergences", state: "rebuild" as const },
+    { id: "arbitrage", label: "Arbitrage éditorial", detail: "Un humain décide du sujet", state: "live" as const, human: true },
+    { id: "redaction", label: "Rédaction assistée", detail: "Structuration, pas rédaction seule", state: "rebuild" as const },
+    { id: "controle", label: "Contrôle", detail: "Un humain valide avant publication", state: "live" as const, human: true },
+    { id: "publication", label: "Publication", detail: "Site, données, formats courts", state: "rebuild" as const },
+    { id: "mesure", label: "Mesure", detail: "Audience, citations, retours", state: "planned" as const },
+  ] as readonly FlowNode[],
+
+  stateLabels: {
+    live: "En service",
+    rebuild: "En reconstruction",
+    planned: "Au plan",
+  } as Record<NodeState, string>,
+
+  /** Why the two human nodes are not a weakness to be optimised away. */
+  guardrails: {
+    label: "Les deux mains",
+    items: [
+      {
+        label: "Arbitrage",
+        body: "Un sujet est choisi, pas déclenché par un volume de mentions.",
+      },
+      {
+        label: "Contrôle",
+        body: "Rien n'est publié sans qu'un humain ait remonté chaque chiffre à sa source.",
+      },
+    ],
+    statement:
+      "Retirer ces deux nœuds doublerait le débit et coûterait ce qui distingue le projet d'un site généré automatiquement.",
+  },
+
+  note: "La V1 a fonctionné. Les nœuds « en reconstruction » ne tournent pas aujourd'hui.",
+} as const;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   16 — LE FORMAT ARTICLE
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ARTICLE_FORMAT = {

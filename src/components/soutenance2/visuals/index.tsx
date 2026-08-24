@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   DUR,
@@ -747,7 +748,17 @@ export function ArticlePipeline({
                 />
               </div>
 
-              <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
+              {/* Two lines' worth of room whatever the label needs, so a
+                  stage whose name wraps does not push its own list a line
+                  below its neighbours'. */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: 12,
+                  minHeight: 54,
+                }}
+              >
                 <span
                   className="t-index"
                   style={{ color: accent, fontSize: 17, fontWeight: 800 }}
@@ -799,6 +810,7 @@ export function ProductScreenshotFrame({
   width = "100%",
   height = 420,
   delay = 0,
+  src,
   children,
 }: {
   label: string;
@@ -807,9 +819,16 @@ export function ProductScreenshotFrame({
   width?: string | number;
   height?: number;
   delay?: number;
+  /**
+   * The capture, in `public/`. Drop the file at this path and it fills the
+   * frame; until then the frame keeps the same size and says what it is
+   * waiting for, so nothing on the slide moves when the image lands.
+   */
+  src?: string;
   children?: React.ReactNode;
 }) {
   const ink = useInk();
+  const [shown, setShown] = useState(false);
 
   return (
     <Rise delay={delay} y={18}>
@@ -865,6 +884,7 @@ export function ProductScreenshotFrame({
         {/* Body — replace with the real capture */}
         <div
           style={{
+            position: "relative",
             height,
             display: "grid",
             placeItems: "center",
@@ -874,18 +894,43 @@ export function ProductScreenshotFrame({
           role="img"
           aria-label={`Emplacement capture : ${label}`}
         >
-          {children ?? (
-            <div style={{ textAlign: "center", padding: "0 40px" }}>
-              <div className="t-micro" style={{ color: ink.muted }}>
-                {label}
-              </div>
-              {caption && (
-                <div style={{ fontSize: 13, color: ink.faint, marginTop: 8, letterSpacing: "0.06em" }}>
-                  {caption}
-                </div>
-              )}
-            </div>
+          {src && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={src}
+              alt={label}
+              onLoad={() => setShown(true)}
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "top center",
+                opacity: shown ? 1 : 0,
+                transition: "opacity .45s",
+              }}
+            />
           )}
+
+          {children ??
+            (!shown && (
+              <div style={{ textAlign: "center", padding: "0 40px" }}>
+                <div className="t-micro" style={{ color: ink.muted }}>
+                  {label}
+                </div>
+                {caption && (
+                  <div style={{ fontSize: 13, color: ink.faint, marginTop: 8, letterSpacing: "0.06em" }}>
+                    {caption}
+                  </div>
+                )}
+                {src && (
+                  <div style={{ fontSize: 12, color: ink.faint, marginTop: 12, opacity: 0.75 }}>
+                    {src}
+                  </div>
+                )}
+              </div>
+            ))}
         </div>
       </div>
     </Rise>

@@ -33,6 +33,7 @@ import {
   PRODUCT,
   REVENUE,
   ROADMAP,
+  S2_SLIDES,
   STATUS,
 } from "@/data/soutenance2/soutenance2Data";
 import {
@@ -50,6 +51,12 @@ import {
   useAccent,
 } from "./visuals";
 import { AiShiftScene } from "./visuals/AiShift";
+import {
+  AutomationSlide,
+  GeoSlide,
+  PartnersSlide,
+  PublicationsSlide,
+} from "./newSlides";
 import { useSlideStep } from "./useDeck";
 
 /** The globe is the deck's signature — cover, product, expansion, close. */
@@ -57,6 +64,18 @@ const PresentationGlobe = dynamic(
   () => import("@/components/presentation/visuals/PresentationGlobe"),
   { ssr: false, loading: () => null }
 );
+
+/**
+ * The § number of a slide, read off its place in the deck.
+ *
+ * Written by hand, these drifted every time a section was inserted: the number
+ * on screen and the number in the summary disagreed, and eight slides had to
+ * be edited to add one. Derived, they cannot.
+ */
+const sectionNo = (id: string): string => {
+  const i = S2_SLIDES.findIndex((slide) => slide.id === id);
+  return i <= 0 ? "§" : `§ ${String(i).padStart(2, "0")}`;
+};
 
 /* ── Shared title blocks ──────────────────────────────────────────────── */
 
@@ -155,7 +174,7 @@ function ProblemSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 01">Le problème</Eyebrow>
+      <Eyebrow index={sectionNo("probleme")}>Le problème</Eyebrow>
 
       <div style={{ marginTop: 26, maxWidth: 1040 }}>
         <StatementTitle lines={PROBLEM.title} delay={0.1} size="t-h2" />
@@ -236,7 +255,7 @@ function AudienceSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 02">Pour qui</Eyebrow>
+      <Eyebrow index={sectionNo("cible")}>Pour qui</Eyebrow>
 
       <div style={{ marginTop: 34, maxWidth: 1180 }}>
         <StatementTitle lines={AUDIENCE.title} delay={0.1} />
@@ -308,7 +327,7 @@ function ProductSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 03">Le produit</Eyebrow>
+      <Eyebrow index={sectionNo("produit")}>Le produit</Eyebrow>
 
       <Rise delay={0.1} y={22}>
         <h2 className="t-h1" style={{ color: ink.primary, letterSpacing: "-0.04em", marginTop: 30 }}>
@@ -333,6 +352,7 @@ function ProductSlide() {
             label={PRODUCT.screenshot.label}
             caption={PRODUCT.screenshot.ratio}
             url="theessentialdata.com/map/economy"
+            src="/soutenance/produit-carte.png"
             height={520}
             delay={0.45}
           />
@@ -357,7 +377,7 @@ function MarketSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 04">Le marché</Eyebrow>
+      <Eyebrow index={sectionNo("marche")}>Le marché</Eyebrow>
 
       <div style={{ marginTop: 26, maxWidth: 1180 }}>
         <StatementTitle lines={MARKET.title} delay={0.1} size="t-h2" />
@@ -426,7 +446,7 @@ function CompetitionSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 05">La concurrence</Eyebrow>
+      <Eyebrow index={sectionNo("concurrence")}>La concurrence</Eyebrow>
 
       <div style={{ marginTop: 30, maxWidth: 1240 }}>
         <StatementTitle lines={COMPETITION_TITLE} delay={0.1} size="t-h2" />
@@ -455,7 +475,7 @@ function AcquisitionSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 06">Moteur d&apos;acquisition</Eyebrow>
+      <Eyebrow index={sectionNo("acquisition")}>Moteur d&apos;acquisition</Eyebrow>
 
       <div style={{ marginTop: 26, maxWidth: 900 }}>
         <StatementTitle lines={ACQUISITION.title} delay={0.1} size="t-h2" />
@@ -531,7 +551,7 @@ function AiShiftSlide() {
   return (
     <SlideBody style={{ paddingTop: 72, paddingBottom: 78 }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
-        <Eyebrow index="§ 07">{AI_SHIFT.label}</Eyebrow>
+        <Eyebrow index={sectionNo("ia")}>{AI_SHIFT.label}</Eyebrow>
 
         {/* State counter — the presenter's place in the sequence, and the
             audience's. Deliberately quiet. */}
@@ -608,7 +628,7 @@ function RevenueSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 08">Modèle économique</Eyebrow>
+      <Eyebrow index={sectionNo("modele")}>Modèle économique</Eyebrow>
 
       <div style={{ marginTop: 34, maxWidth: 1080 }}>
         <StatementTitle lines={REVENUE.title} delay={0.1} />
@@ -702,7 +722,7 @@ function CrossCheckSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 09">Le travail de recoupement</Eyebrow>
+      <Eyebrow index={sectionNo("recoupement")}>Le travail de recoupement</Eyebrow>
 
       <Rise delay={0.1} y={22}>
         <h2
@@ -757,30 +777,43 @@ function PipelineSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 10">Comment naît un article</Eyebrow>
+      <Eyebrow index={sectionNo("pipeline")}>Comment naît un article</Eyebrow>
 
-      <div style={{ marginTop: 46 }}>
+      {/* Stages and statement travel together, centred in what the header
+          leaves. Split apart — the stages pinned under the header, the
+          statement pinned to the floor — the slide carried a band of nothing
+          between them wide enough to read as a mistake. */}
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          gap: 64,
+        }}
+      >
         <ArticlePipeline steps={PIPELINE.steps} startDelay={0.25} />
-      </div>
 
-      <div style={{ marginTop: "auto", paddingTop: 70 }}>
-        <Rule delay={1.2} accentWidth={140} />
-        <div style={{ marginTop: 40 }}>
-          {PIPELINE.statement.map((line, i) => (
-            <Rise key={line} delay={1.3 + i * 0.16} y={18}>
-              <div
-                className="t-h1"
-                style={{
-                  color: i === 1 ? ink.primary : ink.muted,
-                  letterSpacing: "-0.04em",
-                  display: "inline",
-                  marginRight: 20,
-                }}
-              >
-                {line}
-              </div>
-            </Rise>
-          ))}
+        <div>
+          <Rule delay={1.2} accentWidth={140} />
+          <div style={{ marginTop: 32 }}>
+            {PIPELINE.statement.map((line, i) => (
+              <Rise key={line} delay={1.3 + i * 0.16} y={18}>
+                <div
+                  className="t-h1"
+                  style={{
+                    color: i === 1 ? ink.primary : ink.muted,
+                    letterSpacing: "-0.04em",
+                    display: "inline",
+                    marginRight: 20,
+                  }}
+                >
+                  {line}
+                </div>
+              </Rise>
+            ))}
+          </div>
         </div>
       </div>
     </SlideBody>
@@ -797,7 +830,7 @@ function ArticleSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 11">Le format article</Eyebrow>
+      <Eyebrow index={sectionNo("article")}>Le format article</Eyebrow>
 
       <div style={{ marginTop: 28 }}>
         {ARTICLE_FORMAT.title.map((line, i) => (
@@ -831,6 +864,7 @@ function ArticleSlide() {
           label={ARTICLE_FORMAT.screenshot.label}
           caption={ARTICLE_FORMAT.screenshot.ratio}
           url="theessentialdata.com/articles/…"
+          src="/soutenance/article-format.png"
           height={540}
           delay={0.35}
         />
@@ -908,7 +942,7 @@ function StatusSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 12">Où en est le projet</Eyebrow>
+      <Eyebrow index={sectionNo("etat")}>Où en est le projet</Eyebrow>
 
       <div style={{ marginTop: 30, maxWidth: 1080 }}>
         <StatementTitle lines={STATUS.title} delay={0.1} />
@@ -1005,7 +1039,7 @@ function FinanceSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index="§ 13">Chiffres clés du business plan</Eyebrow>
+      <Eyebrow index={sectionNo("finance")}>Chiffres clés du business plan</Eyebrow>
 
       <div style={{ marginTop: 30, maxWidth: 1080 }}>
         <StatementTitle lines={FINANCE_SLIDE.title} delay={0.1} />
@@ -1098,7 +1132,7 @@ function RoadmapSlide() {
       </div>
 
       <div style={{ position: "relative", zIndex: 2 }}>
-        <Eyebrow index="§ 14">Roadmap</Eyebrow>
+        <Eyebrow index={sectionNo("roadmap")}>Roadmap</Eyebrow>
 
         <div style={{ marginTop: 28, display: "flex", gap: 26 }}>
           {ROADMAP.title.map((word, i) => (
@@ -1146,7 +1180,7 @@ function ConclusionSlide() {
       </div>
 
       <div style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", height: "100%" }}>
-        <Eyebrow index="§ 15">Conclusion</Eyebrow>
+        <Eyebrow index={sectionNo("conclusion")}>Conclusion</Eyebrow>
 
         <div style={{ marginTop: 24, maxWidth: 1180 }}>
           <StatementTitle lines={CONCLUSION.lines} delay={0.1} size="t-h3" />
@@ -1221,11 +1255,15 @@ export const S2_VIEWS: Record<string, ComponentType> = {
   marche: MarketSlide,
   concurrence: CompetitionSlide,
   acquisition: AcquisitionSlide,
+  publications: () => <PublicationsSlide index={sectionNo("publications")} />,
   ia: AiShiftSlide,
+  geo: () => <GeoSlide index={sectionNo("geo")} />,
+  partenaires: () => <PartnersSlide index={sectionNo("partenaires")} />,
   modele: RevenueSlide,
   pivot: PivotSlide,
   recoupement: CrossCheckSlide,
   pipeline: PipelineSlide,
+  automatisation: () => <AutomationSlide index={sectionNo("automatisation")} />,
   article: ArticleSlide,
   etat: StatusSlide,
   finance: FinanceSlide,
