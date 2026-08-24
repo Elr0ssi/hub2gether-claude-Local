@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, GeoJSON, ZoomControl } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, ZoomControl, useMap } from "react-leaflet";
 import type { FeatureCollection, Feature } from "geojson";
-import type { PathOptions, Layer } from "leaflet";
+import type { PathOptions, Layer, LatLngBoundsExpression } from "leaflet";
 import type { EconomyYear, EconomyMetricId } from "@/types";
 import { ECONOMY_METRICS } from "@/data/economy/economy";
 import {
@@ -35,6 +35,56 @@ const TILES = {
 } as const;
 
 export type LeafletTileStyle = keyof typeof TILES;
+
+/**
+ * The whole world and no further. Cut at ±85° because Mercator sends the poles
+ * to infinity — past that there is no map to show, only the blank the reader
+ * was falling into.
+ */
+/** Country names come from a data file; they are never trusted as markup. */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+const WORLD: LatLngBoundsExpression = [
+  [-85, -180],
+  [85, 180],
+];
+
+/**
+ * Keeps the map full of map.
+ *
+ * Two faults have the same cause — a viewport free to leave the world. Below a
+ * certain zoom the projection is narrower than the box, which is where the
+ * bands above and below the map came from; and with no bounds the reader could
+ * drag the world off the side entirely. The floor is recomputed on resize
+ * because it depends on the box, not on the data.
+ */
+function HoldTheWorld() {
+  const map = useMap();
+
+  useEffect(() => {
+    const apply = () => {
+      // `inside` asks for the zoom at which the bounds *fill* the container
+      // rather than fit inside it: exactly the level below which bands appear.
+      const floor = map.getBoundsZoom(WORLD, true);
+      map.setMinZoom(floor);
+      map.setMaxBounds(WORLD);
+      if (map.getZoom() < floor) map.setZoom(floor);
+    };
+    apply();
+    map.on("resize", apply);
+    return () => {
+      map.off("resize", apply);
+    };
+  }, [map]);
+
+  return null;
+}
 
 interface EconomyLeafletMapProps {
   economyYear: EconomyYear;
@@ -94,15 +144,17 @@ export function EconomyLeafletMap({
     };
   };
 
-  const formatValue = (name: string): string => {
+  const tooltipFor = (name: string): string => {
     const data = economyYear.countries[name];
-    if (!data) return name;
+    const label = escapeHtml(name);
+    if (!data) return `<span class="ta-country">${label}</span>`;
     const v = data[metric] as number;
     const unit = metricDef?.unit ?? "";
-    if (metric === "gdp" || metric === "companies") {
-      return `${name}<br/>${metricDef?.label} : <strong>${v.toLocaleString("fr-FR")} ${unit}</strong>`;
-    }
-    return `${name}<br/>${metricDef?.label} : <strong>${v.toLocaleString("fr-FR")} ${unit}</strong>`;
+    return [
+      `<span class="ta-country">${label}</span>`,
+      `<span class="ta-metric">${escapeHtml(metricDef?.label ?? "")}</span>`,
+      `<span class="ta-value">${v.toLocaleString("fr-FR")} ${escapeHtml(unit)}</span>`,
+    ].join("");
   };
 
   const onEachFeature = (feature: Feature, layer: Layer) => {
@@ -111,10 +163,16 @@ export function EconomyLeafletMap({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const l = layer as any;
 
-    l.bindTooltip(
-      hasData ? formatValue(name) : name,
-      { direction: "auto", className: "leaflet-economy-tooltip" }
-    );
+    // Sticky: the label follows the cursor instead of anchoring at the
+    // polygon's centre, which on a country the size of Russia put the name
+    // several hundred pixels from the pointer.
+    l.bindTooltip(tooltipFor(name), {
+      sticky: true,
+      direction: "top",
+      offset: [0, -8],
+      opacity: 1,
+      className: "eco-map-tip",
+    });
 
     if (hasData) {
       l.on("click", () => onCountryClick(name));
@@ -131,17 +189,26 @@ export function EconomyLeafletMap({
       <MapContainer
         center={[20, 10]}
         zoom={2}
-        minZoom={1}
         maxZoom={18}
+        // Fractional zoom, so the floor can sit exactly where the world fills
+        // the box instead of one whole level above or below it.
+        zoomSnap={0}
+        zoomDelta={0.4}
+        maxBounds={WORLD}
+        maxBoundsViscosity={1}
+        worldCopyJump={false}
         style={{ width: "100%", height: fillHeight ? "100%" : "480px", background: tileStyle === "satellite" ? "#0a0a0a" : "#F5F5F5" }}
         zoomControl={false}
       >
+        <HoldTheWorld />
         <ZoomControl position="topright" />
         <TileLayer
           key={tileStyle}
           url={TILES[tileStyle].url}
           attribution={TILES[tileStyle].attribution}
           maxZoom={18}
+          noWrap
+          bounds={WORLD}
         />
         {geoData && (
           <GeoJSON

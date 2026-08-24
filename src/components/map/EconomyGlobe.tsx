@@ -21,8 +21,32 @@ import { getCountryFillColorEconomy, getMaxMetricValue } from "@/lib/economyColo
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const RADIUS = 1;
-const TEXTURE_W = 4096;
-const TEXTURE_H = 2048;
+/**
+ * Painted texture size, and the zoom it can carry.
+ *
+ * Not constants: sharpness is bounded by texels, and how many the device can
+ * hold is not knowable until there is a renderer to ask. A laptop with memory
+ * to spare gets four times the texels and twice the zoom; a phone keeps what
+ * it had. Both are set once, before anything is painted.
+ */
+let TEXTURE_W = 4096;
+let TEXTURE_H = 2048;
+let ZOOM_CEILING = 2.6;
+/** Field of view at rest. Zooming past the dolly limit narrows it. */
+const BASE_FOV = 34;
+
+function chooseTextureSize(renderer: THREE.WebGLRenderer) {
+  const maxTex = renderer.capabilities.maxTextureSize;
+  const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4;
+  const coarse = window.matchMedia("(pointer: coarse)").matches;
+  const roomy = maxTex >= 8192 && memory >= 8 && !coarse;
+
+  TEXTURE_W = roomy ? 8192 : 4096;
+  TEXTURE_H = TEXTURE_W / 2;
+  // Capped where the texture still has texels to give: past it the map stops
+  // gaining detail and only gains blur.
+  ZOOM_CEILING = roomy ? 5 : 2.6;
+}
 const PICK_W = 2048;
 const PICK_H = 1024;
 
@@ -249,6 +273,20 @@ function buildSatelliteMap(
 
   return canvas;
 }
+
+/**
+ * The stock map lookup, with a negative mipmap bias.
+ *
+ * Mipmapping is correct and, head-on to a sphere, soft: at the globe's resting
+ * size the map is minified about four to one, so the level sampled sits two
+ * removed from the one that was painted. Pulling the sample back toward the
+ * source is what the flat map gets for free by being vector. The anisotropic
+ * filter, already at its maximum, absorbs most of what the bias costs.
+ */
+const SHARPENED_MAP_FRAGMENT = THREE.ShaderChunk.map_fragment.replace(
+  "texture2D( map, vMapUv )",
+  "texture2D( map, vMapUv, -0.75 )"
+);
 
 /** Solid white over land, transparent over water. Masks everything else. */
 function buildLandMask(
@@ -735,11 +773,12 @@ export function EconomyGlobe({
     if (!mount) return;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(BASE_FOV, 1, 0.1, 100);
     camera.position.z = 3.5;
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    chooseTextureSize(renderer);
     mount.appendChild(renderer.domElement);
     renderer.domElement.style.display = "block";
     renderer.domElement.style.cursor = "grab";
@@ -808,7 +847,10 @@ export function EconomyGlobe({
         )
         .replace(
           "#include <map_fragment>",
-          `#include <map_fragment>
+          // The chunk is expanded here rather than left as an include, because
+          // three resolves includes after this hook runs — a bias written
+          // against the include's text would never find it.
+          `${SHARPENED_MAP_FRAGMENT}
            if (uTerrainAmount > 0.0) {
              float lum = dot(texture2D(uTerrain, vMapUv).rgb, vec3(0.2126, 0.7152, 0.0722));
              float onLand = smoothstep(0.3, 0.58, texture2D(uTerrainMask, vMapUv).r);
@@ -848,12 +890,26 @@ export function EconomyGlobe({
     let baseDistance = 3.5;
     let zoom = 1;
     const ZOOM_MIN = 1;
-    // Capped where the 4096-wide texture still has texels to spare: past this
-    // the map stops gaining detail and only gains blur.
-    const ZOOM_MAX = 2.4;
+    // Capped where the texture still has texels to spare: past this the map
+    // stops gaining detail and only gains blur.
+    const ZOOM_MAX = ZOOM_CEILING;
+    /**
+     * How far in the camera itself is allowed to come.
+     *
+     * Zooming by moving closer stops working before the zoom ceiling does: at
+     * the far end the camera would pass inside the sphere and the globe would
+     * simply vanish. Up to here the camera moves in; past it, it stays put and
+     * the field of view narrows instead — which is what a map does anyway.
+     */
+    const DOLLY_MAX = 2.2;
 
     const applyCamera = () => {
-      camera.position.z = (baseDistance * MARGIN) / zoom;
+      const dolly = Math.min(zoom, DOLLY_MAX);
+      camera.position.z = (baseDistance * MARGIN) / dolly;
+      // A projection scales with 1 / tan(fov / 2): narrowing the field by this
+      // much magnifies by exactly the zoom the dolly did not deliver.
+      camera.fov =
+        (2 * Math.atan(Math.tan((BASE_FOV * Math.PI) / 360) * (dolly / zoom)) * 180) / Math.PI;
       camera.updateProjectionMatrix();
     };
 
@@ -865,7 +921,9 @@ export function EconomyGlobe({
       resolutionRef.current.set(width, height);
       for (const mat of lineMatsRef.current) mat.resolution.copy(resolutionRef.current);
 
-      const vFov = (camera.fov * Math.PI) / 180;
+      // Framed from the base field of view, never the narrowed one: the
+      // resting distance must not follow the zoom.
+      const vFov = (BASE_FOV * Math.PI) / 180;
       const hFov = 2 * Math.atan(Math.tan(vFov / 2) * camera.aspect);
       baseDistance = RADIUS / Math.sin(Math.min(vFov, hFov) / 2);
       applyCamera();

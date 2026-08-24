@@ -748,3 +748,56 @@ body {
   .ta-chart-row { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 32px; }
   .ta-perspective-row { grid-template-columns: repeat(3, 1fr); gap: 16px; }
 }
+
+/* ── Leaflet — the interactive world map ──────────────────────────────────
+   Leaflet paints its own chrome; three things of it have to be answered. */
+
+/* A clicked country is an SVG path, and the browser rings a focused path with
+   a rectangle — the box that appeared around a country the moment it was
+   selected. The selection is already drawn in the path's own stroke. */
+.leaflet-container .leaflet-interactive:focus,
+.leaflet-container .leaflet-interactive:focus-visible {
+  outline: none;
+}
+
+/* The label under the cursor, in the site's own register rather than
+   Leaflet's default bubble. */
+.leaflet-tooltip.eco-map-tip {
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+  color: var(--ink);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.leaflet-tooltip.eco-map-tip::before { display: none; }
+
+.eco-map-tip .ta-country {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.eco-map-tip .ta-metric {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.eco-map-tip .ta-value {
+  display: block;
+  margin-top: 1px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #0d7a40;
+}
