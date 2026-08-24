@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Maximize2, Minimize2, ChevronLeft, Map, Globe } from "lucide-react";
+import { Maximize2, Minimize2, ChevronLeft, Map, Globe, Satellite } from "lucide-react";
 import { EconomyInteractiveMap } from "./EconomyInteractiveMap";
+import { EconomyLeafletMap } from "./EconomyLeafletMap";
 import dynamic from "next/dynamic";
 
 // WebGL and the world file are only paid for when the reader asks for the globe.
@@ -81,6 +82,13 @@ export function EconomyMapView() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ytdMode, setYtdMode] = useState(false);
   const [view, setView] = useState<"map" | "globe">("map");
+  /**
+   * Satellite is a modifier, not a third view: it applies to whichever of the
+   * two is on screen. The flat map swaps its editorial rendering for aerial
+   * imagery under the same choropleth; the globe drops the tint and shows the
+   * photography it already carries.
+   */
+  const [satellite, setSatellite] = useState(false);
   const mapSectionRef = useRef<HTMLElement>(null);
   const rankSectionRef = useRef<HTMLElement>(null);
   const articleSectionRef = useRef<HTMLElement>(null);
@@ -222,6 +230,27 @@ export function EconomyMapView() {
                 </button>
               ))}
             </div>
+
+            <button
+              onClick={() => setSatellite((v) => !v)}
+              aria-pressed={satellite}
+              title="Vue satellite"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all duration-150"
+              style={
+                satellite
+                  ? {
+                      background: "var(--accent-dim)",
+                      color: "#0D7A40",
+                      fontWeight: 700,
+                      border: "1px solid rgba(57,255,136,0.4)",
+                    }
+                  : { background: "transparent", color: "var(--ink-3)", border: "1px solid var(--border)" }
+              }
+            >
+              <Satellite size={13} />
+              <span className="hidden sm:inline">Satellite</span>
+            </button>
+
             {sidePanelOpen ? (
               <button onClick={() => setSidePanelOpen(false)} className="btn-ghost px-2.5 py-1.5 text-xs gap-1.5">
                 <ChevronLeft size={13} /> Réduire
@@ -294,6 +323,18 @@ export function EconomyMapView() {
                 metric={metric}
                 selectedCountry={selectedCountry}
                 onCountryClick={handleCountryClick}
+                satellite={satellite}
+              />
+            ) : satellite ? (
+              // Aerial imagery served as tiles: it keeps its detail all the
+              // way down, which is the whole point of asking for it.
+              <EconomyLeafletMap
+                economyYear={activeEconomyYear}
+                metric={metric}
+                selectedCountry={selectedCountry}
+                onCountryClick={handleCountryClick}
+                tileStyle="satellite"
+                fillHeight
               />
             ) : (
               <EconomyInteractiveMap

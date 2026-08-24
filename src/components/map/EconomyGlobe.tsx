@@ -197,6 +197,57 @@ function buildBaseMap(geojson: GeoJSON.FeatureCollection): HTMLCanvasElement {
   return canvas;
 }
 
+/**
+ * The satellite base: the photography as it is, with the map's own borders and
+ * graticule laid over it. No class colour — in this mode the reader is looking
+ * at the ground, and the data is carried by the selection and the side panel.
+ */
+function buildSatelliteMap(
+  geojson: GeoJSON.FeatureCollection,
+  imagery: HTMLImageElement | null
+): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = TEXTURE_W;
+  canvas.height = TEXTURE_H;
+  const ctx = canvas.getContext("2d")!;
+
+  if (imagery) {
+    ctx.drawImage(imagery, 0, 0, TEXTURE_W, TEXTURE_H);
+  } else {
+    ctx.fillStyle = OCEAN_MID;
+    ctx.fillRect(0, 0, TEXTURE_W, TEXTURE_H);
+  }
+
+  // A quieter graticule than the editorial map's: over photography a grid has
+  // to be found rather than seen.
+  ctx.strokeStyle = "rgba(255,255,255,0.07)";
+  ctx.lineWidth = 1.4;
+  for (let lon = -180; lon <= 180; lon += 15) {
+    const x = ((lon + 180) / 360) * TEXTURE_W;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, TEXTURE_H);
+    ctx.stroke();
+  }
+  for (let lat = -75; lat <= 75; lat += 15) {
+    const y = ((90 - lat) / 180) * TEXTURE_H;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(TEXTURE_W, y);
+    ctx.stroke();
+  }
+
+  ctx.strokeStyle = "rgba(255,255,255,0.9)";
+  ctx.lineWidth = BORDER_WIDTH * 0.62;
+  ctx.lineJoin = "round";
+  for (const feat of geojson.features) {
+    traceFeature(ctx, feat, TEXTURE_W, TEXTURE_H);
+    ctx.stroke();
+  }
+
+  return canvas;
+}
+
 /** Solid white over land, transparent over water. Masks everything else. */
 function buildLandMask(
   geojson: GeoJSON.FeatureCollection,
@@ -539,6 +590,8 @@ interface Props {
   metric: EconomyMetricId;
   selectedCountry: string | null;
   onCountryClick: (name: string) => void;
+  /** Show the photography instead of the choropleth. */
+  satellite?: boolean;
 }
 
 export function EconomyGlobe({
@@ -546,12 +599,18 @@ export function EconomyGlobe({
   metric,
   selectedCountry,
   onCountryClick,
+  satellite = false,
 }: Props) {
   const mountRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
 
   const byNameRef = useRef<Map<string, GeoJSON.Feature>>(new Map());
   const baseMapRef = useRef<HTMLCanvasElement | null>(null);
+  const satelliteMapRef = useRef<HTMLCanvasElement | null>(null);
+  const geojsonRef = useRef<GeoJSON.FeatureCollection | null>(null);
+  const imageryRef = useRef<HTMLImageElement | null>(null);
+  /** The live uniform, so the terrain blend can be switched off in place. */
+  const terrainAmountRef = useRef<{ value: number } | null>(null);
   const fillCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const textureRef = useRef<THREE.CanvasTexture | null>(null);
   const pickRef = useRef<PickMap | null>(null);
@@ -569,16 +628,32 @@ export function EconomyGlobe({
 
   /* ── Repaint: base blit, then the countries carrying a value ──────────── */
   useEffect(() => {
-    const base = baseMapRef.current;
+    if (satellite && !satelliteMapRef.current && geojsonRef.current) {
+      satelliteMapRef.current = buildSatelliteMap(geojsonRef.current, imageryRef.current);
+    }
+    const base = satellite ? satelliteMapRef.current : baseMapRef.current;
     const canvas = fillCanvasRef.current;
     const texture = textureRef.current;
     const byName = byNameRef.current;
     if (!base || !canvas || !texture) return;
 
+    // The photography carries its own colour; folding the imagery into it a
+    // second time would only wash it out.
+    if (terrainAmountRef.current) {
+      terrainAmountRef.current.value = satellite ? 0 : TERRAIN_AMOUNT;
+    }
+
     // Coalesced to one frame, so dragging the year rail cannot queue repaints.
     const handle = requestAnimationFrame(() => {
       const ctx = canvas.getContext("2d")!;
       ctx.drawImage(base, 0, 0);
+
+      // Under the photography the ground is the subject: no class colour is
+      // laid over it, and the reading is carried by the selection and panel.
+      if (satellite) {
+        texture.needsUpdate = true;
+        return;
+      }
 
       const maxValue = getMaxMetricValue(economyYear.countries, metric);
       for (const name of Object.keys(economyYear.countries)) {
@@ -598,7 +673,7 @@ export function EconomyGlobe({
       texture.needsUpdate = true;
     });
     return () => cancelAnimationFrame(handle);
-  }, [economyYear, metric, ready]);
+  }, [economyYear, metric, ready, satellite]);
 
   /* ── Selection: an outline in 3D, so picking never repaints the map ───── */
   useEffect(() => {
@@ -800,6 +875,12 @@ export function EconomyGlobe({
 
         baseMapRef.current = buildBaseMap(geojson);
         pickRef.current = buildPickMap(geojson);
+        // The satellite base is a second full-size canvas with every border
+        // stroked onto it. Built the first time it is asked for rather than on
+        // every mount, so the editorial globe pays nothing for a mode it does
+        // not use.
+        geojsonRef.current = geojson;
+        imageryRef.current = imagery;
 
         // The same height field drives the geometry and its shading: the land
         // is pushed out along the normal, and the wall it now stands on is lit
@@ -828,6 +909,7 @@ export function EconomyGlobe({
           terrainUniforms.uTerrainMask.value = relief;
           terrainUniforms.uTerrainAmount.value = TERRAIN_AMOUNT;
         }
+        terrainAmountRef.current = terrainUniforms.uTerrainAmount;
         material.needsUpdate = true;
 
         fillCanvas.getContext("2d")!.drawImage(baseMapRef.current, 0, 0);
@@ -1043,6 +1125,10 @@ export function EconomyGlobe({
       textureRef.current = null;
       fillCanvasRef.current = null;
       baseMapRef.current = null;
+      satelliteMapRef.current = null;
+      geojsonRef.current = null;
+      imageryRef.current = null;
+      terrainAmountRef.current = null;
       pickRef.current = null;
     };
   }, []);
