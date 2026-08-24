@@ -66,6 +66,8 @@ const IMAGERY = "/geo/earth-blue-marble.jpg";
 const TOPOLOGY = "/geo/earth-topology.png";
 /** How much of the terrain's texture comes through the class colour. */
 const TERRAIN_AMOUNT = 0.78;
+/** How much class colour is washed over the photography in satellite mode. */
+const SATELLITE_TINT = 0.46;
 /**
  * How much the sea's own surface colours the water.
  *
@@ -648,14 +650,38 @@ export function EconomyGlobe({
       const ctx = canvas.getContext("2d")!;
       ctx.drawImage(base, 0, 0);
 
-      // Under the photography the ground is the subject: no class colour is
-      // laid over it, and the reading is carried by the selection and panel.
+      const maxValue = getMaxMetricValue(economyYear.countries, metric);
+
+      // Over the photography the class colour is a wash, not a fill: light
+      // enough that the ground stays readable, strong enough that two
+      // countries can still be told apart — the flat satellite map's bargain.
       if (satellite) {
+        ctx.save();
+        ctx.globalAlpha = SATELLITE_TINT;
+        for (const name of Object.keys(economyYear.countries)) {
+          const feat = byName.get(name);
+          if (!feat) continue;
+          const fill = getCountryFillColorEconomy(name, economyYear.countries, maxValue, metric);
+          if (fill === "#EBEBEB") continue;
+          ctx.fillStyle = fill;
+          traceFeature(ctx, feat, TEXTURE_W, TEXTURE_H);
+          ctx.fill("evenodd");
+        }
+        ctx.restore();
+
+        // Restated over the wash, which would otherwise soften them.
+        ctx.strokeStyle = "rgba(255,255,255,0.9)";
+        ctx.lineWidth = BORDER_WIDTH * 0.62;
+        ctx.lineJoin = "round";
+        for (const feat of geojsonRef.current?.features ?? []) {
+          traceFeature(ctx, feat, TEXTURE_W, TEXTURE_H);
+          ctx.stroke();
+        }
+
         texture.needsUpdate = true;
         return;
       }
 
-      const maxValue = getMaxMetricValue(economyYear.countries, metric);
       for (const name of Object.keys(economyYear.countries)) {
         const feat = byName.get(name);
         if (!feat) continue;
@@ -692,7 +718,9 @@ export function EconomyGlobe({
       feat,
       RADIUS + PLATEAU_TOP,
       new THREE.Color(ACCENT).getHex(),
-      [{ width: 3.8, opacity: 1 }],
+      // The same stroke a hover leaves, only held: a selection should read as
+      // the hover staying put, not as a heavier ring standing off the globe.
+      [{ width: 2.4, opacity: 1 }],
       resolutionRef.current,
       lineMatsRef.current
     );
