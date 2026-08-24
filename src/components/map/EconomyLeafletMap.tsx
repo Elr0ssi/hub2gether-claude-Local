@@ -41,19 +41,43 @@ export type LeafletTileStyle = keyof typeof TILES;
  * to infinity — past that there is no map to show, only the blank the reader
  * was falling into.
  */
-/** Country names come from a data file; they are never trusted as markup. */
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
 const WORLD: LatLngBoundsExpression = [
   [-85, -180],
   [85, 180],
 ];
+
+/**
+ * Unwraps rings that cross the antimeridian.
+ *
+ * Russia's arctic rings, Fiji and Antarctica each step straight from +179° to
+ * -180°. Drawn literally, the fill joins the far right of the map to the far
+ * left and lays a band of country colour across the whole width — the green
+ * bars at the top of the map, sitting at exactly Russia's arctic latitudes.
+ * Carrying an offset along the ring keeps it continuous; the part that ends up
+ * past ±180° falls outside the world bounds and is simply not shown.
+ */
+function unwrapAntimeridian(data: FeatureCollection): FeatureCollection {
+  const ring = (coords: number[][]) => {
+    let offset = 0;
+    for (let i = 1; i < coords.length; i++) {
+      const step = coords[i][0] + offset - coords[i - 1][0];
+      if (step > 180) offset -= 360;
+      else if (step < -180) offset += 360;
+      coords[i][0] += offset;
+    }
+  };
+
+  for (const feature of data.features) {
+    const geom = feature.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
+    if (!geom) continue;
+    const polygons =
+      geom.type === "Polygon"
+        ? [geom.coordinates as number[][][]]
+        : (geom.coordinates as number[][][][]);
+    for (const polygon of polygons) for (const r of polygon) ring(r);
+  }
+  return data;
+}
 
 /**
  * Keeps the map full of map.
@@ -112,8 +136,9 @@ export function EconomyLeafletMap({
     fetch(GEO_URL)
       .then((r) => r.json())
       .then((data: FeatureCollection) => {
-        cacheRef.current = data;
-        setGeoData(data);
+        const clean = unwrapAntimeridian(data);
+        cacheRef.current = clean;
+        setGeoData(clean);
       })
       .catch(() => {});
   }, []);
@@ -144,35 +169,11 @@ export function EconomyLeafletMap({
     };
   };
 
-  const tooltipFor = (name: string): string => {
-    const data = economyYear.countries[name];
-    const label = escapeHtml(name);
-    if (!data) return `<span class="ta-country">${label}</span>`;
-    const v = data[metric] as number;
-    const unit = metricDef?.unit ?? "";
-    return [
-      `<span class="ta-country">${label}</span>`,
-      `<span class="ta-metric">${escapeHtml(metricDef?.label ?? "")}</span>`,
-      `<span class="ta-value">${v.toLocaleString("fr-FR")} ${escapeHtml(unit)}</span>`,
-    ].join("");
-  };
-
   const onEachFeature = (feature: Feature, layer: Layer) => {
     const name: string = (feature.properties as Record<string, string>)?.name ?? "";
     const hasData = Boolean(economyYear.countries[name]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const l = layer as any;
-
-    // Sticky: the label follows the cursor instead of anchoring at the
-    // polygon's centre, which on a country the size of Russia put the name
-    // several hundred pixels from the pointer.
-    l.bindTooltip(tooltipFor(name), {
-      sticky: true,
-      direction: "top",
-      offset: [0, -8],
-      opacity: 1,
-      className: "eco-map-tip",
-    });
 
     if (hasData) {
       l.on("click", () => onCountryClick(name));
@@ -247,18 +248,6 @@ export function EconomyLeafletMap({
         </p>
       </div>
 
-      <style>{`
-        .leaflet-economy-tooltip {
-          background: rgba(255,255,255,0.95);
-          border: 1px solid #E8E8E8;
-          border-radius: 8px;
-          padding: 6px 10px;
-          font-size: 12px;
-          color: #0A0A0A;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-        }
-        .leaflet-economy-tooltip::before { display: none; }
-      `}</style>
     </div>
   );
 }

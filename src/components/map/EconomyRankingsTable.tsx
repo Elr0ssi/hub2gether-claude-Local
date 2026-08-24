@@ -1,5 +1,6 @@
 "use client";
 
+import { countryFr } from "@/data/countryNamesFr";
 import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Search, ChevronUp, ChevronDown, ChevronsUpDown, TrendingUp, TrendingDown, Minus } from "lucide-react";
@@ -244,7 +245,12 @@ export function EconomyRankingsTable({
   const filtered = useMemo(() => {
     if (!search.trim()) return allRows;
     const q = search.toLowerCase();
-    return allRows.filter((r) => r.name.toLowerCase().includes(q));
+    // Matched on both spellings: the reader types what is on screen, and the
+    // English key stays searchable for anyone who knows it.
+    return allRows.filter(
+      (r) =>
+        countryFr(r.name).toLowerCase().includes(q) || r.name.toLowerCase().includes(q)
+    );
   }, [allRows, search]);
 
   const currentMetric = ECONOMY_METRICS.find((m) => m.id === metric) ?? ECONOMY_METRICS[0];
@@ -390,7 +396,7 @@ export function EconomyRankingsTable({
                       <div className="flex items-center gap-2">
                         {flagImg(FLAGS[name])}
                         <span className="text-xs font-medium" style={{ color: "var(--ink)", whiteSpace: "nowrap" }}>
-                          {name}
+                          {countryFr(name)}
                         </span>
                       </div>
                     </td>

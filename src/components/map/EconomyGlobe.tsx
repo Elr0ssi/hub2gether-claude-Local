@@ -92,6 +92,8 @@ const TOPOLOGY = "/geo/earth-topology.png";
 const TERRAIN_AMOUNT = 0.78;
 /** How much class colour is washed over the photography in satellite mode. */
 const SATELLITE_TINT = 0.46;
+/** The sea of the tiled satellite map, so both views show the same water. */
+const SATELLITE_SEA = "#0B3B5C";
 /**
  * How much the sea's own surface colours the water.
  *
@@ -239,10 +241,20 @@ function buildSatelliteMap(
 
   if (imagery) {
     ctx.drawImage(imagery, 0, 0, TEXTURE_W, TEXTURE_H);
-  } else {
-    ctx.fillStyle = OCEAN_MID;
-    ctx.fillRect(0, 0, TEXTURE_W, TEXTURE_H);
   }
+
+  // The water, flattened to the tone the tiled satellite map shows. The
+  // photography's ocean is a different blue from Esri's, and switching between
+  // the flat map and the globe should not switch seas.
+  const water = document.createElement("canvas");
+  water.width = TEXTURE_W;
+  water.height = TEXTURE_H;
+  const wc = water.getContext("2d")!;
+  wc.fillStyle = SATELLITE_SEA;
+  wc.fillRect(0, 0, TEXTURE_W, TEXTURE_H);
+  wc.globalCompositeOperation = "destination-out";
+  wc.drawImage(buildLandMask(geojson, TEXTURE_W, TEXTURE_H), 0, 0);
+  ctx.drawImage(water, 0, 0);
 
   // A quieter graticule than the editorial map's: over photography a grid has
   // to be found rather than seen.
@@ -1163,7 +1175,9 @@ export function EconomyGlobe({
       const t = (performance.now() - start) / 1000;
 
       if (!dragging) {
-        globe.rotation.y += 0.00042 + spin;
+        // No idle drift: the globe holds where it was left. What remains here
+        // is only the throw of a drag, spending itself.
+        globe.rotation.y += spin;
         spin *= 0.955;
         if (Math.abs(spin) < 0.00002) spin = 0;
       }

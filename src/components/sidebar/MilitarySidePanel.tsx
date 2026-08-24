@@ -1,5 +1,6 @@
 "use client";
 
+import { countryFr } from "@/data/countryNamesFr";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Shield, Users, Plane, Ship, Crosshair } from "lucide-react";
@@ -129,7 +130,7 @@ export function MilitarySidePanel({ countryName, data, metric, year, open, onClo
             {/* Header */}
             <div className="px-4 py-3 flex items-center justify-between" style={{ borderBottom: "1px solid var(--border)", background: "var(--surface-2)" }}>
               <p className="text-xs font-bold" style={{ color: "var(--ink)" }}>
-                {countryName ?? "Sélectionnez un pays"}
+                {countryName ? countryFr(countryName) : "Sélectionnez un pays"}
               </p>
               <button onClick={onClose} className="btn-ghost p-1">
                 <X size={13} />

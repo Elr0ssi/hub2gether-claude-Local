@@ -1,5 +1,6 @@
 "use client";
 
+import { countryFr } from "@/data/countryNamesFr";
 import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronUp, ChevronDown, Shield } from "lucide-react";
@@ -212,7 +213,7 @@ export function MilitaryRankingsTable({
                       <div className="flex items-center gap-2">
                         {flagImg(FLAGS[name])}
                         <span className="text-xs font-medium" style={{ color: isHighlighted ? metricDef.color : "var(--ink)", whiteSpace: "nowrap" }}>
-                          {name}
+                          {countryFr(name)}
                         </span>
                       </div>
                     </td>
