@@ -1,0 +1,13 @@
+{
+  "iso3": "GIB",
+  "iso2": "GI",
+  "nom": "Gibraltar",
+  "indicateurs": {
+    "pib": {
+      "libelle": "PIB",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NY.GDP.MKTP.CD)",
+      "valeurs": {}
+    }
+  }
+}

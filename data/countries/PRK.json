@@ -1,0 +1,13 @@
+{
+  "iso3": "PRK",
+  "iso2": "KP",
+  "nom": "Corée du Nord",
+  "indicateurs": {
+    "pib": {
+      "libelle": "PIB",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NY.GDP.MKTP.CD)",
+      "valeurs": {}
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "iso3": "MAF",
+  "iso2": "MF",
+  "nom": "Saint-Martin",
+  "indicateurs": {
+    "pib": {
+      "libelle": "PIB",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NY.GDP.MKTP.CD)",
+      "valeurs": {
+        "2011": 775875748.523832,
+        "2014": 772921958.529509,
+        "2019": 652206037.103874,
+        "2021": 649206262.847519
+      }
+    }
+  }
+}

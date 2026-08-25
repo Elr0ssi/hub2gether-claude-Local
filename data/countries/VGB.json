@@ -1,0 +1,13 @@
+{
+  "iso3": "VGB",
+  "iso2": "VG",
+  "nom": "Îles Vierges britanniques",
+  "indicateurs": {
+    "pib": {
+      "libelle": "PIB",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NY.GDP.MKTP.CD)",
+      "valeurs": {}
+    }
+  }
+}
