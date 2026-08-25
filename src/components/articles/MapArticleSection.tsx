@@ -101,9 +101,9 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 function MediaSlot({ children }: { children?: React.ReactNode }) {
   return (
     <div
+      className="eco-card-media"
       style={{
         position: "relative",
-        aspectRatio: "16 / 10",
         borderRadius: 10,
         background: "var(--surface-2)",
         border: "1px dashed var(--border)",
@@ -170,7 +170,9 @@ function RecommendedCard({
     <article
       style={{
         flex: "0 0 auto",
-        width: 268,
+        // Fluid rather than fixed: a desktop-width card on a phone is a card
+        // the reader scrolls past instead of reading.
+        width: "clamp(204px, 66vw, 268px)",
         scrollSnapAlign: "start",
         borderRadius: 14,
         background: "var(--surface)",

@@ -291,12 +291,27 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
           .cat-hero-stat:nth-child(n + 3) { border-top: 1px solid var(--border-light); }
           .cat-hero-globe-anchor { top: 44%; width: min(700px, 145vw); }
         }
-        @media (max-width: 560px) {
-          .cat-hero-stat { padding: 13px 10px; }
-          .cat-hero-stat-icon { width: 32px; height: 32px; margin-bottom: 7px; }
-          .cat-hero-stat-label { font-size: 0.7rem; }
+        /* Sous 640px les quatre chiffres passent sur une seule ligne. En
+           deux par deux ils faisaient un bloc plus haut que ce qui restait
+           d'écran, et le lecteur n'en voyait jamais la fin. */
+        @media (max-width: 640px) {
+          .cat-hero-stats { grid-template-columns: repeat(4, 1fr); }
+          .cat-hero-stat,
+          .cat-hero-stat:nth-child(n + 3) { border-top: none; }
+          .cat-hero-stat:nth-child(2n + 1) { border-left: 1px solid var(--border-light); }
+          .cat-hero-stat:first-child { border-left: none; }
+          .cat-hero-stat { padding: 10px 6px; }
+          .cat-hero-stat-icon { display: none; }
+          .cat-hero-stat-label {
+            font-size: 0.58rem;
+            line-height: 1.25;
+            letter-spacing: 0.01em;
+          }
+          .cat-hero-stat-value { font-size: 0.98rem; }
           .cat-hero-stat-meta { display: none; }
           .cat-hero-source { display: none; }
+          .cat-hero-title { font-size: clamp(1.9rem, 9vw, 2.4rem); }
+          .cat-hero-globe-anchor { top: 38%; width: min(620px, 155vw); }
         }
       `}</style>
     </div>

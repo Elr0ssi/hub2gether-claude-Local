@@ -113,11 +113,11 @@ function EconomicView({ countryName, yearData, metric, onMetricChange }: { count
                   className="rounded-xl px-3 py-2.5 text-left transition-colors"
                   style={{ background: "var(--surface-2)", border: "1px solid var(--border)", cursor: onMetricChange ? "pointer" : "default" }}
                 >
-                  <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>{def?.label}</p>
+                  <p style={{ color: "var(--ink-3)", fontSize: "clamp(0.55rem, 1.5vw, 0.6rem)", textTransform: "uppercase", fontWeight: 700 }}>{def?.label}</p>
                   <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: valueColor }}>
                     {fmtMetric(v, id)}
                   </p>
-                  <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>
+                  <p style={{ color: "var(--ink-4)", fontSize: "clamp(0.53rem, 1.45vw, 0.58rem)" }}>
                     {id === "gdp_per_capita" ? "par personne" : "exports − imports"}
                   </p>
                 </button>
@@ -142,7 +142,7 @@ function EconomicView({ countryName, yearData, metric, onMetricChange }: { count
                   className="rounded-xl px-3 py-2.5 text-left transition-colors"
                   style={{ background: "var(--surface-2)", border: "1px solid var(--border)", cursor: onMetricChange ? "pointer" : "default" }}
                 >
-                  <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>{def?.label}</p>
+                  <p style={{ color: "var(--ink-3)", fontSize: "clamp(0.55rem, 1.5vw, 0.6rem)", textTransform: "uppercase", fontWeight: 700 }}>{def?.label}</p>
                   <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: "var(--ink)" }}>{fmtMetric(v, id)}</p>
                 </button>
               );
@@ -153,7 +153,7 @@ function EconomicView({ countryName, yearData, metric, onMetricChange }: { count
 
       {/* Year trend */}
       <div>
-        <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
+        <p style={{ color: "var(--ink-3)", fontSize: "clamp(0.58rem, 1.6vw, 0.65rem)", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
           Évolution — {ECONOMY_METRICS.find(m => m.id === metric)?.label}
         </p>
         <div className="flex flex-col gap-1.5">
@@ -216,7 +216,7 @@ function UnemploymentView({ countryName, yearData, metric, onMetricChange }: { c
                 className="rounded-xl px-3 py-3 flex flex-col gap-1 text-left transition-colors"
                 style={{ background: "var(--surface-2)", border: "1px solid var(--border)", cursor: onMetricChange ? "pointer" : "default" }}
               >
-                <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>{def?.label}</p>
+                <p style={{ color: "var(--ink-3)", fontSize: "clamp(0.55rem, 1.5vw, 0.6rem)", textTransform: "uppercase", fontWeight: 700 }}>{def?.label}</p>
                 <p className="text-base font-bold tabular-nums" style={{ color: "var(--ink)" }}>{fmtMetric(v, id)}</p>
               </button>
             );
@@ -226,7 +226,7 @@ function UnemploymentView({ countryName, yearData, metric, onMetricChange }: { c
 
       {/* Trend */}
       <div>
-        <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
+        <p style={{ color: "var(--ink-3)", fontSize: "clamp(0.58rem, 1.6vw, 0.65rem)", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
           Évolution — {ECONOMY_METRICS.find(m => m.id === metric)?.label}
         </p>
         <div className="flex flex-col gap-1.5">
@@ -280,24 +280,24 @@ function CompaniesView({ countryName, yearData }: { countryName: string; yearDat
       {/* Active population */}
       <div className="grid grid-cols-2 gap-2">
         <div className="rounded-xl px-3 py-3 flex flex-col gap-1" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-          <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>Pop. active</p>
+          <p style={{ color: "var(--ink-3)", fontSize: "clamp(0.55rem, 1.5vw, 0.6rem)", textTransform: "uppercase", fontWeight: 700 }}>Pop. active</p>
           <p className="text-base font-bold tabular-nums" style={{ color: "var(--ink)" }}>
             {labor ? `${labor.active_population_millions.toLocaleString("fr-FR")} M` : "—"}
           </p>
-          <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>personnes (15-64 ans)</p>
+          <p style={{ color: "var(--ink-4)", fontSize: "clamp(0.53rem, 1.45vw, 0.58rem)" }}>personnes (15-64 ans)</p>
         </div>
         <div className="rounded-xl px-3 py-3 flex flex-col gap-1" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
-          <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>% Pop. active</p>
+          <p style={{ color: "var(--ink-3)", fontSize: "clamp(0.55rem, 1.5vw, 0.6rem)", textTransform: "uppercase", fontWeight: 700 }}>% Pop. active</p>
           <p className="text-base font-bold tabular-nums" style={{ color: "var(--ink)" }}>
             {activePct !== null ? `${activePct.toFixed(1)} %` : "—"}
           </p>
-          <p style={{ color: "var(--ink-4)", fontSize: "0.58rem" }}>sur {comp ? `${comp.population_millions.toLocaleString("fr-FR")} M hab.` : "—"}</p>
+          <p style={{ color: "var(--ink-4)", fontSize: "clamp(0.53rem, 1.45vw, 0.58rem)" }}>sur {comp ? `${comp.population_millions.toLocaleString("fr-FR")} M hab.` : "—"}</p>
         </div>
       </div>
 
       {/* Year trend */}
       <div>
-        <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
+        <p style={{ color: "var(--ink-3)", fontSize: "clamp(0.58rem, 1.6vw, 0.65rem)", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
           Évolution des entreprises
         </p>
         <div className="flex flex-col gap-1.5">
@@ -322,7 +322,7 @@ function CompaniesView({ countryName, yearData }: { countryName: string; yearDat
       {/* Top companies (always from 2023) */}
       {topCompanies && topCompanies.length > 0 ? (
         <div>
-          <p style={{ color: "var(--ink-3)", fontSize: "0.65rem", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
+          <p style={{ color: "var(--ink-3)", fontSize: "clamp(0.58rem, 1.6vw, 0.65rem)", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
             Top {topCompanies.length} entreprises <span style={{ color: "var(--ink-4)", textTransform: "none", fontWeight: 400 }}>(2023)</span>
           </p>
           <div className="flex flex-col gap-1.5">
@@ -331,7 +331,7 @@ function CompaniesView({ countryName, yearData }: { countryName: string; yearDat
                 <span className="text-xs font-bold tabular-nums" style={{ color: "var(--accent)", minWidth: 18 }}>{i + 1}</span>
                 <div className="flex flex-col flex-1 min-w-0">
                   <span className="text-xs font-semibold truncate" style={{ color: "var(--ink)" }}>{c.name}</span>
-                  <span style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>{c.sector}</span>
+                  <span style={{ color: "var(--ink-4)", fontSize: "clamp(0.55rem, 1.5vw, 0.6rem)" }}>{c.sector}</span>
                 </div>
                 <span className="text-xs tabular-nums whitespace-nowrap" style={{ color: "var(--ink-2)" }}>{c.revenue_bn} Mds€</span>
               </div>
@@ -361,7 +361,16 @@ export function EconomySidePanel({ countryName, yearData, metric, open, onClose,
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 16 }}
           transition={{ duration: 0.25, ease: "easeInOut" }}
-          className="flex-shrink-0 overflow-hidden w-full lg:w-[300px] lg:min-w-[300px] border-t lg:border-t-0 lg:border-l"
+          /* Sous le grand écran, le panneau se pose sur la carte plutôt qu'en
+             dessous : la rangée a une hauteur fixe, et se partager cette
+             hauteur coupait le détail du pays en deux. En feuille, il dispose
+             de toute la hauteur, et le pays se lit d'un seul tenant. */
+          className={`eco-panel absolute inset-0 z-30 lg:static lg:z-auto flex-shrink-0 overflow-hidden w-full lg:w-[300px] lg:min-w-[300px] lg:border-l${
+            // En feuille, l'invitation « cliquez sur un pays » masquerait la
+            // carte qu'elle invite à cliquer : sous le grand écran, le panneau
+            // n'existe qu'une fois le pays choisi.
+            hasData ? "" : " max-lg:hidden"
+          }`}
           style={{ borderColor: "var(--border)", background: "var(--surface)" }}
         >
           <div className="h-full overflow-y-auto">

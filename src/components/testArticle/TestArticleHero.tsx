@@ -102,7 +102,7 @@ export function TestArticleHero() {
       </div>
 
       {/* ── Title, rule, section ── */}
-      <div style={{ maxWidth: 880, margin: "0 auto", padding: "40px 20px 0", textAlign: "center" }}>
+      <div style={{ maxWidth: 880, margin: "0 auto", padding: "clamp(26px, 6vw, 40px) clamp(18px, 5vw, 20px) 0", textAlign: "center" }}>
         <p
           style={{
             fontSize: "0.62rem",
@@ -141,7 +141,7 @@ export function TestArticleHero() {
         </p>
 
         {/* The rule, and the section hanging under it. */}
-        <div style={{ marginTop: 30 }}>
+        <div style={{ marginTop: "clamp(20px, 5vw, 30px)" }}>
           <div style={{ height: 1, background: "var(--border)", width: "100%" }} />
           <p
             style={{

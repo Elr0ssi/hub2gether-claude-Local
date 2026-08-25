@@ -56,7 +56,7 @@ export function Slot({ children = TO_FILL }: { children?: string }) {
 /** Section marker: a rule with the part's number and name sitting on it. */
 export function PartRule({ n, title }: { n: string; title: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 16, margin: "56px 0 22px" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: "clamp(10px, 3vw, 16px)", margin: "clamp(34px, 7vw, 56px) 0 clamp(14px, 3vw, 22px)" }}>
       <span
         style={{
           fontSize: "0.7rem",
@@ -71,15 +71,17 @@ export function PartRule({ n, title }: { n: string; title: string }) {
       <h2
         className="font-black"
         style={{
-          fontSize: "clamp(1.25rem, 2vw, 1.7rem)",
+          fontSize: "clamp(1.15rem, 4.6vw, 1.7rem)",
           letterSpacing: "-0.025em",
           color: "var(--ink)",
-          flexShrink: 0,
+          // Un titre long doit se replier plutôt que sortir de l'écran : le
+          // filet, lui, se contente de ce qui reste.
+          minWidth: 0,
         }}
       >
         {title}
       </h2>
-      <span style={{ flex: 1, height: 1, background: "var(--border)" }} />
+      <span style={{ flex: "1 1 14px", minWidth: 14, height: 1, background: "var(--border)" }} />
     </div>
   );
 }
@@ -104,7 +106,7 @@ export function KeyFigures() {
         borderRadius: 18,
         border: "1px solid var(--border)",
         background: "var(--surface-2)",
-        padding: "20px 22px",
+        padding: "clamp(14px, 4vw, 20px) clamp(14px, 4.5vw, 22px)",
       }}
     >
       <p
@@ -139,7 +141,7 @@ export function KeyFigures() {
               {value ? (
                 <p
                   className="font-black"
-                  style={{ fontSize: "1.5rem", letterSpacing: "-0.03em", color: "var(--ink)" }}
+                  style={{ fontSize: "clamp(1.2rem, 5.5vw, 1.5rem)", letterSpacing: "-0.03em", color: "var(--ink)" }}
                 >
                   {value}
                   <span
@@ -219,14 +221,14 @@ export function IdeaCarousel() {
           border: "1px solid var(--border)",
           background: "var(--surface)",
           overflow: "hidden",
-          minHeight: 210,
+          minHeight: "clamp(150px, 42vw, 210px)",
           display: "flex",
         }}
       >
         {/* The number, set large and quiet on the left. */}
         <div
           style={{
-            flex: "0 0 clamp(78px, 9vw, 128px)",
+            flex: "0 0 clamp(56px, 14vw, 128px)",
             background: "linear-gradient(160deg, rgba(57,255,136,0.10), rgba(57,255,136,0.02))",
             borderRight: "1px solid var(--border)",
             display: "grid",
@@ -252,7 +254,7 @@ export function IdeaCarousel() {
           </AnimatePresence>
         </div>
 
-        <div style={{ flex: 1, minWidth: 0, padding: "26px clamp(18px, 2.4vw, 34px)" }}>
+        <div style={{ flex: 1, minWidth: 0, padding: "clamp(16px, 4.5vw, 26px) clamp(14px, 4vw, 34px)" }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={slide.title}
@@ -392,7 +394,7 @@ export function DebtChart() {
             borderRadius: 18,
             border: "1px solid var(--border)",
             background: "var(--surface)",
-            padding: "16px 18px 12px",
+            padding: "clamp(12px, 3.5vw, 16px) clamp(12px, 4vw, 18px) 12px",
           }}
         >
           <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={chart.caption}>
@@ -494,7 +496,7 @@ export function PullQuote({ text, attribution }: { text: string; attribution: st
     <blockquote
       style={{
         margin: "26px 0",
-        paddingLeft: 22,
+        paddingLeft: "clamp(14px, 4.5vw, 22px)",
         borderLeft: `3px solid ${ACCENT}`,
       }}
     >
@@ -544,7 +546,7 @@ export function PerspectiveCard({
         borderRadius: 16,
         border: "1px solid var(--border)",
         background: "var(--surface)",
-        padding: "20px 22px",
+        padding: "clamp(14px, 4vw, 20px) clamp(14px, 4.5vw, 22px)",
         display: "flex",
         flexDirection: "column",
         gap: 12,
@@ -572,7 +574,7 @@ export function PerspectiveCard({
           borderRadius: 12,
           background: "var(--surface-2)",
           border: "1px dashed var(--border)",
-          padding: "12px 14px",
+          padding: "clamp(10px, 3vw, 12px) clamp(11px, 3.5vw, 14px)",
           display: "flex",
           gap: 10,
         }}

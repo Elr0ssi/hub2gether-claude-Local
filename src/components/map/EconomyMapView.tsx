@@ -299,7 +299,7 @@ export function EconomyMapView() {
             has its own padding, so a fixed height overflowed a 1440x800
             laptop. */}
         <div
-          className={`flex flex-col lg:flex-row${isFullscreen ? " flex-1 overflow-hidden" : ""}`}
+          className={`relative flex flex-col lg:flex-row${isFullscreen ? " flex-1 overflow-hidden" : ""}`}
           style={
             isFullscreen
               ? {}

@@ -26,7 +26,7 @@ export default function TestArticlePage() {
     <Layout>
       <TestArticleHero />
 
-      <div className="eco-section-body" style={{ paddingTop: 28, paddingBottom: 64 }}>
+      <div className="eco-section-body ta-page" style={{ paddingTop: 28, paddingBottom: 64 }}>
         <div className="eco-section-row">
           <AdRail side="left" />
           <div className="eco-section-main">

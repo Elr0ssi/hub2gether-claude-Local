@@ -165,7 +165,7 @@ export function TestArticleBody() {
                 borderRadius: 12,
                 border: "1px solid var(--border)",
                 background: "var(--surface)",
-                padding: "14px 16px",
+                padding: "clamp(11px, 3.2vw, 14px) clamp(12px, 4vw, 16px)",
                 display: "flex",
                 gap: 11,
               }}
@@ -188,7 +188,7 @@ export function TestArticleBody() {
             borderRadius: 18,
             border: `1px solid ${ACCENT}`,
             background: "rgba(57,255,136,0.06)",
-            padding: "24px 26px",
+            padding: "clamp(16px, 4.5vw, 24px) clamp(16px, 5vw, 26px)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>

@@ -312,10 +312,13 @@ export function EconomyRankingsTable({
               <th className="px-3 py-2.5 text-left" style={{ color: "var(--ink-4)", fontSize: "0.62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                 Pays
               </th>
-              {cols.map((col) => (
+              {cols.map((col, i) => (
                 <th
                   key={col.key}
-                  className="px-3 py-2.5 text-right cursor-pointer transition-colors"
+                  // Sur un téléphone, seule la colonne que la carte met en
+                  // couleur reste : les autres sortaient de l'écran et se
+                  // lisaient déjà dans la fiche du pays.
+                  className={`px-3 py-2.5 text-right cursor-pointer transition-colors${i > 0 ? " eco-rank-extra" : ""}`}
                   onClick={() => handleSort(col.key, col.sortDir)}
                   style={{
                     color: col.key === effectiveSortKey ? "#0D7A40" : "var(--ink-4)",
@@ -395,17 +398,17 @@ export function EconomyRankingsTable({
                     <td className="px-3 py-2.5">
                       <div className="flex items-center gap-2">
                         {flagImg(FLAGS[name])}
-                        <span className="text-xs font-medium" style={{ color: "var(--ink)", whiteSpace: "nowrap" }}>
+                        <span className="text-xs font-medium eco-rank-country" style={{ color: "var(--ink)", whiteSpace: "nowrap" }}>
                           {countryFr(name)}
                         </span>
                       </div>
                     </td>
 
                     {/* Data columns */}
-                    {cols.map((col) => (
+                    {cols.map((col, i) => (
                       <td
                         key={col.key}
-                        className="px-3 py-2.5 text-right tabular-nums"
+                        className={`px-3 py-2.5 text-right tabular-nums${i > 0 ? " eco-rank-extra" : ""}`}
                         style={{
                           background: "rgba(57,255,136,0.05)",
                           fontWeight: col.key === effectiveSortKey ? 700 : 500,

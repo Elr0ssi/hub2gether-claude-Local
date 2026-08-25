@@ -749,6 +749,20 @@ body {
   .ta-perspective-row { grid-template-columns: repeat(3, 1fr); gap: 16px; }
 }
 
+/* Une page de lecture, pas une carte : sur un téléphone la gouttière commune
+   à la section économie (12px) collait le texte au bord de l'écran. Ici la
+   colonne garde une marge où poser le pouce et l'œil. */
+@media (max-width: 1179px) {
+  .ta-page.eco-section-body { padding-left: clamp(18px, 5vw, 28px); padding-right: clamp(18px, 5vw, 28px); }
+}
+
+@media (max-width: 640px) {
+  .ta-open-row,
+  .ta-chart-row { gap: 20px; }
+  .ta-perspective-row,
+  .ta-source-row { gap: 11px; }
+}
+
 /* ── Leaflet — the interactive world map ──────────────────────────────────
    Leaflet paints its own chrome; three things of it have to be answered. */
 
@@ -760,3 +774,92 @@ body {
   outline: none;
 }
 
+/* ── Petits écrans : l'échelle de la page économie ────────────────────────
+   La page est composée pour un grand écran. En dessous, ce n'est pas la
+   disposition qui gêne — elle passe déjà en colonne — mais la taille : les
+   chiffres, les cartes et le panneau de détail gardent leur corps de bureau
+   et le lecteur ne voit plus un pays d'un seul tenant.
+
+   Les tailles viennent de classes utilitaires, donc une règle plus
+   spécifique les reprend. Ce qui est écrit en style inline est traité dans
+   les composants, où seul `clamp()` peut gagner. */
+
+@media (max-width: 1023px) {
+  .eco-snap .text-3xl { font-size: 1.5rem; line-height: 1.15; }
+  .eco-snap .text-2xl { font-size: 1.3rem; line-height: 1.15; }
+  .eco-snap .text-xl { font-size: 1.1rem; line-height: 1.2; }
+  .eco-snap .text-base { font-size: 0.92rem; }
+  .eco-snap .text-sm { font-size: 0.84rem; }
+}
+
+@media (max-width: 640px) {
+  .eco-snap .text-3xl { font-size: 1.28rem; }
+  .eco-snap .text-2xl { font-size: 1.12rem; }
+  .eco-snap .text-xl { font-size: 1rem; }
+  .eco-snap .text-base { font-size: 0.86rem; }
+  .eco-snap .text-sm { font-size: 0.8rem; }
+  .eco-snap .text-xs { font-size: 0.7rem; }
+
+  /* Les cartes d'articles recommandées : une carte pleine largeur plutôt
+     qu'une carte de bureau qui déborde du pouce. */
+  .eco-snap .w-72 { width: 15rem; }
+}
+
+/* ── Le panneau de détail d'un pays ───────────────────────────────────────
+   En feuille sur la carte, il dispose de toute la hauteur de la rangée ; ce
+   qui reste à gagner est de l'air. On resserre les blocs et on descend d'un
+   cran les tailles, pour que le pays se lise d'un seul tenant plutôt qu'en
+   deux écrans de défilement interne. */
+@media (max-width: 1023px) {
+  .eco-panel .px-4 { padding-left: 0.8rem; padding-right: 0.8rem; }
+  .eco-panel .py-4 { padding-top: 0.7rem; padding-bottom: 0.7rem; }
+  .eco-panel .py-3 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+  .eco-panel .px-3 { padding-left: 0.6rem; padding-right: 0.6rem; }
+  .eco-panel .py-2\.5 { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+  .eco-panel .py-2 { padding-top: 0.35rem; padding-bottom: 0.35rem; }
+  .eco-panel .gap-5 { gap: 0.75rem; }
+  .eco-panel .gap-3 { gap: 0.5rem; }
+  .eco-panel .gap-2 { gap: 0.375rem; }
+  .eco-panel .gap-1\.5 { gap: 0.25rem; }
+  .eco-panel .py-16 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+  .eco-panel .text-3xl { font-size: 1.5rem; line-height: 1.1; }
+  .eco-panel .text-2xl { font-size: 1.3rem; line-height: 1.1; }
+  .eco-panel .text-xl { font-size: 1.1rem; line-height: 1.15; }
+  .eco-panel .text-base { font-size: 0.9rem; }
+  .eco-panel .text-sm { font-size: 0.82rem; }
+  .eco-panel .text-xs { font-size: 0.72rem; }
+}
+
+@media (max-width: 640px) {
+  .eco-panel .px-4 { padding-left: 0.7rem; padding-right: 0.7rem; }
+  .eco-panel .py-4 { padding-top: 0.55rem; padding-bottom: 0.55rem; }
+  .eco-panel .gap-5 { gap: 0.6rem; }
+  .eco-panel .text-3xl { font-size: 1.32rem; }
+  .eco-panel .text-2xl { font-size: 1.16rem; }
+  .eco-panel .text-xl { font-size: 1rem; }
+  .eco-panel .text-base { font-size: 0.84rem; }
+  .eco-panel .text-sm { font-size: 0.78rem; }
+  .eco-panel .text-xs { font-size: 0.68rem; }
+}
+
+/* ── Le classement mondial ────────────────────────────────────────────────
+   Cinq colonnes tiennent sur un écran large ; sur un téléphone elles
+   poussaient le chiffre principal hors du cadre. On garde le rang, le pays et
+   la mesure affichée par la carte — les autres restent accessibles en
+   changeant de mesure, et figurent dans la fiche du pays. */
+@media (max-width: 640px) {
+  .eco-rank-extra { display: none; }
+  /* Un nom long se replie plutôt que de pousser le chiffre hors du cadre. */
+  .eco-rank-country { white-space: normal !important; }
+  .eco-snap table .px-4 { padding-left: 0.55rem; padding-right: 0.55rem; }
+  .eco-snap table .px-3 { padding-left: 0.45rem; padding-right: 0.45rem; }
+  .eco-snap table .py-2\.5 { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+}
+
+/* La vignette d'une carte d'article. Le ratio vit ici et non en style inline,
+   pour qu'il puisse se raccourcir quand la carte se raccourcit. */
+.eco-card-media { aspect-ratio: 16 / 10; }
+
+@media (max-width: 640px) {
+  .eco-card-media { aspect-ratio: 16 / 7; }
+}
