@@ -66,7 +66,7 @@ export const S2_SLIDES: readonly Slide2[] = [
     label: "Couverture",
     act: "pitch",
     seconds: 30,
-    tone: "light",
+    tone: "dark",
     speakerNotes:
       "Poser la promesse et ne plus la lâcher : comprendre en 30 secondes, maîtriser en 5 minutes. Laisser le globe tourner deux secondes avant de parler. Ne pas annoncer le plan, la narration se tient toute seule.",
   },
@@ -283,13 +283,13 @@ export const ACT_LABELS: Record<Act, string> = {
 
 export const COVER = {
   wordmark: "The Essential Data",
-  promise: ["Comprendre en 30 secondes.", "Maîtriser en 5 minutes."],
   tagline: "Turning data into meaning.",
   context: "Soutenance de business plan",
 } as const;
 
-/** The through-line. Repeated verbatim on the cover, the article slide and the close. */
-export const PROMISE = COVER.promise;
+/** Le fil conducteur. Repris tel quel sur la slide article et à la clôture ;
+    la couverture ne le porte plus, il se dit à l'oral. */
+export const PROMISE = ["Comprendre en 30 secondes.", "Maîtriser en 5 minutes."] as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
    02 — LE PROBLÈME
@@ -317,14 +317,6 @@ export const PROBLEM = {
       body: "La confiance dans l'information consultée reste minoritaire.",
     },
   ],
-  headline: {
-    value: "29 %",
-    body: "des Français déclarent faire confiance à la majorité de l'information qu'ils consultent.",
-  },
-  secondary: {
-    value: "89 %",
-    body: "refusent de payer pour s'informer en ligne.",
-  },
   /** Orbiting around the reader on the right-hand composition. */
   scatter: [
     "Presse quotidienne",
@@ -344,9 +336,28 @@ export const PROBLEM = {
 
 export const AUDIENCE = {
   title: ["Une information exigeante.", "Sans exiger des heures de recherche."],
+  /* Les deux chiffres du problème vivent ici : ils ne décrivent pas une
+     friction, ils décrivent exactement le public visé, celui qui ne croit pas
+     ce qu'il lit et ne paiera pas pour le lire. */
+  stats: [
+    {
+      value: "29 %",
+      body: "des Français déclarent faire confiance à la majorité de l'information qu'ils consultent.",
+      source: "Reuters Institute, Digital News Report",
+    },
+    {
+      value: "89 %",
+      body: "refusent de payer pour s'informer en ligne.",
+      source: "Reuters Institute, Digital News Report",
+    },
+  ],
+  paywall: {
+    label: "Le mur",
+    body: "L'essentiel des titres de référence français placent leurs analyses derrière un abonnement. Le lecteur qui ne fait déjà pas confiance est aussi celui à qui l'on demande de payer d'avance.",
+  },
   core: {
     label: "Cible principale",
-    body: "Public francophone intéressé par l'économie et la géopolitique.",
+    body: "Public francophone intéressé par l'économie et la géopolitique. Les autres marchés viendront ; le francophone est celui que nous savons servir aujourd'hui.",
   },
   segments: [
     {

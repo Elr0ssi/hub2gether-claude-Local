@@ -65,105 +65,89 @@ function DrawPath({
    Sources strewn around the reader: the work they are left to do.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export function ScatterField({
+export function SourceFan({
   labels,
   startDelay = 0,
-  size = 620,
 }: {
   labels: readonly string[];
   startDelay?: number;
-  size?: number;
 }) {
   const ink = useInk();
   const accent = useAccent();
-  const c = size / 2;
 
-  // Two rings, offset — irregular enough to read as scatter, regular enough
-  // to stay legible at projection distance.
-  const placed = labels.map((label, i) => {
-    const ring = i % 2 === 0 ? 0.94 : 0.62;
-    const angle = (i / labels.length) * Math.PI * 2 - Math.PI / 2 + (i % 2 ? 0.34 : 0);
-    return {
-      label,
-      // Les pastilles sont centrées sur leur point : sur l'anneau extérieur,
-      // la moitié d'un intitulé long dépassait du cadre et, le cadre touchant
-      // déjà le bord de la colonne, sortait de l'écran. Le rayon horizontal
-      // est resserré pour que la pastille entière tienne, la hauteur non.
-      x: q(c + Math.cos(angle) * c * ring * 0.74),
-      y: q(c + Math.sin(angle) * c * ring * 0.82),
-    };
+  /* Le lecteur en haut, les sources en éventail dessous.
+     La version précédente semait les sources sur deux anneaux autour du
+     lecteur : la composition partait dans tous les sens, rien ne s'alignait,
+     et une pastille finissait hors du cadre. Ici les positions sont posées à
+     la main, en parts du cadre, symétriques ligne par ligne. Les traits sont
+     tracés vers ces mêmes coordonnées, si bien qu'ils touchent toujours le
+     centre de la pastille : le schéma ne peut pas se désaligner. */
+  // Trois par rangée au plus : à quatre, deux intitulés longs se chevauchent
+  // dans la largeur d'une colonne de slide.
+  const ROWS: readonly (readonly number[])[] = [
+    [0.15, 0.5, 0.85],
+    [0.3, 0.7],
+    [0.15, 0.5, 0.85],
+  ];
+  const ROW_Y = [0.44, 0.68, 0.92];
+
+  const placed = labels.slice(0, 9).map((label, i) => {
+    let row = 0;
+    let n = i;
+    while (row < ROWS.length - 1 && n >= ROWS[row].length) {
+      n -= ROWS[row].length;
+      row += 1;
+    }
+    const cols = ROWS[row];
+    return { label, x: cols[Math.min(n, cols.length - 1)], y: ROW_Y[row] };
   });
 
+  const READER = { x: 0.5, y: 0.09 };
+
   return (
-    <div style={{ position: "relative", width: size, height: size }}>
-      <svg width={size} height={size} style={{ position: "absolute", inset: 0 }}>
+    <div style={{ position: "relative", width: "100%", maxWidth: 660, aspectRatio: "660 / 560" }}>
+      <svg
+        viewBox="0 0 1000 1000"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+      >
         {placed.map((p, i) => (
           <DrawPath
-            key={i}
-            d={`M ${p.x} ${p.y} L ${c} ${c}`}
+            key={p.label}
+            d={`M ${READER.x * 1000} ${READER.y * 1000 + 40} L ${p.x * 1000} ${p.y * 1000 - 22}`}
             stroke={ink.rule}
             width={1}
             opacity={0.9}
             dashed
             delay={startDelay + 0.3 + i * 0.05}
-            duration={0.8}
+            duration={0.7}
           />
         ))}
       </svg>
 
-      {placed.map((p, i) => (
-        <Rise
-          key={p.label}
-          delay={startDelay + 0.2 + i * 0.06}
-          y={8}
-          duration={DUR.quick}
-          style={{
-            position: "absolute",
-            left: p.x,
-            top: p.y,
-            transform: "translate(-50%, -50%)",
-          }}
-        >
-          <span
-            style={{
-              display: "inline-block",
-              whiteSpace: "nowrap",
-              padding: "9px 16px",
-              borderRadius: 100,
-              border: `1px solid ${ink.rule}`,
-              background: ink.tone === "dark" ? "rgba(255,255,255,0.04)" : "#fff",
-              color: ink.muted,
-              fontSize: 17,
-              fontWeight: 600,
-            }}
-          >
-            {p.label}
-          </span>
-        </Rise>
-      ))}
-
-      {/* The reader, in the middle of it */}
+      {/* Le lecteur */}
       <Rise
         delay={startDelay}
         y={0}
         style={{
           position: "absolute",
-          left: c,
-          top: c,
+          left: `${READER.x * 100}%`,
+          top: `${READER.y * 100}%`,
           transform: "translate(-50%, -50%)",
         }}
       >
         <div
           style={{
-            width: 132,
-            height: 132,
+            width: 112,
+            height: 112,
             borderRadius: "50%",
             border: `2px solid ${accent}`,
             display: "grid",
             placeItems: "center",
             background: ink.tone === "dark" ? "#0B0B0B" : "#fff",
             color: ink.primary,
-            fontSize: 19,
+            fontSize: 18,
             fontWeight: 800,
             letterSpacing: "-0.02em",
             textAlign: "center",
@@ -175,6 +159,38 @@ export function ScatterField({
           lecteur
         </div>
       </Rise>
+
+      {/* Les sources */}
+      {placed.map((p, i) => (
+        <Rise
+          key={p.label}
+          delay={startDelay + 0.25 + i * 0.06}
+          y={8}
+          duration={DUR.quick}
+          style={{
+            position: "absolute",
+            left: `${p.x * 100}%`,
+            top: `${p.y * 100}%`,
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          <span
+            style={{
+              display: "inline-block",
+              whiteSpace: "nowrap",
+              padding: "7px 13px",
+              borderRadius: 100,
+              border: `1px solid ${ink.rule}`,
+              background: ink.tone === "dark" ? "rgba(255,255,255,0.04)" : "#fff",
+              color: ink.muted,
+              fontSize: 14,
+              fontWeight: 600,
+            }}
+          >
+            {p.label}
+          </span>
+        </Rise>
+      ))}
     </div>
   );
 }

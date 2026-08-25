@@ -45,7 +45,7 @@ import {
   ProductScreenshotFrame,
   ReplicationDiagram,
   RevenueCurve,
-  ScatterField,
+  SourceFan,
   SourceConvergence,
   StatusTimeline,
   useAccent,
@@ -117,6 +117,9 @@ function CoverSlide() {
   const ink = useInk();
   const accent = useAccent();
 
+  /* Fond noir, comme la soutenance V1, et la promesse retirée : elle est dite
+     à l'oral et revient plus loin dans le deck. Le contexte se lit d'une
+     traite, sans le point qui le coupait de son libellé. */
   return (
     <SlideBody center>
       <div style={{ position: "absolute", right: 96, top: "50%", transform: "translateY(-50%)", zIndex: 1 }}>
@@ -128,12 +131,25 @@ function CoverSlide() {
       </div>
 
       <div style={{ position: "relative", zIndex: 2, maxWidth: 940 }}>
-        <Eyebrow index="§">{COVER.context}</Eyebrow>
+        <Rise delay={0.05} y={12}>
+          <p
+            style={{
+              fontFamily: "Georgia, 'Times New Roman', serif",
+              fontStyle: "italic",
+              fontSize: 25,
+              fontWeight: 400,
+              letterSpacing: "-0.01em",
+              color: accent,
+            }}
+          >
+            {COVER.context}
+          </p>
+        </Rise>
 
         <Rise delay={0.15} y={26}>
           <h1
             className="t-display"
-            style={{ color: ink.primary, letterSpacing: "-0.05em", marginTop: 30 }}
+            style={{ color: ink.primary, letterSpacing: "-0.05em", marginTop: 26 }}
           >
             The Essential
             <br />
@@ -141,22 +157,12 @@ function CoverSlide() {
           </h1>
         </Rise>
 
-        <div style={{ marginTop: 46, maxWidth: 640 }}>
+        <div style={{ marginTop: 44, maxWidth: 640 }}>
           <Rule delay={0.5} accentWidth={120} />
         </div>
 
-        <div style={{ marginTop: 34 }}>
-          {COVER.promise.map((line, i) => (
-            <Rise key={line} delay={0.62 + i * 0.14} y={16}>
-              <div className="t-h3" style={{ color: ink.secondary, letterSpacing: "-0.02em" }}>
-                {line}
-              </div>
-            </Rise>
-          ))}
-        </div>
-
-        <Rise delay={0.95} y={12}>
-          <div className="t-small" style={{ color: ink.faint, marginTop: 30, letterSpacing: "0.1em" }}>
+        <Rise delay={0.7} y={12}>
+          <div className="t-small" style={{ color: ink.faint, marginTop: 28, letterSpacing: "0.1em" }}>
             {COVER.tagline}
           </div>
         </Rise>
@@ -173,73 +179,48 @@ function ProblemSlide() {
   const ink = useInk();
   const accent = useAccent();
 
+  /* Les deux pourcentages qui fermaient cette slide sont passés sur « Pour
+     qui » : ils décrivent une audience, pas une friction, et ils tassaient
+     une colonne déjà pleine. Ce qui reste respire. */
   return (
     <SlideBody>
-      <Eyebrow index={sectionNo("probleme")}>Le problème</Eyebrow>
+      <Eyebrow>Le problème</Eyebrow>
 
-      <div style={{ marginTop: 26, maxWidth: 1040 }}>
+      <div style={{ marginTop: 34, maxWidth: 1100 }}>
         <StatementTitle lines={PROBLEM.title} delay={0.1} size="t-h2" />
       </div>
 
       <div
         style={{
-          marginTop: 46,
+          marginTop: 58,
           display: "grid",
-          gridTemplateColumns: "1fr 560px",
+          gridTemplateColumns: "1fr 680px",
           gap: 64,
-          alignItems: "start",
+          alignItems: "center",
           flex: 1,
+          minHeight: 0,
         }}
       >
-        <div>
-          <div style={{ display: "grid", gap: 26 }}>
-            {PROBLEM.frictions.map((f, i) => (
-              <Rise key={f.id} delay={0.4 + i * 0.13} y={16}>
-                <div style={{ display: "flex", gap: 24, alignItems: "baseline" }}>
-                  <span
-                    className="t-micro"
-                    style={{ color: accent, minWidth: 118, letterSpacing: "0.14em" }}
-                  >
-                    {f.label}
-                  </span>
-                  <span className="t-body" style={{ color: ink.secondary, maxWidth: 520 }}>
-                    {f.body}
-                  </span>
-                </div>
-              </Rise>
-            ))}
-          </div>
-
-          <div style={{ marginTop: 42, maxWidth: 620 }}>
-            <Rule delay={0.85} accentWidth={90} />
-          </div>
-
-          <Rise delay={0.95} y={18}>
-            <div style={{ marginTop: 26, display: "flex", alignItems: "baseline", gap: 26 }}>
-              <span
-                className="t-display"
-                style={{ color: accent, letterSpacing: "-0.05em", fontSize: 96, lineHeight: 1 }}
-              >
-                {PROBLEM.headline.value}
-              </span>
-              <span className="t-body" style={{ color: ink.secondary, maxWidth: 420 }}>
-                {PROBLEM.headline.body}
-              </span>
-            </div>
-          </Rise>
-
-          <Rise delay={1.15} y={12}>
-            <div className="t-small" style={{ color: ink.faint, marginTop: 20 }}>
-              <strong style={{ color: ink.muted, fontWeight: 800 }}>
-                {PROBLEM.secondary.value}
-              </strong>{" "}
-              {PROBLEM.secondary.body}
-            </div>
-          </Rise>
+        <div style={{ display: "grid", gap: 38 }}>
+          {PROBLEM.frictions.map((f, i) => (
+            <Rise key={f.id} delay={0.4 + i * 0.13} y={16}>
+              <div style={{ display: "flex", gap: 28, alignItems: "baseline" }}>
+                <span
+                  className="t-micro"
+                  style={{ color: accent, minWidth: 118, letterSpacing: "0.14em" }}
+                >
+                  {f.label}
+                </span>
+                <span className="t-body" style={{ color: ink.secondary, maxWidth: 540 }}>
+                  {f.body}
+                </span>
+              </div>
+            </Rise>
+          ))}
         </div>
 
         <div style={{ display: "grid", placeItems: "center" }}>
-          <ScatterField labels={PROBLEM.scatter} startDelay={0.3} size={520} />
+          <SourceFan labels={PROBLEM.scatter} startDelay={0.3} />
         </div>
       </div>
     </SlideBody>
@@ -254,53 +235,98 @@ function AudienceSlide() {
   const ink = useInk();
   const accent = useAccent();
 
+  /* Les deux chiffres ouvrent la slide : ils ne décrivent pas une friction
+     mais le public visé, celui qui ne croit pas ce qu'il lit et à qui l'on
+     demande en plus de payer d'avance. Les segments suivent, avec leurs
+     canaux. */
   return (
     <SlideBody>
-      <Eyebrow index={sectionNo("cible")}>Pour qui</Eyebrow>
+      <Eyebrow>Pour qui</Eyebrow>
 
-      <div style={{ marginTop: 34, maxWidth: 1180 }}>
+      <div style={{ marginTop: 30, maxWidth: 1180 }}>
         <StatementTitle lines={AUDIENCE.title} delay={0.1} />
-      </div>
-
-      <Rise delay={0.42} y={18}>
-        <div style={{ marginTop: 66, display: "flex", alignItems: "baseline", gap: 30 }}>
-          <span className="t-micro" style={{ color: accent, letterSpacing: "0.14em", minWidth: 168 }}>
-            {AUDIENCE.core.label}
-          </span>
-          <span className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em", maxWidth: 880 }}>
-            {AUDIENCE.core.body}
-          </span>
-        </div>
-      </Rise>
-
-      <div style={{ marginTop: 54 }}>
-        <Rule delay={0.6} />
       </div>
 
       <div
         style={{
-          marginTop: 54,
+          marginTop: 46,
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 96,
+          gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.1fr)",
+          gap: 56,
+          alignItems: "start",
         }}
       >
-        {AUDIENCE.segments.map((s, i) => (
-          <Rise key={s.id} delay={0.72 + i * 0.16} y={20}>
+        {AUDIENCE.stats.map((st, i) => (
+          <Rise key={st.value} delay={0.38 + i * 0.14} y={18}>
             <div>
-              <div className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em" }}>
-                {s.label}
+              <div
+                className="t-display"
+                style={{ color: accent, letterSpacing: "-0.05em", fontSize: 92, lineHeight: 1 }}
+              >
+                {st.value}
               </div>
-              <div style={{ display: "flex", gap: 12, marginTop: 24, flexWrap: "wrap" }}>
-                {s.channels.map((c) => (
+              <p className="t-body" style={{ color: ink.secondary, marginTop: 16 }}>
+                {st.body}
+              </p>
+              <p className="t-small" style={{ color: ink.faint, marginTop: 10 }}>
+                {st.source}
+              </p>
+            </div>
+          </Rise>
+        ))}
+
+        <Rise delay={0.66} y={18}>
+          <div>
+            <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 14 }}>
+              {AUDIENCE.paywall.label}
+            </p>
+            <p className="t-body" style={{ color: ink.muted, lineHeight: 1.55 }}>
+              {AUDIENCE.paywall.body}
+            </p>
+          </div>
+        </Rise>
+      </div>
+
+      <div style={{ marginTop: 40 }}>
+        <Rule delay={0.8} />
+      </div>
+
+      <div
+        style={{
+          marginTop: 34,
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr)",
+          gap: 56,
+          alignItems: "start",
+        }}
+      >
+        <Rise delay={0.9} y={16}>
+          <div>
+            <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 12 }}>
+              {AUDIENCE.core.label}
+            </p>
+            <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
+              {AUDIENCE.core.body}
+            </p>
+          </div>
+        </Rise>
+
+        {AUDIENCE.segments.map((sg, i) => (
+          <Rise key={sg.id} delay={1 + i * 0.14} y={16}>
+            <div>
+              <div className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.03em" }}>
+                {sg.label}
+              </div>
+              <div style={{ display: "flex", gap: 9, marginTop: 14, flexWrap: "wrap" }}>
+                {sg.channels.map((c) => (
                   <span
                     key={c}
                     style={{
-                      padding: "9px 20px",
+                      padding: "6px 14px",
                       borderRadius: 100,
                       border: `1px solid ${accent}`,
                       color: accent,
-                      fontSize: 19,
+                      fontSize: 15,
                       fontWeight: 700,
                     }}
                   >
@@ -308,8 +334,8 @@ function AudienceSlide() {
                   </span>
                 ))}
               </div>
-              <div className="t-body" style={{ color: ink.muted, marginTop: 26, maxWidth: 460 }}>
-                {s.body}
+              <div className="t-small" style={{ color: ink.muted, marginTop: 14 }}>
+                {sg.body}
               </div>
             </div>
           </Rise>
@@ -328,7 +354,7 @@ function ProductSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index={sectionNo("produit")}>Le produit</Eyebrow>
+      <Eyebrow>Le produit</Eyebrow>
 
       <Rise delay={0.1} y={22}>
         <h2 className="t-h1" style={{ color: ink.primary, letterSpacing: "-0.04em", marginTop: 30 }}>
@@ -378,7 +404,7 @@ function MarketSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index={sectionNo("marche")}>Le marché</Eyebrow>
+      <Eyebrow>Le marché</Eyebrow>
 
       <div style={{ marginTop: 26, maxWidth: 1180 }}>
         <StatementTitle lines={MARKET.title} delay={0.1} size="t-h2" />
@@ -447,7 +473,7 @@ function CompetitionSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index={sectionNo("concurrence")}>La concurrence</Eyebrow>
+      <Eyebrow>La concurrence</Eyebrow>
 
       <div style={{ marginTop: 30, maxWidth: 1240 }}>
         <StatementTitle lines={COMPETITION_TITLE} delay={0.1} size="t-h2" />
@@ -476,7 +502,7 @@ function AcquisitionSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index={sectionNo("acquisition")}>Moteur d&apos;acquisition</Eyebrow>
+      <Eyebrow>Moteur d&apos;acquisition</Eyebrow>
 
       <div style={{ marginTop: 26, maxWidth: 900 }}>
         <StatementTitle lines={ACQUISITION.title} delay={0.1} size="t-h2" />
@@ -552,7 +578,7 @@ function AiShiftSlide() {
   return (
     <SlideBody style={{ paddingTop: 72, paddingBottom: 78 }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
-        <Eyebrow index={sectionNo("ia")}>{AI_SHIFT.label}</Eyebrow>
+        <Eyebrow>{AI_SHIFT.label}</Eyebrow>
 
         {/* State counter — the presenter's place in the sequence, and the
             audience's. Deliberately quiet. */}
@@ -629,7 +655,7 @@ function RevenueSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index={sectionNo("modele")}>Modèle économique</Eyebrow>
+      <Eyebrow>Modèle économique</Eyebrow>
 
       <div style={{ marginTop: 34, maxWidth: 1080 }}>
         <StatementTitle lines={REVENUE.title} delay={0.1} />
@@ -723,7 +749,7 @@ function CrossCheckSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index={sectionNo("recoupement")}>Le travail de recoupement</Eyebrow>
+      <Eyebrow>Le travail de recoupement</Eyebrow>
 
       <Rise delay={0.1} y={22}>
         <h2
@@ -778,7 +804,7 @@ function PipelineSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index={sectionNo("pipeline")}>Comment naît un article</Eyebrow>
+      <Eyebrow>Comment naît un article</Eyebrow>
 
       {/* Stages and statement travel together, centred in what the header
           leaves. Split apart — the stages pinned under the header, the
@@ -831,10 +857,10 @@ function ArticleSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index={sectionNo("article")}>Le format article</Eyebrow>
+      <Eyebrow>Le format article</Eyebrow>
 
       <div style={{ marginTop: 28 }}>
-        {ARTICLE_FORMAT.title.map((line, i) => (
+        {ARTICLE_FORMAT.title.map((line: string, i: number) => (
           <Rise key={line} delay={0.1 + i * 0.12} y={18}>
             <div
               className="t-h2"
@@ -943,7 +969,7 @@ function StatusSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index={sectionNo("etat")}>Où en est le projet</Eyebrow>
+      <Eyebrow>Où en est le projet</Eyebrow>
 
       <div style={{ marginTop: 30, maxWidth: 1080 }}>
         <StatementTitle lines={STATUS.title} delay={0.1} />
@@ -1040,7 +1066,7 @@ function FinanceSlide() {
 
   return (
     <SlideBody>
-      <Eyebrow index={sectionNo("finance")}>Chiffres clés du business plan</Eyebrow>
+      <Eyebrow>Chiffres clés du business plan</Eyebrow>
 
       <div style={{ marginTop: 30, maxWidth: 1080 }}>
         <StatementTitle lines={FINANCE_SLIDE.title} delay={0.1} />
@@ -1133,7 +1159,7 @@ function RoadmapSlide() {
       </div>
 
       <div style={{ position: "relative", zIndex: 2 }}>
-        <Eyebrow index={sectionNo("roadmap")}>Roadmap</Eyebrow>
+        <Eyebrow>Roadmap</Eyebrow>
 
         <div style={{ marginTop: 28, display: "flex", gap: 26 }}>
           {ROADMAP.title.map((word, i) => (
@@ -1181,7 +1207,7 @@ function ConclusionSlide() {
       </div>
 
       <div style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", height: "100%" }}>
-        <Eyebrow index={sectionNo("conclusion")}>Conclusion</Eyebrow>
+        <Eyebrow>Conclusion</Eyebrow>
 
         <div style={{ marginTop: 24, maxWidth: 1180 }}>
           <StatementTitle lines={CONCLUSION.lines} delay={0.1} size="t-h3" />

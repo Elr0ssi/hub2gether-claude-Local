@@ -165,7 +165,7 @@ export function PublicationsSlide({ index }: { index: string }) {
      désormais la leur, juste après. */
   return (
     <SlideBody>
-      <Eyebrow index={index}>Nos publications</Eyebrow>
+      <Eyebrow>Nos publications</Eyebrow>
       <Title lines={PUBLICATIONS.title} />
 
       <div
@@ -237,7 +237,7 @@ export function PartnershipsSlide({ index }: { index: string }) {
 
   return (
     <SlideBody>
-      <Eyebrow index={index}>Partenariats possibles</Eyebrow>
+      <Eyebrow>Partenariats possibles</Eyebrow>
       <Title lines={["Ce que le format ouvre.", "Rien n'est signé à ce jour."]} />
 
       <Rise delay={0.4} y={12}>
@@ -281,7 +281,7 @@ export function GeoSlide({ index }: { index: string }) {
 
   return (
     <SlideBody>
-      <Eyebrow index={index}>GEO · être lisible par les moteurs</Eyebrow>
+      <Eyebrow>GEO · être lisible par les moteurs</Eyebrow>
       <Title lines={GEO.title} />
 
       <div
@@ -433,7 +433,7 @@ export function PartnersSlide({ index }: { index: string }) {
 
   return (
     <SlideBody>
-      <Eyebrow index={index}>Sélection des partenaires</Eyebrow>
+      <Eyebrow>Sélection des partenaires</Eyebrow>
       <Title lines={PARTNERS.title} />
 
       <Rise delay={0.4} y={12}>
@@ -658,7 +658,7 @@ export function AutomationSlide({ index }: { index: string }) {
 
   return (
     <SlideBody>
-      <Eyebrow index={index}>L&apos;automatisation</Eyebrow>
+      <Eyebrow>L&apos;automatisation</Eyebrow>
       <Title lines={AUTOMATION.title} />
 
       <Rise delay={0.4} y={12}>
