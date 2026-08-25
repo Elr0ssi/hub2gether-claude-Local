@@ -205,7 +205,7 @@ export const S2_SLIDES: readonly Slide2[] = [
   },
   {
     id: "pipeline",
-    label: "Comment naît un article",
+    label: "L'atelier · 1",
     act: "depth",
     seconds: 120,
     tone: "light",
@@ -837,11 +837,10 @@ export const AI_SHIFT = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const GEO = {
-  title: ["Ne pas courir après l'IA.", "Être ce qu'elle a besoin de citer."],
-  definition:
-    "Un moteur de recherche classe des pages. Un moteur de réponse choisit des sources. L'optimisation qui gagne l'un ne gagne pas l'autre.",
+  title: ["Comment être cité par l'IA."],
 
-  /** SEO on the left, GEO on the right — the same column, two objects. */
+  /** SEO à gauche, GEO à droite : la même colonne, deux objets. */
+  contrastHeads: ["Le SEO habituel", "Ce que demande le GEO"],
   contrast: [
     { seo: "Se placer dans un classement", geo: "Être retenu dans une réponse" },
     { seo: "Mots-clés et backlinks", geo: "Faits datés et sources primaires" },
@@ -849,49 +848,39 @@ export const GEO = {
     { seo: "Le clic est la récompense", geo: "La citation est la porte d'entrée" },
   ],
 
-  /** What has to be built. Ordered by what unlocks the rest. */
-  worksites: [
-    {
-      n: "01",
-      label: "Structurer",
-      body: "Pays, indicateur, année, unité, source : ce qu'une machine sait reprendre sans se tromper.",
-      state: "En cours" as const,
-    },
-    {
-      n: "02",
-      label: "Baliser",
-      body: "Des données structurées sur les pages, pour que la source soit explicite et attribuable.",
-      state: "À construire" as const,
-    },
-    {
-      n: "03",
-      label: "Dater",
-      body: "Millésime et mise à jour visibles partout : une donnée qui assume son âge en vaut deux.",
-      state: "En cours" as const,
-    },
-    {
-      n: "04",
-      label: "Ouvrir",
-      body: "Un accès propre aux séries : export, puis interface de programmation.",
-      state: "À construire" as const,
-    },
-    {
-      n: "05",
-      label: "Mesurer",
-      body: "Suivre où le site est cité, pour piloter le reste sur autre chose qu'une intuition.",
-      state: "À construire" as const,
-    },
-  ],
-
-  /** The one thing an engine cannot reproduce by quoting. */
-  moat: {
-    label: "Ce qu'une réponse ne reproduit pas",
-    items: ["La carte", "La comparaison", "La série dans le temps", "Le chemin vers la source"],
-    statement: "Citer nous rend visibles. Explorer nous rend nécessaires.",
+  /* Ce que le GEO impose à la rédaction. Ces quatre exigences portaient le
+     titre « sélection des partenaires » alors qu'elles ne parlent pas de
+     partenaires : elles disent à quelles conditions un moteur de réponse
+     accepte de nous reprendre. */
+  discipline: {
+    label: "Ce que cela impose à nos articles",
+    items: [
+      {
+        label: "Citer la source",
+        body: "Chaque chiffre nommé, daté, et renvoyé à sa publication d'origine.",
+      },
+      {
+        label: "Publier la méthode",
+        body: "Dire comment le chiffre est calculé, sur quel périmètre, avec quelle définition.",
+      },
+      {
+        label: "Tenir la série",
+        body: "Une définition qui ne change pas d'une année sur l'autre, sans quoi la comparaison casse.",
+      },
+      {
+        label: "Tenir la même ligne",
+        body: "Un récit stable et indépendant : c'est la constance qui rend une source reprenable.",
+      },
+    ],
   },
 
-  caveat:
-    "Aucun de ces chantiers n'est mesuré aujourd'hui : ce sont des objectifs, pas des résultats.",
+  /** Ce qu'une réponse ne peut pas reproduire en citant. */
+  moat: {
+    label: "Ce que la réponse ne produit pas",
+    items: ["La carte", "La comparaison", "La série dans le temps", "Le chemin vers la source"],
+    statement:
+      "La citation nous rend visibles. C'est en explorant la carte que le lecteur découvre que l'information est manipulable chez nous, et pas dans la réponse qu'il vient de lire.",
+  },
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -899,61 +888,66 @@ export const GEO = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const PARTNERS = {
-  title: ["Une source entre par la porte", "ou elle n'entre pas."],
+  title: ["Avec qui nous acceptons de travailler."],
   intro:
-    "Le projet vaut ce que valent ses sources. La grille s'applique dans l'ordre : un critère manqué arrête l'examen.",
+    "Un partenariat engage le nom du média autant que le contenu. La grille s'applique dans l'ordre : un critère manqué arrête l'examen.",
 
   criteria: [
     {
       n: "01",
-      label: "Citabilité",
-      question: "Peut-on nommer la source et y renvoyer ?",
-      body: "Une donnée qu'on ne peut pas attribuer ne sert ni au lecteur, ni à un moteur.",
+      label: "Indépendance préservée",
+      question: "Le partenaire peut-il peser sur ce que nous publions ?",
+      body: "Aucun accord ne porte sur le contenu éditorial. Un partenaire finance ou diffuse, il n'oriente pas.",
       veto: true,
     },
     {
       n: "02",
-      label: "Méthode publiée",
-      question: "Sait-on comment le chiffre a été produit ?",
-      body: "Sans méthode publiée, deux chiffres qui se ressemblent ne mesurent pas la même chose.",
+      label: "Visibilité mutuelle",
+      question: "Que gagne chacun, et le dit-on ?",
+      body: "Reprise contre citation et lien. L'échange est nommé dans la publication, jamais implicite.",
       veto: false,
     },
     {
       n: "03",
-      label: "Stabilité",
-      question: "La série tiendra-t-elle dans le temps ?",
-      body: "Une définition qui change chaque année casse la comparaison. Mieux vaut moins fin et continu.",
+      label: "Compatibilité d'audience",
+      question: "Son public recouvre-t-il le nôtre ?",
+      body: "Un partenariat sans recouvrement d'audience coûte du temps et ne rapporte pas de lecteur.",
       veto: false,
     },
     {
       n: "04",
-      label: "Indépendance du récit",
-      question: "La source a-t-elle intérêt au résultat ?",
-      body: "Une source partie prenante n'est pas exclue : elle est signalée comme telle.",
+      label: "Charge tenable",
+      question: "Le format demandé tient-il dans notre production ?",
+      body: "Un partenariat qui demande un travail sur mesure à chaque parution ne passe pas l'échelle.",
       veto: false,
     },
   ],
 
-  /** Where a partner sits once it has passed. */
-  tiers: [
+  /** Les familles envisagées, et ce que l'échange porterait. */
+  candidates: [
     {
-      tier: "Socle",
-      body: "Statistique publique et organisations multilatérales. Portent les séries de référence.",
-      examples: "INSEE, Eurostat, FMI, Banque mondiale, OCDE, OMS",
+      tier: "Médias et éditeurs",
+      body: "Reprise d'un visuel de données contre citation et lien retour.",
+      examples: "Courrier International · Alternatives Économiques · La Tribune",
     },
     {
-      tier: "Complément",
-      body: "Médias spécialisés et instituts. Servent au recoupement et au contexte, jamais seuls.",
-      examples: "Panel du plan : 10 titres français, 15 internationaux prévus",
+      tier: "Institutions et statistique publique",
+      body: "Mise en forme grand public de séries publiques contre accès à la source primaire.",
+      examples: "INSEE · Eurostat · Banque de France · OCDE",
     },
     {
-      tier: "Signalé",
-      body: "Sources engagées ou intéressées. Utilisables, à condition d'être identifiées comme telles dans l'article.",
-      examples: "Fédérations, entreprises, groupes de plaidoyer",
+      tier: "Écoles et recherche",
+      body: "Accès aux jeux de données contre relecture méthodologique.",
+      examples: "Écoles de commerce · Sciences Po · laboratoires d'économie",
+    },
+    {
+      tier: "Marques et annonceurs",
+      body: "Formats sponsorisés identifiés, tenus hors des contenus de données.",
+      examples: "Régies data · éditeurs de logiciels financiers",
     },
   ],
 
-  note: "Aucun accord commercial n'est signé avec une source. La relation est celle du citant au cité.",
+  note: "Aucun partenariat n'est signé à ce jour. Cette grille dit à quelles conditions il le serait.",
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1093,6 +1087,88 @@ export interface FlowNode {
   /** Human hands on the wire — the two places a person decides. */
   human?: boolean;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ATELIER — la chaîne de production, en deux tableaux
+
+   Posé comme un plan de travail à la Make : des nœuds sur une grille, reliés
+   par des liens qui partent d'un bord et arrivent sur un autre. Les positions
+   sont données en colonne et en rangée, et les liens sont tracés vers ces
+   mêmes coordonnées : le schéma ne peut pas se désaligner.
+
+   Deux tableaux plutôt qu'un : du sujet à l'article, puis de l'article à sa
+   vie publique. L'arbitrage et le contrôle, qui avaient leur propre slide,
+   sont revenus dans la chaîne, à l'endroit exact où ils s'exercent.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export interface FlowCell {
+  id: string;
+  col: number;
+  row: number;
+  label: string;
+  detail: string;
+  /** `human` porte une main, `out` ferme une branche. */
+  kind?: "human" | "out";
+}
+
+export const WORKSHOP = {
+  one: {
+    eyebrow: "L'atelier · 1",
+    title: ["Comment naît un article.", "Du sujet à sa structure."],
+    cols: 5,
+    rows: 3,
+    nodes: [
+      { id: "sujet", col: 0, row: 1, label: "Choix du sujet", detail: "Tendances de recherche, actualité du jour", kind: "human" as const },
+      { id: "agents", col: 1, row: 1, label: "Mise en place des agents", detail: "Une consigne par sujet, une attente par agent" },
+      { id: "presse", col: 2, row: 0, label: "Presse", detail: "Panel français et international" },
+      { id: "institutions", col: 2, row: 1, label: "Institutions", detail: "INSEE, Eurostat, FMI, Banque mondiale" },
+      { id: "donnees", col: 2, row: 2, label: "Jeux de données", detail: "Séries du site, bases ouvertes" },
+      { id: "recoupement", col: 3, row: 1, label: "Recoupement", detail: "Convergences, divergences, éléments uniques" },
+      { id: "article", col: 4, row: 1, label: "Article structuré", detail: "Faits, sources, carte, comparaison", kind: "out" as const },
+    ] as readonly FlowCell[],
+    links: [
+      ["sujet", "agents"],
+      ["agents", "presse"],
+      ["agents", "institutions"],
+      ["agents", "donnees"],
+      ["presse", "recoupement"],
+      ["institutions", "recoupement"],
+      ["donnees", "recoupement"],
+      ["recoupement", "article"],
+    ] as readonly (readonly [string, string])[],
+    note: "Les agents ne décident pas du sujet. Ils exécutent une consigne écrite pour ce sujet-là.",
+  },
+
+  two: {
+    eyebrow: "L'atelier · 2",
+    title: ["De l'article à sa vie publique.", "Et les deux mains dessus."],
+    cols: 5,
+    rows: 3,
+    nodes: [
+      { id: "article", col: 0, row: 1, label: "Article structuré", detail: "Sortie du premier tableau" },
+      { id: "arbitrage", col: 1, row: 1, label: "Arbitrage éditorial", detail: "Un humain choisit ce qui se publie", kind: "human" as const },
+      { id: "controle", col: 2, row: 1, label: "Contrôle", detail: "Chaque chiffre remonté à sa source", kind: "human" as const },
+      { id: "site", col: 3, row: 0, label: "Publication site", detail: "Article, carte, séries" },
+      { id: "social", col: 3, row: 2, label: "Formats sociaux", detail: "Carrousels, reels, fil" },
+      { id: "mesure", col: 4, row: 1, label: "Suivi social et data", detail: "Audience, citations, retours", kind: "out" as const },
+    ] as readonly FlowCell[],
+    links: [
+      ["article", "arbitrage"],
+      ["arbitrage", "controle"],
+      ["controle", "site"],
+      ["controle", "social"],
+      ["site", "mesure"],
+      ["social", "mesure"],
+      ["mesure", "arbitrage"],
+    ] as readonly (readonly [string, string])[],
+    handsLabel: "Les deux mains",
+    hands: [
+      { label: "Arbitrage", body: "Un sujet est choisi, pas déclenché par un volume de mentions." },
+      { label: "Contrôle", body: "Rien n'est publié sans qu'un humain ait remonté chaque chiffre à sa source." },
+    ],
+    note: "Retirer ces deux nœuds doublerait le débit et coûterait ce qui distingue le projet d'un site généré automatiquement.",
+  },
+} as const;
 
 export const AUTOMATION = {
   title: ["Une chaîne, pas un bouton.", "Et deux mains dessus."],

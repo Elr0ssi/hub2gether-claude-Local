@@ -11,6 +11,7 @@ import {
   useDeckReducedMotion,
   useInk,
 } from "@/components/presentation/primitives";
+import type { FlowCell } from "@/data/soutenance2/soutenance2Data";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SHARED
@@ -1306,6 +1307,145 @@ export function ReplicationDiagram({
                   </span>
                 )}
               </span>
+            </div>
+          </Rise>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PLAN DE TRAVAIL — les nœuds d'une chaîne, sur une grille
+
+   Les positions viennent d'une colonne et d'une rangée ; les liens sont
+   tracés vers ces mêmes coordonnées. Rien n'est posé à l'œil, donc rien ne
+   peut se désaligner. Un lien sort par le bord droit de sa carte et entre par
+   le bord gauche de la suivante ; quand il revient en arrière, il passe par
+   dessous.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export function FlowCanvas({
+  nodes,
+  links,
+  cols,
+  rows,
+  startDelay = 0,
+}: {
+  nodes: readonly FlowCell[];
+  links: readonly (readonly [string, string])[];
+  cols: number;
+  rows: number;
+  startDelay?: number;
+}) {
+  const ink = useInk();
+  const accent = useAccent();
+
+  const W = 1000;
+  const H = (rows / cols) * 640;
+  const CARD_W = W / cols - 26;
+  const CARD_H = H / rows - 26;
+
+  const centre = (n: FlowCell) => ({
+    x: (n.col + 0.5) * (W / cols),
+    y: (n.row + 0.5) * (H / rows),
+  });
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+
+  const path = (a: FlowCell, b: FlowCell) => {
+    const p1 = centre(a);
+    const p2 = centre(b);
+    const forward = p2.x >= p1.x;
+    if (forward) {
+      const x1 = p1.x + CARD_W / 2;
+      const x2 = p2.x - CARD_W / 2;
+      const mid = (x1 + x2) / 2;
+      return `M ${x1} ${p1.y} C ${mid} ${p1.y}, ${mid} ${p2.y}, ${x2} ${p2.y}`;
+    }
+    // Retour : on descend sous la rangée basse et on remonte.
+    const under = H + 34;
+    return `M ${p1.x} ${p1.y + CARD_H / 2} C ${p1.x} ${under}, ${p2.x} ${under}, ${p2.x} ${p2.y + CARD_H / 2}`;
+  };
+
+  return (
+    <div style={{ position: "relative", width: "100%", aspectRatio: `${W} / ${H + 46}` }}>
+      <svg
+        viewBox={`0 0 ${W} ${H + 46}`}
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+      >
+        {links.map(([from, to], i) => {
+          const a = byId.get(from);
+          const b = byId.get(to);
+          if (!a || !b) return null;
+          return (
+            <DrawPath
+              key={`${from}-${to}`}
+              d={path(a, b)}
+              stroke={ink.rule}
+              width={1.4}
+              opacity={0.95}
+              delay={startDelay + 0.25 + i * 0.07}
+              duration={0.6}
+            />
+          );
+        })}
+      </svg>
+
+      {nodes.map((n, i) => {
+        const c = centre(n);
+        const human = n.kind === "human";
+        const out = n.kind === "out";
+        return (
+          <Rise
+            key={n.id}
+            delay={startDelay + i * 0.08}
+            y={10}
+            duration={DUR.quick}
+            /* Coin haut gauche et taille, pas de centrage par transformation :
+               l'entrée de la carte anime déjà sa translation, et les deux se
+               disputaient le même attribut. La dernière carte sortait alors du
+               cadre par la droite. */
+            style={{
+              position: "absolute",
+              left: `${((c.x - CARD_W / 2) / W) * 100}%`,
+              top: `${((c.y - CARD_H / 2) / (H + 46)) * 100}%`,
+              width: `${(CARD_W / W) * 100}%`,
+              height: `${(CARD_H / (H + 46)) * 100}%`,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                borderRadius: 12,
+                border: `1px solid ${human || out ? accent : ink.rule}`,
+                background: human
+                  ? ink.tone === "dark"
+                    ? "rgba(57,255,136,0.08)"
+                    : "rgba(57,255,136,0.09)"
+                  : ink.tone === "dark"
+                  ? "rgba(255,255,255,0.03)"
+                  : "#fff",
+                padding: "11px 13px",
+              }}
+            >
+              <p
+                style={{
+                  fontSize: 15,
+                  fontWeight: 800,
+                  color: human || out ? accent : ink.primary,
+                  letterSpacing: "-0.015em",
+                  lineHeight: 1.2,
+                }}
+              >
+                {n.label}
+              </p>
+              <p style={{ fontSize: 12, color: ink.faint, marginTop: 5, lineHeight: 1.35 }}>
+                {n.detail}
+              </p>
             </div>
           </Rise>
         );

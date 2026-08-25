@@ -52,7 +52,8 @@ import {
 } from "./visuals";
 import { AiShiftScene } from "./visuals/AiShift";
 import {
-  AutomationSlide,
+  WorkshopOneSlide,
+  WorkshopTwoSlide,
   GeoSlide,
   PartnersSlide,
   PublicationsSlide,
@@ -1379,8 +1380,8 @@ export const S2_VIEWS: Record<string, ComponentType> = {
   modele: RevenueSlide,
   pivot: PivotSlide,
   recoupement: CrossCheckSlide,
-  pipeline: PipelineSlide,
-  automatisation: () => <AutomationSlide index={sectionNo("automatisation")} />,
+  pipeline: WorkshopOneSlide,
+  automatisation: WorkshopTwoSlide,
   article: ArticleSlide,
   etat: StatusSlide,
   finance: FinanceSlide,
