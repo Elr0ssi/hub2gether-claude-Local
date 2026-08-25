@@ -41,6 +41,23 @@ function fmtMetric(v: number | undefined, metric: EconomyMetricId): string {
   return `${v.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`;
 }
 
+/**
+ * Les années portées par la courbe d'évolution.
+ *
+ * Sept lignes empilées poussaient la fin de la fiche hors de sa colonne, et
+ * l'oeil ne lit pas sept barres, il lit une pente. Quatre repères espacés la
+ * donnent aussi bien. L'année choisie dans la frise s'ajoute si elle n'en
+ * fait pas partie, sinon le lecteur ne verrait pas celle qu'il vient de
+ * sélectionner.
+ */
+const TREND_YEARS = [2000, 2010, 2015, 2025];
+
+function trendYears<T extends { year: number }>(all: readonly T[], active?: number): T[] {
+  const keep = new Set<number>(TREND_YEARS);
+  if (active !== undefined) keep.add(active);
+  return all.filter((y) => keep.has(y.year));
+}
+
 function getMaxForTrend(countryName: string, metric: EconomyMetricId): number {
   let max = 1;
   for (const yr of ECONOMY_YEARS) {
@@ -79,7 +96,6 @@ function EconomicView({ countryName, yearData, metric, onMetricChange }: { count
 
   return (
     <div className="px-4 py-4 flex flex-col gap-5">
-      <p className="text-xs" style={{ color: "var(--ink-4)" }}>Données {yearData?.year}</p>
 
       {/* Active metric highlighted */}
       <div className="rounded-xl px-4 py-4 flex flex-col gap-1" style={{ background: "var(--accent-dim)", border: "1px solid rgba(57,255,136,0.3)" }}>
@@ -116,9 +132,6 @@ function EconomicView({ countryName, yearData, metric, onMetricChange }: { count
                   <p style={{ color: "var(--ink-3)", fontSize: "clamp(0.55rem, 1.5vw, 0.6rem)", textTransform: "uppercase", fontWeight: 700 }}>{def?.label}</p>
                   <p className="text-sm font-bold tabular-nums mt-0.5" style={{ color: valueColor }}>
                     {fmtMetric(v, id)}
-                  </p>
-                  <p style={{ color: "var(--ink-4)", fontSize: "clamp(0.53rem, 1.45vw, 0.58rem)" }}>
-                    {id === "gdp_per_capita" ? "par personne" : "exports − imports"}
                   </p>
                 </button>
               );
@@ -157,7 +170,7 @@ function EconomicView({ countryName, yearData, metric, onMetricChange }: { count
           Évolution · {ECONOMY_METRICS.find(m => m.id === metric)?.label}
         </p>
         <div className="flex flex-col gap-1.5">
-          {ECONOMY_YEARS.map((yr) => {
+          {trendYears(ECONOMY_YEARS, yearData?.year).map((yr) => {
             const d = yr.countries[countryName];
             const v = d ? (d[metric] as number | undefined) : undefined;
             if (v === undefined) return null;
@@ -191,7 +204,6 @@ function UnemploymentView({ countryName, yearData, metric, onMetricChange }: { c
 
   return (
     <div className="px-4 py-4 flex flex-col gap-5">
-      <p className="text-xs" style={{ color: "var(--ink-4)" }}>Données {yearData?.year}</p>
 
       {/* Active metric highlighted */}
       <div className="rounded-xl px-4 py-4 flex flex-col gap-1" style={{ background: "var(--accent-dim)", border: "1px solid rgba(57,255,136,0.3)" }}>
@@ -230,7 +242,7 @@ function UnemploymentView({ countryName, yearData, metric, onMetricChange }: { c
           Évolution · {ECONOMY_METRICS.find(m => m.id === metric)?.label}
         </p>
         <div className="flex flex-col gap-1.5">
-          {ECONOMY_YEARS.map((yr) => {
+          {trendYears(ECONOMY_YEARS, yearData?.year).map((yr) => {
             const d = yr.countries[countryName];
             const v = d ? (d[metric] as number | undefined) : undefined;
             if (v === undefined) return null;
@@ -269,7 +281,6 @@ function CompaniesView({ countryName, yearData }: { countryName: string; yearDat
 
   return (
     <div className="px-4 py-4 flex flex-col gap-5">
-      <p className="text-xs" style={{ color: "var(--ink-4)" }}>Données {yearData?.year}</p>
 
       {/* Total count */}
       <div className="rounded-xl px-3 py-3 flex items-center justify-between gap-3" style={{ background: "var(--accent-dim)", border: "1px solid rgba(57,255,136,0.3)" }}>
@@ -301,7 +312,7 @@ function CompaniesView({ countryName, yearData }: { countryName: string; yearDat
           Évolution des entreprises
         </p>
         <div className="flex flex-col gap-1.5">
-          {ECONOMY_YEARS.map((yr) => {
+          {trendYears(ECONOMY_YEARS, yearData?.year).map((yr) => {
             const d = yr.countries[countryName];
             if (!d) return null;
             const v = d.companies;

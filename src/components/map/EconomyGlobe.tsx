@@ -1250,18 +1250,6 @@ export function EconomyGlobe({
           Chargement du globe…
         </div>
       )}
-      <div
-        className="absolute bottom-3 right-3 px-3 py-1.5 rounded-lg"
-        style={{
-          background: "rgba(255,255,255,0.93)",
-          border: "1px solid var(--border)",
-          color: "var(--ink-4)",
-          fontSize: "0.62rem",
-          pointerEvents: "none",
-        }}
-      >
-        Faites tourner le globe · molette pour zoomer · cliquez sur un pays
-      </div>
     </div>
   );
 }

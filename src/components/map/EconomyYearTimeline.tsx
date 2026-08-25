@@ -64,7 +64,10 @@ export function EconomyYearTimeline({
   const MIN_LABEL_GAP = useMemo(() => {
     if (!railWidth) return 2;
     const perYear = railWidth / Math.max(1, max - min);
-    return Math.max(2, Math.ceil(46 / perYear));
+    // Quatre chiffres à 0,66rem tiennent dans trente-quatre pixels. La marge
+    // prise à quarante-six écartait 2020 de 2025 et laissait un trou dans la
+    // règle graduée.
+    return Math.max(2, Math.ceil(34 / perYear));
   }, [railWidth, min, max]);
   const labelled = useMemo(() => {
     const kept: number[] = [];
@@ -150,18 +153,13 @@ export function EconomyYearTimeline({
         >
           <CalendarDays size={13} style={{ color: "#0D7A40" }} />
         </span>
+        {/* Le titre seul. L'année choisie se lit sur la frise, en vert et sous
+            l'anneau : la répéter ici, avec en plus le millésime des données,
+            faisait trois nombres pour une seule information. */}
         <div className="flex items-baseline gap-2 min-w-0">
           <span className="text-xs font-bold" style={{ color: "var(--ink)" }}>
             Sélection année
           </span>
-          <span className="text-sm font-extrabold tabular-nums" style={{ color: "#0D7A40" }}>
-            {liveMode ? "En direct" : value}
-          </span>
-          {!liveMode && dataYear !== value && (
-            <span className="text-xs whitespace-nowrap" style={{ color: "var(--ink-4)" }}>
-              données {dataYear}
-            </span>
-          )}
         </div>
         <span
           className="ml-auto flex items-center gap-1.5 text-xs font-semibold shrink-0"
@@ -260,15 +258,14 @@ export function EconomyYearTimeline({
             />
             {years.map((y) => {
               const pct = ((y - min) / span) * 100;
-              const covered = dataYears.includes(y);
               const decade = isDecade(y);
               const active = y === value && !liveMode;
-              // Decades are the ruler. Covered years are called out by colour
-              // rather than size, so the reader can see at a glance where the
-              // dataset actually has figures without losing the count of ten.
-              // The selection always carries a full mark, so the ring never
-              // closes around an empty spot.
-              const size = decade || active ? 10 : covered ? 7 : 4;
+              // Les décennies font la règle graduée, rien d'autre. Les années
+              // couvertes par le jeu de données portaient un point vert : le
+              // lecteur y lisait une sélection là où il n'y avait qu'une
+              // disponibilité, et la frise semblait déjà cliquée à six
+              // endroits. Le vert ne dit plus qu'une chose, l'année choisie.
+              const size = decade || active ? 10 : 4;
               return (
                 <span
                   key={`mark-${y}`}
@@ -280,8 +277,6 @@ export function EconomyYearTimeline({
                     height: size,
                     background: active
                       ? "#0D7A40"
-                      : covered
-                      ? "#166534"
                       : decade
                       ? "var(--ink-4)"
                       : "var(--border)",

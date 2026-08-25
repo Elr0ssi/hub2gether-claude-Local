@@ -221,7 +221,12 @@ export function DataStoryScene() {
             top: `${i * 100}vh`,
             left: 0,
             width: 1,
-            height: "100vh",
+            // La hauteur de l'ancre est celle de la scène, barre déduite. À
+            // cent pour cent de l'écran elle passait pour une section trop
+            // haute pour être franchie d'un saut, et la course rendait un
+            // geste sur deux au défilement ordinaire : le lecteur voyait la
+            // page avancer d'une catégorie, puis dériver, puis avancer.
+            height: "calc(100vh - var(--navbar-height))",
             pointerEvents: "none",
           }}
         />

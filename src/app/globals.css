@@ -962,3 +962,9 @@ body {
   .eco-card-media { aspect-ratio: 16 / 7; }
   .eco-snap .py-16 { padding-top: 2rem; padding-bottom: 2rem; }
 }
+
+/* Le classement sur un écran bas : des lignes un cran plus serrées, pour que
+   la fenêtre du tableau porte deux ou trois pays de plus sans grandir. */
+@media (max-height: 900px) {
+  .eco-snap table .py-2\.5 { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+}

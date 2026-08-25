@@ -194,36 +194,46 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
            middle of the stage. */
         .cat-hero-curves { transform-origin: 50% 76%; }
 
+        /* Le globe se mesure à la hauteur de l'écran, pas à sa largeur. Réglé
+           en largeur, il gardait sa taille de grand écran sur un portable :
+           son bord haut passait au-dessus du cadre pendant que le bandeau de
+           chiffres lui mangeait le bas, et il n'en restait qu'une tranche. En
+           parts de hauteur, il occupe la même place partout, et l'espace
+           laissé au titre au-dessus et aux chiffres en dessous ne bouge plus.
+           Le centre est posé sous la moitié pour laisser le titre respirer. */
         .cat-hero-globe-anchor {
           position: absolute;
           left: 50%;
-          top: 40%;
+          top: 45%;
           transform: translateX(-50%);
-          width: min(900px, 118vw);
+          width: min(70vh, 92vw, 780px);
           aspect-ratio: 1 / 1;
         }
         .cat-hero-globe { width: 100%; height: 100%; position: relative; }
 
         .cat-hero-head {
           position: absolute;
-          top: clamp(26px, 5.5vh, 66px);
+          top: clamp(14px, 4vh, 46px);
           left: 0;
           right: 0;
           padding: 0 clamp(20px, 5vw, 56px);
           text-align: center;
         }
+        /* Même raisonnement pour le titre : la plus petite des deux mesures
+           l'emporte, si bien qu'un écran large mais bas ne lui donne pas la
+           taille d'un écran large et haut. */
         .cat-hero-title {
           margin: 0;
-          font-size: clamp(2.3rem, 6vw, 4.6rem);
+          font-size: clamp(1.7rem, min(5.6vw, 5vh), 3.4rem);
           font-weight: 900;
           line-height: 1.02;
           letter-spacing: -0.045em;
           color: var(--ink);
         }
         .cat-hero-subtitle {
-          margin: 14px auto 0;
+          margin: clamp(7px, 1.1vh, 14px) auto 0;
           max-width: 700px;
-          font-size: clamp(0.9rem, 1.2vw, 1.08rem);
+          font-size: clamp(0.82rem, min(1.2vw, 1.15vh), 1.02rem);
           line-height: 1.6;
           color: var(--ink-3);
         }
@@ -270,7 +280,7 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
           margin-bottom: 6px;
         }
         .cat-hero-stat-value {
-          font-size: clamp(1.35rem, 2.2vw, 1.9rem);
+          font-size: clamp(1.1rem, min(2.2vw, 2.1vh), 1.7rem);
           font-weight: 900;
           letter-spacing: -0.035em;
           color: var(--ink);
@@ -285,27 +295,20 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
           color: var(--ink-4);
         }
 
-        /* Un portable : 800px de haut. Le titre, le bandeau de chiffres et
-           la note de source y prenaient la place du globe, qui n'apparaissait
-           plus que par une tranche sous le bandeau. On rend cette place. */
+        /* Ce qui reste de palier ne touche plus à l'échelle : le titre et le
+           globe la tiennent déjà de la hauteur. Seul le bandeau de chiffres,
+           dont la hauteur vient de son contenu, doit encore se resserrer. */
         @media (max-height: 900px) {
-          .cat-hero-head { top: clamp(16px, 3.4vh, 34px); }
-          .cat-hero-title { font-size: clamp(1.75rem, 3vw, 2.5rem); }
-          .cat-hero-subtitle { margin-top: 8px; font-size: 0.86rem; }
-          .cat-hero-globe-anchor { top: 35%; width: min(620px, 86vw); }
           .cat-hero-stats-anchor { bottom: clamp(10px, 2vh, 20px); }
           .cat-hero-stat { padding: 11px clamp(10px, 1.3vw, 18px); }
           .cat-hero-stat-icon { width: 28px; height: 28px; margin-bottom: 6px; }
           .cat-hero-stat-label { font-size: 0.68rem; margin-bottom: 3px; }
-          .cat-hero-stat-value { font-size: clamp(1.15rem, 1.7vw, 1.5rem); margin-bottom: 2px; }
           .cat-hero-stat-meta { font-size: 0.62rem; }
           .cat-hero-source { margin-top: 6px; font-size: 0.6rem; }
         }
 
         @media (max-height: 780px) {
-          .cat-hero-title { font-size: clamp(1.6rem, 2.6vw, 2.1rem); }
           .cat-hero-stat-icon { display: none; }
-          .cat-hero-globe-anchor { top: 32%; width: min(560px, 80vw); }
         }
 
         @media (max-width: 900px) {

@@ -300,7 +300,11 @@ export function EconomyRankingsTable({
         // scroll region, so reaching the last country does not throw the
         // reader into the next section.
         data-scroll-region
-        style={{ maxHeight: "min(640px, calc(100vh - 336px))" }}
+        /* La fenêtre du tableau prend ce que la page lui laisse : sur un
+           portable elle s'arrêtait à sept pays, ce qui ne fait pas un
+           classement. Ce qui est retranché, c'est l'en-tête de la carte, sa
+           ligne de titres, son pied et les marges de la section. */
+        style={{ maxHeight: "min(760px, calc(100vh - 274px))" }}
         translate="no"
       >
         <table className="w-full" style={{ borderCollapse: "collapse" }}>

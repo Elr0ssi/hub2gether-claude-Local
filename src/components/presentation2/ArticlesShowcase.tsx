@@ -20,11 +20,16 @@ const SIDEBAR_SLUGS = ["chine-russie-regimes-autoritaires-21e-siecle", "europe-r
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 export function ArticlesShowcase() {
-  // The last category and this section are a locked pair: one gesture rolls
-  // from one to the other and settles there, in both directions, with nothing
-  // in between. `startAt: "first"` keeps the run off everything above the
-  // last category, which scrolls as it always did.
-  useScrollTeleport({ selector: ".p2-lock", offset: 64, startAt: "first" });
+  // Une catégorie par geste, jusqu'aux articles.
+  //
+  // La course ne portait que sur la dernière catégorie et cette section. Entre
+  // les autres, il fallait dérouler une pleine hauteur d'écran pour passer de
+  // l'économie à la politique : le lecteur croyait la page bloquée, et la
+  // catégorie changeait au milieu du geste sans qu'on voie la bascule. La
+  // course couvre maintenant toutes les ancres, si bien qu'un geste vaut une
+  // catégorie et que l'arrivée est portée par le roulé, en descente comme en
+  // montée. La dernière catégorie mène droit aux articles.
+  useScrollTeleport({ selector: ".p2-snap-target", offset: 64, startAt: "first" });
 
   const carousel = CAROUSEL_SLUGS.map(getArticleBySlug).filter((a): a is NonNullable<typeof a> => Boolean(a));
   const sidebar = SIDEBAR_SLUGS.map(getArticleBySlug).filter((a): a is NonNullable<typeof a> => Boolean(a));
