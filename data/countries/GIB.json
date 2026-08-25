@@ -8,6 +8,12 @@
       "unite": "USD",
       "source": "Banque mondiale · WDI (NY.GDP.MKTP.CD)",
       "valeurs": {}
+    },
+    "pib_par_habitant": {
+      "libelle": "PIB par habitant",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NY.GDP.PCAP.CD)",
+      "valeurs": {}
     }
   }
 }
