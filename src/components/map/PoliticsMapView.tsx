@@ -237,7 +237,7 @@ export function PoliticsMapView() {
           style={{ borderColor: "var(--border)", background: "var(--surface)" }}
         >
           <p style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>
-            Source : données compilées à partir de sources académiques et institutionnelles — à titre éditorial
+            Source : données compilées à partir de sources académiques et institutionnelles · à titre éditorial
           </p>
         </div>
       </div>

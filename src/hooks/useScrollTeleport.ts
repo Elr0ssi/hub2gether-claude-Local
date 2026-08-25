@@ -127,6 +127,20 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
       rollFrame = requestAnimationFrame(step);
     };
 
+    /**
+     * La barre de navigation ne fait pas toujours la même hauteur : elle se
+     * réduit sur un écran bas. La valeur passée en option n'est donc qu'un
+     * repli, la source étant la variable CSS que la barre elle-même applique.
+     * Sans cela, chaque arrêt tombait à huit pixels de sa place sur un
+     * portable, et la section arrivait déjà entamée.
+     */
+    const gap = (): number => {
+      const v = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue("--navbar-height")
+      );
+      return Number.isFinite(v) && v > 0 ? v : offset;
+    };
+
     const stops = (): { tops: number[]; heights: number[]; end: number; floor: number } | null => {
       const els = Array.from(document.querySelectorAll<HTMLElement>(selector));
       if (els.length === 0) return null;
@@ -134,7 +148,7 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
       const heights: number[] = [];
       for (const el of els) {
         const r = el.getBoundingClientRect();
-        tops.push(Math.round(r.top + window.scrollY - offset));
+        tops.push(Math.round(r.top + window.scrollY - gap()));
         heights.push(Math.round(r.height));
       }
       // Whatever follows the last section is a stop too, otherwise the page
@@ -189,7 +203,7 @@ export function useScrollTeleport({ selector, offset, enabled = true, startAt = 
       if (!s) return null;
 
       const y = window.scrollY;
-      const viewport = window.innerHeight - offset;
+      const viewport = window.innerHeight - gap();
 
       // Outside the run of sections — hand the page back.
       if (y < s.floor - EPSILON || y > s.end + EPSILON) return null;

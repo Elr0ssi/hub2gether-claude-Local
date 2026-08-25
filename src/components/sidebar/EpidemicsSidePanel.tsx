@@ -15,7 +15,7 @@ interface EpidemicsSidePanelProps {
 }
 
 function mortalityRate(infected: number, deaths: number): string {
-  if (infected === 0) return "–";
+  if (infected === 0) return "-";
   return ((deaths / infected) * 100).toFixed(1) + "%";
 }
 

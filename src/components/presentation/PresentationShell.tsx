@@ -181,7 +181,7 @@ export function PresentationShell({
                 }}
                 role="group"
                 aria-roledescription="slide"
-                aria-label={`${index + 1} sur ${SLIDES.length} — ${slide.label}`}
+                aria-label={`${index + 1} sur ${SLIDES.length} · ${slide.label}`}
               >
                 <ToneProvider value={tone}>
                   {View ? <View /> : null}
@@ -519,9 +519,9 @@ function Overview({
         style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 40 }}
       >
         {[
-          { title: "Partie I — Pitch entrepreneurial", rows: partI },
-          { title: "Partie II — Approfondissement", rows: partII },
-          { title: "Partie III — Audience & modèle", rows: partIII },
+          { title: "Partie I · Pitch entrepreneurial", rows: partI },
+          { title: "Partie II · Approfondissement", rows: partII },
+          { title: "Partie III · Audience & modèle", rows: partIII },
         ].map((col) => (
           <div key={col.title}>
             <div

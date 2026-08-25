@@ -111,14 +111,14 @@ function EpidemicsSummary() {
 
   return (
     <section aria-label="Données épidémies mondiales">
-      <h2>COVID-19 — Top 15 pays par décès cumulés (source OMS)</h2>
+      <h2>COVID-19 · Top 15 pays par décès cumulés (source OMS)</h2>
       <Table
         headers={["#", "Pays", "Cas confirmés", "Décès"]}
         rows={topDeaths}
       />
       {topHiv.length > 0 && (
         <>
-          <h3 style={{ marginTop: "1.5rem" }}>VIH/SIDA — Top 10 pays prévalence (source ONUSIDA)</h3>
+          <h3 style={{ marginTop: "1.5rem" }}>VIH/SIDA · Top 10 pays prévalence (source ONUSIDA)</h3>
           <Table
             headers={["#", "Pays", "Personnes infectées", "Décès cumulés"]}
             rows={topHiv}
@@ -161,7 +161,7 @@ function PoliticsSummary() {
   const currentLeaders = POLITICS_COUNTRIES.map((country) => {
     const current = country.periods.find((p) => p.from <= currentYear && p.to >= currentYear);
     if (!current) return null;
-    return [country.name, current.regime, current.orientation, current.leader, current.party ?? "—"];
+    return [country.name, current.regime, current.orientation, current.leader, current.party ?? "-"];
   }).filter(Boolean) as (string | number)[][];
 
   return (
@@ -179,12 +179,12 @@ function EmpiresSummary() {
   const rows = ROMAN_TIMELINE.map((entry) => [
     entry.year > 0 ? `${entry.year} ap. J.-C.` : `${Math.abs(entry.year)} av. J.-C.`,
     entry.label,
-    entry.description ?? "—",
+    entry.description ?? "-",
   ]);
 
   return (
     <section aria-label="Chronologie empire romain">
-      <h2>Chronologie de l&apos;Empire romain — 500 av. J.-C. à 1453 ap. J.-C.</h2>
+      <h2>Chronologie de l&apos;Empire romain, 500 av. J.-C. à 1453 ap. J.-C.</h2>
       <Table
         headers={["Année", "Période", "Description"]}
         rows={rows}

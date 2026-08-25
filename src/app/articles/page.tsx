@@ -5,7 +5,7 @@ import { Layout } from "@/components/layout/Layout";
 import { ARTICLES } from "@/data/articles";
 
 export const metadata: Metadata = {
-  title: "Tous les articles — Analyses géopolitiques | The Essential Data",
+  title: "Tous les articles · Analyses géopolitiques | The Essential Data",
   description:
     "Explorez toutes les analyses éditoriales de The Essential Data : PIB mondial, épidémies, empires historiques, régimes politiques et puissances militaires. Synthèses data journalism.",
   alternates: {
@@ -66,7 +66,7 @@ export default function ArticlesIndexPage() {
             Tous les articles
           </h1>
           <p className="text-base leading-relaxed" style={{ color: "var(--ink-2)", fontSize: "1.0625rem", maxWidth: "600px" }}>
-            {sorted.length} analyses éditoriales sur la géopolitique mondiale — PIB, épidémies, empires historiques, régimes politiques et puissances militaires.
+            {sorted.length} analyses éditoriales sur la géopolitique mondiale, PIB, épidémies, empires historiques, régimes politiques et puissances militaires.
           </p>
         </header>
 

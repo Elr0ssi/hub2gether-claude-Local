@@ -168,7 +168,7 @@ const ECONOMY_HERO: CategoryHeroConfig = {
       note: `${TRADE_DATA.length} pays · dernier exercice`,
     },
   ],
-  sourceNote: `Sources : FMI (WEO), Banque mondiale, OIT, OMC — projections ${LATEST}.`,
+  sourceNote: `Sources : FMI (WEO), Banque mondiale, OIT, OMC · projections ${LATEST}.`,
 };
 
 // ── Registry ────────────────────────────────────────────────────────────────

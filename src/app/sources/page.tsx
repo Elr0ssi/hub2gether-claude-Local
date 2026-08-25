@@ -4,7 +4,7 @@ import { Layout } from "@/components/layout/Layout";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Sources de données — The Essential Data",
+  title: "Sources de données · The Essential Data",
   description:
     "Toutes les sources de données utilisées par The Essential Data : FMI, Banque mondiale, OMS, SIPRI, AWMC et médias internationaux de référence.",
   alternates: {
@@ -32,8 +32,8 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
     description: "Données macroéconomiques, PIB, dette publique, taux de chômage.",
     sources: [
       {
-        name: "FMI — WEO",
-        fullName: "Fonds Monétaire International — World Economic Outlook",
+        name: "FMI · WEO",
+        fullName: "Fonds Monétaire International · World Economic Outlook",
         url: "https://www.imf.org/en/Publications/WEO",
         usage: "PIB nominal par pays, dette/PIB, taux de chômage. Millésime 2024.",
         license: "Données librement consultables",
@@ -54,7 +54,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
       },
       {
         name: "Fortune Global 500",
-        fullName: "Fortune Magazine — Global 500 ranking",
+        fullName: "Fortune Magazine · Global 500 ranking",
         url: "https://fortune.com/global500/",
         usage: "Classement des plus grandes entreprises mondiales par chiffre d'affaires.",
       },
@@ -67,7 +67,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
     sources: [
       {
         name: "OMS / WHO",
-        fullName: "Organisation Mondiale de la Santé — World Health Organization",
+        fullName: "Organisation Mondiale de la Santé · World Health Organization",
         url: "https://www.who.int/data",
         usage: "Données COVID-19, VIH/SIDA, maladies infectieuses, mortalité mondiale.",
         license: "Données librement consultables",
@@ -95,7 +95,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
       },
       {
         name: "Our World in Data",
-        fullName: "Our World in Data — University of Oxford",
+        fullName: "Our World in Data · University of Oxford",
         url: "https://ourworldindata.org/health",
         usage: "Séries temporelles historiques des épidémies, visualisations vérifiées.",
         license: "CC BY 4.0",
@@ -116,7 +116,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
       },
       {
         name: "IISS",
-        fullName: "International Institute for Strategic Studies — The Military Balance",
+        fullName: "International Institute for Strategic Studies · The Military Balance",
         url: "https://www.iiss.org/publications/the-military-balance",
         usage: "Effectifs militaires, équipements, capacités opérationnelles par pays.",
       },
@@ -136,7 +136,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
     sources: [
       {
         name: "AWMC",
-        fullName: "Ancient World Mapping Center — UNC Chapel Hill",
+        fullName: "Ancient World Mapping Center · UNC Chapel Hill",
         url: "https://awmc.unc.edu",
         usage: "Référence cartographique principale pour les frontières des empires antiques.",
         license: "CC BY 4.0",
@@ -149,7 +149,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
       },
       {
         name: "Encyclopedia Iranica",
-        fullName: "Encyclopaedia Iranica — Columbia University",
+        fullName: "Encyclopaedia Iranica · Columbia University",
         url: "https://www.iranicaonline.org",
         usage: "Sources sur l'Empire perse achéménide, sassanide et parthe.",
         license: "Accès libre en ligne",
@@ -169,7 +169,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
     sources: [
       {
         name: "Natural Earth",
-        fullName: "Natural Earth — Free Vector and Raster Map Data",
+        fullName: "Natural Earth · Free Vector and Raster Map Data",
         url: "https://www.naturalearthdata.com",
         usage: "Frontières politiques actuelles, pays, océans, projections. Échelle 1:10m et 1:50m.",
         license: "Domaine public",
@@ -202,7 +202,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
       },
       {
         name: "BBC News",
-        fullName: "British Broadcasting Corporation — News",
+        fullName: "British Broadcasting Corporation · News",
         url: "https://www.bbc.com/news",
         usage: "Analyses et reportages sur les conflits, épidémies et économie mondiale.",
       },

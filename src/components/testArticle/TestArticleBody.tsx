@@ -88,7 +88,7 @@ export function TestArticleBody() {
         {/* ── The development ── */}
         {parts.map((part) => (
           <section key={part.n}>
-            <PartRule n={part.n} title={part.title} />
+            <PartRule title={part.title} />
 
             {"intro" in part && part.intro && (
               <p
@@ -135,8 +135,6 @@ export function TestArticleBody() {
                     label={p.label}
                     holders={p.holders}
                     body={p.body}
-                    quote={p.quote}
-                    quoteSource={p.quoteSource}
                   />
                 ))}
               </div>
@@ -145,7 +143,7 @@ export function TestArticleBody() {
         ))}
 
         {/* ── Sources ── */}
-        <PartRule n="§" title={sources.label} />
+        <PartRule title={sources.label} />
         <p
           style={{
             fontSize: "0.9rem",

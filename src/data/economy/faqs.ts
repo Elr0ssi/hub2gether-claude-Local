@@ -28,7 +28,7 @@ export const FAQS_ECONOMY: FAQItem[] = [
   {
     question: "Que signifie un ratio dette/PIB élevé ?",
     answer:
-      "Le ratio dette/PIB exprime le montant de la dette publique en pourcentage de la production économique annuelle du pays. Un ratio élevé (au-delà de 100%) ne signifie pas forcément une crise imminente — le Japon dépasse 260% depuis des années sans perdre la confiance des marchés. Ce qui compte davantage : la capacité à refinancer cette dette, la confiance des investisseurs, la devise dans laquelle elle est libellée, et la croissance économique. La zone de vigilance généralement admise se situe autour de 60% (critère de Maastricht).",
+      "Le ratio dette/PIB exprime le montant de la dette publique en pourcentage de la production économique annuelle du pays. Un ratio élevé (au-delà de 100%) ne signifie pas forcément une crise imminente, le Japon dépasse 260% depuis des années sans perdre la confiance des marchés. Ce qui compte davantage : la capacité à refinancer cette dette, la confiance des investisseurs, la devise dans laquelle elle est libellée, et la croissance économique. La zone de vigilance généralement admise se situe autour de 60% (critère de Maastricht).",
     category: "Concepts",
   },
   {
@@ -121,7 +121,7 @@ export function buildEconomyDataFaqs(year: EconomyYear | undefined): FAQItem[] {
       answer:
         `Classement par PIB nominal ${year.year} : ` +
         topGdp
-          .map(([name, d], i) => `${i + 1}. ${name} — ${fmt(d.gdp)} Mds € (dette ${d.debt_ratio} % du PIB, chômage ${d.unemployment} %)`)
+          .map(([name, d], i) => `${i + 1}. ${name}, ${fmt(d.gdp)} Mds € (dette ${d.debt_ratio} % du PIB, chômage ${d.unemployment} %)`)
           .join(" ; ") +
         `. ${year.dataNote}`,
       category: "Données de référence",
@@ -131,7 +131,7 @@ export function buildEconomyDataFaqs(year: EconomyYear | undefined): FAQItem[] {
       answer:
         `Ratios dette publique / PIB les plus élevés en ${year.year} : ` +
         topDebt
-          .map(([name, d], i) => `${i + 1}. ${name} — ${d.debt_ratio} % du PIB` + (d.debt_amount ? ` (${fmt(d.debt_amount)} Mds €)` : ""))
+          .map(([name, d], i) => `${i + 1}. ${name}, ${d.debt_ratio} % du PIB` + (d.debt_amount ? ` (${fmt(d.debt_amount)} Mds €)` : ""))
           .join(" ; ") +
         `. Un ratio élevé ne vaut pas crise : ce qui compte est la capacité de refinancement, la devise d'émission et la croissance. ${year.dataNote}`,
       category: "Données de référence",
@@ -143,7 +143,7 @@ export function buildEconomyDataFaqs(year: EconomyYear | undefined): FAQItem[] {
         topUnemployment.map(([name, d]) => `${name} ${d.unemployment} %`).join(", ") +
         `. Les plus faibles : ` +
         lowUnemployment.map(([name, d]) => `${name} ${d.unemployment} %`).join(", ") +
-        `. Les méthodologies nationales diffèrent — la mesure retenue ici suit la définition de l'OIT. ${year.dataNote}`,
+        `. Les méthodologies nationales diffèrent, la mesure retenue ici suit la définition de l'OIT. ${year.dataNote}`,
       category: "Données de référence",
     },
   ];

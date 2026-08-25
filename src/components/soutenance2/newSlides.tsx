@@ -278,7 +278,7 @@ export function GeoSlide({ index }: { index: string }) {
 
   return (
     <SlideBody>
-      <Eyebrow index={index}>GEO — être lisible par les moteurs</Eyebrow>
+      <Eyebrow index={index}>GEO · être lisible par les moteurs</Eyebrow>
       <Title lines={GEO.title} />
 
       <div

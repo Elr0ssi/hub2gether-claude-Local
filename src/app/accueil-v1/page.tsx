@@ -8,7 +8,7 @@ import { FAQSection } from "@/components/faq/FAQSection";
 import { FAQS_EMPIRES } from "@/data/faqs";
 
 export const metadata: Metadata = {
-  title: "The Essential Data — Cartes géopolitiques interactives PIB, Épidémies, Politique",
+  title: "The Essential Data · Cartes géopolitiques interactives PIB, Épidémies, Politique",
   description:
     "Explorez le PIB par pays 2025, les épidémies mondiales, les régimes politiques et les forces militaires grâce à des cartes interactives. Données FMI, Banque mondiale, OMS. Data journalism géopolitique de référence.",
   keywords: [
@@ -28,14 +28,14 @@ export const metadata: Metadata = {
   // Superseded by the presentation home at "/" — kept reachable, not indexed.
   robots: { index: false, follow: true },
   openGraph: {
-    title: "The Essential Data — Cartes géopolitiques interactives",
+    title: "The Essential Data · Cartes géopolitiques interactives",
     description:
       "PIB par pays 2025, épidémies mondiales (COVID, VIH, Peste Noire), régimes politiques, puissances militaires. Cartes interactives avec données FMI, Banque mondiale et OMS.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Essential Data — Cartes géopolitiques interactives",
+    title: "The Essential Data · Cartes géopolitiques interactives",
     description:
       "PIB par pays 2025, épidémies mondiales, régimes politiques. Data journalism géopolitique.",
   },
@@ -64,7 +64,7 @@ function AITransparencyBanner() {
                 <circle cx="5" cy="5" r="4" fillOpacity="0.2" stroke="currentColor" strokeWidth="1.5" fill="none" />
                 <path d="M5 3v2.5l1.5 1" strokeLinecap="round" strokeWidth="1.2" stroke="currentColor" fill="none" />
               </svg>
-              EU AI Act — Transparence
+              EU AI Act · Transparence
             </span>
           </div>
           <div>
@@ -73,8 +73,8 @@ function AITransparencyBanner() {
             </h2>
             <p className="text-sm leading-relaxed mb-3" style={{ color: "var(--ink-2)" }}>
               The Essential Data est un <strong>agrégateur éditorial assisté par intelligence artificielle</strong>.
-              Chaque article est une synthèse d&apos;<strong>articles médiatiques du monde entier</strong> — presse internationale,
-              rapports d&apos;institutions (FMI, Banque mondiale, OMS, SIPRI…) et recherches académiques — condensés pour offrir
+              Chaque article est une synthèse d&apos;<strong>articles médiatiques du monde entier</strong>, presse internationale,
+              rapports d&apos;institutions (FMI, Banque mondiale, OMS, SIPRI…) et recherches académiques, condensés pour offrir
               une <strong>vision impartiale, avec des points de vue multiples</strong>, en temps réel.
             </p>
             <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--ink-3)" }}>

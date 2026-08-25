@@ -179,7 +179,7 @@ export function EquationSlide() {
       <SlideBody padding="96px 120px" center>
         <div style={{ textAlign: "center" }}>
           <Rise delay={0.15} y={10}>
-            <div className="t-eyebrow accent">§ 12 — L&apos;équation</div>
+            <div className="t-eyebrow accent">§ 12 · L&apos;équation</div>
           </Rise>
         </div>
 
@@ -771,7 +771,7 @@ export function ParadoxeSlide() {
       <SlideBody padding="72px 120px 60px">
         <div style={{ textAlign: "center" }}>
           <Rise delay={0.15} y={10}>
-            <div className="t-eyebrow accent">§ 17 — Gestion du risque</div>
+            <div className="t-eyebrow accent">§ 17 · Gestion du risque</div>
           </Rise>
           <Rise delay={0.3} y={18} duration={DUR.slow}>
             <h2

@@ -287,7 +287,7 @@ export function ValeurSlide() {
         {/* Centred composition — a break from the left-aligned slides */}
         <div style={{ textAlign: "center" }}>
           <Rise delay={0.15} y={10}>
-            <div className="t-eyebrow accent">§ 03 — Proposition de valeur</div>
+            <div className="t-eyebrow accent">§ 03 · Proposition de valeur</div>
           </Rise>
 
           <Rise delay={0.35} y={24} duration={DUR.slow}>
@@ -456,7 +456,7 @@ export function DemoSlide() {
       <SlideBody center>
         <div style={{ textAlign: "center" }}>
           <Rise delay={0.15} y={10}>
-            <div className="t-eyebrow accent">§ 05 — Démonstration</div>
+            <div className="t-eyebrow accent">§ 05 · Démonstration</div>
           </Rise>
 
           <Rise delay={0.35} y={26} duration={DUR.slow}>
@@ -1097,7 +1097,7 @@ export function IaHumainSlide() {
       <SlideBody padding="64px 120px">
         <div style={{ textAlign: "center" }}>
           <Rise delay={0.15} y={10}>
-            <div className="t-eyebrow accent">§ 11 — Positionnement</div>
+            <div className="t-eyebrow accent">§ 11 · Positionnement</div>
           </Rise>
           <Rise delay={0.32} y={22} duration={DUR.slow}>
             <h2

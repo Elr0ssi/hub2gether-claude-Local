@@ -921,7 +921,7 @@ function ArticleSlide() {
                 {ARTICLE_FORMAT.dataExport}
               </span>
               <div className="t-small" style={{ color: ink.faint, marginTop: 10, maxWidth: 400 }}>
-                Réutilisation des données brutes — à confirmer dans le produit avant
+                Réutilisation des données brutes, à confirmer dans le produit avant
                 d&apos;être annoncée.
               </div>
             </div>

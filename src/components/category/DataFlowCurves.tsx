@@ -452,7 +452,7 @@ export function DataFlowCurves({
       {icons.length > 0 && (
         <style>{`
           /* Outer span carries the per-frame position on the strand, inner one
-             the hover response — the two transforms never fight. */
+             the hover response, the two transforms never fight. */
           .cat-node {
             position: absolute;
             left: 0;
@@ -470,8 +470,7 @@ export function DataFlowCurves({
             background: #fff;
             box-shadow: 0 6px 18px rgba(16,24,20,0.10), 0 0 0 1px rgba(16,24,20,0.04);
             cursor: default;
-            /* The layer sets pointer-events: none so the globe stays draggable —
-               badges opt back in for their hover state. */
+            /* The layer sets pointer-events: none so the globe stays draggable, badges opt back in for their hover state. */
             pointer-events: auto;
             transition: transform 420ms var(--ease-spring), box-shadow 420ms var(--ease-smooth);
           }

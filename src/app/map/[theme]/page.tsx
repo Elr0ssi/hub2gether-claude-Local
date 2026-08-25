@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (theme === "empires") {
     return {
-      title: "Carte empire romain interactif — Expansion territoriale 500 BC à 1453 AD",
+      title: "Carte empire romain interactif · Expansion territoriale 500 BC à 1453 AD",
       description:
         "Carte interactive de l'Empire romain de 500 av. J.-C. à 1453 ap. J.-C. Suivez l'expansion territoriale, les périodes clés et le contexte historique de la plus grande puissance de l'Antiquité.",
       keywords: [
@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ],
       alternates: { canonical: "/map/empires" },
       openGraph: {
-        title: "Carte empire romain interactif — The Essential Data",
+        title: "Carte empire romain interactif · The Essential Data",
         description:
           "De la cité latine (500 av. J.-C.) à la chute de Constantinople (1453). Explorez l'empire romain en 7 étapes clés avec données historiques.",
         type: "website",
@@ -69,7 +69,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (theme === "epidemics") {
     return {
-      title: "Carte épidémies mondiales — COVID-19, VIH, Peste Noire, Hantavirus, HMPV 2025",
+      title: "Carte épidémies mondiales · COVID-19, VIH, Peste Noire, Hantavirus, HMPV 2025",
       description:
         "Carte interactive des grandes épidémies mondiales : COVID-19, VIH/SIDA, Peste Noire (1347), Hantavirus et HMPV 2025. Cas confirmés, décès et taux de létalité par pays.",
       keywords: [
@@ -88,7 +88,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ],
       alternates: { canonical: "/map/epidemics" },
       openGraph: {
-        title: "Carte épidémies mondiales — COVID, VIH, Peste Noire | The Essential Data",
+        title: "Carte épidémies mondiales · COVID, VIH, Peste Noire | The Essential Data",
         description:
           "Visualisez l'impact de 5 épidémies majeures par pays : Peste Noire (1347), COVID-19, VIH/SIDA, Hantavirus, HMPV 2025. Données OMS et CDC.",
         type: "website",
@@ -98,7 +98,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (theme === "economy") {
     return {
-      title: "Carte PIB par pays 2025 — Dette publique, Chômage, Économie mondiale",
+      title: "Carte PIB par pays 2025 · Dette publique, Chômage, Économie mondiale",
       description:
         "Carte interactive du PIB par pays en 2025 (projections FMI). Comparez la dette publique, le taux de chômage et les grandes entreprises de 70+ pays de 2000 à 2025. Données FMI et Banque mondiale.",
       keywords: [
@@ -117,9 +117,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ],
       alternates: { canonical: "/map/economy" },
       openGraph: {
-        title: "Carte PIB par pays 2025 — Économie mondiale | The Essential Data",
+        title: "Carte PIB par pays 2025 · Économie mondiale | The Essential Data",
         description:
-          "PIB, dette publique, chômage et entreprises pour 70+ pays de 2000 à 2025. Projections FMI avril 2025 — vue YTD en temps réel.",
+          "PIB, dette publique, chômage et entreprises pour 70+ pays de 2000 à 2025. Projections FMI avril 2025, vue YTD en temps réel.",
         type: "website",
       },
     };
@@ -127,9 +127,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (theme === "politics") {
     return {
-      title: "Carte politique mondiale — Régimes et orientations politiques 1900–2025",
+      title: "Carte politique mondiale · Régimes et orientations politiques 1900-2025",
       description:
-        "Explorez les régimes politiques et les orientations idéologiques de 20+ pays depuis 1900. Démocraties, dictatures, totalitarismes — naviguez sur une frise chronologique interactive.",
+        "Explorez les régimes politiques et les orientations idéologiques de 20+ pays depuis 1900. Démocraties, dictatures, totalitarismes, naviguez sur une frise chronologique interactive.",
       keywords: [
         "carte politique mondiale",
         "régimes politiques par pays",
@@ -141,7 +141,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ],
       alternates: { canonical: "/map/politics" },
       openGraph: {
-        title: "Carte politique mondiale 1900–2025 — The Essential Data",
+        title: "Carte politique mondiale 1900-2025 · The Essential Data",
         description:
           "Régimes et orientations politiques de 20+ pays depuis 1900. Frise chronologique interactive.",
         type: "website",
@@ -150,7 +150,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   return {
-    title: `${themeData.label} — Carte interactive`,
+    title: `${themeData.label} · Carte interactive`,
     description: themeData.description,
     alternates: { canonical: `/map/${theme}` },
   };
@@ -220,9 +220,9 @@ export default async function MapPage({ params, searchParams }: PageProps) {
         </h1>
         <p className="text-body" style={{ maxWidth: "600px" }}>
           {isEpidemics
-            ? "Visualisez l'impact de cinq grandes épidémies — Peste Noire, COVID-19, VIH/SIDA, Hantavirus et HMPV 2025 — pays par pays. Cas confirmés, décès et taux de létalité. Vue YTD disponible pour les maladies actives."
+            ? "Visualisez l'impact de cinq grandes épidémies, Peste Noire, COVID-19, VIH/SIDA, Hantavirus et HMPV 2025, pays par pays. Cas confirmés, décès et taux de létalité. Vue YTD disponible pour les maladies actives."
             : isEconomy
-            ? "Comparez le PIB, la dette publique, le chômage et les entreprises de 70+ pays de 2000 à 2025. Projections FMI avril 2025 — vue en temps réel (YTD) disponible pour l'année en cours."
+            ? "Comparez le PIB, la dette publique, le chômage et les entreprises de 70+ pays de 2000 à 2025. Projections FMI avril 2025, vue en temps réel (YTD) disponible pour l'année en cours."
             : isPolitics
             ? "Explorez les régimes politiques et les orientations idéologiques de 20+ pays depuis 1900. Naviguez sur la frise chronologique pour voir comment le monde politique a évolué d'une décennie à l'autre."
             : isMilitary

@@ -30,7 +30,7 @@ function fmtNumber(v: number): string {
 }
 
 function fmtMetric(v: number | undefined, metric: EconomyMetricId): string {
-  if (v === undefined) return "—";
+  if (v === undefined) return "-";
   if (metric === "gdp")               return `${fmtNumber(v)} Mds€`;
   if (metric === "companies")         return `${fmtNumber(v)} k`;
   if (metric === "gdp_per_capita")    return `${fmtNumber(Math.round(v))} €`;
@@ -154,7 +154,7 @@ function EconomicView({ countryName, yearData, metric, onMetricChange }: { count
       {/* Year trend */}
       <div>
         <p style={{ color: "var(--ink-3)", fontSize: "clamp(0.58rem, 1.6vw, 0.65rem)", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
-          Évolution — {ECONOMY_METRICS.find(m => m.id === metric)?.label}
+          Évolution · {ECONOMY_METRICS.find(m => m.id === metric)?.label}
         </p>
         <div className="flex flex-col gap-1.5">
           {ECONOMY_YEARS.map((yr) => {
@@ -227,7 +227,7 @@ function UnemploymentView({ countryName, yearData, metric, onMetricChange }: { c
       {/* Trend */}
       <div>
         <p style={{ color: "var(--ink-3)", fontSize: "clamp(0.58rem, 1.6vw, 0.65rem)", letterSpacing: "0.07em", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
-          Évolution — {ECONOMY_METRICS.find(m => m.id === metric)?.label}
+          Évolution · {ECONOMY_METRICS.find(m => m.id === metric)?.label}
         </p>
         <div className="flex flex-col gap-1.5">
           {ECONOMY_YEARS.map((yr) => {
@@ -282,16 +282,16 @@ function CompaniesView({ countryName, yearData }: { countryName: string; yearDat
         <div className="rounded-xl px-3 py-3 flex flex-col gap-1" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
           <p style={{ color: "var(--ink-3)", fontSize: "clamp(0.55rem, 1.5vw, 0.6rem)", textTransform: "uppercase", fontWeight: 700 }}>Pop. active</p>
           <p className="text-base font-bold tabular-nums" style={{ color: "var(--ink)" }}>
-            {labor ? `${labor.active_population_millions.toLocaleString("fr-FR")} M` : "—"}
+            {labor ? `${labor.active_population_millions.toLocaleString("fr-FR")} M` : "-"}
           </p>
           <p style={{ color: "var(--ink-4)", fontSize: "clamp(0.53rem, 1.45vw, 0.58rem)" }}>personnes (15-64 ans)</p>
         </div>
         <div className="rounded-xl px-3 py-3 flex flex-col gap-1" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
           <p style={{ color: "var(--ink-3)", fontSize: "clamp(0.55rem, 1.5vw, 0.6rem)", textTransform: "uppercase", fontWeight: 700 }}>% Pop. active</p>
           <p className="text-base font-bold tabular-nums" style={{ color: "var(--ink)" }}>
-            {activePct !== null ? `${activePct.toFixed(1)} %` : "—"}
+            {activePct !== null ? `${activePct.toFixed(1)} %` : "-"}
           </p>
-          <p style={{ color: "var(--ink-4)", fontSize: "clamp(0.53rem, 1.45vw, 0.58rem)" }}>sur {comp ? `${comp.population_millions.toLocaleString("fr-FR")} M hab.` : "—"}</p>
+          <p style={{ color: "var(--ink-4)", fontSize: "clamp(0.53rem, 1.45vw, 0.58rem)" }}>sur {comp ? `${comp.population_millions.toLocaleString("fr-FR")} M hab.` : "-"}</p>
         </div>
       </div>
 

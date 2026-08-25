@@ -363,7 +363,7 @@ export function BenchmarkBars({
                   {multiple(mine.value, leader)}
                 </span>
                 <span className="t-body" style={{ color: ink.muted }}>
-                  {"l’audience du leader — l’écart est la marge de progression, pas le verdict"}
+                  {"l’audience du leader · l’écart est la marge de progression, pas le verdict"}
                 </span>
               </div>
               <div />

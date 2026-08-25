@@ -5,7 +5,7 @@ import { DataStoryScene } from "@/components/presentation2/DataStoryScene";
 import { ArticlesShowcase } from "@/components/presentation2/ArticlesShowcase";
 
 export const metadata: Metadata = {
-  title: "The Essential Data — Cartes géopolitiques interactives PIB, Épidémies, Politique",
+  title: "The Essential Data · Cartes géopolitiques interactives PIB, Épidémies, Politique",
   description:
     "Explorez le PIB par pays 2025, les épidémies mondiales, les régimes politiques et les forces militaires grâce à des cartes interactives. Données FMI, Banque mondiale, OMS. Data journalism géopolitique de référence.",
   keywords: [
@@ -23,14 +23,14 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "The Essential Data — Cartes géopolitiques interactives",
+    title: "The Essential Data · Cartes géopolitiques interactives",
     description:
       "PIB par pays 2025, épidémies mondiales (COVID, VIH, Peste Noire), régimes politiques, puissances militaires. Cartes interactives avec données FMI, Banque mondiale et OMS.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Essential Data — Cartes géopolitiques interactives",
+    title: "The Essential Data · Cartes géopolitiques interactives",
     description:
       "PIB par pays 2025, épidémies mondiales, régimes politiques. Data journalism géopolitique.",
   },

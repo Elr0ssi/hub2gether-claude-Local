@@ -6,7 +6,7 @@ import { TestArticleBody } from "@/components/testArticle/TestArticleBody";
 import { TEST_ARTICLE } from "@/data/testArticle/testArticleData";
 
 export const metadata: Metadata = {
-  title: `${TEST_ARTICLE.title} — Format en test | The Essential Data`,
+  title: `${TEST_ARTICLE.title} · Format en test | The Essential Data`,
   description: TEST_ARTICLE.standfirst,
   alternates: { canonical: "/test-article" },
   // A layout laboratory, not an editorial publication: it should not be

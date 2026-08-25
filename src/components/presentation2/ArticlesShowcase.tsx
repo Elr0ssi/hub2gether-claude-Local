@@ -371,7 +371,7 @@ export function ArticlesShowcase() {
         </motion.div>
         {subscribed && (
           <p style={{ marginTop: 8, fontSize: "0.72rem", color: "#8A8A8A" }} aria-live="polite">
-            Merci — cette fonctionnalité sera activée prochainement.
+            Merci, cette fonctionnalité sera activée prochainement.
           </p>
         )}
       </div>

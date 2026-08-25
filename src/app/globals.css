@@ -922,6 +922,20 @@ body {
 /* ── Le test article ──────────────────────────────────────────────────────
    Une colonne de lecture reste une colonne de lecture, mais ses titres de
    partie et ses encadrés étaient dimensionnés pour un grand écran. */
+/* La FAQ ferme la course de sections de la page économie. Elle dépassait
+   l'écran d'une centaine de pixels, et une section plus haute que l'écran est
+   lue au défilement et non au saut : le lecteur défilait un peu avant que la
+   section suivante n'arrive, ce qui se ressent comme un accroc. Resserrée,
+   elle redevient un arrêt franc. */
+@media (max-height: 900px) {
+  .eco-snap-target > section { padding-top: 28px; padding-bottom: 28px; }
+  .eco-snap-target .mb-10 { margin-bottom: 1rem; }
+  .eco-snap-target .pb-10 { padding-bottom: 1rem; }
+  .eco-snap-target .grid.gap-4 { gap: 0.6rem; }
+  .eco-snap-target .card .px-5 { padding-left: 0.9rem; padding-right: 0.9rem; }
+  .eco-snap-target .card .py-4 { padding-top: 0.55rem; padding-bottom: 0.55rem; }
+}
+
 @media (max-height: 900px) {
   .ta-page .ta-open-row,
   .ta-page .ta-chart-row { gap: 24px; }
@@ -938,4 +952,13 @@ body {
 
 @media (max-width: 640px) {
   .eco-card-media { aspect-ratio: 16 / 7; }
+}
+
+/* Sur un écran très bas, la section des articles dépassait de quelques
+   dizaines de pixels, ce qui suffit à rendre son arrêt mou : une section plus
+   haute que l'écran se lit au défilement, pas au saut. La vignette est ce qui
+   se raccourcit le mieux sans rien retirer au lecteur. */
+@media (max-height: 780px) {
+  .eco-card-media { aspect-ratio: 16 / 7; }
+  .eco-snap .py-16 { padding-top: 2rem; padding-bottom: 2rem; }
 }

@@ -14,11 +14,11 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theessentialdata.co
 
 export const metadata: Metadata = {
   title: {
-    default: "The Essential Data — Geopolitical Intelligence",
+    default: "The Essential Data · Geopolitical Intelligence",
     template: "%s | The Essential Data",
   },
   description:
-    "Cartes interactives mondiales : PIB par pays 2025, épidémies, empires historiques. Données FMI, Banque mondiale, OMS. The Essential Data — data journalism géopolitique.",
+    "Cartes interactives mondiales : PIB par pays 2025, épidémies, empires historiques. Données FMI, Banque mondiale, OMS. The Essential Data, data journalism géopolitique.",
   keywords: [
     "carte PIB monde 2025",
     "PIB par pays 2025",
@@ -48,13 +48,13 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     alternateLocale: ["en_US"],
     url: siteUrl,
-    title: "The Essential Data — Cartes géopolitiques interactives",
+    title: "The Essential Data · Cartes géopolitiques interactives",
     description:
       "PIB par pays 2025, épidémies mondiales, empires historiques. Données FMI & Banque mondiale visualisées en cartes interactives.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Essential Data — Cartes géopolitiques interactives",
+    title: "The Essential Data · Cartes géopolitiques interactives",
     description:
       "PIB par pays 2025, épidémies mondiales, empires historiques. Données FMI & Banque mondiale.",
   },

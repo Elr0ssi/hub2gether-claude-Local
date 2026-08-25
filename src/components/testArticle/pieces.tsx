@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ECONOMY_YEARS } from "@/data/economy/economy";
 import { TEST_ARTICLE, TO_FILL } from "@/data/testArticle/testArticleData";
 
@@ -54,28 +54,18 @@ export function Slot({ children = TO_FILL }: { children?: string }) {
 }
 
 /** Section marker: a rule with the part's number and name sitting on it. */
-export function PartRule({ n, title }: { n: string; title: string }) {
+export function PartRule({ title }: { n?: string; title: string }) {
+  /* Sans numéro. Le « I », le « II » puis le « § » posés devant chaque titre
+     comptaient des parties que personne ne compte : le titre dit déjà de quoi
+     il s'agit, et le filet dit déjà qu'une partie commence. */
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "clamp(10px, 3vw, 16px)", margin: "clamp(34px, 7vw, 56px) 0 clamp(14px, 3vw, 22px)" }}>
-      <span
-        style={{
-          fontSize: "0.7rem",
-          fontWeight: 900,
-          letterSpacing: "0.14em",
-          color: ACCENT_INK,
-          flexShrink: 0,
-        }}
-      >
-        {n}
-      </span>
       <h2
-        className="font-black"
+        className="font-black ta-part-title"
         style={{
           fontSize: "clamp(1.15rem, 4.6vw, 1.7rem)",
           letterSpacing: "-0.025em",
           color: "var(--ink)",
-          // Un titre long doit se replier plutôt que sortir de l'écran : le
-          // filet, lui, se contente de ce qui reste.
           minWidth: 0,
         }}
       >
@@ -100,23 +90,28 @@ export function KeyFigures() {
     return null;
   };
 
+  /* Deux chiffres côte à côte plutôt qu'une pile de fiches. L'encadré
+     précédent empilait quatre blocs séparés par des filets, chacun avec son
+     libellé, sa valeur et sa note : la colonne devenait un second article. Ici
+     le millésime est annoncé une fois en tête, les valeurs se lisent d'un
+     coup d'œil, et la provenance tient sur une ligne au pied. */
   return (
     <aside
       style={{
-        borderRadius: 18,
+        borderRadius: 16,
         border: "1px solid var(--border)",
         background: "var(--surface-2)",
-        padding: "clamp(14px, 4vw, 20px) clamp(14px, 4.5vw, 22px)",
+        padding: "clamp(13px, 3.5vw, 16px) clamp(14px, 4vw, 18px)",
       }}
     >
       <p
         style={{
-          fontSize: "0.6rem",
+          fontSize: "0.58rem",
           fontWeight: 900,
           letterSpacing: "0.16em",
           textTransform: "uppercase",
           color: ACCENT_INK,
-          marginBottom: 16,
+          marginBottom: 12,
         }}
       >
         {keyFigures.label}
@@ -127,51 +122,58 @@ export function KeyFigures() {
         )}
       </p>
 
-      <div style={{ display: "grid", gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 14 }}>
         {keyFigures.items.map((item) => {
           const value = item.source === "dataset" ? valueOf(item.id) : null;
           return (
-            <div
-              key={item.id}
-              style={{ paddingBottom: 16, borderBottom: "1px solid var(--border)" }}
-            >
-              <p style={{ fontSize: "0.68rem", color: "var(--ink-3)", marginBottom: 5 }}>
+            <div key={item.id}>
+              <p style={{ fontSize: "0.62rem", color: "var(--ink-3)", marginBottom: 3 }}>
                 {item.label}
               </p>
               {value ? (
                 <p
                   className="font-black"
-                  style={{ fontSize: "clamp(1.2rem, 5.5vw, 1.5rem)", letterSpacing: "-0.03em", color: "var(--ink)" }}
+                  style={{
+                    fontSize: "clamp(1.15rem, 2.2vw, 1.45rem)",
+                    letterSpacing: "-0.035em",
+                    color: "var(--ink)",
+                    lineHeight: 1.1,
+                  }}
                 >
                   {value}
                   <span
                     style={{
-                      fontSize: "0.72rem",
+                      fontSize: "0.64rem",
                       fontWeight: 700,
                       color: "var(--ink-4)",
-                      marginLeft: 6,
+                      marginLeft: 5,
                     }}
                   >
                     {item.unit}
                   </span>
                 </p>
               ) : (
-                <p style={{ margin: "3px 0" }}>
+                <p style={{ margin: "2px 0" }}>
                   <Slot />
-                  <span
-                    style={{ fontSize: "0.7rem", color: "var(--ink-4)", marginLeft: 6 }}
-                  >
-                    {item.unit}
-                  </span>
                 </p>
               )}
-              <p style={{ fontSize: "0.62rem", color: "var(--ink-4)", marginTop: 5, lineHeight: 1.5 }}>
-                {item.note}
-              </p>
             </div>
           );
         })}
       </div>
+
+      <p
+        style={{
+          marginTop: 12,
+          paddingTop: 10,
+          borderTop: "1px solid var(--border)",
+          fontSize: "0.6rem",
+          color: "var(--ink-4)",
+          lineHeight: 1.45,
+        }}
+      >
+        {keyFigures.items.map((i) => i.note).join(" · ")}
+      </p>
     </aside>
   );
 }
@@ -221,14 +223,14 @@ export function IdeaCarousel() {
           border: "1px solid var(--border)",
           background: "var(--surface)",
           overflow: "hidden",
-          minHeight: "clamp(150px, 42vw, 210px)",
+          minHeight: "clamp(128px, 20vw, 172px)",
           display: "flex",
         }}
       >
         {/* The number, set large and quiet on the left. */}
         <div
           style={{
-            flex: "0 0 clamp(56px, 14vw, 128px)",
+            flex: "0 0 clamp(54px, 8vw, 96px)",
             background: "linear-gradient(160deg, rgba(57,255,136,0.10), rgba(57,255,136,0.02))",
             borderRight: "1px solid var(--border)",
             display: "grid",
@@ -244,7 +246,7 @@ export function IdeaCarousel() {
               transition={{ duration: 0.32, ease: EASE }}
               className="font-black"
               style={{
-                fontSize: "clamp(1.8rem, 3.4vw, 2.8rem)",
+                fontSize: "clamp(1.5rem, 2.4vw, 2.1rem)",
                 letterSpacing: "-0.04em",
                 color: ACCENT_INK,
               }}
@@ -531,14 +533,10 @@ export function PerspectiveCard({
   label,
   holders,
   body,
-  quote,
-  quoteSource,
 }: {
   label: string;
   holders: string;
   body: string;
-  quote: string;
-  quoteSource: string;
 }) {
   return (
     <article
@@ -567,26 +565,7 @@ export function PerspectiveCard({
         <p style={{ fontSize: "0.68rem", color: "var(--ink-4)", marginTop: 4 }}>{holders}</p>
       </div>
 
-      <p style={{ fontSize: "0.88rem", lineHeight: 1.65, color: "var(--ink-2)" }}>{body}</p>
-
-      <div
-        style={{
-          borderRadius: 12,
-          background: "var(--surface-2)",
-          border: "1px dashed var(--border)",
-          padding: "clamp(10px, 3vw, 12px) clamp(11px, 3.5vw, 14px)",
-          display: "flex",
-          gap: 10,
-        }}
-      >
-        <Quote size={13} style={{ color: "var(--ink-4)", flexShrink: 0, marginTop: 2 }} />
-        <div>
-          <Slot>{quote}</Slot>
-          <p style={{ fontSize: "0.62rem", color: "var(--ink-4)", marginTop: 6, lineHeight: 1.5 }}>
-            {quoteSource}
-          </p>
-        </div>
-      </div>
+      <p style={{ fontSize: "0.86rem", lineHeight: 1.62, color: "var(--ink-2)" }}>{body}</p>
     </article>
   );
 }

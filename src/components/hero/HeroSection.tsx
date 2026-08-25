@@ -22,7 +22,7 @@ const HERO_PHASES = [
   {
     globeTheme: "pib" as const,
     label: "Économie mondiale",
-    sectionLabel: "§ 01 — Économie",
+    sectionLabel: "§ 01 · Économie",
     accent: "#10B981",
     href: "/map/economy",
     articles: ECONOMY_ARTICLES.slice(0, 4),
@@ -30,7 +30,7 @@ const HERO_PHASES = [
   {
     globeTheme: "politique" as const,
     label: "Régimes politiques",
-    sectionLabel: "§ 02 — Politique",
+    sectionLabel: "§ 02 · Politique",
     accent: "#8B5CF6",
     href: "/map/politics",
     articles: POLITICS_ARTICLES.slice(0, 4),
@@ -38,7 +38,7 @@ const HERO_PHASES = [
   {
     globeTheme: "demographie" as const,
     label: "Épidémies & Santé",
-    sectionLabel: "§ 03 — Santé",
+    sectionLabel: "§ 03 · Santé",
     accent: "#3B82F6",
     href: "/map/epidemics",
     articles: EPIDEMICS_ARTICLES.slice(0, 4),
@@ -46,7 +46,7 @@ const HERO_PHASES = [
   {
     globeTheme: "chomage" as const,
     label: "Puissances militaires",
-    sectionLabel: "§ 04 — Défense",
+    sectionLabel: "§ 04 · Défense",
     accent: "#F59E0B",
     href: "/map/military",
     articles: MILITARY_ARTICLES.slice(0, 4),

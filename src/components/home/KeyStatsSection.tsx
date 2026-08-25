@@ -149,7 +149,7 @@ function StatCard({ stat, triggered }: { stat: StatDef; triggered: boolean }) {
 
   const displayValue = stat.isLive
     ? formatLiveValue(stat.id, liveValue)
-    : (stat.staticValue ?? "—");
+    : (stat.staticValue ?? "-");
 
   return (
     <Link key={stat.id} href={stat.href} style={{ textDecoration: "none" }}>

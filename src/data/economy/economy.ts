@@ -518,7 +518,7 @@ export const ECONOMY_YEARS: EconomyYear[] = [
   {
     year: 2020,
     label: "2020",
-    dataNote: "Source : Banque mondiale, FMI, OIT. Année COVID — forte contraction mondiale.",
+    dataNote: "Source : Banque mondiale, FMI, OIT. Année COVID, forte contraction mondiale.",
     countries: {
       "United States of America": { gdp: 21_060, debt_ratio: 133, unemployment: 8.1,  companies: 32_000 },
       China:                       { gdp: 14_720, debt_ratio: 51,  unemployment: 5.6,  companies: 44_000 },

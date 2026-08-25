@@ -39,7 +39,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2001-03-11",
-            label: "11 mars 2001 — 1er tour",
+            label: "11 mars 2001-1er tour",
             cities: [
               { city: "Paris",      winner: "Bertrand Delanoë",      party: "PS",      partyColor: "#E05A6C", voteShare: 48.1, lat: 48.8566, lon: 2.3522,  orientation: "left"  },
               { city: "Lyon",       winner: "Gérard Collomb",         party: "PS",      partyColor: "#E05A6C", voteShare: 42.6, lat: 45.7578, lon: 4.8320,  orientation: "left"  },
@@ -55,7 +55,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
           },
           {
             date: "2001-03-18",
-            label: "18 mars 2001 — 2e tour",
+            label: "18 mars 2001-2e tour",
             cities: [
               { city: "Paris",    winner: "Bertrand Delanoë",     party: "PS",  partyColor: "#E05A6C", voteShare: 48.8, lat: 48.8566, lon: 2.3522, orientation: "left"   },
               { city: "Lyon",     winner: "Gérard Collomb",       party: "PS",  partyColor: "#E05A6C", voteShare: 43.5, lat: 45.7578, lon: 4.8320, orientation: "left"   },
@@ -69,7 +69,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2008-03-09",
-            label: "9 mars 2008 — 1er tour",
+            label: "9 mars 2008-1er tour",
             cities: [
               { city: "Paris",      winner: "Bertrand Delanoë",  party: "PS",  partyColor: "#E05A6C", voteShare: 49.2, lat: 48.8566, lon: 2.3522,  orientation: "left"  },
               { city: "Lyon",       winner: "Gérard Collomb",    party: "PS",  partyColor: "#E05A6C", voteShare: 41.8, lat: 45.7578, lon: 4.8320,  orientation: "left"  },
@@ -85,7 +85,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
           },
           {
             date: "2008-03-16",
-            label: "16 mars 2008 — 2e tour",
+            label: "16 mars 2008-2e tour",
             cities: [
               { city: "Paris",      winner: "Bertrand Delanoë", party: "PS", partyColor: "#E05A6C", voteShare: 58.2, lat: 48.8566, lon: 2.3522, orientation: "left" },
               { city: "Lyon",       winner: "Gérard Collomb",   party: "PS", partyColor: "#E05A6C", voteShare: 53.6, lat: 45.7578, lon: 4.8320, orientation: "left" },
@@ -100,7 +100,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2014-03-23",
-            label: "23 mars 2014 — 1er tour",
+            label: "23 mars 2014-1er tour",
             cities: [
               { city: "Paris",       winner: "Anne Hidalgo",        party: "PS",  partyColor: "#E05A6C", voteShare: 34.4, lat: 48.8566, lon: 2.3522,  orientation: "left"  },
               { city: "Lyon",        winner: "Gérard Collomb",      party: "PS",  partyColor: "#E05A6C", voteShare: 40.8, lat: 45.7578, lon: 4.8320,  orientation: "left"  },
@@ -116,7 +116,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
           },
           {
             date: "2014-03-30",
-            label: "30 mars 2014 — 2e tour",
+            label: "30 mars 2014-2e tour",
             cities: [
               { city: "Paris",       winner: "Anne Hidalgo",     party: "PS",  partyColor: "#E05A6C", voteShare: 54.0, lat: 48.8566, lon: 2.3522, orientation: "left"  },
               { city: "Lyon",        winner: "Gérard Collomb",   party: "PS",  partyColor: "#E05A6C", voteShare: 61.0, lat: 45.7578, lon: 4.8320, orientation: "left"  },
@@ -132,7 +132,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2020-03-15",
-            label: "15 mars 2020 — 1er tour",
+            label: "15 mars 2020-1er tour",
             cities: [
               { city: "Paris",       winner: "Anne Hidalgo",          party: "PS",     partyColor: "#E05A6C", voteShare: 29.3, lat: 48.8566, lon: 2.3522,  orientation: "left"  },
               { city: "Lyon",        winner: "Grégory Doucet",        party: "EELV",   partyColor: "#52A855", voteShare: 28.5, lat: 45.7578, lon: 4.8320,  orientation: "left"  },
@@ -148,7 +148,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
           },
           {
             date: "2020-06-28",
-            label: "28 juin 2020 — 2e tour (report COVID)",
+            label: "28 juin 2020-2e tour (report COVID)",
             cities: [
               { city: "Paris",       winner: "Anne Hidalgo",      party: "PS",     partyColor: "#E05A6C", voteShare: 50.2, lat: 48.8566, lon: 2.3522,  orientation: "left" },
               { city: "Lyon",        winner: "Grégory Doucet",    party: "EELV",   partyColor: "#52A855", voteShare: 51.3, lat: 45.7578, lon: 4.8320,  orientation: "left" },
@@ -167,12 +167,12 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2026-03-22",
-            label: "22 mars 2026 — 1er tour (prévu)",
+            label: "22 mars 2026-1er tour (prévu)",
             cities: [],
           },
           {
             date: "2026-03-29",
-            label: "29 mars 2026 — 2e tour (prévu)",
+            label: "29 mars 2026-2e tour (prévu)",
             cities: [],
           },
         ],
@@ -188,7 +188,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2020-03-15",
-            label: "15 mars 2020 — Bavière (Kommunalwahl)",
+            label: "15 mars 2020 · Bavière (Kommunalwahl)",
             region: "Bavière",
             cities: [
               { city: "Munich",      winner: "Dieter Reiter",                    party: "SPD",  partyColor: "#E05A6C", voteShare: 47.2, lat: 48.1351, lon: 11.5820, orientation: "left"  },
@@ -200,7 +200,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
           },
           {
             date: "2020-09-13",
-            label: "13 sept. 2020 — Rhénanie-du-Nord-Westphalie",
+            label: "13 sept. 2020, Rhénanie-du-Nord-Westphalie",
             region: "NRW",
             cities: [
               { city: "Cologne",    winner: "Henriette Reker",    party: "Indépendant (CDU+Verts)", partyColor: "#6A9A6A", voteShare: 59.6, lat: 50.9333, lon: 6.9500, orientation: "other" },
@@ -214,7 +214,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
           },
           {
             date: "2020-10-18",
-            label: "18 oct. 2020 — Basse-Saxe",
+            label: "18 oct. 2020, Basse-Saxe",
             region: "Basse-Saxe",
             cities: [
               { city: "Hanovre",    winner: "Belit Onay",          party: "Verts", partyColor: "#52A855", voteShare: 56.3, lat: 52.3759, lon: 9.7320,  orientation: "left"  },
@@ -229,7 +229,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2021-03-14",
-            label: "14 mars 2021 — Hesse",
+            label: "14 mars 2021 · Hesse",
             region: "Hesse",
             cities: [
               { city: "Francfort",  winner: "Mike Josef",           party: "SPD", partyColor: "#E05A6C", voteShare: 46.3, lat: 50.1109, lon: 8.6821, orientation: "left" },
@@ -240,7 +240,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
           },
           {
             date: "2021-09-26",
-            label: "26 sept. 2021 — Rhénanie-Palatinat",
+            label: "26 sept. 2021, Rhénanie-Palatinat",
             region: "Rhénanie-Palatinat",
             cities: [
               { city: "Mayence",       winner: "Michael Ebling",   party: "SPD", partyColor: "#E05A6C", voteShare: 60.9, lat: 49.9929, lon: 8.2473, orientation: "left" },
@@ -255,7 +255,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2024-06-09",
-            label: "9 juin 2024 — Bade-Wurtemberg",
+            label: "9 juin 2024 · Bade-Wurtemberg",
             region: "Bade-Wurtemberg",
             cities: [
               { city: "Stuttgart",             winner: "Frank Nopper",    party: "CDU",        partyColor: "#4A90D9", voteShare: 40.2, lat: 48.7758, lon: 9.1829, orientation: "right" },
@@ -267,7 +267,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
           },
           {
             date: "2024-06-09",
-            label: "9 juin 2024 — Saxe",
+            label: "9 juin 2024 · Saxe",
             region: "Saxe",
             cities: [
               { city: "Dresde",   winner: "Dirk Hilbert",   party: "FDP/lib.", partyColor: "#FFD54F", voteShare: 60.9, lat: 51.0509, lon: 13.7383, orientation: "center" },
@@ -277,7 +277,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
           },
           {
             date: "2024-06-09",
-            label: "9 juin 2024 — Thuringe",
+            label: "9 juin 2024 · Thuringe",
             region: "Thuringe",
             cities: [
               { city: "Erfurt", winner: "Andreas Bausewein", party: "SPD", partyColor: "#E05A6C", voteShare: 58.4, lat: 50.9787, lon: 11.0328, orientation: "left"   },
@@ -292,7 +292,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2025-09-14",
-            label: "14 sept. 2025 — NRW (prévu)",
+            label: "14 sept. 2025, NRW (prévu)",
             region: "NRW",
             cities: [],
           },
@@ -309,7 +309,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2021-11-02",
-            label: "2 nov. 2021 — Élections municipales",
+            label: "2 nov. 2021, Élections municipales",
             cities: [
               { city: "New York",        winner: "Eric Adams",         party: "Democrat",    partyColor: "#4A90D9", voteShare: 51.1, lat: 40.7128, lon: -74.0060,  orientation: "center" },
               { city: "Boston",          winner: "Michelle Wu",         party: "Democrat",    partyColor: "#E05A6C", voteShare: 64.0, lat: 42.3601, lon: -71.0589,  orientation: "left"   },
@@ -334,7 +334,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2023-11-07",
-            label: "7 nov. 2023 — Élections municipales",
+            label: "7 nov. 2023, Élections municipales",
             cities: [
               { city: "Los Angeles",     winner: "Karen Bass",          party: "Democrat",    partyColor: "#E05A6C", voteShare: 55.9, lat: 34.0522, lon: -118.2437, orientation: "left"   },
               { city: "Chicago",         winner: "Brandon Johnson",     party: "Democrat",    partyColor: "#E05A6C", voteShare: 51.4, lat: 41.8781, lon: -87.6298,  orientation: "left"   },
@@ -387,7 +387,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2021-05-06",
-            label: "6 mai 2021 — Élections locales",
+            label: "6 mai 2021 · Élections locales",
             cities: [
               { city: "London",       winner: "Sadiq Khan",        party: "Labour",    partyColor: "#E05A6C", voteShare: 55.2, lat: 51.5074, lon: -0.1278, orientation: "left"   },
               { city: "Bristol",      winner: "Marvin Rees",       party: "Labour",    partyColor: "#E05A6C", voteShare: 51.3, lat: 51.4545, lon: -2.5879, orientation: "left"   },
@@ -402,7 +402,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2024-05-02",
-            label: "2 mai 2024 — Élections locales",
+            label: "2 mai 2024 · Élections locales",
             cities: [
               { city: "London",        winner: "Sadiq Khan",         party: "Labour",      partyColor: "#E05A6C", voteShare: 43.8, lat: 51.5074, lon: -0.1278,  orientation: "left"   },
               { city: "Manchester",    winner: "Bev Craig",           party: "Labour",      partyColor: "#E05A6C", voteShare: 61.2, lat: 53.4808, lon: -2.2426,  orientation: "left"   },
@@ -434,7 +434,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2023-05-28",
-            label: "28 mai 2023 — Élections municipales",
+            label: "28 mai 2023 · Élections municipales",
             cities: [
               { city: "Madrid",        winner: "José Luis Almeida",    party: "PP",  partyColor: "#4A90D9", voteShare: 47.4, lat: 40.4168, lon: -3.7038, orientation: "right"  },
               { city: "Barcelona",     winner: "Jaume Collboni",        party: "PSC", partyColor: "#E05A6C", voteShare: 22.5, lat: 41.3851, lon: 2.1734,  orientation: "left"   },
@@ -466,7 +466,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2021-10-03",
-            label: "3 oct. 2021 — 1er tour",
+            label: "3 oct. 2021-1er tour",
             cities: [
               { city: "Rome",      winner: "Roberto Gualtieri",  party: "PD",       partyColor: "#E05A6C", voteShare: 42.9, lat: 41.9028, lon: 12.4964, orientation: "left"   },
               { city: "Milan",     winner: "Beppe Sala",         party: "Centre-G.", partyColor: "#E05A6C", voteShare: 57.0, lat: 45.4654, lon: 9.1859,  orientation: "left"   },
@@ -478,7 +478,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
           },
           {
             date: "2021-10-17",
-            label: "17 oct. 2021 — 2e tour",
+            label: "17 oct. 2021-2e tour",
             cities: [
               { city: "Rome",    winner: "Roberto Gualtieri", party: "PD",        partyColor: "#E05A6C", voteShare: 60.1, lat: 41.9028, lon: 12.4964, orientation: "left"  },
               { city: "Turin",   winner: "Stefano Lo Russo",  party: "PD",        partyColor: "#E05A6C", voteShare: 59.6, lat: 45.0703, lon: 7.6869,  orientation: "left"  },
@@ -492,7 +492,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2022-06-12",
-            label: "12 juin 2022 — 1er tour",
+            label: "12 juin 2022-1er tour",
             cities: [
               { city: "Gênes",     winner: "Marco Bucci",        party: "FdI/FI",   partyColor: "#4A90D9", voteShare: 47.2, lat: 44.4056, lon: 8.9463,  orientation: "right"  },
               { city: "Palerme",   winner: "Roberto Lagalla",    party: "Centre-D.", partyColor: "#4A90D9", voteShare: 48.4, lat: 38.1157, lon: 13.3615, orientation: "right"  },
@@ -504,7 +504,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
           },
           {
             date: "2022-06-26",
-            label: "26 juin 2022 — 2e tour",
+            label: "26 juin 2022-2e tour",
             cities: [
               { city: "Gênes",   winner: "Marco Bucci",      party: "FdI/FI",    partyColor: "#4A90D9", voteShare: 56.4, lat: 44.4056, lon: 8.9463,  orientation: "right" },
               { city: "Vérone",  winner: "Damiano Tommasi",  party: "Centre-G.", partyColor: "#E05A6C", voteShare: 53.0, lat: 45.4384, lon: 10.9916, orientation: "left"  },
@@ -517,7 +517,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
         rounds: [
           {
             date: "2024-06-08",
-            label: "8 juin 2024 — 1er tour",
+            label: "8 juin 2024-1er tour",
             cities: [
               { city: "Florence",  winner: "Sara Funaro",      party: "PD",        partyColor: "#E05A6C", voteShare: 43.7, lat: 43.7696, lon: 11.2558, orientation: "left"   },
               { city: "Bari",      winner: "Vito Leccese",     party: "PD/Centre-G.", partyColor: "#E05A6C", voteShare: 46.8, lat: 41.1177, lon: 16.8719, orientation: "left" },
@@ -528,7 +528,7 @@ export const MUNICIPAL_ELECTIONS: CountryMunicipalData[] = [
           },
           {
             date: "2024-06-23",
-            label: "23 juin 2024 — 2e tour",
+            label: "23 juin 2024-2e tour",
             cities: [
               { city: "Florence",  winner: "Sara Funaro",   party: "PD",        partyColor: "#E05A6C", voteShare: 59.7, lat: 43.7696, lon: 11.2558, orientation: "left" },
               { city: "Bari",      winner: "Vito Leccese",  party: "PD",        partyColor: "#E05A6C", voteShare: 57.2, lat: 41.1177, lon: 16.8719, orientation: "left" },

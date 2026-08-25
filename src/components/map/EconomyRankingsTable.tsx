@@ -52,7 +52,7 @@ function flagImg(emoji: string | undefined): React.ReactNode {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function formatValue(value: number | undefined, metricId: EconomyMetricId): string {
-  if (value === undefined || value === null) return "—";
+  if (value === undefined || value === null) return "-";
   if (metricId === "gdp") {
     if (value >= 1000) return `${(value / 1000).toFixed(1)} T$`;
     return `${value.toLocaleString("fr-FR")} Mds`;
@@ -300,7 +300,7 @@ export function EconomyRankingsTable({
         // scroll region, so reaching the last country does not throw the
         // reader into the next section.
         data-scroll-region
-        style={{ maxHeight: "min(640px, calc(100vh - 290px))" }}
+        style={{ maxHeight: "min(640px, calc(100vh - 336px))" }}
         translate="no"
       >
         <table className="w-full" style={{ borderCollapse: "collapse" }}>

@@ -383,7 +383,7 @@ export function DataPlaceholder({
       <span
         className="ted-data-slot"
         data-tone={ink.tone}
-        title={hint ? `À remplir — ${hint}` : "À remplir"}
+        title={hint ? `À remplir · ${hint}` : "À remplir"}
       >
         {"{DATA_TO_FILL}"}
       </span>

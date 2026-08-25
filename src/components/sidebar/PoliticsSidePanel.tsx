@@ -117,7 +117,7 @@ export function PoliticsSidePanel({ countryName, period, year, open, onClose }: 
                 <div className="rounded-xl px-3 py-2.5" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
                   <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>Période historique</p>
                   <p className="text-xs font-semibold mt-0.5" style={{ color: "var(--ink-2)" }}>
-                    {period.from} — {period.to === 9999 ? "présent" : period.to}
+                    {period.from}, {period.to === 9999 ? "présent" : period.to}
                   </p>
                 </div>
               </div>

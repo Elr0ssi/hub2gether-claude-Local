@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { DeckShell } from "@/components/soutenance2/DeckShell";
 
 export const metadata: Metadata = {
-  title: "Soutenance 2 — The Essential Data",
+  title: "Soutenance 2 · The Essential Data",
   description:
-    "Soutenance de business plan — version 2 : quinze slides, du problème au passage à l'échelle.",
+    "Soutenance de business plan · version 2 : quinze slides, du problème au passage à l'échelle.",
   // A deck is not a page anyone should land on from search.
   robots: { index: false, follow: false },
 };

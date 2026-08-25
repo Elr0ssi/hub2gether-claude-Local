@@ -190,7 +190,7 @@ export function DeckShell({ initialSlide, presenter = false }: DeckShellProps) {
                 }}
                 role="group"
                 aria-roledescription="slide"
-                aria-label={`${index + 1} sur ${S2_SLIDES.length} — ${slide.label}`}
+                aria-label={`${index + 1} sur ${S2_SLIDES.length} · ${slide.label}`}
               >
                 <ToneProvider value={tone}>
                   <SlideStepProvider value={step}>{View ? <View /> : null}</SlideStepProvider>

@@ -23,7 +23,7 @@ export const TEST_ARTICLE = {
   kicker: "Format en test",
   title: "Les dépenses publiques françaises",
   /** Sits under the rule, below the title. */
-  section: "Économie — Dette",
+  section: "Économie · Dette",
   standfirst:
     "Ce que la France dépense, ce qu'elle prélève, et pourquoi les deux chiffres ne racontent pas la même histoire.",
   readingTime: 7,
@@ -41,67 +41,60 @@ export const TEST_ARTICLE = {
   /** The box that sits to the right of the opening. */
   keyFigures: {
     label: "Chiffres clés",
-    /** `source: "dataset"` reads the site's own economy series; the rest are slots. */
+    /* Deux, pas quatre. Un encadré de chiffres se lit d'un coup d'œil ou ne
+       se lit pas : au-delà de deux lignes il devient un tableau, et le
+       lecteur le saute. Les deux retenus sont ceux que le site porte et
+       source lui-même, si bien que l'encadré ne contient aucun emplacement
+       vide. Les autres reviendront quand leur source sera branchée. */
     items: [
       {
         id: "debt_ratio",
         label: "Dette publique",
         unit: "% du PIB",
         source: "dataset" as const,
-        note: "Série portée par la carte Économie du site.",
+        note: "Série Économie du site",
       },
       {
         id: "gdp",
         label: "PIB",
         unit: "Mds €",
         source: "dataset" as const,
-        note: "Même série, même millésime.",
-      },
-      {
-        id: "spending_ratio",
-        label: "Dépense publique",
-        unit: "% du PIB",
-        source: "slot" as const,
-        note: "Eurostat, comptes des administrations publiques (S13).",
-      },
-      {
-        id: "balance",
-        label: "Solde public",
-        unit: "% du PIB",
-        source: "slot" as const,
-        note: "INSEE, comptes nationaux annuels.",
+        note: "Même série, même millésime",
       },
     ],
   },
 
   /* ── Five slides, five ideas ────────────────────────────────────────── */
   carousel: {
-    label: "Cinq idées pour lire le sujet",
+    label: "Les idées à retenir",
+    /* Un carrousel énonce, il ne démontre pas. Une idée par écran, une
+       phrase pour l'asseoir : le développement a ses propres parties plus
+       bas, et le lecteur qui fait défiler cherche la liste, pas l'argument. */
     slides: [
       {
         n: "01",
-        title: "Un niveau, pas une dérive",
-        body: "La part de la dépense publique dans le PIB française est haute depuis longtemps. Traiter chaque hausse conjoncturelle comme une rupture fait manquer le fait principal : c'est un régime installé, pas une pente récente.",
+        title: "Un niveau installé, pas une dérive",
+        body: "La part de la dépense publique dans le PIB est haute depuis des décennies. C'est un régime, pas une pente récente.",
       },
       {
         n: "02",
         title: "L'État n'est pas le premier payeur",
-        body: "La plus grande part ne relève pas du budget de l'État mais des administrations de sécurité sociale. Comparer deux pays sur le total, c'est comparer deux périmètres — et souvent conclure sur autre chose que ce qu'on croit mesurer.",
+        body: "La plus grande part relève des administrations de sécurité sociale, pas du budget de l'État.",
       },
       {
         n: "03",
         title: "Dépenser n'est pas être en déficit",
-        body: "Le déficit est un écart entre dépense et recette, pas un niveau de dépense. Un pays peut dépenser beaucoup et rester à l'équilibre s'il prélève autant. Les deux débats sont régulièrement fondus en un seul.",
+        body: "Le déficit est un écart entre dépense et recette. Un pays peut dépenser beaucoup et rester à l'équilibre.",
       },
       {
         n: "04",
-        title: "Le périmètre décide de la conclusion",
-        body: "Une retraite par répartition passe par la dépense publique ; la même retraite financée par capitalisation n'y passe pas. Le service rendu peut être identique et le classement international inversé.",
+        title: "Le périmètre décide du classement",
+        body: "Une retraite par répartition passe par la dépense publique ; la même par capitalisation n'y passe pas.",
       },
       {
         n: "05",
         title: "Un stock et un flux",
-        body: "La dette est un stock, la dépense un flux annuel. Rapporter l'un à l'autre sans le dire produit des raccourcis dont aucun des deux camps du débat n'a besoin.",
+        body: "La dette est un stock, la dépense un flux annuel. Les deux ne se comparent pas directement.",
       },
     ],
   },
@@ -147,39 +140,33 @@ export const TEST_ARTICLE = {
     },
     {
       n: "II",
-      title: "Trois lectures qui ne se contredisent pas",
+      title: "Trois manières de lire le chiffre",
       intro:
-        "Le sujet est rarement présenté pour ce qu'il est : un désaccord sur le critère, plus que sur les faits. Trois lectures cohabitent, chacune adossée à des travaux identifiables.",
+        "Trois lectures cohabitent, chacune adossée à des travaux identifiables. Elles ne portent pas sur le même chiffre.",
       perspectives: [
         {
           label: "Efficience",
-          holders: "Cour des comptes, OCDE — Government at a Glance",
+          holders: "Cour des comptes, OCDE · Government at a Glance",
           body: "La question posée n'est pas le montant mais le rendement : pour un euro dépensé, quel résultat mesurable sur la santé, l'éducation, l'emploi. Cette lecture accepte un niveau élevé si la contrepartie est documentée, et conteste la dépense dont l'effet ne l'est pas.",
-          quote: TO_FILL,
-          quoteSource: "Citation exacte et référence à insérer avant publication.",
         },
         {
           label: "Choix de socialisation",
-          holders: "Économie de la redistribution — travaux académiques sur l'État social",
+          holders: "Économie de la redistribution · travaux académiques sur l'État social",
           body: "Le niveau français traduirait d'abord une décision collective : faire passer par la sphère publique des dépenses que d'autres pays laissent aux ménages ou aux assureurs privés. Dans cette lecture, un ratio élevé n'est pas en soi un dysfonctionnement mais la trace d'un arbitrage.",
-          quote: TO_FILL,
-          quoteSource: "Citation exacte et référence à insérer avant publication.",
         },
         {
           label: "Soutenabilité",
-          holders: "FMI — Fiscal Monitor, Commission européenne",
+          holders: "FMI · Fiscal Monitor, Commission européenne",
           body: "L'objet d'attention n'est ni le niveau ni sa légitimité mais la trajectoire : la dette augmente-t-elle plus vite que la capacité à la porter. Cette lecture est indifférente au périmètre et se concentre sur l'écart durable entre recettes et dépenses.",
-          quote: TO_FILL,
-          quoteSource: "Citation exacte et référence à insérer avant publication.",
         },
       ],
     },
     {
       n: "III",
-      title: "Le désaccord réel",
+      title: "Ce que cela change pour le lecteur",
       paragraphs: [
-        "Une fois les trois lectures posées, le point de friction apparaît : elles ne portent pas sur le même chiffre. La première parle d'efficacité par euro, la deuxième de périmètre, la troisième d'écart entre flux. Un débat qui saute de l'une à l'autre sans le signaler donne l'impression d'un affrontement frontal là où il y a surtout un changement de critère.",
-        "C'est là que le travail éditorial a une valeur : non pas trancher, mais rendre visible sur quel chiffre chacun s'appuie, avec quelle définition, et à quelle date. Le lecteur peut alors faire le reste — et vérifier lui-même dans la source.",
+        "La première lecture parle d'efficacité par euro, la deuxième de périmètre, la troisième d'écart entre flux. Un commentaire qui saute de l'une à l'autre sans le dire donne l'impression d'un affrontement là où il y a surtout un changement de critère.",
+        "Le travail éditorial tient là : rendre visible sur quel chiffre chacun s'appuie, avec quelle définition et à quelle date. Le lecteur fait le reste, et vérifie dans la source.",
       ],
     },
   ],
@@ -191,34 +178,34 @@ export const TEST_ARTICLE = {
       "Chaque chiffre de cet article doit pouvoir être remonté jusqu'à sa source primaire. Les sources ci-dessous sont celles à utiliser pour remplir les emplacements laissés visibles.",
     items: [
       {
-        name: "INSEE — Comptes nationaux annuels",
+        name: "INSEE · Comptes nationaux annuels",
         role: "Dépenses et recettes des administrations publiques, solde public.",
       },
       {
-        name: "Eurostat — Government finance statistics (S13, COFOG)",
+        name: "Eurostat · Government finance statistics (S13, COFOG)",
         role: "Comparaisons européennes et ventilation par fonction.",
       },
       {
-        name: "Cour des comptes — Rapports publics annuels",
+        name: "Cour des comptes · Rapports publics annuels",
         role: "Analyse de l'efficience et des trajectoires.",
       },
       {
-        name: "OCDE — Government at a Glance",
+        name: "OCDE · Government at a Glance",
         role: "Comparaisons internationales hors Union européenne.",
       },
       {
-        name: "FMI — Fiscal Monitor et World Economic Outlook",
+        name: "FMI · Fiscal Monitor et World Economic Outlook",
         role: "Projections et lecture de soutenabilité.",
       },
       {
-        name: "Jeu de données The Essential Data — Économie",
+        name: "Jeu de données The Essential Data · Économie",
         role: "Série de dette publique utilisée par le graphique de cet article.",
       },
     ],
   },
 
   transparency: {
-    label: "Transparence — assistance par IA",
+    label: "Transparence · assistance par IA",
     body: [
       "Cet article est produit avec une assistance par IA sur la collecte, la mise en forme et le recoupement des sources. Les choix éditoriaux, la vérification des chiffres et la validation avant publication restent humains.",
       "Aucune donnée n'est publiée sans source primaire identifiée : les emplacements encore vides sont laissés visibles plutôt que comblés par une estimation.",

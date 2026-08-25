@@ -189,7 +189,7 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
         }
         .cat-hero-layer { position: absolute; inset: 0; pointer-events: none; }
         .cat-hero-scene { position: absolute; inset: 0; }
-        /* The sheaf closes about the sphere's centre, not the stage's — the
+        /* The sheaf closes about the sphere's centre, not the stage's, the
            globe anchor sits at 50% across and its centre a little below the
            middle of the stage. */
         .cat-hero-curves { transform-origin: 50% 76%; }
@@ -290,9 +290,9 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
            plus que par une tranche sous le bandeau. On rend cette place. */
         @media (max-height: 900px) {
           .cat-hero-head { top: clamp(16px, 3.4vh, 34px); }
-          .cat-hero-title { font-size: clamp(2rem, 3.8vw, 3rem); }
-          .cat-hero-subtitle { margin-top: 9px; font-size: 0.92rem; }
-          .cat-hero-globe-anchor { top: 33%; width: min(760px, 104vw); }
+          .cat-hero-title { font-size: clamp(1.75rem, 3vw, 2.5rem); }
+          .cat-hero-subtitle { margin-top: 8px; font-size: 0.86rem; }
+          .cat-hero-globe-anchor { top: 35%; width: min(620px, 86vw); }
           .cat-hero-stats-anchor { bottom: clamp(10px, 2vh, 20px); }
           .cat-hero-stat { padding: 11px clamp(10px, 1.3vw, 18px); }
           .cat-hero-stat-icon { width: 28px; height: 28px; margin-bottom: 6px; }
@@ -303,9 +303,9 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
         }
 
         @media (max-height: 780px) {
-          .cat-hero-title { font-size: clamp(1.85rem, 3.2vw, 2.5rem); }
+          .cat-hero-title { font-size: clamp(1.6rem, 2.6vw, 2.1rem); }
           .cat-hero-stat-icon { display: none; }
-          .cat-hero-globe-anchor { top: 30%; }
+          .cat-hero-globe-anchor { top: 32%; width: min(560px, 80vw); }
         }
 
         @media (max-width: 900px) {

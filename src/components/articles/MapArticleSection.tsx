@@ -536,7 +536,7 @@ export function MapArticleSection({
               </span>
             )}
             {!selectedCountry && themeLabel && (
-              <span style={{ fontSize: "0.6rem", color: "var(--ink-4)" }}>— {themeLabel}</span>
+              <span style={{ fontSize: "0.6rem", color: "var(--ink-4)" }}>- {themeLabel}</span>
             )}
           </div>
 

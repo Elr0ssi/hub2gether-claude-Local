@@ -86,7 +86,7 @@ function CarouselSection({
               border: "none",
               cursor: "pointer",
             }}
-            aria-label={`${item.name} — cliquez pour détails`}
+            aria-label={`${item.name} · cliquez pour détails`}
           >
             <motion.div
               className="w-full h-full relative"
@@ -319,8 +319,7 @@ function QuoteSection({ text, source }: { text: string; source: string }) {
       <cite
         className="text-xs not-italic font-semibold"
         style={{ color: "var(--ink-3)" }}
-      >
-        — {source}
+      > · {source}
       </cite>
     </blockquote>
   );

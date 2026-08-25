@@ -238,7 +238,7 @@ export default async function ArticlePage({ params }: PageProps) {
             <span
               className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
               style={{ background: "rgba(57,255,136,0.12)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)" }}
-              title="Contenu synthétisé par IA à partir de sources vérifiées — Conformité EU AI Act"
+              title="Contenu synthétisé par IA à partir de sources vérifiées · Conformité EU AI Act"
             >
               <Info size={9} />
               Synthèse IA
@@ -362,7 +362,7 @@ export default async function ArticlePage({ params }: PageProps) {
                       )}
                       {(src.outlet || src.year) && (
                         <span style={{ color: "var(--ink-4)" }}>
-                          {" — "}
+                          {" · "}
                           {[src.outlet, src.year].filter(Boolean).join(", ")}
                         </span>
                       )}

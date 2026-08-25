@@ -6,7 +6,7 @@ import { FAQSection } from "@/components/faq/FAQSection";
 import { FAQS_EMPIRES } from "@/data/faqs";
 
 export const metadata: Metadata = {
-  title: "Aperçu — The Essential Data",
+  title: "Aperçu · The Essential Data",
   robots: { index: false, follow: false },
 };
 

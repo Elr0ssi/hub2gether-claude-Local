@@ -98,7 +98,7 @@ export function TestArticleHero() {
             color: "rgba(255,255,255,0.5)",
           }}
         >
-          Dette publique française · {series[0]?.year}–{series[series.length - 1]?.year}
+          Dette publique française · {series[0]?.year}-{series[series.length - 1]?.year}
         </span>
       </div>
 

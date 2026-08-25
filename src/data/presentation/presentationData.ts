@@ -51,7 +51,7 @@ export const BRAND = {
 
 /** Route opened by the live-demo slide. */
 export const DEMO_ROUTE = "/map/economy";
-export const DEMO_DURATION = "60–90 sec demo";
+export const DEMO_DURATION = "60-90 sec demo";
 
 /** The problématique of Part II. Displayed in full on its own slide. */
 export const RESEARCH_QUESTION =
@@ -119,21 +119,21 @@ export const PRODUCT_LEVELS = [
     key: "explore",
     title: "Explore",
     items: ["Cartes", "Globe", "Pays", "Indicateurs"],
-    mediaLabel: "Screenshot — carte interactive",
+    mediaLabel: "Screenshot · carte interactive",
   },
   {
     index: "02",
     key: "understand",
     title: "Understand",
     items: ["Comparaisons", "Évolutions", "Relations", "Chiffres clés"],
-    mediaLabel: "Screenshot — comparaison pays",
+    mediaLabel: "Screenshot · comparaison pays",
   },
   {
     index: "03",
     key: "deepdive",
     title: "Deep dive",
     items: ["Articles", "Analyses", "Sources", "Perspectives"],
-    mediaLabel: "Screenshot — article + sources",
+    mediaLabel: "Screenshot · article + sources",
   },
 ] as const;
 
@@ -384,13 +384,13 @@ export const AGILE = {
       concept: "Boucle de feedback courte",
       applied:
         "Les limites du pipeline éditorial ont été identifiées en production, pas en conception.",
-      mediaLabel: "Avant / après — pipeline",
+      mediaLabel: "Avant / après · pipeline",
     },
     {
       concept: "Périmètre réduit, livré",
       applied:
         "Un MVP publié plutôt qu’une architecture complète non livrée.",
-      mediaLabel: "Avant / après — architecture data",
+      mediaLabel: "Avant / après · architecture data",
     },
   ],
 } as const;
@@ -976,12 +976,12 @@ export const BENCHMARK = {
   unit: "visites / mois",
   /** e.g. "SimilarWeb, janvier 2026" — cite the tool and the date. */
   source: null as string | null,
-  sourceDemo: "SimilarWeb — estimation",
+  sourceDemo: "SimilarWeb · estimation",
   rows: [
     { name: "Statista", monthlyVisits: null, demo: 9_100_000 },
     { name: "Our World in Data", monthlyVisits: null, demo: 4_200_000 },
     { name: "Visual Capitalist", monthlyVisits: null, demo: 1_800_000 },
-    { name: "Les Décodeurs — Le Monde", monthlyVisits: null, demo: 950_000 },
+    { name: "Les Décodeurs · Le Monde", monthlyVisits: null, demo: 950_000 },
     { name: "The Essential Data", monthlyVisits: null, demo: 8_400, isUs: true },
   ] as BenchmarkRow[],
   caption:

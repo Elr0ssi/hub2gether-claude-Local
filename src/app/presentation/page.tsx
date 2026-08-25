@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PresentationShell } from "@/components/presentation/PresentationShell";
 
 export const metadata: Metadata = {
-  title: "Présentation — The Essential Data",
+  title: "Présentation · The Essential Data",
   description:
     "Présentation interactive de soutenance : pitch entrepreneurial et approfondissement de la problématique éditoriale de The Essential Data.",
   // A deck is not a page anyone should land on from search.

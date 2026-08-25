@@ -120,7 +120,7 @@ export function Navbar() {
                   key={theme.id}
                   className="relative px-2.5 py-1.5 rounded-lg text-sm font-medium cursor-not-allowed opacity-50 flex items-center gap-1.5"
                   style={{ color: "var(--ink-4)" }}
-                  title={`${theme.label} — Bientôt disponible ${theme.comingSoonLabel ?? ""}`}
+                  title={`${theme.label}, Bientôt disponible ${theme.comingSoonLabel ?? ""}`}
                 >
                   {theme.label}
                   <span

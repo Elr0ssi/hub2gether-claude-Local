@@ -71,7 +71,7 @@ export const S2_SLIDES: readonly Slide2[] = [
     seconds: 30,
     tone: "light",
     speakerNotes:
-      "Poser la promesse et ne plus la lâcher : comprendre en 30 secondes, maîtriser en 5 minutes. Laisser le globe tourner deux secondes avant de parler. Ne pas annoncer le plan — la narration se tient toute seule.",
+      "Poser la promesse et ne plus la lâcher : comprendre en 30 secondes, maîtriser en 5 minutes. Laisser le globe tourner deux secondes avant de parler. Ne pas annoncer le plan, la narration se tient toute seule.",
   },
   {
     id: "probleme",
@@ -98,7 +98,7 @@ export const S2_SLIDES: readonly Slide2[] = [
     seconds: 60,
     tone: "light",
     speakerNotes:
-      "Montrer, ne pas décrire. Explorer, comparer, comprendre, approfondir — quatre gestes, un seul outil. Si le temps le permet, basculer ici sur une démo live de la carte économie. Transition : « et ce produit s'adresse à un marché déjà mesurable ».",
+      "Montrer, ne pas décrire. Explorer, comparer, comprendre, approfondir, quatre gestes, un seul outil. Si le temps le permet, basculer ici sur une démo live de la carte économie. Transition : « et ce produit s'adresse à un marché déjà mesurable ».",
   },
   {
     id: "marche",
@@ -107,7 +107,7 @@ export const S2_SLIDES: readonly Slide2[] = [
     seconds: 50,
     tone: "light",
     speakerNotes:
-      "Le chiffre qui compte n'est pas 590–760 M€, c'est 0,08 %. Insister : le modèle n'a pas besoin de dominer le marché pour être viable. Rappeler que ce sont des projections du plan, pas des revenus constatés.",
+      "Le chiffre qui compte n'est pas 590-760 M€, c'est 0,08 %. Insister : le modèle n'a pas besoin de dominer le marché pour être viable. Rappeler que ce sont des projections du plan, pas des revenus constatés.",
   },
   {
     id: "concurrence",
@@ -116,7 +116,7 @@ export const S2_SLIDES: readonly Slide2[] = [
     seconds: 60,
     tone: "light",
     speakerNotes:
-      "Quatre familles, quatre forces réelles. Ne jamais dire « nous sommes meilleurs partout » : dire que peu d'acteurs réunissent les quatre dimensions à la fois. La différence avec Courrier International est la plus fine — l'expliciter.",
+      "Quatre familles, quatre forces réelles. Ne jamais dire « nous sommes meilleurs partout » : dire que peu d'acteurs réunissent les quatre dimensions à la fois. La différence avec Courrier International est la plus fine, l'expliciter.",
   },
   {
     id: "acquisition",
@@ -134,7 +134,7 @@ export const S2_SLIDES: readonly Slide2[] = [
     seconds: 60,
     tone: "light",
     speakerNotes:
-      "Montrer ce qui a été publié, pas seulement décrire le moteur. Les captures parlent d'elles-mêmes : formats courts, sujets d'actualité économique, un chiffre par publication. Les compteurs d'audience sont des emplacements tant qu'ils ne sont pas relevés dans l'analytics — ne jamais improviser un chiffre de vues devant le jury. Enchaîner sur les partenariats possibles sans les présenter comme acquis.",
+      "Montrer ce qui a été publié, pas seulement décrire le moteur. Les captures parlent d'elles-mêmes : formats courts, sujets d'actualité économique, un chiffre par publication. Les compteurs d'audience sont des emplacements tant qu'ils ne sont pas relevés dans l'analytics, ne jamais improviser un chiffre de vues devant le jury. Enchaîner sur les partenariats possibles sans les présenter comme acquis.",
   },
 
   {
@@ -145,17 +145,17 @@ export const S2_SLIDES: readonly Slide2[] = [
     tone: "dark",
     steps: 6,
     speakerNotes:
-      "La séquence la plus stratégique du pitch. Six états, six respirations : avancer avec →, ne jamais enchaîner deux états sans laisser le jury lire. État 2, marquer le silence sur « et si l'utilisateur ne venait plus jusqu'au média ». État 3, dire clairement ce qui est en ligne et ce qui est au plan — les nœuds en pointillé ne sont pas encore construits. État 5, ne jamais présenter l'API ni les licences comme existantes : ce sont des pistes. Phrase à ne pas rater : l'IA donne la réponse, The Essential Data permet de l'explorer.",
+      "La séquence la plus stratégique du pitch. Six états, six respirations : avancer avec →, ne jamais enchaîner deux états sans laisser le jury lire. État 2, marquer le silence sur « et si l'utilisateur ne venait plus jusqu'au média ». État 3, dire clairement ce qui est en ligne et ce qui est au plan, les nœuds en pointillé ne sont pas encore construits. État 5, ne jamais présenter l'API ni les licences comme existantes : ce sont des pistes. Phrase à ne pas rater : l'IA donne la réponse, The Essential Data permet de l'explorer.",
   },
 
   {
     id: "geo",
-    label: "GEO — être lisible par les moteurs",
+    label: "GEO · être lisible par les moteurs",
     act: "pitch",
     seconds: 70,
     tone: "light",
     speakerNotes:
-      "La suite opérationnelle de la slide précédente : là c'était la stratégie, ici c'est le chantier. Insister sur le fait que le GEO n'est pas du SEO renommé — un moteur de réponse choisit ce qu'il cite, pas ce qu'il classe. Dire clairement que rien de tout cela n'est mesuré aujourd'hui : ce sont des chantiers, pas des résultats.",
+      "La suite opérationnelle de la slide précédente : là c'était la stratégie, ici c'est le chantier. Insister sur le fait que le GEO n'est pas du SEO renommé, un moteur de réponse choisit ce qu'il cite, pas ce qu'il classe. Dire clairement que rien de tout cela n'est mesuré aujourd'hui : ce sont des chantiers, pas des résultats.",
   },
 
   {
@@ -165,7 +165,7 @@ export const S2_SLIDES: readonly Slide2[] = [
     seconds: 60,
     tone: "light",
     speakerNotes:
-      "Quatre critères, dans l'ordre, et un droit de veto : une source qui ne peut pas être citée n'entre pas. Le jury cherchera à savoir si des partenariats existent — répondre franchement : aucun n'est signé, la grille sert à ne pas prendre le premier venu. Transition vers le modèle économique : « voilà ce qui alimente les trois flux ».",
+      "Quatre critères, dans l'ordre, et un droit de veto : une source qui ne peut pas être citée n'entre pas. Le jury cherchera à savoir si des partenariats existent, répondre franchement : aucun n'est signé, la grille sert à ne pas prendre le premier venu. Transition vers le modèle économique : « voilà ce qui alimente les trois flux ».",
   },
 
   {
@@ -180,7 +180,7 @@ export const S2_SLIDES: readonly Slide2[] = [
 
   {
     id: "pivot",
-    label: "Pivot — la vraie différence",
+    label: "Pivot · la vraie différence",
     act: "pivot",
     seconds: 15,
     tone: "dark",
@@ -195,7 +195,7 @@ export const S2_SLIDES: readonly Slide2[] = [
     seconds: 90,
     tone: "dark",
     speakerNotes:
-      "Le lecteur ne devrait pas avoir à faire lui-même le recoupement. Laisser l'animation converger avant de parler du panel : 10 titres français, 15 internationaux prévus au plan. Piège : ne pas dire « IA impartiale » — dire diversification des sources.",
+      "Le lecteur ne devrait pas avoir à faire lui-même le recoupement. Laisser l'animation converger avant de parler du panel : 10 titres français, 15 internationaux prévus au plan. Piège : ne pas dire « IA impartiale », dire diversification des sources.",
   },
   {
     id: "pipeline",
@@ -204,7 +204,7 @@ export const S2_SLIDES: readonly Slide2[] = [
     seconds: 120,
     tone: "light",
     speakerNotes:
-      "La slide la plus importante. Six étapes, et une seule idée : des dizaines de sources, un seul point d'entrée. Insister sur l'étape 5, traçabilité — c'est elle qui sépare le projet d'un site généré automatiquement.",
+      "La slide la plus importante. Six étapes, et une seule idée : des dizaines de sources, un seul point d'entrée. Insister sur l'étape 5, traçabilité, c'est elle qui sépare le projet d'un site généré automatiquement.",
   },
   {
     id: "automatisation",
@@ -213,7 +213,7 @@ export const S2_SLIDES: readonly Slide2[] = [
     seconds: 80,
     tone: "dark",
     speakerNotes:
-      "La slide précédente montre ce que produit la chaîne ; celle-ci montre la chaîne. Lire le graphe de gauche à droite en nommant les étapes, puis s'arrêter sur les deux points de contrôle humains — ce sont eux qui distinguent le projet d'un site généré automatiquement. Dire clairement ce qui tourne et ce qui est en reconstruction ; ne jamais laisser croire que tout est branché.",
+      "La slide précédente montre ce que produit la chaîne ; celle-ci montre la chaîne. Lire le graphe de gauche à droite en nommant les étapes, puis s'arrêter sur les deux points de contrôle humains, ce sont eux qui distinguent le projet d'un site généré automatiquement. Dire clairement ce qui tourne et ce qui est en reconstruction ; ne jamais laisser croire que tout est branché.",
   },
 
   {
@@ -223,7 +223,7 @@ export const S2_SLIDES: readonly Slide2[] = [
     seconds: 120,
     tone: "light",
     speakerNotes:
-      "Montrer, pas expliquer. Dérouler les trois profondeurs de lecture : 30 secondes, 2 minutes, 5 minutes. Relier un chiffre à sa carte puis à sa source — c'est la démonstration de la traçabilité. Ne pas promettre l'export de données tant qu'il n'est pas vérifié.",
+      "Montrer, pas expliquer. Dérouler les trois profondeurs de lecture : 30 secondes, 2 minutes, 5 minutes. Relier un chiffre à sa carte puis à sa source, c'est la démonstration de la traçabilité. Ne pas promettre l'export de données tant qu'il n'est pas vérifié.",
   },
   {
     id: "etat",
@@ -371,7 +371,7 @@ export const PRODUCT = {
     { id: "approfondir", label: "Approfondir", items: ["Articles", "Analyses", "Historique"] },
   ],
   screenshot: {
-    label: "Carte interactive — Économie mondiale",
+    label: "Carte interactive · Économie mondiale",
     ratio: "Capture produit · /map/economy",
   },
   demoNote: "Démo live possible ici : /map/economy",
@@ -398,7 +398,7 @@ export const MARKET = {
     },
     {
       id: "market",
-      value: "590–760 M€",
+      value: "590-760 M€",
       label: "marché francophone accessible",
       note: "Fourchette de référence retenue dans le business plan.",
     },
@@ -541,7 +541,7 @@ export interface Publication {
 export const PUBLICATIONS = {
   title: ["Ce que nous publions déjà.", "Un chiffre, un format, une source."],
   intro:
-    "Même promesse que le site — une donnée, sa source, de quoi aller plus loin — dans un format qui circule là où le lecteur est déjà.",
+    "Même promesse que le site · une donnée, sa source, de quoi aller plus loin · dans un format qui circule là où le lecteur est déjà.",
 
   items: [
     {
@@ -647,7 +647,7 @@ export const AI_SHIFT = {
       id: "source",
       ordinal: "03",
       title: "Devenir la source que l'IA cite.",
-      caption: "Une base structurée, sourcée, datée — lisible par une machine.",
+      caption: "Une base structurée, sourcée, datée · lisible par une machine.",
     },
     {
       id: "return",
@@ -708,7 +708,7 @@ export const AI_SHIFT = {
   /** Answer, proof, exploration — the three tiers of one citation. */
   answer: {
     tiers: [
-      { key: "Answer", items: ["France — Dette publique — 2025"] },
+      { key: "Answer", items: ["France · Dette publique · 2025"] },
       {
         key: "Proof",
         items: ["Source primaire", "Année", "Méthodologie", "Dernière mise à jour"],
@@ -1095,7 +1095,7 @@ export const ARTICLE_FORMAT = {
     },
   ],
   screenshot: {
-    label: "Article réel — The Essential Data",
+    label: "Article réel · The Essential Data",
     ratio: "Capture produit · /articles/…",
   },
   /** Only claim raw-data reuse once it is verified in the product. */
@@ -1170,7 +1170,7 @@ export const FINANCE_SLIDE = {
   funding: { label: "Besoin de financement initial", value: "27 500 €" },
   note: "Ces résultats reposent notamment sur une structure sans salaire fondateur au démarrage et sur des coûts largement semi-fixes.",
   disclaimer:
-    "Projections du business plan, scénario central — et non des revenus constatés.",
+    "Projections du business plan, scénario central · et non des revenus constatés.",
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════

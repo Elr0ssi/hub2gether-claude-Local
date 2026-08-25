@@ -316,7 +316,7 @@ export function EconomyYearTimeline({
         <button
           onClick={onLive}
           className="flex items-center gap-1.5 px-3 rounded-xl text-xs font-semibold transition-all duration-200 shrink-0 self-center"
-          title="Prorata des données depuis le 1er janvier — PIB au jour actuel"
+          title="Prorata des données depuis le 1er janvier · PIB au jour actuel"
           style={
             liveMode
               ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }

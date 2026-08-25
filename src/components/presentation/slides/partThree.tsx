@@ -399,7 +399,7 @@ export function RevenueChannelsSlide() {
       <SlideBody padding="96px 120px">
         <div style={{ textAlign: "center" }}>
           <Rise delay={0.15} y={10}>
-            <div className="t-eyebrow accent">§ 22 — Monétisation</div>
+            <div className="t-eyebrow accent">§ 22 · Monétisation</div>
           </Rise>
           <Rise delay={0.3} y={20} duration={DUR.slow}>
             <h2
