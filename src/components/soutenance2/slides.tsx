@@ -57,7 +57,6 @@ import {
   EditorialSlide,
   WorkshopSlide,
   GeoSlide,
-  PartnersSlide,
   PublicationsSlide,
   PartnershipsSlide,
 } from "./newSlides";
@@ -813,42 +812,45 @@ function RevenueSlide() {
             {REVENUE.projection.label}
           </p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.5fr) repeat(3, minmax(0, 1fr))", gap: "0 28px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 0.8fr) repeat(4, minmax(0, 1fr))", gap: "0 30px" }}>
             <span />
-            {REVENUE.projection.years.map((y) => (
+            {REVENUE.projection.streams.map((st) => (
               <p
-                key={y}
+                key={st}
                 className="t-micro"
-                style={{ color: ink.faint, textAlign: "right", paddingBottom: 9, borderBottom: `1px solid ${ink.rule}` }}
+                style={{ color: ink.faint, textAlign: "right", paddingBottom: 10, borderBottom: `1px solid ${ink.rule}` }}
               >
-                {y}
+                {st}
               </p>
             ))}
+            <p
+              className="t-micro"
+              style={{ color: accent, textAlign: "right", paddingBottom: 10, borderBottom: `1px solid ${ink.rule}` }}
+            >
+              Total
+            </p>
 
             {REVENUE.projection.rows.map((r) => (
-              <Fragment key={r.stream}>
-                <p className="t-small" style={{ color: ink.secondary, padding: "9px 0", borderBottom: `1px solid ${ink.rule}` }}>
-                  {r.stream}
+              <Fragment key={r.year}>
+                <p className="t-h3" style={{ color: ink.primary, padding: "14px 0", borderBottom: `1px solid ${ink.rule}`, letterSpacing: "-0.024em" }}>
+                  {r.year}
                 </p>
                 {r.values.map((v, k) => (
                   <p
                     key={k}
-                    className="t-small"
-                    style={{ color: ink.primary, textAlign: "right", padding: "9px 0", borderBottom: `1px solid ${ink.rule}` }}
+                    className="t-body"
+                    style={{ color: ink.secondary, textAlign: "right", padding: "14px 0", borderBottom: `1px solid ${ink.rule}` }}
                   >
                     {v}
                   </p>
                 ))}
+                <p
+                  className="t-h3"
+                  style={{ color: accent, textAlign: "right", padding: "14px 0", borderBottom: `1px solid ${ink.rule}`, letterSpacing: "-0.024em" }}
+                >
+                  {r.total}
+                </p>
               </Fragment>
-            ))}
-
-            <p className="t-h3" style={{ color: ink.primary, padding: "12px 0 0", letterSpacing: "-0.02em" }}>
-              {REVENUE.projection.total.stream}
-            </p>
-            {REVENUE.projection.total.values.map((v, k) => (
-              <p key={k} className="t-h3" style={{ color: accent, textAlign: "right", padding: "12px 0 0", letterSpacing: "-0.02em" }}>
-                {v}
-              </p>
             ))}
           </div>
 
@@ -857,23 +859,6 @@ function RevenueSlide() {
           </p>
         </div>
       </Rise>
-
-      <div style={{ marginTop: "auto", paddingTop: 26 }}>
-        <div style={{ display: "flex", gap: 90 }}>
-          {REVENUE.absolutes.map((a, i) => (
-            <Rise key={a.label} delay={1.3 + i * 0.14} y={16}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
-                <span className="t-h2" style={{ color: accent, letterSpacing: "-0.04em" }}>
-                  {a.value}
-                </span>
-                <span className="t-small" style={{ color: ink.secondary }}>
-                  {a.label}
-                </span>
-              </div>
-            </Rise>
-          ))}
-        </div>
-      </div>
     </SlideBody>
   );
 }
@@ -1448,7 +1433,6 @@ export const S2_VIEWS: Record<string, ComponentType> = {
   partenariats: () => <PartnershipsSlide index={sectionNo("partenariats")} />,
   ia: AiShiftSlide,
   geo: () => <GeoSlide index={sectionNo("geo")} />,
-  partenaires: () => <PartnersSlide index={sectionNo("partenaires")} />,
   modele: RevenueSlide,
   pivot: PivotSlide,
   recoupement: CrossCheckSlide,

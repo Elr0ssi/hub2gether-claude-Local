@@ -150,6 +150,7 @@ export const S2_SLIDES: readonly Slide2[] = [
     tone: "light",
     speakerNotes:
       "Trois pistes, aucune signée, et le dire d'emblée. Ce qui compte ici est la logique d'échange : ce que nous apportons contre ce que nous obtenons. Ne pas s'attarder, le jury retiendra le principe.",
+    steps: 3,
   },
 
   {
@@ -173,15 +174,6 @@ export const S2_SLIDES: readonly Slide2[] = [
       "La suite opérationnelle de la slide précédente : là c'était la stratégie, ici c'est le chantier. Insister sur le fait que le GEO n'est pas du SEO renommé, un moteur de réponse choisit ce qu'il cite, pas ce qu'il classe. Dire clairement que rien de tout cela n'est mesuré aujourd'hui : ce sont des chantiers, pas des résultats.",
   },
 
-  {
-    id: "partenaires",
-    label: "Sélection des partenaires",
-    act: "pitch",
-    seconds: 60,
-    tone: "light",
-    speakerNotes:
-      "Quatre critères, dans l'ordre, et un droit de veto : une source qui ne peut pas être citée n'entre pas. Le jury cherchera à savoir si des partenariats existent, répondre franchement : aucun n'est signé, la grille sert à ne pas prendre le premier venu. Transition vers le modèle économique : « voilà ce qui alimente les trois flux ».",
-  },
 
   {
     id: "modele",
@@ -646,6 +638,15 @@ export const PUBLICATIONS = {
   partnerships: {
     label: "Partenariats éventuels",
     title: ["Avec qui, et contre quoi."],
+    /* Les critères d'acceptation avaient une slide à eux, redondante avec
+       celle-ci : ils la referment maintenant, en une ligne chacun. */
+    criteriaLabel: "À quelles conditions",
+    criteria: [
+      { label: "Indépendance", body: "Aucun accord ne porte sur le contenu éditorial." },
+      { label: "Réciprocité", body: "L'échange est nommé dans la publication." },
+      { label: "Audience", body: "Un recouvrement réel, sinon le partenariat ne rapporte rien." },
+      { label: "Charge", body: "Un format qui tient dans la production courante." },
+    ],
     disclaimer: "Aucun partenariat n'est signé à ce jour. Cette liste décrit des pistes.",
     /** Trois emplacements au format vertical du site, à remplir. */
     visuals: [
@@ -777,20 +778,15 @@ export const AI_SHIFT = {
   },
 
   /** Answer, proof, exploration — the three tiers of one citation. */
-  /* Trois marches d'une même citation, nommées en français : ce que l'IA
-     rend, ce qui prouve le chiffre, et ce que le lecteur vient chercher chez
-     nous. Les intitulés anglais rendaient le schéma illisible pour un jury qui
-     cherchait d'abord à comprendre qui parle à qui. */
+  /* Une réponse de moteur, telle qu'un lecteur la voit, avec sa citation en
+     bas. Le schéma en trois marches nommait des couches abstraites ; ce que le
+     jury doit reconnaître, c'est l'écran qu'il a sous les yeux tous les jours,
+     et la ligne qui ramène chez nous. */
   answer: {
-    tiers: [
-      { key: "La réponse", items: ["France · Dette publique · 2025"] },
-      {
-        key: "La preuve",
-        items: ["Source primaire", "Année", "Méthodologie", "Dernière mise à jour"],
-      },
-      { key: "L'exploration", items: ["Carte", "Historique", "Comparaison", "Article"] },
-    ],
-    citation: "Source : The Essential Data ↗",
+    engine: "Réponse générée",
+    question: "Où en est la dette publique française ?",
+    body: "Elle atteint 113 % du produit intérieur brut en 2025, contre 97 % en 2019. La hausse tient surtout aux plans de soutien de 2020 et à la charge d'intérêts qui remonte depuis 2022.",
+    citation: "Explorer davantage sur The Essential Data ↗",
   },
 
   /** What the site already does that a paragraph of text does not. */
@@ -801,6 +797,7 @@ export const AI_SHIFT = {
     { label: "Vérifier", note: "Sources primaires et méthodologie" },
   ],
   gestureStatement: ["L'IA donne la réponse.", "The Essential Data permet de l'explorer."],
+  clickLabel: "Le clic qui revient",
 
   /** Three flows, each labelled with what it actually is today. */
   flows: [
@@ -986,23 +983,20 @@ export const REVENUE = {
       body: "Instagram et partenariats directs avec des annonceurs cohérents avec le positionnement.",
     },
   ],
-  absolutes: [
-    { value: "0 €", label: "d'abonnement lecteur" },
-    { value: "0 €", label: "de subvention publique dans le modèle présenté" },
-  ],
   /* Ce que chaque source rapporterait, année après année. Le jury ne retient
      pas trois intitulés, il retient une trajectoire. Montants du scénario
      central du business plan, à recaler avant la soutenance. */
+  /* Les années en lignes, les sources en colonnes : on lit une trajectoire de
+     haut en bas plutôt que de gauche à droite, et le total tombe à droite. */
   projection: {
     label: "Ce que chaque source rapporterait",
-    years: ["Année 2", "Année 3", "Année 5"],
+    streams: ["Display web", "Réseaux sociaux", "Partenariats de marque"],
     rows: [
-      { stream: "Display web", values: ["38 K€", "72 K€", "196 K€"] },
-      { stream: "Réseaux sociaux", values: ["46 K€", "88 K€", "164 K€"] },
-      { stream: "Partenariats de marque", values: ["27 K€", "54 K€", "85 K€"] },
+      { year: "Année 2", values: ["38 K€", "46 K€", "27 K€"], total: "111 K€" },
+      { year: "Année 3", values: ["72 K€", "88 K€", "54 K€"], total: "214 K€" },
+      { year: "Année 5", values: ["196 K€", "164 K€", "85 K€"], total: "445 K€" },
     ],
-    total: { stream: "Total", values: ["111 K€", "214 K€", "445 K€"] },
-    note: "Scénario central du business plan, à recaler avant la soutenance. Ce ne sont pas des revenus constatés.",
+    note: "Scénario central du business plan, à recaler avant la soutenance.",
   },
 } as const;
 

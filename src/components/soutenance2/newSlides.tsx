@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSlideStep } from "./useDeck";
 import { motion } from "framer-motion";
 import { ImageIcon } from "lucide-react";
 import { DUR, EASE, Eyebrow, Rise, SlideBody, useDeckReducedMotion, useInk } from "@/components/presentation/primitives";
@@ -221,6 +222,9 @@ export function PartnershipsSlide({ index: _index }: { index?: string }) {
   const ink = useInk();
   const accent = useAccent();
 
+  /* Quatre familles marquées comme telles, en colonnes : la liste en lignes
+     les faisait lire comme un paragraphe. Les conditions d'acceptation, qui
+     avaient une slide redondante à elles seules, referment celle-ci. */
   return (
     <SlideBody>
       <Eyebrow>Partenariats éventuels</Eyebrow>
@@ -232,46 +236,69 @@ export function PartnershipsSlide({ index: _index }: { index?: string }) {
           flex: 1,
           minHeight: 0,
           display: "grid",
-          gridTemplateColumns: "minmax(0, 1fr) 400px",
-          gap: 60,
-          alignItems: "start",
+          gridTemplateColumns: "minmax(0, 1fr) 330px",
+          gap: 56,
+          alignItems: "center",
         }}
       >
         <div>
-          <Rise delay={0.35} y={12}>
-            <p className="t-small" style={{ color: ink.faint, marginBottom: 22 }}>
-              {PUBLICATIONS.partnerships.disclaimer}
-            </p>
-          </Rise>
-
-          <div style={{ display: "grid", gap: 14 }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+              gap: "28px 48px",
+            }}
+          >
             {PUBLICATIONS.partnerships.items.map((pt, i) => (
-              <Rise key={pt.kind} delay={0.45 + i * 0.1} y={12}>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "260px minmax(0, 1fr)",
-                    gap: 26,
-                    alignItems: "baseline",
-                    paddingBottom: 13,
-                    borderBottom: `1px solid ${ink.rule}`,
-                  }}
-                >
-                  <p className="t-h3" style={{ color: accent, letterSpacing: "-0.02em" }}>
+              <Rise key={pt.kind} delay={0.4 + i * 0.1} y={14}>
+                <div style={{ paddingTop: 14, borderTop: `2px solid ${accent}` }}>
+                  <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
                     {pt.kind}
                   </p>
-                  <div>
-                    <p className="t-small" style={{ color: ink.muted, lineHeight: 1.5 }}>
-                      {pt.body}
-                    </p>
-                    <p className="t-micro" style={{ color: ink.faint, marginTop: 7, letterSpacing: "0.08em" }}>
-                      {pt.names}
-                    </p>
-                  </div>
+                  <p className="t-small" style={{ color: ink.muted, marginTop: 8, lineHeight: 1.5 }}>
+                    {pt.body}
+                  </p>
+                  <p className="t-micro" style={{ color: ink.faint, marginTop: 8, letterSpacing: "0.07em" }}>
+                    {pt.names}
+                  </p>
                 </div>
               </Rise>
             ))}
           </div>
+
+          <div
+            style={{
+              marginTop: 34,
+              paddingTop: 20,
+              borderTop: `1px solid ${ink.rule}`,
+              display: "grid",
+              gridTemplateColumns: "170px repeat(4, minmax(0, 1fr))",
+              gap: 26,
+              alignItems: "baseline",
+            }}
+          >
+            <Rise delay={0.85} y={10}>
+              <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em" }}>
+                {PUBLICATIONS.partnerships.criteriaLabel}
+              </p>
+            </Rise>
+            {PUBLICATIONS.partnerships.criteria.map((c, i) => (
+              <Rise key={c.label} delay={0.9 + i * 0.07} y={10}>
+                <div>
+                  <p className="t-small" style={{ color: ink.primary, fontWeight: 800 }}>{c.label}</p>
+                  <p className="t-small" style={{ color: ink.faint, marginTop: 4, lineHeight: 1.45 }}>
+                    {c.body}
+                  </p>
+                </div>
+              </Rise>
+            ))}
+          </div>
+
+          <Rise delay={1.2} y={10}>
+            <p className="t-small" style={{ color: ink.faint, marginTop: 18 }}>
+              {PUBLICATIONS.partnerships.disclaimer}
+            </p>
+          </Rise>
         </div>
 
         <VisualCarousel />
@@ -290,9 +317,13 @@ export function PartnershipsSlide({ index: _index }: { index?: string }) {
 function VisualCarousel() {
   const ink = useInk();
   const accent = useAccent();
-  const [i, setI] = useState(0);
+  /* Le carrousel avance avec la slide, pas avec la souris : la flèche fait
+     défiler les trois visuels, et c'est seulement au dernier qu'elle passe à
+     la slide suivante. En arrière, les trois repassent dans l'autre sens. */
+  const step = useSlideStep();
   const items = PUBLICATIONS.partnerships.visuals;
   const last = items.length - 1;
+  const i = Math.min(Math.max(step, 0), last);
 
   return (
     <Rise delay={0.5} y={16}>
@@ -341,26 +372,20 @@ function VisualCarousel() {
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14 }}>
-          <button
-            type="button"
-            onClick={() => setI((n) => Math.max(0, n - 1))}
-            disabled={i === 0}
-            aria-label="Visuel précédent"
-            style={carouselButton(ink, i === 0)}
-          >
-            ‹
-          </button>
-          <button
-            type="button"
-            onClick={() => setI((n) => Math.min(last, n + 1))}
-            disabled={i === last}
-            aria-label="Visuel suivant"
-            style={carouselButton(ink, i === last)}
-          >
-            ›
-          </button>
-          <span className="t-micro" style={{ color: ink.faint, marginLeft: 4 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 14 }}>
+          {items.map((v, k) => (
+            <span
+              key={v.id}
+              style={{
+                width: k === i ? 24 : 8,
+                height: 4,
+                borderRadius: 4,
+                background: k === i ? accent : ink.rule,
+                transition: "width .3s cubic-bezier(0.16,1,0.3,1), background .3s",
+              }}
+            />
+          ))}
+          <span className="t-micro" style={{ color: ink.faint, marginLeft: 6 }}>
             {i + 1} / {items.length}
           </span>
         </div>
@@ -369,22 +394,6 @@ function VisualCarousel() {
   );
 }
 
-function carouselButton(
-  ink: { rule: string; muted: string; faint: string },
-  disabled: boolean
-): React.CSSProperties {
-  return {
-    width: 30,
-    height: 30,
-    borderRadius: 8,
-    border: `1px solid ${ink.rule}`,
-    background: "transparent",
-    color: disabled ? ink.faint : ink.muted,
-    cursor: disabled ? "default" : "pointer",
-    fontSize: 17,
-    lineHeight: 1,
-  };
-}
 
 export function GeoSlide({ index: _index }: { index?: string }) {
   const ink = useInk();

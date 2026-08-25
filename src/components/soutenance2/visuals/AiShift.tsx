@@ -91,7 +91,10 @@ const SPINE: Record<string, readonly Pos[]> = {
   ],
   // L'information ne pend plus sous le média : elle est posée sur la courbe
   // de retour, à son sommet, là où le lecteur suit des yeux ce qui lui revient.
-  info: [{ x: 800, y: 392, o: 1 }, { x: 800, y: 392, o: 0 }, OFF, OFF, OFF, OFF],
+  // L'information est posée sous le sommet de la courbe de retour, à son
+  // milieu : c'est ce que la courbe transporte, et la lire sous le trait dit
+  // qu'elle voyage avec lui plutôt qu'elle ne l'interrompt.
+  info: [{ x: 815, y: 512, o: 1 }, { x: 815, y: 512, o: 0 }, OFF, OFF, OFF, OFF],
   ted: [
     { x: 1330, y: 286, o: 1 },
     { x: 1330, y: 476, o: 0.34 },
@@ -284,9 +287,11 @@ function Connectors({ step }: { step: number }) {
     // transporte, et non un maillon de plus accroché sous le média.
     const ted = p("ted");
     const user = p("user");
-    const back = `M ${q(ted.x - HALF.ted - GAP)} ${q(ted.y + 18)} Q ${q(W / 2)} ${q(
-      560
-    )} ${q(user.x + 40)} ${q(user.y + 40)}`;
+    // Du dessous du média, au dessous du lecteur : la courbe part et arrive
+    // au milieu de chaque pastille, pas sur un flanc.
+    const back = `M ${q(ted.x)} ${q(ted.y + 34)} Q ${q(W / 2)} ${q(620)} ${q(user.x)} ${q(
+      user.y + 34
+    )}`;
     return (
       <>
         <Line d={search} stroke={ink.rule} />
@@ -438,36 +443,22 @@ function AnswerCard() {
           padding: "26px 30px 24px",
         }}
       >
-        {answer.tiers.map((tier, i) => (
-          <motion.div
-            key={tier.key}
-            initial={reduced ? { opacity: 1 } : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.15 + i * 0.22, ease: EASE }}
-            style={{
-              paddingBottom: 16,
-              marginBottom: 16,
-              borderBottom: i < answer.tiers.length - 1 ? `1px solid ${ink.rule}` : undefined,
-            }}
-          >
-            <div className="t-micro" style={{ color: i === 0 ? accent : ink.faint, marginBottom: 10 }}>
-              {tier.key}
-            </div>
-            {i === 0 ? (
-              <div className="t-h3" style={{ color: ink.primary }}>
-                {tier.items[0]}
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                {tier.items.map((item) => (
-                  <Pill key={item} ink={ink} small>
-                    {item}
-                  </Pill>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        ))}
+        <motion.div
+          initial={reduced ? { opacity: 1 } : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.15, ease: EASE }}
+        >
+          <div className="t-micro" style={{ color: accent, marginBottom: 12 }}>
+            {answer.engine}
+          </div>
+          <div className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
+            {answer.question}
+          </div>
+          <p className="t-body" style={{ color: ink.muted, marginTop: 14, lineHeight: 1.55 }}>
+            {answer.body}
+          </p>
+          <div style={{ height: 1, background: ink.rule, margin: "20px 0 16px" }} />
+        </motion.div>
 
         <motion.div
           initial={reduced ? { opacity: 1 } : { opacity: 0 }}
