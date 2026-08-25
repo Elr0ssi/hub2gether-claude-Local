@@ -246,14 +246,16 @@ export function PartnershipsSlide({ index }: { index: string }) {
         </p>
       </Rise>
 
-      <div style={{ marginTop: 34, display: "grid", gap: 16 }}>
+      {/* Centré dans ce qui reste de la slide : quatre lignes posées sous le
+          titre laissaient un tiers d'écran vide sous elles. */}
+      <div style={{ marginTop: 30, flex: 1, display: "grid", gap: 18, alignContent: "center", minHeight: 0 }}>
         {PUBLICATIONS.partnerships.items.map((pt, i) => (
           <Rise key={pt.kind} delay={0.55 + i * 0.1} y={12}>
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "300px minmax(0, 1fr)",
-                gap: 28,
+                gridTemplateColumns: "340px minmax(0, 1fr)",
+                gap: 32,
                 alignItems: "baseline",
                 paddingBottom: 16,
                 borderBottom: `1px solid ${ink.rule}`,

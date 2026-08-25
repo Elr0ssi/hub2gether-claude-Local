@@ -85,7 +85,11 @@ export function ScatterField({
     const angle = (i / labels.length) * Math.PI * 2 - Math.PI / 2 + (i % 2 ? 0.34 : 0);
     return {
       label,
-      x: q(c + Math.cos(angle) * c * ring),
+      // Les pastilles sont centrées sur leur point : sur l'anneau extérieur,
+      // la moitié d'un intitulé long dépassait du cadre et, le cadre touchant
+      // déjà le bord de la colonne, sortait de l'écran. Le rayon horizontal
+      // est resserré pour que la pastille entière tienne, la hauteur non.
+      x: q(c + Math.cos(angle) * c * ring * 0.74),
       y: q(c + Math.sin(angle) * c * ring * 0.82),
     };
   });

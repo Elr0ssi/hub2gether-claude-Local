@@ -203,15 +203,10 @@ export function Eyebrow({ index, children, delay = 0 }: EyebrowProps) {
             {index}
           </span>
         )}
+        {/* Un point, pas un filet. Le trait posé entre le numéro et le libellé
+            se lisait comme un tiret long, ce que la maison n'écrit pas. */}
         {index && (
-          <span
-            style={{
-              width: 26,
-              height: 1,
-              background: ink.faint,
-              flexShrink: 0,
-            }}
-          />
+          <span style={{ color: ink.faint, flexShrink: 0 }}>·</span>
         )}
         <span className="t-eyebrow" style={{ color: ink.muted }}>
           {children}

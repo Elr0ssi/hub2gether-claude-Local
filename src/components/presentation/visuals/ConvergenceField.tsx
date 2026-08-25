@@ -53,12 +53,15 @@ export function ConvergenceField({
   });
 
   return (
-    <div style={{ position: "relative", width: W, height: H }}>
+    /* Le champ était posé à sa taille de dessin, 900 px, dans une colonne qui
+       n'en fait pas toujours autant : la dernière pastille sortait de l'écran.
+       Il tient maintenant dans ce qu'on lui donne, et garde ses proportions. */
+    <div style={{ position: "relative", width: W, maxWidth: "100%", aspectRatio: `${W} / ${H}` }}>
       {/* Converging lines + focus point */}
       <svg
         viewBox={`0 0 ${W} ${H}`}
-        width={W}
-        height={H}
+        width="100%"
+        height="100%"
         aria-hidden="true"
         style={{ position: "absolute", inset: 0 }}
       >
@@ -139,8 +142,13 @@ export function ConvergenceField({
             }}
             style={{
               position: "absolute",
-              left: n.x,
-              top: n.y,
+              // Une pastille de la moitié droite s'ancre par sa droite : posée
+              // par la gauche, un intitulé long poussait son texte hors du
+              // cadre, et la dernière source sortait de l'écran.
+              ...(n.x > W * 0.5
+                ? { right: `${(1 - n.x / W) * 100}%`, flexDirection: "row-reverse" as const }
+                : { left: `${(n.x / W) * 100}%` }),
+              top: `${(n.y / H) * 100}%`,
               display: "flex",
               alignItems: "center",
               gap: 9,
