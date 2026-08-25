@@ -55,7 +55,7 @@ import { AiShiftScene } from "./visuals/AiShift";
 import {
   FundingSlide,
   TeamSlide,
-  BeforeSlide,
+  ContextSlide,
   EditorialSlide,
   IdeaSlide,
   LaterSlide,
@@ -409,12 +409,11 @@ function MarketSlide() {
   const ink = useInk();
   const accent = useAccent();
 
-  /* Des rectangles emboîtés, chacun portant son montant. Trois cercles
-     concentriques disaient la même chose mais laissaient les chiffres à côté,
-     dans une légende : l'œil devait faire l'aller-retour. Ici la surface et le
-     montant sont au même endroit, et l'emboîtement se lit d'un coup. */
-  const W = 900;
-  const H = 470;
+  /* Des ronds emboîtés à gauche, chacun portant son montant, et les mesures du
+     marché en regard à droite. Un rond dans un rond dit une inclusion mieux
+     qu'une ligne de chiffres, et laisse la colonne de droite libre pour ce qui
+     se lit, et non se voit. */
+  const S = 520;
   const sizes = [1, 0.66, 0.3];
 
   return (
@@ -432,68 +431,94 @@ function MarketSlide() {
 
       <div
         style={{
-          marginTop: 40,
+          marginTop: 36,
           flex: 1,
           minHeight: 0,
-          display: "flex",
+          display: "grid",
+          gridTemplateColumns: `${S}px minmax(0, 1fr)`,
+          gap: 90,
           alignItems: "center",
-          justifyContent: "center",
         }}
       >
-        <div style={{ position: "relative", width: W, height: H }}>
+        <div style={{ position: "relative", width: S, height: S }}>
           {MARKET.circles.map((c, i) => {
-            const w = W * sizes[i];
-            const h = H * sizes[i];
+            const d = S * sizes[i];
             const inner = i === 2;
             return (
               <Rise
                 key={c.id}
                 delay={0.35 + i * 0.18}
                 y={0}
-                /* Emboîtés par le bas, pas par le centre : centrés, chaque
-                   cadre venait couper la légende de celui qui l'englobe. */
                 style={{
                   position: "absolute",
-                  left: (W - w) / 2,
-                  top: H - h,
-                  width: w,
-                  height: h,
+                  left: (S - d) / 2,
+                  top: S - d,
+                  width: d,
+                  height: d,
                 }}
               >
                 <div
                   style={{
                     width: "100%",
                     height: "100%",
-                    borderRadius: 20,
+                    borderRadius: "50%",
                     border: `1px solid ${inner ? accent : ink.rule}`,
                     background: inner
                       ? ink.tone === "dark"
-                        ? "rgba(57,255,136,0.12)"
-                        : "rgba(57,255,136,0.14)"
+                        ? "rgba(57,255,136,0.14)"
+                        : "rgba(57,255,136,0.16)"
                       : ink.tone === "dark"
                       ? "rgba(255,255,255,0.02)"
                       : "rgba(0,0,0,0.012)",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    justifyContent: "flex-start",
-                    paddingTop: 22,
+                    paddingTop: inner ? d * 0.3 : 20,
                     textAlign: "center",
                   }}
                 >
                   <span
-                    className={inner ? "t-h2" : "t-h3"}
-                    style={{ color: inner ? accent : ink.primary, letterSpacing: "-0.03em" }}
+                    className={inner ? "t-h3" : "t-h3"}
+                    style={{ color: inner ? accent : ink.primary, letterSpacing: "-0.028em" }}
                   >
                     {c.value}
                   </span>
-                  <span className="t-small" style={{ color: ink.muted, marginTop: 6 }}>
+                  <span className="t-small" style={{ color: ink.muted, marginTop: 4, maxWidth: d * 0.8 }}>
                     {c.label}
                   </span>
                 </div>
               </Rise>
             );
           })}
+        </div>
+
+        <div>
+          <Rise delay={0.5} y={12}>
+            <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 20 }}>
+              {MARKET.sideLabel}
+            </p>
+          </Rise>
+          <div style={{ display: "grid", gap: 14 }}>
+            {MARKET.side.map((m, i) => (
+              <Rise key={m.label} delay={0.58 + i * 0.11} y={12}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "minmax(0, 1fr) auto",
+                    gap: 26,
+                    alignItems: "baseline",
+                    paddingBottom: 13,
+                    borderBottom: `1px solid ${ink.rule}`,
+                  }}
+                >
+                  <span className="t-body" style={{ color: ink.muted }}>{m.label}</span>
+                  <span className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em" }}>
+                    {m.value}
+                  </span>
+                </div>
+              </Rise>
+            ))}
+          </div>
         </div>
       </div>
     </SlideBody>
@@ -1433,7 +1458,7 @@ function ConclusionSlide() {
 
 export const S2_VIEWS: Record<string, ComponentType> = {
   cover: CoverSlide,
-  avant: BeforeSlide,
+  contexte: ContextSlide,
   idee: IdeaSlide,
   reprise: LaterSlide,
   probleme: ProblemSlide,

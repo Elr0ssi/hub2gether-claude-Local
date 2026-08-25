@@ -452,9 +452,15 @@ export function GeoSlide({ index: _index }: { index?: string }) {
                 <motion.p
                   key={h}
                   className="t-micro"
-                  initial={{ color: accent }}
-                  animate={{ color: i === 1 ? accent : ink.faint }}
-                  transition={{ duration: 0.5, delay: 1.1, ease: EASE }}
+                  initial={{ color: i === 0 ? accent : ink.rule, opacity: i === 0 ? 1 : 0 }}
+                  animate={{
+                    color: i === 0 ? ink.faint : accent,
+                    opacity: 1,
+                  }}
+                  transition={{
+                    color: { duration: 0.6, delay: 2, ease: EASE },
+                    opacity: { duration: 0.5, delay: i === 0 ? 0.35 : 2, ease: EASE },
+                  }}
                   style={{ letterSpacing: "0.12em" }}
                 >
                   {h}
@@ -474,20 +480,36 @@ export function GeoSlide({ index: _index }: { index?: string }) {
                   borderBottom: `1px solid ${ink.rule}`,
                 }}
               >
+                {/* Le SEO s'écrit d'abord, seul et à pleine encre. Deux
+                    secondes plus tard il passe au gris pendant que la colonne
+                    GEO s'écrit à son tour : la bascule se joue, elle ne
+                    s'explique pas. */}
                 <motion.p
                   className="t-body"
-                  initial={{ color: ink.primary }}
-                  animate={{ color: ink.faint }}
-                  transition={{ duration: 0.5, delay: 1.1 + i * 0.06, ease: EASE }}
+                  initial={{ color: ink.primary, opacity: 0, y: 10 }}
+                  animate={{ color: ink.faint, opacity: 1, y: 0 }}
+                  transition={{
+                    color: { duration: 0.6, delay: 2 + i * 0.06, ease: EASE },
+                    opacity: { duration: 0.45, delay: 0.45 + i * 0.09, ease: EASE },
+                    y: { duration: 0.45, delay: 0.45 + i * 0.09, ease: EASE },
+                  }}
                 >
                   {row.seo}
                 </motion.p>
-                <p className="t-body" style={{ color: ink.primary, fontWeight: 700 }}>{row.geo}</p>
+                <motion.p
+                  className="t-body"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 2.05 + i * 0.09, ease: EASE }}
+                  style={{ color: ink.primary, fontWeight: 700 }}
+                >
+                  {row.geo}
+                </motion.p>
               </div>
             </Rise>
           ))}
 
-          <Rise delay={0.85} y={12}>
+          <Rise delay={2.6} y={12}>
             <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginTop: 30 }}>
               {GEO.discipline.label}
             </p>
@@ -495,7 +517,7 @@ export function GeoSlide({ index: _index }: { index?: string }) {
 
           <div style={{ marginTop: 14, display: "grid", gap: 12 }}>
             {GEO.discipline.items.map((it, i) => (
-              <Rise key={it.label} delay={0.92 + i * 0.09} y={10}>
+              <Rise key={it.label} delay={2.68 + i * 0.09} y={10}>
                 <div style={{ display: "grid", gridTemplateColumns: "220px minmax(0, 1fr)", gap: 22, alignItems: "baseline" }}>
                   <p className="t-body" style={{ color: ink.primary, fontWeight: 800 }}>{it.label}</p>
                   <p className="t-body" style={{ color: ink.muted, lineHeight: 1.5 }}>{it.body}</p>
@@ -659,16 +681,19 @@ export function WorkshopSlide() {
         />
       </div>
 
-      {/* Les deux mains, sous la chaîne : elles s'exercent partout. */}
+      {/* Les deux mains, sous la chaîne. Elles étaient posées sur une rangée
+          libre, chacune avec son corps et son alignement propres ; elles
+          reprennent ici la grille et l'écriture des autres blocs du deck :
+          filet d'accent, intitulé, ligne. */}
       <div
         style={{
-          marginTop: 18,
-          paddingTop: 20,
+          marginTop: 20,
+          paddingTop: 22,
           borderTop: `1px solid ${ink.rule}`,
           display: "grid",
-          gridTemplateColumns: "210px repeat(2, minmax(0, 1fr))",
-          gap: 40,
-          alignItems: "baseline",
+          gridTemplateColumns: "230px repeat(2, minmax(0, 1fr))",
+          gap: 48,
+          alignItems: "start",
         }}
       >
         <Rise delay={1.05} y={12}>
@@ -678,11 +703,13 @@ export function WorkshopSlide() {
         </Rise>
         {WORKSHOP.hands.map((h, i) => (
           <Rise key={h.label} delay={1.12 + i * 0.1} y={12}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
-              <span className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.024em" }}>
+            <div style={{ paddingTop: 14, borderTop: `2px solid ${accent}` }}>
+              <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
                 {h.label}
-              </span>
-              <span className="t-small" style={{ color: ink.muted }}>{h.body}</span>
+              </p>
+              <p className="t-small" style={{ color: ink.muted, marginTop: 8, lineHeight: 1.5 }}>
+                {h.body}
+              </p>
             </div>
           </Rise>
         ))}
@@ -827,7 +854,7 @@ export function FundingSlide() {
           display: "grid",
           gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.25fr)",
           gap: 64,
-          alignItems: "start",
+          alignItems: "center",
         }}
       >
         <div>
@@ -916,34 +943,49 @@ export function EditorialSlide() {
       <Eyebrow>La promesse éditoriale</Eyebrow>
       <Title lines={EDITORIAL.title} />
 
+      {/* Une progression, pas une grille. Les quatre exigences se posaient en
+          deux colonnes identiques, qui les donnaient à lire comme une liste
+          interchangeable ; en escalier, chacune s'appuie sur la précédente, et
+          l'ordre d'arrivée le dit. */}
       <div
         style={{
-          marginTop: 40,
+          marginTop: 36,
           flex: 1,
           minHeight: 0,
           display: "grid",
-          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-          gap: "34px 70px",
+          gap: 14,
           alignContent: "center",
         }}
       >
         {EDITORIAL.demands.map((d, i) => (
-          <Rise key={d.n} delay={0.35 + i * 0.12} y={16}>
-            <div style={{ paddingTop: 16, borderTop: `2px solid ${i === 0 ? accent : ink.rule}` }}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
-                <span className="t-micro" style={{ color: ink.faint }}>{d.n}</span>
-                <span className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
-                  {d.label}
-                </span>
-              </div>
-              <p className="t-body" style={{ color: ink.muted, marginTop: 12, lineHeight: 1.5 }}>
-                {d.body}
-              </p>
-              <p className="t-micro" style={{ color: accent, marginTop: 10, letterSpacing: "0.08em" }}>
-                {d.examples}
-              </p>
+          <motion.div
+            key={d.n}
+            initial={{ opacity: 0, x: -22 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.55, delay: 0.35 + i * 0.18, ease: EASE }}
+            style={{
+              marginLeft: i * 74,
+              paddingLeft: 26,
+              borderLeft: `2px solid ${accent}`,
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 360px) minmax(0, 1fr) auto",
+              gap: 34,
+              alignItems: "baseline",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
+              <span className="t-micro" style={{ color: ink.faint }}>{d.n}</span>
+              <span className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
+                {d.label}
+              </span>
             </div>
-          </Rise>
+            <p className="t-small" style={{ color: ink.muted, lineHeight: 1.5 }}>
+              {d.body}
+            </p>
+            <p className="t-micro" style={{ color: accent, letterSpacing: "0.08em", whiteSpace: "nowrap" }}>
+              {d.examples}
+            </p>
+          </motion.div>
         ))}
       </div>
 
@@ -1035,99 +1077,124 @@ export function LegalSlide() {
    ligne. Rien de neuf n'est introduit ; seule la composition change.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export function BeforeSlide() {
+export function ContextSlide() {
   const ink = useInk();
   const accent = useAccent();
-  const reduced = useDeckReducedMotion();
   const step = useSlideStep();
-  const { before } = STORY;
+  const { context } = STORY;
+  const second = step >= 1;
 
+  /* Deux temps : ce qui a été construit, puis d'où vient le sujet. Les deux
+     tiennent dans la même slide parce que c'est la même histoire, mais pas
+     dans le même écran parce que ce sont deux idées. */
   return (
     <SlideBody>
-      <Eyebrow>{before.eyebrow}</Eyebrow>
-      <Title lines={before.title} />
+      <Eyebrow>{context.eyebrow}</Eyebrow>
+      <Title lines={context.title} />
 
-      <div
-        style={{
-          marginTop: 40,
-          flex: 1,
-          minHeight: 0,
-          display: "grid",
-          gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
-          gap: 80,
-          alignItems: "center",
-        }}
-      >
-        {/* Les projets, un par un. */}
-        <div>
-          <Rise delay={0.3} y={12}>
-            <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 20 }}>
-              {before.projectsLabel}
-            </p>
-          </Rise>
-          <div style={{ display: "grid", gap: 14 }}>
-            {before.projects.map((pr, i) => (
-              <Rise key={pr} delay={0.4 + i * 0.14} y={12}>
-                <p className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em" }}>
-                  {pr}
-                </p>
-              </Rise>
-            ))}
-          </div>
-        </div>
-
-        {/* Et ce que chacun ajoutait : la pile s'empile, littéralement. */}
-        <div>
-          <Rise delay={0.9} y={12}>
-            <p className="t-micro" style={{ color: ink.faint, letterSpacing: "0.14em", marginBottom: 20 }}>
-              {before.loadLabel}
-            </p>
-          </Rise>
-          <div style={{ display: "grid", gap: 9 }}>
-            {before.load.map((l, i) => (
-              <motion.div
-                key={l}
-                initial={reduced ? { opacity: 1, x: 0 } : { opacity: 0, x: -18 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.45, delay: 1 + i * 0.16, ease: EASE }}
-                style={{
-                  // Chaque tâche décale la suivante : la marge croissante fait
-                  // la pile, sans qu'aucun mot n'ait à dire « accumulation ».
-                  marginLeft: i * 26,
-                  padding: "10px 18px",
-                  borderRadius: 100,
-                  border: `1px solid ${ink.rule}`,
-                  background: ink.tone === "dark" ? "rgba(255,255,255,0.03)" : "#fff",
-                  color: ink.muted,
-                  fontSize: 17,
-                  fontWeight: 600,
-                  justifySelf: "start",
-                }}
-              >
-                {l}
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Le constat n'arrive qu'au second temps, quand la pile est posée. */}
-      <motion.div
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: step >= 1 ? 1 : 0, y: step >= 1 ? 0 : 14 }}
-        transition={{ duration: 0.55, ease: EASE }}
-        style={{ marginTop: 26, paddingLeft: 24, borderLeft: `2px solid ${accent}` }}
-      >
-        {before.statement.map((line, i) => (
-          <p
-            key={line}
-            className="t-h3"
-            style={{ color: i === 1 ? ink.primary : ink.muted, letterSpacing: "-0.025em" }}
+      <div style={{ marginTop: 40, flex: 1, minHeight: 0, position: "relative" }}>
+        {/* Premier temps */}
+        <motion.div
+          animate={{ opacity: second ? 0 : 1 }}
+          transition={{ duration: 0.45, ease: EASE }}
+          style={{ position: "absolute", inset: 0, display: "grid", alignContent: "center", gap: 40 }}
+        >
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1fr) 120px minmax(0, 1fr)",
+              gap: 20,
+              alignItems: "center",
+            }}
           >
-            {line}
+            {/* Les deux projets, qui se rejoignent sur un même résultat. */}
+            <div>
+              <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 16 }}>
+                {context.projectsLabel}
+              </p>
+              <div style={{ display: "grid", gap: 12 }}>
+                {context.projects.map((pr, i) => (
+                  <Rise key={pr} delay={0.3 + i * 0.14} y={12}>
+                    <p className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em" }}>
+                      {pr}
+                    </p>
+                  </Rise>
+                ))}
+              </div>
+            </div>
+
+            <svg width="120" height="120" aria-hidden="true" style={{ display: "block" }}>
+              <DrawPath d="M 4 26 C 60 26, 62 58, 116 58" stroke={accent} width={2} opacity={0.85} delay={0.6} duration={0.6} />
+              <DrawPath d="M 4 94 C 60 94, 62 62, 116 62" stroke={accent} width={2} opacity={0.85} delay={0.7} duration={0.6} />
+            </svg>
+
+            <div style={{ display: "grid", gap: 22 }}>
+              {context.results.map((r, i) => (
+                <Rise key={r.label} delay={0.85 + i * 0.14} y={12}>
+                  <div>
+                    <p className="t-h1" style={{ color: accent, letterSpacing: "-0.04em" }}>
+                      {r.value}
+                    </p>
+                    <p className="t-body" style={{ color: ink.muted, marginTop: 4 }}>{r.label}</p>
+                  </div>
+                </Rise>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ paddingTop: 26, borderTop: `1px solid ${ink.rule}` }}>
+            <Rise delay={1.15} y={10}>
+              <p className="t-micro" style={{ color: ink.faint, letterSpacing: "0.14em", marginBottom: 16 }}>
+                {context.limitsLabel}
+              </p>
+            </Rise>
+            <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+              {context.limits.map((l, i) => (
+                <Rise key={l} delay={1.22 + i * 0.1} y={10}>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      padding: "10px 18px",
+                      borderRadius: 100,
+                      border: `1px solid ${ink.rule}`,
+                      background: ink.tone === "dark" ? "rgba(255,255,255,0.03)" : "#fff",
+                      color: ink.muted,
+                      fontSize: 17,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {l}
+                  </span>
+                </Rise>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Second temps : d'où vient le sujet. */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: second ? 1 : 0 }}
+          transition={{ duration: 0.55, delay: second ? 0.3 : 0, ease: EASE }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "grid",
+            alignContent: "center",
+            gap: 26,
+            pointerEvents: second ? "auto" : "none",
+          }}
+        >
+          <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em" }}>
+            {context.originLabel}
           </p>
-        ))}
-      </motion.div>
+          {context.origin.map((o) => (
+            <p key={o} className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em" }}>
+              {o}
+            </p>
+          ))}
+        </motion.div>
+      </div>
     </SlideBody>
   );
 }
@@ -1135,7 +1202,6 @@ export function BeforeSlide() {
 export function IdeaSlide() {
   const ink = useInk();
   const accent = useAccent();
-  const reduced = useDeckReducedMotion();
   const step = useSlideStep();
   const { idea } = STORY;
   const open = step >= 1;
@@ -1176,9 +1242,7 @@ export function IdeaSlide() {
             </span>
           </Rise>
 
-          {/* Les traits et les pastilles partagent les mêmes abscisses : posées
-              dans une rangée souple, les pastilles ne tombaient pas au bout de
-              leur trait. */}
+          {/* Les traits et les pastilles partagent les mêmes abscisses. */}
           <div style={{ position: "relative", width: 880, height: 132 }}>
             <svg width="880" height="76" aria-hidden="true" style={{ position: "absolute", left: 0, top: 0 }}>
               {idea.sources.map((_, i) => {
@@ -1187,9 +1251,9 @@ export function IdeaSlide() {
                   <DrawPath
                     key={i}
                     d={`M 440 2 C 440 44, ${x} 30, ${x} 72`}
-                    stroke={ink.rule}
-                    width={1.4}
-                    opacity={0.9}
+                    stroke={accent}
+                    width={2}
+                    opacity={0.5}
                     delay={0.5 + i * 0.1}
                     duration={0.6}
                   />
@@ -1239,7 +1303,7 @@ export function IdeaSlide() {
           </Rise>
         </motion.div>
 
-        {/* Second temps : tout tombe, la question reste. */}
+        {/* Second temps : ce qu'il faudrait faire. */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: open ? 1 : 0 }}
@@ -1249,25 +1313,30 @@ export function IdeaSlide() {
             inset: 0,
             display: "grid",
             alignContent: "center",
+            gap: 28,
             pointerEvents: open ? "auto" : "none",
           }}
         >
-          <p className="t-h1" style={{ color: ink.primary, letterSpacing: "-0.038em", maxWidth: 1180 }}>
-            {idea.question}
+          <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em" }}>
+            {idea.intentLabel}
           </p>
-          <motion.p
-            className="t-body"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: open ? 1 : 0 }}
-            transition={{ duration: 0.5, delay: open ? 0.9 : 0, ease: EASE }}
-            style={{ color: accent, marginTop: 30 }}
-          >
-            {idea.seed}
-          </motion.p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 56 }}>
+            {idea.intents.map((it) => (
+              <div key={it.n} style={{ paddingTop: 16, borderTop: `2px solid ${accent}` }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
+                  <span className="t-micro" style={{ color: ink.faint }}>{it.n}</span>
+                  <span className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em" }}>
+                    {it.label}
+                  </span>
+                </div>
+                <p className="t-body" style={{ color: ink.muted, marginTop: 12, lineHeight: 1.5 }}>
+                  {it.body}
+                </p>
+              </div>
+            ))}
+          </div>
         </motion.div>
       </div>
-
-      {reduced ? null : null}
     </SlideBody>
   );
 }

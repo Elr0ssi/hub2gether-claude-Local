@@ -71,33 +71,24 @@ export const S2_SLIDES: readonly Slide2[] = [
       "Poser la promesse et ne plus la lâcher : comprendre en 30 secondes, maîtriser en 5 minutes. Laisser le globe tourner deux secondes avant de parler. Ne pas annoncer le plan, la narration se tient toute seule.",
   },
   {
-    id: "avant",
-    label: "Avant",
+    id: "contexte",
+    label: "Contexte",
     act: "pitch",
     seconds: 60,
     tone: "light",
     steps: 2,
     speakerNotes:
-      "Raconter les premiers projets sans les vendre : des sites, un peu de trafic, aucun qui décolle. Le point n'est pas l'idée mais le temps passé à construire au lieu de faire grandir. Laisser la pile de tâches s'accumuler à l'écran pendant qu'on parle, puis lâcher la phrase.",
+      "Deux projets, une vraie audience, aucun revenu : dire pourquoi, sans s'excuser. WordPress, un trafic dur à faire grandir, un développement lourd, et la motivation qui s'épuise. Au second temps, basculer sur l'origine du sujet : les débats entre amis, les sources qui divergent, le coût de s'informer.",
   },
   {
     id: "idee",
-    label: "Le projet qui reste",
+    label: "Arrivée du sujet",
     act: "pitch",
     seconds: 70,
     tone: "light",
     steps: 2,
     speakerNotes:
-      "L'histoire des amis, du lycée aux études : mêmes sujets, sources différentes, conclusions différentes. Ne pas décrire le schéma, il se voit. Au deuxième temps, tout tombe sauf la question : la laisser respirer avant d'enchaîner.",
-  },
-  {
-    id: "reprise",
-    label: "Quatre ans plus tard",
-    act: "pitch",
-    seconds: 70,
-    tone: "dark",
-    speakerNotes:
-      "Deux ans sans IA, un plafond technique, puis le vibe coding. Dire le doute : l'IA a d'abord dévalué des heures de travail manuel. Puis la bascule, ce qu'elle permet enfin de construire. Mentionner UpTogether au passage, comme expérience produit. Finir sur la phrase et enchaîner : alors, qu'est-ce que c'est devenu ?",
+      "Ne pas décrire le schéma, il se voit. Au deuxième temps, il s'efface et laisse les trois intentions : centraliser, synthétiser, rendre accessible. C'est là que le sujet devient un projet.",
   },
   {
     id: "probleme",
@@ -107,6 +98,15 @@ export const S2_SLIDES: readonly Slide2[] = [
     tone: "light",
     speakerNotes:
       "Une phrase, trois frictions : temps, coût, confiance. Le chiffre à commenter est 29 % de confiance ; 89 % qui refusent de payer se glisse en second. Piège : ne pas empiler d'autres statistiques, le jury retient deux chiffres au maximum.",
+  },
+  {
+    id: "reprise",
+    label: "Quatre ans plus tard",
+    act: "pitch",
+    seconds: 70,
+    tone: "dark",
+    speakerNotes:
+      "Deux ans sans IA, un plafond technique, puis le vibe coding. Dire le doute : l'IA a d'abord dévalué des heures de travail manuel. Puis la bascule, ce qu'elle permet enfin de construire. Mentionner UpTogether au passage, comme expérience produit. Finir sur la phrase et enchaîner : alors, qu'est-ce que c'est devenu ?",
   },
   {
     id: "cible",
@@ -460,6 +460,13 @@ export const MARKET = {
     { id: "total", value: "670 M+", label: "visites annuelles du panel", r: 1 },
     { id: "access", value: "590 à 760 M€", label: "marché francophone accessible", r: 0.62 },
     { id: "aim", value: "0,08 %", label: "part visée à l'horizon du plan", r: 0.2 },
+  ],
+  sideLabel: "Ce que le marché dit",
+  side: [
+    { label: "Titres du panel", value: "25" },
+    { label: "Visites mensuelles cumulées", value: "56 M" },
+    { label: "Modèle dominant", value: "Abonnement" },
+    { label: "Part visée à l'horizon du plan", value: "0,08 %" },
   ],
   playersLabel: "Les acteurs en place",
   playersColumns: ["Titre", "Visites / mois", "Modèle d'accès", "Chiffre d'affaires"],
@@ -1349,29 +1356,43 @@ export const LEGAL = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const STORY = {
-  before: {
-    eyebrow: "Avant",
-    title: ["Ce n'était pas le premier."],
-    projectsLabel: "Premiers projets",
-    projects: ["Sites web", "Sport", "Contenus", "Premières audiences"],
-    /** Ce que chaque projet ajoutait, et qui s'empilait. */
-    loadLabel: "Ce que chacun demandait",
-    load: ["Construire", "Designer", "Écrire", "Maintenir", "Corriger", "Recommencer"],
-    statement: ["Beaucoup de temps pour construire.", "Peu de temps pour faire grandir."],
+  context: {
+    eyebrow: "Contexte",
+    title: ["Ce que j'ai construit avant."],
+    projectsLabel: "Projets réalisés",
+    projects: ["Sport", "Apprentissage de l'anglais"],
+    resultLabel: "Ce qu'ils ont donné",
+    results: [
+      { value: "≈ 50 000", label: "visites mensuelles cumulées" },
+      { value: "0 €", label: "aucune publicité, aucun revenu" },
+    ],
+    limitsLabel: "Pourquoi ils se sont arrêtés",
+    limits: ["WordPress et ses limites", "Trafic difficile à faire grandir", "Développement lourd à tenir", "Motivation qui s'épuise"],
+    /* Second temps de la slide : d'où vient le sujet. */
+    originLabel: "Contexte du projet",
+    origin: [
+      "Des débats d'actualité entre amis, depuis le lycée",
+      "Des sources différentes, des conclusions différentes",
+      "S'informer sérieusement coûte cher et prend du temps",
+    ],
   },
 
   idea: {
-    eyebrow: "Le projet qui reste",
+    eyebrow: "Arrivée du sujet",
     title: ["Une même actualité.", "Autant de lectures."],
     event: "Une actualité",
     sources: ["Presse française", "Presse étrangère", "Réseaux", "Institutions"],
     outcome: "Des conclusions différentes",
-    question: "Pourquoi faut-il autant de temps et de sources pour comprendre un sujet ?",
-    seed: "Première idée : centraliser, synthétiser, rendre accessible.",
+    intentLabel: "Ce qu'il faudrait",
+    intents: [
+      { n: "01", label: "Centraliser", body: "Rassembler ce qui est éparpillé entre les titres et les bases." },
+      { n: "02", label: "Synthétiser", body: "Tirer d'un article ce qu'il apporte de factuel, et le recouper." },
+      { n: "03", label: "Rendre accessible", body: "Gratuitement, et dans une forme qui s'apprend vite." },
+    ],
   },
 
   later: {
-    eyebrow: "Quatre ans plus tard",
+    eyebrow: "Quatre ans d'histoire",
     title: ["Le même projet.", "De nouveaux moyens."],
     versions: [
       {
@@ -1393,10 +1414,7 @@ export const STORY = {
         items: ["Code sur mesure", "Base de données", "Agents IA", "Make et n8n"],
       },
     ],
-    statement: [
-      "L'IA n'a pas créé The Essential Data.",
-      "Elle a rendu possible le projet que j'essayais de construire.",
-    ],
+    statement: ["L'arrivée de l'IA", "a transformé les versions du projet."],
   },
 } as const;
 

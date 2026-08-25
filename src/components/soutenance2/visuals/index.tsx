@@ -103,14 +103,15 @@ export function SourceFan({
         aria-hidden="true"
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
       >
+        {/* Traits à l'accent et épaissis : en gris clair et en un pixel, ils
+            disparaissaient à la projection. */}
         {placed.map((p, i) => (
           <DrawPath
             key={p.label}
             d={`M 500 500 L ${p.x * 1000} ${p.y * 1000}`}
-            stroke={ink.rule}
-            width={1}
-            opacity={0.9}
-            dashed
+            stroke={accent}
+            width={2.2}
+            opacity={0.5}
             delay={startDelay + 0.45 + i * 0.13}
             duration={0.6}
           />
@@ -181,12 +182,12 @@ export function SourceFan({
             style={{
               display: "inline-block",
               whiteSpace: "nowrap",
-              padding: "7px 13px",
+              padding: "9px 16px",
               borderRadius: 100,
               border: `1px solid ${ink.rule}`,
               background: ink.tone === "dark" ? "rgba(255,255,255,0.04)" : "#fff",
-              color: ink.muted,
-              fontSize: 14,
+              color: ink.secondary,
+              fontSize: 16,
               fontWeight: 600,
             }}
           >
