@@ -897,8 +897,7 @@ export const GEO = {
   moat: {
     label: "Ce que la réponse ne produit pas",
     items: ["La carte", "La comparaison", "La série dans le temps", "Le chemin vers la source"],
-    statement:
-      "La citation nous rend visibles. C'est en explorant la carte que le lecteur découvre que l'information est manipulable chez nous, et pas dans la réponse qu'il vient de lire.",
+    statement: "La citation nous rend visibles. L'exploration nous rend nécessaires.",
   },
 } as const;
 

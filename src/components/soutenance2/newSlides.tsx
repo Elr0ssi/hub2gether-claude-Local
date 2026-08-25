@@ -445,10 +445,19 @@ export function GeoSlide({ index: _index }: { index?: string }) {
                 borderBottom: `1px solid ${ink.rule}`,
               }}
             >
+              {/* Le SEO s'allume d'abord, puis s'éteint au profit du GEO :
+                  la bascule se joue à l'écran au lieu d'être expliquée. */}
               {GEO.contrastHeads.map((h, i) => (
-                <p key={h} className="t-micro" style={{ color: i === 1 ? accent : ink.faint, letterSpacing: "0.12em" }}>
+                <motion.p
+                  key={h}
+                  className="t-micro"
+                  initial={{ color: accent }}
+                  animate={{ color: i === 1 ? accent : ink.faint }}
+                  transition={{ duration: 0.5, delay: 1.1, ease: EASE }}
+                  style={{ letterSpacing: "0.12em" }}
+                >
                   {h}
-                </p>
+                </motion.p>
               ))}
             </div>
           </Rise>
@@ -464,8 +473,15 @@ export function GeoSlide({ index: _index }: { index?: string }) {
                   borderBottom: `1px solid ${ink.rule}`,
                 }}
               >
-                <p className="t-small" style={{ color: ink.faint }}>{row.seo}</p>
-                <p className="t-small" style={{ color: ink.primary, fontWeight: 700 }}>{row.geo}</p>
+                <motion.p
+                  className="t-body"
+                  initial={{ color: ink.primary }}
+                  animate={{ color: ink.faint }}
+                  transition={{ duration: 0.5, delay: 1.1 + i * 0.06, ease: EASE }}
+                >
+                  {row.seo}
+                </motion.p>
+                <p className="t-body" style={{ color: ink.primary, fontWeight: 700 }}>{row.geo}</p>
               </div>
             </Rise>
           ))}
@@ -480,8 +496,8 @@ export function GeoSlide({ index: _index }: { index?: string }) {
             {GEO.discipline.items.map((it, i) => (
               <Rise key={it.label} delay={0.92 + i * 0.09} y={10}>
                 <div style={{ display: "grid", gridTemplateColumns: "220px minmax(0, 1fr)", gap: 22, alignItems: "baseline" }}>
-                  <p className="t-small" style={{ color: ink.primary, fontWeight: 800 }}>{it.label}</p>
-                  <p className="t-small" style={{ color: ink.muted, lineHeight: 1.5 }}>{it.body}</p>
+                  <p className="t-body" style={{ color: ink.primary, fontWeight: 800 }}>{it.label}</p>
+                  <p className="t-body" style={{ color: ink.muted, lineHeight: 1.5 }}>{it.body}</p>
                 </div>
               </Rise>
             ))}
@@ -507,7 +523,7 @@ export function GeoSlide({ index: _index }: { index?: string }) {
                 </p>
               ))}
             </div>
-            <p className="t-small" style={{ color: ink.muted, marginTop: 24, lineHeight: 1.55 }}>
+            <p className="t-body" style={{ color: ink.muted, marginTop: 26, lineHeight: 1.5 }}>
               {GEO.moat.statement}
             </p>
           </div>

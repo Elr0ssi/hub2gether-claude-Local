@@ -406,9 +406,13 @@ function MarketSlide() {
   const ink = useInk();
   const accent = useAccent();
 
-  /* Le tableau des acteurs a sa propre slide : deux sujets dans un écran, la
-     taille et l'occupation, se lisaient l'un contre l'autre. */
-  const SIZE = 470;
+  /* Des rectangles emboîtés, chacun portant son montant. Trois cercles
+     concentriques disaient la même chose mais laissaient les chiffres à côté,
+     dans une légende : l'œil devait faire l'aller-retour. Ici la surface et le
+     montant sont au même endroit, et l'emboîtement se lit d'un coup. */
+  const W = 900;
+  const H = 470;
+  const sizes = [1, 0.66, 0.3];
 
   return (
     <SlideBody>
@@ -428,69 +432,65 @@ function MarketSlide() {
           marginTop: 40,
           flex: 1,
           minHeight: 0,
-          display: "grid",
-          gridTemplateColumns: `${SIZE}px minmax(0, 1fr)`,
-          gap: 90,
+          display: "flex",
           alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        {/* Les cercles, emboîtés par le bas pour que les trois se voient. */}
-        <div style={{ position: "relative", width: SIZE, height: SIZE }}>
+        <div style={{ position: "relative", width: W, height: H }}>
           {MARKET.circles.map((c, i) => {
-            const d = SIZE * c.r;
+            const w = W * sizes[i];
+            const h = H * sizes[i];
+            const inner = i === 2;
             return (
               <Rise
                 key={c.id}
-                delay={0.35 + i * 0.16}
+                delay={0.35 + i * 0.18}
                 y={0}
+                /* Emboîtés par le bas, pas par le centre : centrés, chaque
+                   cadre venait couper la légende de celui qui l'englobe. */
                 style={{
                   position: "absolute",
-                  left: (SIZE - d) / 2,
-                  bottom: 0,
-                  width: d,
-                  height: d,
+                  left: (W - w) / 2,
+                  top: H - h,
+                  width: w,
+                  height: h,
                 }}
               >
                 <div
                   style={{
                     width: "100%",
                     height: "100%",
-                    borderRadius: "50%",
-                    border: `1px solid ${i === 2 ? accent : ink.rule}`,
-                    background:
-                      i === 2
-                        ? ink.tone === "dark"
-                          ? "rgba(57,255,136,0.12)"
-                          : "rgba(57,255,136,0.16)"
-                        : "transparent",
+                    borderRadius: 20,
+                    border: `1px solid ${inner ? accent : ink.rule}`,
+                    background: inner
+                      ? ink.tone === "dark"
+                        ? "rgba(57,255,136,0.12)"
+                        : "rgba(57,255,136,0.14)"
+                      : ink.tone === "dark"
+                      ? "rgba(255,255,255,0.02)"
+                      : "rgba(0,0,0,0.012)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                    paddingTop: 22,
+                    textAlign: "center",
                   }}
-                />
+                >
+                  <span
+                    className={inner ? "t-h2" : "t-h3"}
+                    style={{ color: inner ? accent : ink.primary, letterSpacing: "-0.03em" }}
+                  >
+                    {c.value}
+                  </span>
+                  <span className="t-small" style={{ color: ink.muted, marginTop: 6 }}>
+                    {c.label}
+                  </span>
+                </div>
               </Rise>
             );
           })}
-        </div>
-
-        <div style={{ display: "grid", gap: 26 }}>
-          {MARKET.circles.map((c, i) => (
-            <Rise key={c.id} delay={0.5 + i * 0.14} y={14}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 22 }}>
-                <span
-                  style={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: "50%",
-                    border: `1px solid ${i === 2 ? accent : ink.rule}`,
-                    background: i === 2 ? accent : "transparent",
-                    flexShrink: 0,
-                  }}
-                />
-                <span className="t-h2" style={{ color: i === 2 ? accent : ink.primary, letterSpacing: "-0.032em" }}>
-                  {c.value}
-                </span>
-                <span className="t-body" style={{ color: ink.muted }}>{c.label}</span>
-              </div>
-            </Rise>
-          ))}
         </div>
       </div>
     </SlideBody>
@@ -1069,7 +1069,7 @@ function ArticleSlide() {
           display: "grid",
           gridTemplateColumns: "1fr 470px",
           gap: 74,
-          alignItems: "start",
+          alignItems: "center",
           flex: 1,
         }}
       >
