@@ -638,19 +638,31 @@ export function SourceConvergence({
           delay={startDelay + i * 0.045}
           y={6}
           duration={DUR.quick}
-          style={{ position: "absolute", left: 0, top: r.y, transform: "translateY(-50%)" }}
+          /* Posé par son coin haut gauche, avec une hauteur : le centrage par
+             transformation se faisait écraser par la translation d'entrée, et
+             chaque titre flottait à côté de sa courbe au lieu d'être dessus. */
+          style={{
+            position: "absolute",
+            left: 0,
+            top: r.y - 13,
+            width: 288,
+            height: 26,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+          }}
         >
           <span
             style={{
               display: "inline-block",
-              width: 288,
+              maxWidth: 288,
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
               textAlign: "right",
               paddingRight: 16,
               color: r.isFr ? ink.secondary : ink.muted,
-              fontSize: 19,
+              fontSize: 15,
               fontWeight: r.isFr ? 700 : 500,
             }}
           >
@@ -665,9 +677,8 @@ export function SourceConvergence({
         y={0}
         style={{
           position: "absolute",
-          left: hubX,
-          top: hubY,
-          transform: "translate(-50%, -50%)",
+          left: hubX - 95,
+          top: hubY - 95,
         }}
       >
         <div
@@ -698,9 +709,8 @@ export function SourceConvergence({
         y={10}
         style={{
           position: "absolute",
-          left: outX,
-          top: hubY,
-          transform: "translate(-50%, -50%)",
+          left: outX - 118,
+          top: hubY - 58,
         }}
       >
         <div

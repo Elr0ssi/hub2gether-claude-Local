@@ -8,6 +8,8 @@ import {
   GEO,
   PARTNERS,
   PUBLICATIONS,
+  FUNDING,
+  TEAM,
   WORKSHOP,
   TO_CONFIRM,
 } from "@/data/soutenance2/soutenance2Data";
@@ -681,6 +683,209 @@ export function WorkshopTwoSlide() {
             {WORKSHOP.two.note}
           </p>
         </Rise>
+      </div>
+    </SlideBody>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ÉQUIPE ET LE FINANCEMENT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export function TeamSlide() {
+  const ink = useInk();
+  const accent = useAccent();
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <SlideBody>
+      <Eyebrow>L&apos;équipe</Eyebrow>
+      <Title lines={TEAM.title} />
+
+      <div
+        style={{
+          marginTop: 40,
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          gridTemplateColumns: "300px minmax(0, 1fr)",
+          gap: 60,
+          alignItems: "start",
+        }}
+      >
+        <Rise delay={0.3} y={16}>
+          <div>
+            <div
+              style={{
+                aspectRatio: "4 / 5",
+                borderRadius: 16,
+                border: `1px solid ${ink.rule}`,
+                background: ink.tone === "dark" ? "#0B0B0B" : "#F2F2F2",
+                display: "grid",
+                placeItems: "center",
+                overflow: "hidden",
+              }}
+            >
+              {failed ? (
+                <div style={{ textAlign: "center", padding: 20 }}>
+                  <ImageIcon size={20} style={{ color: ink.faint }} />
+                  <p className="t-micro" style={{ color: ink.faint, marginTop: 10 }}>
+                    Portrait à déposer
+                  </p>
+                  <p style={{ fontSize: 12, color: ink.faint, marginTop: 6, opacity: 0.8 }}>
+                    {TEAM.person.photo}
+                  </p>
+                </div>
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={TEAM.person.photo}
+                  alt={TEAM.person.name}
+                  onError={() => setFailed(true)}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                />
+              )}
+            </div>
+            <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em", marginTop: 16 }}>
+              {TEAM.person.name}
+            </p>
+            <p className="t-small" style={{ color: accent, marginTop: 6 }}>
+              {TEAM.person.role}
+            </p>
+          </div>
+        </Rise>
+
+        <div>
+          <div style={{ display: "grid", gap: 16 }}>
+            {TEAM.facts.map((f, i) => (
+              <Rise key={f.label} delay={0.42 + i * 0.1} y={12}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "250px minmax(0, 1fr)",
+                    gap: 28,
+                    alignItems: "baseline",
+                    paddingBottom: 15,
+                    borderBottom: `1px solid ${ink.rule}`,
+                  }}
+                >
+                  <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
+                    {f.label}
+                  </p>
+                  <p className="t-small" style={{ color: ink.muted, lineHeight: 1.55 }}>{f.body}</p>
+                </div>
+              </Rise>
+            ))}
+          </div>
+
+          <Rise delay={0.9} y={14}>
+            <p
+              className="t-body"
+              style={{
+                color: ink.secondary,
+                marginTop: 30,
+                paddingLeft: 22,
+                borderLeft: `2px solid ${accent}`,
+                lineHeight: 1.55,
+              }}
+            >
+              {TEAM.statement}
+            </p>
+          </Rise>
+        </div>
+      </div>
+    </SlideBody>
+  );
+}
+
+export function FundingSlide() {
+  const ink = useInk();
+  const accent = useAccent();
+
+  return (
+    <SlideBody>
+      <Eyebrow>Financement initial</Eyebrow>
+      <Title lines={FUNDING.title} />
+
+      <div
+        style={{
+          marginTop: 38,
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.25fr)",
+          gap: 64,
+          alignItems: "start",
+        }}
+      >
+        <div>
+          <Rise delay={0.3} y={16}>
+            <div>
+              <p className="t-display" style={{ color: accent, letterSpacing: "-0.05em", fontSize: 84, lineHeight: 1 }}>
+                {FUNDING.need.value}
+              </p>
+              <p className="t-body" style={{ color: ink.secondary, marginTop: 12 }}>
+                {FUNDING.need.label}
+              </p>
+            </div>
+          </Rise>
+
+          <Rise delay={0.44} y={14}>
+            <div style={{ marginTop: 30 }}>
+              <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
+                {FUNDING.instrument.label}
+              </p>
+              <p className="t-small" style={{ color: ink.muted, marginTop: 10, lineHeight: 1.55 }}>
+                {FUNDING.instrument.body}
+              </p>
+              <p className="t-small" style={{ color: ink.faint, marginTop: 12 }}>
+                {FUNDING.ticket.label} · {FUNDING.ticket.value}
+              </p>
+            </div>
+          </Rise>
+
+          <Rise delay={0.6} y={14}>
+            <div style={{ marginTop: 28 }}>
+              <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 12 }}>
+                Emploi des fonds
+              </p>
+              <div style={{ display: "grid", gap: 8 }}>
+                {FUNDING.allocation.map((a) => (
+                  <div
+                    key={a.label}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "minmax(0, 1fr) auto",
+                      gap: 20,
+                      alignItems: "baseline",
+                      paddingBottom: 8,
+                      borderBottom: `1px solid ${ink.rule}`,
+                    }}
+                  >
+                    <span className="t-small" style={{ color: ink.muted }}>{a.label}</span>
+                    <span className="t-small" style={{ color: ink.primary, fontWeight: 800 }}>{a.value}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="t-small" style={{ color: ink.faint, marginTop: 10 }}>{FUNDING.note}</p>
+            </div>
+          </Rise>
+        </div>
+
+        <div style={{ display: "grid", gap: 22 }}>
+          {FUNDING.reasons.map((r, i) => (
+            <Rise key={r.label} delay={0.5 + i * 0.12} y={14}>
+              <div style={{ paddingTop: 16, borderTop: `2px solid ${accent}` }}>
+                <p className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em" }}>
+                  {r.label}
+                </p>
+                <p className="t-body" style={{ color: ink.muted, marginTop: 12, lineHeight: 1.55 }}>
+                  {r.body}
+                </p>
+              </div>
+            </Rise>
+          ))}
+        </div>
       </div>
     </SlideBody>
   );

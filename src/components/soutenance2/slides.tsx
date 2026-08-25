@@ -52,6 +52,8 @@ import {
 } from "./visuals";
 import { AiShiftScene } from "./visuals/AiShift";
 import {
+  FundingSlide,
+  TeamSlide,
   WorkshopOneSlide,
   WorkshopTwoSlide,
   GeoSlide,
@@ -779,15 +781,68 @@ function RevenueSlide() {
         ))}
       </div>
 
-      <div style={{ marginTop: "auto", paddingTop: 60 }}>
+      {/* La trajectoire, source par source : trois intitulés ne se retiennent
+          pas, une courbe de montants si. */}
+      <Rise delay={0.95} y={16}>
+        <div style={{ marginTop: 44 }}>
+          <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 14 }}>
+            {REVENUE.projection.label}
+          </p>
+
+          <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.5fr) repeat(3, minmax(0, 1fr))", gap: "0 28px" }}>
+            <span />
+            {REVENUE.projection.years.map((y) => (
+              <p
+                key={y}
+                className="t-micro"
+                style={{ color: ink.faint, textAlign: "right", paddingBottom: 9, borderBottom: `1px solid ${ink.rule}` }}
+              >
+                {y}
+              </p>
+            ))}
+
+            {REVENUE.projection.rows.map((r) => (
+              <Fragment key={r.stream}>
+                <p className="t-small" style={{ color: ink.secondary, padding: "9px 0", borderBottom: `1px solid ${ink.rule}` }}>
+                  {r.stream}
+                </p>
+                {r.values.map((v, k) => (
+                  <p
+                    key={k}
+                    className="t-small"
+                    style={{ color: ink.primary, textAlign: "right", padding: "9px 0", borderBottom: `1px solid ${ink.rule}` }}
+                  >
+                    {v}
+                  </p>
+                ))}
+              </Fragment>
+            ))}
+
+            <p className="t-h3" style={{ color: ink.primary, padding: "12px 0 0", letterSpacing: "-0.02em" }}>
+              {REVENUE.projection.total.stream}
+            </p>
+            {REVENUE.projection.total.values.map((v, k) => (
+              <p key={k} className="t-h3" style={{ color: accent, textAlign: "right", padding: "12px 0 0", letterSpacing: "-0.02em" }}>
+                {v}
+              </p>
+            ))}
+          </div>
+
+          <p className="t-small" style={{ color: ink.faint, marginTop: 12 }}>
+            {REVENUE.projection.note}
+          </p>
+        </div>
+      </Rise>
+
+      <div style={{ marginTop: "auto", paddingTop: 26 }}>
         <div style={{ display: "flex", gap: 90 }}>
           {REVENUE.absolutes.map((a, i) => (
-            <Rise key={a.label} delay={0.95 + i * 0.14} y={16}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 18 }}>
-                <span className="t-h1" style={{ color: accent, letterSpacing: "-0.045em" }}>
+            <Rise key={a.label} delay={1.3 + i * 0.14} y={16}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
+                <span className="t-h2" style={{ color: accent, letterSpacing: "-0.04em" }}>
                   {a.value}
                 </span>
-                <span className="t-body" style={{ color: ink.secondary }}>
+                <span className="t-small" style={{ color: ink.secondary }}>
                   {a.label}
                 </span>
               </div>
@@ -1006,43 +1061,6 @@ function ArticleSlide() {
             ))}
           </div>
 
-          <Rise delay={1.15} y={14}>
-            <div style={{ marginTop: 46 }}>
-              <div className="t-micro" style={{ color: ink.muted, marginBottom: 14 }}>
-                Traçabilité
-              </div>
-              <div style={{ display: "grid", gap: 10 }}>
-                {ARTICLE_FORMAT.traceability.map((step, i) => (
-                  <div key={step} style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                    <span
-                      style={{
-                        width: 7,
-                        height: 7,
-                        borderRadius: "50%",
-                        background: accent,
-                        opacity: 1 - i * 0.22,
-                      }}
-                    />
-                    <span className="t-small" style={{ color: ink.secondary }}>
-                      {step}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Rise>
-
-          <Rise delay={1.35} y={12}>
-            <div style={{ marginTop: 32 }}>
-              <span className="ted-data-slot" data-tone={ink.tone}>
-                {ARTICLE_FORMAT.dataExport}
-              </span>
-              <div className="t-small" style={{ color: ink.faint, marginTop: 10, maxWidth: 400 }}>
-                Réutilisation des données brutes, à confirmer dans le produit avant
-                d&apos;être annoncée.
-              </div>
-            </div>
-          </Rise>
         </div>
       </div>
     </SlideBody>
@@ -1117,27 +1135,30 @@ function StatusSlide() {
           </Rise>
 
           <Rise delay={1.25} y={18}>
-            <div
-              style={{
-                marginTop: 46,
-                paddingLeft: 26,
-                borderLeft: `2px solid ${accent}`,
-                maxWidth: 700,
-              }}
-            >
-              {STATUS.statement.map((line, i) => (
-                <div
-                  key={line}
-                  className="t-h3"
-                  style={{
-                    color: i === 1 ? ink.primary : ink.muted,
-                    letterSpacing: "-0.028em",
-                    marginTop: i === 0 ? 0 : 10,
-                  }}
-                >
-                  {line}
-                </div>
-              ))}
+            <div style={{ marginTop: 40, paddingLeft: 26, borderLeft: `2px solid ${accent}`, maxWidth: 760 }}>
+              <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 16 }}>
+                {STATUS.model.label}
+              </p>
+              <div style={{ display: "grid", gap: 10 }}>
+                {STATUS.model.rows.map((r) => (
+                  <div
+                    key={r.label}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "minmax(0, 1fr) auto",
+                      gap: 24,
+                      alignItems: "baseline",
+                      paddingBottom: 9,
+                      borderBottom: `1px solid ${ink.rule}`,
+                    }}
+                  >
+                    <span className="t-small" style={{ color: ink.muted }}>{r.label}</span>
+                    <span className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
+                      {r.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </Rise>
         </div>
@@ -1237,42 +1258,116 @@ function FinanceSlide() {
 
 function RoadmapSlide() {
   const ink = useInk();
+  const accent = useAccent();
 
   return (
     <SlideBody>
-      <div style={{ position: "absolute", right: -180, top: "50%", transform: "translateY(-50%)", opacity: 0.5 }}>
-        <Fade delay={0.4} duration={1.4}>
-          <div style={{ width: 720, height: 720 }}>
-            <PresentationGlobe tone={ink.tone} dotOpacity={0.5} />
-          </div>
-        </Fade>
+      <Eyebrow>Trajectoire</Eyebrow>
+
+      <div style={{ marginTop: 26, maxWidth: 1180 }}>
+        <StatementTitle lines={ROADMAP.title} delay={0.1} size="t-h2" />
       </div>
 
-      <div style={{ position: "relative", zIndex: 2 }}>
-        <Eyebrow>Roadmap</Eyebrow>
-
-        <div style={{ marginTop: 28, display: "flex", gap: 26 }}>
-          {ROADMAP.title.map((word, i) => (
-            <Rise key={word} delay={0.1 + i * 0.13} y={20}>
-              <span className="t-h1" style={{ color: ink.primary, letterSpacing: "-0.04em" }}>
-                {word}
-              </span>
-            </Rise>
-          ))}
-        </div>
-
-        <div style={{ marginTop: 46 }}>
-          <ReplicationDiagram phases={ROADMAP.phases} startDelay={0.4} width={1240} height={420} />
-        </div>
-
-        <Rise delay={1.7} y={14}>
-          <p
-            className="t-lead"
-            style={{ color: ink.secondary, marginTop: 40, maxWidth: 860, letterSpacing: "-0.015em" }}
+      <div
+        style={{
+          marginTop: 40,
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.35fr)",
+          gap: 64,
+          alignItems: "start",
+        }}
+      >
+        <Rise delay={0.34} y={16}>
+          <div
+            style={{
+              padding: "26px 28px",
+              borderRadius: 16,
+              border: `1px solid ${accent}`,
+              background: ink.tone === "dark" ? "rgba(57,255,136,0.05)" : "rgba(57,255,136,0.06)",
+            }}
           >
-            {ROADMAP.statement}
-          </p>
+            <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em" }}>
+              {ROADMAP.proof.label}
+            </p>
+            <p className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em", marginTop: 12 }}>
+              {ROADMAP.proof.theme}
+            </p>
+            <p className="t-small" style={{ color: ink.muted, marginTop: 14, lineHeight: 1.55 }}>
+              {ROADMAP.proof.body}
+            </p>
+            <div style={{ display: "grid", gap: 10, marginTop: 22 }}>
+              {ROADMAP.proof.metrics.map((m) => (
+                <div
+                  key={m.label}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "minmax(0, 1fr) auto",
+                    gap: 18,
+                    alignItems: "baseline",
+                    paddingBottom: 9,
+                    borderBottom: `1px solid ${ink.rule}`,
+                  }}
+                >
+                  <span className="t-small" style={{ color: ink.muted }}>{m.label}</span>
+                  <span className="t-h3" style={{ color: accent, letterSpacing: "-0.02em" }}>{m.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </Rise>
+
+        <div>
+          <Rise delay={0.5} y={12}>
+            <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 16 }}>
+              {ROADMAP.replicateLabel}
+            </p>
+          </Rise>
+
+          <div style={{ display: "grid", gap: 13 }}>
+            {ROADMAP.replicate.map((r, i) => (
+              <Rise key={r.id} delay={0.58 + i * 0.1} y={12}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "minmax(0, 1fr) auto",
+                    gap: 26,
+                    alignItems: "baseline",
+                    paddingBottom: 12,
+                    borderBottom: `1px solid ${ink.rule}`,
+                  }}
+                >
+                  <div>
+                    <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
+                      {r.label}
+                    </p>
+                    <p className="t-small" style={{ color: ink.muted, marginTop: 5 }}>{r.body}</p>
+                  </div>
+                  <span className="t-micro" style={{ color: accent, whiteSpace: "nowrap" }}>
+                    {r.audience}
+                  </span>
+                </div>
+              </Rise>
+            ))}
+          </div>
+
+          <Rise delay={1.05} y={10}>
+            <div style={{ display: "flex", gap: 40, marginTop: 20, flexWrap: "wrap" }}>
+              {ROADMAP.milestones.map((m) => (
+                <span key={m.label} className="t-small" style={{ color: ink.faint }}>
+                  {m.label} <strong style={{ color: ink.muted, fontWeight: 800 }}>{m.year}</strong>
+                </span>
+              ))}
+            </div>
+          </Rise>
+
+          <Rise delay={1.15} y={10}>
+            <p className="t-small" style={{ color: ink.faint, marginTop: 14 }}>
+              {ROADMAP.replicateNote}
+            </p>
+          </Rise>
+        </div>
       </div>
     </SlideBody>
   );
@@ -1380,11 +1475,13 @@ export const S2_VIEWS: Record<string, ComponentType> = {
   modele: RevenueSlide,
   pivot: PivotSlide,
   recoupement: CrossCheckSlide,
+  equipe: TeamSlide,
   pipeline: WorkshopOneSlide,
   automatisation: WorkshopTwoSlide,
   article: ArticleSlide,
   etat: StatusSlide,
   finance: FinanceSlide,
+  financement: FundingSlide,
   roadmap: RoadmapSlide,
   conclusion: ConclusionSlide,
 };

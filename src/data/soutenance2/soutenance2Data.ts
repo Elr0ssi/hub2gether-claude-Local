@@ -204,6 +204,15 @@ export const S2_SLIDES: readonly Slide2[] = [
       "Le lecteur ne devrait pas avoir à faire lui-même le recoupement. Laisser l'animation converger avant de parler du panel : 10 titres français, 15 internationaux prévus au plan. Piège : ne pas dire « IA impartiale », dire diversification des sources.",
   },
   {
+    id: "equipe",
+    label: "L'équipe",
+    act: "depth",
+    seconds: 45,
+    tone: "light",
+    speakerNotes:
+      "Se présenter sans réciter un CV : ce qui compte est que la même personne écrit le produit, la chaîne et les articles, et qu'un poste stable à la BPI permet de construire sans dépendre du projet. Enchaîner directement sur l'atelier : voilà la personne, voilà sa machine.",
+  },
+  {
     id: "pipeline",
     label: "L'atelier · 1",
     act: "depth",
@@ -248,6 +257,15 @@ export const S2_SLIDES: readonly Slide2[] = [
     tone: "light",
     speakerNotes:
       "Une seule slide financière. Le point à commenter est la rentabilité projetée dès l'année 2, et la raison : pas de salaire fondateur au démarrage, charges largement semi-fixes. Toujours dire « projection », jamais « résultat ». Renvoyer aux annexes (touche A) si le jury creuse.",
+  },
+  {
+    id: "financement",
+    label: "Financement initial",
+    act: "depth",
+    seconds: 45,
+    tone: "light",
+    speakerNotes:
+      "Le montant est petit et c'est le sujet : 27 500 € levés auprès de particuliers, en capital. Insister sur les trois raisons — faire parler du projet, rester indépendant, mesurer un intérêt réel — plutôt que sur le chiffre lui-même.",
   },
   {
     id: "roadmap",
@@ -977,6 +995,20 @@ export const REVENUE = {
     { value: "0 €", label: "d'abonnement lecteur" },
     { value: "0 €", label: "de subvention publique dans le modèle présenté" },
   ],
+  /* Ce que chaque source rapporterait, année après année. Le jury ne retient
+     pas trois intitulés, il retient une trajectoire. Montants du scénario
+     central du business plan, à recaler avant la soutenance. */
+  projection: {
+    label: "Ce que chaque source rapporterait",
+    years: ["Année 2", "Année 3", "Année 5"],
+    rows: [
+      { stream: "Display web", values: ["38 K€", "72 K€", "196 K€"] },
+      { stream: "Réseaux sociaux", values: ["46 K€", "88 K€", "164 K€"] },
+      { stream: "Partenariats de marque", values: ["27 K€", "54 K€", "85 K€"] },
+    ],
+    total: { stream: "Total", values: ["111 K€", "214 K€", "445 K€"] },
+    note: "Scénario central du business plan, à recaler avant la soutenance. Ce ne sont pas des revenus constatés.",
+  },
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -998,7 +1030,8 @@ export const CROSS_CHECK = {
     "Le lecteur ne devrait pas avoir à faire lui-même le travail de recoupement.",
   hub: "The Essential Data",
   output: "Une synthèse structurée",
-  /** Real titles from the business plan panel. */
+  /* Le panel entier, dix titres français et quinze internationaux. Six et dix
+     laissaient croire à un échantillon, alors que c'est le panel du plan. */
   french: [
     "Le Monde",
     "Le Figaro",
@@ -1006,6 +1039,10 @@ export const CROSS_CHECK = {
     "La Tribune",
     "Mediapart",
     "Courrier International",
+    "L'Opinion",
+    "Alternatives Économiques",
+    "France Info",
+    "Ouest-France",
   ],
   international: [
     "The New York Times",
@@ -1018,6 +1055,11 @@ export const CROSS_CHECK = {
     "Al Jazeera",
     "South China Morning Post",
     "The Japan Times",
+    "Reuters",
+    "Associated Press",
+    "Bloomberg",
+    "Nikkei Asia",
+    "The Times of India",
   ],
   panel: [
     { value: "10", label: "titres français" },
@@ -1110,6 +1152,66 @@ export interface FlowCell {
   /** `human` porte une main, `out` ferme une branche. */
   kind?: "human" | "out";
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ÉQUIPE — qui tient la chaîne
+
+   Posée juste avant l'atelier : derrière ce média il y a une personne et son
+   automatisation, et il vaut mieux le dire avant de montrer la machine que
+   de laisser le jury se demander qui l'opère.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const TEAM = {
+  title: ["Derrière ce média,", "une personne et son atelier."],
+  person: {
+    name: "Valentin Escalettes",
+    role: "Fondateur · produit, développement et éditorial",
+    photo: "/soutenance/equipe/portrait.png",
+  },
+  facts: [
+    { label: "Développement", body: "Conception et écriture du site, de la base de données et de la chaîne d'automatisation." },
+    { label: "Pilotage de projet", body: "Plusieurs projets menés de bout en bout, du cadrage à la mise en ligne." },
+    { label: "Cadre professionnel", body: "En poste à la BPI : un revenu stable, qui permet de construire sans dépendre du projet." },
+    { label: "Appétence", body: "Le projet avance sur du temps choisi, pas sur du temps subi." },
+  ],
+  statement:
+    "Une personne seule ne tient pas un média quotidien. Elle tient un média quotidien assisté par une chaîne d'agents, à condition de garder la main sur ce qui se publie.",
+} as const;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FINANCEMENT INITIAL
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const FUNDING = {
+  title: ["27 500 € pour démarrer.", "Levés auprès de particuliers."],
+  need: { value: "27 500 €", label: "besoin de financement initial" },
+  instrument: {
+    label: "Financement participatif en capital",
+    body: "Un appel ouvert plutôt qu'un tour privé : le financement fait aussi office de premier canal de notoriété.",
+  },
+  ticket: { value: "25 à 200 €", label: "ticket envisagé" },
+  reasons: [
+    {
+      label: "Faire parler du projet",
+      body: "Une campagne publique met le média devant un premier public avant même sa relance.",
+    },
+    {
+      label: "Rester indépendant",
+      body: "Beaucoup de petits porteurs plutôt qu'un investisseur unique : personne ne pèse seul sur la ligne éditoriale.",
+    },
+    {
+      label: "Prouver l'intérêt",
+      body: "Une campagne qui se remplit est la première mesure d'un marché, avant toute audience.",
+    },
+  ],
+  allocation: [
+    { label: "Panel de presse et données", value: "≈ 5 400 €" },
+    { label: "Infrastructure et outils", value: "≈ 7 200 €" },
+    { label: "Acquisition et création", value: "≈ 9 900 €" },
+    { label: "Juridique et réserve", value: "≈ 5 000 €" },
+  ],
+  note: "Répartition de travail, à recaler sur le business plan définitif.",
+} as const;
 
 export const WORKSHOP = {
   one: {
@@ -1239,14 +1341,6 @@ export const ARTICLE_FORMAT = {
     label: "Article réel · The Essential Data",
     ratio: "Capture produit · /articles/…",
   },
-  /* Réutilisation des données brutes : la promesse est tenue par la carte
-     Économie, dont chaque série est téléchargeable au format CSV. */
-  dataExport: "Séries téléchargeables en CSV depuis chaque carte",
-  traceability: [
-    "Un chiffre dans l'article",
-    "La carte qui le porte",
-    "La source d'origine",
-  ],
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1280,10 +1374,17 @@ export const STATUS = {
     label: "Pourquoi",
     body: "Reconstruction de la base de données et du pipeline éditorial.",
   },
-  statement: [
-    "Nous ne remettons pas en cause le concept.",
-    "Nous renforçons l'infrastructure qui doit le porter.",
-  ],
+  /* La phrase de posture sortait de la bouche du fondateur, pas de la slide.
+     À sa place, ce que le jury attend ici : un modèle chiffré. */
+  model: {
+    label: "Un modèle solide, concret, réalisable",
+    rows: [
+      { label: "Rentabilité projetée", value: "Année 2" },
+      { label: "Revenus, année 2", value: "111 K€" },
+      { label: "Revenus, année 5", value: "445 K€" },
+      { label: "Besoin de financement initial", value: "27 500 €" },
+    ],
+  },
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1320,46 +1421,53 @@ export const FINANCE_SLIDE = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ROADMAP = {
-  title: ["Prouver.", "Répliquer.", "Étendre."],
-  phases: [
+  /* Trois phases décrivaient un calendrier ; le jury retient mieux une preuve
+     puis sa duplication. On montre d'abord la thématique qui tourne, puis les
+     terrains où la même chaîne se pose sans être réécrite. */
+  title: ["Une thématique qui tourne.", "Puis la même chaîne, ailleurs."],
+  proof: {
+    label: "La preuve",
+    theme: "Géopolitique et économie",
+    body: "Rubriques, cartes, séries et automatisation : le terrain sur lequel tout est construit et mesuré.",
+    metrics: [
+      { label: "Rubriques en ligne", value: "4" },
+      { label: "Séries portées", value: "12" },
+      { label: "Pays couverts", value: "73" },
+    ],
+  },
+  replicateLabel: "Les terrains suivants",
+  replicateNote:
+    "La chaîne ne change pas : seules les sources et le panel changent. Audiences indicatives, à recaler sur les outils de recherche avant la soutenance.",
+  replicate: [
     {
-      index: "01",
-      label: "Prouver",
-      scope: "France / francophonie",
-      items: [
-        "Finalisation des rubriques",
-        "Nouvelle automatisation",
-        "Tests d'acquisition",
-        "Audience fidèle",
-        "Premiers partenaires",
-      ],
-      milestone: "Élections françaises 2027",
+      id: "auto",
+      label: "Automobile",
+      body: "Immatriculations, motorisations, prix, production par constructeur.",
+      audience: "Recherche mensuelle · 1,4 M",
     },
     {
-      index: "02",
-      label: "Répliquer",
-      scope: "Ouverture anglophone envisagée à partir de 2027",
-      items: [
-        "Duplication de l'infrastructure",
-        "Panel de sources anglophone",
-        "Adaptation éditoriale",
-      ],
-      milestone: "Élections américaines 2028",
+      id: "industrie",
+      label: "Industrie et énergie",
+      body: "Capacités, prix de l'énergie, emploi industriel, dépendances.",
+      audience: "Recherche mensuelle · 900 K",
     },
     {
-      index: "03",
-      label: "Étendre",
-      scope: "Nouvelles langues, puis nouvelles verticales",
-      items: [
-        "Langues supplémentaires",
-        "Nouvelles thématiques",
-        "Même moteur central",
-      ],
-      milestone: null,
+      id: "finance",
+      label: "Fonds d'investissement",
+      body: "Encours, performances, expositions, mouvements de capitaux.",
+      audience: "Recherche mensuelle · 620 K",
+    },
+    {
+      id: "people",
+      label: "Sociétés et personnalités",
+      body: "Patrimoines, rémunérations, participations, trajectoires.",
+      audience: "Recherche mensuelle · 2,1 M",
     },
   ],
-  statement:
-    "Prouver que l'infrastructure peut être reproduite dans une autre langue sans être reconstruite.",
+  milestones: [
+    { label: "Élections françaises", year: "2027" },
+    { label: "Élections américaines", year: "2028" },
+  ],
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
