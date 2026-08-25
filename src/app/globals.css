@@ -941,9 +941,7 @@ body {
   .ta-page .ta-chart-row { gap: 24px; }
   /* Le bandeau, le titre et le chapeau occupaient l'écran entier avant le
      premier paragraphe. */
-  .ta-hero-band { height: clamp(140px, 22vh, 200px) !important; }
-  .ta-hero-head { padding-top: 24px !important; }
-  .ta-hero-title { font-size: clamp(1.8rem, 3.2vw, 2.5rem) !important; }
+  .ta-hero-head { padding-top: 22px !important; }
 }
 
 /* La vignette d'une carte d'article. Le ratio vit ici et non en style inline,

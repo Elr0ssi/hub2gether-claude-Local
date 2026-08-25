@@ -40,7 +40,7 @@ export function TestArticleHero() {
         style={{
           position: "relative",
           width: "100%",
-          height: "clamp(200px, 30vh, 340px)",
+          height: "clamp(240px, 42vh, 440px)",
           overflow: "hidden",
           background: "linear-gradient(160deg, #06140E 0%, #0A2418 55%, #06140E 100%)",
         }}
@@ -120,7 +120,7 @@ export function TestArticleHero() {
         <h1
           className="font-black ta-hero-title"
           style={{
-            fontSize: "clamp(1.9rem, 4.4vw, 3.4rem)",
+            fontSize: "clamp(1.55rem, min(3.4vw, 3.4vh), 2.6rem)",
             lineHeight: 1.06,
             letterSpacing: "-0.04em",
             color: "var(--ink)",
@@ -131,7 +131,7 @@ export function TestArticleHero() {
 
         <p
           style={{
-            fontSize: "clamp(0.95rem, 1.5vw, 1.12rem)",
+            fontSize: "clamp(0.86rem, min(1.1vw, 1.1vh), 0.98rem)",
             lineHeight: 1.6,
             color: "var(--ink-3)",
             maxWidth: 620,

@@ -13,6 +13,7 @@ import {
   PartRule,
   PerspectiveCard,
   PullQuote,
+  SpendingBreakdown,
 } from "./pieces";
 
 const ACCENT = "#39FF88";
@@ -52,30 +53,48 @@ export function TestArticleBody() {
           <div>
             <p
               style={{
-                fontSize: "0.6rem",
+                fontSize: "0.58rem",
                 fontWeight: 900,
                 letterSpacing: "0.16em",
                 textTransform: "uppercase",
                 color: ACCENT_INK,
-                marginBottom: 14,
+                marginBottom: 12,
               }}
             >
               {summary.label}
             </p>
-            {summary.paragraphs.map((p, i) => (
-              <p
-                key={p.slice(0, 24)}
-                style={{
-                  fontSize: i === 0 ? "clamp(0.97rem, 1.1vw, 1.15rem)" : "clamp(0.89rem, 0.9vw, 0.95rem)",
-                  lineHeight: 1.72,
-                  color: i === 0 ? "var(--ink)" : "var(--ink-2)",
-                  fontWeight: i === 0 ? 500 : 400,
-                  marginBottom: 16,
-                }}
-              >
-                {p}
-              </p>
-            ))}
+
+            {/* La conclusion en tête, au corps de l'article. */}
+            <p
+              style={{
+                fontSize: "clamp(0.97rem, 1.1vw, 1.1rem)",
+                lineHeight: 1.6,
+                fontWeight: 600,
+                color: "var(--ink)",
+                marginBottom: 18,
+              }}
+            >
+              {summary.lead}
+            </p>
+
+            {/* Puis les points qui la portent, chacun ouvert par son idée. */}
+            <div style={{ display: "grid", gap: 13 }}>
+              {summary.points.map((pt) => (
+                <p
+                  key={pt.strong}
+                  style={{
+                    fontSize: "clamp(0.89rem, 0.9vw, 0.95rem)",
+                    lineHeight: 1.68,
+                    color: "var(--ink-2)",
+                    paddingLeft: 14,
+                    borderLeft: `2px solid ${ACCENT}`,
+                  }}
+                >
+                  <strong style={{ color: "var(--ink)", fontWeight: 800 }}>{pt.strong}</strong>{" "}
+                  {pt.body}
+                </p>
+              ))}
+            </div>
           </div>
 
           <KeyFigures />
@@ -84,6 +103,8 @@ export function TestArticleBody() {
         <IdeaCarousel />
 
         <DebtChart />
+
+        <SpendingBreakdown />
 
         {/* ── The development ── */}
         {parts.map((part) => (

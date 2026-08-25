@@ -30,11 +30,27 @@ export const TEST_ARTICLE = {
   updated: "2026-08-20",
 
   /* ── The condensed opening ──────────────────────────────────────────── */
+  /* ── L'essentiel ─────────────────────────────────────────────────────
+     Une conclusion d'abord, puis les points qui la portent. Deux paragraphes
+     pleins, réglés plus gros que le corps de l'article, se lisaient comme un
+     deuxième chapeau : le lecteur les sautait pour aller au texte. Au même
+     corps que l'article et découpés, ils se parcourent. */
   summary: {
     label: "L'essentiel",
-    paragraphs: [
-      "La France figure parmi les pays de l'Union européenne où la dépense publique rapportée au PIB est la plus élevée. Ce niveau n'est pas un accident récent : il est installé depuis des décennies, et ce qui bouge d'une année sur l'autre tient davantage à la composition de cette dépense qu'à son montant global.",
-      "L'essentiel du débat porte en réalité sur trois questions distinctes que la discussion publique confond souvent : le niveau de la dépense, l'écart entre ce qui est dépensé et ce qui est prélevé, et la trajectoire de la dette qui en résulte. Ce sont trois grandeurs différentes, et elles ne se corrigent pas avec les mêmes leviers.",
+    lead: "Le débat français sur la dépense publique confond trois grandeurs différentes, qui ne se corrigent pas avec les mêmes leviers.",
+    points: [
+      {
+        strong: "Un niveau installé.",
+        body: "La France figure parmi les pays de l'Union européenne où la dépense publique rapportée au PIB est la plus élevée, et ce depuis des décennies. Ce qui bouge d'une année sur l'autre tient à la composition de cette dépense, pas à son montant global.",
+      },
+      {
+        strong: "Trois questions, pas une.",
+        body: "Le niveau de la dépense, l'écart entre ce qui est dépensé et ce qui est prélevé, et la trajectoire de la dette qui en résulte sont trois mesures distinctes.",
+      },
+      {
+        strong: "Le périmètre décide.",
+        body: "Deux pays qui organisent différemment leurs retraites ou leur assurance maladie produisent des ratios écartés sans que les services rendus le soient autant.",
+      },
     ],
   },
 
@@ -121,6 +137,82 @@ export const TEST_ARTICLE = {
         label: "Millésime",
         body: "Le point le plus récent de la série est une projection annuelle, pas un résultat constaté.",
       },
+    ],
+  },
+
+  /* ── Décomposition par poste ──────────────────────────────────────────
+     La charpente d'abord, le contenu ensuite. Chaque poste porte sa part, son
+     montant et deux exemples concrets : ce que la ligne finance, et ce qu'elle
+     ne finance pas — la confusion la plus commune du débat. Les valeurs sont
+     des emplacements tant que la source primaire n'est pas branchée : la
+     ventilation COFOG d'Eurostat et les comptes de l'INSEE la portent, et
+     c'est de là qu'elles viendront. */
+  breakdown: {
+    label: "Où va l'argent",
+    intro:
+      "La dépense publique n'est pas un bloc. Elle se répartit entre des postes dont les logiques, les payeurs et les marges de manoeuvre n'ont rien de commun.",
+    yearNote: "Exercice à préciser lors du remplissage.",
+    items: [
+      {
+        id: "protection-sociale",
+        label: "Protection sociale",
+        share: TO_FILL,
+        amount: TO_FILL,
+        funds: TO_FILL,
+        excludes: TO_FILL,
+        source: "INSEE, comptes des administrations publiques · Eurostat COFOG 10",
+      },
+      {
+        id: "sante",
+        label: "Santé",
+        share: TO_FILL,
+        amount: TO_FILL,
+        funds: TO_FILL,
+        excludes: TO_FILL,
+        source: "DREES, comptes de la santé · Eurostat COFOG 07",
+      },
+      {
+        id: "education",
+        label: "Éducation",
+        share: TO_FILL,
+        amount: TO_FILL,
+        funds: TO_FILL,
+        excludes: TO_FILL,
+        source: "DEPP, compte de l'éducation · Eurostat COFOG 09",
+      },
+      {
+        id: "defense",
+        label: "Défense",
+        share: TO_FILL,
+        amount: TO_FILL,
+        funds: TO_FILL,
+        excludes: TO_FILL,
+        source: "Loi de programmation militaire · Eurostat COFOG 02",
+      },
+      {
+        id: "charge-dette",
+        label: "Charge de la dette",
+        share: TO_FILL,
+        amount: TO_FILL,
+        funds: TO_FILL,
+        excludes: TO_FILL,
+        source: "Agence France Trésor · INSEE",
+      },
+      {
+        id: "autres",
+        label: "Autres postes",
+        share: TO_FILL,
+        amount: TO_FILL,
+        funds: TO_FILL,
+        excludes: TO_FILL,
+        source: "Eurostat COFOG, postes restants",
+      },
+    ],
+    /** Deux questions que le lecteur pose et que la ventilation seule n'éclaire pas. */
+    questions: [
+      { q: "Qu'a-t-on financé en 2025 ?", a: TO_FILL },
+      { q: "Qu'a-t-on renoncé à financer ?", a: TO_FILL },
+      { q: "Qu'est-ce qui relève d'un transfert et non d'un service rendu ?", a: TO_FILL },
     ],
   },
 

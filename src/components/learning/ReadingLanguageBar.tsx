@@ -2,9 +2,20 @@
 
 import { BookOpen } from "lucide-react";
 
-const TARGET_LANGS = [
-  { code: "en", label: "English 🇬🇧" },
-];
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODE APPRENTISSAGE — la commande, pas une annonce
+
+   Elle occupait toute la largeur au-dessus de l'article, avec un cadre vert
+   épais, une liste déroulante native et un drapeau collé à un code pays. Trois
+   défauts en un : elle annonçait plus fort que le titre, la liste ne proposait
+   qu'une seule langue, et le rendu natif d'un select n'est celui d'aucun autre
+   élément du site. C'est maintenant une pastille posée à droite, à la taille
+   d'une commande, et le couple de langues s'y lit sans liste puisqu'il n'y a
+   rien à choisir. Le jour où une deuxième langue arrive, elle prendra la forme
+   d'un menu dessiné par nous, pas celle du navigateur.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const TARGET_LABEL: Record<string, string> = { en: "EN" };
 
 interface Props {
   fromLang: string;
@@ -12,139 +23,73 @@ interface Props {
   onToLangChange: (lang: string) => void;
   enabled: boolean;
   onToggle: () => void;
-  /**
-   * Louder register. The bar is a quiet utility inside a published article,
-   * where it must not compete with the text; in the format under test it is
-   * one of the things being shown, so it says so.
-   */
+  /** Conservé pour les appelants ; la barre a désormais un seul registre. */
   emphasis?: boolean;
 }
 
-export function ReadingLanguageBar({
-  toLang,
-  onToLangChange,
-  enabled,
-  onToggle,
-  emphasis = false,
-}: Props) {
-  const live = enabled && emphasis;
+export function ReadingLanguageBar({ fromLang, toLang, enabled, onToggle }: Props) {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        flexWrap: "wrap",
-        gap: 10,
-        padding: emphasis ? "14px 18px" : "10px 14px",
-        borderRadius: emphasis ? 14 : 12,
-        background: live
-          ? "linear-gradient(120deg, rgba(57,255,136,0.20), rgba(57,255,136,0.07))"
-          : enabled
-          ? "rgba(57,255,136,0.05)"
-          : "var(--surface-2)",
-        border: `${live ? 2 : 1}px solid ${
-          live ? "#39FF88" : enabled ? "rgba(57,255,136,0.22)" : "var(--border)"
-        }`,
-        boxShadow: live ? "0 0 0 4px rgba(57,255,136,0.12)" : undefined,
-        marginBottom: 28,
-        transition: "all 0.25s ease",
-      }}
-    >
-      <BookOpen
-        size={emphasis ? 17 : 14}
+    <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 20 }}>
+      <div
         style={{
-          color: live ? "#0D7A40" : enabled ? "#39FF88" : "var(--ink-4)",
-          flexShrink: 0,
-          transition: "color 0.25s",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 9,
+          padding: "5px 6px 5px 12px",
+          borderRadius: 999,
+          border: `1px solid ${enabled ? "rgba(57,255,136,0.45)" : "var(--border)"}`,
+          background: enabled ? "rgba(57,255,136,0.07)" : "var(--surface-2)",
+          transition: "all 0.2s ease",
         }}
-      />
+      >
+        <BookOpen
+          size={13}
+          style={{ color: enabled ? "#0D7A40" : "var(--ink-4)", flexShrink: 0 }}
+        />
 
-      <div style={{ flex: 1, minWidth: 120 }}>
-        <p
+        <span
           style={{
-            fontSize: emphasis ? "0.7rem" : "0.6rem",
-            fontWeight: 900,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-            color: enabled ? "#0D7A40" : "var(--ink-4)",
-            transition: "color 0.25s",
+            fontSize: "0.66rem",
+            fontWeight: 700,
+            color: enabled ? "var(--ink-2)" : "var(--ink-4)",
+            whiteSpace: "nowrap",
           }}
         >
           Mode apprentissage
-        </p>
-        {enabled && (
-          <p
-            style={{
-              fontSize: emphasis ? "0.72rem" : "0.58rem",
-              color: emphasis ? "var(--ink-2)" : "var(--ink-3)",
-              marginTop: 3,
-              lineHeight: 1.45,
-            }}
-          >
-            Sélectionnez un mot ou une phrase pour voir sa traduction
-          </p>
-        )}
-      </div>
-
-      {/* Language selector */}
-      <div style={{ display: "flex", alignItems: "center", gap: 7, flexShrink: 0 }}>
-        <span
-          style={{ fontSize: "0.65rem", fontWeight: 700, color: "var(--ink-3)", letterSpacing: "0.04em" }}
-        >
-          🇫🇷 FR
         </span>
-        <svg width="18" height="10" viewBox="0 0 18 10" fill="none" aria-hidden="true">
-          <path
-            d="M0 5h16M12 1l4 4-4 4"
-            stroke={enabled ? "#39FF88" : "var(--ink-5)"}
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-        <select
-          value={toLang}
-          onChange={(e) => onToLangChange(e.target.value)}
+
+        <span
           style={{
-            fontSize: "0.65rem",
-            fontWeight: 700,
-            border: "1px solid var(--border)",
-            borderRadius: 6,
-            padding: "3px 6px",
-            background: "var(--surface)",
-            color: "var(--ink)",
-            cursor: "pointer",
-            outline: "none",
+            fontSize: "0.6rem",
+            fontWeight: 800,
+            letterSpacing: "0.06em",
+            color: enabled ? "#0D7A40" : "var(--ink-4)",
+            whiteSpace: "nowrap",
           }}
         >
-          {TARGET_LANGS.map((l) => (
-            <option key={l.code} value={l.code}>
-              {l.label}
-            </option>
-          ))}
-        </select>
-      </div>
+          {fromLang.toUpperCase()} → {TARGET_LABEL[toLang] ?? toLang.toUpperCase()}
+        </span>
 
-      {/* Toggle button */}
-      <button
-        onClick={onToggle}
-        style={{
-          flexShrink: 0,
-          fontSize: "0.6rem",
-          fontWeight: 700,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          padding: "5px 11px",
-          borderRadius: 8,
-          border: `1px solid ${enabled ? "rgba(57,255,136,0.4)" : "var(--border)"}`,
-          background: enabled ? "rgba(57,255,136,0.1)" : "var(--surface-2)",
-          color: enabled ? "#0D7A40" : "var(--ink-4)",
-          cursor: "pointer",
-          transition: "all 0.2s",
-        }}
-      >
-        {enabled ? "● Actif" : "○ Inactif"}
-      </button>
+        <button
+          onClick={onToggle}
+          aria-pressed={enabled}
+          style={{
+            fontSize: "0.58rem",
+            fontWeight: 800,
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            padding: "4px 10px",
+            borderRadius: 999,
+            border: "none",
+            background: enabled ? "#0D7A40" : "var(--border)",
+            color: enabled ? "#fff" : "var(--ink-3)",
+            cursor: "pointer",
+            transition: "all 0.2s",
+          }}
+        >
+          {enabled ? "Actif" : "Inactif"}
+        </button>
+      </div>
     </div>
   );
 }

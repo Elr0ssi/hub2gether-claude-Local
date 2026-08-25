@@ -351,6 +351,11 @@ function navButton(disabled: boolean): React.CSSProperties {
 export function DebtChart() {
   const series = useFranceSeries();
   const { chart } = TEST_ARTICLE;
+  /* Le graphique se lit au doigt : le point le plus proche du curseur est
+     désigné, sa valeur affichée. Un graphique qu'on ne peut pas interroger
+     n'est qu'une image du chiffre, et le lecteur qui veut 2015 doit le
+     deviner entre deux étiquettes. */
+  const [hover, setHover] = useState<number | null>(null);
 
   const W = 640;
   const H = 300;
@@ -399,7 +404,23 @@ export function DebtChart() {
             padding: "clamp(12px, 3.5vw, 16px) clamp(12px, 4vw, 18px) 12px",
           }}
         >
-          <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={chart.caption}>
+          <svg
+            viewBox={`0 0 ${W} ${H}`}
+            width="100%"
+            role="img"
+            aria-label={chart.caption}
+            style={{ display: "block", touchAction: "none" }}
+            onPointerMove={(e) => {
+              const r = e.currentTarget.getBoundingClientRect();
+              const local = ((e.clientX - r.left) / r.width) * W;
+              let best = 0;
+              for (let i = 1; i < series.length; i++) {
+                if (Math.abs(x(i) - local) < Math.abs(x(best) - local)) best = i;
+              }
+              setHover(best);
+            }}
+            onPointerLeave={() => setHover(null)}
+          >
             <defs>
               <linearGradient id="ta-area" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={ACCENT} stopOpacity="0.28" />
@@ -442,6 +463,39 @@ export function DebtChart() {
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 1.2, ease: EASE }}
             />
+
+            {hover !== null && series[hover] && (
+              <g>
+                <line
+                  x1={x(hover)}
+                  x2={x(hover)}
+                  y1={PAD.top}
+                  y2={H - PAD.bottom}
+                  stroke={ACCENT_INK}
+                  strokeWidth="1"
+                  strokeDasharray="3 3"
+                  opacity="0.5"
+                />
+                <circle
+                  cx={x(hover)}
+                  cy={y(series[hover].debt as number)}
+                  r="5.5"
+                  fill="#fff"
+                  stroke={ACCENT_INK}
+                  strokeWidth="2.4"
+                />
+                <text
+                  x={Math.min(Math.max(x(hover), PAD.left + 34), W - PAD.right - 34)}
+                  y={Math.max(y(series[hover].debt as number) - 14, PAD.top + 12)}
+                  textAnchor="middle"
+                  fontSize="13"
+                  fontWeight="800"
+                  fill={ACCENT_INK}
+                >
+                  {series[hover].year} · {series[hover].debt} %
+                </text>
+              </g>
+            )}
 
             {series.map((p, i) =>
               i === 0 || i === series.length - 1 || p.year % 10 === 0 ? (
@@ -567,5 +621,150 @@ export function PerspectiveCard({
 
       <p style={{ fontSize: "0.86rem", lineHeight: 1.62, color: "var(--ink-2)" }}>{body}</p>
     </article>
+  );
+}
+
+/* ── Décomposition par poste ─────────────────────────────────────────────
+   La charpente est posée, les valeurs sont des emplacements : chaque case
+   vide est une question à laquelle il faut répondre avec une source, et non
+   un trou à combler par une estimation. Un poste s'ouvre pour montrer ce
+   qu'il finance et ce qu'il ne finance pas. */
+
+export function SpendingBreakdown() {
+  const { breakdown } = TEST_ARTICLE;
+  const [open, setOpen] = useState<string | null>(breakdown.items[0]?.id ?? null);
+
+  return (
+    <section style={{ marginTop: "clamp(34px, 7vw, 56px)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
+        <span
+          style={{
+            fontSize: "0.6rem",
+            fontWeight: 900,
+            letterSpacing: "0.16em",
+            textTransform: "uppercase",
+            color: ACCENT_INK,
+          }}
+        >
+          {breakdown.label}
+        </span>
+        <span style={{ flex: 1, height: 1, background: "var(--border)" }} />
+        <span style={{ fontSize: "0.62rem", color: "var(--ink-4)" }}>{breakdown.yearNote}</span>
+      </div>
+
+      <p
+        style={{
+          fontSize: "clamp(0.89rem, 0.9vw, 0.95rem)",
+          lineHeight: 1.7,
+          color: "var(--ink-2)",
+          marginBottom: 20,
+          maxWidth: 760,
+        }}
+      >
+        {breakdown.intro}
+      </p>
+
+      <div style={{ display: "grid", gap: 8 }}>
+        {breakdown.items.map((item) => {
+          const isOpen = open === item.id;
+          return (
+            <div
+              key={item.id}
+              style={{
+                borderRadius: 14,
+                border: `1px solid ${isOpen ? ACCENT : "var(--border)"}`,
+                background: isOpen ? "rgba(57,255,136,0.05)" : "var(--surface)",
+                overflow: "hidden",
+                transition: "border-color .2s, background .2s",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setOpen(isOpen ? null : item.id)}
+                aria-expanded={isOpen}
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                  padding: "clamp(11px, 3vw, 14px) clamp(12px, 3.5vw, 16px)",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  textAlign: "left",
+                }}
+              >
+                <span
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    fontSize: "0.92rem",
+                    fontWeight: 800,
+                    color: "var(--ink)",
+                  }}
+                >
+                  {item.label}
+                </span>
+                <Slot>{item.share}</Slot>
+                <ChevronRight
+                  size={14}
+                  style={{
+                    color: "var(--ink-4)",
+                    flexShrink: 0,
+                    transform: isOpen ? "rotate(90deg)" : "none",
+                    transition: "transform .2s",
+                  }}
+                />
+              </button>
+
+              {isOpen && (
+                <div
+                  style={{
+                    padding: "0 clamp(12px, 3.5vw, 16px) clamp(12px, 3.5vw, 16px)",
+                    display: "grid",
+                    gap: 10,
+                  }}
+                >
+                  <Row label="Montant">{item.amount}</Row>
+                  <Row label="Ce que la ligne finance">{item.funds}</Row>
+                  <Row label="Ce qu'elle ne finance pas">{item.excludes}</Row>
+                  <p style={{ fontSize: "0.62rem", color: "var(--ink-4)", lineHeight: 1.5 }}>
+                    {item.source}
+                  </p>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ marginTop: 18, display: "grid", gap: 10 }}>
+        {breakdown.questions.map((q) => (
+          <div
+            key={q.q}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1fr) auto",
+              alignItems: "baseline",
+              gap: 14,
+              paddingBottom: 10,
+              borderBottom: "1px solid var(--border)",
+            }}
+          >
+            <p style={{ fontSize: "0.86rem", fontWeight: 700, color: "var(--ink-2)" }}>{q.q}</p>
+            <Slot>{q.a}</Slot>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Row({ label, children }: { label: string; children: string }) {
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 200px) minmax(0, 1fr)", gap: 12, alignItems: "baseline" }}>
+      <p style={{ fontSize: "0.66rem", color: "var(--ink-3)", fontWeight: 700 }}>{label}</p>
+      <Slot>{children}</Slot>
+    </div>
   );
 }
