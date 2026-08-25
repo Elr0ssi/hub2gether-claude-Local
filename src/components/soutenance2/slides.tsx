@@ -56,6 +56,7 @@ import {
   GeoSlide,
   PartnersSlide,
   PublicationsSlide,
+  PartnershipsSlide,
 } from "./newSlides";
 import { useSlideStep } from "./useDeck";
 
@@ -1256,6 +1257,7 @@ export const S2_VIEWS: Record<string, ComponentType> = {
   concurrence: CompetitionSlide,
   acquisition: AcquisitionSlide,
   publications: () => <PublicationsSlide index={sectionNo("publications")} />,
+  partenariats: () => <PartnershipsSlide index={sectionNo("partenariats")} />,
   ia: AiShiftSlide,
   geo: () => <GeoSlide index={sectionNo("geo")} />,
   partenaires: () => <PartnersSlide index={sectionNo("partenaires")} />,

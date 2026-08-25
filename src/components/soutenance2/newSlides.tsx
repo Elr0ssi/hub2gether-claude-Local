@@ -140,16 +140,16 @@ function PublicationCard({
           )}
         </div>
 
-        <figcaption style={{ marginTop: 14 }}>
+        {/* Une ligne. Le titre et le format se lisaient déjà dans la capture,
+            et trois lignes sous chacune des trois vignettes faisaient un mur
+            de texte au bas de la slide. Le reste appartient à l'oral. */}
+        <figcaption style={{ marginTop: 12, display: "flex", alignItems: "baseline", gap: 10 }}>
           <p className="t-h3" style={{ color: accent, letterSpacing: "-0.025em" }}>
             {item.hook === TO_CONFIRM ? <Slot /> : item.hook}
           </p>
-          <p className="t-small" style={{ color: ink.secondary, marginTop: 6, lineHeight: 1.45 }}>
-            {item.title === TO_CONFIRM ? <Slot /> : item.title}
-          </p>
-          <p className="t-micro" style={{ color: ink.faint, marginTop: 8 }}>
-            {item.format}
-          </p>
+          {item.reach && (
+            <p className="t-micro" style={{ color: ink.faint }}>{item.reach}</p>
+          )}
         </figcaption>
       </figure>
     </Rise>
@@ -160,6 +160,9 @@ export function PublicationsSlide({ index }: { index: string }) {
   const ink = useInk();
   const accent = useAccent();
 
+  /* Les captures d'abord, l'audience en regard. Les pistes de partenariat
+     tenaient dans la même colonne et faisaient déborder la slide : elles ont
+     désormais la leur, juste après. */
   return (
     <SlideBody>
       <Eyebrow index={index}>Nos publications</Eyebrow>
@@ -167,110 +170,108 @@ export function PublicationsSlide({ index }: { index: string }) {
 
       <div
         style={{
-          marginTop: 30,
+          marginTop: 26,
           flex: 1,
           display: "grid",
-          gridTemplateColumns: "minmax(0, 1fr) 520px",
-          gap: 64,
+          gridTemplateColumns: "minmax(0, 1fr) 340px",
+          gap: 56,
           alignItems: "start",
           minHeight: 0,
         }}
       >
-        {/* The captures */}
         <div>
           <Rise delay={0.4} y={12}>
-            <p className="t-body" style={{ color: ink.secondary, maxWidth: 720, marginBottom: 24 }}>
+            <p className="t-body" style={{ color: ink.secondary, maxWidth: 760, marginBottom: 22 }}>
               {PUBLICATIONS.intro}
             </p>
           </Rise>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 26 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
             {PUBLICATIONS.items.map((item, i) => (
               <PublicationCard key={item.id} item={item} delay={0.55 + i * 0.12} />
             ))}
           </div>
         </div>
 
-        {/* Audience, then what the format opens */}
-        <div style={{ display: "grid", gap: 24, alignContent: "start" }}>
-          <Rise delay={0.6} y={14}>
-            <div>
-              <p className="t-micro" style={{ color: accent, marginBottom: 14 }}>
-                {PUBLICATIONS.audience.label}
-              </p>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-                {PUBLICATIONS.audience.metrics.map((m) => (
-                  <div
-                    key={m.label}
-                    style={{
-                      padding: "12px 14px",
-                      borderRadius: 12,
-                      border: `1px solid ${ink.rule}`,
-                    }}
-                  >
-                    <p className="t-micro" style={{ color: ink.faint, marginBottom: 8 }}>
-                      {m.label}
-                    </p>
-                    {m.value ? (
-                      <p className="t-h3" style={{ color: ink.primary }}>
-                        {m.value}
-                      </p>
-                    ) : (
-                      <Slot />
-                    )}
-                  </div>
-                ))}
-              </div>
-              <p className="t-small" style={{ color: ink.faint, marginTop: 12, lineHeight: 1.5 }}>
-                {PUBLICATIONS.audience.note}
-              </p>
+        <Rise delay={0.6} y={14}>
+          <div>
+            <p className="t-micro" style={{ color: accent, marginBottom: 14 }}>
+              {PUBLICATIONS.audience.label}
+            </p>
+            <div style={{ display: "grid", gap: 12 }}>
+              {PUBLICATIONS.audience.metrics.map((m) => (
+                <div
+                  key={m.label}
+                  style={{
+                    display: "flex",
+                    alignItems: "baseline",
+                    justifyContent: "space-between",
+                    gap: 16,
+                    paddingBottom: 10,
+                    borderBottom: `1px solid ${ink.rule}`,
+                  }}
+                >
+                  <p className="t-micro" style={{ color: ink.faint }}>{m.label}</p>
+                  {m.value ? (
+                    <p className="t-h3" style={{ color: ink.primary }}>{m.value}</p>
+                  ) : (
+                    <Slot />
+                  )}
+                </div>
+              ))}
             </div>
-          </Rise>
-
-          <Rise delay={0.85} y={14}>
-            <div>
-              <p className="t-micro" style={{ color: accent, marginBottom: 4 }}>
-                {PUBLICATIONS.partnerships.label}
-              </p>
-              <p className="t-small" style={{ color: ink.faint, marginBottom: 16 }}>
-                {PUBLICATIONS.partnerships.disclaimer}
-              </p>
-              {/* One line each. Four paragraphs here made the column run off
-                  the bottom of the slide and gave the eye nowhere to rest —
-                  the detail belongs in the speaker's mouth, not on the wall. */}
-              <div style={{ display: "grid", gap: 12 }}>
-                {PUBLICATIONS.partnerships.items.map((pt) => (
-                  <div
-                    key={pt.kind}
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "210px minmax(0, 1fr)",
-                      gap: 18,
-                      alignItems: "baseline",
-                      paddingBottom: 12,
-                      borderBottom: `1px solid ${ink.rule}`,
-                    }}
-                  >
-                    <p className="t-small" style={{ color: ink.primary, fontWeight: 800 }}>
-                      {pt.kind}
-                    </p>
-                    <p className="t-small" style={{ color: ink.muted, lineHeight: 1.45 }}>
-                      {pt.body}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Rise>
-        </div>
+            <p className="t-small" style={{ color: ink.faint, marginTop: 14, lineHeight: 1.5 }}>
+              {PUBLICATIONS.audience.note}
+            </p>
+          </div>
+        </Rise>
       </div>
     </SlideBody>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════════
-   GEO
-   ═══════════════════════════════════════════════════════════════════════ */
+/** Ce que le format ouvre. Rien n'est signé, et la slide le dit. */
+export function PartnershipsSlide({ index }: { index: string }) {
+  const ink = useInk();
+  const accent = useAccent();
+
+  return (
+    <SlideBody>
+      <Eyebrow index={index}>Partenariats possibles</Eyebrow>
+      <Title lines={["Ce que le format ouvre.", "Rien n'est signé à ce jour."]} />
+
+      <Rise delay={0.4} y={12}>
+        <p className="t-body" style={{ color: ink.secondary, maxWidth: 820, marginTop: 22 }}>
+          {PUBLICATIONS.partnerships.disclaimer}
+        </p>
+      </Rise>
+
+      <div style={{ marginTop: 34, display: "grid", gap: 16 }}>
+        {PUBLICATIONS.partnerships.items.map((pt, i) => (
+          <Rise key={pt.kind} delay={0.55 + i * 0.1} y={12}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "300px minmax(0, 1fr)",
+                gap: 28,
+                alignItems: "baseline",
+                paddingBottom: 16,
+                borderBottom: `1px solid ${ink.rule}`,
+              }}
+            >
+              <p className="t-h3" style={{ color: accent, letterSpacing: "-0.02em" }}>
+                {pt.kind}
+              </p>
+              <p className="t-body" style={{ color: ink.muted, lineHeight: 1.5 }}>
+                {pt.body}
+              </p>
+            </div>
+          </Rise>
+        ))}
+      </div>
+    </SlideBody>
+  );
+}
 
 export function GeoSlide({ index }: { index: string }) {
   const ink = useInk();

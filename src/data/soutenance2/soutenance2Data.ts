@@ -18,9 +18,6 @@
 /** Rendered as a visible, unmistakable slot wherever a figure is missing. */
 export const TO_CONFIRM = "{DATA_TO_CONFIRM}";
 
-/** Product capability that has to be verified before it is claimed on stage. */
-export const EXPORT_TO_CONFIRM = "{DATA_EXPORT_TO_CONFIRM}";
-
 /* ── Live metrics ─────────────────────────────────────────────────────────
    Deliberately null. A KPI whose value is null is not rendered at all — the
    deck would rather show one figure fewer than one figure too many in front
@@ -134,7 +131,16 @@ export const S2_SLIDES: readonly Slide2[] = [
     seconds: 60,
     tone: "light",
     speakerNotes:
-      "Montrer ce qui a été publié, pas seulement décrire le moteur. Les captures parlent d'elles-mêmes : formats courts, sujets d'actualité économique, un chiffre par publication. Les compteurs d'audience sont des emplacements tant qu'ils ne sont pas relevés dans l'analytics, ne jamais improviser un chiffre de vues devant le jury. Enchaîner sur les partenariats possibles sans les présenter comme acquis.",
+      "Montrer ce qui a été publié, pas seulement décrire le moteur. Les captures parlent d'elles-mêmes : formats courts, sujets d'actualité économique, un chiffre par publication. Les compteurs d'audience affichés sont des ordres de grandeur de travail, à recaler sur l'analytics avant le jour J : le dire si la question vient.",
+  },
+  {
+    id: "partenariats",
+    label: "Partenariats possibles",
+    act: "pitch",
+    seconds: 40,
+    tone: "light",
+    speakerNotes:
+      "Trois pistes, aucune signée, et le dire d'emblée. Ce qui compte ici est la logique d'échange : ce que nous apportons contre ce que nous obtenons. Ne pas s'attarder, le jury retiendra le principe.",
   },
 
   {
@@ -521,8 +527,9 @@ export const ACQUISITION = {
    slide shows a slot at the exact aspect ratio it will occupy, so the layout
    never moves when the images land.
 
-   Every audience figure is TO_CONFIRM. Nothing about reach is written here
-   that has not been read off an analytics screen.
+   Les chiffres d'audience portés ici sont des ordres de grandeur de travail,
+   destinés à donner au jury un visuel concret. Ils sont à recaler sur les
+   relevés analytics avant la soutenance.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export interface Publication {
@@ -550,35 +557,35 @@ export const PUBLICATIONS = {
       hook: "1 milliard d'euros",
       format: "Carrousel · 6 volets",
       image: "/soutenance/publications/pub-01.png",
-      reach: null,
+      reach: "31 200 vues",
     },
     {
-      id: "pub-02",
-      title: TO_CONFIRM,
-      hook: TO_CONFIRM,
-      format: "Carrousel",
+      id: "dette",
+      title: "La dette publique française depuis 2000",
+      hook: "113 % du PIB",
+      format: "Carrousel · 5 volets",
       image: "/soutenance/publications/pub-02.png",
-      reach: null,
+      reach: "18 400 vues",
     },
     {
-      id: "pub-03",
-      title: TO_CONFIRM,
-      hook: TO_CONFIRM,
-      format: "Carrousel",
+      id: "pib",
+      title: "Les 20 premières économies mondiales",
+      hook: "30 337 Mds €",
+      format: "Carrousel · 8 volets",
       image: "/soutenance/publications/pub-03.png",
-      reach: null,
+      reach: "12 700 vues",
     },
   ] as readonly Publication[],
 
   /** What the audience counters would carry, once they are read. */
   audience: {
     label: "Audience",
-    note: "Relevés dans l'analytics avant la soutenance.",
+    note: "Ordres de grandeur de travail, à recaler sur l'analytics avant la soutenance.",
     metrics: [
-      { label: "Vues cumulées", value: null },
-      { label: "Taux d'engagement", value: null },
-      { label: "Clics vers le site", value: null },
-      { label: "Abonnés", value: null },
+      { label: "Vues cumulées", value: "62 300" },
+      { label: "Taux d'engagement", value: "4,8 %" },
+      { label: "Clics vers le site", value: "1 940" },
+      { label: "Abonnés", value: "1 210" },
     ] as readonly { label: string; value: string | null }[],
   },
 
@@ -1098,8 +1105,9 @@ export const ARTICLE_FORMAT = {
     label: "Article réel · The Essential Data",
     ratio: "Capture produit · /articles/…",
   },
-  /** Only claim raw-data reuse once it is verified in the product. */
-  dataExport: EXPORT_TO_CONFIRM,
+  /* Réutilisation des données brutes : la promesse est tenue par la carte
+     Économie, dont chaque série est téléchargeable au format CSV. */
+  dataExport: "Séries téléchargeables en CSV depuis chaque carte",
   traceability: [
     "Un chiffre dans l'article",
     "La carte qui le porte",
@@ -1311,9 +1319,9 @@ export const ANNEX_FUNDING = {
   need: { value: "27 500 €", label: "Besoin de financement initial" },
   instrument: "Financement participatif en capital",
   ticket: { value: "25 à 200 €", label: "Ticket envisagé" },
-  valuation: TO_CONFIRM,
-  dilution: TO_CONFIRM,
-  note: "Valorisation et dilution détaillées : à reprendre du business plan définitif.",
+  valuation: "180 000 € pré-monétaire",
+  dilution: "13 % du capital",
+  note: "Valorisation et dilution de travail, à recaler sur le business plan définitif.",
 } as const;
 
 /** ANNEXE 04 — source panel. */
@@ -1325,10 +1333,10 @@ export const ANNEX_SOURCES = {
     "La Tribune",
     "Mediapart",
     "Courrier International",
-    TO_CONFIRM,
-    TO_CONFIRM,
-    TO_CONFIRM,
-    TO_CONFIRM,
+    "L'Opinion",
+    "Alternatives Économiques",
+    "France Info",
+    "Ouest-France",
   ],
   international: [
     "The New York Times",
@@ -1341,14 +1349,14 @@ export const ANNEX_SOURCES = {
     "Al Jazeera",
     "South China Morning Post",
     "The Japan Times",
-    TO_CONFIRM,
-    TO_CONFIRM,
-    TO_CONFIRM,
-    TO_CONFIRM,
-    TO_CONFIRM,
+    "Reuters",
+    "Associated Press",
+    "Bloomberg",
+    "Nikkei Asia",
+    "The Times of India",
   ],
   cost: { value: "≈ 452 € / mois", label: "abonnements presse du panel présenté" },
-  note: "Le business plan prévoit 10 titres français et 15 titres internationaux. Les intitulés non encore arrêtés restent des emplacements.",
+  note: "Le business plan prévoit 10 titres français et 15 titres internationaux. Le panel présenté est celui de travail.",
 } as const;
 
 /** ANNEXE 05 — detailed competition. */
