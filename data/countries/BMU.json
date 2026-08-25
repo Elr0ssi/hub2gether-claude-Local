@@ -3,6 +3,34 @@
   "iso2": "BM",
   "nom": "Bermudes",
   "indicateurs": {
+    "balance_commerciale": {
+      "libelle": "Balance extérieure des biens et services",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NE.RSB.GNFS.CD)",
+      "valeurs": {
+        "2010": 1790984000,
+        "2011": 1818563000,
+        "2012": 1737596000,
+        "2013": 1742927000,
+        "2014": 1655177000,
+        "2015": 1773181000,
+        "2016": 1787781000,
+        "2017": 1763000000,
+        "2018": 1835618000,
+        "2019": 1924663000,
+        "2020": 1630892000,
+        "2021": 1667462000,
+        "2022": 1864279000,
+        "2023": 2397874000,
+        "2024": 2766352000
+      }
+    },
+    "inflation": {
+      "libelle": "Inflation (prix à la consommation)",
+      "unite": "%",
+      "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+      "valeurs": {}
+    },
     "pib": {
       "libelle": "PIB",
       "unite": "USD",

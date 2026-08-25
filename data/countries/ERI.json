@@ -3,6 +3,39 @@
   "iso2": "ER",
   "nom": "Érythrée",
   "indicateurs": {
+    "balance_commerciale": {
+      "libelle": "Balance extérieure des biens et services",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NE.RSB.GNFS.CD)",
+      "valeurs": {
+        "1992": -159972072.524164,
+        "1993": -191578061.65379,
+        "1994": -291590909.090909,
+        "1995": -349968750,
+        "1996": -403291015.778627,
+        "1997": -385705357.018847,
+        "1998": -486517937.551702,
+        "1999": -531779119.7028,
+        "2000": -342873246.753247,
+        "2001": -379561211.27708,
+        "2002": -386743256.326714,
+        "2003": -531923316.013939,
+        "2004": -599112181.323663,
+        "2005": -535752294.862082,
+        "2006": -381053658.536585,
+        "2007": -303343089.430894,
+        "2008": -299548403.252033,
+        "2009": -351191993.495935,
+        "2010": -392844169.105691,
+        "2011": -228887167.479675
+      }
+    },
+    "inflation": {
+      "libelle": "Inflation (prix à la consommation)",
+      "unite": "%",
+      "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+      "valeurs": {}
+    },
     "pib": {
       "libelle": "PIB",
       "unite": "USD",

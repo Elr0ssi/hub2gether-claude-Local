@@ -3,6 +3,31 @@
   "iso2": "SX",
   "nom": "Saint-Martin (partie néerlandaise)",
   "indicateurs": {
+    "balance_commerciale": {
+      "libelle": "Balance extérieure des biens et services",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NE.RSB.GNFS.CD)",
+      "valeurs": {}
+    },
+    "inflation": {
+      "libelle": "Inflation (prix à la consommation)",
+      "unite": "%",
+      "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+      "valeurs": {
+        "2006": 0.300601202404805,
+        "2007": 4.43245754245754,
+        "2008": -0.417929020080758,
+        "2009": 5.95763688760801,
+        "2010": 1.33857621672882,
+        "2011": 4.58475435650401,
+        "2012": 4.01518421081576,
+        "2013": 2.5286478853837,
+        "2014": 1.88675466275266,
+        "2015": 0.330027165141066,
+        "2016": 0.111682655737579,
+        "2017": 2.19201010962985
+      }
+    },
     "pib": {
       "libelle": "PIB",
       "unite": "USD",

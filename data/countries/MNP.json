@@ -3,6 +3,40 @@
   "iso2": "MP",
   "nom": "Îles Mariannes du Nord",
   "indicateurs": {
+    "balance_commerciale": {
+      "libelle": "Balance extérieure des biens et services",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NE.RSB.GNFS.CD)",
+      "valeurs": {
+        "2002": 387000000,
+        "2003": 344000000,
+        "2004": 281000000,
+        "2005": 182000000,
+        "2006": 77000000,
+        "2007": 48000000,
+        "2008": 29000000,
+        "2009": -48000000,
+        "2010": -70000000,
+        "2011": -132000000,
+        "2012": -99000000,
+        "2013": -123000000,
+        "2014": -123000000,
+        "2015": -153000000,
+        "2016": -116000000,
+        "2017": 112000000,
+        "2018": -95000000,
+        "2019": -233000000,
+        "2020": -428000000,
+        "2021": -611000000,
+        "2022": -533000000
+      }
+    },
+    "inflation": {
+      "libelle": "Inflation (prix à la consommation)",
+      "unite": "%",
+      "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+      "valeurs": {}
+    },
     "pib": {
       "libelle": "PIB",
       "unite": "USD",

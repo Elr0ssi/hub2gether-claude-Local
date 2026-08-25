@@ -3,6 +3,40 @@
   "iso2": "AS",
   "nom": "Samoa américaines",
   "indicateurs": {
+    "balance_commerciale": {
+      "libelle": "Balance extérieure des biens et services",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NE.RSB.GNFS.CD)",
+      "valeurs": {
+        "2002": -44000000,
+        "2003": -61000000,
+        "2004": -110000000,
+        "2005": -120000000,
+        "2006": -143000000,
+        "2007": -120000000,
+        "2008": -117000000,
+        "2009": -29000000,
+        "2010": -177000000,
+        "2011": -228000000,
+        "2012": -163000000,
+        "2013": -193000000,
+        "2014": -266000000,
+        "2015": -237000000,
+        "2016": -210000000,
+        "2017": -264000000,
+        "2018": -226000000,
+        "2019": -215000000,
+        "2020": -259000000,
+        "2021": -362000000,
+        "2022": -268000000
+      }
+    },
+    "inflation": {
+      "libelle": "Inflation (prix à la consommation)",
+      "unite": "%",
+      "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+      "valeurs": {}
+    },
     "pib": {
       "libelle": "PIB",
       "unite": "USD",

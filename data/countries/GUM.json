@@ -3,6 +3,40 @@
   "iso2": "GU",
   "nom": "Guam",
   "indicateurs": {
+    "balance_commerciale": {
+      "libelle": "Balance extérieure des biens et services",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NE.RSB.GNFS.CD)",
+      "valeurs": {
+        "2002": -894000000,
+        "2003": -1023000000,
+        "2004": -939000000,
+        "2005": -887000000,
+        "2006": -1074000000,
+        "2007": -1484000000,
+        "2008": -1700000000,
+        "2009": -1801000000,
+        "2010": -1873000000,
+        "2011": -2021000000,
+        "2012": -2033000000,
+        "2013": -2188000000,
+        "2014": -2282000000,
+        "2015": -2041000000,
+        "2016": -1917000000,
+        "2017": -1883000000,
+        "2018": -2085000000,
+        "2019": -2133000000,
+        "2020": -3009000000,
+        "2021": -3469000000,
+        "2022": -3876000000
+      }
+    },
+    "inflation": {
+      "libelle": "Inflation (prix à la consommation)",
+      "unite": "%",
+      "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+      "valeurs": {}
+    },
     "pib": {
       "libelle": "PIB",
       "unite": "USD",

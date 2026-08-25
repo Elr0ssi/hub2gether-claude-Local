@@ -3,6 +3,40 @@
   "iso2": "VI",
   "nom": "Îles Vierges des États-Unis",
   "indicateurs": {
+    "balance_commerciale": {
+      "libelle": "Balance extérieure des biens et services",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NE.RSB.GNFS.CD)",
+      "valeurs": {
+        "2002": 381000000,
+        "2003": 543000000,
+        "2004": 685000000,
+        "2005": 982000000,
+        "2006": 703000000,
+        "2007": 1474000000,
+        "2008": 190000000,
+        "2009": 76000000,
+        "2010": 534000000,
+        "2011": 58000000,
+        "2012": 129000000,
+        "2013": -267000000,
+        "2014": -269000000,
+        "2015": -55000000,
+        "2016": -731000000,
+        "2017": -1177000000,
+        "2018": -2079000000,
+        "2019": -1875000000,
+        "2020": -1564000000,
+        "2021": 12000000,
+        "2022": -509000000
+      }
+    },
+    "inflation": {
+      "libelle": "Inflation (prix à la consommation)",
+      "unite": "%",
+      "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+      "valeurs": {}
+    },
     "pib": {
       "libelle": "PIB",
       "unite": "USD",

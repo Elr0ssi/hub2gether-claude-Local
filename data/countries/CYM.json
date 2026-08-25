@@ -3,6 +3,31 @@
   "iso2": "KY",
   "nom": "Îles Caïmans",
   "indicateurs": {
+    "balance_commerciale": {
+      "libelle": "Balance extérieure des biens et services",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NE.RSB.GNFS.CD)",
+      "valeurs": {
+        "2017": 1581246324.9853,
+        "2018": 1441085764.34306,
+        "2019": 1432205728.82292,
+        "2020": 780123120.492482
+      }
+    },
+    "inflation": {
+      "libelle": "Inflation (prix à la consommation)",
+      "unite": "%",
+      "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+      "valeurs": {
+        "2010": 0.276140861750108,
+        "2011": 1.32543575779664,
+        "2012": 1.18894845245608,
+        "2013": 2.16061146813391,
+        "2014": 1.27397911533388,
+        "2015": -2.34752770165615,
+        "2016": -0.62525835861814
+      }
+    },
     "pib": {
       "libelle": "PIB",
       "unite": "USD",

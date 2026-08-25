@@ -3,6 +3,20 @@
   "iso2": "TV",
   "nom": "Tuvalu",
   "indicateurs": {
+    "balance_commerciale": {
+      "libelle": "Balance extérieure des biens et services",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NE.RSB.GNFS.CD)",
+      "valeurs": {}
+    },
+    "inflation": {
+      "libelle": "Inflation (prix à la consommation)",
+      "unite": "%",
+      "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+      "valeurs": {
+        "2011": 0.5005807431527
+      }
+    },
     "pib": {
       "libelle": "PIB",
       "unite": "USD",
