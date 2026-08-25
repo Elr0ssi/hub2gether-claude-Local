@@ -399,35 +399,41 @@ export const PRODUCT = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const MARKET = {
-  title: ["Un marché immense.", "Une ambition volontairement limitée."],
-  funnel: [
+  title: ["Le marché francophone de l'information.", "Sa taille, et ceux qui l'occupent."],
+  /* Rappel à l'écran, en coin : la liste des acteurs n'est pas close. */
+  reminder: "À compléter : l'intégralité des acteurs",
+  size: [
     {
       id: "monthly",
       value: "56 M",
       label: "visites mensuelles cumulées",
-      note: "Cinq titres francophones spécialisés étudiés dans le business plan.",
+      note: "Panel de titres francophones du business plan.",
     },
     {
       id: "yearly",
       value: "670 M+",
       label: "visites annuelles correspondantes",
-      note: "Volume annuel du même panel.",
+      note: "Même panel, sur douze mois.",
     },
     {
       id: "market",
-      value: "590-760 M€",
+      value: "590 à 760 M€",
       label: "marché francophone accessible",
-      note: "Fourchette de référence retenue dans le business plan.",
+      note: "Fourchette de référence du business plan.",
     },
   ],
-  target: {
-    value: "445 K€",
-    label: "revenus projetés en année 5",
-    share: "≈ 0,08 %",
-    shareLabel: "du marché accessible",
-  },
-  conclusion:
-    "Le modèle n'a pas besoin de dominer le marché pour devenir viable.",
+  playersLabel: "Les acteurs en place",
+  playersColumns: ["Titre", "Visites / mois", "Modèle d'accès", "Chiffre d'affaires"],
+  players: [
+    { name: "Le Figaro", visits: "88 M", model: "Mixte", revenue: "512 M€" },
+    { name: "Le Monde", visits: "72 M", model: "Abonnement", revenue: "268 M€" },
+    { name: "Les Échos", visits: "26 M", model: "Abonnement", revenue: "214 M€" },
+    { name: "Mediapart", visits: "11 M", model: "Abonnement intégral", revenue: "26 M€" },
+    { name: "Courrier International", visits: "5 M", model: "Mixte", revenue: "18 M€" },
+    { name: "La Tribune", visits: "4 M", model: "Mixte", revenue: "12 M€" },
+  ],
+  playersNote:
+    "Ordres de grandeur de travail, à recaler sur les derniers comptes publiés avant la soutenance.",
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -502,8 +508,8 @@ export const COMPETITION: readonly CompetitorFamily[] = [
 ] as const;
 
 export const COMPETITION_TITLE = [
-  "Beaucoup d'information.",
-  "Peu d'acteurs réunissent ces quatre dimensions.",
+  "L'information ne manque pas.",
+  "La difficulté est de la relier.",
 ] as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -557,9 +563,7 @@ export interface Publication {
 }
 
 export const PUBLICATIONS = {
-  title: ["Ce que nous publions déjà.", "Un chiffre, un format, une source."],
-  intro:
-    "Même promesse que le site · une donnée, sa source, de quoi aller plus loin · dans un format qui circule là où le lecteur est déjà.",
+  title: ["Ce que nous publions déjà."],
 
   items: [
     {
@@ -593,6 +597,8 @@ export const PUBLICATIONS = {
     label: "Audience",
     note: "Ordres de grandeur de travail, à recaler sur l'analytics avant la soutenance.",
     metrics: [
+      { label: "Date de création", value: "Mars 2026" },
+      { label: "Publications", value: "14" },
       { label: "Vues cumulées", value: "62 300" },
       { label: "Taux d'engagement", value: "4,8 %" },
       { label: "Clics vers le site", value: "1 940" },
@@ -602,24 +608,35 @@ export const PUBLICATIONS = {
 
   /** Partnerships that the format makes possible. None is signed. */
   partnerships: {
-    label: "Partenariats possibles",
+    label: "Partenariats éventuels",
+    title: ["Avec qui, et contre quoi."],
     disclaimer: "Aucun partenariat n'est signé à ce jour. Cette liste décrit des pistes.",
+    /** Trois emplacements au format vertical du site, à remplir. */
+    visuals: [
+      { id: "v1", label: "Visuel partenaire 1", image: "/soutenance/partenariats/visuel-01.png" },
+      { id: "v2", label: "Visuel partenaire 2", image: "/soutenance/partenariats/visuel-02.png" },
+      { id: "v3", label: "Visuel partenaire 3", image: "/soutenance/partenariats/visuel-03.png" },
+    ],
     items: [
       {
         kind: "Médias spécialisés",
         body: "Reprise d'un visuel contre citation et lien. Coût nul, audience croisée.",
+        names: "Courrier International · Alternatives Économiques · La Tribune",
       },
       {
         kind: "Institutions et statistique publique",
         body: "Mise en forme de données publiques : une lecture grand public contre une source primaire.",
+        names: "INSEE · Eurostat · Banque de France · OCDE",
       },
       {
         kind: "Écoles et recherche",
         body: "Accès aux jeux de données contre relecture méthodologique.",
+        names: "Écoles de commerce · Sciences Po · laboratoires d'économie",
       },
       {
         kind: "Marques et annonceurs",
         body: "Formats sponsorisés identifiés, hors des contenus de données. Le mur est la condition.",
+        names: "Régies data · éditeurs de logiciels financiers",
       },
     ],
   },

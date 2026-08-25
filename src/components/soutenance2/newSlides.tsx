@@ -140,17 +140,6 @@ function PublicationCard({
           )}
         </div>
 
-        {/* Une ligne. Le titre et le format se lisaient déjà dans la capture,
-            et trois lignes sous chacune des trois vignettes faisaient un mur
-            de texte au bas de la slide. Le reste appartient à l'oral. */}
-        <figcaption style={{ marginTop: 12, display: "flex", alignItems: "baseline", gap: 10 }}>
-          <p className="t-h3" style={{ color: accent, letterSpacing: "-0.025em" }}>
-            {item.hook === TO_CONFIRM ? <Slot /> : item.hook}
-          </p>
-          {item.reach && (
-            <p className="t-micro" style={{ color: ink.faint }}>{item.reach}</p>
-          )}
-        </figcaption>
       </figure>
     </Rise>
   );
@@ -180,12 +169,6 @@ export function PublicationsSlide({ index }: { index: string }) {
         }}
       >
         <div>
-          <Rise delay={0.4} y={12}>
-            <p className="t-body" style={{ color: ink.secondary, maxWidth: 760, marginBottom: 22 }}>
-              {PUBLICATIONS.intro}
-            </p>
-          </Rise>
-
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
             {PUBLICATIONS.items.map((item, i) => (
               <PublicationCard key={item.id} item={item} delay={0.55 + i * 0.12} />
@@ -230,49 +213,174 @@ export function PublicationsSlide({ index }: { index: string }) {
   );
 }
 
-/** Ce que le format ouvre. Rien n'est signé, et la slide le dit. */
-export function PartnershipsSlide({ index }: { index: string }) {
+/** Les partenariats envisagés, et les visuels qu'ils reprendraient. */
+export function PartnershipsSlide({ index: _index }: { index?: string }) {
   const ink = useInk();
   const accent = useAccent();
 
   return (
     <SlideBody>
-      <Eyebrow>Partenariats possibles</Eyebrow>
-      <Title lines={["Ce que le format ouvre.", "Rien n'est signé à ce jour."]} />
+      <Eyebrow>Partenariats éventuels</Eyebrow>
+      <Title lines={PUBLICATIONS.partnerships.title} />
 
-      <Rise delay={0.4} y={12}>
-        <p className="t-body" style={{ color: ink.secondary, maxWidth: 820, marginTop: 22 }}>
-          {PUBLICATIONS.partnerships.disclaimer}
-        </p>
-      </Rise>
-
-      {/* Centré dans ce qui reste de la slide : quatre lignes posées sous le
-          titre laissaient un tiers d'écran vide sous elles. */}
-      <div style={{ marginTop: 30, flex: 1, display: "grid", gap: 18, alignContent: "center", minHeight: 0 }}>
-        {PUBLICATIONS.partnerships.items.map((pt, i) => (
-          <Rise key={pt.kind} delay={0.55 + i * 0.1} y={12}>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "340px minmax(0, 1fr)",
-                gap: 32,
-                alignItems: "baseline",
-                paddingBottom: 16,
-                borderBottom: `1px solid ${ink.rule}`,
-              }}
-            >
-              <p className="t-h3" style={{ color: accent, letterSpacing: "-0.02em" }}>
-                {pt.kind}
-              </p>
-              <p className="t-body" style={{ color: ink.muted, lineHeight: 1.5 }}>
-                {pt.body}
-              </p>
-            </div>
+      <div
+        style={{
+          marginTop: 30,
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr) 400px",
+          gap: 60,
+          alignItems: "start",
+        }}
+      >
+        <div>
+          <Rise delay={0.35} y={12}>
+            <p className="t-small" style={{ color: ink.faint, marginBottom: 22 }}>
+              {PUBLICATIONS.partnerships.disclaimer}
+            </p>
           </Rise>
-        ))}
+
+          <div style={{ display: "grid", gap: 14 }}>
+            {PUBLICATIONS.partnerships.items.map((pt, i) => (
+              <Rise key={pt.kind} delay={0.45 + i * 0.1} y={12}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "260px minmax(0, 1fr)",
+                    gap: 26,
+                    alignItems: "baseline",
+                    paddingBottom: 13,
+                    borderBottom: `1px solid ${ink.rule}`,
+                  }}
+                >
+                  <p className="t-h3" style={{ color: accent, letterSpacing: "-0.02em" }}>
+                    {pt.kind}
+                  </p>
+                  <div>
+                    <p className="t-small" style={{ color: ink.muted, lineHeight: 1.5 }}>
+                      {pt.body}
+                    </p>
+                    <p className="t-micro" style={{ color: ink.faint, marginTop: 7, letterSpacing: "0.08em" }}>
+                      {pt.names}
+                    </p>
+                  </div>
+                </div>
+              </Rise>
+            ))}
+          </div>
+        </div>
+
+        <VisualCarousel />
       </div>
     </SlideBody>
   );
+}
+
+/**
+ * Les visuels que reprendrait un partenaire.
+ *
+ * Trois emplacements au format vertical du site, ceux des rails publicitaires,
+ * qui défilent d'un clic : le suivant se laisse deviner sur le bord, si bien
+ * qu'on voit qu'il y en a d'autres sans avoir à le dire.
+ */
+function VisualCarousel() {
+  const ink = useInk();
+  const accent = useAccent();
+  const [i, setI] = useState(0);
+  const items = PUBLICATIONS.partnerships.visuals;
+  const last = items.length - 1;
+
+  return (
+    <Rise delay={0.5} y={16}>
+      <div>
+        <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 14 }}>
+          Visuels repris
+        </p>
+
+        <div style={{ position: "relative", overflow: "hidden", borderRadius: 14 }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 14,
+              transform: `translateX(calc(${-i} * (240px + 14px)))`,
+              transition: "transform .55s cubic-bezier(0.16,1,0.3,1)",
+            }}
+          >
+            {items.map((v) => (
+              <figure
+                key={v.id}
+                style={{
+                  margin: 0,
+                  flex: "0 0 240px",
+                  aspectRatio: "160 / 600",
+                  height: 320,
+                  borderRadius: 14,
+                  border: `1px solid ${ink.rule}`,
+                  background: ink.tone === "dark" ? "#0B0B0B" : "#F4F4F4",
+                  display: "grid",
+                  placeItems: "center",
+                  textAlign: "center",
+                  padding: 18,
+                }}
+              >
+                <div>
+                  <ImageIcon size={20} style={{ color: ink.faint }} />
+                  <p className="t-micro" style={{ color: ink.faint, marginTop: 10 }}>
+                    {v.label}
+                  </p>
+                  <p style={{ fontSize: 12, color: ink.faint, marginTop: 6, opacity: 0.8 }}>
+                    {v.image}
+                  </p>
+                </div>
+              </figure>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 14 }}>
+          <button
+            type="button"
+            onClick={() => setI((n) => Math.max(0, n - 1))}
+            disabled={i === 0}
+            aria-label="Visuel précédent"
+            style={carouselButton(ink, i === 0)}
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            onClick={() => setI((n) => Math.min(last, n + 1))}
+            disabled={i === last}
+            aria-label="Visuel suivant"
+            style={carouselButton(ink, i === last)}
+          >
+            ›
+          </button>
+          <span className="t-micro" style={{ color: ink.faint, marginLeft: 4 }}>
+            {i + 1} / {items.length}
+          </span>
+        </div>
+      </div>
+    </Rise>
+  );
+}
+
+function carouselButton(
+  ink: { rule: string; muted: string; faint: string },
+  disabled: boolean
+): React.CSSProperties {
+  return {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    border: `1px solid ${ink.rule}`,
+    background: "transparent",
+    color: disabled ? ink.faint : ink.muted,
+    cursor: disabled ? "default" : "pointer",
+    fontSize: 17,
+    lineHeight: 1,
+  };
 }
 
 export function GeoSlide({ index }: { index: string }) {

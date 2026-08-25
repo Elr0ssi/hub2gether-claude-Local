@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import type { ComponentType } from "react";
+import { Fragment, type ComponentType } from "react";
 import {
   DUR,
   EASE as DECK_EASE,
@@ -402,9 +402,20 @@ function MarketSlide() {
   const ink = useInk();
   const accent = useAccent();
 
+  /* La slide dit la taille du marché et qui l'occupe, rien de plus. Nos
+     propres revenus projetés en sortent : ils appartiennent au modèle
+     économique, et posés ici ils faisaient répondre à une question que le
+     jury ne s'est pas encore posée. L'entonnoir de rectangles, dont le
+     dernier se cassait faute de place, laisse la place à trois mesures
+     alignées et à un tableau des acteurs. */
   return (
     <SlideBody>
-      <Eyebrow>Le marché</Eyebrow>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 24 }}>
+        <Eyebrow>Le marché</Eyebrow>
+        <span className="t-micro" style={{ color: ink.faint, letterSpacing: "0.1em" }}>
+          {MARKET.reminder}
+        </span>
+      </div>
 
       <div style={{ marginTop: 26, maxWidth: 1180 }}>
         <StatementTitle lines={MARKET.title} delay={0.1} size="t-h2" />
@@ -414,52 +425,86 @@ function MarketSlide() {
         style={{
           marginTop: 40,
           display: "grid",
-          gridTemplateColumns: "720px 1fr",
-          gap: 90,
-          alignItems: "center",
-          flex: 1,
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 48,
         }}
       >
-        <MarketFunnel tiers={MARKET.funnel} startDelay={0.35} width={700} />
-
-        <div>
-          <Rise delay={0.9} y={20}>
-            <div
-              className="t-display"
-              style={{ color: ink.primary, letterSpacing: "-0.05em", fontSize: 96, lineHeight: 1 }}
-            >
-              {MARKET.target.value}
-            </div>
-            <div className="t-body" style={{ color: ink.muted, marginTop: 14 }}>
-              {MARKET.target.label}
+        {MARKET.size.map((m, i) => (
+          <Rise key={m.id} delay={0.36 + i * 0.12} y={18}>
+            <div>
+              <div
+                className="t-display"
+                style={{ color: accent, letterSpacing: "-0.05em", fontSize: 64, lineHeight: 1 }}
+              >
+                {m.value}
+              </div>
+              <p className="t-body" style={{ color: ink.secondary, marginTop: 12 }}>
+                {m.label}
+              </p>
+              <p className="t-small" style={{ color: ink.faint, marginTop: 6 }}>
+                {m.note}
+              </p>
             </div>
           </Rise>
+        ))}
+      </div>
 
-          <div style={{ marginTop: 40, maxWidth: 430 }}>
-            <Rule delay={1.05} accentWidth={80} />
+      <div style={{ marginTop: 34 }}>
+        <Rule delay={0.7} />
+      </div>
+
+      <Rise delay={0.78} y={16}>
+        <div style={{ marginTop: 24 }}>
+          <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 14 }}>
+            {MARKET.playersLabel}
+          </p>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1.6fr) repeat(3, minmax(0, 1fr))",
+              gap: "0 28px",
+            }}
+          >
+            {MARKET.playersColumns.map((c, i) => (
+              <p
+                key={c}
+                className="t-micro"
+                style={{
+                  color: ink.faint,
+                  letterSpacing: "0.1em",
+                  paddingBottom: 9,
+                  borderBottom: `1px solid ${ink.rule}`,
+                  textAlign: i === 0 ? "left" : "right",
+                }}
+              >
+                {c}
+              </p>
+            ))}
+
+            {MARKET.players.map((pl) => (
+              <Fragment key={pl.name}>
+                <p className="t-small" style={{ color: ink.primary, fontWeight: 800, padding: "9px 0", borderBottom: `1px solid ${ink.rule}` }}>
+                  {pl.name}
+                </p>
+                <p className="t-small" style={{ color: ink.secondary, padding: "9px 0", borderBottom: `1px solid ${ink.rule}`, textAlign: "right" }}>
+                  {pl.visits}
+                </p>
+                <p className="t-small" style={{ color: ink.muted, padding: "9px 0", borderBottom: `1px solid ${ink.rule}`, textAlign: "right" }}>
+                  {pl.model}
+                </p>
+                <p className="t-small" style={{ color: ink.secondary, padding: "9px 0", borderBottom: `1px solid ${ink.rule}`, textAlign: "right" }}>
+                  {pl.revenue}
+                </p>
+              </Fragment>
+            ))}
           </div>
 
-          <Rise delay={1.15} y={16}>
-            <div style={{ marginTop: 32, display: "flex", alignItems: "baseline", gap: 20 }}>
-              <span className="t-h1" style={{ color: accent, letterSpacing: "-0.04em" }}>
-                {MARKET.target.share}
-              </span>
-              <span className="t-body" style={{ color: ink.secondary }}>
-                {MARKET.target.shareLabel}
-              </span>
-            </div>
-          </Rise>
-
-          <Rise delay={1.32} y={14}>
-            <p
-              className="t-lead"
-              style={{ color: ink.secondary, marginTop: 32, maxWidth: 460, letterSpacing: "-0.015em" }}
-            >
-              {MARKET.conclusion}
-            </p>
-          </Rise>
+          <p className="t-small" style={{ color: ink.faint, marginTop: 12 }}>
+            {MARKET.playersNote}
+          </p>
         </div>
-      </div>
+      </Rise>
     </SlideBody>
   );
 }

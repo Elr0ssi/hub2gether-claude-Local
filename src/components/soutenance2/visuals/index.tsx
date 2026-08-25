@@ -353,6 +353,8 @@ export function CoverageMatrix({
   const ink = useInk();
   const accent = useAccent();
 
+  const tintBg = ink.tone === "dark" ? "rgba(57,255,136,0.06)" : "rgba(57,255,136,0.07)";
+
   const dot = (state: "full" | "partial" | "none", us?: boolean) => {
     const colour = us ? accent : ink.secondary;
     if (state === "full") {
@@ -402,14 +404,14 @@ export function CoverageMatrix({
               alignItems: "center",
               padding: "20px 0",
               borderBottom: `1px solid ${ink.rule}`,
-              background: row.us
-                ? ink.tone === "dark"
-                  ? "rgba(57,255,136,0.06)"
-                  : "rgba(57,255,136,0.07)"
-                : undefined,
-              borderRadius: row.us ? 12 : undefined,
-              paddingLeft: row.us ? 18 : 0,
-              paddingRight: row.us ? 18 : 0,
+              // Le fond de notre rangée déborde par une ombre portée plutôt que
+              // par une marge intérieure : la marge décalait ses colonnes de
+              // dix-huit pixels, si bien que nos points ne tombaient pas dans
+              // l'axe de ceux des autres rangées.
+              background: row.us ? tintBg : undefined,
+              boxShadow: row.us ? `0 0 0 18px ${tintBg}` : undefined,
+              borderRadius: row.us ? 4 : undefined,
+              position: row.us ? "relative" : undefined,
             }}
           >
             <span>
