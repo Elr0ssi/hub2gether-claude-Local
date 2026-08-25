@@ -71,6 +71,35 @@ export const S2_SLIDES: readonly Slide2[] = [
       "Poser la promesse et ne plus la lâcher : comprendre en 30 secondes, maîtriser en 5 minutes. Laisser le globe tourner deux secondes avant de parler. Ne pas annoncer le plan, la narration se tient toute seule.",
   },
   {
+    id: "avant",
+    label: "Avant",
+    act: "pitch",
+    seconds: 60,
+    tone: "light",
+    steps: 2,
+    speakerNotes:
+      "Raconter les premiers projets sans les vendre : des sites, un peu de trafic, aucun qui décolle. Le point n'est pas l'idée mais le temps passé à construire au lieu de faire grandir. Laisser la pile de tâches s'accumuler à l'écran pendant qu'on parle, puis lâcher la phrase.",
+  },
+  {
+    id: "idee",
+    label: "Le projet qui reste",
+    act: "pitch",
+    seconds: 70,
+    tone: "light",
+    steps: 2,
+    speakerNotes:
+      "L'histoire des amis, du lycée aux études : mêmes sujets, sources différentes, conclusions différentes. Ne pas décrire le schéma, il se voit. Au deuxième temps, tout tombe sauf la question : la laisser respirer avant d'enchaîner.",
+  },
+  {
+    id: "reprise",
+    label: "Quatre ans plus tard",
+    act: "pitch",
+    seconds: 70,
+    tone: "dark",
+    speakerNotes:
+      "Deux ans sans IA, un plafond technique, puis le vibe coding. Dire le doute : l'IA a d'abord dévalué des heures de travail manuel. Puis la bascule, ce qu'elle permet enfin de construire. Mentionner UpTogether au passage, comme expérience produit. Finir sur la phrase et enchaîner : alors, qu'est-ce que c'est devenu ?",
+  },
+  {
     id: "probleme",
     label: "Le problème",
     act: "pitch",
@@ -1309,6 +1338,66 @@ export const LEGAL = {
   ],
   statement:
     "Ce qui protège le lecteur nous protège aussi. La transparence n'est pas une contrainte subie, c'est ce qui nous sépare des sites qui se font sanctionner.",
+} as const;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   OUVERTURE — trois slides avant le produit
+
+   Une progression, pas un récit : construire, buter, garder une idée, la
+   reprendre avec d'autres moyens. Le texte affiché est réduit au strict
+   nécessaire ; tout le reste se dit à l'oral.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const STORY = {
+  before: {
+    eyebrow: "Avant",
+    title: ["Ce n'était pas le premier."],
+    projectsLabel: "Premiers projets",
+    projects: ["Sites web", "Sport", "Contenus", "Premières audiences"],
+    /** Ce que chaque projet ajoutait, et qui s'empilait. */
+    loadLabel: "Ce que chacun demandait",
+    load: ["Construire", "Designer", "Écrire", "Maintenir", "Corriger", "Recommencer"],
+    statement: ["Beaucoup de temps pour construire.", "Peu de temps pour faire grandir."],
+  },
+
+  idea: {
+    eyebrow: "Le projet qui reste",
+    title: ["Une même actualité.", "Autant de lectures."],
+    event: "Une actualité",
+    sources: ["Presse française", "Presse étrangère", "Réseaux", "Institutions"],
+    outcome: "Des conclusions différentes",
+    question: "Pourquoi faut-il autant de temps et de sources pour comprendre un sujet ?",
+    seed: "Première idée : centraliser, synthétiser, rendre accessible.",
+  },
+
+  later: {
+    eyebrow: "Quatre ans plus tard",
+    title: ["Le même projet.", "De nouveaux moyens."],
+    versions: [
+      {
+        id: "v1",
+        tag: "V1",
+        label: "Assemblé",
+        items: ["WordPress", "Extensions", "MapGeo", "Contenus manuels"],
+      },
+      {
+        id: "v2",
+        tag: "V2",
+        label: "Cherché",
+        items: ["Premières données", "Premières cartes", "API difficiles", "Plafond technique"],
+      },
+      {
+        id: "v3",
+        tag: "V3",
+        label: "Construit",
+        items: ["Code sur mesure", "Base de données", "Agents IA", "Make et n8n"],
+      },
+    ],
+    statement: [
+      "L'IA n'a pas créé The Essential Data.",
+      "Elle a rendu possible le projet que j'essayais de construire.",
+    ],
+  },
 } as const;
 
 export const WORKSHOP = {

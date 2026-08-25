@@ -55,7 +55,10 @@ import { AiShiftScene } from "./visuals/AiShift";
 import {
   FundingSlide,
   TeamSlide,
+  BeforeSlide,
   EditorialSlide,
+  IdeaSlide,
+  LaterSlide,
   LegalSlide,
   WorkshopSlide,
   GeoSlide,
@@ -1430,6 +1433,9 @@ function ConclusionSlide() {
 
 export const S2_VIEWS: Record<string, ComponentType> = {
   cover: CoverSlide,
+  avant: BeforeSlide,
+  idee: IdeaSlide,
+  reprise: LaterSlide,
   probleme: ProblemSlide,
   cible: AudienceSlide,
   produit: ProductSlide,

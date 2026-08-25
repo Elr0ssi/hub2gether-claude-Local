@@ -27,7 +27,7 @@ export function useAccent(): string {
 }
 
 /** A drawn line: reveals along its own length rather than fading in. */
-function DrawPath({
+export function DrawPath({
   d,
   delay = 0,
   duration = 1.1,

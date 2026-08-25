@@ -13,10 +13,11 @@ import {
   TEAM,
   EDITORIAL,
   LEGAL,
+  STORY,
   WORKSHOP,
   TO_CONFIRM,
 } from "@/data/soutenance2/soutenance2Data";
-import { FlowCanvas, useAccent } from "./visuals";
+import { DrawPath, FlowCanvas, useAccent } from "./visuals";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    The four sections added to the deck. Same vocabulary as the rest: one
@@ -1021,6 +1022,313 @@ export function LegalSlide() {
         >
           {LEGAL.statement}
         </p>
+      </Rise>
+    </SlideBody>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   OUVERTURE — trois slides avant le produit
+
+   Mêmes composants, même écriture visuelle que le reste du deck : le filet
+   d'accent en tête de bloc, la pastille, le titre qui s'estompe ligne après
+   ligne. Rien de neuf n'est introduit ; seule la composition change.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export function BeforeSlide() {
+  const ink = useInk();
+  const accent = useAccent();
+  const reduced = useDeckReducedMotion();
+  const step = useSlideStep();
+  const { before } = STORY;
+
+  return (
+    <SlideBody>
+      <Eyebrow>{before.eyebrow}</Eyebrow>
+      <Title lines={before.title} />
+
+      <div
+        style={{
+          marginTop: 40,
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+          gap: 80,
+          alignItems: "center",
+        }}
+      >
+        {/* Les projets, un par un. */}
+        <div>
+          <Rise delay={0.3} y={12}>
+            <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 20 }}>
+              {before.projectsLabel}
+            </p>
+          </Rise>
+          <div style={{ display: "grid", gap: 14 }}>
+            {before.projects.map((pr, i) => (
+              <Rise key={pr} delay={0.4 + i * 0.14} y={12}>
+                <p className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em" }}>
+                  {pr}
+                </p>
+              </Rise>
+            ))}
+          </div>
+        </div>
+
+        {/* Et ce que chacun ajoutait : la pile s'empile, littéralement. */}
+        <div>
+          <Rise delay={0.9} y={12}>
+            <p className="t-micro" style={{ color: ink.faint, letterSpacing: "0.14em", marginBottom: 20 }}>
+              {before.loadLabel}
+            </p>
+          </Rise>
+          <div style={{ display: "grid", gap: 9 }}>
+            {before.load.map((l, i) => (
+              <motion.div
+                key={l}
+                initial={reduced ? { opacity: 1, x: 0 } : { opacity: 0, x: -18 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.45, delay: 1 + i * 0.16, ease: EASE }}
+                style={{
+                  // Chaque tâche décale la suivante : la marge croissante fait
+                  // la pile, sans qu'aucun mot n'ait à dire « accumulation ».
+                  marginLeft: i * 26,
+                  padding: "10px 18px",
+                  borderRadius: 100,
+                  border: `1px solid ${ink.rule}`,
+                  background: ink.tone === "dark" ? "rgba(255,255,255,0.03)" : "#fff",
+                  color: ink.muted,
+                  fontSize: 17,
+                  fontWeight: 600,
+                  justifySelf: "start",
+                }}
+              >
+                {l}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Le constat n'arrive qu'au second temps, quand la pile est posée. */}
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: step >= 1 ? 1 : 0, y: step >= 1 ? 0 : 14 }}
+        transition={{ duration: 0.55, ease: EASE }}
+        style={{ marginTop: 26, paddingLeft: 24, borderLeft: `2px solid ${accent}` }}
+      >
+        {before.statement.map((line, i) => (
+          <p
+            key={line}
+            className="t-h3"
+            style={{ color: i === 1 ? ink.primary : ink.muted, letterSpacing: "-0.025em" }}
+          >
+            {line}
+          </p>
+        ))}
+      </motion.div>
+    </SlideBody>
+  );
+}
+
+export function IdeaSlide() {
+  const ink = useInk();
+  const accent = useAccent();
+  const reduced = useDeckReducedMotion();
+  const step = useSlideStep();
+  const { idea } = STORY;
+  const open = step >= 1;
+
+  return (
+    <SlideBody>
+      <Eyebrow>{idea.eyebrow}</Eyebrow>
+      <Title lines={idea.title} />
+
+      <div
+        style={{
+          marginTop: 34,
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          placeItems: "center",
+          position: "relative",
+        }}
+      >
+        {/* Premier temps : une actualité, quatre lectures, une divergence. */}
+        <motion.div
+          animate={{ opacity: open ? 0 : 1 }}
+          transition={{ duration: 0.5, ease: EASE }}
+          style={{ display: "grid", justifyItems: "center", gap: 22, width: "100%" }}
+        >
+          <Rise delay={0.3} y={10}>
+            <span
+              style={{
+                padding: "12px 26px",
+                borderRadius: 100,
+                border: `2px solid ${accent}`,
+                color: accent,
+                fontSize: 21,
+                fontWeight: 800,
+              }}
+            >
+              {idea.event}
+            </span>
+          </Rise>
+
+          {/* Les traits et les pastilles partagent les mêmes abscisses : posées
+              dans une rangée souple, les pastilles ne tombaient pas au bout de
+              leur trait. */}
+          <div style={{ position: "relative", width: 880, height: 132 }}>
+            <svg width="880" height="76" aria-hidden="true" style={{ position: "absolute", left: 0, top: 0 }}>
+              {idea.sources.map((_, i) => {
+                const x = 110 + i * 220;
+                return (
+                  <DrawPath
+                    key={i}
+                    d={`M 440 2 C 440 44, ${x} 30, ${x} 72`}
+                    stroke={ink.rule}
+                    width={1.4}
+                    opacity={0.9}
+                    delay={0.5 + i * 0.1}
+                    duration={0.6}
+                  />
+                );
+              })}
+            </svg>
+
+            {idea.sources.map((src, i) => (
+              <Rise
+                key={src}
+                delay={0.6 + i * 0.12}
+                y={10}
+                style={{
+                  position: "absolute",
+                  left: 110 + i * 220 - 105,
+                  top: 76,
+                  width: 210,
+                  height: 44,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span
+                  style={{
+                    display: "inline-block",
+                    padding: "9px 18px",
+                    borderRadius: 100,
+                    border: `1px solid ${ink.rule}`,
+                    background: ink.tone === "dark" ? "rgba(255,255,255,0.04)" : "#fff",
+                    color: ink.muted,
+                    fontSize: 16,
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {src}
+                </span>
+              </Rise>
+            ))}
+          </div>
+
+          <Rise delay={1.15} y={10}>
+            <p className="t-h3" style={{ color: ink.muted, letterSpacing: "-0.025em", marginTop: 8 }}>
+              {idea.outcome}
+            </p>
+          </Rise>
+        </motion.div>
+
+        {/* Second temps : tout tombe, la question reste. */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: open ? 1 : 0 }}
+          transition={{ duration: 0.6, delay: open ? 0.25 : 0, ease: EASE }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "grid",
+            alignContent: "center",
+            pointerEvents: open ? "auto" : "none",
+          }}
+        >
+          <p className="t-h1" style={{ color: ink.primary, letterSpacing: "-0.038em", maxWidth: 1180 }}>
+            {idea.question}
+          </p>
+          <motion.p
+            className="t-body"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: open ? 1 : 0 }}
+            transition={{ duration: 0.5, delay: open ? 0.9 : 0, ease: EASE }}
+            style={{ color: accent, marginTop: 30 }}
+          >
+            {idea.seed}
+          </motion.p>
+        </motion.div>
+      </div>
+
+      {reduced ? null : null}
+    </SlideBody>
+  );
+}
+
+export function LaterSlide() {
+  const ink = useInk();
+  const accent = useAccent();
+  const { later } = STORY;
+
+  return (
+    <SlideBody>
+      <Eyebrow>{later.eyebrow}</Eyebrow>
+      <Title lines={later.title} />
+
+      <div
+        style={{
+          marginTop: 44,
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 56,
+          alignContent: "center",
+        }}
+      >
+        {later.versions.map((v, i) => {
+          const now = i === 2;
+          return (
+            <Rise key={v.id} delay={0.35 + i * 0.16} y={16}>
+              <div style={{ paddingTop: 18, borderTop: `2px solid ${now ? accent : ink.rule}` }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
+                  <span className="t-h2" style={{ color: now ? accent : ink.primary, letterSpacing: "-0.035em" }}>
+                    {v.tag}
+                  </span>
+                  <span className="t-micro" style={{ color: ink.faint }}>{v.label}</span>
+                </div>
+                <div style={{ marginTop: 18, display: "grid", gap: 9 }}>
+                  {v.items.map((it) => (
+                    <p key={it} className="t-body" style={{ color: now ? ink.secondary : ink.muted }}>
+                      {it}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </Rise>
+          );
+        })}
+      </div>
+
+      <Rise delay={1} y={14}>
+        <div style={{ marginTop: 30, paddingLeft: 24, borderLeft: `2px solid ${accent}` }}>
+          {later.statement.map((line, i) => (
+            <p
+              key={line}
+              className="t-h3"
+              style={{ color: i === 1 ? ink.primary : ink.muted, letterSpacing: "-0.025em" }}
+            >
+              {line}
+            </p>
+          ))}
+        </div>
       </Rise>
     </SlideBody>
   );
