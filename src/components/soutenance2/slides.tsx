@@ -545,64 +545,108 @@ function AcquisitionSlide() {
   const ink = useInk();
   const accent = useAccent();
 
+  /* Trois réseaux, ce qu'ils portent et ce qu'ils rendent, puis la part que
+     chaque canal prendrait dans notre trafic. La boucle de l'acquisition
+     tenait la moitié droite de la slide sans rien dire de mesurable ; elle
+     revient à l'oral. */
   return (
     <SlideBody>
       <Eyebrow>Moteur d&apos;acquisition</Eyebrow>
 
-      <div style={{ marginTop: 26, maxWidth: 900 }}>
+      <div style={{ marginTop: 26, maxWidth: 1100 }}>
         <StatementTitle lines={ACQUISITION.title} delay={0.1} size="t-h2" />
       </div>
 
+      <Rise delay={0.34} y={12}>
+        <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginTop: 40 }}>
+          {ACQUISITION.channelsLabel}
+        </p>
+      </Rise>
+
       <div
         style={{
-          marginTop: 24,
+          marginTop: 18,
           display: "grid",
-          gridTemplateColumns: "1fr 600px",
-          gap: 70,
-          alignItems: "center",
-          flex: 1,
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 40,
         }}
       >
-        <div>
-          <div style={{ display: "grid", gap: 22, maxWidth: 520 }}>
-            {ACQUISITION.channels.map((c, i) => (
-              <Rise key={c.id} delay={0.6 + i * 0.13} y={16}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "baseline",
-                    gap: 22,
-                    paddingBottom: 22,
-                    borderBottom: `1px solid ${ink.rule}`,
-                  }}
-                >
-                  <span className="t-h3" style={{ color: ink.primary, minWidth: 168, letterSpacing: "-0.025em" }}>
-                    {c.label}
-                  </span>
-                  <span>
-                    <span className="t-micro" style={{ color: accent, display: "block" }}>
-                      {c.rank}
-                    </span>
-                    <span className="t-small" style={{ color: ink.muted, display: "block", marginTop: 6 }}>
-                      {c.body}
-                    </span>
-                  </span>
-                </div>
-              </Rise>
-            ))}
-          </div>
-
-          <Rise delay={1.05} y={10}>
-            <div className="t-small" style={{ color: ink.faint, marginTop: 28, maxWidth: 480 }}>
-              {ACQUISITION.note}
+        {ACQUISITION.channels.map((c, i) => (
+          <Rise key={c.id} delay={0.42 + i * 0.12} y={16}>
+            <div style={{ paddingTop: 16, borderTop: `2px solid ${i < 2 ? accent : ink.rule}` }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
+                <span className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em" }}>
+                  {c.label}
+                </span>
+                <span className="t-micro" style={{ color: i < 2 ? accent : ink.faint }}>
+                  {c.rank}
+                </span>
+              </div>
+              <p className="t-body" style={{ color: ink.secondary, marginTop: 14 }}>
+                {c.audience}
+              </p>
+              <p className="t-small" style={{ color: ink.muted, marginTop: 10 }}>
+                {c.format}
+              </p>
+              <p className="t-small" style={{ color: ink.faint, marginTop: 8 }}>
+                {c.pay}
+              </p>
             </div>
           </Rise>
-        </div>
-
-        <div style={{ display: "grid", placeItems: "center" }}>
-          <AcquisitionLoop steps={ACQUISITION.loop} startDelay={0.3} size={560} />
-        </div>
+        ))}
       </div>
+
+      <div style={{ marginTop: 38 }}>
+        <Rule delay={0.8} />
+      </div>
+
+      <Rise delay={0.88} y={14}>
+        <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginTop: 26 }}>
+          {ACQUISITION.mixLabel}
+        </p>
+      </Rise>
+
+      <div style={{ marginTop: 16, display: "grid", gap: 14 }}>
+        {ACQUISITION.mix.map((m, i) => (
+          <Rise key={m.id} delay={0.94 + i * 0.1} y={12}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "230px 96px minmax(0, 1fr)",
+                alignItems: "center",
+                gap: 22,
+              }}
+            >
+              <span className="t-small" style={{ color: ink.primary, fontWeight: 800 }}>
+                {m.label}
+              </span>
+              <span className="t-h3" style={{ color: accent, letterSpacing: "-0.02em", whiteSpace: "nowrap" }}>
+                {m.share} %
+              </span>
+              <span style={{ display: "flex", alignItems: "center", gap: 18 }}>
+                <span
+                  style={{
+                    height: 6,
+                    borderRadius: 6,
+                    width: `${m.share * 1.1}%`,
+                    maxWidth: 300,
+                    background: accent,
+                    opacity: 0.75,
+                    flexShrink: 0,
+                  }}
+                />
+                <span className="t-small" style={{ color: ink.muted }}>{m.body}</span>
+              </span>
+            </div>
+          </Rise>
+        ))}
+      </div>
+
+      <Rise delay={1.3} y={10}>
+        <p className="t-small" style={{ color: ink.faint, marginTop: 22 }}>
+          {ACQUISITION.note}
+        </p>
+      </Rise>
     </SlideBody>
   );
 }

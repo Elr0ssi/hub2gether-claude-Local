@@ -89,7 +89,9 @@ const SPINE: Record<string, readonly Pos[]> = {
     OFF,
     OFF,
   ],
-  info: [{ x: 1330, y: 430, o: 1 }, { x: 1330, y: 430, o: 0 }, OFF, OFF, OFF, OFF],
+  // L'information ne pend plus sous le média : elle est posée sur la courbe
+  // de retour, à son sommet, là où le lecteur suit des yeux ce qui lui revient.
+  info: [{ x: 800, y: 392, o: 1 }, { x: 800, y: 392, o: 0 }, OFF, OFF, OFF, OFF],
   ted: [
     { x: 1330, y: 286, o: 1 },
     { x: 1330, y: 476, o: 0.34 },
@@ -277,24 +279,22 @@ function Connectors({ step }: { step: number }) {
   if (step === 0) {
     const search = seg("user", "google");
     const fetchTed = seg("google", "ted");
-    // The answer travels back under the chain, and it leaves from the piece of
-    // information rather than from the media: what returns is the answer.
-    const info = p("info");
+    // Le retour part du média lui-même et remonte vers le lecteur en une seule
+    // courbe. L'information est posée à son sommet : c'est ce que la courbe
+    // transporte, et non un maillon de plus accroché sous le média.
+    const ted = p("ted");
     const user = p("user");
-    const back = `M ${q(info.x - HALF.info - GAP)} ${info.y} Q ${q(W / 2)} ${q(
-      info.y + 140
-    )} ${q(user.x + 70)} ${q(user.y + 44)}`;
-    // The media hands its information down: a short drop, not a second chain.
-    const drop = `M ${p("ted").x} ${q(p("ted").y + 34)} L ${p("ted").x} ${q(info.y - 34)}`;
+    const back = `M ${q(ted.x - HALF.ted - GAP)} ${q(ted.y + 18)} Q ${q(W / 2)} ${q(
+      560
+    )} ${q(user.x + 40)} ${q(user.y + 40)}`;
     return (
       <>
         <Line d={search} stroke={ink.rule} />
         <Line d={fetchTed} stroke={ink.rule} delay={0.15} />
-        <Line d={drop} stroke={ink.rule} delay={0.55} duration={0.5} />
-        <Line d={back} stroke={accent} width={1.5} delay={0.8} duration={1.1} />
+        <Line d={back} stroke={accent} width={1.6} delay={0.7} duration={1.2} />
         <Packet path={search} colour={accent} delay={0.2} duration={1.5} />
         <Packet path={fetchTed} colour={accent} delay={0.9} duration={1.5} />
-        <Packet path={back} colour={accent} delay={2} duration={2.4} r={6} />
+        <Packet path={back} colour={accent} delay={1.9} duration={2.4} r={6} />
       </>
     );
   }

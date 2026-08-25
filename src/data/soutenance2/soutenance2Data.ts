@@ -517,7 +517,9 @@ export const COMPETITION_TITLE = [
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const ACQUISITION = {
-  title: ["L'actualité crée la demande.", "La donnée crée le trafic."],
+  /* Le titre disait un mécanisme, pas ce que la slide montre. Elle montre où
+     nous allons chercher le lecteur, et ce que chaque canal peut rendre. */
+  title: ["Nos canaux d'acquisition.", "Là où le lecteur est déjà."],
   loop: [
     "Événement mondial",
     "Données / carte",
@@ -528,12 +530,40 @@ export const ACQUISITION = {
     "Exploration / comparaison",
     "Retour / partage",
   ],
+  channelsLabel: "Les trois réseaux",
   channels: [
-    { id: "tiktok", label: "TikTok", rank: "Prioritaire", body: "Formats courts, portée organique." },
-    { id: "instagram", label: "Instagram", rank: "Prioritaire", body: "Visuels de données, partenariats de marque." },
-    { id: "x", label: "X", rank: "Continu", body: "Actualité continue, public engagé sur l'international." },
+    {
+      id: "tiktok",
+      label: "TikTok",
+      rank: "Prioritaire",
+      audience: "22 M d'utilisateurs actifs en France",
+      format: "Vidéo courte, carrousel de données",
+      pay: "Rémunération à partir d'un million de vues sur un mois",
+    },
+    {
+      id: "instagram",
+      label: "Instagram",
+      rank: "Prioritaire",
+      audience: "30 M d'utilisateurs actifs en France",
+      format: "Carrousel, Reels",
+      pay: "Bonus Reels et partenariats de marque",
+    },
+    {
+      id: "x",
+      label: "X",
+      rank: "Continu",
+      audience: "12 M d'utilisateurs actifs en France",
+      format: "Fil d'actualité, image de données",
+      pay: "Partage des revenus publicitaires du fil",
+    },
   ],
-  note: "Le business plan retient les réseaux sociaux comme canal d'acquisition principal.",
+  mixLabel: "D'où viendrait notre trafic",
+  mix: [
+    { id: "search", label: "Recherche organique", share: 45, body: "Un sujet cherché, un article qui y répond." },
+    { id: "social", label: "Réseaux sociaux", share: 40, body: "Un carrousel ou un reel qui ramène vers la carte." },
+    { id: "direct", label: "Direct et retour", share: 15, body: "Le lecteur qui revient de lui-même." },
+  ],
+  note: "Audiences plateformes publiques ; répartition du trafic en objectif de travail, à recaler sur l'analytics.",
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -669,20 +699,20 @@ export const AI_SHIFT = {
     {
       id: "search",
       ordinal: "01",
-      title: "Le trafic passait par le moteur.",
-      caption: "L'utilisateur cherche, le moteur oriente, le média répond.",
+      title: "Le trafic originel.",
+      caption: "Le lecteur cherche, le moteur oriente, le média lui rend l'information.",
     },
     {
       id: "rupture",
       ordinal: "02",
-      title: "L'IA répond avant le clic.",
-      caption: "Une part des réponses ne passe plus par une visite.",
+      title: "Transformation du système par l'IA.",
+      caption: "Le lecteur interroge l'IA, l'IA répond. La visite n'a plus lieu.",
     },
     {
       id: "source",
       ordinal: "03",
       title: "Devenir la source que l'IA cite.",
-      caption: "Une base structurée, sourcée, datée · lisible par une machine.",
+      caption: "PIB, dette, chômage, commerce, défense, politique, épidémies, séries historiques.",
     },
     {
       id: "return",
@@ -718,7 +748,7 @@ export const AI_SHIFT = {
   /** Named small and flat: the engines are context, not a logo wall. */
   engines: ["ChatGPT", "Gemini", "Perplexity"],
 
-  tension: "Et si l'utilisateur ne venait plus jusqu'au média ?",
+  tension: "Et si le lecteur ne venait plus jusqu'aux médias ?",
 
   /* ── The structured base ────────────────────────────────────────────────
      `live` is what /map serves today. `planned` is in the plan and nowhere
