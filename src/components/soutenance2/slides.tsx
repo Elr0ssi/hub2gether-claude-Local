@@ -584,17 +584,17 @@ function AcquisitionSlide() {
       </div>
 
       <Rise delay={0.34} y={12}>
-        <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginTop: 40 }}>
+        <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginTop: 52 }}>
           {ACQUISITION.channelsLabel}
         </p>
       </Rise>
 
       <div
         style={{
-          marginTop: 18,
+          marginTop: 24,
           display: "grid",
           gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-          gap: 40,
+          gap: 52,
         }}
       >
         {ACQUISITION.channels.map((c, i) => (
@@ -632,7 +632,7 @@ function AcquisitionSlide() {
         </p>
       </Rise>
 
-      <div style={{ marginTop: 16, display: "grid", gap: 14 }}>
+      <div style={{ marginTop: 20, display: "grid", gap: 20 }}>
         {ACQUISITION.mix.map((m, i) => (
           <Rise key={m.id} delay={0.94 + i * 0.1} y={12}>
             <div

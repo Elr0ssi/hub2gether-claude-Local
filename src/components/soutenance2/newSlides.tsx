@@ -163,12 +163,12 @@ export function PublicationsSlide({ index }: { index: string }) {
 
       <div
         style={{
-          marginTop: 26,
+          marginTop: 30,
           flex: 1,
           display: "grid",
           gridTemplateColumns: "minmax(0, 1fr) 340px",
-          gap: 56,
-          alignItems: "start",
+          gap: 64,
+          alignItems: "center",
           minHeight: 0,
         }}
       >
@@ -412,13 +412,13 @@ export function GeoSlide({ index: _index }: { index?: string }) {
 
       <div
         style={{
-          marginTop: 38,
+          marginTop: 44,
           flex: 1,
           minHeight: 0,
           display: "grid",
-          gridTemplateColumns: "minmax(0, 1.35fr) minmax(0, 1fr)",
-          gap: 64,
-          alignItems: "start",
+          gridTemplateColumns: "minmax(0, 1.3fr) minmax(0, 1fr)",
+          gap: 80,
+          alignItems: "center",
         }}
       >
         <div>
