@@ -75,6 +75,7 @@ export function SourceFan({
 }) {
   const ink = useInk();
   const accent = useAccent();
+  const reduced = useDeckReducedMotion();
 
   /* Le lecteur au centre, les sources en orbite.
      Deux versions ont échoué avant celle-ci : un semis à l'œil, où rien ne
@@ -86,8 +87,8 @@ export function SourceFan({
   const items = labels.slice(0, 9);
   const N = items.length;
 
-  const RX = 0.37; // rayon horizontal, en part de largeur
-  const RY = 0.4; // rayon vertical, en part de hauteur
+  const RX = 0.38; // rayon horizontal, en part de largeur
+  const RY = 0.41; // rayon vertical, en part de hauteur
 
   const placed = items.map((label, i) => {
     const a = (i / N) * Math.PI * 2 - Math.PI / 2;
@@ -110,8 +111,8 @@ export function SourceFan({
             width={1}
             opacity={0.9}
             dashed
-            delay={startDelay + 0.3 + i * 0.05}
-            duration={0.7}
+            delay={startDelay + 0.45 + i * 0.13}
+            duration={0.6}
           />
         ))}
       </svg>
@@ -124,10 +125,10 @@ export function SourceFan({
           position: "absolute",
           left: "50%",
           top: "50%",
-          width: 132,
-          height: 132,
-          marginLeft: -66,
-          marginTop: -66,
+          width: 168,
+          height: 168,
+          marginLeft: -84,
+          marginTop: -84,
         }}
       >
         <div
@@ -140,7 +141,7 @@ export function SourceFan({
             placeItems: "center",
             background: ink.tone === "dark" ? "#0B0B0B" : "#fff",
             color: ink.primary,
-            fontSize: 19,
+            fontSize: 23,
             fontWeight: 800,
             letterSpacing: "-0.02em",
           }}
@@ -151,11 +152,18 @@ export function SourceFan({
 
       {/* Les sources, en orbite */}
       {placed.map((p, i) => (
-        <Rise
+        /* Chacune sort du lecteur et gagne sa place, l'une après l'autre :
+           l'ordre d'arrivée raconte la dispersion, ce qu'une apparition
+           simultanée ne dit pas. */
+        <motion.div
           key={p.label}
-          delay={startDelay + 0.25 + i * 0.06}
-          y={8}
-          duration={DUR.quick}
+          initial={
+            reduced
+              ? { opacity: 1, x: 0, y: 0, scale: 1 }
+              : { opacity: 0, x: (0.5 - p.x) * 620, y: (0.5 - p.y) * 620, scale: 0.7 }
+          }
+          animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+          transition={{ duration: reduced ? 0.001 : 0.72, delay: startDelay + 0.35 + i * 0.13, ease: EASE }}
           style={{
             position: "absolute",
             left: `${p.x * 100}%`,
@@ -184,7 +192,7 @@ export function SourceFan({
           >
             {p.label}
           </span>
-        </Rise>
+        </motion.div>
       ))}
     </div>
   );
@@ -1347,8 +1355,8 @@ export function FlowCanvas({
 
   const W = 1000;
   const H = (rows / cols) * 640;
-  const CARD_W = W / cols - 26;
-  const CARD_H = H / rows - 26;
+  const CARD_W = W / cols - 18;
+  const CARD_H = H / rows - 20;
 
   const centre = (n: FlowCell) => ({
     x: (n.col + 0.5) * (W / cols),
@@ -1387,9 +1395,10 @@ export function FlowCanvas({
             <DrawPath
               key={`${from}-${to}`}
               d={path(a, b)}
-              stroke={ink.rule}
-              width={1.4}
-              opacity={0.95}
+              // Projeté, un trait d'un pixel et demi en gris clair disparaît.
+              stroke={accent}
+              width={2.2}
+              opacity={0.55}
               delay={startDelay + 0.25 + i * 0.07}
               duration={0.6}
             />
@@ -1438,7 +1447,7 @@ export function FlowCanvas({
             >
               <p
                 style={{
-                  fontSize: 15,
+                  fontSize: 18,
                   fontWeight: 800,
                   color: human || out ? accent : ink.primary,
                   letterSpacing: "-0.015em",
@@ -1447,7 +1456,7 @@ export function FlowCanvas({
               >
                 {n.label}
               </p>
-              <p style={{ fontSize: 12, color: ink.faint, marginTop: 5, lineHeight: 1.35 }}>
+              <p style={{ fontSize: 14, color: ink.muted, marginTop: 6, lineHeight: 1.35 }}>
                 {n.detail}
               </p>
             </div>

@@ -387,3 +387,16 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/* En plein écran, les commandes s'effacent : la slide est projetée, elles
+   n'ont plus à figurer dans le champ. Le survol les rappelle, de sorte
+   qu'elles restent atteignables à la souris comme au clavier. */
+.ted-controls-hidden {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.ted-controls-hidden:hover,
+.ted-controls-hidden:focus-within {
+  opacity: 1;
+}

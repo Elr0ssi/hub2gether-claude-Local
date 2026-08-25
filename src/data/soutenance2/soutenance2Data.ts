@@ -223,6 +223,15 @@ export const S2_SLIDES: readonly Slide2[] = [
       "La slide la plus importante. Six étapes, et une seule idée : des dizaines de sources, un seul point d'entrée. Insister sur l'étape 5, traçabilité, c'est elle qui sépare le projet d'un site généré automatiquement.",
   },
   {
+    id: "juridique",
+    label: "Cadre juridique",
+    act: "depth",
+    seconds: 60,
+    tone: "light",
+    speakerNotes:
+      "Ne pas se défendre : montrer qu'on connaît le terrain. Citer le règlement 2024/1689, dire que la mention est sur chaque article, et que nous synthétisons des textes humains au lieu de les reproduire. Finir sur la phrase : ce qui protège le lecteur nous protège aussi.",
+  },
+  {
     id: "exigence",
     label: "Ce qu'on attend d'un article",
     act: "depth",
@@ -637,7 +646,7 @@ export const PUBLICATIONS = {
   /** Partnerships that the format makes possible. None is signed. */
   partnerships: {
     label: "Partenariats éventuels",
-    title: ["Avec qui, et contre quoi."],
+    title: ["Avec qui la construction est envisageable."],
     /* Les critères d'acceptation avaient une slide à eux, redondante avec
        celle-ci : ils la referment maintenant, en une ligne chacun. */
     criteriaLabel: "À quelles conditions",
@@ -1154,15 +1163,46 @@ export const TEAM = {
   title: ["Derrière ce média."],
   person: {
     name: "Raphaël Rossi",
-    role: "Fondateur · produit, développement et éditorial",
+    role: "Fondateur · produit, développement, éditorial",
     photo: "/soutenance/equipe/portrait.png",
   },
-  facts: [
-    { label: "Développement", body: "Conception et écriture du site, de la base de données et de la chaîne d'automatisation." },
-    { label: "Pilotage de projet", body: "Plusieurs projets menés de bout en bout, du cadrage à la mise en ligne." },
-    { label: "Cadre professionnel", body: "En poste à la BPI : un revenu stable, qui permet de construire sans dépendre du projet." },
-    { label: "Appétence", body: "Le projet avance sur du temps choisi, pas sur du temps subi." },
+  /* Ce qui compte n'est pas un parcours mais quatre conditions réunies : une
+     expérience déjà éprouvée, un revenu qui ne dépend pas du projet, du temps
+     réellement disponible, et des agents qui portent la charge courante. */
+  blocks: [
+    {
+      label: "Entrepreneuriat",
+      lines: [
+        "Un site de musculation et un site d'apprentissage de l'anglais, menés de bout en bout.",
+        "≈ 50 000 visites mensuelles cumulées entre 2020 et 2023, sans IA et sans acquisition payante.",
+        "Audience brésilienne pour les langues, francophone (France, Canada) pour le sport.",
+        "Projets arrêtés faute d'attachement au sujet, pas faute de trafic.",
+      ],
+    },
+    {
+      label: "Stabilité financière",
+      lines: [
+        "Poste en entreprise, salaire indépendant du projet.",
+        "Aucune rémunération prélevée sur la structure au démarrage.",
+      ],
+    },
+    {
+      label: "Disponibilité",
+      lines: [
+        "Le gros du développement est fait ; ce qui reste est du contrôle, de la vérification et de l'anticipation.",
+        "Une charge de mi-temps, tenable avec un emploi.",
+      ],
+    },
+    {
+      label: "Agents IA",
+      lines: [
+        "Claude, ChatGPT, Cowork : plusieurs agents, chacun sur une tâche.",
+        "Maintenance du site, mise à jour des articles et des séries.",
+      ],
+    },
   ],
+  skillsLabel: "Compétences",
+  skills: ["Développement web", "Prévisions financières", "Pilotage de projet"],
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1240,6 +1280,36 @@ export const EDITORIAL = {
     "Nous n'apportons pas la réponse.",
     "Nous apportons de quoi se faire la sienne, vite.",
   ],
+} as const;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CADRE JURIDIQUE — AI Act, droit d'auteur, transparence
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const LEGAL = {
+  title: ["Le cadre est connu.", "Il fait partie du produit."],
+  intro:
+    "Des sites entiers ont été déréférencés pour du contenu généré sans contrôle ni source. Ce n'est pas un risque théorique, c'est le fond de la concurrence que nous décrivions.",
+  pillars: [
+    {
+      label: "Règlement européen sur l'IA",
+      body: "Le règlement (UE) 2024/1689 impose d'informer le lecteur quand un contenu est produit ou modifié avec l'aide d'une IA. La mention figure sur chaque article, à sa place.",
+    },
+    {
+      label: "Droit d'auteur",
+      body: "Nous synthétisons des articles écrits par des humains, nous ne les reproduisons pas : citation courte, source nommée, lien vers l'original.",
+    },
+    {
+      label: "Traçabilité",
+      body: "Chaque chiffre remonte à sa publication d'origine. C'est la garantie juridique autant qu'éditoriale.",
+    },
+    {
+      label: "Contrôle humain",
+      body: "Un humain arbitre le sujet et valide avant publication. Sans cette main, le reste ne tient pas.",
+    },
+  ],
+  statement:
+    "Ce qui protège le lecteur nous protège aussi. La transparence n'est pas une contrainte subie, c'est ce qui nous sépare des sites qui se font sanctionner.",
 } as const;
 
 export const WORKSHOP = {
@@ -1475,34 +1545,16 @@ export const ROADMAP = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const CONCLUSION = {
-  lines: [
-    "Nous avons appris à construire le produit.",
-    "L'enjeu est maintenant de construire l'organisation capable de le faire grandir.",
-  ],
+  /* Épurée. La slide portait deux phrases, trois colonnes de besoins et une
+     signature : de quoi refermer trois fois. Une phrase, deux demandes. */
+  lines: ["Le produit est prêt.", "Il n'attend que vous."],
+  needsLabel: "Ce que nous cherchons",
   needs: [
-    {
-      id: "trust",
-      label: "Trust",
-      items: ["Gouvernance", "Fiabilité", "Cadre légal", "Transparence"],
-    },
-    {
-      id: "distribution",
-      label: "Distribution",
-      items: ["Acquisition", "Partenariats", "Visibilité"],
-    },
-    {
-      id: "business",
-      label: "Business",
-      items: ["Priorisation", "Monétisation", "Passage à l'échelle"],
-    },
-  ],
-  close: [
-    "Nous ne voulons pas produire plus d'information.",
-    "Nous voulons réduire le temps nécessaire pour la comprendre.",
+    { id: "mentorat", label: "Mentorat", body: "Un regard extérieur sur les arbitrages, pas sur le code." },
+    { id: "strategie", label: "Accompagnement stratégique", body: "Priorisation, partenariats, passage à l'échelle." },
   ],
   signature: {
     wordmark: "The Essential Data",
-    promise: PROMISE,
     tagline: "Turning data into meaning.",
   },
 } as const;

@@ -242,7 +242,15 @@ export function DeckShell({ initialSlide, presenter = false }: DeckShellProps) {
         </div>
 
         {/* ── Controls ───────────────────────────────────────────────────── */}
-        <div className="ted-controls" data-no-advance style={{ right: presenter ? RAIL_W + 28 : 28 }}>
+        {/* Les commandes s'effacent en plein écran : elles n'ont plus à être là
+            quand la slide est projetée. Elles réapparaissent au passage de la
+            souris, si bien qu'elles restent atteignables sans jamais s'inviter
+            dans le champ pendant qu'on parle. Le clavier, lui, ne change pas. */}
+        <div
+          className={`ted-controls${fullscreen ? " ted-controls-hidden" : ""}`}
+          data-no-advance
+          style={{ right: presenter ? RAIL_W + 28 : 28 }}
+        >
           <button
             type="button"
             className={chromeClass}

@@ -6,6 +6,7 @@ import { Fragment, type ComponentType } from "react";
 import {
   DUR,
   EASE as DECK_EASE,
+  useDeckReducedMotion,
   Eyebrow,
   Fade,
   Rise,
@@ -55,6 +56,7 @@ import {
   FundingSlide,
   TeamSlide,
   EditorialSlide,
+  LegalSlide,
   WorkshopSlide,
   GeoSlide,
   PublicationsSlide,
@@ -92,21 +94,38 @@ function StatementTitle({
   size?: string;
 }) {
   const ink = useInk();
+  const reduced = useDeckReducedMotion();
+
+  /* L'ordre de lecture, joué plutôt qu'indiqué.
+     Chaque ligne arrive à pleine encre, puis s'estompe au moment où la
+     suivante se pose : l'œil suit la ligne qui vient d'apparaître, et le
+     titre se lit dans l'ordre où il a été écrit au lieu de tomber d'un bloc
+     avec ses hiérarchies déjà figées. Le décalage d'une demi-seconde entre la
+     pose et l'estompe laisse le temps de lire avant de rendre la main. */
+  const STEP = 0.62;
+
   return (
     <div>
-      {lines.map((line, i) => (
-        <Rise key={line} delay={delay + i * 0.12} y={20}>
-          <div
+      {lines.map((line, i) => {
+        const last = i === lines.length - 1;
+        const at = delay + i * STEP;
+        return (
+          <motion.div
+            key={line}
             className={size}
-            style={{
-              color: i === lines.length - 1 ? ink.primary : ink.muted,
-              letterSpacing: "-0.035em",
+            initial={reduced ? { opacity: 1, y: 0, color: ink.primary } : { opacity: 0, y: 22, color: ink.primary }}
+            animate={{ opacity: 1, y: 0, color: last ? ink.primary : ink.muted }}
+            transition={{
+              opacity: { duration: reduced ? 0.001 : 0.5, delay: at, ease: DECK_EASE },
+              y: { duration: reduced ? 0.001 : 0.5, delay: at, ease: DECK_EASE },
+              color: { duration: reduced ? 0.001 : 0.45, delay: at + STEP - 0.08, ease: DECK_EASE },
             }}
+            style={{ letterSpacing: "-0.035em" }}
           >
             {line}
-          </div>
-        </Rise>
-      ))}
+          </motion.div>
+        );
+      })}
     </div>
   );
 }
@@ -208,7 +227,7 @@ function ProblemSlide() {
                 >
                   {f.label}
                 </span>
-                <span className="t-body" style={{ color: ink.secondary, maxWidth: 540 }}>
+                <span className="t-h3" style={{ color: ink.secondary, maxWidth: 560, fontWeight: 500, letterSpacing: "-0.018em" }}>
                   {f.body}
                 </span>
               </div>
@@ -240,79 +259,89 @@ function AudienceSlide() {
         <StatementTitle lines={AUDIENCE.title} delay={0.1} />
       </div>
 
+      {/* Les deux chiffres au milieu de la slide, chacun dans son cadre, et la
+          cible posée dans le même rang : trois cartes se comparent, trois
+          paragraphes se lisent. */}
       <div
         style={{
-          marginTop: 64,
+          marginTop: "auto",
+          marginBottom: "auto",
           display: "grid",
-          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-          gap: 90,
-          maxWidth: 1100,
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 34,
         }}
       >
         {AUDIENCE.stats.map((st, i) => (
           <Rise key={st.value} delay={0.38 + i * 0.14} y={18}>
-            <div>
-              <div
-                className="t-display"
-                style={{ color: accent, letterSpacing: "-0.05em", lineHeight: 1 }}
-              >
+            <div
+              style={{
+                padding: "34px 34px 30px",
+                borderRadius: 18,
+                border: `1px solid ${ink.rule}`,
+                background: ink.tone === "dark" ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.015)",
+                height: "100%",
+              }}
+            >
+              <div className="t-display" style={{ color: accent, letterSpacing: "-0.05em", lineHeight: 1 }}>
                 {st.value}
               </div>
-              <p className="t-body" style={{ color: ink.secondary, marginTop: 16 }}>
+              <p className="t-body" style={{ color: ink.secondary, marginTop: 18 }}>
                 {st.body}
               </p>
             </div>
           </Rise>
         ))}
+
+        <Rise delay={0.66} y={18}>
+          <div
+            style={{
+              padding: "34px 34px 30px",
+              borderRadius: 18,
+              border: `1px solid ${accent}`,
+              background: ink.tone === "dark" ? "rgba(57,255,136,0.06)" : "rgba(57,255,136,0.07)",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em" }}>
+              Cible
+            </p>
+            <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em", marginTop: 16 }}>
+              {AUDIENCE.core}
+            </p>
+            <div style={{ marginTop: "auto", paddingTop: 22, display: "grid", gap: 10 }}>
+              {AUDIENCE.segments.map((sg) => (
+                <div key={sg.id} style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
+                  <span className="t-small" style={{ color: ink.muted }}>{sg.label}</span>
+                  {sg.channels.map((c) => (
+                    <span
+                      key={c}
+                      style={{
+                        padding: "4px 11px",
+                        borderRadius: 100,
+                        border: `1px solid ${accent}`,
+                        color: accent,
+                        fontSize: 13,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </Rise>
       </div>
 
-      <Rise delay={0.7} y={10}>
-        <p className="t-small" style={{ color: ink.faint, marginTop: 22 }}>
+      <Rise delay={0.9} y={10}>
+        <p className="t-small" style={{ color: ink.faint }}>
           {AUDIENCE.source}
         </p>
       </Rise>
 
-      <div style={{ marginTop: "auto", paddingTop: 40 }}>
-        <Rule delay={0.8} />
-        <div
-          style={{
-            marginTop: 30,
-            display: "flex",
-            alignItems: "baseline",
-            gap: 70,
-            flexWrap: "wrap",
-          }}
-        >
-          <Rise delay={0.9} y={14}>
-            <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
-              {AUDIENCE.core}
-            </p>
-          </Rise>
-
-          {AUDIENCE.segments.map((sg, i) => (
-            <Rise key={sg.id} delay={1 + i * 0.12} y={14}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
-                <span className="t-small" style={{ color: ink.muted }}>{sg.label}</span>
-                {sg.channels.map((c) => (
-                  <span
-                    key={c}
-                    style={{
-                      padding: "5px 13px",
-                      borderRadius: 100,
-                      border: `1px solid ${accent}`,
-                      color: accent,
-                      fontSize: 14,
-                      fontWeight: 700,
-                    }}
-                  >
-                    {c}
-                  </span>
-                ))}
-              </div>
-            </Rise>
-          ))}
-        </div>
-      </div>
     </SlideBody>
   );
 }
@@ -329,21 +358,24 @@ function ProductSlide() {
       <Eyebrow>Le produit</Eyebrow>
 
       <Rise delay={0.1} y={22}>
-        <h2 className="t-h1" style={{ color: ink.primary, letterSpacing: "-0.04em", marginTop: 30 }}>
+        <h2 className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em", marginTop: 26 }}>
           {PRODUCT.title}
         </h2>
       </Rise>
 
       <div
         style={{
-          marginTop: 58,
+          marginTop: 44,
           display: "grid",
           gridTemplateColumns: "430px 1fr",
           gap: 90,
-          alignItems: "start",
+          alignItems: "center",
           flex: 1,
+          minHeight: 0,
         }}
       >
+        {/* La chaîne de gestes descend au milieu de la hauteur : collée sous le
+            titre, elle ne répondait pas à la capture qui lui fait face. */}
         <ExperienceChain steps={PRODUCT.chain} startDelay={0.35} />
 
         <div>
@@ -483,7 +515,7 @@ function PlayersSlide() {
       </div>
 
       <div style={{ marginTop: 26, maxWidth: 1180 }}>
-        <StatementTitle lines={["Qui occupe le terrain."]} delay={0.1} />
+        <StatementTitle lines={["Qui occupe le terrain, en France."]} delay={0.1} />
       </div>
 
       <div style={{ marginTop: "auto", marginBottom: "auto", paddingTop: 44 }}>
@@ -1342,75 +1374,51 @@ function ConclusionSlide() {
   const ink = useInk();
   const accent = useAccent();
 
+  /* Le globe de l'accueil tourne derrière, à l'échelle de la slide : c'est
+     l'objet que le jury vient de voir dans le produit, pas une décoration. */
   return (
-    <SlideBody>
-      <div style={{ position: "absolute", right: -220, bottom: -220, opacity: 0.42 }}>
-        <Fade delay={0.5} duration={1.6}>
-          <div style={{ width: 860, height: 860 }}>
-            <PresentationGlobe tone={ink.tone} dotOpacity={0.42} />
+    <SlideBody center>
+      <div style={{ position: "absolute", right: 84, top: "50%", transform: "translateY(-50%)", zIndex: 1 }}>
+        <Fade delay={0.2} duration={1.2}>
+          <div style={{ width: 700, height: 700, opacity: 0.9 }}>
+            <PresentationGlobe tone={ink.tone} />
           </div>
         </Fade>
       </div>
 
-      <div style={{ position: "relative", zIndex: 2, display: "flex", flexDirection: "column", height: "100%" }}>
-        <Eyebrow>Conclusion</Eyebrow>
+      <div style={{ position: "relative", zIndex: 2, maxWidth: 900 }}>
+        <StatementTitle lines={CONCLUSION.lines} delay={0.1} />
 
-        <div style={{ marginTop: 24, maxWidth: 1180 }}>
-          <StatementTitle lines={CONCLUSION.lines} delay={0.1} />
+        <div style={{ marginTop: 56, maxWidth: 520 }}>
+          <Rule delay={0.9} accentWidth={110} />
         </div>
 
-        <div style={{ marginTop: 40, display: "grid", gridTemplateColumns: "repeat(3, 290px)", gap: 56 }}>
+        <Rise delay={1} y={12}>
+          <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginTop: 30 }}>
+            {CONCLUSION.needsLabel}
+          </p>
+        </Rise>
+
+        <div style={{ marginTop: 18, display: "grid", gap: 20 }}>
           {CONCLUSION.needs.map((n, i) => (
-            <Rise key={n.id} delay={0.5 + i * 0.14} y={18}>
+            <Rise key={n.id} delay={1.08 + i * 0.14} y={14}>
               <div>
-                <div className="t-h3" style={{ color: accent, letterSpacing: "-0.03em" }}>
+                <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
                   {n.label}
-                </div>
-                <div style={{ marginTop: 16 }}>
-                  <Rule delay={0.58 + i * 0.14} />
-                </div>
-                <ul style={{ listStyle: "none", margin: "20px 0 0", padding: 0, display: "grid", gap: 9 }}>
-                  {n.items.map((item) => (
-                    <li key={item} className="t-small" style={{ color: ink.muted }}>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                </p>
+                <p className="t-body" style={{ color: ink.muted, marginTop: 6 }}>
+                  {n.body}
+                </p>
               </div>
             </Rise>
           ))}
         </div>
 
-        <div style={{ marginTop: "auto", paddingTop: 36 }}>
-          {CONCLUSION.close.map((line, i) => (
-            <Rise key={line} delay={1.05 + i * 0.3} y={18}>
-              <div
-                className="t-h2"
-                style={{
-                  color: i === 1 ? ink.primary : ink.muted,
-                  letterSpacing: "-0.035em",
-                  marginTop: i === 0 ? 0 : 12,
-                }}
-              >
-                {line}
-              </div>
-            </Rise>
-          ))}
-
-          <Rise delay={1.75} y={14}>
-            <div style={{ marginTop: 32, display: "flex", alignItems: "baseline", gap: 30, flexWrap: "wrap" }}>
-              <span className="t-h3" style={{ color: accent, letterSpacing: "-0.03em" }}>
-                {CONCLUSION.signature.wordmark}
-              </span>
-              <span className="t-small" style={{ color: ink.secondary }}>
-                {CONCLUSION.signature.promise.join(" ")}
-              </span>
-              <span className="t-small" style={{ color: ink.faint, letterSpacing: "0.1em" }}>
-                {CONCLUSION.signature.tagline}
-              </span>
-            </div>
-          </Rise>
-        </div>
+        <Rise delay={1.5} y={10}>
+          <p className="t-small" style={{ color: ink.faint, marginTop: 44, letterSpacing: "0.1em" }}>
+            {CONCLUSION.signature.wordmark} · {CONCLUSION.signature.tagline}
+          </p>
+        </Rise>
       </div>
     </SlideBody>
   );
@@ -1438,6 +1446,7 @@ export const S2_VIEWS: Record<string, ComponentType> = {
   recoupement: CrossCheckSlide,
   equipe: TeamSlide,
   pipeline: WorkshopSlide,
+  juridique: LegalSlide,
   exigence: EditorialSlide,
   article: ArticleSlide,
   etat: StatusSlide,

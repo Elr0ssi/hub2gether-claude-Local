@@ -426,7 +426,7 @@ function AnswerCard() {
   const ink = useInk();
   const accent = useAccent();
   const reduced = useDeckReducedMotion();
-  const { answer, gestures, gestureStatement } = AI_SHIFT;
+  const { answer, gestureStatement } = AI_SHIFT;
 
   return (
     <Layer>
@@ -479,30 +479,14 @@ function AnswerCard() {
         <Packet path={RETURN_PATH} colour={accent} delay={1.7} duration={2.2} r={6} />
       </svg>
 
-      <div style={{ position: "absolute", left: 130, top: 268, width: 580 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "26px 30px" }}>
-          {gestures.map((g, i) => (
-            <motion.div
-              key={g.label}
-              initial={reduced ? { opacity: 1 } : { opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 1.35 + i * 0.14, ease: EASE }}
-            >
-              <div className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
-                {g.label}
-              </div>
-              <div className="t-small" style={{ color: ink.muted, marginTop: 6 }}>
-                {g.note}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
+      {/* Les quatre gestes qui occupaient cette moitié sortent : la slide dit
+          ce que la citation ramène, pas ce que le site sait faire. Reste la
+          phrase, seule, en regard de la réponse. */}
+      <div style={{ position: "absolute", left: 130, top: 330, width: 580 }}>
         <motion.div
           initial={reduced ? { opacity: 1 } : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 2, ease: EASE }}
-          style={{ marginTop: 34 }}
         >
           {gestureStatement.map((line, i) => (
             <div

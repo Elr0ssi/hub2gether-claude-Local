@@ -12,6 +12,7 @@ import {
   FUNDING,
   TEAM,
   EDITORIAL,
+  LEGAL,
   WORKSHOP,
   TO_CONFIRM,
 } from "@/data/soutenance2/soutenance2Data";
@@ -47,21 +48,33 @@ function Slot({ children = TO_CONFIRM }: { children?: string }) {
 /** Title block shared by the four, matching the deck's existing one. */
 function Title({ lines, delay = 0.1 }: { lines: readonly string[]; delay?: number }) {
   const ink = useInk();
+  const reduced = useDeckReducedMotion();
+  const STEP = 0.62;
+
+  /* Même jeu que sur les autres slides : la ligne arrive à pleine encre et
+     s'estompe quand la suivante se pose. */
   return (
     <div style={{ marginTop: 24 }}>
-      {lines.map((line, i) => (
-        <Rise key={line} delay={delay + i * 0.12} y={18}>
-          <div
+      {lines.map((line, i) => {
+        const last = i === lines.length - 1;
+        const at = delay + i * STEP;
+        return (
+          <motion.div
+            key={line}
             className="t-h2"
-            style={{
-              color: i === lines.length - 1 ? ink.primary : ink.muted,
-              letterSpacing: "-0.032em",
+            initial={reduced ? { opacity: 1, y: 0, color: ink.primary } : { opacity: 0, y: 20, color: ink.primary }}
+            animate={{ opacity: 1, y: 0, color: last ? ink.primary : ink.muted }}
+            transition={{
+              opacity: { duration: reduced ? 0.001 : 0.5, delay: at, ease: EASE },
+              y: { duration: reduced ? 0.001 : 0.5, delay: at, ease: EASE },
+              color: { duration: reduced ? 0.001 : 0.45, delay: at + STEP - 0.08, ease: EASE },
             }}
+            style={{ letterSpacing: "-0.032em" }}
           >
             {line}
-          </div>
-        </Rise>
-      ))}
+          </motion.div>
+        );
+      })}
     </div>
   );
 }
@@ -232,12 +245,12 @@ export function PartnershipsSlide({ index: _index }: { index?: string }) {
 
       <div
         style={{
-          marginTop: 30,
+          marginTop: 36,
           flex: 1,
           minHeight: 0,
           display: "grid",
-          gridTemplateColumns: "minmax(0, 1fr) 330px",
-          gap: 56,
+          gridTemplateColumns: "minmax(0, 1fr) 300px",
+          gap: 72,
           alignItems: "center",
         }}
       >
@@ -246,7 +259,7 @@ export function PartnershipsSlide({ index: _index }: { index?: string }) {
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-              gap: "28px 48px",
+              gap: "38px 64px",
             }}
           >
             {PUBLICATIONS.partnerships.items.map((pt, i) => (
@@ -337,7 +350,7 @@ function VisualCarousel() {
             style={{
               display: "flex",
               gap: 14,
-              transform: `translateX(calc(${-i} * (240px + 14px)))`,
+              transform: `translateX(calc(${-i} * (214px + 14px)))`,
               transition: "transform .55s cubic-bezier(0.16,1,0.3,1)",
             }}
           >
@@ -346,9 +359,9 @@ function VisualCarousel() {
                 key={v.id}
                 style={{
                   margin: 0,
-                  flex: "0 0 240px",
+                  flex: "0 0 214px",
                   aspectRatio: "160 / 600",
-                  height: 320,
+                  height: 560,
                   borderRadius: 14,
                   border: `1px solid ${ink.rule}`,
                   background: ink.tone === "dark" ? "#0B0B0B" : "#F4F4F4",
@@ -679,13 +692,13 @@ export function TeamSlide() {
 
       <div
         style={{
-          marginTop: 40,
+          marginTop: 34,
           flex: 1,
           minHeight: 0,
           display: "grid",
-          gridTemplateColumns: "300px minmax(0, 1fr)",
-          gap: 60,
-          alignItems: "start",
+          gridTemplateColumns: "270px minmax(0, 1fr)",
+          gap: 64,
+          alignItems: "center",
         }}
       >
         <Rise delay={0.3} y={16}>
@@ -707,9 +720,6 @@ export function TeamSlide() {
                   <p className="t-micro" style={{ color: ink.faint, marginTop: 10 }}>
                     Portrait à déposer
                   </p>
-                  <p style={{ fontSize: 12, color: ink.faint, marginTop: 6, opacity: 0.8 }}>
-                    {TEAM.person.photo}
-                  </p>
                 </div>
               ) : (
                 /* eslint-disable-next-line @next/next/no-img-element */
@@ -727,32 +737,56 @@ export function TeamSlide() {
             <p className="t-small" style={{ color: accent, marginTop: 6 }}>
               {TEAM.person.role}
             </p>
+
+            <div style={{ marginTop: 22 }}>
+              <p className="t-micro" style={{ color: ink.faint, letterSpacing: "0.12em", marginBottom: 10 }}>
+                {TEAM.skillsLabel}
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+                {TEAM.skills.map((sk) => (
+                  <span
+                    key={sk}
+                    style={{
+                      padding: "5px 11px",
+                      borderRadius: 100,
+                      border: `1px solid ${ink.rule}`,
+                      color: ink.muted,
+                      fontSize: 13,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {sk}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </Rise>
 
-        <div>
-          <div style={{ display: "grid", gap: 16 }}>
-            {TEAM.facts.map((f, i) => (
-              <Rise key={f.label} delay={0.42 + i * 0.1} y={12}>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "250px minmax(0, 1fr)",
-                    gap: 28,
-                    alignItems: "baseline",
-                    paddingBottom: 15,
-                    borderBottom: `1px solid ${ink.rule}`,
-                  }}
-                >
-                  <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
-                    {f.label}
-                  </p>
-                  <p className="t-small" style={{ color: ink.muted, lineHeight: 1.55 }}>{f.body}</p>
+        {/* Quatre conditions, deux par deux, posées dans toute la hauteur. */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gap: "34px 56px",
+          }}
+        >
+          {TEAM.blocks.map((b, i) => (
+            <Rise key={b.label} delay={0.42 + i * 0.11} y={14}>
+              <div style={{ paddingTop: 15, borderTop: `2px solid ${i === 0 ? accent : ink.rule}` }}>
+                <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
+                  {b.label}
+                </p>
+                <div style={{ marginTop: 12, display: "grid", gap: 7 }}>
+                  {b.lines.map((l) => (
+                    <p key={l} className="t-small" style={{ color: ink.muted, lineHeight: 1.5 }}>
+                      {l}
+                    </p>
+                  ))}
                 </div>
-              </Rise>
-            ))}
-          </div>
-
+              </div>
+            </Rise>
+          ))}
         </div>
       </div>
     </SlideBody>
@@ -908,6 +942,69 @@ export function EditorialSlide() {
             </p>
           ))}
         </div>
+      </Rise>
+    </SlideBody>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CADRE JURIDIQUE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export function LegalSlide() {
+  const ink = useInk();
+  const accent = useAccent();
+
+  return (
+    <SlideBody>
+      <Eyebrow>Cadre juridique</Eyebrow>
+      <Title lines={LEGAL.title} />
+
+      <Rise delay={0.3} y={12}>
+        <p className="t-body" style={{ color: ink.secondary, maxWidth: 900, marginTop: 22 }}>
+          {LEGAL.intro}
+        </p>
+      </Rise>
+
+      <div
+        style={{
+          marginTop: 40,
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gap: "32px 64px",
+          alignContent: "center",
+        }}
+      >
+        {LEGAL.pillars.map((pl, i) => (
+          <Rise key={pl.label} delay={0.42 + i * 0.11} y={14}>
+            <div style={{ paddingTop: 15, borderTop: `2px solid ${i === 0 ? accent : ink.rule}` }}>
+              <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
+                {pl.label}
+              </p>
+              <p className="t-small" style={{ color: ink.muted, marginTop: 10, lineHeight: 1.55 }}>
+                {pl.body}
+              </p>
+            </div>
+          </Rise>
+        ))}
+      </div>
+
+      <Rise delay={0.95} y={12}>
+        <p
+          className="t-body"
+          style={{
+            color: ink.secondary,
+            marginTop: 24,
+            paddingLeft: 22,
+            borderLeft: `2px solid ${accent}`,
+            maxWidth: 980,
+            lineHeight: 1.55,
+          }}
+        >
+          {LEGAL.statement}
+        </p>
       </Rise>
     </SlideBody>
   );
