@@ -285,6 +285,29 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
           color: var(--ink-4);
         }
 
+        /* Un portable : 800px de haut. Le titre, le bandeau de chiffres et
+           la note de source y prenaient la place du globe, qui n'apparaissait
+           plus que par une tranche sous le bandeau. On rend cette place. */
+        @media (max-height: 900px) {
+          .cat-hero-head { top: clamp(16px, 3.4vh, 34px); }
+          .cat-hero-title { font-size: clamp(2rem, 3.8vw, 3rem); }
+          .cat-hero-subtitle { margin-top: 9px; font-size: 0.92rem; }
+          .cat-hero-globe-anchor { top: 33%; width: min(760px, 104vw); }
+          .cat-hero-stats-anchor { bottom: clamp(10px, 2vh, 20px); }
+          .cat-hero-stat { padding: 11px clamp(10px, 1.3vw, 18px); }
+          .cat-hero-stat-icon { width: 28px; height: 28px; margin-bottom: 6px; }
+          .cat-hero-stat-label { font-size: 0.68rem; margin-bottom: 3px; }
+          .cat-hero-stat-value { font-size: clamp(1.15rem, 1.7vw, 1.5rem); margin-bottom: 2px; }
+          .cat-hero-stat-meta { font-size: 0.62rem; }
+          .cat-hero-source { margin-top: 6px; font-size: 0.6rem; }
+        }
+
+        @media (max-height: 780px) {
+          .cat-hero-title { font-size: clamp(1.85rem, 3.2vw, 2.5rem); }
+          .cat-hero-stat-icon { display: none; }
+          .cat-hero-globe-anchor { top: 30%; }
+        }
+
         @media (max-width: 900px) {
           .cat-hero-stats { grid-template-columns: repeat(2, 1fr); }
           .cat-hero-stat:nth-child(2n + 1) { border-left: none; }

@@ -36,6 +36,7 @@ export function TestArticleHero() {
     <header>
       {/* ── The band ── */}
       <div
+        className="ta-hero-band"
         style={{
           position: "relative",
           width: "100%",
@@ -102,7 +103,7 @@ export function TestArticleHero() {
       </div>
 
       {/* ── Title, rule, section ── */}
-      <div style={{ maxWidth: 880, margin: "0 auto", padding: "clamp(26px, 6vw, 40px) clamp(18px, 5vw, 20px) 0", textAlign: "center" }}>
+      <div className="ta-hero-head" style={{ maxWidth: 880, margin: "0 auto", padding: "clamp(26px, 6vw, 40px) clamp(18px, 5vw, 20px) 0", textAlign: "center" }}>
         <p
           style={{
             fontSize: "0.62rem",
@@ -117,7 +118,7 @@ export function TestArticleHero() {
         </p>
 
         <h1
-          className="font-black"
+          className="font-black ta-hero-title"
           style={{
             fontSize: "clamp(1.9rem, 4.4vw, 3.4rem)",
             lineHeight: 1.06,

@@ -311,7 +311,7 @@ export function EconomyMapView() {
                   // laptop. And with only a min and a max, selecting a country
                   // grew the side panel, which grew the row, which resized the
                   // globe's canvas: the sphere rescaled on every click.
-                  height: "clamp(320px, calc(100vh - 330px), 520px)",
+                  height: "clamp(320px, calc(100vh - 322px), 520px)",
                   overflow: "hidden",
                 }
           }

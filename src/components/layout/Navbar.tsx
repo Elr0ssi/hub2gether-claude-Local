@@ -11,10 +11,10 @@ export function Navbar() {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 h-16 glass"
+      className="site-nav fixed top-0 left-0 right-0 z-50 h-16 glass"
       style={{ boxShadow: "var(--shadow-navbar)" }}
     >
-      <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between gap-8">
+      <div className="site-nav-row max-w-7xl mx-auto px-6 h-full flex items-center justify-between gap-8">
         {/* Wordmark */}
         <Link
           href="/"

@@ -329,9 +329,11 @@ function CompaniesView({ countryName, yearData }: { countryName: string; yearDat
             {topCompanies.map((c, i) => (
               <div key={c.name} className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
                 <span className="text-xs font-bold tabular-nums" style={{ color: "var(--accent)", minWidth: 18 }}>{i + 1}</span>
-                <div className="flex flex-col flex-1 min-w-0">
+                {/* Nom et secteur sur une ligne : empilés, les cinq entreprises
+                    ajoutaient deux cents pixels à une fiche déjà trop longue. */}
+                <div className="flex items-baseline gap-1.5 flex-1 min-w-0">
                   <span className="text-xs font-semibold truncate" style={{ color: "var(--ink)" }}>{c.name}</span>
-                  <span style={{ color: "var(--ink-4)", fontSize: "clamp(0.55rem, 1.5vw, 0.6rem)" }}>{c.sector}</span>
+                  <span className="truncate" style={{ color: "var(--ink-4)", fontSize: "clamp(0.55rem, 1.5vw, 0.6rem)" }}>{c.sector}</span>
                 </div>
                 <span className="text-xs tabular-nums whitespace-nowrap" style={{ color: "var(--ink-2)" }}>{c.revenue_bn} Mds€</span>
               </div>

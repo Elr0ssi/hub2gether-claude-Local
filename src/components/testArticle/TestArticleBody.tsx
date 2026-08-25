@@ -66,7 +66,7 @@ export function TestArticleBody() {
               <p
                 key={p.slice(0, 24)}
                 style={{
-                  fontSize: i === 0 ? "clamp(1rem, 1.5vw, 1.15rem)" : "0.95rem",
+                  fontSize: i === 0 ? "clamp(0.97rem, 1.1vw, 1.15rem)" : "clamp(0.89rem, 0.9vw, 0.95rem)",
                   lineHeight: 1.72,
                   color: i === 0 ? "var(--ink)" : "var(--ink-2)",
                   fontWeight: i === 0 ? 500 : 400,
@@ -93,8 +93,8 @@ export function TestArticleBody() {
             {"intro" in part && part.intro && (
               <p
                 style={{
-                  fontSize: "1rem",
-                  lineHeight: 1.7,
+                  fontSize: "clamp(0.93rem, 0.95vw, 1rem)",
+                  lineHeight: 1.68,
                   color: "var(--ink-2)",
                   marginBottom: 22,
                   maxWidth: 760,
@@ -109,8 +109,8 @@ export function TestArticleBody() {
                 <p
                   key={p.slice(0, 24)}
                   style={{
-                    fontSize: "0.95rem",
-                    lineHeight: 1.8,
+                    fontSize: "clamp(0.89rem, 0.9vw, 0.95rem)",
+                    lineHeight: 1.74,
                     color: "var(--ink-2)",
                     marginBottom: 16,
                     maxWidth: 760,
