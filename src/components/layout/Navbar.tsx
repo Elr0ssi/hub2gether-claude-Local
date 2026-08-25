@@ -1,13 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Globe } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Globe, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { THEMES } from "@/data/themes";
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const present = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      }
+    } catch {
+      // Le navigateur peut refuser ; la soutenance s'ouvre quand même.
+    }
+    router.push("/soutenance-2");
+  };
 
   return (
     <header
@@ -160,10 +172,33 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* CTA — Comparer */}
-        <Link href="/comparaison" className="btn-primary text-sm hidden sm:inline-flex">
-          Comparer
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Présenter — passe l'onglet en plein écran, puis ouvre la soutenance.
+              La demande de plein écran part du clic lui-même, et la navigation
+              qui suit reste dans le même document : le mode tient jusqu'à la
+              fin de la présentation. Demandé après coup, sur une page déjà
+              chargée, le navigateur refuse faute de geste utilisateur. */}
+          <button
+            type="button"
+            onClick={present}
+            title="Présenter la soutenance en plein écran"
+            aria-label="Présenter la soutenance en plein écran"
+            className="hidden sm:inline-flex items-center justify-center rounded-lg transition-colors"
+            style={{
+              width: 32,
+              height: 32,
+              border: "1px solid var(--border)",
+              color: "var(--ink-3)",
+              background: "var(--surface)",
+            }}
+          >
+            <Maximize2 size={14} />
+          </button>
+
+          <Link href="/comparaison" className="btn-primary text-sm hidden sm:inline-flex">
+            Comparer
+          </Link>
+        </div>
       </div>
     </header>
   );

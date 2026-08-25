@@ -76,37 +76,26 @@ export function SourceFan({
   const ink = useInk();
   const accent = useAccent();
 
-  /* Le lecteur en haut, les sources en éventail dessous.
-     La version précédente semait les sources sur deux anneaux autour du
-     lecteur : la composition partait dans tous les sens, rien ne s'alignait,
-     et une pastille finissait hors du cadre. Ici les positions sont posées à
-     la main, en parts du cadre, symétriques ligne par ligne. Les traits sont
-     tracés vers ces mêmes coordonnées, si bien qu'ils touchent toujours le
-     centre de la pastille : le schéma ne peut pas se désaligner. */
-  // Trois par rangée au plus : à quatre, deux intitulés longs se chevauchent
-  // dans la largeur d'une colonne de slide.
-  const ROWS: readonly (readonly number[])[] = [
-    [0.15, 0.5, 0.85],
-    [0.3, 0.7],
-    [0.15, 0.5, 0.85],
-  ];
-  const ROW_Y = [0.44, 0.68, 0.92];
+  /* Le lecteur au centre, les sources en orbite.
+     Deux versions ont échoué avant celle-ci : un semis à l'œil, où rien ne
+     s'alignait, puis un éventail vers le bas, qui disait une descente là où il
+     s'agit d'un encerclement. Les sources sont maintenant posées sur une
+     ellipse, à pas réguliers, en partant du haut. Le rayon horizontal est
+     rentré pour qu'un intitulé long tienne dans le cadre, et le rayon vertical
+     suit la hauteur : c'est ce qui rend le cercle lisible sans le déformer. */
+  const items = labels.slice(0, 9);
+  const N = items.length;
 
-  const placed = labels.slice(0, 9).map((label, i) => {
-    let row = 0;
-    let n = i;
-    while (row < ROWS.length - 1 && n >= ROWS[row].length) {
-      n -= ROWS[row].length;
-      row += 1;
-    }
-    const cols = ROWS[row];
-    return { label, x: cols[Math.min(n, cols.length - 1)], y: ROW_Y[row] };
+  const RX = 0.37; // rayon horizontal, en part de largeur
+  const RY = 0.4; // rayon vertical, en part de hauteur
+
+  const placed = items.map((label, i) => {
+    const a = (i / N) * Math.PI * 2 - Math.PI / 2;
+    return { label, x: 0.5 + Math.cos(a) * RX, y: 0.5 + Math.sin(a) * RY };
   });
 
-  const READER = { x: 0.5, y: 0.09 };
-
   return (
-    <div style={{ position: "relative", width: "100%", maxWidth: 660, aspectRatio: "660 / 560" }}>
+    <div style={{ position: "relative", width: "100%", maxWidth: 660, aspectRatio: "1 / 1" }}>
       <svg
         viewBox="0 0 1000 1000"
         preserveAspectRatio="none"
@@ -116,7 +105,7 @@ export function SourceFan({
         {placed.map((p, i) => (
           <DrawPath
             key={p.label}
-            d={`M ${READER.x * 1000} ${READER.y * 1000 + 40} L ${p.x * 1000} ${p.y * 1000 - 22}`}
+            d={`M 500 500 L ${p.x * 1000} ${p.y * 1000}`}
             stroke={ink.rule}
             width={1}
             opacity={0.9}
@@ -127,41 +116,40 @@ export function SourceFan({
         ))}
       </svg>
 
-      {/* Le lecteur */}
+      {/* Le lecteur, au milieu */}
       <Rise
         delay={startDelay}
         y={0}
         style={{
           position: "absolute",
-          left: `${READER.x * 100}%`,
-          top: `${READER.y * 100}%`,
-          transform: "translate(-50%, -50%)",
+          left: "50%",
+          top: "50%",
+          width: 132,
+          height: 132,
+          marginLeft: -66,
+          marginTop: -66,
         }}
       >
         <div
           style={{
-            width: 112,
-            height: 112,
+            width: "100%",
+            height: "100%",
             borderRadius: "50%",
             border: `2px solid ${accent}`,
             display: "grid",
             placeItems: "center",
             background: ink.tone === "dark" ? "#0B0B0B" : "#fff",
             color: ink.primary,
-            fontSize: 18,
+            fontSize: 19,
             fontWeight: 800,
             letterSpacing: "-0.02em",
-            textAlign: "center",
-            lineHeight: 1.2,
           }}
         >
-          Un
-          <br />
-          lecteur
+          Un lecteur
         </div>
       </Rise>
 
-      {/* Les sources */}
+      {/* Les sources, en orbite */}
       {placed.map((p, i) => (
         <Rise
           key={p.label}
@@ -172,7 +160,13 @@ export function SourceFan({
             position: "absolute",
             left: `${p.x * 100}%`,
             top: `${p.y * 100}%`,
-            transform: "translate(-50%, -50%)",
+            width: 210,
+            height: 34,
+            marginLeft: -105,
+            marginTop: -17,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <span

@@ -10,6 +10,7 @@ import {
   PUBLICATIONS,
   FUNDING,
   TEAM,
+  EDITORIAL,
   WORKSHOP,
   TO_CONFIRM,
 } from "@/data/soutenance2/soutenance2Data";
@@ -591,50 +592,14 @@ export function PartnersSlide({ index: _index }: { index?: string }) {
    et le commentaire les accompagne au pied du second tableau.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export function WorkshopOneSlide() {
-  const ink = useInk();
-
-  return (
-    <SlideBody>
-      <Eyebrow>{WORKSHOP.one.eyebrow}</Eyebrow>
-      <Title lines={WORKSHOP.one.title} />
-
-      <div
-        style={{
-          marginTop: 30,
-          flex: 1,
-          minHeight: 0,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-        }}
-      >
-        <FlowCanvas
-          nodes={WORKSHOP.one.nodes}
-          links={WORKSHOP.one.links}
-          cols={WORKSHOP.one.cols}
-          rows={WORKSHOP.one.rows}
-          startDelay={0.3}
-        />
-      </div>
-
-      <Rise delay={1.1} y={10}>
-        <p className="t-small" style={{ color: ink.faint, marginTop: 20 }}>
-          {WORKSHOP.one.note}
-        </p>
-      </Rise>
-    </SlideBody>
-  );
-}
-
-export function WorkshopTwoSlide() {
+export function WorkshopSlide() {
   const ink = useInk();
   const accent = useAccent();
 
   return (
     <SlideBody>
-      <Eyebrow>{WORKSHOP.two.eyebrow}</Eyebrow>
-      <Title lines={WORKSHOP.two.title} />
+      <Eyebrow>{WORKSHOP.eyebrow}</Eyebrow>
+      <Title lines={WORKSHOP.title} />
 
       <div
         style={{
@@ -647,50 +612,51 @@ export function WorkshopTwoSlide() {
         }}
       >
         <FlowCanvas
-          nodes={WORKSHOP.two.nodes}
-          links={WORKSHOP.two.links}
-          cols={WORKSHOP.two.cols}
-          rows={WORKSHOP.two.rows}
+          nodes={WORKSHOP.nodes}
+          links={WORKSHOP.links}
+          cols={WORKSHOP.cols}
+          rows={WORKSHOP.rows}
           startDelay={0.3}
         />
       </div>
 
+      {/* Les deux mains, sous la chaîne : elles s'exercent partout. */}
       <div
         style={{
-          marginTop: 20,
+          marginTop: 18,
           paddingTop: 20,
           borderTop: `1px solid ${ink.rule}`,
           display: "grid",
-          gridTemplateColumns: "repeat(2, minmax(0, 1fr)) minmax(0, 1.3fr)",
-          gap: 44,
-          alignItems: "start",
+          gridTemplateColumns: "210px repeat(2, minmax(0, 1fr))",
+          gap: 40,
+          alignItems: "baseline",
         }}
       >
-        {WORKSHOP.two.hands.map((h, i) => (
-          <Rise key={h.label} delay={1.1 + i * 0.1} y={12}>
-            <div>
-              <p className="t-micro" style={{ color: accent, marginBottom: 8 }}>
+        <Rise delay={1.05} y={12}>
+          <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em" }}>
+            {WORKSHOP.handsLabel}
+          </p>
+        </Rise>
+        {WORKSHOP.hands.map((h, i) => (
+          <Rise key={h.label} delay={1.12 + i * 0.1} y={12}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
+              <span className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.024em" }}>
                 {h.label}
-              </p>
-              <p className="t-small" style={{ color: ink.muted, lineHeight: 1.5 }}>
-                {h.body}
-              </p>
+              </span>
+              <span className="t-small" style={{ color: ink.muted }}>{h.body}</span>
             </div>
           </Rise>
         ))}
-        <Rise delay={1.3} y={12}>
-          <p className="t-small" style={{ color: ink.faint, lineHeight: 1.5 }}>
-            {WORKSHOP.two.note}
-          </p>
-        </Rise>
       </div>
+
+      <Rise delay={1.35} y={10}>
+        <p className="t-small" style={{ color: ink.faint, marginTop: 14 }}>
+          {WORKSHOP.note}
+        </p>
+      </Rise>
     </SlideBody>
   );
 }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   L'ÉQUIPE ET LE FINANCEMENT
-   ═══════════════════════════════════════════════════════════════════════════ */
 
 export function TeamSlide() {
   const ink = useInk();
@@ -778,20 +744,6 @@ export function TeamSlide() {
             ))}
           </div>
 
-          <Rise delay={0.9} y={14}>
-            <p
-              className="t-body"
-              style={{
-                color: ink.secondary,
-                marginTop: 30,
-                paddingLeft: 22,
-                borderLeft: `2px solid ${accent}`,
-                lineHeight: 1.55,
-              }}
-            >
-              {TEAM.statement}
-            </p>
-          </Rise>
         </div>
       </div>
     </SlideBody>
@@ -887,6 +839,67 @@ export function FundingSlide() {
           ))}
         </div>
       </div>
+    </SlideBody>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CE QU'ON ATTEND D'UN ARTICLE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export function EditorialSlide() {
+  const ink = useInk();
+  const accent = useAccent();
+
+  return (
+    <SlideBody>
+      <Eyebrow>La promesse éditoriale</Eyebrow>
+      <Title lines={EDITORIAL.title} />
+
+      <div
+        style={{
+          marginTop: 40,
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gap: "34px 70px",
+          alignContent: "center",
+        }}
+      >
+        {EDITORIAL.demands.map((d, i) => (
+          <Rise key={d.n} delay={0.35 + i * 0.12} y={16}>
+            <div style={{ paddingTop: 16, borderTop: `2px solid ${i === 0 ? accent : ink.rule}` }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
+                <span className="t-micro" style={{ color: ink.faint }}>{d.n}</span>
+                <span className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
+                  {d.label}
+                </span>
+              </div>
+              <p className="t-body" style={{ color: ink.muted, marginTop: 12, lineHeight: 1.5 }}>
+                {d.body}
+              </p>
+              <p className="t-micro" style={{ color: accent, marginTop: 10, letterSpacing: "0.08em" }}>
+                {d.examples}
+              </p>
+            </div>
+          </Rise>
+        ))}
+      </div>
+
+      <Rise delay={0.9} y={14}>
+        <div style={{ marginTop: 26, paddingLeft: 24, borderLeft: `2px solid ${accent}` }}>
+          {EDITORIAL.statement.map((line, i) => (
+            <p
+              key={line}
+              className="t-h3"
+              style={{ color: i === 1 ? ink.primary : ink.muted, letterSpacing: "-0.025em" }}
+            >
+              {line}
+            </p>
+          ))}
+        </div>
+      </Rise>
     </SlideBody>
   );
 }

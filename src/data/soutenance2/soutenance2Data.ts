@@ -107,6 +107,15 @@ export const S2_SLIDES: readonly Slide2[] = [
       "Le chiffre qui compte n'est pas 590-760 M€, c'est 0,08 %. Insister : le modèle n'a pas besoin de dominer le marché pour être viable. Rappeler que ce sont des projections du plan, pas des revenus constatés.",
   },
   {
+    id: "acteurs",
+    label: "Les acteurs",
+    act: "pitch",
+    seconds: 45,
+    tone: "light",
+    speakerNotes:
+      "Nommer les acteurs et donner leur ordre de grandeur, sans les commenter un par un. Le point à faire passer : ce sont de grosses maisons, à modèle payant, et aucune ne fait ce que nous faisons.",
+  },
+  {
     id: "concurrence",
     label: "La concurrence",
     act: "pitch",
@@ -214,7 +223,7 @@ export const S2_SLIDES: readonly Slide2[] = [
   },
   {
     id: "pipeline",
-    label: "L'atelier · 1",
+    label: "L'atelier",
     act: "depth",
     seconds: 120,
     tone: "light",
@@ -222,13 +231,13 @@ export const S2_SLIDES: readonly Slide2[] = [
       "La slide la plus importante. Six étapes, et une seule idée : des dizaines de sources, un seul point d'entrée. Insister sur l'étape 5, traçabilité, c'est elle qui sépare le projet d'un site généré automatiquement.",
   },
   {
-    id: "automatisation",
-    label: "L'automatisation",
+    id: "exigence",
+    label: "Ce qu'on attend d'un article",
     act: "depth",
-    seconds: 80,
-    tone: "dark",
+    seconds: 120,
+    tone: "light",
     speakerNotes:
-      "La slide précédente montre ce que produit la chaîne ; celle-ci montre la chaîne. Lire le graphe de gauche à droite en nommant les étapes, puis s'arrêter sur les deux points de contrôle humains, ce sont eux qui distinguent le projet d'un site généré automatiquement. Dire clairement ce qui tourne et ce qui est en reconstruction ; ne jamais laisser croire que tout est branché.",
+      "La slide sur laquelle s'attarder. Quatre exigences : un sujet pris là où il se cherche, un spectre pluriel de sources, l'historique qui donne l'échelle, et la transparence de bout en bout. Dire qu'on n'apporte pas la réponse mais de quoi se faire la sienne, vite.",
   },
 
   {
@@ -301,7 +310,6 @@ export const ACT_LABELS: Record<Act, string> = {
 
 export const COVER = {
   wordmark: "The Essential Data",
-  tagline: "Turning data into meaning.",
   context: "Soutenance de business plan",
 } as const;
 
@@ -353,43 +361,19 @@ export const PROBLEM = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const AUDIENCE = {
-  title: ["Une information exigeante.", "Sans exiger des heures de recherche."],
-  /* Les deux chiffres du problème vivent ici : ils ne décrivent pas une
-     friction, ils décrivent exactement le public visé, celui qui ne croit pas
-     ce qu'il lit et ne paiera pas pour le lire. */
+  /* Épurée. La slide portait un titre long, un paragraphe de cible, un bloc
+     sur le payant et deux segments détaillés : trop de texte pour une idée
+     simple. Deux chiffres, une ligne chacun, et les canaux. */
+  title: ["Ceux qui ne croient plus.", "Et qui ne paieront pas."],
   stats: [
-    {
-      value: "29 %",
-      body: "des Français déclarent faire confiance à la majorité de l'information qu'ils consultent.",
-      source: "Reuters Institute, Digital News Report",
-    },
-    {
-      value: "89 %",
-      body: "refusent de payer pour s'informer en ligne.",
-      source: "Reuters Institute, Digital News Report",
-    },
+    { value: "29 %", body: "font confiance à l'information qu'ils consultent." },
+    { value: "89 %", body: "refusent de payer pour s'informer en ligne." },
   ],
-  paywall: {
-    label: "Le mur",
-    body: "L'essentiel des titres de référence français placent leurs analyses derrière un abonnement. Le lecteur qui ne fait déjà pas confiance est aussi celui à qui l'on demande de payer d'avance.",
-  },
-  core: {
-    label: "Cible principale",
-    body: "Public francophone intéressé par l'économie et la géopolitique. Les autres marchés viendront ; le francophone est celui que nous savons servir aujourd'hui.",
-  },
+  source: "Reuters Institute · Digital News Report",
+  core: "Francophones · économie et géopolitique",
   segments: [
-    {
-      id: "young",
-      label: "Moins de 35 ans",
-      channels: ["TikTok", "Instagram"],
-      body: "Formats visuels courts, découverte par l'actualité.",
-    },
-    {
-      id: "expert",
-      label: "Public plus expert",
-      channels: ["X", "Site", "Recherche organique"],
-      body: "Actualité continue, retour direct et recherche par sujet.",
-    },
+    { id: "young", label: "Moins de 35 ans", channels: ["TikTok", "Instagram"] },
+    { id: "expert", label: "Public expert", channels: ["X", "Recherche", "Site"] },
   ],
 } as const;
 
@@ -417,7 +401,7 @@ export const PRODUCT = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const MARKET = {
-  title: ["Le marché francophone de l'information.", "Sa taille, et ceux qui l'occupent."],
+  title: ["La taille du marché."],
   /* Rappel à l'écran, en coin : la liste des acteurs n'est pas close. */
   reminder: "À compléter : l'intégralité des acteurs",
   size: [
@@ -439,6 +423,13 @@ export const MARKET = {
       label: "marché francophone accessible",
       note: "Fourchette de référence du business plan.",
     },
+  ],
+  /* Trois cercles emboîtés : le marché, ce qui nous est accessible, ce que
+     nous visons. Une taille se lit mieux en surface qu'en ligne de chiffres. */
+  circles: [
+    { id: "total", value: "670 M+", label: "visites annuelles du panel", r: 1 },
+    { id: "access", value: "590 à 760 M€", label: "marché francophone accessible", r: 0.62 },
+    { id: "aim", value: "0,08 %", label: "part visée à l'horizon du plan", r: 0.2 },
   ],
   playersLabel: "Les acteurs en place",
   playersColumns: ["Titre", "Visites / mois", "Modèle d'accès", "Chiffre d'affaires"],
@@ -525,10 +516,7 @@ export const COMPETITION: readonly CompetitorFamily[] = [
   },
 ] as const;
 
-export const COMPETITION_TITLE = [
-  "L'information ne manque pas.",
-  "La difficulté est de la relier.",
-] as const;
+export const COMPETITION_TITLE = ["Couverture de la concurrence."] as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
    07 — MOTEUR D'ACQUISITION
@@ -645,12 +633,12 @@ export const PUBLICATIONS = {
     label: "Audience",
     note: "Ordres de grandeur de travail, à recaler sur l'analytics avant la soutenance.",
     metrics: [
-      { label: "Date de création", value: "Mars 2026" },
+      { label: "Depuis", value: "Mars 2026" },
       { label: "Publications", value: "14" },
       { label: "Vues cumulées", value: "62 300" },
       { label: "Taux d'engagement", value: "4,8 %" },
       { label: "Clics vers le site", value: "1 940" },
-      { label: "Abonnés", value: "1 210" },
+      { label: "Abonnés", value: "6 300" },
     ] as readonly { label: string; value: string | null }[],
   },
 
@@ -1169,9 +1157,9 @@ export interface FlowCell {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const TEAM = {
-  title: ["Derrière ce média,", "une personne et son atelier."],
+  title: ["Derrière ce média."],
   person: {
-    name: "Valentin Escalettes",
+    name: "Raphaël Rossi",
     role: "Fondateur · produit, développement et éditorial",
     photo: "/soutenance/equipe/portrait.png",
   },
@@ -1181,8 +1169,6 @@ export const TEAM = {
     { label: "Cadre professionnel", body: "En poste à la BPI : un revenu stable, qui permet de construire sans dépendre du projet." },
     { label: "Appétence", body: "Le projet avance sur du temps choisi, pas sur du temps subi." },
   ],
-  statement:
-    "Une personne seule ne tient pas un média quotidien. Elle tient un média quotidien assisté par une chaîne d'agents, à condition de garder la main sur ce qui se publie.",
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1190,7 +1176,7 @@ export const TEAM = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const FUNDING = {
-  title: ["27 500 € pour démarrer.", "Levés auprès de particuliers."],
+  title: ["Levés auprès de particuliers."],
   need: { value: "27 500 €", label: "besoin de financement initial" },
   instrument: {
     label: "Financement participatif en capital",
@@ -1220,63 +1206,86 @@ export const FUNDING = {
   note: "Répartition de travail, à recaler sur le business plan définitif.",
 } as const;
 
-export const WORKSHOP = {
-  one: {
-    eyebrow: "L'atelier · 1",
-    title: ["Comment naît un article.", "Du sujet à sa structure."],
-    cols: 5,
-    rows: 3,
-    nodes: [
-      { id: "sujet", col: 0, row: 1, label: "Choix du sujet", detail: "Tendances de recherche, actualité du jour", kind: "human" as const },
-      { id: "agents", col: 1, row: 1, label: "Mise en place des agents", detail: "Une consigne par sujet, une attente par agent" },
-      { id: "presse", col: 2, row: 0, label: "Presse", detail: "Panel français et international" },
-      { id: "institutions", col: 2, row: 1, label: "Institutions", detail: "INSEE, Eurostat, FMI, Banque mondiale" },
-      { id: "donnees", col: 2, row: 2, label: "Jeux de données", detail: "Séries du site, bases ouvertes" },
-      { id: "recoupement", col: 3, row: 1, label: "Recoupement", detail: "Convergences, divergences, éléments uniques" },
-      { id: "article", col: 4, row: 1, label: "Article structuré", detail: "Faits, sources, carte, comparaison", kind: "out" as const },
-    ] as readonly FlowCell[],
-    links: [
-      ["sujet", "agents"],
-      ["agents", "presse"],
-      ["agents", "institutions"],
-      ["agents", "donnees"],
-      ["presse", "recoupement"],
-      ["institutions", "recoupement"],
-      ["donnees", "recoupement"],
-      ["recoupement", "article"],
-    ] as readonly (readonly [string, string])[],
-    note: "Les agents ne décident pas du sujet. Ils exécutent une consigne écrite pour ce sujet-là.",
-  },
+/* ═══════════════════════════════════════════════════════════════════════════
+   CE QU'ON ATTEND D'UN ARTICLE
 
-  two: {
-    eyebrow: "L'atelier · 2",
-    title: ["De l'article à sa vie publique.", "Et les deux mains dessus."],
-    cols: 5,
-    rows: 3,
-    nodes: [
-      { id: "article", col: 0, row: 1, label: "Article structuré", detail: "Sortie du premier tableau" },
-      { id: "arbitrage", col: 1, row: 1, label: "Arbitrage éditorial", detail: "Un humain choisit ce qui se publie", kind: "human" as const },
-      { id: "controle", col: 2, row: 1, label: "Contrôle", detail: "Chaque chiffre remonté à sa source", kind: "human" as const },
-      { id: "site", col: 3, row: 0, label: "Publication site", detail: "Article, carte, séries" },
-      { id: "social", col: 3, row: 2, label: "Formats sociaux", detail: "Carrousels, reels, fil" },
-      { id: "mesure", col: 4, row: 1, label: "Suivi social et data", detail: "Audience, citations, retours", kind: "out" as const },
-    ] as readonly FlowCell[],
-    links: [
-      ["article", "arbitrage"],
-      ["arbitrage", "controle"],
-      ["controle", "site"],
-      ["controle", "social"],
-      ["site", "mesure"],
-      ["social", "mesure"],
-      ["mesure", "arbitrage"],
-    ] as readonly (readonly [string, string])[],
-    handsLabel: "Les deux mains",
-    hands: [
-      { label: "Arbitrage", body: "Un sujet est choisi, pas déclenché par un volume de mentions." },
-      { label: "Contrôle", body: "Rien n'est publié sans qu'un humain ait remonté chaque chiffre à sa source." },
-    ],
-    note: "Retirer ces deux nœuds doublerait le débit et coûterait ce qui distingue le projet d'un site généré automatiquement.",
-  },
+   La slide sur laquelle s'attarder à l'oral : elle dit la promesse
+   éditoriale, pas le produit. Quatre exigences, quatre gestes, et un exemple
+   qui les rassemble.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const EDITORIAL = {
+  title: ["Ce qu'on attend d'un article."],
+  demands: [
+    {
+      n: "01",
+      label: "Un sujet pris là où il se cherche",
+      body: "Tendances de recherche, forums, une du jour : le sujet vient de la demande, pas de l'envie.",
+      examples: "Iran · Ukraine · Yémen · midterms américaines",
+    },
+    {
+      n: "02",
+      label: "Un spectre pluriel",
+      body: "Le même fait vu par plusieurs pays et plusieurs titres, convergences et divergences nommées.",
+      examples: "10 titres français · 15 internationaux",
+    },
+    {
+      n: "03",
+      label: "L'historique qui donne l'échelle",
+      body: "Un scrutin se lit contre les précédents, un conflit contre sa chronologie. Sans profondeur, un chiffre ne dit rien.",
+      examples: "Séries longues · comparaisons entre pays",
+    },
+    {
+      n: "04",
+      label: "La transparence de bout en bout",
+      body: "Chaque chiffre nommé, daté, rattaché à sa source. Ce qui manque est laissé visible.",
+      examples: "Source primaire · millésime · méthode",
+    },
+  ],
+  statement: [
+    "Nous n'apportons pas la réponse.",
+    "Nous apportons de quoi se faire la sienne, vite.",
+  ],
+} as const;
+
+export const WORKSHOP = {
+  /* Un seul tableau. Les deux précédents racontaient la même chaîne coupée en
+     son milieu, et le second répétait le premier plus qu'il ne le prolongeait.
+     Les deux mains, arbitrage et contrôle, sont posées sous la chaîne : elles
+     s'exercent partout, pas à un nœud. */
+  eyebrow: "L'atelier",
+  title: ["Automatisation de process."],
+  cols: 6,
+  rows: 3,
+  nodes: [
+    { id: "sujet", col: 0, row: 1, label: "Choix du sujet", detail: "Tendances de recherche, actualité du jour", kind: "human" as const },
+    { id: "agents", col: 1, row: 1, label: "Mise en place des agents", detail: "Une consigne par sujet, une attente par agent" },
+    { id: "presse", col: 2, row: 0, label: "Presse", detail: "Panel français et international" },
+    { id: "institutions", col: 2, row: 1, label: "Institutions", detail: "INSEE, Eurostat, FMI, Banque mondiale" },
+    { id: "donnees", col: 2, row: 2, label: "Jeux de données", detail: "Séries du site, bases ouvertes" },
+    { id: "recoupement", col: 3, row: 1, label: "Recoupement", detail: "Convergences, divergences, éléments uniques" },
+    { id: "article", col: 4, row: 1, label: "Article structuré", detail: "Faits, sources, carte, comparaison" },
+    { id: "diffusion", col: 5, row: 0, label: "Publication site", detail: "Article, carte, séries" },
+    { id: "social", col: 5, row: 2, label: "Formats sociaux", detail: "Carrousels, reels, fil" },
+  ] as readonly FlowCell[],
+  links: [
+    ["sujet", "agents"],
+    ["agents", "presse"],
+    ["agents", "institutions"],
+    ["agents", "donnees"],
+    ["presse", "recoupement"],
+    ["institutions", "recoupement"],
+    ["donnees", "recoupement"],
+    ["recoupement", "article"],
+    ["article", "diffusion"],
+    ["article", "social"],
+  ] as readonly (readonly [string, string])[],
+  handsLabel: "À la main du fondateur",
+  hands: [
+    { label: "Arbitrage", body: "Le sujet est choisi, pas déclenché par un volume de mentions." },
+    { label: "Contrôle", body: "Rien n'est publié sans qu'un chiffre soit remonté à sa source." },
+  ],
+  note: "Les agents exécutent une consigne écrite pour ce sujet-là. Ils ne décident de rien.",
 } as const;
 
 export const AUTOMATION = {
@@ -1381,17 +1390,6 @@ export const STATUS = {
     label: "Pourquoi",
     body: "Reconstruction de la base de données et du pipeline éditorial.",
   },
-  /* La phrase de posture sortait de la bouche du fondateur, pas de la slide.
-     À sa place, ce que le jury attend ici : un modèle chiffré. */
-  model: {
-    label: "Un modèle solide, concret, réalisable",
-    rows: [
-      { label: "Rentabilité projetée", value: "Année 2" },
-      { label: "Revenus, année 2", value: "111 K€" },
-      { label: "Revenus, année 5", value: "445 K€" },
-      { label: "Besoin de financement initial", value: "27 500 €" },
-    ],
-  },
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1415,12 +1413,13 @@ export const FINANCE: readonly FinanceYear[] = [
 ] as const;
 
 export const FINANCE_SLIDE = {
-  title: ["Une structure légère.", "Un modèle fortement scalable."],
+  /* Un business model solide, concret, réalisable : c'est ce que la slide doit
+     dire, et le besoin de financement a désormais sa propre slide. Les deux
+     notes qui refermaient celle-ci, sur l'absence de salaire fondateur et sur
+     la nature des projections, appartiennent à l'oral. */
+  title: ["Un modèle solide, concret, réalisable."],
   breakeven: { label: "Rentabilité projetée", value: "Année 2" },
-  funding: { label: "Besoin de financement initial", value: "27 500 €" },
-  note: "Ces résultats reposent notamment sur une structure sans salaire fondateur au démarrage et sur des coûts largement semi-fixes.",
-  disclaimer:
-    "Projections du business plan, scénario central · et non des revenus constatés.",
+  year2: { label: "Résultat net, année 2", value: "32 908 €" },
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1510,7 +1509,7 @@ export const CONCLUSION = {
   signature: {
     wordmark: "The Essential Data",
     promise: PROMISE,
-    tagline: COVER.tagline,
+    tagline: "Turning data into meaning.",
   },
 } as const;
 

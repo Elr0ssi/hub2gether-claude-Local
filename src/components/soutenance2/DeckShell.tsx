@@ -155,7 +155,11 @@ export function DeckShell({ initialSlide, presenter = false }: DeckShellProps) {
     <ReducedMotionProvider value={reduced}>
       <div
         className="ted-deck ted-deck-root"
-        style={{ background: tone === "dark" ? "#050505" : "#111111" }}
+        /* Le pourtour prend la couleur de la slide. Il était noir quelle que
+           soit la slide : sur une slide claire, le cadre se voyait comme deux
+           bandes noires sur les côtés, et la projection n'occupait plus
+           l'écran. Même fond de part et d'autre, la limite disparaît. */
+        style={{ background: tone === "dark" ? "var(--slide-dark)" : "var(--slide-light)" }}
       >
         {/* ── Stage ──────────────────────────────────────────────────────── */}
         <div
