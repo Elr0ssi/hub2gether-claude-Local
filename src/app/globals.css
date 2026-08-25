@@ -691,6 +691,9 @@ body {
 .p2-hero-runway {
   position: relative;
   height: 190vh;
+  /* La piste n'est qu'une longueur de défilement : elle ne doit rien
+     intercepter. Seul son panneau collant compte, et lui reprend la main. */
+  pointer-events: none;
   /* Above the story scene, which is pulled up underneath it: the hero's pane
      always paints over the scene until it has scrolled out. */
   z-index: 2;

@@ -47,12 +47,6 @@ interface Curve {
   dots: number[];
 }
 
-interface Pulse {
-  curve: number;
-  x0: number;
-  dir: 1 | -1;
-  born: number;
-}
 
 // --- Path shape --------------------------------------------------------------
 // Up to TAIL_START the strand is a circle concentric with the globe, so it
@@ -64,14 +58,18 @@ const TAIL_START = 0.78;
 // --- Pointer response --------------------------------------------------------
 // No wave: the strand under the cursor brightens over a short span, a pulse of
 // light runs along it, and the line itself barely moves.
-const NEAR_SIGMA = 7; // px — vertical falloff; neighbours react far less
-const HOVER_SPAN = 190; // px — half-length of the brightened stretch
-const HOVER_GAIN = 0.26; // extra alpha at the centre of that stretch
-const HOVER_BEND = 1.8; // px — the whole of the strand's displacement
-const PULSE_SPAN = 62; // px — half-length of the travelling glint
-const PULSE_SPEED = 250; // px per second
-const PULSE_LIFE = 1000; // ms
-const PULSE_GAP = 1100; // ms between two pulses on the same strand
+// Un rideau, pas un interrupteur. La version précédente n'allumait qu'un brin
+// à la fois, dans une bande verticale de sept pixels : en travers de la gerbe,
+// les brins s'allumaient et s'éteignaient un par un, et des éclats partaient
+// au franchissement d'un seuil. D'où le saccadé. Ici la clarté décroît
+// doucement avec la distance verticale, si bien que plusieurs brins répondent
+// ensemble, et le point suivi n'est pas le curseur mais une position lissée
+// image par image : la main peut sauter, le rideau ne saute pas.
+const NEAR_SIGMA = 78; // px — décroissance verticale, large et douce
+const HOVER_SPAN = 330; // px — demi-largeur de la portion éclaircie
+const HOVER_GAIN = 0.3; // alpha ajouté au centre de cette portion
+const HOVER_BEND = 1.2; // px — tout le déplacement du brin
+const POINTER_EASE = 0.14; // part du chemin parcouru par image vers le curseur
 const SAMPLES = 96;
 
 // Deterministic pseudo-random so server and client agree and the field looks
@@ -88,8 +86,11 @@ function rand(seed: number): () => number {
 // the others fan out above it with widening gaps.
 // The whole sheaf has to fit between the globe's crown and the subtitle, so
 // the topmost strand never rises past roughly a quarter of a radius above it.
-const BACK_MARGINS = [6, 14, 24, 36, 50, 66, 84];
-const FRONT_MARGINS = [96, 110, 124];
+// Quatre brins derrière, deux devant. À dix, la gerbe faisait une trame au
+// dessus du globe et lui disputait le regard ; espacés, ils se lisent comme
+// des courants.
+const BACK_MARGINS = [8, 22, 42, 68];
+const FRONT_MARGINS = [98, 124];
 
 function buildCurves(layer: CurveLayer): Curve[] {
   const next = rand(layer === "back" ? 20250729 : 78123401);
@@ -222,19 +223,26 @@ export function DataFlowCurves({
     };
 
     // --- Pointer state -------------------------------------------------------
+    // Cible : là où est le curseur. Position : là où le rideau en est.
+    let targetX = -9999;
+    let targetY = -9999;
     let pointerX = -9999;
     let pointerY = -9999;
-    const near = curves.map(() => 0); // smoothed proximity, per strand
-    const lastPulseAt = curves.map(() => 0);
-    const pulses: Pulse[] = [];
+    const near = curves.map(() => 0); // proximité lissée, par brin
 
     const onMove = (e: MouseEvent) => {
-      pointerX = e.clientX - rect.left;
-      pointerY = e.clientY - rect.top;
-      if (pointerX < -60 || pointerY < -60 || pointerX > W + 60 || pointerY > H + 60) {
-        pointerX = -9999;
-        pointerY = -9999;
+      const nx = e.clientX - rect.left;
+      const ny = e.clientY - rect.top;
+      if (nx < -60 || ny < -60 || nx > W + 60 || ny > H + 60) {
+        targetX = -9999;
+        targetY = -9999;
+        return;
       }
+      // Première entrée : le rideau se pose là plutôt que d'y courir depuis
+      // le coin, ce qui produirait un balayage que personne n'a demandé.
+      if (pointerX < -1000) { pointerX = nx; pointerY = ny; }
+      targetX = nx;
+      targetY = ny;
     };
 
     /** The strand leans a hair towards the cursor — 2px at most, nothing else. */
@@ -317,18 +325,6 @@ export function DataFlowCurves({
           ctx.stroke();
         }
 
-        // Glints running along it.
-        for (const p of pulses) {
-          if (p.curve !== index) continue;
-          const age = (now - p.born) / PULSE_LIFE;
-          if (age >= 1) continue;
-          const x = p.x0 + p.dir * PULSE_SPEED * age * (PULSE_LIFE / 1000);
-          const env = Math.sin(age * Math.PI); // fades in and out
-          ctx.lineWidth = c.width + 0.5;
-          ctx.strokeStyle = bandGradient(x, PULSE_SPAN, 0.4 * env);
-          ctx.stroke();
-        }
-
         for (const u of c.dots) {
           const x = u * W;
           const y = strandY(c, x, t);
@@ -349,7 +345,21 @@ export function DataFlowCurves({
       frame = requestAnimationFrame(tick);
       const now = performance.now();
 
-      // Proximity per strand: quick to answer, slow to let go.
+      // Le rideau glisse vers le curseur d'une fraction du chemin par image :
+      // une trajectoire continue, quelle que soit la cadence des événements de
+      // souris, qui eux arrivent par paquets.
+      if (targetX < -1000) {
+        if (pointerX > -1000) {
+          pointerX = -9999;
+          pointerY = -9999;
+        }
+      } else if (pointerX > -1000) {
+        pointerX += (targetX - pointerX) * POINTER_EASE;
+        pointerY += (targetY - pointerY) * POINTER_EASE;
+      }
+
+      // Clarté par brin : elle décroît doucement avec la distance verticale,
+      // si bien que la gerbe entière répond au passage plutôt qu'un brin.
       visible.forEach((c) => {
         const index = curves.indexOf(c);
         let target = 0;
@@ -358,21 +368,9 @@ export function DataFlowCurves({
           const dv = pointerY - y;
           target = Math.exp(-(dv * dv) / (2 * NEAR_SIGMA * NEAR_SIGMA));
         }
-        const k = target > near[index] ? 0.22 : 0.07;
-        near[index] += (target - near[index]) * k;
-
-        if (target > 0.45 && now - lastPulseAt[index] > PULSE_GAP) {
-          lastPulseAt[index] = now;
-          pulses.push({
-            curve: index,
-            x0: pointerX,
-            dir: pointerX > cx ? 1 : -1,
-            born: now,
-          });
-        }
+        near[index] += (target - near[index]) * 0.12;
       });
 
-      while (pulses.length && now - pulses[0].born > PULSE_LIFE) pulses.shift();
       draw(now);
     };
 

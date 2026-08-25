@@ -47,27 +47,29 @@ export function ArticlesShowcase() {
   if (!featured) return null;
 
   return (
-    <section className="p2-snap-target p2-lock" style={{ background: "#fff", padding: "clamp(56px, 9vh, 100px) clamp(20px, 4vw, 64px)" }}>
+    <section className="p2-snap-target p2-lock" style={{ background: "#fff", padding: "clamp(28px, 5vh, 56px) clamp(20px, 4vw, 64px)" }}>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-10%" }}
           transition={{ duration: 0.6, ease: EASE }}
-          style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, marginBottom: 32, flexWrap: "wrap" }}
+          style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, marginBottom: 22, flexWrap: "wrap" }}
         >
+          {/* Un titre d'une ligne. Deux lignes et une italique posaient
+              quatre-vingts pixels de plus au-dessus du tableau d'articles :
+              l'arrêt tombait trop haut et la section arrivait décadrée. */}
           <h2
             style={{
-              fontSize: "clamp(1.7rem, 3.2vw, 2.6rem)",
+              fontSize: "clamp(1.5rem, 2.6vw, 2.1rem)",
               fontWeight: 900,
               color: "#0A0A0A",
               letterSpacing: "-0.03em",
-              lineHeight: 1.12,
+              lineHeight: 1.1,
               margin: 0,
             }}
           >
-            Ce qui bouge
-            <br />
+            Nos articles{" "}
             <em
               style={{
                 fontFamily: "Georgia, 'Times New Roman', serif",
@@ -79,7 +81,7 @@ export function ArticlesShowcase() {
                 backgroundClip: "text",
               }}
             >
-              dans le monde aujourd&apos;hui.
+              en vogue
             </em>
           </h2>
           <Link

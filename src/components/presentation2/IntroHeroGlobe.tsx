@@ -64,12 +64,15 @@ export function IntroHeroGlobe() {
   const loadingScale = useTransform(p, [0, 0.125], [1, 0.85]);
 
   // ── Title ────────────────────────────────────────────────────────────────
+  // Le titre arrive plus tôt et reste plus longtemps : posé à 0,28 et repris
+  // à 0,58, il n'était pleinement lisible qu'un dixième de la course, et le
+  // lecteur passait à la section suivante avant de l'avoir lu.
   const titleOpacityMv = useTransform(
     p,
-    [0.28, T.toHeroEnd + 0.08, T.titleOut, T.titleGone],
+    [0.15, 0.26, 0.64, 0.76],
     [0, 1, 1, 0]
   );
-  const titleY = useTransform(p, [0.28, T.toHeroEnd + 0.08], [24, 0], { clamp: true });
+  const titleY = useTransform(p, [0.15, 0.26], [24, 0], { clamp: true });
 
   // ── Surface ──────────────────────────────────────────────────────────────
   // A real geometric expansion — width, height, corner radius and position all
@@ -166,6 +169,11 @@ export function IntroHeroGlobe() {
           overflow: "hidden",
           background: stageBg,
           opacity: stageOpacity,
+          // Le panneau du héros couvre la scène qui est tirée sous lui. Une
+          // fois fondu, il restait quand même le premier sous le curseur :
+          // la carte de la première catégorie ne réagissait pas au survol.
+          // Transparent, il laisse passer.
+          pointerEvents: stageOpacity < 0.05 ? "none" : "auto",
         }}
       >
         {/* Halo — a breath of colour under the surface as it appears, gone by

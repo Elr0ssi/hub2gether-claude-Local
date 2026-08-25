@@ -13,11 +13,11 @@ export interface TeleportDetail {
 }
 
 /** How long the page takes to roll from one stop to the next, in ms. */
-const ROLL_MS = 1050;
+const ROLL_MS = 760;
 /** Gestures land on the next stop no sooner than this, in ms. */
 const COOLDOWN = ROLL_MS + 60;
 /** Wheel deltas below this are treated as noise, not as a page gesture. */
-const WHEEL_THRESHOLD = 8;
+const WHEEL_THRESHOLD = 4;
 /**
  * Quiet time that has to pass before a new wheel gesture is recognised.
  *
@@ -28,7 +28,7 @@ const WHEEL_THRESHOLD = 8;
  * wheel keeps restarting, so a busy main thread delays the end of a gesture
  * rather than inventing a new one.
  */
-const GESTURE_GAP = 260;
+const GESTURE_GAP = 170;
 /** Vertical travel a touch drag needs before it counts as a gesture. */
 const TOUCH_THRESHOLD = 34;
 /** Slack when matching the current scroll position against a stop, in px. */

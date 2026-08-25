@@ -213,7 +213,9 @@ export function CategoryHero({ themeId }: CategoryHeroProps) {
 
         .cat-hero-head {
           position: absolute;
-          top: clamp(14px, 4vh, 46px);
+          /* La gerbe ayant quatre brins de moins, la place libérée revient au
+             titre : il descend au lieu d'être collé sous la barre. */
+          top: clamp(26px, 7vh, 78px);
           left: 0;
           right: 0;
           padding: 0 clamp(20px, 5vw, 56px);

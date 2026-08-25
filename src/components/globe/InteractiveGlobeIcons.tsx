@@ -297,6 +297,17 @@ export default function InteractiveGlobeIcons({
     let velX = 0;
     const AUTO_SPEED = prefersReduced ? 0 : 0.0014;
 
+    // ── Le lancer ──────────────────────────────────────────────────────────
+    // À l'arrivée, le globe part comme une toupie et perd sa vitesse peu à
+    // peu, jusqu'à la dérive de fond. Sans cela il tournait déjà à son rythme
+    // de croisière quand le lecteur posait les yeux dessus, et rien ne disait
+    // que c'était un objet qu'on manipule. Le surplus décroît d'un facteur
+    // constant par image : rapide d'abord, imperceptible au bout de quelques
+    // secondes, et jamais un arrêt net.
+    const SPIN_LAUNCH = prefersReduced ? 0 : 0.052;
+    const SPIN_DECAY = 0.982;
+    let launch = SPIN_LAUNCH;
+
     const onPointerDown = (clientX: number, clientY: number) => {
       isDragging = true;
       prevX = clientX;
@@ -371,7 +382,9 @@ export default function InteractiveGlobeIcons({
         // Inertia bleeds off, then an almost imperceptible drift keeps the
         // globe alive; the tilt eases back to its resting horizon.
         velX *= 0.94;
-        globeGroup.rotation.y += AUTO_SPEED + velX;
+        launch *= SPIN_DECAY;
+        if (launch < 0.00004) launch = 0;
+        globeGroup.rotation.y += AUTO_SPEED + velX + launch;
         globeGroup.rotation.x += (0 - globeGroup.rotation.x) * 0.006;
       }
 

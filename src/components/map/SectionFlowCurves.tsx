@@ -62,8 +62,12 @@ const STRANDS: Strand[] = [
 function controls(s: Strand) {
   const y = s.y * H;
   const b = s.bend * H;
+  // Le débord doit couvrir le plus long déplacement d'un brin, sinon celui qui
+  // glisse vers la gauche découvre le bord droit de la section : la courbe
+  // s'arrêtait net vers quatre-vingts pour cent de la largeur, à l'aplomb du
+  // rail publicitaire. Deux cent soixante de course, quatre-vingt-dix de marge.
   const a: [number, number][] = [
-    [-90, y],
+    [-370, y],
     [W * 0.2, y + b],
     [W * 0.34, y - b * 1.5],
     [W * 0.5, y - b * 0.4],
@@ -73,7 +77,7 @@ function controls(s: Strand) {
     a[3],
     [2 * a[3][0] - a[2][0], 2 * a[3][1] - a[2][1]],
     [W * 0.82, y + b * 1.6],
-    [W + 90, y + b * 0.3],
+    [W + 370, y + b * 0.3],
   ];
   return [a, c] as const;
 }
