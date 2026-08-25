@@ -735,8 +735,8 @@ export const AI_SHIFT = {
     {
       id: "return",
       ordinal: "04",
-      title: "La réponse ne remplace pas l'exploration.",
-      caption: "La citation ramène le lecteur là où la donnée se manipule.",
+      title: "La citation ramène le lecteur.",
+      caption: "L'IA donne le chiffre. Nous donnons ce qu'il y a autour, et c'est ce qui fait revenir.",
     },
     {
       id: "flows",
@@ -789,14 +789,18 @@ export const AI_SHIFT = {
   },
 
   /** Answer, proof, exploration — the three tiers of one citation. */
+  /* Trois marches d'une même citation, nommées en français : ce que l'IA
+     rend, ce qui prouve le chiffre, et ce que le lecteur vient chercher chez
+     nous. Les intitulés anglais rendaient le schéma illisible pour un jury qui
+     cherchait d'abord à comprendre qui parle à qui. */
   answer: {
     tiers: [
-      { key: "Answer", items: ["France · Dette publique · 2025"] },
+      { key: "La réponse", items: ["France · Dette publique · 2025"] },
       {
-        key: "Proof",
+        key: "La preuve",
         items: ["Source primaire", "Année", "Méthodologie", "Dernière mise à jour"],
       },
-      { key: "Explore", items: ["Carte", "Historique", "Comparaison", "Article"] },
+      { key: "L'exploration", items: ["Carte", "Historique", "Comparaison", "Article"] },
     ],
     citation: "Source : The Essential Data ↗",
   },
@@ -840,7 +844,10 @@ export const AI_SHIFT = {
 
   close: {
     center: "The Essential Data",
-    facets: ["Média", "Data", "Exploration", "AI-ready"],
+    /* Les quatre facettes disparaissent : quatre étiquettes autour d'un nom
+       ne disent rien que la phrase ne dise mieux, et « AI-ready » n'est pas
+       du français. */
+    facets: [] as readonly string[],
     statement: ["Ne pas concurrencer l'IA.", "Devenir une source qu'elle utilise."],
     coda: "Et une expérience que l'utilisateur veut explorer.",
   },
