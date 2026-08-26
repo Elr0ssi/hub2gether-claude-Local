@@ -1,4 +1,5 @@
-import { ECONOMY_YEARS } from "@/data/economy/economy";
+import { ECONOMY_YEARS, SOURCES_SOCLE } from "@/data/economy/economy";
+import { countryFr } from "@/data/countryNamesFr";
 import { EPIDEMICS } from "@/data/epidemics/epidemics";
 import { getMilitaryData } from "@/data/military/military";
 import { POLITICS_COUNTRIES } from "@/data/politics/politics";
@@ -59,21 +60,37 @@ function EconomySummary() {
   if (!year2025) return null;
 
   const entries = Object.entries(year2025.countries);
+  const mds = (v: number) => Math.round(v).toLocaleString("fr-FR");
 
-  const topGdp = [...entries]
-    .sort((a, b) => b[1].gdp - a[1].gdp)
+  const topGdp = entries
+    .filter(([, d]) => d.gdp !== undefined)
+    .sort((a, b) => (b[1].gdp ?? 0) - (a[1].gdp ?? 0))
     .slice(0, 15)
-    .map(([name, d], i) => [i + 1, name, `${d.gdp.toLocaleString("fr-FR")} Mds €`, `${d.debt_ratio} %`, `${d.unemployment} %`]);
+    .map(([name, d], i) => [
+      i + 1,
+      countryFr(name),
+      `${mds(d.gdp ?? 0)} Mds €`,
+      d.debt_ratio === undefined ? "-" : `${d.debt_ratio} %`,
+      d.unemployment === undefined ? "-" : `${d.unemployment} %`,
+    ]);
 
-  const topDebt = [...entries]
-    .filter(([, d]) => d.debt_ratio != null)
-    .sort((a, b) => b[1].debt_ratio - a[1].debt_ratio)
+  const topDebt = entries
+    .filter(([, d]) => d.debt_ratio !== undefined)
+    .sort((a, b) => (b[1].debt_ratio ?? 0) - (a[1].debt_ratio ?? 0))
     .slice(0, 15)
-    .map(([name, d], i) => [i + 1, name, `${d.debt_ratio} %`, `${(d.debt_amount ?? 0).toLocaleString("fr-FR")} Mds €`]);
+    .map(([name, d], i) => [
+      i + 1,
+      countryFr(name),
+      `${d.debt_ratio} %`,
+      d.debt_amount === undefined ? "-" : `${mds(d.debt_amount)} Mds €`,
+    ]);
 
   return (
     <section aria-label="Données économiques mondiales 2025">
-      <h2>Top 15 PIB mondial 2025 (FMI)</h2>
+      <h2>Top 15 PIB mondial 2025</h2>
+      <p style={{ fontSize: "0.75rem", color: "var(--ink-3)", margin: "0 0 0.6rem" }}>
+        Source : {SOURCES_SOCLE.gdp.source}.
+      </p>
       <Table
         headers={["#", "Pays", "PIB (Mds €)", "Dette/PIB", "Chômage"]}
         rows={topGdp}

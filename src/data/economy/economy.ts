@@ -1,8 +1,9 @@
-import type { EconomyYear, EconomyMetric } from "@/types";
+import type { EconomyYear, EconomyMetric, CountryEconomyData } from "@/types";
 import { getPopulationMillions } from "./populationData";
 import { getTradeBalanceBn } from "./tradeBalanceHistory";
 import { getDebtByCountry } from "./debtData";
 import { getLaborByCountry } from "./laborData";
+import SOCLE from "./genere/socle-economie.json";
 
 export const ECONOMY_METRICS: EconomyMetric[] = [
   {
@@ -997,17 +998,76 @@ export const ECONOMY_YEARS: EconomyYear[] = [
   },
 ];
 
+/* ══ Raccordement à la base ═════════════════════════════════════════════════
+   Les quatre indicateurs que la base couvre — PIB, PIB par habitant, balance
+   extérieure, inflation — viennent d'elle et de nulle part ailleurs. Les
+   chiffres encore saisis à la main (dette, chômage, entreprises, population
+   active, âge de la retraite) attendent leur propre import.
+
+   Trois conséquences assumées :
+     · un pays que la source ne publie pas cette année-là sort en gris, même
+       si un chiffre avait été saisi ;
+     · le classement passe d'une centaine de pays à un peu plus de deux
+       cents, puisque la base les couvre ;
+     · les valeurs affichées sont celles de la source, au million près, et
+       non des ordres de grandeur arrondis à la main.
+
+   L'affichage, lui, ne bouge pas : mêmes années, mêmes unités, mêmes écrans. */
+
+type SocleFiche = { iso3: string; iso2: string; valeurs: Record<string, (number | null)[]> };
+const SOCLE_PAYS = SOCLE.pays as Record<string, SocleFiche>;
+const I_GDP = SOCLE.colonnes.indexOf("gdp");
+const I_GDP_HAB = SOCLE.colonnes.indexOf("gdp_per_capita");
+const I_BALANCE = SOCLE.colonnes.indexOf("trade_balance");
+const I_INFLATION = SOCLE.colonnes.indexOf("inflation");
+
+/* Trois pays étaient saisis sous un nom que le fond de carte n'emploie pas :
+   ils n'ont jamais été coloriés, faute d'être reconnus. Le socle utilise les
+   noms de la carte ; ces trois-là les rejoignent, avec leurs chiffres
+   manuels. */
+const ALIAS_CARTE: Record<string, string> = {
+  "Czech Republic": "Czechia",
+  "Dominican Republic": "Dominican Rep.",
+  "Ivory Coast": "Côte d'Ivoire",
+};
+
+for (const yr of ECONOMY_YEARS) {
+  for (const [saisi, carte] of Object.entries(ALIAS_CARTE)) {
+    const data = yr.countries[saisi];
+    if (!data) continue;
+    yr.countries[carte] = { ...data, ...yr.countries[carte] };
+    delete yr.countries[saisi];
+  }
+}
+
+/* Le PIB d'abord : les dérivations qui suivent s'appuient dessus. */
+for (const yr of ECONOMY_YEARS) {
+  const cle = String(yr.year);
+  for (const [name, fiche] of Object.entries(SOCLE_PAYS)) {
+    const gdp = fiche.valeurs[cle]?.[I_GDP];
+    if (gdp === null || gdp === undefined) continue;
+    (yr.countries[name] ??= {}).gdp = gdp;
+  }
+  // Un chiffre saisi que la base ne confirme pas ne survit pas : deux sources
+  // dans une même colonne, ce n'est plus une source.
+  for (const [name, data] of Object.entries(yr.countries)) {
+    if (SOCLE_PAYS[name]?.valeurs[cle]?.[I_GDP] == null) delete data.gdp;
+  }
+}
+
 for (const yr of ECONOMY_YEARS) {
   for (const [countryName, data] of Object.entries(yr.countries)) {
     const population = getPopulationMillions(countryName, yr.year);
-    if (population) {
+    if (data.gdp !== undefined && population) {
       data.gdp_per_capita = Math.round((data.gdp * 1000) / population);
     }
     const tradeBalance = getTradeBalanceBn(countryName, yr.year);
     if (tradeBalance !== undefined) {
       data.trade_balance = tradeBalance;
     }
-    data.debt_amount = Math.round((data.gdp * data.debt_ratio) / 100);
+    if (data.gdp !== undefined && data.debt_ratio !== undefined) {
+      data.debt_amount = Math.round((data.gdp * data.debt_ratio) / 100);
+    }
     // Inflation, population active and âge de la retraite are single-snapshot
     // values (no per-year history available) — applied flatly across every year.
     const debt = getDebtByCountry(countryName);
@@ -1021,6 +1081,41 @@ for (const yr of ECONOMY_YEARS) {
     }
   }
 }
+
+/* Les trois autres indicateurs de la base passent après les dérivations, pour
+   les remplacer et non l'inverse. Là où la base ne publie rien, le champ est
+   retiré plutôt que laissé à une estimation maison. */
+const CHAMPS_SOCLE: [number, keyof CountryEconomyData][] = [
+  [I_GDP_HAB, "gdp_per_capita"],
+  [I_BALANCE, "trade_balance"],
+  [I_INFLATION, "inflation"],
+];
+
+for (const yr of ECONOMY_YEARS) {
+  const cle = String(yr.year);
+  for (const [name, data] of Object.entries(yr.countries)) {
+    const cellule = SOCLE_PAYS[name]?.valeurs[cle];
+    for (const [i, champ] of CHAMPS_SOCLE) {
+      const v = cellule?.[i];
+      if (v === null || v === undefined) delete data[champ];
+      else (data[champ] as number) = v;
+    }
+  }
+  // La note tient sous la carte, sur une ligne : les codes d'indicateurs
+  // complets sont dans data/catalogue-indicateurs.json, pas sur l'écran.
+  yr.dataNote =
+    `Sources : Banque mondiale (WDI) — PIB, PIB/hab., balance extérieure ; ` +
+    `FMI (IFS) — inflation. Montants en milliards, valeurs ${yr.year}. ` +
+    `Dette, chômage et entreprises : estimations.`;
+}
+
+/** Code ISO2 d'un pays, pour son drapeau. Absent si le pays n'est pas en base. */
+export function iso2DePays(name: string): string | undefined {
+  return SOCLE_PAYS[name]?.iso2;
+}
+
+/** Source d'affichage d'une métrique, telle que la base la déclare. */
+export const SOURCES_SOCLE = SOCLE.sources as Record<string, { indicateur: string; libelle: string; source: string }>;
 
 export function getYearData(year: number): EconomyYear | undefined {
   return ECONOMY_YEARS.find((y) => y.year === year);

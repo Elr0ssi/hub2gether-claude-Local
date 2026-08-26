@@ -71,7 +71,9 @@ const gdpOf: CountryMetric = (name, year) => yearCountries(year)[name]?.gdp ?? 0
 const debtOf: CountryMetric = (name, year) => {
   const c = yearCountries(year)[name];
   if (!c) return 0;
-  return c.debt_amount ?? (c.gdp * c.debt_ratio) / 100;
+  if (c.debt_amount !== undefined) return c.debt_amount;
+  if (c.gdp === undefined || c.debt_ratio === undefined) return 0;
+  return (c.gdp * c.debt_ratio) / 100;
 };
 
 const populationOf: CountryMetric = (name, year) => getPopulationMillions(name, year) ?? 0;
@@ -168,7 +170,7 @@ const ECONOMY_HERO: CategoryHeroConfig = {
       note: `${TRADE_DATA.length} pays · dernier exercice`,
     },
   ],
-  sourceNote: `Sources : FMI (WEO), Banque mondiale, OIT, OMC · projections ${LATEST}.`,
+  sourceNote: `Sources : Banque mondiale (WDI) pour le PIB, OIT et OMC pour l'emploi et les échanges · année ${LATEST}.`,
 };
 
 // ── Registry ────────────────────────────────────────────────────────────────

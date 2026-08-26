@@ -25,17 +25,27 @@ interface EconomySidePanelProps {
   onMetricChange?: (id: EconomyMetricId) => void;
 }
 
-function fmtNumber(v: number): string {
+function fmtNumber(v: number | undefined): string {
+  if (v === undefined) return "-";
   return v.toLocaleString("fr-FR");
+}
+
+/* Les montants viennent de la base au million près ; l'écran les arrondit
+   selon leur taille, pour qu'un pays à soixante millions de PIB ne s'affiche
+   pas à zéro. */
+function fmtMilliards(v: number): string {
+  const abs = Math.abs(v);
+  const decimales = abs >= 100 ? 0 : abs >= 10 ? 1 : 2;
+  return v.toLocaleString("fr-FR", { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
 }
 
 function fmtMetric(v: number | undefined, metric: EconomyMetricId): string {
   if (v === undefined) return "-";
-  if (metric === "gdp")               return `${fmtNumber(v)} Mds€`;
+  if (metric === "gdp")               return `${fmtMilliards(v)} Mds€`;
   if (metric === "companies")         return `${fmtNumber(v)} k`;
   if (metric === "gdp_per_capita")    return `${fmtNumber(Math.round(v))} €`;
-  if (metric === "trade_balance")     return `${v > 0 ? "+" : ""}${fmtNumber(Math.round(v))} Mds€`;
-  if (metric === "debt_amount")       return v >= 1000 ? `${(v / 1000).toFixed(1)} T€` : `${fmtNumber(Math.round(v))} Mds€`;
+  if (metric === "trade_balance")     return `${v > 0 ? "+" : ""}${fmtMilliards(v)} Mds€`;
+  if (metric === "debt_amount")       return v >= 1000 ? `${(v / 1000).toFixed(1)} T€` : `${fmtMilliards(v)} Mds€`;
   if (metric === "active_population") return `${v.toLocaleString("fr-FR")} M`;
   if (metric === "retirement_age")    return `${v} ans`;
   return `${v.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`;
@@ -316,6 +326,7 @@ function CompaniesView({ countryName, yearData }: { countryName: string; yearDat
             const d = yr.countries[countryName];
             if (!d) return null;
             const v = d.companies;
+            if (v === undefined) return null;
             const isCurrent = yr.year === yearData?.year;
             return (
               <div key={yr.year} className="flex items-center gap-2">

@@ -62,7 +62,10 @@ function computeLiveYearData(baseYear: EconomyYear): EconomyYear {
     liveCountries[country] = {
       ...data,
       // GDP is a flow: prorate to days elapsed. Rates (debt/unemployment/companies) are stocks — unchanged.
-      gdp: Math.round(data.gdp * fraction),
+      // L'arrondi reste au million : la base couvre des pays dont le PIB
+      // annuel tient sous le milliard, et les arrondir à l'entier les
+      // effaçait de la carte.
+      gdp: data.gdp === undefined ? undefined : Math.round(data.gdp * fraction * 1000) / 1000,
     };
   }
   return {

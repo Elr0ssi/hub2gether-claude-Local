@@ -1,4 +1,5 @@
 import type { EconomyYear, FAQItem } from "@/types";
+import { countryFr } from "@/data/countryNamesFr";
 
 export const FAQS_ECONOMY: FAQItem[] = [
   {
@@ -87,8 +88,13 @@ export const FAQS_ECONOMY: FAQItem[] = [
 // balisage FAQPage (JSON-LD) de la page — un signal SEO plus fort qu'un
 // tableau muet, et une lecture plus naturelle pour un visiteur.
 
-function fmt(n: number): string {
-  return n.toLocaleString("fr-FR");
+function fmt(n: number | undefined): string {
+  if (n === undefined) return "-";
+  // Les montants viennent de la base au million près : l'arrondi de lecture
+  // suit la taille du chiffre, comme sur la carte et dans le classement.
+  const abs = Math.abs(n);
+  const decimales = abs >= 100 ? 0 : abs >= 10 ? 1 : 2;
+  return n.toLocaleString("fr-FR", { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
 }
 
 /**
@@ -101,18 +107,21 @@ export function buildEconomyDataFaqs(year: EconomyYear | undefined): FAQItem[] {
   const entries = Object.entries(year.countries);
   if (entries.length === 0) return [];
 
-  const topGdp = [...entries].sort((a, b) => b[1].gdp - a[1].gdp).slice(0, 15);
-  const topDebt = [...entries]
-    .filter(([, d]) => d.debt_ratio != null)
-    .sort((a, b) => b[1].debt_ratio - a[1].debt_ratio)
+  const topGdp = entries
+    .filter(([, d]) => d.gdp !== undefined)
+    .sort((a, b) => (b[1].gdp ?? 0) - (a[1].gdp ?? 0))
     .slice(0, 15);
-  const topUnemployment = [...entries]
+  const topDebt = entries
+    .filter(([, d]) => d.debt_ratio != null)
+    .sort((a, b) => (b[1].debt_ratio ?? 0) - (a[1].debt_ratio ?? 0))
+    .slice(0, 15);
+  const topUnemployment = entries
     .filter(([, d]) => d.unemployment != null)
-    .sort((a, b) => b[1].unemployment - a[1].unemployment)
+    .sort((a, b) => (b[1].unemployment ?? 0) - (a[1].unemployment ?? 0))
     .slice(0, 8);
-  const lowUnemployment = [...entries]
+  const lowUnemployment = entries
     .filter(([, d]) => d.unemployment != null)
-    .sort((a, b) => a[1].unemployment - b[1].unemployment)
+    .sort((a, b) => (a[1].unemployment ?? 0) - (b[1].unemployment ?? 0))
     .slice(0, 8);
 
   return [
@@ -121,7 +130,11 @@ export function buildEconomyDataFaqs(year: EconomyYear | undefined): FAQItem[] {
       answer:
         `Classement par PIB nominal ${year.year} : ` +
         topGdp
-          .map(([name, d], i) => `${i + 1}. ${name}, ${fmt(d.gdp)} Mds € (dette ${d.debt_ratio} % du PIB, chômage ${d.unemployment} %)`)
+          .map(([name, d], i) => {
+            const dette = d.debt_ratio === undefined ? "" : `, dette ${d.debt_ratio} % du PIB`;
+            const chomage = d.unemployment === undefined ? "" : `, chômage ${d.unemployment} %`;
+            return `${i + 1}. ${countryFr(name)}, ${fmt(d.gdp)} Mds €${dette}${chomage}`;
+          })
           .join(" ; ") +
         `. ${year.dataNote}`,
       category: "Données de référence",
@@ -131,7 +144,7 @@ export function buildEconomyDataFaqs(year: EconomyYear | undefined): FAQItem[] {
       answer:
         `Ratios dette publique / PIB les plus élevés en ${year.year} : ` +
         topDebt
-          .map(([name, d], i) => `${i + 1}. ${name}, ${d.debt_ratio} % du PIB` + (d.debt_amount ? ` (${fmt(d.debt_amount)} Mds €)` : ""))
+          .map(([name, d], i) => `${i + 1}. ${countryFr(name)}, ${d.debt_ratio} % du PIB` + (d.debt_amount ? ` (${fmt(d.debt_amount)} Mds €)` : ""))
           .join(" ; ") +
         `. Un ratio élevé ne vaut pas crise : ce qui compte est la capacité de refinancement, la devise d'émission et la croissance. ${year.dataNote}`,
       category: "Données de référence",
@@ -140,9 +153,9 @@ export function buildEconomyDataFaqs(year: EconomyYear | undefined): FAQItem[] {
       question: `Quels sont les taux de chômage les plus élevés et les plus faibles en ${year.year} ?`,
       answer:
         `Taux de chômage les plus élevés en ${year.year} : ` +
-        topUnemployment.map(([name, d]) => `${name} ${d.unemployment} %`).join(", ") +
+        topUnemployment.map(([name, d]) => `${countryFr(name)} ${d.unemployment} %`).join(", ") +
         `. Les plus faibles : ` +
-        lowUnemployment.map(([name, d]) => `${name} ${d.unemployment} %`).join(", ") +
+        lowUnemployment.map(([name, d]) => `${countryFr(name)} ${d.unemployment} %`).join(", ") +
         `. Les méthodologies nationales diffèrent, la mesure retenue ici suit la définition de l'OIT. ${year.dataNote}`,
       category: "Données de référence",
     },

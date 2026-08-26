@@ -4,7 +4,7 @@ import { countryFr } from "@/data/countryNamesFr";
 import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Search, ChevronUp, ChevronDown, ChevronsUpDown, TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { ECONOMY_METRICS, ECONOMY_YEARS } from "@/data/economy/economy";
+import { ECONOMY_METRICS, ECONOMY_YEARS, iso2DePays } from "@/data/economy/economy";
 import type { EconomyMetricId, EconomyYear } from "@/types";
 
 const GDP_FAMILY: EconomyMetricId[] = ["gdp", "gdp_per_capita", "trade_balance"];
@@ -40,39 +40,47 @@ const FLAGS: Record<string, string> = {
 };
 
 // ── Flag image helper (avoids emoji rendering as text on some Android devices) ──
-function flagImg(emoji: string | undefined): React.ReactNode {
-  if (!emoji) return <span style={{ fontSize: "0.9rem" }}>🌍</span>;
-  const chars = [...emoji];
-  const a = chars[0]?.codePointAt(0) ?? 0;
-  const b = chars[1]?.codePointAt(0) ?? 0;
-  if (chars.length < 2 || a < 0x1F1E6 || b < 0x1F1E6) return <span style={{ fontSize: "0.9rem" }}>🌍</span>;
-  const code = (String.fromCharCode(a - 0x1F1E6 + 65) + String.fromCharCode(b - 0x1F1E6 + 65)).toLowerCase();
+// La table d'émojis ci-dessus ne couvrait qu'une centaine de pays. La base en
+// porte deux cents, avec leur code ISO2 : c'est lui qu'on interroge d'abord,
+// l'émoji ne servant plus qu'aux pays qu'elle ne couvre pas encore.
+function flagImg(name: string): React.ReactNode {
+  const code = iso2DePays(name)?.toLowerCase() ?? emojiVersIso2(FLAGS[name]);
+  if (!code) return <span style={{ fontSize: "0.9rem" }}>🌍</span>;
   return <img src={`https://flagcdn.com/20x15/${code}.png`} alt="" width={20} height={15} style={{ borderRadius: "2px", objectFit: "cover", flexShrink: 0 }} />;
 }
 
+function emojiVersIso2(emoji: string | undefined): string | null {
+  if (!emoji) return null;
+  const chars = [...emoji];
+  const a = chars[0]?.codePointAt(0) ?? 0;
+  const b = chars[1]?.codePointAt(0) ?? 0;
+  if (chars.length < 2 || a < 0x1F1E6 || b < 0x1F1E6) return null;
+  return (String.fromCharCode(a - 0x1F1E6 + 65) + String.fromCharCode(b - 0x1F1E6 + 65)).toLowerCase();
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
+/* Les montants viennent de la base au million près. À l'écran on les arrondit,
+   et l'arrondi suit la taille : trois chiffres significatifs suffisent à lire
+   un classement, et un pays à soixante millions de PIB ne doit pas s'afficher
+   à zéro pour autant. */
+function fmtMilliards(value: number): string {
+  const abs = Math.abs(value);
+  const decimales = abs >= 100 ? 0 : abs >= 10 ? 1 : 2;
+  return value.toLocaleString("fr-FR", { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
+}
+
 function formatValue(value: number | undefined, metricId: EconomyMetricId): string {
   if (value === undefined || value === null) return "-";
   if (metricId === "gdp") {
     if (value >= 1000) return `${(value / 1000).toFixed(1)} T$`;
-    return `${value.toLocaleString("fr-FR")} Mds`;
+    return `${fmtMilliards(value)} Mds`;
   }
   if (metricId === "debt_ratio") return `${value.toFixed(1)} %`;
   if (metricId === "unemployment") return `${value.toFixed(1)} %`;
   if (metricId === "companies") return `${value.toLocaleString("fr-FR")} k`;
   if (metricId === "gdp_per_capita") return `${Math.round(value).toLocaleString("fr-FR")} €`;
-  if (metricId === "trade_balance") return `${value > 0 ? "+" : ""}${value.toLocaleString("fr-FR")} Mds€`;
+  if (metricId === "trade_balance") return `${value > 0 ? "+" : ""}${fmtMilliards(value)} Mds€`;
   return String(value);
-}
-
-function getMetricValue(data: EconomyYear["countries"][string], metricId: EconomyMetricId): number {
-  if (metricId === "gdp") return data.gdp;
-  if (metricId === "debt_ratio") return data.debt_ratio;
-  if (metricId === "unemployment") return data.unemployment;
-  if (metricId === "companies") return data.companies;
-  if (metricId === "gdp_per_capita") return data.gdp_per_capita ?? 0;
-  if (metricId === "trade_balance") return data.trade_balance ?? 0;
-  return 0;
 }
 
 // Sort direction: GDP/Companies/PIB per capita/Balance → bigger is "better" → desc by default
@@ -94,7 +102,7 @@ interface ColDef {
 function gdpCol(): ColDef {
   return {
     key: "gdp", header: "PIB", unit: "Mds USD",
-    getValue: (d) => d.gdp,
+    getValue: (d) => d.gdp ?? -Infinity,
     format: (d) => formatValue(d.gdp, "gdp"),
     sortDir: "desc",
   };
@@ -126,25 +134,22 @@ function getColDefs(metric: EconomyMetricId): ColDef[] {
     primary = [
       {
         key: "debt_ratio", header: "% Dette / PIB", unit: "%",
-        getValue: (d) => d.debt_ratio,
-        format: (d) => `${d.debt_ratio.toFixed(1)} %`,
+        getValue: (d) => d.debt_ratio ?? -Infinity,
+        format: (d) => (d.debt_ratio === undefined ? "-" : `${d.debt_ratio.toFixed(1)} %`),
         sortDir: "desc",
       },
       {
         key: "debt_abs", header: "Montant dette", unit: "Mds USD",
-        getValue: (d) => Math.round(d.gdp * d.debt_ratio / 100),
-        format: (d) => {
-          const v = Math.round(d.gdp * d.debt_ratio / 100);
-          return formatValue(v, "gdp");
-        },
+        getValue: (d) => d.debt_amount ?? -Infinity,
+        format: (d) => formatValue(d.debt_amount, "gdp"),
         sortDir: "desc",
       },
     ];
   } else if (metric === "unemployment") {
     primary = [{
       key: "unemployment", header: "Chômage", unit: "%",
-      getValue: (d) => d.unemployment,
-      format: (d) => `${d.unemployment.toFixed(1)} %`,
+      getValue: (d) => d.unemployment ?? Infinity,
+      format: (d) => (d.unemployment === undefined ? "-" : `${d.unemployment.toFixed(1)} %`),
       sortDir: "asc",
     }];
   } else if (metric === "gdp_per_capita") {
@@ -208,14 +213,23 @@ export function EconomyRankingsTable({
 
   // Previous year data for rank delta
   const prevYearData = useMemo(() => {
-    const prev = ECONOMY_YEARS.find((y) => y.year === year - 1) ??
-      ECONOMY_YEARS.find((y) => y.year < year);
+    // ECONOMY_YEARS est trié dans l'ordre croissant : chercher la première
+    // année inférieure renvoyait 2000, si bien que la flèche montrait un écart
+    // de vingt-cinq ans en se faisant passer pour l'année précédente. C'est la
+    // dernière année inférieure qu'il faut.
+    const prev = [...ECONOMY_YEARS].reverse().find((y) => y.year < year);
     return prev ?? null;
   }, [year]);
 
   // Build ranked rows sorted by primary col
   const allRows = useMemo(() => {
-    const countries = Object.entries(activeEconomyYear.countries);
+    // Un classement ne se remplit pas de tirets : un pays dont la métrique
+    // affichée est absente de la base n'y figure pas, il reste gris sur la
+    // carte. Le compteur du pied de tableau dit alors combien la source
+    // couvre réellement cette année-là.
+    const countries = Object.entries(activeEconomyYear.countries).filter(
+      ([, d]) => Number.isFinite(primaryCol.getValue(d))
+    );
 
     const sorted = [...countries].sort(([, a], [, b]) => {
       const av = effectiveSortCol.getValue(a);
@@ -225,11 +239,13 @@ export function EconomyRankingsTable({
 
     const prevRankMap: Record<string, number> = {};
     if (prevYearData) {
-      const prevSorted = Object.entries(prevYearData.countries).sort(([, a], [, b]) => {
-        const av = primaryCol.getValue(a);
-        const bv = primaryCol.getValue(b);
-        return primaryCol.sortDir === "desc" ? bv - av : av - bv;
-      });
+      const prevSorted = Object.entries(prevYearData.countries)
+        .filter(([, d]) => Number.isFinite(primaryCol.getValue(d)))
+        .sort(([, a], [, b]) => {
+          const av = primaryCol.getValue(a);
+          const bv = primaryCol.getValue(b);
+          return primaryCol.sortDir === "desc" ? bv - av : av - bv;
+        });
       prevSorted.forEach(([name], i) => { prevRankMap[name] = i + 1; });
     }
 
@@ -401,7 +417,7 @@ export function EconomyRankingsTable({
                     {/* Country */}
                     <td className="px-3 py-2.5">
                       <div className="flex items-center gap-2">
-                        {flagImg(FLAGS[name])}
+                        {flagImg(name)}
                         <span className="text-xs font-medium eco-rank-country" style={{ color: "var(--ink)", whiteSpace: "nowrap" }}>
                           {countryFr(name)}
                         </span>
