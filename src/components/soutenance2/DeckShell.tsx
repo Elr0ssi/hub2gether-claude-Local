@@ -24,11 +24,13 @@ import {
   S2_ANNEXES,
   S2_SLIDES,
   S2_TOTAL_SECONDS,
-  type Act,
+  type Annex,
+  type Tone,
 } from "@/data/soutenance2/soutenance2Data";
 import { SlideStepProvider, useDeck } from "./useDeck";
 import { S2_VIEWS } from "./slides";
 import { ANNEX_VIEWS } from "./annexes";
+import type { ComponentType } from "react";
 import {
   EASE,
   ReducedMotionProvider,
@@ -39,8 +41,53 @@ import {
 // does today.
 import "@/components/presentation/presentation.css";
 
-/** States held by the slide at `index` — see `Slide2.steps`. */
-const stepsAt = (index: number) => S2_SLIDES[index]?.steps ?? 1;
+/**
+ * Tout ce qui distingue une version d'une autre : sa liste de slides, ses
+ * vues, ses actes, ses annexes. La coquille — scène, clavier, sommaire, rail
+ * présentateur, plein écran — ne change pas d'une version à l'autre, et il
+ * n'y a aucune raison de l'écrire deux fois.
+ */
+/**
+ * Une slide, vue par la coquille. Identique à `Slide2` sauf sur l'acte, qui
+ * est une chaîne libre : la V2 en a trois, la V3 en a sept, et il n'y a pas
+ * de raison qu'une version connaisse les actes de l'autre.
+ */
+export interface DeckSlide {
+  id: string;
+  label: string;
+  act: string;
+  seconds: number;
+  tone?: Tone;
+  steps?: number;
+  speakerNotes: string;
+}
+
+export interface DeckConfig {
+  /** Titre du sommaire et de l'onglet présentateur. */
+  name: string;
+  slides: readonly DeckSlide[];
+  views: Record<string, ComponentType>;
+  /** Les actes, dans l'ordre où le sommaire les empile. */
+  acts: readonly string[];
+  actLabels: Record<string, string>;
+  annexes: readonly Annex[];
+  annexViews: Record<string, ComponentType>;
+  totalSeconds: number;
+  /** Classe posée sur la racine du deck, pour une feuille propre à la version. */
+  className?: string;
+}
+
+/** La V2, telle quelle. C'est ce que `/soutenance-2` obtient sans rien passer. */
+export const DECK_S2: DeckConfig = {
+  name: "Soutenance 2",
+  slides: S2_SLIDES,
+  views: S2_VIEWS,
+  acts: ["pitch", "pivot", "depth"],
+  actLabels: ACT_LABELS,
+  annexes: S2_ANNEXES,
+  annexViews: ANNEX_VIEWS,
+  totalSeconds: S2_TOTAL_SECONDS,
+};
 
 const STAGE_W = 1920;
 const STAGE_H = 1080;
@@ -51,10 +98,14 @@ interface DeckShellProps {
   initialSlide?: number;
   /** `?presenter=true` — notes, timer, next slide and annex access. */
   presenter?: boolean;
+  /** Quelle version jouer. Absent = la V2, inchangée. */
+  config?: DeckConfig;
 }
 
-export function DeckShell({ initialSlide, presenter = false }: DeckShellProps) {
-  const deck = useDeck(S2_SLIDES.length, S2_ANNEXES.length, initialSlide, stepsAt);
+export function DeckShell({ initialSlide, presenter = false, config = DECK_S2 }: DeckShellProps) {
+  const SLIDES = config.slides;
+  const stepsAt = (index: number) => SLIDES[index]?.steps ?? 1;
+  const deck = useDeck(SLIDES.length, config.annexes.length, initialSlide, stepsAt);
   const {
     index,
     step,
@@ -76,9 +127,9 @@ export function DeckShell({ initialSlide, presenter = false }: DeckShellProps) {
   const prefersReduced = useReducedMotion();
   const reduced = Boolean(prefersReduced);
 
-  const slide = S2_SLIDES[index];
+  const slide = SLIDES[index];
   const tone = slide.tone ?? "light";
-  const View = S2_VIEWS[slide.id];
+  const View = config.views[slide.id];
   const overlayOpen = overviewOpen || annexIndex !== null;
 
   /* ── Stage scaling: fit 1920×1080 into whatever the projector gives us ── */
@@ -147,14 +198,14 @@ export function DeckShell({ initialSlide, presenter = false }: DeckShellProps) {
     [reduced]
   );
 
-  const progress = (index + 1) / S2_SLIDES.length;
+  const progress = (index + 1) / SLIDES.length;
   const chromeClass =
     tone === "dark" ? "ted-ctrl ted-ctrl-on-dark" : "ted-ctrl ted-ctrl-on-light";
 
   return (
     <ReducedMotionProvider value={reduced}>
       <div
-        className="ted-deck ted-deck-root"
+        className={`ted-deck ted-deck-root${config.className ? ` ${config.className}` : ""}`}
         /* Le pourtour prend la couleur de la slide. Il était noir quelle que
            soit la slide : sur une slide claire, le cadre se voyait comme deux
            bandes noires sur les côtés, et la projection n'occupait plus
@@ -194,7 +245,7 @@ export function DeckShell({ initialSlide, presenter = false }: DeckShellProps) {
                 }}
                 role="group"
                 aria-roledescription="slide"
-                aria-label={`${index + 1} sur ${S2_SLIDES.length} · ${slide.label}`}
+                aria-label={`${index + 1} sur ${SLIDES.length} · ${slide.label}`}
               >
                 <ToneProvider value={tone}>
                   <SlideStepProvider value={step}>{View ? <View /> : null}</SlideStepProvider>
@@ -215,7 +266,7 @@ export function DeckShell({ initialSlide, presenter = false }: DeckShellProps) {
               }}
             >
               {String(index + 1).padStart(2, "0")}
-              <span style={{ opacity: 0.5 }}> / {S2_SLIDES.length}</span>
+              <span style={{ opacity: 0.5 }}> / {SLIDES.length}</span>
             </div>
 
             {/* Progress */}
@@ -307,12 +358,13 @@ export function DeckShell({ initialSlide, presenter = false }: DeckShellProps) {
         </div>
 
         {/* ── Presenter rail ─────────────────────────────────────────────── */}
-        {presenter && <PresenterRail index={index} onJump={goTo} onAnnex={openAnnex} />}
+        {presenter && <PresenterRail index={index} onJump={goTo} onAnnex={openAnnex} config={config} />}
 
         {/* ── Overlays ───────────────────────────────────────────────────── */}
         <AnimatePresence>
           {overviewOpen && (
             <Overview
+              config={config}
               index={index}
               onSelect={(i) => {
                 goTo(i);
@@ -322,7 +374,7 @@ export function DeckShell({ initialSlide, presenter = false }: DeckShellProps) {
             />
           )}
           {annexIndex !== null && (
-            <AnnexOverlay index={annexIndex} onSelect={openAnnex} onClose={closeAnnex} />
+            <AnnexOverlay index={annexIndex} onSelect={openAnnex} onClose={closeAnnex} config={config} />
           )}
         </AnimatePresence>
       </div>
@@ -344,11 +396,17 @@ function PresenterRail({
   index,
   onJump,
   onAnnex,
+  config,
 }: {
   index: number;
   onJump: (i: number) => void;
   onAnnex: (i: number) => void;
+  config: DeckConfig;
 }) {
+  const S2_SLIDES = config.slides;
+  const S2_TOTAL_SECONDS = config.totalSeconds;
+  const S2_ANNEXES = config.annexes;
+  const ACT_LABELS = config.actLabels;
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -491,18 +549,22 @@ function Overview({
   index,
   onSelect,
   onClose,
+  config,
 }: {
   index: number;
   onSelect: (i: number) => void;
   onClose: () => void;
+  config: DeckConfig;
 }) {
-  const indexed = S2_SLIDES.map((s, i) => ({ s, i }));
-  const columns: { title: string; rows: typeof indexed }[] = (
-    ["pitch", "pivot", "depth"] as Act[]
-  ).map((act) => ({
-    title: ACT_LABELS[act],
-    rows: indexed.filter(({ s }) => s.act === act),
-  }));
+  const indexed = config.slides.map((s, i) => ({ s, i }));
+  // Un acte sans slide ne fait pas une colonne vide : le sommaire d'une
+  // version à sept actes n'a pas à porter les trois de l'autre.
+  const columns: { title: string; rows: typeof indexed }[] = config.acts
+    .map((act) => ({
+      title: config.actLabels[act] ?? act,
+      rows: indexed.filter(({ s }) => s.act === act),
+    }))
+    .filter((c) => c.rows.length > 0);
 
   return (
     <motion.div
@@ -525,7 +587,7 @@ function Overview({
         }}
       >
         <div>
-          <div className="t-eyebrow accent">The Essential Data · Soutenance 2</div>
+          <div className="t-eyebrow accent">The Essential Data · {config.name}</div>
           <div
             style={{
               fontSize: 30,
@@ -599,13 +661,16 @@ function AnnexOverlay({
   index,
   onSelect,
   onClose,
+  config,
 }: {
   index: number;
   onSelect: (i: number) => void;
   onClose: () => void;
+  config: DeckConfig;
 }) {
-  const annex = S2_ANNEXES[index];
-  const View = ANNEX_VIEWS[annex.id];
+  const S2_ANNEXES = config.annexes;
+  const annex = config.annexes[index];
+  const View = config.annexViews[annex.id];
 
   return (
     <motion.div

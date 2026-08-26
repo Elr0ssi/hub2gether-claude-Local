@@ -69,9 +69,21 @@ export function DrawPath({
 export function SourceFan({
   labels,
   startDelay = 0,
+  center = "Un lecteur",
+  centerSize = 23,
+  labelSize = 16,
+  maxWidth = 660,
 }: {
   labels: readonly string[];
   startDelay?: number;
+  /* Quatre réglages ajoutés pour la V3, tous par défaut sur les valeurs de la
+     V2 : le centre devient « Le lecteur » quand la slide parle de sa charge de
+     travail, et la typographie monte d'un cran pour une projection. La V2, qui
+     ne passe rien, est rendue exactement comme avant. */
+  center?: string;
+  centerSize?: number;
+  labelSize?: number;
+  maxWidth?: number;
 }) {
   const ink = useInk();
   const accent = useAccent();
@@ -96,7 +108,7 @@ export function SourceFan({
   });
 
   return (
-    <div style={{ position: "relative", width: "100%", maxWidth: 660, aspectRatio: "1 / 1" }}>
+    <div style={{ position: "relative", width: "100%", maxWidth, aspectRatio: "1 / 1" }}>
       <svg
         viewBox="0 0 1000 1000"
         preserveAspectRatio="none"
@@ -142,12 +154,15 @@ export function SourceFan({
             placeItems: "center",
             background: ink.tone === "dark" ? "#0B0B0B" : "#fff",
             color: ink.primary,
-            fontSize: 23,
+            fontSize: centerSize,
             fontWeight: 800,
             letterSpacing: "-0.02em",
+            textAlign: "center",
+            padding: "0 14px",
+            lineHeight: 1.15,
           }}
         >
-          Un lecteur
+          {center}
         </div>
       </Rise>
 
@@ -187,7 +202,7 @@ export function SourceFan({
               border: `1px solid ${ink.rule}`,
               background: ink.tone === "dark" ? "rgba(255,255,255,0.04)" : "#fff",
               color: ink.secondary,
-              fontSize: 16,
+              fontSize: labelSize,
               fontWeight: 600,
             }}
           >

@@ -80,14 +80,14 @@ const PresentationGlobe = dynamic(
  * on screen and the number in the summary disagreed, and eight slides had to
  * be edited to add one. Derived, they cannot.
  */
-const sectionNo = (id: string): string => {
+export const sectionNo = (id: string): string => {
   const i = S2_SLIDES.findIndex((slide) => slide.id === id);
   return i <= 0 ? "§" : `§ ${String(i).padStart(2, "0")}`;
 };
 
 /* ── Shared title blocks ──────────────────────────────────────────────── */
 
-function StatementTitle({
+export function StatementTitle({
   lines,
   delay = 0,
   size = "t-h2",
@@ -137,7 +137,7 @@ function StatementTitle({
    01 — COVER
    ═══════════════════════════════════════════════════════════════════════ */
 
-function CoverSlide() {
+export function CoverSlide() {
   const ink = useInk();
   const accent = useAccent();
 
@@ -194,7 +194,7 @@ function CoverSlide() {
    02 — LE PROBLÈME
    ═══════════════════════════════════════════════════════════════════════ */
 
-function ProblemSlide() {
+export function ProblemSlide() {
   const ink = useInk();
   const accent = useAccent();
 
@@ -250,7 +250,7 @@ function ProblemSlide() {
    03 — POUR QUI
    ═══════════════════════════════════════════════════════════════════════ */
 
-function AudienceSlide() {
+export function AudienceSlide() {
   const ink = useInk();
   const accent = useAccent();
 
@@ -353,7 +353,7 @@ function AudienceSlide() {
    04 — LE PRODUIT
    ═══════════════════════════════════════════════════════════════════════ */
 
-function ProductSlide() {
+export function ProductSlide() {
   const ink = useInk();
 
   return (
@@ -405,7 +405,7 @@ function ProductSlide() {
    05 — LE MARCHÉ
    ═══════════════════════════════════════════════════════════════════════ */
 
-function MarketSlide() {
+export function MarketSlide() {
   const ink = useInk();
   const accent = useAccent();
 
@@ -529,7 +529,7 @@ function MarketSlide() {
    LES ACTEURS
    ═══════════════════════════════════════════════════════════════════════ */
 
-function PlayersSlide() {
+export function PlayersSlide() {
   const ink = useInk();
   const accent = useAccent();
 
@@ -599,7 +599,7 @@ function PlayersSlide() {
    06 — LA CONCURRENCE
    ═══════════════════════════════════════════════════════════════════════ */
 
-function CompetitionSlide() {
+export function CompetitionSlide() {
   const ink = useInk();
 
   return (
@@ -627,7 +627,7 @@ function CompetitionSlide() {
    07 — MOTEUR D'ACQUISITION
    ═══════════════════════════════════════════════════════════════════════ */
 
-function AcquisitionSlide() {
+export function AcquisitionSlide() {
   const ink = useInk();
   const accent = useAccent();
 
@@ -744,7 +744,7 @@ function AcquisitionSlide() {
    nodes travel instead of being replaced.
    ═══════════════════════════════════════════════════════════════════════ */
 
-function AiShiftSlide() {
+export function AiShiftSlide() {
   const ink = useInk();
   const accent = useAccent();
   const step = useSlideStep();
@@ -824,7 +824,7 @@ function AiShiftSlide() {
    09 — MODÈLE ÉCONOMIQUE
    ═══════════════════════════════════════════════════════════════════════ */
 
-function RevenueSlide() {
+export function RevenueSlide() {
   const ink = useInk();
   const accent = useAccent();
 
@@ -927,7 +927,7 @@ function RevenueSlide() {
    PIVOT
    ═══════════════════════════════════════════════════════════════════════ */
 
-function PivotSlide() {
+export function PivotSlide() {
   const ink = useInk();
   const accent = useAccent();
 
@@ -957,7 +957,7 @@ function PivotSlide() {
    09 — LE TRAVAIL DE RECOUPEMENT
    ═══════════════════════════════════════════════════════════════════════ */
 
-function CrossCheckSlide() {
+export function CrossCheckSlide() {
   const ink = useInk();
   const accent = useAccent();
 
@@ -1013,7 +1013,7 @@ function CrossCheckSlide() {
    10 — COMMENT NAÎT UN ARTICLE
    ═══════════════════════════════════════════════════════════════════════ */
 
-function PipelineSlide() {
+export function PipelineSlide() {
   const ink = useInk();
 
   return (
@@ -1065,7 +1065,7 @@ function PipelineSlide() {
    11 — LE FORMAT ARTICLE
    ═══════════════════════════════════════════════════════════════════════ */
 
-function ArticleSlide() {
+export function ArticleSlide() {
   const ink = useInk();
   const accent = useAccent();
 
@@ -1140,7 +1140,7 @@ function ArticleSlide() {
    12 — OÙ EN EST LE PROJET
    ═══════════════════════════════════════════════════════════════════════ */
 
-function StatusSlide() {
+export function StatusSlide() {
   const ink = useInk();
   const accent = useAccent();
 
@@ -1213,7 +1213,7 @@ function StatusSlide() {
    13 — CHIFFRES CLÉS DU BUSINESS PLAN
    ═══════════════════════════════════════════════════════════════════════ */
 
-function FinanceSlide() {
+export function FinanceSlide() {
   const ink = useInk();
   const accent = useAccent();
 
@@ -1277,7 +1277,7 @@ function FinanceSlide() {
    14 — ROADMAP
    ═══════════════════════════════════════════════════════════════════════ */
 
-function RoadmapSlide() {
+export function RoadmapSlide() {
   const ink = useInk();
   const accent = useAccent();
 
@@ -1398,7 +1398,7 @@ function RoadmapSlide() {
    15 — CONCLUSION
    ═══════════════════════════════════════════════════════════════════════ */
 
-function ConclusionSlide() {
+export function ConclusionSlide() {
   const ink = useInk();
   const accent = useAccent();
 
