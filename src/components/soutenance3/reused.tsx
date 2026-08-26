@@ -24,11 +24,15 @@ import { FUNDING } from "@/data/soutenance2/soutenance2Data";
 import { S3_UNLOCK } from "@/data/soutenance3/soutenance3Data";
 
 export {
+  AcquisitionSlide,
+  AudienceSlide,
+  CompetitionSlide,
   ConclusionSlide,
   CrossCheckSlide,
   FinanceSlide,
   MarketSlide,
   PivotSlide,
+  PlayersSlide,
   RevenueSlide,
   RoadmapSlide,
   StatusSlide,
@@ -36,9 +40,15 @@ export {
 
 export {
   EditorialSlide as EditorialSlideRef,
+  LaterSlide as HistorySlideRef,
   TeamSlide as TeamSlideRef,
   WorkshopSlide as PipelineSlideRef,
 } from "@/components/soutenance2/newSlides";
+
+/* Trois slides de la V2 affichent leur numéro de section : il vient de la
+   place qu'elles occupent dans le deck, donc il doit être calculé sur la
+   liste de la V3 et non sur celle de la V2. */
+export { GeoSlide, PublicationsSlide, PartnershipsSlide } from "@/components/soutenance2/newSlides";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    24 — CE QUE LE FINANCEMENT DÉBLOQUE

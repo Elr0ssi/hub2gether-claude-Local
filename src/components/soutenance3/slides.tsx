@@ -13,7 +13,7 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 import dynamic from "next/dynamic";
-import { Fragment, useMemo, useState, type ComponentType } from "react";
+import { useMemo, useState, type ComponentType } from "react";
 import { countryFr } from "@/data/countryNamesFr";
 import { getYearData } from "@/data/economy/economy";
 import {
@@ -31,13 +31,21 @@ import {
   useAccent,
 } from "@/components/soutenance2/visuals";
 import {
+  AcquisitionSlide,
+  AudienceSlide,
+  CompetitionSlide,
   ConclusionSlide,
   CrossCheckSlide,
   EditorialSlideRef,
   FinanceSlide,
+  GeoSlide,
+  HistorySlideRef,
   MarketSlide,
+  PartnershipsSlide,
   PipelineSlideRef,
   PivotSlide,
+  PlayersSlide,
+  PublicationsSlide,
   RevenueSlide,
   RoadmapSlide,
   StatusSlide,
@@ -48,27 +56,34 @@ import {
   Intersection,
   MarginalCurve,
   OperationChain,
-  SeriesTimeline,
   ShiftChain,
   VerbStack,
 } from "./visuals";
 import {
+  S3_SLIDES,
   S3_ANSWER,
   S3_CHANNEL,
   S3_COVER,
   S3_DEPTH,
   S3_ECONOMICS,
-  S3_JOURNEY,
   S3_MISSING,
   S3_PARADOX,
   S3_POSITIONING,
   S3_READER_WORK,
-  S3_SERIES,
   S3_SHIFT,
   S3_SPLIT,
   S3_TRACE,
 } from "@/data/soutenance3/soutenance3Data";
 import { useSlideStep } from "@/components/soutenance2/useDeck";
+
+/**
+ * Le § d'une slide, lu sur sa place dans le deck. Trois slides reprises de la
+ * V2 l'affichent ; écrit à la main, il se décalait au premier déplacement.
+ */
+const sectionNo = (id: string): string => {
+  const i = S3_SLIDES.findIndex((slide) => slide.id === id);
+  return i <= 0 ? "§" : `§ ${String(i).padStart(2, "0")}`;
+};
 
 const PresentationGlobe = dynamic(
   () => import("@/components/presentation/visuals/PresentationGlobe"),
@@ -594,98 +609,6 @@ function AnswerSlide() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   06 — LE PARCOURS
-
-   Six gestes qui s'enchaînent, dans l'ordre où on les fait réellement. La
-   numérotation est là pour que l'œil suive la progression sans que la voix ait
-   à dire « ensuite » six fois.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-function JourneySlide() {
-  const ink = useInk();
-  const accent = useAccent();
-
-  return (
-    <SlideBody>
-      <Eyebrow>{S3_JOURNEY.eyebrow}</Eyebrow>
-
-      <div style={{ marginTop: 22 }}>
-        <Rise delay={0.08} y={20}>
-          <p className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em" }}>
-            {S3_JOURNEY.title[0]}
-          </p>
-        </Rise>
-      </div>
-
-      <div
-        style={{
-          marginTop: 44,
-          display: "grid",
-          gridTemplateColumns: "repeat(6, 1fr)",
-          gap: 0,
-          flex: 1,
-          minHeight: 0,
-          alignItems: "start",
-        }}
-      >
-        {S3_JOURNEY.steps.map((s, i) => (
-          <Rise key={s.id} delay={0.3 + i * 0.17} y={18}>
-            <div
-              style={{
-                paddingRight: 26,
-                borderLeft: i === 0 ? "none" : `1px solid ${ink.rule}`,
-                paddingLeft: i === 0 ? 0 : 26,
-                height: "100%",
-              }}
-            >
-              <div
-                className="t-micro"
-                style={{ color: accent, letterSpacing: "0.16em", marginBottom: 14 }}
-              >
-                {String(i + 1).padStart(2, "0")}
-              </div>
-              <div
-                style={{
-                  fontSize: 33,
-                  fontWeight: 800,
-                  letterSpacing: "-0.03em",
-                  color: ink.primary,
-                  lineHeight: 1.08,
-                }}
-              >
-                {s.label}
-              </div>
-              <div
-                style={{
-                  fontSize: 21,
-                  fontWeight: 500,
-                  letterSpacing: "-0.012em",
-                  color: ink.secondary,
-                  marginTop: 12,
-                  lineHeight: 1.34,
-                }}
-              >
-                {s.body}
-              </div>
-            </div>
-          </Rise>
-        ))}
-      </div>
-
-      <div style={{ marginTop: 28 }}>
-        <Rise delay={1.5} y={10}>
-          <ProductScreenshotFrame
-            label="Carte interactive · Économie mondiale"
-            caption={S3_JOURNEY.demoNote}
-            height={228}
-          />
-        </Rise>
-      </div>
-    </SlideBody>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
    07 — TROIS PROFONDEURS
 
    La proposition de valeur centrale, remontée de la slide 23 de la V2. Un
@@ -781,146 +704,6 @@ function DepthSlide() {
             </Rise>
           ))}
         </div>
-      </div>
-    </SlideBody>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   08 — LES SÉRIES
-
-   Ne pas cataloguer les indicateurs : montrer la mécanique. C'est la
-   répétabilité du format qui fait le média, et la profondeur temporelle qui le
-   distingue d'un tableau de bord.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-function SeriesSlide() {
-  const ink = useInk();
-  const accent = useAccent();
-
-  /* Trois colonnes de texte à la suite d'une slide en trois colonnes de texte
-     et d'une autre en trois colonnes de texte : l'acte produit ronronnait. La
-     mécanique s'écrit ici comme une équation — trois termes, deux croix, un
-     résultat — et se lit d'un coup au lieu de se parcourir. */
-  return (
-    <SlideBody>
-      <Eyebrow>{S3_SERIES.eyebrow}</Eyebrow>
-
-      <div style={{ marginTop: 22, maxWidth: 1240 }}>
-        {S3_SERIES.title.map((line, i) => (
-          <Rise key={line} delay={0.08 + i * 0.16} y={20}>
-            <p
-              className="t-h2"
-              style={{ color: i === 1 ? ink.primary : ink.secondary, letterSpacing: "-0.035em" }}
-            >
-              {line}
-            </p>
-          </Rise>
-        ))}
-      </div>
-
-      {/* L'équation */}
-      <div
-        style={{
-          marginTop: 54,
-          display: "flex",
-          alignItems: "center",
-          gap: 34,
-          flexWrap: "nowrap",
-        }}
-      >
-        {S3_SERIES.formula.map((f, i) => (
-          <Fragment key={f.label}>
-            {i > 0 && (
-              <Rise delay={0.5 + i * 0.22} y={0}>
-                <span style={{ fontSize: 44, fontWeight: 300, color: ink.faint, lineHeight: 1 }}>×</span>
-              </Rise>
-            )}
-            <Rise delay={0.45 + i * 0.22} y={18}>
-              <div style={{ maxWidth: 340 }}>
-                <div
-                  style={{
-                    fontSize: 38,
-                    fontWeight: 800,
-                    letterSpacing: "-0.034em",
-                    color: ink.primary,
-                    lineHeight: 1.05,
-                  }}
-                >
-                  {f.label}
-                </div>
-                <div
-                  style={{
-                    fontSize: 20,
-                    fontWeight: 500,
-                    color: ink.secondary,
-                    marginTop: 10,
-                    letterSpacing: "-0.012em",
-                    lineHeight: 1.32,
-                  }}
-                >
-                  {f.detail}
-                </div>
-              </div>
-            </Rise>
-          </Fragment>
-        ))}
-
-        <Rise delay={1.15} y={0}>
-          <span style={{ fontSize: 44, fontWeight: 300, color: ink.faint, lineHeight: 1 }}>=</span>
-        </Rise>
-
-        <Rise delay={1.25} y={18}>
-          <div
-            style={{
-              padding: "20px 34px",
-              borderRadius: 4,
-              background: accent,
-              color: "#0B0B0B",
-              fontSize: 38,
-              fontWeight: 800,
-              letterSpacing: "-0.032em",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {S3_SERIES.result}
-          </div>
-        </Rise>
-      </div>
-
-      <div style={{ marginTop: 58, flex: 1, minHeight: 0, display: "grid", alignContent: "center" }}>
-        <SeriesTimeline
-          from={S3_SERIES.timeline.from}
-          to={S3_SERIES.timeline.to}
-          live={S3_SERIES.timeline.live}
-          startDelay={1.5}
-        />
-
-        <div style={{ marginTop: 50, display: "flex", gap: 13, flexWrap: "wrap" }}>
-          {S3_SERIES.indicators.map((ind, i) => (
-            <Rise key={ind} delay={2.15 + i * 0.06} y={10}>
-              <span
-                style={{
-                  display: "inline-block",
-                  padding: "11px 22px",
-                  borderRadius: 100,
-                  border: `1px solid ${ink.rule}`,
-                  color: ink.secondary,
-                  fontSize: 20,
-                  fontWeight: 600,
-                }}
-              >
-                {ind}
-              </span>
-            </Rise>
-          ))}
-        </div>
-
-        <Rise delay={2.7} y={8}>
-          <p style={{ marginTop: 20, fontSize: 18, color: ink.faint, fontStyle: "italic" }}>
-            {S3_SERIES.note}
-          </p>
-        </Rise>
       </div>
     </SlideBody>
   );
@@ -1617,36 +1400,42 @@ export const S3_VIEWS: Record<string, ComponentType> = {
   cover: CoverSlide,
   paradoxe: ParadoxSlide,
   travail: ReaderWorkSlide,
+  reprise: HistorySlideRef,
   manque: MissingSlide,
   reponse: AnswerSlide,
 
   /* Acte II — le produit */
-  parcours: JourneySlide,
   lecture: DepthSlide,
-  series: SeriesSlide,
   promesse: EditorialSlideRef,
 
   /* Acte III — pourquoi il y a une place */
-  marche: MarketSlide,
   positionnement: PositioningSlide,
   bascule: ShiftSlide,
   canal: ChannelSlide,
 
-  /* Acte IV — le modèle économique */
-  modele: RevenueSlide,
-  trajectoire: FinanceSlide,
-
-  /* Acte V — la fabrication */
+  /* Acte IV — la fabrication */
   pivot: PivotSlide,
   recoupement: CrossCheckSlide,
   pipeline: PipelineSlideRef,
   partage: SplitSlide,
   economie: EconomicsSlide,
+  geo: () => <GeoSlide index={sectionNo("geo")} />,
   tracabilite: TraceSlide,
 
-  /* Acte VI — preuve d'exécution */
+  /* Acte V — preuve d'exécution */
   etat: StatusSlide,
   derriere: TeamSlideRef,
+
+  /* Acte VI — le modèle économique */
+  cible: AudienceSlide,
+  marche: MarketSlide,
+  acteurs: PlayersSlide,
+  concurrence: CompetitionSlide,
+  acquisition: AcquisitionSlide,
+  publications: () => <PublicationsSlide index={sectionNo("publications")} />,
+  partenariats: () => <PartnershipsSlide index={sectionNo("partenariats")} />,
+  modele: RevenueSlide,
+  trajectoire: FinanceSlide,
 
   /* Acte VII — passage à l'échelle */
   financement: UnlockSlide,

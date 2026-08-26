@@ -92,6 +92,15 @@ export const S3_SLIDES: readonly DeckSlide[] = [
       "QUESTION : concrètement, qu'est-ce qui coûte au lecteur ? Les sources arrivent, puis la chaîne d'opérations se déroule. Insister : l'information existe, elle est même surabondante. Ce qui manque, c'est le travail de mise en relation, et il est aujourd'hui à la charge du lecteur. Cette idée reviendra à l'acte V, retournée : c'est nous qui le prendrons en charge.",
   },
   {
+    id: "reprise",
+    label: "Quatre ans d'histoire",
+    act: "probleme",
+    seconds: 65,
+    tone: "dark",
+    speakerNotes:
+      "QUESTION : depuis quand ce projet existe-t-il ? Trois versions, un même projet. Ce qui a changé n'est pas l'idée mais ce qu'on peut en faire : la V1 butait sur le coût du recoupement manuel, la V3 le fait faire. Ne pas s'excuser du temps écoulé — c'est ce temps qui rend la démonstration crédible.",
+  },
+  {
     id: "manque",
     label: "Ce qui manque",
     act: "probleme",
@@ -110,28 +119,12 @@ export const S3_SLIDES: readonly DeckSlide[] = [
   },
   /* ── ACTE II — LE PRODUIT ────────────────────────────────────────────── */
   {
-    id: "parcours",
-    label: "Comment ça marche",
-    act: "produit",
-    seconds: 60,
-    speakerNotes:
-      "QUESTION : à quoi ressemble l'expérience ? Montrer, ne pas décrire. Suivre le parcours du doigt : globe, pays, indicateur, historique, comparaison, source. Une démo live sur /map/economy est possible ici si la salle et le réseau le permettent — la décision se prend avant, pas devant le jury.",
-  },
-  {
     id: "lecture",
     label: "Trois profondeurs",
     act: "produit",
     seconds: 70,
     speakerNotes:
       "QUESTION : combien de temps me faut-il pour comprendre ? C'est la proposition de valeur centrale, et elle arrivait en slide 23 en V2. Prendre un exemple et le tenir : la dette française. Trente secondes pour le chiffre, deux minutes pour le situer, cinq pour l'instruire. Finir sur la source : c'est la traçabilité qui fait la différence.",
-  },
-  {
-    id: "series",
-    label: "Les séries",
-    act: "produit",
-    seconds: 50,
-    speakerNotes:
-      "QUESTION : est-ce que ça tient au-delà d'un article ? Ne pas réciter la liste des indicateurs. Faire comprendre la mécanique : un indicateur × plusieurs pays × plusieurs années. C'est la répétabilité du format qui fait le média, pas le nombre de séries. Appuyer sur la profondeur temporelle, 1960 à aujourd'hui.",
   },
   {
     id: "promesse",
@@ -214,6 +207,14 @@ export const S3_SLIDES: readonly DeckSlide[] = [
       "QUESTION : qu'est-ce que l'automatisation change vraiment ? Ne pas se contenter de « j'utilise des agents ». Montrer le coût. Les cases marquées à compléter le sont volontairement : les mesures de production seront faites avant la soutenance, et annoncer un chiffre non mesuré serait exactement ce que le projet reproche aux autres. Le dire au jury si la question vient.",
   },
   {
+    id: "geo",
+    label: "Comment être cité par l'IA",
+    act: "fabrication",
+    seconds: 65,
+    speakerNotes:
+      "QUESTION : qu'est-ce que la fabrication doit produire pour qu'une IA nous reprenne ? Le pendant technique de « devenir une source », vu depuis l'atelier : faits datés, sources primaires, méthode publiée, série stable. Ce sont des contraintes de production, pas de communication — c'est pour cela que la slide est ici et non à l'acte III.",
+  },
+  {
     id: "tracabilite",
     label: "Automatisé, mais traçable",
     act: "fabrication",
@@ -240,12 +241,61 @@ export const S3_SLIDES: readonly DeckSlide[] = [
   },
   /* ── ACTE VI — LE MODÈLE ÉCONOMIQUE ──────────────────────────────────── */
   {
+    id: "cible",
+    label: "Pour qui",
+    act: "modele",
+    seconds: 40,
+    speakerNotes:
+      "QUESTION : à qui ce média s'adresse-t-il ? Ouvre le volet économique : avant de parler recette, dire qui est en face. Deux chiffres, deux phrases, et ne pas les commenter — ils se lisent seuls. Ce sont eux qui expliquent l'absence de paywall trois slides plus loin.",
+  },
+  {
     id: "marche",
     label: "Le marché",
     act: "modele",
     seconds: 45,
     speakerNotes:
       "QUESTION : y a-t-il une demande ? Le marché ouvre désormais le volet économique, après la preuve d'exécution : le jury a vu le produit et sait qu'il est construit, la question devient à qui il se vend. Deux ou trois chiffres, pas davantage, et chacun sert une conclusion.",
+  },
+  {
+    id: "acteurs",
+    label: "Qui occupe le terrain",
+    act: "modele",
+    seconds: 45,
+    speakerNotes:
+      "QUESTION : qui est déjà sur ce terrain, en France ? Nommer les acteurs sans les opposer : la slide suivante montre ce qu'ils couvrent et ce qu'ils laissent. Rester rapide, c'est un état des lieux, pas un jugement.",
+  },
+  {
+    id: "concurrence",
+    label: "Couverture de la concurrence",
+    act: "modele",
+    seconds: 60,
+    speakerNotes:
+      "QUESTION : que couvrent-ils, et que laissent-ils ? La matrice se lit en colonnes : chaque acteur fait bien une ou deux choses. Notre ligne est la seule qui les tienne toutes — le dire une fois, sans insister, la matrice a déjà parlé.",
+  },
+  {
+    id: "acquisition",
+    label: "Nos canaux d'acquisition",
+    act: "modele",
+    seconds: 50,
+    tone: "dark",
+    speakerNotes:
+      "QUESTION : par où le lecteur arrive-t-il ? Aller là où il est déjà plutôt que d'attendre qu'il vienne. La boucle se referme : le format court amène sur le site, le site nourrit le format court. C'est aussi ce qui rend le modèle sans paywall tenable.",
+  },
+  {
+    id: "publications",
+    label: "Ce que nous publions déjà",
+    act: "modele",
+    seconds: 55,
+    speakerNotes:
+      "QUESTION : est-ce que ça tourne déjà ? Trois publications réelles, pas des maquettes. Laisser les captures parler et ne commenter que ce que le jury ne peut pas voir : la fréquence et le circuit de production.",
+  },
+  {
+    id: "partenariats",
+    label: "Partenariats éventuels",
+    act: "modele",
+    seconds: 40,
+    speakerNotes:
+      "QUESTION : avec qui la construction est-elle envisageable ? Des pistes, pas des accords — le dire franchement si la question vient. Ce qui compte est la cohérence avec le positionnement, pas le nom.",
   },
   {
     id: "modele",
@@ -381,23 +431,6 @@ export const S3_ANSWER = {
    ACTE II — LE PRODUIT
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* 06 — LE PARCOURS
-   Six gestes qui s'enchaînent, comme on les fait réellement dans le produit.
-   La slide doit donner l'impression de naviguer, pas de lire une liste. */
-export const S3_JOURNEY = {
-  eyebrow: "Comment ça marche",
-  title: ["Six gestes, un seul outil."],
-  steps: [
-    { id: "globe", label: "Globe", body: "Le monde entier, d'un coup d'œil." },
-    { id: "pays", label: "Pays", body: "Un clic, et la fiche s'ouvre." },
-    { id: "indicateur", label: "Indicateur", body: "PIB, dette, chômage, échanges." },
-    { id: "historique", label: "Historique", body: "Soixante-six années, pas un instantané." },
-    { id: "comparaison", label: "Comparaison", body: "Le même chiffre, ailleurs." },
-    { id: "source", label: "Source", body: "D'où il vient, et quand." },
-  ],
-  demoNote: "Démo possible en direct : /map/economy",
-} as const;
-
 /* 07 — TROIS PROFONDEURS DE LECTURE
    La proposition de valeur centrale, remontée de la slide 23 de la V2. Un
    exemple tenu de bout en bout vaut mieux qu'une explication du format. */
@@ -414,32 +447,6 @@ export const S3_DEPTH = {
     label: "Article réel · The Essential Data",
     ratio: "Capture produit · /articles/…",
   },
-} as const;
-
-/* 08 — LES SÉRIES
-   Ne pas cataloguer. Faire comprendre la mécanique : c'est la répétabilité du
-   format qui fait le média, pas la longueur de la liste. */
-export const S3_SERIES = {
-  eyebrow: "Les séries",
-  title: ["Un format qui se répète.", "C'est ce qui en fait un média."],
-  formula: [
-    { label: "Un indicateur", detail: "PIB, dette, chômage, démographie…" },
-    { label: "Plusieurs pays", detail: "Deux cents et quelques, quand la source les publie." },
-    { label: "Plusieurs années", detail: "Chaque année, jamais une moyenne." },
-  ],
-  result: "Une comparaison",
-  timeline: { from: "1960", to: "2025", live: "En direct" },
-  indicators: [
-    "PIB",
-    "PIB par habitant",
-    "Balance extérieure",
-    "Inflation",
-    "Dette publique",
-    "Dépenses publiques",
-    "Chômage",
-    "Démographie",
-  ],
-  note: "Les quatre premières séries sont en base et servent la carte. Les suivantes suivent le même import.",
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
