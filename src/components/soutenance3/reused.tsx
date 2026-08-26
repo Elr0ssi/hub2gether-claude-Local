@@ -45,10 +45,13 @@ export {
   WorkshopSlide as PipelineSlideRef,
 } from "@/components/soutenance2/newSlides";
 
-/* Trois slides de la V2 affichent leur numéro de section : il vient de la
+/* Ces deux slides de la V2 affichent leur numéro de section : il vient de la
    place qu'elles occupent dans le deck, donc il doit être calculé sur la
-   liste de la V3 et non sur celle de la V2. */
-export { GeoSlide, PublicationsSlide, PartnershipsSlide } from "@/components/soutenance2/newSlides";
+   liste de la V3 et non sur celle de la V2.
+
+   La slide GEO, elle, a une variante propre à la V3 (voir slides.tsx) : le
+   cadre vert y change de contenu. */
+export { PublicationsSlide, PartnershipsSlide } from "@/components/soutenance2/newSlides";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    24 — CE QUE LE FINANCEMENT DÉBLOQUE

@@ -12,11 +12,13 @@
    en ouvrant les deux onglets côte à côte.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useMemo, useState, type ComponentType } from "react";
 import { countryFr } from "@/data/countryNamesFr";
 import { getYearData } from "@/data/economy/economy";
 import {
+  EASE as DECK_EASE,
   Eyebrow,
   Fade,
   Rise,
@@ -38,7 +40,6 @@ import {
   CrossCheckSlide,
   EditorialSlideRef,
   FinanceSlide,
-  GeoSlide,
   HistorySlideRef,
   MarketSlide,
   PartnershipsSlide,
@@ -60,6 +61,7 @@ import {
   ShiftChain,
   VerbStack,
 } from "./visuals";
+import { GEO } from "@/data/soutenance2/soutenance2Data";
 import {
   S3_SLIDES,
   S3_ANSWER,
@@ -1527,6 +1529,148 @@ function TraceSlide() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   17 — COMMENT ÊTRE CITÉ PAR L'IA · variante V3
+
+   Même slide que la V2, à un échange près. Le cadre vert portait « ce que la
+   réponse ne produit pas » — la carte, la comparaison, la série, le chemin
+   vers la source — mais la V3 dit déjà exactement cela quatre slides plus tôt,
+   sur « Devenir une source ». Le répéter ici ne fait rien apprendre au jury.
+
+   Le cadre accueille donc ce qui se trouvait en bas à gauche : ce que le GEO
+   impose à l'écriture. C'est le bon endroit — cette slide est dans l'acte
+   fabrication, et ces quatre exigences sont des contraintes de production.
+
+   La V2 garde sa version, inchangée.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function GeoDisciplineSlide() {
+  const ink = useInk();
+  const accent = useAccent();
+
+  return (
+    <SlideBody>
+      <Eyebrow>GEO</Eyebrow>
+
+      <Rise delay={0.08} y={20}>
+        <p className="t-h1" style={{ color: ink.primary, letterSpacing: "-0.042em", marginTop: 22 }}>
+          {GEO.title[0]}
+        </p>
+      </Rise>
+
+      <div
+        style={{
+          marginTop: 50,
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1.25fr) minmax(0, 1fr)",
+          gap: 80,
+          alignItems: "center",
+        }}
+      >
+        <div>
+          <Rise delay={0.35} y={12}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+                gap: 28,
+                paddingBottom: 12,
+                borderBottom: `1px solid ${ink.rule}`,
+              }}
+            >
+              {/* Le SEO s'allume d'abord, puis s'éteint au profit du GEO :
+                  la bascule se joue à l'écran au lieu d'être expliquée. */}
+              {GEO.contrastHeads.map((h, i) => (
+                <motion.p
+                  key={h}
+                  className="t-micro"
+                  initial={{ color: i === 0 ? accent : ink.rule, opacity: i === 0 ? 1 : 0 }}
+                  animate={{ color: i === 0 ? ink.faint : accent, opacity: 1 }}
+                  transition={{
+                    color: { duration: 0.6, delay: 2, ease: DECK_EASE },
+                    opacity: { duration: 0.5, delay: i === 0 ? 0.35 : 2, ease: DECK_EASE },
+                  }}
+                  style={{ letterSpacing: "0.12em" }}
+                >
+                  {h}
+                </motion.p>
+              ))}
+            </div>
+          </Rise>
+
+          {GEO.contrast.map((row, i) => (
+            <Rise key={row.seo} delay={0.42 + i * 0.09} y={10}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+                  gap: 28,
+                  padding: "15px 0",
+                  borderBottom: `1px solid ${ink.rule}`,
+                }}
+              >
+                <motion.p
+                  className="t-body"
+                  initial={{ color: ink.primary, opacity: 0, y: 10 }}
+                  animate={{ color: ink.faint, opacity: 1, y: 0 }}
+                  transition={{
+                    color: { duration: 0.6, delay: 2 + i * 0.06, ease: DECK_EASE },
+                    opacity: { duration: 0.45, delay: 0.45 + i * 0.09, ease: DECK_EASE },
+                    y: { duration: 0.45, delay: 0.45 + i * 0.09, ease: DECK_EASE },
+                  }}
+                >
+                  {row.seo}
+                </motion.p>
+                <motion.p
+                  className="t-body"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 2.05 + i * 0.09, ease: DECK_EASE }}
+                  style={{ color: ink.primary, fontWeight: 700 }}
+                >
+                  {row.geo}
+                </motion.p>
+              </div>
+            </Rise>
+          ))}
+        </div>
+
+        {/* Le cadre : ce que cela impose à l'écriture. */}
+        <Rise delay={2.6} y={16}>
+          <div
+            style={{
+              padding: "30px 32px",
+              borderRadius: 16,
+              border: `1px solid ${accent}`,
+              background: ink.tone === "dark" ? "rgba(57,255,136,0.05)" : "rgba(57,255,136,0.06)",
+            }}
+          >
+            <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 22 }}>
+              {GEO.discipline.label}
+            </p>
+            <div style={{ display: "grid", gap: 20 }}>
+              {GEO.discipline.items.map((it, i) => (
+                <Rise key={it.label} delay={2.7 + i * 0.1} y={10}>
+                  <div>
+                    <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
+                      {it.label}
+                    </p>
+                    <p className="t-body" style={{ color: ink.muted, marginTop: 6, lineHeight: 1.45 }}>
+                      {it.body}
+                    </p>
+                  </div>
+                </Rise>
+              ))}
+            </div>
+          </div>
+        </Rise>
+      </div>
+    </SlideBody>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    LE REGISTRE
    ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -1555,7 +1699,7 @@ export const S3_VIEWS: Record<string, ComponentType> = {
   pipeline: PipelineSlideRef,
   partage: SplitSlide,
   economie: EconomicsSlide,
-  geo: () => <GeoSlide index={sectionNo("geo")} />,
+  geo: GeoDisciplineSlide,
   tracabilite: TraceSlide,
 
   /* Acte V — preuve d'exécution */
