@@ -12,6 +12,14 @@
      « voici un problème, voici ma réponse, voici pourquoi elle tient ». Sept
      actes, une seule direction, jamais de retour en arrière.
 
+   OÙ SE PLACE L'ARGENT
+     Le marché, le modèle et la trajectoire financière formaient un acte au
+     milieu du deck, entre le produit et la fabrication. Ils coupaient la
+     démonstration en deux : le jury quittait le produit pour un tableau de
+     revenus, puis y revenait. Ils forment désormais l'avant-dernier acte,
+     après la preuve d'exécution — on ne parle de recette qu'une fois montré
+     qu'il y a quelque chose à vendre et que c'est déjà construit.
+
    RÈGLE DU FICHIER — inchangée depuis la V2 : le business plan fait foi. Un
    chiffre que le plan ne porte pas n'est pas écrit ici, il est `A_COMPLETER`,
    que les slides affichent comme un emplacement visible plutôt que comme un
@@ -32,9 +40,9 @@ export const S3_ACTS = [
   "probleme",
   "produit",
   "place",
-  "modele",
   "fabrication",
   "preuve",
+  "modele",
   "echelle",
 ] as const;
 
@@ -42,9 +50,9 @@ export const S3_ACT_LABELS: Record<string, string> = {
   probleme: "I · Le problème",
   produit: "II · Le produit",
   place: "III · Pourquoi il y a une place",
-  modele: "IV · Le modèle économique",
-  fabrication: "V · La fabrication",
-  preuve: "VI · Preuve d'exécution",
+  fabrication: "IV · La fabrication",
+  preuve: "V · Preuve d'exécution",
+  modele: "VI · Le modèle économique",
   echelle: "VII · Passage à l'échelle",
 };
 
@@ -56,7 +64,7 @@ export const S3_ACT_LABELS: Record<string, string> = {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export const S3_SLIDES: readonly DeckSlide[] = [
-  /* ── ACTE I — LE PROBLÈME ──────────────────────────────────────────── */
+  /* ── ACTE I — LE PROBLÈME ────────────────────────────────────────────── */
   {
     id: "cover",
     label: "Couverture",
@@ -100,8 +108,7 @@ export const S3_SLIDES: readonly DeckSlide[] = [
     speakerNotes:
       "QUESTION : quelle est la réponse ? Le produit apparaît comme conséquence, pas comme annonce. Ne parler ni de modèle économique, ni d'IA, ni d'automatisation : uniquement de ce que le lecteur obtient. Si le jury pose une question business ici, répondre « j'y viens » et avancer.",
   },
-
-  /* ── ACTE II — LE PRODUIT ──────────────────────────────────────────── */
+  /* ── ACTE II — LE PRODUIT ────────────────────────────────────────────── */
   {
     id: "parcours",
     label: "Comment ça marche",
@@ -132,25 +139,16 @@ export const S3_SLIDES: readonly DeckSlide[] = [
     act: "produit",
     seconds: 75,
     speakerNotes:
-      "QUESTION : qu'est-ce qui distingue un article TED ? Quatre exigences, et surtout la phrase finale, à laisser tomber seule : nous n'apportons pas la réponse, nous apportons de quoi se faire la sienne, vite. C'est la fin de l'acte produit — marquer un temps avant d'attaquer le marché.",
+      "QUESTION : qu'est-ce qui distingue un article TED ? Quatre exigences, et surtout la phrase finale, à laisser tomber seule : nous n'apportons pas la réponse, nous apportons de quoi se faire la sienne, vite. C'est la fin de l'acte produit — marquer un temps avant de passer au positionnement.",
   },
-
-  /* ── ACTE III — POURQUOI IL Y A UNE PLACE ──────────────────────────── */
-  {
-    id: "marche",
-    label: "Le marché",
-    act: "place",
-    seconds: 45,
-    speakerNotes:
-      "QUESTION : y a-t-il une demande ? Deux ou trois chiffres, pas davantage, et chacun sert une conclusion. Ne pas dérouler la totalité des acteurs : la slide suivante s'en charge, en familles.",
-  },
+  /* ── ACTE III — POURQUOI IL Y A UNE PLACE ────────────────────────────── */
   {
     id: "positionnement",
     label: "Le positionnement",
     act: "place",
     seconds: 60,
     speakerNotes:
-      "QUESTION : pourquoi ce produit face aux médias, aux plateformes data et à ChatGPT ? Ne jamais dire « meilleur ». Dire « à l'intersection ». Les quatre familles font bien leur métier ; aucune ne réunit les quatre gestes. C'est cette intersection qui est la place.",
+      "QUESTION : pourquoi ce produit face aux médias, aux plateformes data et à ChatGPT ? On enchaîne directement sur la promesse éditoriale, sans passer par les chiffres de marché : ils viennent bien plus loin, une fois la preuve faite. Ne jamais dire « meilleur ». Dire « à l'intersection ». Les quatre familles font bien leur métier ; aucune ne réunit les quatre gestes. C'est cette intersection qui est la place.",
   },
   {
     id: "bascule",
@@ -172,26 +170,7 @@ export const S3_SLIDES: readonly DeckSlide[] = [
     speakerNotes:
       "QUESTION : quelle est notre stratégie face à l'IA ? Ne pas la concurrencer, devenir une source qu'elle cite. Énumérer vite les conditions du GEO — faits datés, sources primaires, méthode stable — sans en faire un cours. Finir sur la phrase, qui est la meilleure du deck : la citation nous rend visibles, l'exploration nous rend nécessaires.",
   },
-
-  /* ── ACTE IV — LE MODÈLE ÉCONOMIQUE ────────────────────────────────── */
-  {
-    id: "modele",
-    label: "Le modèle",
-    act: "modele",
-    seconds: 50,
-    speakerNotes:
-      "QUESTION : comment ce média gagne-t-il de l'argent ? Une phrase par moteur, pas plus. Le point qui compte : pas de paywall. L'audience est la recette, donc tout ce qui augmente l'audience augmente directement le potentiel.",
-  },
-  {
-    id: "trajectoire",
-    label: "La trajectoire",
-    act: "modele",
-    seconds: 60,
-    speakerNotes:
-      "QUESTION : est-ce que ça devient viable ? La courbe se dessine année après année. Deux chiffres à laisser à l'écran : rentabilité projetée en année 2, et le résultat net de l'année 2. Si le jury conteste, assumer que ce sont des projections du business plan et proposer l'annexe détaillée (touche A).",
-  },
-
-  /* ── ACTE V — LA FABRICATION ───────────────────────────────────────── */
+  /* ── ACTE IV — LA FABRICATION ────────────────────────────────────────── */
   {
     id: "pivot",
     label: "Pivot",
@@ -242,8 +221,7 @@ export const S3_SLIDES: readonly DeckSlide[] = [
     speakerNotes:
       "QUESTION : et le cadre légal ? Quatre garanties, quatre coches, et on avance. Ne pas faire un cours de droit : le message est que le risque a été anticipé, pas qu'on maîtrise l'AI Act article par article. Si le jury creuse, l'annexe juridique existe (touche A).",
   },
-
-  /* ── ACTE VI — PREUVE D'EXÉCUTION ──────────────────────────────────── */
+  /* ── ACTE V — PREUVE D'EXÉCUTION ─────────────────────────────────────── */
   {
     id: "etat",
     label: "Ce qui existe déjà",
@@ -258,10 +236,34 @@ export const S3_SLIDES: readonly DeckSlide[] = [
     act: "preuve",
     seconds: 45,
     speakerNotes:
-      "QUESTION : qui tient tout ça ? Ne surtout pas laisser l'impression « je fais tout seul, donc c'est fragile ». Le message est inverse : une structure légère par construction, parce que la charge courante est portée par l'automatisation. Compétences utiles d'un côté, agents de l'autre.",
+      "QUESTION : qui tient tout ça ? Ne surtout pas laisser l'impression « je fais tout seul, donc c'est fragile ». Le message est inverse : une structure légère par construction, parce que la charge courante est portée par l'automatisation. Compétences utiles d'un côté, agents de l'autre. Enchaîner : le produit existe, il est fabriqué, il est tenu — reste à dire à qui il s'adresse et comment il gagne de l'argent.",
   },
-
-  /* ── ACTE VII — PASSAGE À L'ÉCHELLE ────────────────────────────────── */
+  /* ── ACTE VI — LE MODÈLE ÉCONOMIQUE ──────────────────────────────────── */
+  {
+    id: "marche",
+    label: "Le marché",
+    act: "modele",
+    seconds: 45,
+    speakerNotes:
+      "QUESTION : y a-t-il une demande ? Le marché ouvre désormais le volet économique, après la preuve d'exécution : le jury a vu le produit et sait qu'il est construit, la question devient à qui il se vend. Deux ou trois chiffres, pas davantage, et chacun sert une conclusion.",
+  },
+  {
+    id: "modele",
+    label: "Le modèle",
+    act: "modele",
+    seconds: 50,
+    speakerNotes:
+      "QUESTION : comment ce média gagne-t-il de l'argent ? Une phrase par moteur, pas plus. Le point qui compte : pas de paywall. L'audience est la recette, donc tout ce qui augmente l'audience augmente directement le potentiel.",
+  },
+  {
+    id: "trajectoire",
+    label: "La trajectoire",
+    act: "modele",
+    seconds: 60,
+    speakerNotes:
+      "QUESTION : est-ce que ça devient viable ? Dernière slide avant la demande : c'est elle qui doit rester à l'écran dans la tête du jury quand arrive le besoin de financement. La courbe se dessine année après année. Deux chiffres à laisser à l'écran : rentabilité projetée en année 2, et le résultat net de l'année 2. Si le jury conteste, assumer que ce sont des projections du business plan et proposer l'annexe détaillée (touche A).",
+  },
+  /* ── ACTE VII — PASSAGE À L'ÉCHELLE ──────────────────────────────────── */
   {
     id: "financement",
     label: "Le financement",
@@ -514,7 +516,7 @@ export const S3_CHANNEL = {
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ACTE V — LA FABRICATION
+   ACTE IV — LA FABRICATION
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* 19 — QUI FAIT QUOI
