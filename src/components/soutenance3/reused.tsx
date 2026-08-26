@@ -65,15 +65,19 @@ export function UnlockSlide() {
         </Rise>
       </div>
 
+      {/* Le corps se centre dans ce que le titre lui laisse, au lieu de se
+          coller dessous : le montant et sa répartition étaient tassés en haut
+          de la scène avec deux cents pixels de vide en dessous. */}
       <div
         style={{
-          marginTop: 40,
+          marginTop: 64,
           flex: 1,
           minHeight: 0,
           display: "grid",
           gridTemplateColumns: "minmax(0, 0.85fr) minmax(0, 1fr) minmax(0, 1fr)",
           gap: 56,
-          alignItems: "start",
+          alignItems: "center",
+          alignContent: "center",
         }}
       >
         {/* Le montant, et à quoi il sert */}

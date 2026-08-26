@@ -238,11 +238,14 @@ export function Intersection({
 export function ShiftChain({
   label,
   chain,
+  caption,
   startDelay = 0,
   highlightLast = false,
 }: {
   label: string;
   chain: readonly string[];
+  /** Une ligne sous la chaîne : ce qu'elle raconte, en une phrase. */
+  caption?: string;
   startDelay?: number;
   highlightLast?: boolean;
 }) {
@@ -308,6 +311,14 @@ export function ShiftChain({
           );
         })}
       </div>
+
+      {caption && (
+        <Rise delay={startDelay + 0.15 + chain.length * 0.18} y={8}>
+          <p style={{ marginTop: 16, fontSize: 22, color: ink.secondary, letterSpacing: "-0.014em" }}>
+            {caption}
+          </p>
+        </Rise>
+      )}
     </div>
   );
 }
@@ -400,16 +411,20 @@ export function SplitPanel({
 
 export function MarginalCurve({
   classicLabel,
+  classicDetail,
   pipelineLabel,
+  pipelineDetail,
   xLabel,
   yLabel,
   axisNote,
   startDelay = 0,
-  width = 720,
-  height = 340,
+  width = 1380,
+  height = 470,
 }: {
   classicLabel: string;
+  classicDetail?: string;
   pipelineLabel: string;
+  pipelineDetail?: string;
   xLabel: string;
   yLabel: string;
   axisNote: string;
@@ -420,71 +435,80 @@ export function MarginalCurve({
   const ink = useInk();
   const accent = useAccent();
 
-  const L = 76;
-  const R = width - 18;
-  const T = 34;
-  const B = height - 62;
+  const L = 30;
+  const R = width - 400;
+  const T = 40;
+  const B = height - 84;
 
   // Classique : le coût par article ne baisse pas, chaque article est refait.
-  const classic = `M ${L} ${T + 34} C ${L + 180} ${T + 30}, ${R - 200} ${T + 44}, ${R} ${T + 40}`;
-  // Pipeline : le coût fixe se répartit, la courbe s'aplatit bas.
-  const pipeline = `M ${L} ${T + 62} C ${L + 150} ${B - 40}, ${R - 260} ${B - 12}, ${R} ${B - 16}`;
+  const classic = `M ${L} ${T + 26} C ${L + 260} ${T + 22}, ${R - 260} ${T + 40}, ${R} ${T + 34}`;
+  // Pipeline : la chaîne est écrite une fois, puis rejouée — la courbe s'aplatit bas.
+  const pipeline = `M ${L} ${T + 58} C ${L + 220} ${B - 60}, ${R - 380} ${B - 18}, ${R} ${B - 22}`;
 
   return (
-    <div>
+    <div style={{ width: "100%" }}>
       <svg
         viewBox={`0 0 ${width} ${height}`}
-        style={{ width: "100%", height: "auto" }}
+        style={{ width: "100%", height: "auto", overflow: "visible" }}
         aria-hidden="true"
       >
-        {/* Les axes, sans graduation : il n'y a rien d'honnête à graduer. */}
-        <line x1={L} y1={T} x2={L} y2={B} stroke={ink.rule} strokeWidth={1.5} />
-        <line x1={L} y1={B} x2={R} y2={B} stroke={ink.rule} strokeWidth={1.5} />
+        {/* Un seul axe, celui du volume. L'ordonnée n'est pas graduée — les
+            coûts n'ont pas été relevés — et un axe vertical sans graduation ne
+            fait qu'encombrer. */}
+        <line x1={L} y1={B} x2={R + 40} y2={B} stroke={ink.rule} strokeWidth={1.5} />
 
-        <DrawPath d={classic} stroke={ink.muted} width={3} opacity={0.85} delay={startDelay} duration={1} />
-        <DrawPath d={pipeline} stroke={accent} width={4} opacity={1} delay={startDelay + 0.45} duration={1.15} />
+        <DrawPath d={classic} stroke={ink.muted} width={3.5} opacity={0.8} delay={startDelay} duration={1.1} />
+        <DrawPath d={pipeline} stroke={accent} width={5} opacity={1} delay={startDelay + 0.55} duration={1.3} />
 
-        <motion.text
-          x={R}
-          y={T + 22}
-          textAnchor="end"
+        {/* Les légendes au bout de leur propre courbe : une légende séparée
+            oblige l'œil à faire l'appariement lui-même. */}
+        <motion.g
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.45, delay: startDelay + 0.95 }}
-          style={{ fontSize: 20, fontWeight: 700, fill: ink.muted }}
+          transition={{ duration: 0.5, delay: startDelay + 1.05 }}
         >
-          {classicLabel}
-        </motion.text>
-        <motion.text
-          x={R}
-          y={B - 30}
-          textAnchor="end"
+          <text x={R + 26} y={T + 32} style={{ fontSize: 30, fontWeight: 800, fill: ink.muted }}>
+            {classicLabel}
+          </text>
+          {classicDetail && (
+            <text x={R + 26} y={T + 62} style={{ fontSize: 20, fontWeight: 500, fill: ink.faint }}>
+              {classicDetail}
+            </text>
+          )}
+        </motion.g>
+
+        <motion.g
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.45, delay: startDelay + 1.5 }}
-          style={{ fontSize: 20, fontWeight: 800, fill: accent }}
+          transition={{ duration: 0.5, delay: startDelay + 1.7 }}
         >
-          {pipelineLabel}
-        </motion.text>
+          <text x={R + 26} y={B - 26} style={{ fontSize: 30, fontWeight: 800, fill: accent }}>
+            {pipelineLabel}
+          </text>
+          {pipelineDetail && (
+            <text x={R + 26} y={B + 4} style={{ fontSize: 20, fontWeight: 500, fill: ink.faint }}>
+              {pipelineDetail}
+            </text>
+          )}
+        </motion.g>
 
-        {/* Au-dessus de l'axe, pas à sa gauche : à gauche, le libellé sortait
-            du cadre et se faisait rogner. */}
-        <text
-          x={L}
-          y={T - 4}
-          textAnchor="start"
-          style={{ fontSize: 17, fontWeight: 600, fill: ink.faint }}
-        >
+        <text x={L} y={T - 12} style={{ fontSize: 21, fontWeight: 700, fill: ink.secondary }}>
           {yLabel}
         </text>
-        <text x={R} y={B + 34} textAnchor="end" style={{ fontSize: 17, fontWeight: 600, fill: ink.faint }}>
+        <text x={L} y={B + 36} style={{ fontSize: 21, fontWeight: 600, fill: ink.faint }}>
           {xLabel}
         </text>
+        {/* La note est dans le SVG et non sous lui : posée dans le flux, elle
+            venait se coucher sur la phrase de bas de slide dès que la courbe
+            occupait toute la hauteur qu'on lui laissait. */}
+        <text x={L} y={B + 60} style={{ fontSize: 17, fontStyle: "italic", fill: ink.faint }}>
+          {axisNote}
+        </text>
       </svg>
-      <div style={{ fontSize: 16, color: ink.faint, marginTop: 4, fontStyle: "italic" }}>{axisNote}</div>
     </div>
   );
 }
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
    EMPLACEMENT DE MESURE — slide 20 et slide 24

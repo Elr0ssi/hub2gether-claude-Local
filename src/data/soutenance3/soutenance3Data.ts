@@ -88,6 +88,7 @@ export const S3_SLIDES: readonly DeckSlide[] = [
     label: "Ce qui manque",
     act: "probleme",
     seconds: 45,
+    steps: 3,
     speakerNotes:
       "QUESTION : personne ne fait déjà ça ? Ne pas attaquer les médias — ils font leur métier. Dire ce que chaque famille apporte, puis nommer les cinq verbes que personne ne réunit. C'est le trou dans lequel le produit va se poser à la slide suivante.",
   },
@@ -155,8 +156,9 @@ export const S3_SLIDES: readonly DeckSlide[] = [
     id: "bascule",
     label: "L'IA déplace la distribution",
     act: "place",
-    seconds: 50,
+    seconds: 55,
     tone: "dark",
+    steps: 3,
     speakerNotes:
       "QUESTION : et si l'IA rend les médias invisibles ? Ici l'IA n'est QU'UN CANAL. Ne pas parler d'agents, de Claude, de production : cela vient à l'acte V et les mélanger est exactement le défaut de la V2. Une seule idée : si l'interface change, la bataille se déplace vers la source.",
   },
@@ -297,7 +299,6 @@ export const S3_TOTAL_SECONDS = S3_SLIDES.reduce((n, s) => n + s.seconds, 0);
 /** 01 — Couverture. La V2 n'affichait pas la signature ; la V3 la pose ici. */
 export const S3_COVER = {
   context: "Soutenance de business plan",
-  tagline: "Turning data into meaning.",
 } as const;
 
 /* 02 — LE PARADOXE
@@ -362,6 +363,16 @@ export const S3_ANSWER = {
   wordmark: "The Essential Data",
   title: ["Transformer des données dispersées", "en une expérience de compréhension."],
   pillars: ["Une donnée", "Une carte", "Une série", "Une source"],
+  /* Le globe de la slide n'est pas une illustration : c'est celui de
+     /map/economy, avec ses vraies données. Survoler un pays affiche sa fiche,
+     et c'est la démonstration la plus courte du deck — on ne dit pas que le
+     produit existe, on le fait tourner. */
+  globe: {
+    hint: "Survolez un pays",
+    empty: "Passez le curseur sur le globe.",
+    year: 2025,
+    metricLabel: "PIB",
+  },
 } as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -456,8 +467,29 @@ export const S3_POSITIONING = {
    le principal défaut narratif de la V2. */
 export const S3_SHIFT = {
   eyebrow: "L'IA déplace la distribution",
-  before: { label: "Hier", chain: ["Utilisateur", "Google", "Média"] },
-  after: { label: "Demain", chain: ["Utilisateur", "IA", "Sources"] },
+  /* Trois temps, et le troisième est celui qui compte : la citation renvoie le
+     lecteur vers nous. Une chaîne qui s'arrête à « sources » décrit une perte ;
+     la boucle refermée décrit un canal. */
+  beats: [
+    {
+      id: "hier",
+      label: "Hier",
+      chain: ["Utilisateur", "Google", "Média"],
+      caption: "Le lecteur cherche, le moteur oriente, le média rend l'information.",
+    },
+    {
+      id: "demain",
+      label: "Demain",
+      chain: ["Utilisateur", "IA", "Sources"],
+      caption: "Le lecteur interroge l'IA, l'IA répond. La visite n'a plus lieu.",
+    },
+    {
+      id: "retour",
+      label: "Ce que cela ouvre",
+      chain: ["Sources", "Réponse citée", "Utilisateur"],
+      caption: "L'IA donne le chiffre et nomme sa source. C'est par là que le lecteur revient.",
+    },
+  ],
   statement: ["Si l'interface change,", "la bataille se déplace vers la source."],
 } as const;
 
@@ -490,63 +522,54 @@ export const S3_CHANNEL = {
    Elle n'existait pas en V2, où la réponse était disséminée. */
 export const S3_SPLIT = {
   eyebrow: "Qui fait quoi",
-  agents: {
-    label: "Les agents",
-    role: "exécutent",
-    items: ["Recherche", "Collecte", "Recoupement", "Structuration", "Mise en forme", "Déclinaisons"],
-  },
-  human: {
-    label: "L'humain",
-    role: "décide",
-    items: ["Choix du sujet", "Arbitrage", "Validation", "Ligne éditoriale", "Publication"],
-  },
+  /* Deux cartes posées côte à côte disaient « voici deux listes ». Ce qu'il
+     faut montrer, c'est une chaîne unique dont chaque maillon revient à l'un
+     ou à l'autre : le partage se lit sur la ligne, pas dans deux boîtes. */
+  agents: { label: "Les agents", role: "exécutent" },
+  human: { label: "L'humain", role: "décide" },
+  chain: [
+    { label: "Choix du sujet", who: "human" as const },
+    { label: "Recherche", who: "agents" as const },
+    { label: "Collecte", who: "agents" as const },
+    { label: "Recoupement", who: "agents" as const },
+    { label: "Arbitrage", who: "human" as const },
+    { label: "Structuration", who: "agents" as const },
+    { label: "Mise en forme", who: "agents" as const },
+    { label: "Validation", who: "human" as const },
+    { label: "Déclinaisons", who: "agents" as const },
+    { label: "Publication", who: "human" as const },
+  ],
   statement: ["Les agents exécutent.", "L'humain décide."],
-  note: "Retirer les deux mains humaines doublerait le débit et coûterait ce qui sépare le projet d'un site généré automatiquement.",
+  note: "Retirer les quatre mains humaines doublerait le débit et coûterait ce qui sépare le projet d'un site généré automatiquement.",
 } as const;
 
 /* 20 — L'ÉCONOMIE DE L'AUTOMATISATION
 
-   NOUVELLE SLIDE, et la démonstration qui manquait le plus.
+   Première version : deux cartes détaillées, quatre emplacements de mesure et
+   une courbe, le tout sur une slide. Trop lourde, illisible, et le message se
+   perdait dans le dispositif.
 
-   AUCUN CHIFFRE N'EST INVENTÉ ICI. Le temps humain, le coût d'un article, la
-   facture d'API : rien de tout cela n'a encore été mesuré sur le pipeline
-   reconstruit. Les emplacements sont donc visibles, et c'est un choix
-   défendable devant un jury — un projet dont la promesse est la traçabilité
-   ne peut pas afficher des coûts qu'il n'a pas relevés.
+   Ce qui reste : une seule idée, une seule courbe. Le coût d'un article
+   classique ne baisse pas avec le volume ; le nôtre, si. Les deux valeurs à
+   mesurer sont posées de part et d'autre, en gros, et rien d'autre.
 
-   À MESURER AVANT LA SOUTENANCE : chronométrer trois articles de bout en bout,
-   relever les factures d'API du mois, et remplir les six cases ci-dessous. */
+   AUCUN CHIFFRE N'EST INVENTÉ. À MESURER AVANT LA SOUTENANCE : chronométrer
+   trois articles de bout en bout, relever les factures d'API du mois. */
 export const S3_ECONOMICS = {
   eyebrow: "L'économie de l'automatisation",
-  title: ["Ce que l'automatisation change", "n'est pas la vitesse. C'est le coût."],
-  classic: {
-    label: "Production classique",
-    steps: ["Recherche", "Recoupement", "Rédaction", "Visuels", "Déclinaisons sociales"],
-    time: { label: "Temps humain", value: A_COMPLETER, unit: "par article" },
-    cost: { label: "Coût estimatif", value: A_COMPLETER, unit: "par article" },
-  },
-  pipeline: {
-    label: "Pipeline TED",
-    steps: ["Agents et API", "Contrôle humain"],
-    time: { label: "Temps humain", value: A_COMPLETER, unit: "par article" },
-    cost: { label: "Coût direct", value: A_COMPLETER, unit: "par article" },
-  },
-  /* La courbe : en abscisse le nombre de contenus produits, en ordonnée le
-     coût marginal moyen. La forme est le message — le coût fixe se répartit,
-     le coût variable ne s'envole pas. Les valeurs de l'axe restent à mesurer ;
-     la courbe est donc tracée sans graduation chiffrée. */
+  title: ["Le coût d'un article ne baisse pas", "quand on en écrit plus. Le nôtre, si."],
+  sides: [
+    { id: "classique", label: "Production classique", detail: "Chaque article est refait de bout en bout." },
+    { id: "pipeline", label: "Pipeline TED", detail: "La chaîne est écrite une fois, puis rejouée." },
+  ],
+  measure: { label: "Coût par article", value: A_COMPLETER },
   curve: {
-    label: "Coût marginal moyen par contenu",
-    x: "Nombre de contenus produits",
-    y: "Coût moyen",
-    classicLabel: "Production classique",
-    pipelineLabel: "Pipeline TED",
-    caption: "Plus le système produit, plus le coût unitaire est maîtrisé.",
-    axisNote: "Graduations à renseigner une fois les coûts de production relevés.",
+    x: "Nombre d'articles produits",
+    y: "Coût par article",
+    caption: "Graduations à renseigner une fois les coûts relevés.",
   },
   statement: "Ce n'est pas produire plus vite. C'est produire à un coût qui ne croît pas avec le volume.",
-  measureNote:
-    "Les valeurs marquées sont mesurées avant la soutenance : trois articles chronométrés de bout en bout, et les factures d'API du mois.",
+  measureNote: "À mesurer avant la soutenance : trois articles chronométrés, et les factures d'API du mois.",
 } as const;
 
 /* 21 — AUTOMATISÉ, MAIS TRAÇABLE

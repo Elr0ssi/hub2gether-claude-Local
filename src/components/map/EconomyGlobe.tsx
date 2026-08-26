@@ -642,6 +642,12 @@ interface Props {
   metric: EconomyMetricId;
   selectedCountry: string | null;
   onCountryClick: (name: string) => void;
+  /**
+   * Le pays sous le curseur, ou null quand il n'y en a plus. Le globe traçait
+   * déjà son contour ; il ne le disait à personne. Facultatif : la page
+   * économie ne le passe pas et se comporte exactement comme avant.
+   */
+  onCountryHover?: (name: string | null) => void;
   /** Show the photography instead of the choropleth. */
   satellite?: boolean;
 }
@@ -651,6 +657,7 @@ export function EconomyGlobe({
   metric,
   selectedCountry,
   onCountryClick,
+  onCountryHover,
   satellite = false,
 }: Props) {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -673,9 +680,11 @@ export function EconomyGlobe({
   const resolutionRef = useRef<THREE.Vector2>(new THREE.Vector2(1, 1));
   const lineMatsRef = useRef<Set<LineMaterial>>(new Set());
   const onClickRef = useRef(onCountryClick);
+  const onHoverRef = useRef(onCountryHover);
   const documentedRef = useRef<Set<string>>(new Set());
 
   onClickRef.current = onCountryClick;
+  onHoverRef.current = onCountryHover;
   documentedRef.current = new Set(Object.keys(economyYear.countries));
 
   /* ── Repaint: base blit, then the countries carrying a value ──────────── */
@@ -1099,6 +1108,7 @@ export function EconomyGlobe({
 
       if (live === hoveredName) return;
       hoveredName = live;
+      onHoverRef.current?.(live);
       clearHover();
       if (!live) return;
 
