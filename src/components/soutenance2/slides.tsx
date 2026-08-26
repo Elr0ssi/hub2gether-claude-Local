@@ -627,7 +627,12 @@ export function CompetitionSlide() {
    07 — MOTEUR D'ACQUISITION
    ═══════════════════════════════════════════════════════════════════════ */
 
-export function AcquisitionSlide() {
+export function AcquisitionSlide({
+  /* La ligne de rémunération de chaque réseau. Rendue par défaut, donc la V2
+     ne bouge pas ; la V3 la retire — elle décrit un seuil de plateforme, pas
+     un canal d'acquisition, et c'est le sujet de la slide. */
+  showPay = true,
+}: { showPay?: boolean } = {}) {
   const ink = useInk();
   const accent = useAccent();
 
@@ -674,9 +679,11 @@ export function AcquisitionSlide() {
               <p className="t-small" style={{ color: ink.muted, marginTop: 10 }}>
                 {c.format}
               </p>
-              <p className="t-small" style={{ color: ink.faint, marginTop: 8 }}>
-                {c.pay}
-              </p>
+              {showPay && (
+                <p className="t-small" style={{ color: ink.faint, marginTop: 8 }}>
+                  {c.pay}
+                </p>
+              )}
             </div>
           </Rise>
         ))}

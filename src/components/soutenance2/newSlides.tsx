@@ -232,7 +232,19 @@ export function PublicationsSlide({ index }: { index: string }) {
 }
 
 /** Les partenariats envisagés, et les visuels qu'ils reprendraient. */
-export function PartnershipsSlide({ index: _index }: { index?: string }) {
+export function PartnershipsSlide({
+  index: _index,
+  showCriteria = true,
+  /* Deux réglages ajoutés pour la V3, tous deux par défaut sur le rendu
+     actuel : la V2 ne passe rien et s'affiche exactement comme avant. La V3
+     retire le bandeau de conditions, qui alourdissait une slide déjà pleine,
+     et respire davantage. */
+  airy = false,
+}: {
+  index?: string;
+  showCriteria?: boolean;
+  airy?: boolean;
+}) {
   const ink = useInk();
   const accent = useAccent();
 
@@ -260,7 +272,7 @@ export function PartnershipsSlide({ index: _index }: { index?: string }) {
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-              gap: "38px 64px",
+              gap: airy ? "62px 80px" : "38px 64px",
             }}
           >
             {PUBLICATIONS.partnerships.items.map((pt, i) => (
@@ -280,6 +292,7 @@ export function PartnershipsSlide({ index: _index }: { index?: string }) {
             ))}
           </div>
 
+          {showCriteria && (
           <div
             style={{
               marginTop: 34,
@@ -307,9 +320,13 @@ export function PartnershipsSlide({ index: _index }: { index?: string }) {
               </Rise>
             ))}
           </div>
+          )}
 
-          <Rise delay={1.2} y={10}>
-            <p className="t-small" style={{ color: ink.faint, marginTop: 18 }}>
+          <Rise delay={showCriteria ? 1.2 : 0.9} y={10}>
+            <p
+              className="t-small"
+              style={{ color: ink.faint, marginTop: showCriteria ? 18 : 40 }}
+            >
               {PUBLICATIONS.partnerships.disclaimer}
             </p>
           </Rise>
@@ -724,7 +741,15 @@ export function WorkshopSlide() {
   );
 }
 
-export function TeamSlide() {
+export function TeamSlide({
+  showSkills = true,
+  /* Les lignes de chaque bloc peuvent être coupées après les deux premières.
+     Par défaut tout est rendu, donc la V2 ne bouge pas. */
+  maxLines,
+}: {
+  showSkills?: boolean;
+  maxLines?: number;
+} = {}) {
   const ink = useInk();
   const accent = useAccent();
   const [failed, setFailed] = useState(false);
@@ -782,6 +807,7 @@ export function TeamSlide() {
               {TEAM.person.role}
             </p>
 
+            {showSkills && (
             <div style={{ marginTop: 22 }}>
               <p className="t-micro" style={{ color: ink.faint, letterSpacing: "0.12em", marginBottom: 10 }}>
                 {TEAM.skillsLabel}
@@ -804,6 +830,7 @@ export function TeamSlide() {
                 ))}
               </div>
             </div>
+            )}
           </div>
         </Rise>
 
@@ -812,7 +839,7 @@ export function TeamSlide() {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-            gap: "34px 56px",
+            gap: maxLines ? "48px 68px" : "34px 56px",
           }}
         >
           {TEAM.blocks.map((b, i) => (
@@ -821,8 +848,8 @@ export function TeamSlide() {
                 <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
                   {b.label}
                 </p>
-                <div style={{ marginTop: 12, display: "grid", gap: 7 }}>
-                  {b.lines.map((l) => (
+                <div style={{ marginTop: 12, display: "grid", gap: maxLines ? 10 : 7 }}>
+                  {(maxLines ? b.lines.slice(0, maxLines) : b.lines).map((l) => (
                     <p key={l} className="t-small" style={{ color: ink.muted, lineHeight: 1.5 }}>
                       {l}
                     </p>

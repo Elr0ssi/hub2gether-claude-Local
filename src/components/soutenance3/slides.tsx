@@ -1704,16 +1704,18 @@ export const S3_VIEWS: Record<string, ComponentType> = {
 
   /* Acte V — preuve d'exécution */
   etat: StatusSlide,
-  derriere: TeamSlideRef,
+  derriere: () => <TeamSlideRef showSkills={false} maxLines={2} />,
 
   /* Acte VI — le modèle économique */
   cible: AudienceSlide,
   marche: MarketSlide,
   acteurs: PlayersSlide,
   concurrence: CompetitionSlide,
-  acquisition: AcquisitionSlide,
+  acquisition: () => <AcquisitionSlide showPay={false} />,
   publications: () => <PublicationsSlide index={sectionNo("publications")} />,
-  partenariats: () => <PartnershipsSlide index={sectionNo("partenariats")} />,
+  partenariats: () => (
+    <PartnershipsSlide index={sectionNo("partenariats")} showCriteria={false} airy />
+  ),
   modele: RevenueSlide,
   trajectoire: FinanceSlide,
 
