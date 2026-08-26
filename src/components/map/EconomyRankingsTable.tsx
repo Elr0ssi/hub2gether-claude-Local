@@ -4,7 +4,7 @@ import { countryFr } from "@/data/countryNamesFr";
 import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Search, ChevronUp, ChevronDown, ChevronsUpDown, TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { ECONOMY_METRICS, ECONOMY_YEARS, iso2DePays } from "@/data/economy/economy";
+import { ECONOMY_METRICS, ECONOMY_YEARS, ECONOMY_YEAR_VALUES, iso2DePays } from "@/data/economy/economy";
 import type { EconomyMetricId, EconomyYear } from "@/types";
 
 const GDP_FAMILY: EconomyMetricId[] = ["gdp", "gdp_per_capita", "trade_balance"];
@@ -177,6 +177,7 @@ interface EconomyRankingsTableProps {
   year: number;
   activeEconomyYear: EconomyYear;
   ytdMode: boolean;
+  onYearChange?: (year: number) => void;
   onCountryClick?: (name: string) => void;
 }
 
@@ -185,6 +186,7 @@ export function EconomyRankingsTable({
   year,
   activeEconomyYear,
   ytdMode,
+  onYearChange,
   onCountryClick,
 }: EconomyRankingsTableProps) {
   const [sortColKey, setSortColKey] = useState<string>(metric);
@@ -283,12 +285,42 @@ export function EconomyRankingsTable({
       >
         <div>
           <p className="section-title mb-0.5">Classement mondial</p>
-          <p className="text-heading-3" style={{ color: "var(--ink)" }}>
-            {currentMetric.label}{" "}
-            <span style={{ color: "var(--accent)" }}>
-              {ytdMode ? "En direct" : year}
-            </span>
-          </p>
+          {/* L'année se lisait, elle se choisit. Le classement vit dans sa
+              propre section : y renvoyer le lecteur à la frise, deux écrans
+              plus haut, pour comparer 1974 et 1975 n'était pas tenable. Le
+              choix reste le même que celui de la carte — c'est le même
+              paramètre d'URL. */}
+          <div className="flex items-baseline gap-2">
+            <p className="text-heading-3" style={{ color: "var(--ink)" }}>
+              {currentMetric.label}
+            </p>
+            {ytdMode || !onYearChange ? (
+              <span className="text-heading-3" style={{ color: "var(--accent)" }}>
+                {ytdMode ? "En direct" : year}
+              </span>
+            ) : (
+              <div className="relative flex items-center">
+                <select
+                  value={year}
+                  onChange={(e) => onYearChange(Number(e.target.value))}
+                  aria-label="Année du classement"
+                  className="appearance-none bg-transparent cursor-pointer text-heading-3 pr-5 outline-none"
+                  style={{ color: "var(--accent)", border: "none" }}
+                >
+                  {[...ECONOMY_YEAR_VALUES].reverse().map((y) => (
+                    <option key={y} value={y} style={{ color: "var(--ink)" }}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  size={14}
+                  className="pointer-events-none absolute right-0"
+                  style={{ color: "var(--accent)" }}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Search */}
@@ -369,6 +401,22 @@ export function EconomyRankingsTable({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18 }}
             >
+              {filtered.length === 0 && (
+                // Un tableau vide sans un mot laisse croire à une panne. Sur
+                // la dette et le chômage, seules sept années ont été saisies :
+                // les autres attendent leur import, et cela se dit.
+                <tr>
+                  <td
+                    colSpan={cols.length + 2}
+                    className="px-5 py-8 text-center"
+                    style={{ color: "var(--ink-3)", fontSize: "0.8rem" }}
+                  >
+                    {search.trim()
+                      ? `Aucun pays ne correspond à « ${search.trim()} ».`
+                      : `Aucune donnée « ${currentMetric.label} » pour ${year} : la source ne couvre pas encore cette année.`}
+                  </td>
+                </tr>
+              )}
               {filtered.map(({ name, data, rank, delta }, idx) => {
                 const isEven = idx % 2 === 1;
                 return (

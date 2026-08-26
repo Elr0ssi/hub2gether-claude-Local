@@ -23,7 +23,10 @@ import { SectionFlowCurves } from "./SectionFlowCurves";
 import { useScrollTeleport } from "@/hooks/useScrollTeleport";
 import { ECONOMY_ARTICLES } from "@/data/articles";
 
-const SLIDER_MIN = 1950;
+/* La frise commence où commence la base. Elle partait de 1950, quinze années
+   avant la première valeur publiée : le lecteur pouvait s'y poser sans que rien
+   ne change à l'écran. */
+const SLIDER_MIN = 1960;
 const SLIDER_MAX = 2025;
 
 // Top toolbar only ever showed the 4 main metrics. Their family sub-metrics (PIB/hab.,
@@ -389,6 +392,11 @@ export function EconomyMapView() {
               year={year}
               activeEconomyYear={activeEconomyYear}
               ytdMode={ytdMode}
+              onYearChange={(y) => {
+                setSliderYear(y);
+                handleYearChange(y);
+                setYtdMode(false);
+              }}
               onCountryClick={(name) => {
                 setSelectedCountry(name);
                 setSidePanelOpen(true);

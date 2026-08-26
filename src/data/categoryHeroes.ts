@@ -58,7 +58,9 @@ export interface CategoryHeroConfig {
 // /map/economy, so the hero can never drift from the map underneath it.
 
 const LATEST = 2025;
-const PREVIOUS = 2023;
+// 2024 : la base couvre désormais chaque année, la comparaison n'a plus à
+// sauter par-dessus une année faute de chiffres.
+const PREVIOUS = 2024;
 
 function yearCountries(year: number) {
   return ECONOMY_YEARS.find((y) => y.year === year)?.countries ?? {};
