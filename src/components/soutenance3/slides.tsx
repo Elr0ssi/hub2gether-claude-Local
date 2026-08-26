@@ -638,69 +638,68 @@ function AnswerSlide() {
             ))}
           </div>
 
-          {/* La fiche du pays survolé. Elle occupe toujours la même place, et
-              garde sa hauteur quand elle est vide : le bloc qui apparaît et
-              disparaît ferait sauter la colonne à chaque mouvement de souris. */}
+          {/* La fiche du pays survolé.
+
+              Elle rend TOUJOURS la même structure — un titre, quatre mesures,
+              une ligne de source — et remplit avec des tirets quand il n'y a
+              rien à montrer. Une version précédente n'affichait qu'une phrase
+              d'invite, plus courte que la fiche pleine : la boîte changeait de
+              hauteur à chaque entrée et sortie du curseur, et toute la colonne
+              sautait avec elle. Une hauteur fixe en dur aurait tenu jusqu'au
+              premier changement de texte ; la même structure tient toujours. */}
           <Rise delay={1.4} y={16}>
             <div
               style={{
                 marginTop: 46,
-                minHeight: 168,
                 border: `1px solid ${fiche ? accent : ink.rule}`,
                 borderRadius: 4,
                 padding: "24px 28px",
                 transition: "border-color 0.25s ease",
               }}
             >
-              {fiche && annee ? (
-                <>
-                  <div
-                    style={{
-                      fontSize: 30,
-                      fontWeight: 800,
-                      letterSpacing: "-0.028em",
-                      color: ink.primary,
-                    }}
-                  >
-                    {countryFr(survole ?? "")}
+              <div
+                style={{
+                  fontSize: 30,
+                  fontWeight: fiche ? 800 : 500,
+                  letterSpacing: "-0.028em",
+                  color: fiche ? ink.primary : ink.faint,
+                  lineHeight: 1.2,
+                }}
+              >
+                {fiche ? countryFr(survole ?? "") : S3_ANSWER.globe.empty}
+              </div>
+              <div
+                style={{
+                  marginTop: 18,
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                  gap: "14px 34px",
+                }}
+              >
+                {[
+                  ["PIB", fiche?.gdp === undefined ? "—" : `${fmtMds(fiche.gdp)} Mds €`],
+                  ["PIB / hab.", fiche?.gdp_per_capita === undefined ? "—" : `${Math.round(fiche.gdp_per_capita).toLocaleString("fr-FR")} €`],
+                  ["Balance", fiche?.trade_balance === undefined ? "—" : `${fiche.trade_balance > 0 ? "+" : ""}${fmtMds(fiche.trade_balance)} Mds €`],
+                  ["Inflation", fiche?.inflation === undefined ? "—" : `${fiche.inflation.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`],
+                ].map(([label, valeur]) => (
+                  <div key={label} style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
+                    <span style={{ fontSize: 18, color: ink.muted, minWidth: 108 }}>{label}</span>
+                    <span
+                      style={{
+                        fontSize: 24,
+                        fontWeight: 800,
+                        color: fiche ? ink.primary : ink.faint,
+                        transition: "color 0.25s ease",
+                      }}
+                    >
+                      {valeur}
+                    </span>
                   </div>
-                  <div
-                    style={{
-                      marginTop: 18,
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-                      gap: "14px 34px",
-                    }}
-                  >
-                    {[
-                      ["PIB", fiche.gdp === undefined ? "—" : `${fmtMds(fiche.gdp)} Mds €`],
-                      ["PIB / hab.", fiche.gdp_per_capita === undefined ? "—" : `${Math.round(fiche.gdp_per_capita).toLocaleString("fr-FR")} €`],
-                      ["Balance", fiche.trade_balance === undefined ? "—" : `${fiche.trade_balance > 0 ? "+" : ""}${fmtMds(fiche.trade_balance)} Mds €`],
-                      ["Inflation", fiche.inflation === undefined ? "—" : `${fiche.inflation.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`],
-                    ].map(([label, valeur]) => (
-                      <div key={label} style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
-                        <span style={{ fontSize: 18, color: ink.muted, minWidth: 108 }}>{label}</span>
-                        <span style={{ fontSize: 24, fontWeight: 800, color: ink.primary }}>{valeur}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div style={{ fontSize: 17, color: ink.faint, marginTop: 16 }}>
-                    {S3_ANSWER.globe.year} · Banque mondiale (WDI)
-                  </div>
-                </>
-              ) : (
-                <div
-                  style={{
-                    height: 120,
-                    display: "grid",
-                    placeItems: "center",
-                    fontSize: 21,
-                    color: ink.faint,
-                  }}
-                >
-                  {S3_ANSWER.globe.empty}
-                </div>
-              )}
+                ))}
+              </div>
+              <div style={{ fontSize: 17, color: ink.faint, marginTop: 16 }}>
+                {S3_ANSWER.globe.year} · Banque mondiale (WDI)
+              </div>
             </div>
           </Rise>
         </div>
