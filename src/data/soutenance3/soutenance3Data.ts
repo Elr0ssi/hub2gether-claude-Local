@@ -408,9 +408,12 @@ export const S3_ATTENTION = {
     "Chaînes d'information",
     "Algorithmes",
   ],
+  /* La seconde ligne disait deux fois la première. Celle-ci nomme le
+     responsable — le tri — et amène la slide suivante, où c'est au lecteur de
+     le faire lui-même. */
   statement: [
     "Le problème n'est pas le manque d'information.",
-    "C'est ce à quoi notre attention est réellement exposée.",
+    "C'est le tri que d'autres font à notre place.",
   ],
 } as const;
 
@@ -447,6 +450,9 @@ export const S3_READER_WORK = {
    occuper à la slide suivante. */
 export const S3_MISSING = {
   eyebrow: "Ce qui manque",
+  /* La slide n'avait qu'un sur-titre. Deux lignes suffisent à dire ce qu'elle
+     démontre : chacun fait sa part, et personne ne rassemble. */
+  title: ["Tout existe.", "Rien n'est réuni."],
   families: [
     { label: "Les médias", body: "racontent l'actualité." },
     { label: "Les bases de données", body: "donnent les chiffres." },

@@ -59,6 +59,7 @@ import {
   MarginalCurve,
   OperationChain,
   ShiftChain,
+  useEmphasis,
   VerbStack,
 } from "./visuals";
 import { GEO } from "@/data/soutenance2/soutenance2Data";
@@ -249,6 +250,9 @@ function AttentionSlide() {
     <SlideBody>
       <Eyebrow>{S3_ATTENTION.eyebrow}</Eyebrow>
 
+      {/* Au dernier temps, tout ce qui précède s'efface presque entièrement :
+          la question a été posée, le nuage a fait son effet, et les laisser à
+          pleine encre sous la conclusion rendait la slide illisible. */}
       <div
         style={{
           marginTop: 34,
@@ -258,6 +262,8 @@ function AttentionSlide() {
           flex: 1,
           minHeight: 0,
           alignItems: "center",
+          opacity: step >= 3 ? 0.14 : 1,
+          transition: "opacity 0.7s ease",
         }}
       >
         {/* La colonne qui parle */}
@@ -465,9 +471,22 @@ function MissingSlide() {
     <SlideBody>
       <Eyebrow>{S3_MISSING.eyebrow}</Eyebrow>
 
+      <div style={{ marginTop: 22 }}>
+        {S3_MISSING.title.map((line, i) => (
+          <Rise key={line} delay={0.04 + i * 0.14} y={20}>
+            <p
+              className="t-h2"
+              style={{ color: i === 1 ? ink.primary : ink.secondary, letterSpacing: "-0.035em" }}
+            >
+              {line}
+            </p>
+          </Rise>
+        ))}
+      </div>
+
       <div
         style={{
-          marginTop: 40,
+          marginTop: 30,
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           gap: 90,
@@ -595,29 +614,15 @@ function AnswerSlide() {
         <div>
           <Eyebrow>{S3_ANSWER.eyebrow}</Eyebrow>
 
-          <Rise delay={0.1} y={18}>
-            <div
-              style={{
-                marginTop: 26,
-                fontSize: 38,
-                fontWeight: 800,
-                letterSpacing: "-0.036em",
-                color: accent,
-              }}
-            >
+          {/* Un seul titre, dans la typographie et l'encre des autres slides.
+              Le nom en vert au-dessus d'une phrase en noir faisait deux titres
+              là où il n'en faut qu'un, et le vert n'est pas la couleur des
+              titres du deck. La phrase se dit à l'oral. */}
+          <Rise delay={0.12} y={22}>
+            <p className="t-h1" style={{ color: ink.primary, letterSpacing: "-0.042em", marginTop: 24 }}>
               {S3_ANSWER.wordmark}
-            </div>
+            </p>
           </Rise>
-
-          <div style={{ marginTop: 20 }}>
-            {S3_ANSWER.title.map((line, i) => (
-              <Rise key={line} delay={0.3 + i * 0.18} y={22}>
-                <p className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.036em" }}>
-                  {line}
-                </p>
-              </Rise>
-            ))}
-          </div>
 
           <div style={{ marginTop: 46, display: "flex", gap: 16, flexWrap: "wrap" }}>
             {S3_ANSWER.pillars.map((p, i) => (
@@ -1132,6 +1137,7 @@ function ChannelSlide() {
 function SplitSlide() {
   const ink = useInk();
   const accent = useAccent();
+  const emphase = useEmphasis();
 
   /* Deux gros rectangles côte à côte disaient « voici deux listes », ce qui
      est vrai et sans intérêt. Ce qu'il faut montrer, c'est une chaîne unique
@@ -1165,8 +1171,8 @@ function SplitSlide() {
                   width: 26,
                   height: 26,
                   borderRadius: 3,
-                  border: `2px solid ${i === 0 ? accent : ink.rule}`,
-                  background: i === 0 ? accent : "transparent",
+                  border: `2px solid ${i === 0 ? emphase.border : ink.rule}`,
+                  background: i === 0 ? emphase.background : "transparent",
                   flexShrink: 0,
                 }}
               />
@@ -1242,9 +1248,9 @@ function SplitSlide() {
                     minHeight: 58,
                     padding: "8px 10px",
                     borderRadius: 4,
-                    border: `2px solid ${humain ? accent : ink.rule}`,
-                    background: humain ? accent : "transparent",
-                    color: humain ? "#0B0B0B" : ink.secondary,
+                    border: `2px solid ${humain ? emphase.border : ink.rule}`,
+                    background: humain ? emphase.background : "transparent",
+                    color: humain ? emphase.color : ink.secondary,
                     fontSize: 18,
                     fontWeight: humain ? 800 : 600,
                     letterSpacing: "-0.014em",

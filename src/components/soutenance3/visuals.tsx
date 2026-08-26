@@ -25,6 +25,32 @@ import {
 import { DrawPath, useAccent } from "@/components/soutenance2/visuals";
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   L'ACCENT MIS EN AVANT
+
+   Sur fond sombre, l'accent est un vert fluorescent : un aplat plein avec du
+   texte noir dessus se lit, et c'est ce que fait la V2.
+
+   Sur fond clair, l'accent est un vert forêt. Le deck ne s'en sert jamais en
+   aplat — filets, libellés, texte, et des fonds à 6 % quand il faut un cadre.
+   Des pastilles pleines en vert foncé avec du texte noir, comme il y en avait
+   ici, sortaient de la charte : trop lourdes, et le texte n'y contrastait
+   presque pas.
+
+   Ce petit accord rend la mise en avant conforme dans les deux cas.
+   ═══════════════════════════════════════════════════════════════════════════ */
+export function useEmphasis() {
+  const ink = useInk();
+  const accent = useAccent();
+  const sombre = ink.tone === "dark";
+  return {
+    background: sombre ? accent : "rgba(57,255,136,0.10)",
+    color: sombre ? "#0B0B0B" : ink.primary,
+    border: accent,
+    accent,
+  };
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    CHAÎNE D'OPÉRATIONS — slide 03
 
    Ce que le lecteur doit faire lui-même, en colonne, chaque geste tombant sous
@@ -152,6 +178,7 @@ export function Intersection({
 }) {
   const ink = useInk();
   const accent = useAccent();
+  const emphase = useEmphasis();
   const reduced = useDeckReducedMotion();
 
   const R = 148;
@@ -201,12 +228,15 @@ export function Intersection({
         </motion.text>
       ))}
 
-      {/* Le centre : le seul endroit où les quatre se superposent. */}
+      {/* Le centre : le seul endroit où les quatre se superposent. Un cercle
+          cerné plutôt qu'un aplat — le deck ne remplit pas en vert forêt. */}
       <motion.circle
         cx={C}
         cy={C}
         r={62}
-        fill={accent}
+        fill={emphase.background}
+        stroke={accent}
+        strokeWidth={2.5}
         initial={reduced ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.6 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: reduced ? 0.001 : 0.55, delay: startDelay + 0.95, ease: EASE }}
@@ -219,7 +249,7 @@ export function Intersection({
         initial={reduced ? { opacity: 1 } : { opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: reduced ? 0.001 : 0.4, delay: startDelay + 1.2, ease: EASE }}
-        style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.01em", fill: "#0B0B0B" }}
+        style={{ fontSize: 19, fontWeight: 800, letterSpacing: "-0.01em", fill: emphase.color }}
       >
         {center}
       </motion.text>
@@ -251,6 +281,7 @@ export function ShiftChain({
 }) {
   const ink = useInk();
   const accent = useAccent();
+  const emphase = useEmphasis();
 
   return (
     <div>
@@ -275,9 +306,9 @@ export function ShiftChain({
                     whiteSpace: "nowrap",
                     padding: "16px 30px",
                     borderRadius: 100,
-                    border: `2px solid ${strong ? accent : ink.rule}`,
-                    background: strong ? accent : "transparent",
-                    color: strong ? "#0B0B0B" : ink.primary,
+                    border: `2px solid ${strong ? emphase.border : ink.rule}`,
+                    background: strong ? emphase.background : "transparent",
+                    color: strong ? emphase.color : ink.primary,
                     fontSize: 26,
                     fontWeight: 700,
                     letterSpacing: "-0.02em",
