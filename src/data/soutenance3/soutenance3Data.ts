@@ -84,6 +84,15 @@ export const S3_SLIDES: readonly DeckSlide[] = [
       "QUESTION : pourquoi ce sujet mérite-t-il qu'on s'y arrête ? Trois temps, trois pressions sur la flèche. Laisser le silence entre les deux phrases : c'est le contraste qui installe la tension, pas le débit. Ne donner aucun chiffre ici, ils viennent plus tard.",
   },
   {
+    id: "attention",
+    label: "Ce que l'on voit vraiment",
+    act: "probleme",
+    seconds: 55,
+    steps: 4,
+    speakerNotes:
+      "QUESTION : de toute cette information, qu'est-ce qui nous parvient réellement ? Poser la question au jury et LAISSER LE SILENCE — trois ou quatre secondes, le temps que chacun cherche et ne trouve pas. C'est l'inconfort qui fait la démonstration, pas la réponse.\n\nNe jamais présenter cela comme une preuve : c'est une accroche, et le dire si on vous le reproche. Le point n'est pas que le jury soit mal informé, c'est que notre exposition est sélective et que personne n'y échappe.\n\nNe pas parler du produit ici. Cette slide prépare la suivante, qui montrera ce que le lecteur doit faire lui-même.",
+  },
+  {
     id: "travail",
     label: "Le travail du lecteur",
     act: "probleme",
@@ -362,6 +371,44 @@ export const S3_PARADOX = {
   first: "Nous n'avons jamais eu autant d'informations.",
   hinge: "Et pourtant…",
   second: "Comprendre demande toujours autant de travail.",
+} as const;
+
+/* 02 bis — CE QUE L'ON VOIT VRAIMENT
+
+   Une prise de recul, avant d'entrer dans le problème de recoupement. Elle ne
+   présente rien : elle installe l'idée que l'information disponible et
+   l'information qui nous parvient ne sont pas la même chose.
+
+   La question sur la Chine est une accroche, pas une preuve, et les notes du
+   présentateur le disent explicitement — un jury qui la prendrait pour une
+   statistique aurait raison de la contester. */
+export const S3_ATTENTION = {
+  eyebrow: "Ce que l'on voit vraiment",
+  question: "Pouvez-vous citer trois personnalités chinoises vivantes ?",
+  /* Trois constats, pas un argument : la disproportion parle d'elle-même. */
+  facts: [
+    "Deuxième économie mondiale.",
+    "Une puissance technologique majeure.",
+    "Et pourtant, une connaissance très partielle de ce qui s'y passe.",
+  ],
+  cloudLabel: "Ce qui occupe l'attention",
+  /* Ce qui prend la place. L'ordre est celui de l'apparition, du plus banal au
+     plus invisible : on commence par ce que chacun reconnaît, on finit par ce
+     que personne ne voit agir. */
+  cloud: [
+    "Réseaux sociaux",
+    "Fil d'actualité",
+    "Notifications",
+    "Vidéos courtes",
+    "Alertes",
+    "Recommandations",
+    "Chaînes d'information",
+    "Algorithmes",
+  ],
+  statement: [
+    "Le problème n'est pas le manque d'information.",
+    "C'est ce à quoi notre attention est réellement exposée.",
+  ],
 } as const;
 
 /* 03 — LE TRAVAIL INVISIBLE DU LECTEUR

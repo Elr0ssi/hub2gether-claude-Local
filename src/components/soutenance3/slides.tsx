@@ -53,6 +53,7 @@ import {
   UnlockSlide,
 } from "./reused";
 import {
+  AttentionCloud,
   Intersection,
   MarginalCurve,
   OperationChain,
@@ -62,6 +63,7 @@ import {
 import {
   S3_SLIDES,
   S3_ANSWER,
+  S3_ATTENTION,
   S3_CHANNEL,
   S3_COVER,
   S3_DEPTH,
@@ -217,6 +219,140 @@ function ParadoxSlide() {
             </Rise>
           )}
         </div>
+      </div>
+    </SlideBody>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   03 — CE QUE L'ON VOIT VRAIMENT
+
+   Une prise de recul avant le problème de recoupement. Quatre temps :
+     0 · la question, seule, et le silence qu'elle doit produire
+     1 · les trois constats sur la Chine
+     2 · ce qui occupe la place, mot après mot
+     3 · la phrase qui referme
+
+   Rien du produit ici. La slide installe une idée — l'information disponible
+   et l'information qui nous parvient ne sont pas la même chose — et laisse la
+   suivante montrer ce que le lecteur doit faire lui-même.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function AttentionSlide() {
+  const ink = useInk();
+  const accent = useAccent();
+  const step = useSlideStep();
+
+  return (
+    <SlideBody>
+      <Eyebrow>{S3_ATTENTION.eyebrow}</Eyebrow>
+
+      <div
+        style={{
+          marginTop: 34,
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+          gap: 72,
+          flex: 1,
+          minHeight: 0,
+          alignItems: "center",
+        }}
+      >
+        {/* La colonne qui parle */}
+        <div>
+          <Rise delay={0.1} y={24}>
+            <p
+              className="t-h1"
+              style={{
+                color: step >= 1 ? ink.muted : ink.primary,
+                letterSpacing: "-0.042em",
+                transition: "color 0.5s ease",
+              }}
+            >
+              {S3_ATTENTION.question}
+            </p>
+          </Rise>
+
+          <div
+            style={{
+              marginTop: 44,
+              opacity: step >= 1 ? 1 : 0,
+              transform: step >= 1 ? "none" : "translateY(16px)",
+              transition: "opacity 0.55s ease, transform 0.55s ease",
+            }}
+          >
+            <div style={{ height: 3, background: accent, width: 108 }} />
+            <div style={{ marginTop: 26, display: "grid", gap: 14 }}>
+              {S3_ATTENTION.facts.map((f, i) => (
+                <p
+                  key={f}
+                  style={{
+                    fontSize: 31,
+                    fontWeight: i === 2 ? 800 : 500,
+                    letterSpacing: "-0.025em",
+                    color: i === 2 ? ink.primary : ink.secondary,
+                    lineHeight: 1.24,
+                  }}
+                >
+                  {f}
+                </p>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* La colonne qui se remplit */}
+        <div style={{ position: "relative", height: "100%", minHeight: 0 }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              opacity: step >= 2 ? 1 : 0,
+              transition: "opacity 0.3s ease",
+            }}
+          >
+            <AttentionCloud words={S3_ATTENTION.cloud} visible={step >= 2} startDelay={0.1} />
+          </div>
+          <div
+            className="t-micro"
+            style={{
+              position: "absolute",
+              right: 0,
+              bottom: -10,
+              color: ink.faint,
+              letterSpacing: "0.16em",
+              opacity: step >= 2 ? 1 : 0,
+              transition: "opacity 0.5s ease 0.9s",
+            }}
+          >
+            {S3_ATTENTION.cloudLabel}
+          </div>
+        </div>
+      </div>
+
+      {/* Ce que tout cela voulait dire */}
+      <div
+        style={{
+          borderTop: `1px solid ${ink.rule}`,
+          paddingTop: 30,
+          marginTop: 12,
+          opacity: step >= 3 ? 1 : 0,
+          transform: step >= 3 ? "none" : "translateY(14px)",
+          transition: "opacity 0.6s ease, transform 0.6s ease",
+        }}
+      >
+        {S3_ATTENTION.statement.map((line, i) => (
+          <p
+            key={line}
+            className="t-h2"
+            style={{
+              color: i === 1 ? ink.primary : ink.secondary,
+              letterSpacing: "-0.035em",
+            }}
+          >
+            {line}
+          </p>
+        ))}
       </div>
     </SlideBody>
   );
@@ -1399,6 +1535,7 @@ export const S3_VIEWS: Record<string, ComponentType> = {
   /* Acte I — le problème */
   cover: CoverSlide,
   paradoxe: ParadoxSlide,
+  attention: AttentionSlide,
   travail: ReaderWorkSlide,
   reprise: HistorySlideRef,
   manque: MissingSlide,

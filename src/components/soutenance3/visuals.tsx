@@ -550,3 +550,83 @@ export function PendingValue({ label, unit }: { label: string; unit?: string }) 
     </div>
   );
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE NUAGE D'ATTENTION — slide 03
+
+   Ce qui occupe la place. Les mots arrivent l'un après l'autre, chacun un peu
+   plus opaque et un peu plus gros que le précédent, jusqu'à ce que le cadre
+   soit visiblement plein : c'est l'encombrement qui est le propos, pas les
+   mots eux-mêmes.
+
+   Les positions sont écrites, jamais tirées au hasard : un semis aléatoire
+   change à chaque rendu, se chevauche une fois sur trois, et rend la slide
+   impossible à relire avant une soutenance.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Position en pourcentage du cadre, et poids visuel du mot. */
+const NUAGE = [
+  { x: 6, y: 8, taille: 40, poids: 800 },
+  { x: 56, y: 4, taille: 32, poids: 700 },
+  { x: 30, y: 27, taille: 52, poids: 800 },
+  { x: 72, y: 30, taille: 30, poids: 600 },
+  { x: 4, y: 48, taille: 34, poids: 700 },
+  { x: 44, y: 55, taille: 44, poids: 800 },
+  { x: 12, y: 74, taille: 28, poids: 600 },
+  { x: 58, y: 79, taille: 46, poids: 800 },
+] as const;
+
+export function AttentionCloud({
+  words,
+  visible,
+  startDelay = 0,
+}: {
+  words: readonly string[];
+  /** Le nuage n'existe qu'au temps où il est dit. */
+  visible: boolean;
+  startDelay?: number;
+}) {
+  const ink = useInk();
+  const accent = useAccent();
+  const reduced = useDeckReducedMotion();
+
+  return (
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      {words.slice(0, NUAGE.length).map((mot, i) => {
+        const p = NUAGE[i];
+        // Le dernier mot est le seul à l'accent : « Algorithmes » est ce qui
+        // trie, et c'est lui que la voix doit pouvoir désigner.
+        const dernier = i === Math.min(words.length, NUAGE.length) - 1;
+        return (
+          <motion.span
+            key={mot}
+            initial={reduced ? { opacity: 0.9, scale: 1 } : { opacity: 0, scale: 0.9 }}
+            animate={
+              visible
+                ? { opacity: dernier ? 1 : 0.42 + i * 0.06, scale: 1 }
+                : { opacity: 0, scale: 0.9 }
+            }
+            transition={{
+              duration: reduced ? 0.001 : 0.5,
+              delay: visible ? startDelay + i * 0.15 : 0,
+              ease: EASE,
+            }}
+            style={{
+              position: "absolute",
+              left: `${p.x}%`,
+              top: `${p.y}%`,
+              whiteSpace: "nowrap",
+              fontSize: p.taille,
+              fontWeight: p.poids,
+              letterSpacing: "-0.03em",
+              color: dernier ? accent : ink.primary,
+              lineHeight: 1,
+            }}
+          >
+            {mot}
+          </motion.span>
+        );
+      })}
+    </div>
+  );
+}
