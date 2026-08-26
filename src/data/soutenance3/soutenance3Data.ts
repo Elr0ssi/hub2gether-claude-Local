@@ -302,9 +302,12 @@ export const S3_SLIDES: readonly DeckSlide[] = [
     id: "partenariats",
     label: "Partenariats éventuels",
     act: "modele",
-    seconds: 40,
+    seconds: 45,
+    // Le carrousel de visuels avance avec la flèche : sans ces trois états,
+    // il restait bloqué sur le premier et la slide passait à la suivante.
+    steps: 3,
     speakerNotes:
-      "QUESTION : avec qui la construction est-elle envisageable ? Des pistes, pas des accords — le dire franchement si la question vient. Ce qui compte est la cohérence avec le positionnement, pas le nom.",
+      "QUESTION : avec qui la construction est-elle envisageable ? Des pistes, pas des accords — le dire franchement si la question vient. Ce qui compte est la cohérence avec le positionnement, pas le nom. Les trois visuels défilent à la flèche : c'est au troisième seulement qu'on passe à la slide suivante.",
   },
   {
     id: "modele",
