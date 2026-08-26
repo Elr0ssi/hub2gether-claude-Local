@@ -38,6 +38,9 @@ const DECK_S3: DeckConfig = {
   annexViews: ANNEX_VIEWS,
   totalSeconds: S3_TOTAL_SECONDS,
   className: "ted-deck-v3",
+  // Le globe de la slide 5 se manipule au curseur : le clic ne doit pas
+  // faire défiler. Flèches et barre d'espace restent la navigation.
+  advanceOnClick: false,
 };
 
 interface PageProps {

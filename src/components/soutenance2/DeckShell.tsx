@@ -75,6 +75,12 @@ export interface DeckConfig {
   totalSeconds: number;
   /** Classe posée sur la racine du deck, pour une feuille propre à la version. */
   className?: string;
+  /**
+   * Avancer d'un clic de souris. Vrai par défaut — c'est le comportement de la
+   * V2, inchangé. La V3 le coupe : son globe se manipule au curseur, et chaque
+   * tentative de survol faisait défiler le deck.
+   */
+  advanceOnClick?: boolean;
 }
 
 /** La V2, telle quelle. C'est ce que `/soutenance-2` obtient sans rien passer. */
@@ -150,16 +156,26 @@ export function DeckShell({ initialSlide, presenter = false, config = DECK_S2 }:
     return () => ro.disconnect();
   }, [presenter]);
 
-  /* ── Click / tap to advance ───────────────────────────────────────────── */
+  /* ── Click / tap to advance ───────────────────────────────────────────────
+     Le clic à la souris avance, sauf si la version le refuse. La V3 le refuse :
+     son globe se manipule au curseur, et chaque tentative de survol ou de clic
+     faisait défiler le deck.
+
+     Le doigt avance toujours : sur une tablette il n'y a pas d'autre geste
+     disponible, et le retirer reviendrait à ne plus pouvoir avancer du tout.
+
+     Au clavier, dans les deux versions : → ou Espace pour avancer, ← pour
+     revenir. */
   const onPointerUp = useCallback(
     (e: ReactPointerEvent<HTMLDivElement>) => {
+      if (e.pointerType === "mouse" && config.advanceOnClick === false) return;
       if (e.target instanceof Element && e.target.closest("a, button, [data-no-advance]")) {
         return;
       }
       if (overlayOpen) return;
       next();
     },
-    [next, overlayOpen]
+    [next, overlayOpen, config.advanceOnClick]
   );
 
   /* ── Swipe ────────────────────────────────────────────────────────────── */

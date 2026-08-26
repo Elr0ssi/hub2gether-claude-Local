@@ -935,7 +935,18 @@ export function EconomyGlobe({
     };
 
     const resize = () => {
-      const { width, height } = mount.getBoundingClientRect();
+      /* La taille de mise en page, pas la taille à l'écran.
+         `getBoundingClientRect` rend la taille APRÈS transformation CSS, et
+         `renderer.setSize` écrit une taille de mise en page : sous une scène
+         mise à l'échelle — celle du deck l'est — le canvas se retrouvait plus
+         petit que le cadre qui le contient. Le globe était dessiné dans un
+         coin de sa boîte, et la visée, calculée sur la boîte, tombait à côté
+         de ce qui était affiché.
+
+         Hors transformation, les deux mesures coïncident : la page économie
+         est rendue exactement comme avant. */
+      const width = mount.clientWidth;
+      const height = mount.clientHeight;
       if (!width || !height) return;
       renderer.setSize(width, height);
       camera.aspect = width / height;
@@ -1059,7 +1070,10 @@ export function EconomyGlobe({
       const pick = pickRef.current;
       if (!pick) return null;
 
-      const rect = mount.getBoundingClientRect();
+      /* Le rectangle du canvas, pas celui du cadre : c'est dans le canvas que
+         l'image est tracée, et lui seul dit où elle commence. Les deux
+         rectangles coïncident quand rien n'est mis à l'échelle. */
+      const rect = renderer.domElement.getBoundingClientRect();
       const ndc = new THREE.Vector2(
         ((clientX - rect.left) / rect.width) * 2 - 1,
         -((clientY - rect.top) / rect.height) * 2 + 1
