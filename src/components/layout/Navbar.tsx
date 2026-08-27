@@ -18,7 +18,7 @@ export function Navbar() {
     } catch {
       // Le navigateur peut refuser ; la soutenance s'ouvre quand même.
     }
-    router.push("/soutenance-3");
+    router.push("/soutenance-4");
   };
 
   return (
@@ -60,6 +60,23 @@ export function Navbar() {
           >
             Présentation
             {pathname === "/preview" && (
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
+                style={{ background: "var(--accent)" }}
+              />
+            )}
+          </Link>
+          <Link
+            href="/soutenance-4"
+            className={cn(
+              "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
+              pathname === "/soutenance-4"
+                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
+                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
+            )}
+          >
+            Soutenance 4
+            {pathname === "/soutenance-4" && (
               <span
                 className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
                 style={{ background: "var(--accent)" }}
