@@ -12,7 +12,7 @@
    en ouvrant les deux onglets côte à côte.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useMemo, useState, type ComponentType } from "react";
 import { countryFr } from "@/data/countryNamesFr";
@@ -858,62 +858,73 @@ function ShiftSlide() {
   const accent = useAccent();
   const step = useSlideStep();
 
-  /* Trois temps, et le troisième est celui qui compte. Deux chaînes posées
-     côte à côte décrivaient une perte : le média disparaissait du bout de la
-     ligne et la slide s'arrêtait là. La boucle refermée — la réponse cite sa
-     source, et c'est par là que le lecteur revient — décrit un canal. */
-  return (
-    <SlideBody>
-      <Eyebrow>{S4_SHIFT.eyebrow}</Eyebrow>
+  /* Mise en scene reprise de la slide IA de la V2 : un seul temps a l'ecran,
+     au centre, remplace par le suivant. Empiler les trois chaines forcait le
+     jury a relire les precedentes ; les faire se succeder laisse le troisieme
+     temps — la boucle refermee — arriver seul. */
+  const beats = S4_SHIFT.beats;
+  const i = Math.min(step, beats.length - 1);
+  const beat = beats[i];
 
-      <div
-        style={{
-          marginTop: 46,
-          display: "grid",
-          gap: 52,
-          flex: 1,
-          minHeight: 0,
-          alignContent: "center",
-        }}
-      >
-        {S4_SHIFT.beats.map((beat, i) => (
-          <div
+  return (
+    <SlideBody style={{ paddingTop: 72, paddingBottom: 78 }}>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+        <Eyebrow>{S4_SHIFT.eyebrow}</Eyebrow>
+
+        {/* Le compteur d'etats, discret : le presentateur et le jury savent ou
+            ils en sont dans la sequence. */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          {beats.map((b, k) => (
+            <span
+              key={b.id}
+              style={{
+                width: k === i ? 22 : 6,
+                height: 2,
+                borderRadius: 2,
+                background: k === i ? accent : ink.rule,
+                transition: "width .45s cubic-bezier(0.16,1,0.3,1), background .45s",
+              }}
+            />
+          ))}
+          <span className="t-index" style={{ color: ink.faint, marginLeft: 8 }}>
+            {String(i + 1).padStart(2, "0")} / {String(beats.length).padStart(2, "0")}
+          </span>
+        </div>
+      </div>
+
+      <div style={{ flex: 1, display: "grid", placeItems: "center" }}>
+        <AnimatePresence mode="wait">
+          <motion.div
             key={beat.id}
-            style={{
-              opacity: step >= i ? 1 : 0,
-              transform: step >= i ? "none" : "translateY(18px)",
-              transition: "opacity 0.55s ease, transform 0.55s ease",
-            }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.45, ease: DECK_EASE }}
           >
-            {step >= i && (
-              <ShiftChain
-                label={beat.label}
-                chain={beat.chain}
-                caption={beat.caption}
-                startDelay={0.1}
-                highlightLast={i > 0}
-              />
-            )}
-          </div>
-        ))}
+            <ShiftChain
+              label={beat.label}
+              chain={beat.chain}
+              caption={beat.caption}
+              startDelay={0.05}
+              highlightLast={i > 0}
+            />
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       <div
         style={{
-          opacity: step >= 2 ? 1 : 0,
-          transition: "opacity 0.6s ease 0.5s",
+          opacity: step >= beats.length - 1 ? 1 : 0,
+          transition: "opacity 0.6s ease 0.4s",
           borderTop: `1px solid ${ink.rule}`,
           paddingTop: 32,
         }}
       >
-        {S4_SHIFT.statement.map((line, i) => (
+        {S4_SHIFT.statement.map((line, k) => (
           <p
             key={line}
             className="t-h2"
-            style={{
-              color: i === 1 ? accent : ink.secondary,
-              letterSpacing: "-0.035em",
-            }}
+            style={{ color: k === 1 ? accent : ink.secondary, letterSpacing: "-0.035em" }}
           >
             {line}
           </p>
@@ -1729,7 +1740,12 @@ function TrajectorySlide4() {
 /* Qui occupe le terrain, en France : meme tableau, chiffres de la V4. */
 function PlayersSlide4() {
   return (
-    <PlayersSlide columns={S4_PLAYERS.columns} players={S4_PLAYERS.rows} note={S4_PLAYERS.note} />
+    <PlayersSlide
+      columns={S4_PLAYERS.columns}
+      players={S4_PLAYERS.rows}
+      note={S4_PLAYERS.note}
+      showReminder={false}
+    />
   );
 }
 
@@ -1806,7 +1822,7 @@ export const S4_VIEWS: Record<string, ComponentType> = {
 
   /* Acte VI — le modèle économique */
   acteurs: PlayersSlide4,
-  concurrence: () => <CompetitionSlide showLegend={false} footer={<></>} />,
+  concurrence: () => <CompetitionSlide showLegend={false} colWidth={190} footer={<></>} />,
   acquisition: () => <AcquisitionSlide showPay={false} />,
   publications: () => <PublicationsSlide index={sectionNo("publications")} />,
   partenariats: () => (

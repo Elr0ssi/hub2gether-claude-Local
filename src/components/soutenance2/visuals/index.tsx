@@ -360,6 +360,8 @@ export function CoverageMatrix({
   startDelay = 0,
   /* La legende est affichee par defaut ; la V4 la retire. */
   showLegend = true,
+  /* Largeur d'une colonne d'axe. 132 par defaut, comme en V2 et V3. */
+  colWidth = 132,
 }: {
   axes: readonly string[];
   rows: readonly {
@@ -371,6 +373,7 @@ export function CoverageMatrix({
   }[];
   startDelay?: number;
   showLegend?: boolean;
+  colWidth?: number;
 }) {
   const ink = useInk();
   const accent = useAccent();
@@ -398,7 +401,7 @@ export function CoverageMatrix({
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: `1fr repeat(${axes.length}, 132px)`,
+            gridTemplateColumns: `1fr repeat(${axes.length}, ${colWidth}px)`,
             alignItems: "end",
             paddingBottom: 14,
             borderBottom: `1px solid ${ink.rule}`,
@@ -422,7 +425,7 @@ export function CoverageMatrix({
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: `1fr repeat(${axes.length}, 132px)`,
+              gridTemplateColumns: `1fr repeat(${axes.length}, ${colWidth}px)`,
               alignItems: "center",
               padding: "20px 0",
               borderBottom: `1px solid ${ink.rule}`,

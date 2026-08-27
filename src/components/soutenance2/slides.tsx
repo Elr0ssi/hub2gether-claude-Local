@@ -535,7 +535,10 @@ export function PlayersSlide({
   columns,
   players,
   note,
+  /* Le rappel pose en haut a droite. Affiche par defaut ; la V4 le retire. */
+  showReminder = true,
 }: {
+  showReminder?: boolean;
   columns?: readonly string[];
   players?: readonly { name: string; visits: string; model: string; revenue: string }[];
   note?: string;
@@ -549,9 +552,11 @@ export function PlayersSlide({
     <SlideBody>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 24 }}>
         <Eyebrow>Les acteurs</Eyebrow>
-        <span className="t-micro" style={{ color: ink.faint, letterSpacing: "0.1em" }}>
-          {MARKET.reminder}
-        </span>
+        {showReminder && (
+          <span className="t-micro" style={{ color: ink.faint, letterSpacing: "0.1em" }}>
+            {MARKET.reminder}
+          </span>
+        )}
       </div>
 
       <div style={{ marginTop: 26, maxWidth: 1180 }}>
@@ -617,7 +622,8 @@ export function CompetitionSlide({
   footer,
   /* La legende des pastilles est affichee par defaut ; la V4 la retire. */
   showLegend = true,
-}: { footer?: ReactNode; showLegend?: boolean } = {}) {
+  colWidth,
+}: { footer?: ReactNode; showLegend?: boolean; colWidth?: number } = {}) {
   const ink = useInk();
 
   return (
@@ -629,7 +635,7 @@ export function CompetitionSlide({
       </div>
 
       <div style={{ marginTop: 46 }}>
-        <CoverageMatrix axes={COMPETITION_AXES} rows={COMPETITION} startDelay={0.3} showLegend={showLegend} />
+        <CoverageMatrix axes={COMPETITION_AXES} rows={COMPETITION} startDelay={0.3} showLegend={showLegend} colWidth={colWidth} />
       </div>
 
       {footer ?? (
