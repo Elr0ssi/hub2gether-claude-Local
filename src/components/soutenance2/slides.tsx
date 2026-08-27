@@ -615,7 +615,9 @@ export function CompetitionSlide({
   /* Un bandeau rendu sous la matrice. Absent par défaut, donc les V2 et V3
      s'affichent exactement comme avant ; la V4 y pose son benchmark. */
   footer,
-}: { footer?: ReactNode } = {}) {
+  /* La legende des pastilles est affichee par defaut ; la V4 la retire. */
+  showLegend = true,
+}: { footer?: ReactNode; showLegend?: boolean } = {}) {
   const ink = useInk();
 
   return (
@@ -627,7 +629,7 @@ export function CompetitionSlide({
       </div>
 
       <div style={{ marginTop: 46 }}>
-        <CoverageMatrix axes={COMPETITION_AXES} rows={COMPETITION} startDelay={0.3} />
+        <CoverageMatrix axes={COMPETITION_AXES} rows={COMPETITION} startDelay={0.3} showLegend={showLegend} />
       </div>
 
       {footer ?? (
@@ -853,9 +855,20 @@ export function RevenueSlide({
   /* Rendu sous les moteurs de revenus. Absent par défaut ; la V4 y pose le
      nombre de partenariats nécessaires. */
   footer,
-}: { footer?: ReactNode } = {}) {
+  /* Le tableau de projection est surchargeable ; absent, la V2 affiche le sien. */
+  projection,
+}: {
+  footer?: ReactNode;
+  projection?: {
+    label: string;
+    streams: readonly string[];
+    rows: readonly { year: string; values: readonly string[]; total: string }[];
+    note: string;
+  };
+} = {}) {
   const ink = useInk();
   const accent = useAccent();
+  const proj = projection ?? REVENUE.projection;
 
   return (
     <SlideBody>
@@ -898,12 +911,12 @@ export function RevenueSlide({
       <Rise delay={0.95} y={16}>
         <div style={{ marginTop: 44 }}>
           <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 14 }}>
-            {REVENUE.projection.label}
+            {proj.label}
           </p>
 
           <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 0.8fr) repeat(4, minmax(0, 1fr))", gap: "0 30px" }}>
             <span />
-            {REVENUE.projection.streams.map((st) => (
+            {proj.streams.map((st) => (
               <p
                 key={st}
                 className="t-micro"
@@ -919,7 +932,7 @@ export function RevenueSlide({
               Total
             </p>
 
-            {REVENUE.projection.rows.map((r) => (
+            {proj.rows.map((r) => (
               <Fragment key={r.year}>
                 <p className="t-h3" style={{ color: ink.primary, padding: "14px 0", borderBottom: `1px solid ${ink.rule}`, letterSpacing: "-0.024em" }}>
                   {r.year}
@@ -944,7 +957,7 @@ export function RevenueSlide({
           </div>
 
           <p className="t-small" style={{ color: ink.faint, marginTop: 12 }}>
-            {REVENUE.projection.note}
+            {proj.note}
           </p>
         </div>
       </Rise>
@@ -1244,9 +1257,19 @@ export function StatusSlide() {
    13 — CHIFFRES CLÉS DU BUSINESS PLAN
    ═══════════════════════════════════════════════════════════════════════ */
 
-export function FinanceSlide() {
+export function FinanceSlide({
+  /* La courbe et le second bloc sont surchargeables ; absents, la V2 garde
+     son chiffre d'affaires et son resultat net. */
+  years,
+  year2,
+}: {
+  years?: readonly { year: string; revenue: number; net: number | null }[];
+  year2?: { label: string; value: string };
+} = {}) {
   const ink = useInk();
   const accent = useAccent();
+  const serie = years ?? FINANCE;
+  const bloc2 = year2 ?? FINANCE_SLIDE.year2;
 
   return (
     <SlideBody>
@@ -1266,7 +1289,7 @@ export function FinanceSlide() {
           flex: 1,
         }}
       >
-        <RevenueCurve years={FINANCE} startDelay={0.35} width={940} height={400} />
+        <RevenueCurve years={serie} startDelay={0.35} width={940} height={400} />
 
         <div>
           <Rise delay={1.0} y={18}>
@@ -1290,10 +1313,10 @@ export function FinanceSlide() {
           <Rise delay={1.25} y={16}>
             <div style={{ marginTop: 30 }}>
               <div className="t-micro" style={{ color: ink.muted, letterSpacing: "0.13em" }}>
-                {FINANCE_SLIDE.year2.label}
+                {bloc2.label}
               </div>
               <div className="t-h1" style={{ color: ink.primary, letterSpacing: "-0.04em", marginTop: 8 }}>
-                {FINANCE_SLIDE.year2.value}
+                {bloc2.value}
               </div>
             </div>
           </Rise>

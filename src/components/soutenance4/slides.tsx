@@ -76,6 +76,9 @@ import {
   S4_COVER,
   S4_DEPTH,
   S4_ECONOMICS,
+  S4_FINANCE_YEARS,
+  S4_FINANCE_YEAR2,
+  S4_REVENUE_PROJECTION,
   S4_PARADOX,
   S4_PLAYERS,
   S4_POSITIONING,
@@ -1302,7 +1305,7 @@ function EconomicsSlide() {
           axisNote={S4_ECONOMICS.curve.caption}
           startDelay={0.5}
           width={1380}
-          height={470}
+          height={380}
         />
       </div>
 
@@ -1319,13 +1322,27 @@ function EconomicsSlide() {
         >
           <p
             className="t-h3"
-            style={{ color: ink.primary, letterSpacing: "-0.028em", maxWidth: 940, fontWeight: 700 }}
+            style={{ color: ink.primary, letterSpacing: "-0.028em", maxWidth: 620, fontWeight: 700 }}
           >
             {S4_ECONOMICS.statement}
           </p>
-          <p style={{ fontSize: 18, color: ink.faint, maxWidth: 620, lineHeight: 1.4, fontStyle: "italic" }}>
-            {S4_ECONOMICS.measureNote}
-          </p>
+          <div style={{ display: "flex", gap: 44, flexWrap: "wrap" }}>
+            {S4_ECONOMICS.costs.map((c) => (
+              <div key={c.label} style={{ minWidth: 210 }}>
+                <p className="t-micro" style={{ color: accent, letterSpacing: "0.13em" }}>
+                  {c.label}
+                </p>
+                {c.lines.map((l) => (
+                  <p key={l} style={{ fontSize: 16, color: ink.faint, marginTop: 5 }}>
+                    {l}
+                  </p>
+                ))}
+                <p style={{ fontSize: 19, fontWeight: 800, color: ink.primary, marginTop: 8, letterSpacing: "-0.02em" }}>
+                  {c.total}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </Rise>
     </SlideBody>
@@ -1668,57 +1685,6 @@ function PlayersSlide4() {
   );
 }
 
-/* Le bandeau de mise en perspective, posé sous la matrice de couverture. */
-function BenchmarkFooter() {
-  const ink = useInk();
-  const accent = useAccent();
-  const nous = S4_BENCHMARK.rows.find((r) => r.us);
-
-  /* Notre chiffre d'abord, puis les autres en multiples de celui-ci. Répéter
-     les cinq volumes en toutes lettres faisait deux lignes, et la matrice de
-     couverture ne laisse la place que pour une. Le multiple dit la même chose
-     en trois caractères, et c'est lui le propos. */
-  return (
-    <Rise delay={1.05} y={10}>
-      <div
-        style={{
-          marginTop: 14,
-          paddingTop: 12,
-          borderTop: `1px solid ${ink.rule}`,
-          display: "flex",
-          alignItems: "baseline",
-          gap: 24,
-          flexWrap: "wrap",
-        }}
-      >
-        <span className="t-micro" style={{ color: accent, letterSpacing: "0.13em" }}>
-          {S4_BENCHMARK.label}
-        </span>
-        {nous && (
-          <span style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-            <span style={{ fontSize: 24, fontWeight: 800, color: accent, letterSpacing: "-0.024em" }}>
-              {nous.visits.toLocaleString("fr-FR")}
-            </span>
-            <span style={{ fontSize: 16, color: ink.primary, fontWeight: 700 }}>{nous.name}</span>
-          </span>
-        )}
-        {S4_BENCHMARK.rows
-          .filter((r) => !r.us)
-          .map((r) => (
-            <span key={r.name} style={{ display: "flex", alignItems: "baseline", gap: 7 }}>
-              <span style={{ fontSize: 16, color: ink.faint }}>{r.name}</span>
-              {nous && (
-                <span style={{ fontSize: 20, fontWeight: 800, color: ink.secondary, letterSpacing: "-0.02em" }}>
-                  ×{Math.round(r.visits / nous.visits).toLocaleString("fr-FR")}
-                </span>
-              )}
-            </span>
-          ))}
-      </div>
-    </Rise>
-  );
-}
-
 /* Ce qu'il faut vendre pour que la ligne « partenariats » du plan tienne. */
 function PartnerTargetFooter() {
   const ink = useInk();
@@ -1749,7 +1715,6 @@ function PartnerTargetFooter() {
             <span style={{ fontSize: 19, color: ink.secondary }}>{l}</span>
           </span>
         ))}
-        <span style={{ fontSize: 16, color: ink.faint, fontStyle: "italic" }}>{S4_PARTNER_TARGET.note}</span>
       </div>
     </Rise>
   );
@@ -1793,15 +1758,15 @@ export const S4_VIEWS: Record<string, ComponentType> = {
 
   /* Acte VI — le modèle économique */
   acteurs: PlayersSlide4,
-  concurrence: () => <CompetitionSlide footer={<BenchmarkFooter />} />,
+  concurrence: () => <CompetitionSlide showLegend={false} footer={<></>} />,
   acquisition: () => <AcquisitionSlide showPay={false} />,
   publications: () => <PublicationsSlide index={sectionNo("publications")} />,
   partenariats: () => (
     <PartnershipsSlide index={sectionNo("partenariats")} showCriteria={false} airy />
   ),
-  modele: () => <RevenueSlide footer={<PartnerTargetFooter />} />,
+  modele: () => <RevenueSlide projection={S4_REVENUE_PROJECTION} footer={<PartnerTargetFooter />} />,
   previsionnel: TrajectorySlide4,
-  trajectoire: FinanceSlide,
+  trajectoire: () => <FinanceSlide years={S4_FINANCE_YEARS} year2={S4_FINANCE_YEAR2} />,
 
   /* Acte VII — passage à l'échelle */
   financement: UnlockSlide,

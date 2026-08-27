@@ -605,14 +605,31 @@ export const S4_ECONOMICS = {
     { id: "classique", label: "Production classique", detail: "Chaque article est refait de bout en bout." },
     { id: "pipeline", label: "Pipeline TED", detail: "La chaîne est écrite une fois, puis rejouée." },
   ],
-  measure: { label: "Coût par article", value: A_COMPLETER },
+  /* Les postes tels qu'ils figurent au business plan. Aucun cout par article
+     n'y est calcule : la courbe montre la pente, pas un montant. */
+  costs: [
+    {
+      label: "IA",
+      lines: ["Claude Max · 100 €/mois", "ChatGPT Pro · 90 €/mois"],
+      total: "190 €/mois — 2 280 €/an",
+    },
+    {
+      label: "Automatisation",
+      lines: ["n8n", "jusqu'à 10 000 exécutions/mois"],
+      total: "50 €/mois — 600 €/an",
+    },
+    {
+      label: "Production visuelle et vidéo",
+      lines: ["Higgsfield", "≈ 30 vidéos/mois"],
+      total: "100 €/mois — 1 200 €/an",
+    },
+  ],
   curve: {
     x: "Nombre d'articles produits",
     y: "Coût par article",
     caption: "Graduations à renseigner une fois les coûts relevés.",
   },
-  statement: "Ce n'est pas produire plus vite. C'est produire à un coût qui ne croît pas avec le volume.",
-  measureNote: "À mesurer avant la soutenance : trois articles chronométrés, et les factures d'API du mois.",
+  statement: "Une infrastructure largement fixe. Une production qui, elle, peut changer d'échelle.",
 } as const;
 
 /* 21 — AUTOMATISÉ, MAIS TRAÇABLE
@@ -668,6 +685,23 @@ export const S4_PLAYERS = {
     { name: "Basta!", visits: "100 000 abonnés dont 30 000 payants", model: "Indépendant / dons‑abonnements", revenue: "N/D" },
   ],
   note: "Concurrence émergente : les sites générés par IA touchent au total 14 à 16 M d'internautes français par mois (2026).",
+} as const;
+
+/* Chiffres cles du business plan. La courbe portait le chiffre d'affaires ;
+   elle porte desormais le resultat d'exploitation simplifie, negatif la
+   premiere annee. Le champ garde son nom `revenue` : c'est celui que lit la
+   courbe de la V2, qu'on ne touche pas. */
+export const S4_FINANCE_YEARS = [
+  { year: "Année 1", revenue: -6_036, net: null },
+  { year: "Année 2", revenue: 20_208, net: null },
+  { year: "Année 3", revenue: 96_360, net: null },
+  { year: "Année 4", revenue: 231_360, net: null },
+  { year: "Année 5", revenue: 426_940, net: null },
+] as const;
+
+export const S4_FINANCE_YEAR2 = {
+  label: "Résultat d'exploitation, année 2",
+  value: "+20 208 €",
 } as const;
 
 export const S4_AUDIENCE = {
@@ -729,11 +763,22 @@ export const S4_TRAJECTORY = {
 /* Ce qu'il faut vendre pour que la ligne « partenariats » du plan tienne.
    Sept mille cinq cents euros le partenariat n'est pas un montant qu'un
    annonceur signe à ce stade ; à cinq cents, il faut en faire vingt. */
+export const S4_REVENUE_PROJECTION = {
+  label: "Ce que chaque source rapporterait",
+  streams: ["Display web", "Réseaux sociaux", "Partenariats de marque"],
+  rows: [
+    { year: "Année 2", values: ["9 600 €", "5 328 €", "17 280 €"], total: "32 208 €" },
+    { year: "Année 3", values: ["36 000 €", "17 760 €", "57 600 €"], total: "111 360 €" },
+    { year: "Année 5", values: ["144 000 €", "71 040 €", "230 400 €"], total: "445 440 €" },
+  ],
+  note: "Scénario central du business plan.",
+} as const;
+
+/* Ce sur quoi repose la ligne « partenariats » du plan. */
 export const S4_PARTNER_TARGET = {
-  label: "Ce que cela suppose",
-  count: "20",
-  countLabel: "partenariats par an",
-  price: "500 €",
-  priceLabel: "par partenariat",
-  note: "Montants à recaler sur le business plan définitif.",
+  label: "Hypothèse partenariats",
+  count: "2",
+  countLabel: "publications sponsorisées par mois",
+  price: "12 €",
+  priceLabel: "pour 1 000 abonnés",
 } as const;

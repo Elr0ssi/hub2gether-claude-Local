@@ -358,6 +358,8 @@ export function CoverageMatrix({
   axes,
   rows,
   startDelay = 0,
+  /* La legende est affichee par defaut ; la V4 la retire. */
+  showLegend = true,
 }: {
   axes: readonly string[];
   rows: readonly {
@@ -368,6 +370,7 @@ export function CoverageMatrix({
     us?: boolean;
   }[];
   startDelay?: number;
+  showLegend?: boolean;
 }) {
   const ink = useInk();
   const accent = useAccent();
@@ -468,16 +471,18 @@ export function CoverageMatrix({
         </Rise>
       ))}
 
-      <Rise delay={startDelay + 0.1 + rows.length * 0.1} y={8}>
-        <div
-          className="t-small"
-          style={{ color: ink.faint, marginTop: 16, display: "flex", gap: 26 }}
-        >
-          <span>● couvert</span>
-          <span>◐ partiel</span>
-          <span>○ non couvert</span>
-        </div>
-      </Rise>
+      {showLegend && (
+        <Rise delay={startDelay + 0.1 + rows.length * 0.1} y={8}>
+          <div
+            className="t-small"
+            style={{ color: ink.faint, marginTop: 16, display: "flex", gap: 26 }}
+          >
+            <span>● couvert</span>
+            <span>◐ partiel</span>
+            <span>○ non couvert</span>
+          </div>
+        </Rise>
+      )}
     </div>
   );
 }
