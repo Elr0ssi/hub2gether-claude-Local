@@ -600,36 +600,34 @@ export const S4_SPLIT = {
    trois articles de bout en bout, relever les factures d'API du mois. */
 export const S4_ECONOMICS = {
   eyebrow: "L'économie de l'automatisation",
-  title: ["Le fossé de coût entre un article classique", "et une production automatisée."],
-  sides: [
-    { id: "classique", label: "Production classique", detail: "Chaque article est refait de bout en bout." },
-    { id: "pipeline", label: "Pipeline TED", detail: "La chaîne est écrite une fois, puis rejouée." },
-  ],
-  /* Les postes tels qu'ils figurent au business plan. Aucun cout par article
-     n'y est calcule : la courbe montre la pente, pas un montant. */
-  costs: [
-    {
-      label: "IA",
-      lines: ["Claude Max · 100 €/mois", "ChatGPT Pro · 90 €/mois"],
-      total: "190 €/mois — 2 280 €/an",
-    },
-    {
-      label: "Automatisation",
-      lines: ["n8n", "jusqu'à 10 000 exécutions/mois"],
-      total: "50 €/mois — 600 €/an",
-    },
-    {
-      label: "Production visuelle et vidéo",
-      lines: ["Higgsfield", "≈ 30 vidéos/mois"],
-      total: "100 €/mois — 1 200 €/an",
-    },
-  ],
-  curve: {
-    x: "Nombre d'articles produits",
-    y: "Coût par article",
-    caption: "Graduations à renseigner une fois les coûts relevés.",
+  title: ["Deux modèles de production.", "Deux structures de coûts."],
+  classique: {
+    label: "Production classique",
+    volume: { value: "≈ 100", label: "articles / an" },
+    cost: { value: "≥ 60 000 €", label: "coût éditorial / an" },
+    lines: [
+      "Journaliste salarié",
+      "+ charges employeur",
+      "+ relecture et validation éditoriale",
+      "+ outils et licences",
+    ],
+    note: "Ordre de grandeur fondé sur ~35 k€ brut/an pour un journaliste, auquel s'ajoutent charges et fonctions éditoriales.",
   },
-  statement: "Une infrastructure largement fixe. Une production qui, elle, peut changer d'échelle.",
+  pipeline: {
+    label: "Pipeline TED",
+    cost: { value: "4 080 €", label: "infrastructure / an" },
+    lines: [
+      { name: "Claude Max", value: "1 200 €/an" },
+      { name: "ChatGPT Pro", value: "1 080 €/an" },
+      { name: "n8n", value: "600 €/an" },
+      { name: "Higgsfield", value: "1 200 €/an" },
+    ],
+    total: { name: "Total", value: "4 080 €/an" },
+    capacity: { label: "Capacité", value: "Production scalable, plusieurs contenus en parallèle" },
+    note: "Le volume dépend principalement du contrôle humain, pas du nombre d'agents.",
+  },
+  statement:
+    "D'un côté, la capacité augmente avec les ressources humaines. De l'autre, une infrastructure largement fixe peut être rejouée.",
 } as const;
 
 /* 21 — AUTOMATISÉ, MAIS TRAÇABLE

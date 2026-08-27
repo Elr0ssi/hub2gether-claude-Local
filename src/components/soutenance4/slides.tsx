@@ -1262,13 +1262,11 @@ function EconomicsSlide() {
   const ink = useInk();
   const accent = useAccent();
 
-  /* Première version : deux cartes détaillées, quatre emplacements de mesure et
-     une courbe, sur une seule slide. Illisible, et le message se perdait dans
-     le dispositif.
+  /* Deux colonnes, un « VS » discret entre elles. Pas de courbe : la comparaison
+     tient dans deux chiffres et leur decomposition, et c'est tout ce que le jury
+     doit retenir. */
+  const { classique: g, pipeline: d } = S4_ECONOMICS;
 
-     Ce qui reste : une idée, une courbe. Le coût d'un article classique ne
-     baisse pas quand on en produit plus ; le nôtre, si. Les deux légendes sont
-     posées au bout de leur courbe, et il n'y a rien d'autre à lire. */
   return (
     <SlideBody>
       <Eyebrow>{S4_ECONOMICS.eyebrow}</Eyebrow>
@@ -1288,61 +1286,122 @@ function EconomicsSlide() {
 
       <div
         style={{
+          marginTop: 34,
           flex: 1,
           minHeight: 0,
           display: "grid",
-          placeItems: "center",
-          marginTop: 8,
+          gridTemplateColumns: "minmax(0, 1fr) 64px minmax(0, 1fr)",
+          gap: 0,
+          alignItems: "stretch",
         }}
       >
-        <MarginalCurve
-          classicLabel={S4_ECONOMICS.sides[0].label}
-          classicDetail={S4_ECONOMICS.sides[0].detail}
-          pipelineLabel={S4_ECONOMICS.sides[1].label}
-          pipelineDetail={S4_ECONOMICS.sides[1].detail}
-          xLabel={S4_ECONOMICS.curve.x}
-          yLabel={S4_ECONOMICS.curve.y}
-          axisNote={S4_ECONOMICS.curve.caption}
-          startDelay={0.5}
-          width={1380}
-          height={380}
-        />
+        {/* Production classique */}
+        <Rise delay={0.32} y={18}>
+          <div style={{ paddingRight: 56 }}>
+            <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em" }}>
+              {g.label}
+            </p>
+
+            <p style={{ fontSize: 72, fontWeight: 900, color: ink.primary, letterSpacing: "-0.045em", lineHeight: 1, marginTop: 26 }}>
+              {g.volume.value}
+            </p>
+            <p className="t-micro" style={{ color: ink.muted, marginTop: 8 }}>
+              {g.volume.label}
+            </p>
+
+            <p style={{ fontSize: 72, fontWeight: 900, color: ink.primary, letterSpacing: "-0.045em", lineHeight: 1, marginTop: 26 }}>
+              {g.cost.value}
+            </p>
+            <p className="t-micro" style={{ color: ink.muted, marginTop: 8 }}>
+              {g.cost.label}
+            </p>
+
+            <div style={{ marginTop: 24, borderTop: `1px solid ${ink.rule}`, paddingTop: 16 }}>
+              {g.lines.map((l) => (
+                <p key={l} style={{ fontSize: 16, color: ink.secondary, lineHeight: 1.6 }}>
+                  {l}
+                </p>
+              ))}
+            </div>
+
+            <p style={{ fontSize: 14, color: ink.faint, marginTop: 16, lineHeight: 1.45, maxWidth: 520 }}>
+              {g.note}
+            </p>
+          </div>
+        </Rise>
+
+        {/* Le pivot */}
+        <Fade delay={0.9}>
+          <div style={{ display: "grid", placeItems: "center", height: "100%" }}>
+            <span className="t-micro" style={{ color: ink.faint, letterSpacing: "0.18em" }}>
+              VS
+            </span>
+          </div>
+        </Fade>
+
+        {/* Pipeline TED */}
+        <Rise delay={0.5} y={18}>
+          <div style={{ paddingLeft: 56, borderLeft: `1px solid ${ink.rule}` }}>
+            <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em" }}>
+              {d.label}
+            </p>
+
+            <p style={{ fontSize: 72, fontWeight: 900, color: accent, letterSpacing: "-0.045em", lineHeight: 1, marginTop: 26 }}>
+              {d.cost.value}
+            </p>
+            <p className="t-micro" style={{ color: ink.muted, marginTop: 8 }}>
+              {d.cost.label}
+            </p>
+
+            <div style={{ marginTop: 24, maxWidth: 460 }}>
+              {d.lines.map((l) => (
+                <div
+                  key={l.name}
+                  style={{ display: "flex", justifyContent: "space-between", gap: 20, padding: "7px 0" }}
+                >
+                  <span style={{ fontSize: 16, color: ink.secondary }}>{l.name}</span>
+                  <span style={{ fontSize: 16, color: ink.secondary, fontVariantNumeric: "tabular-nums" }}>
+                    {l.value}
+                  </span>
+                </div>
+              ))}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 20,
+                  paddingTop: 12,
+                  marginTop: 6,
+                  borderTop: `1px solid ${ink.rule}`,
+                }}
+              >
+                <span style={{ fontSize: 17, fontWeight: 800, color: ink.primary }}>{d.total.name}</span>
+                <span style={{ fontSize: 17, fontWeight: 800, color: ink.primary, fontVariantNumeric: "tabular-nums" }}>
+                  {d.total.value}
+                </span>
+              </div>
+            </div>
+
+            <div style={{ marginTop: 22 }}>
+              <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em" }}>
+                {d.capacity.label}
+              </p>
+              <p style={{ fontSize: 20, fontWeight: 600, color: ink.primary, marginTop: 8 }}>
+                {d.capacity.value}
+              </p>
+              <p style={{ fontSize: 14, color: ink.faint, marginTop: 10, lineHeight: 1.45, maxWidth: 460 }}>
+                {d.note}
+              </p>
+            </div>
+          </div>
+        </Rise>
       </div>
 
-      <Rise delay={2.1} y={14}>
-        <div
-          style={{
-            borderTop: `1px solid ${ink.rule}`,
-            paddingTop: 26,
-            display: "flex",
-            alignItems: "baseline",
-            gap: 48,
-            flexWrap: "wrap",
-          }}
-        >
-          <p
-            className="t-h3"
-            style={{ color: ink.primary, letterSpacing: "-0.028em", maxWidth: 620, fontWeight: 700 }}
-          >
+      <Rise delay={1.5} y={14}>
+        <div style={{ borderTop: `1px solid ${ink.rule}`, paddingTop: 22 }}>
+          <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.028em", maxWidth: 1500, fontWeight: 700 }}>
             {S4_ECONOMICS.statement}
           </p>
-          <div style={{ display: "flex", gap: 44, flexWrap: "wrap" }}>
-            {S4_ECONOMICS.costs.map((c) => (
-              <div key={c.label} style={{ minWidth: 210 }}>
-                <p className="t-micro" style={{ color: accent, letterSpacing: "0.13em" }}>
-                  {c.label}
-                </p>
-                {c.lines.map((l) => (
-                  <p key={l} style={{ fontSize: 16, color: ink.faint, marginTop: 5 }}>
-                    {l}
-                  </p>
-                ))}
-                <p style={{ fontSize: 19, fontWeight: 800, color: ink.primary, marginTop: 8, letterSpacing: "-0.02em" }}>
-                  {c.total}
-                </p>
-              </div>
-            ))}
-          </div>
         </div>
       </Rise>
     </SlideBody>
