@@ -1592,20 +1592,9 @@ function BenchmarkSlide4() {
       </div>
 
       <div style={{ flex: 1, display: "grid", placeItems: "center" }}>
-        <BenchmarkBars rows={rows} unit={S4_BENCHMARK.unit} startDelay={0.55} />
+        <BenchmarkBars rows={rows} unit={S4_BENCHMARK.unit} startDelay={0.55} multipleLabel="l’audience du leader" />
       </div>
 
-      <Rise delay={1.8} y={16}>
-        <div>
-          <Rule delay={1.7} width="100%" accentWidth={200} />
-          <p
-            className="t-h3 t-editorial"
-            style={{ color: ink.primary, fontSize: 34, marginTop: 24, maxWidth: 1500 }}
-          >
-            {S4_BENCHMARK.caption}
-          </p>
-        </div>
-      </Rise>
     </SlideBody>
   );
 }
@@ -1764,7 +1753,7 @@ export const S4_VIEWS: Record<string, ComponentType> = {
   partenariats: () => (
     <PartnershipsSlide index={sectionNo("partenariats")} showCriteria={false} airy />
   ),
-  modele: () => <RevenueSlide projection={S4_REVENUE_PROJECTION} footer={<PartnerTargetFooter />} />,
+  modele: () => <RevenueSlide projection={S4_REVENUE_PROJECTION} showStreamBodies={false} footer={<PartnerTargetFooter />} />,
   previsionnel: TrajectorySlide4,
   trajectoire: () => <FinanceSlide years={S4_FINANCE_YEARS} year2={S4_FINANCE_YEAR2} />,
 

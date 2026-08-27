@@ -190,11 +190,14 @@ export function BenchmarkBars({
   unit,
   startDelay = 0.4,
   width = 1560,
+  /* Le libelle pose a cote du multiplicateur. Absent, la V1 garde le sien. */
+  multipleLabel = "l’audience du leader · l’écart est la marge de progression, pas le verdict",
 }: {
   rows: readonly ResolvedBenchmarkRow[];
   unit: string;
   startDelay?: number;
   width?: number;
+  multipleLabel?: string;
 }) {
   const { us, other, ink } = usePalette();
   const reduced = useDeckReducedMotion();
@@ -362,9 +365,11 @@ export function BenchmarkBars({
                 >
                   {multiple(mine.value, leader)}
                 </span>
-                <span className="t-body" style={{ color: ink.muted }}>
-                  {"l’audience du leader · l’écart est la marge de progression, pas le verdict"}
-                </span>
+                {multipleLabel && (
+                  <span className="t-body" style={{ color: ink.muted }}>
+                    {multipleLabel}
+                  </span>
+                )}
               </div>
               <div />
             </motion.div>

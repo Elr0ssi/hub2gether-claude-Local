@@ -857,8 +857,11 @@ export function RevenueSlide({
   footer,
   /* Le tableau de projection est surchargeable ; absent, la V2 affiche le sien. */
   projection,
+  /* Les descriptions sous chaque moteur. Affichees par defaut ; la V4 les retire. */
+  showStreamBodies = true,
 }: {
   footer?: ReactNode;
+  showStreamBodies?: boolean;
   projection?: {
     label: string;
     streams: readonly string[];
@@ -898,9 +901,11 @@ export function RevenueSlide({
               <div className="t-h3" style={{ color: ink.primary, marginTop: 26, letterSpacing: "-0.028em" }}>
                 {s.label}
               </div>
-              <div className="t-body" style={{ color: ink.muted, marginTop: 18 }}>
-                {s.body}
-              </div>
+              {showStreamBodies && (
+                <div className="t-body" style={{ color: ink.muted, marginTop: 18 }}>
+                  {s.body}
+                </div>
+              )}
             </div>
           </Rise>
         ))}

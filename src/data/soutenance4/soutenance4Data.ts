@@ -600,7 +600,7 @@ export const S4_SPLIT = {
    trois articles de bout en bout, relever les factures d'API du mois. */
 export const S4_ECONOMICS = {
   eyebrow: "L'économie de l'automatisation",
-  title: ["Le coût d'un article ne baisse pas", "quand on en écrit plus. Le nôtre, si."],
+  title: ["Le fossé de coût entre un article classique", "et une production automatisée."],
   sides: [
     { id: "classique", label: "Production classique", detail: "Chaque article est refait de bout en bout." },
     { id: "pipeline", label: "Pipeline TED", detail: "La chaîne est écrite une fois, puis rejouée." },
@@ -732,7 +732,6 @@ export const S4_BENCHMARK = {
   headline: "Où nous nous situons.",
   unit: "visites / mois",
   source: "SimilarWeb · estimation",
-  caption: "Un marché qui se compte en millions de visites par mois : c'est la place qu'une petite structure peut venir prendre.",
   rows: [
     { name: "Statista", visits: 9_100_000, us: false },
     { name: "Our World in Data", visits: 4_200_000, us: false },
