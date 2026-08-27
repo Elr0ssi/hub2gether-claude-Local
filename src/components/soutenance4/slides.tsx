@@ -620,6 +620,7 @@ function AnswerSlide() {
                 <EconomyGlobe
                   economyYear={annee}
                   metric="gdp"
+                  satellite
                   selectedCountry={survole}
                   onCountryClick={() => {}}
                   onCountryHover={setSurvole}
