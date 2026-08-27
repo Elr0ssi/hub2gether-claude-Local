@@ -653,6 +653,23 @@ export const S4_UNLOCK = {
    ceux du site, ils n'ont pas à s'excuser.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* Qui occupe le terrain, en France. Les deux dernieres lignes se comptent en
+   abonnes et non en visites : la colonne est nommee en consequence, sinon on
+   compare deux choses differentes. Les sites generes par IA sont une categorie
+   d'acteurs, pas un titre : ils restent hors tableau, en note. */
+export const S4_PLAYERS = {
+  columns: ["Titre", "Audience / abonnés", "Modèle d'accès", "Chiffre d'affaires"],
+  rows: [
+    { name: "Le Figaro", visits: "240 M", model: "Mixte", revenue: "579 M€" },
+    { name: "Le Monde", visits: "181 M", model: "Mixte / abonnement", revenue: "309,5 M€" },
+    { name: "Les Échos", visits: "33 M", model: "Abonnement", revenue: "96 M€" },
+    { name: "Mediapart", visits: "260 000 abonnés", model: "Abonnement intégral", revenue: "28 M€" },
+    { name: "Courrier International", visits: "≈ 5 M", model: "Abonnement / payant", revenue: "21 M€" },
+    { name: "Basta!", visits: "100 000 abonnés dont 30 000 payants", model: "Indépendant / dons‑abonnements", revenue: "N/D" },
+  ],
+  note: "Concurrence émergente : les sites générés par IA touchent au total 14 à 16 M d'internautes français par mois (2026).",
+} as const;
+
 export const S4_AUDIENCE = {
   eyebrow: "L'audience",
   title: ["Où en est l'audience."],

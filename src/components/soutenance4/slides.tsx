@@ -77,6 +77,7 @@ import {
   S4_DEPTH,
   S4_ECONOMICS,
   S4_PARADOX,
+  S4_PLAYERS,
   S4_POSITIONING,
   S4_READER_WORK,
   S4_SHIFT,
@@ -1660,6 +1661,13 @@ function TrajectorySlide4() {
   );
 }
 
+/* Qui occupe le terrain, en France : meme tableau, chiffres de la V4. */
+function PlayersSlide4() {
+  return (
+    <PlayersSlide columns={S4_PLAYERS.columns} players={S4_PLAYERS.rows} note={S4_PLAYERS.note} />
+  );
+}
+
 /* Le bandeau de mise en perspective, posé sous la matrice de couverture. */
 function BenchmarkFooter() {
   const ink = useInk();
@@ -1784,7 +1792,7 @@ export const S4_VIEWS: Record<string, ComponentType> = {
   derriere: () => <TeamSlideRef showSkills={false} maxLines={2} />,
 
   /* Acte VI — le modèle économique */
-  acteurs: PlayersSlide,
+  acteurs: PlayersSlide4,
   concurrence: () => <CompetitionSlide footer={<BenchmarkFooter />} />,
   acquisition: () => <AcquisitionSlide showPay={false} />,
   publications: () => <PublicationsSlide index={sectionNo("publications")} />,

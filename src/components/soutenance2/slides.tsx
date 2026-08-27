@@ -529,9 +529,21 @@ export function MarketSlide() {
    LES ACTEURS
    ═══════════════════════════════════════════════════════════════════════ */
 
-export function PlayersSlide() {
+export function PlayersSlide({
+  /* Le tableau est surchargeable. Absent par defaut, donc les V2 et V3
+     affichent exactement les memes lignes qu'avant ; la V4 passe les siennes. */
+  columns,
+  players,
+  note,
+}: {
+  columns?: readonly string[];
+  players?: readonly { name: string; visits: string; model: string; revenue: string }[];
+  note?: string;
+} = {}) {
   const ink = useInk();
   const accent = useAccent();
+  const cols = columns ?? MARKET.playersColumns;
+  const rows = players ?? MARKET.players;
 
   return (
     <SlideBody>
@@ -554,7 +566,7 @@ export function PlayersSlide() {
             gap: "0 32px",
           }}
         >
-          {MARKET.playersColumns.map((c, i) => (
+          {cols.map((c, i) => (
             <p
               key={c}
               className="t-micro"
@@ -569,7 +581,7 @@ export function PlayersSlide() {
             </p>
           ))}
 
-          {MARKET.players.map((pl) => (
+          {rows.map((pl) => (
             <Fragment key={pl.name}>
               <p className="t-h3" style={{ color: ink.primary, padding: "15px 0", borderBottom: `1px solid ${ink.rule}`, letterSpacing: "-0.024em" }}>
                 {pl.name}
@@ -588,7 +600,7 @@ export function PlayersSlide() {
         </div>
 
         <p className="t-small" style={{ color: ink.faint, marginTop: 16 }}>
-          {MARKET.playersNote}
+          {note ?? MARKET.playersNote}
         </p>
       </div>
     </SlideBody>
