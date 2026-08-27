@@ -240,10 +240,14 @@ export function PartnershipsSlide({
      retire le bandeau de conditions, qui alourdissait une slide déjà pleine,
      et respire davantage. */
   airy = false,
+  /* Les visuels partenaires sont des cadres d'attente par defaut ; la V4
+     affiche les fichiers deposes dans public/soutenance/partenariats. */
+  showVisuals = false,
 }: {
   index?: string;
   showCriteria?: boolean;
   airy?: boolean;
+  showVisuals?: boolean;
 }) {
   const ink = useInk();
   const accent = useAccent();
@@ -332,7 +336,7 @@ export function PartnershipsSlide({
           </Rise>
         </div>
 
-        <VisualCarousel />
+        <VisualCarousel showImages={showVisuals} />
       </div>
     </SlideBody>
   );
@@ -345,7 +349,7 @@ export function PartnershipsSlide({
  * qui défilent d'un clic : le suivant se laisse deviner sur le bord, si bien
  * qu'on voit qu'il y en a d'autres sans avoir à le dire.
  */
-function VisualCarousel() {
+function VisualCarousel({ showImages = false }: { showImages?: boolean }) {
   const ink = useInk();
   const accent = useAccent();
   /* Le carrousel avance avec la slide, pas avec la souris : la flèche fait
@@ -386,18 +390,28 @@ function VisualCarousel() {
                   display: "grid",
                   placeItems: "center",
                   textAlign: "center",
-                  padding: 18,
+                  padding: showImages ? 0 : 18,
+                  overflow: "hidden",
                 }}
               >
-                <div>
-                  <ImageIcon size={20} style={{ color: ink.faint }} />
-                  <p className="t-micro" style={{ color: ink.faint, marginTop: 10 }}>
-                    {v.label}
-                  </p>
-                  <p style={{ fontSize: 12, color: ink.faint, marginTop: 6, opacity: 0.8 }}>
-                    {v.image}
-                  </p>
-                </div>
+                {showImages ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={v.image}
+                    alt={v.label}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                  />
+                ) : (
+                  <div>
+                    <ImageIcon size={20} style={{ color: ink.faint }} />
+                    <p className="t-micro" style={{ color: ink.faint, marginTop: 10 }}>
+                      {v.label}
+                    </p>
+                    <p style={{ fontSize: 12, color: ink.faint, marginTop: 6, opacity: 0.8 }}>
+                      {v.image}
+                    </p>
+                  </div>
+                )}
               </figure>
             ))}
           </div>

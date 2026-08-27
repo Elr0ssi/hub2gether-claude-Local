@@ -1826,7 +1826,7 @@ export const S4_VIEWS: Record<string, ComponentType> = {
   acquisition: () => <AcquisitionSlide showPay={false} />,
   publications: () => <PublicationsSlide index={sectionNo("publications")} />,
   partenariats: () => (
-    <PartnershipsSlide index={sectionNo("partenariats")} showCriteria={false} airy />
+    <PartnershipsSlide index={sectionNo("partenariats")} showCriteria={false} airy showVisuals />
   ),
   modele: () => <RevenueSlide projection={S4_REVENUE_PROJECTION} showStreamBodies={false} footer={<PartnerTargetFooter />} />,
   previsionnel: TrajectorySlide4,
