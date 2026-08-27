@@ -259,6 +259,14 @@ export const S4_SLIDES: readonly DeckSlide[] = [
       "QUESTION : est-ce que ce chiffre est petit ? Oui, et c'est l'information. Les ordres de grandeur du secteur se comptent en millions de visites par mois : le marché existe et il est occupé par des acteurs installés. La slide sert à situer la trajectoire, pas à se comparer à armes égales.",
   },
   {
+    id: "previsionnel",
+    label: "Prévision d'audience",
+    act: "preuves",
+    seconds: 50,
+    speakerNotes:
+      "QUESTION : jusqu'où cette audience peut-elle aller ? Trois leviers, pas une extrapolation : la reprise du pipeline, la profondeur de catalogue, la distribution sociale. Assumer que c'est une cible conditionnée à la refonte, pas une projection statistique — la note le dit, la voix doit le confirmer.",
+  },
+  {
     id: "publications",
     label: "Ce que nous publions déjà",
     act: "preuves",
@@ -302,14 +310,6 @@ export const S4_SLIDES: readonly DeckSlide[] = [
     seconds: 50,
     speakerNotes:
       "QUESTION : comment ce média gagne-t-il de l'argent ? Une phrase par moteur, pas plus. Le point qui compte : pas de paywall. L'audience est la recette, donc tout ce qui augmente l'audience augmente directement le potentiel.",
-  },
-  {
-    id: "previsionnel",
-    label: "Prévision d'audience",
-    act: "business",
-    seconds: 50,
-    speakerNotes:
-      "QUESTION : jusqu'où cette audience peut-elle aller ? Trois leviers, pas une extrapolation : la reprise du pipeline, la profondeur de catalogue, la distribution sociale. Assumer que c'est une cible conditionnée à la refonte, pas une projection statistique — la note le dit, la voix doit le confirmer.",
   },
   {
     id: "trajectoire",
