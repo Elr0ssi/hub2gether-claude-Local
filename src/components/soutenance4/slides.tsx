@@ -27,6 +27,11 @@ import {
   useInk,
 } from "@/components/presentation/primitives";
 import {
+  BenchmarkBars,
+  Sparkline,
+  TrajectoryChart,
+} from "@/components/presentation/visuals/charts";
+import {
   DrawPath,
   SourceFan,
   ProductScreenshotFrame,
@@ -1448,77 +1453,83 @@ function TraceSlide() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   OÙ EN EST L'AUDIENCE · reprise de la V1
+   OÙ EN EST L'AUDIENCE · mise en page reprise telle quelle de la V1
 
-   Un chiffre en très grand, quatre mesures sous un filet, et la période. Ni
-   pastille « données de démonstration », ni note d'excuse sur l'acquisition
-   mise en retrait : ce sont les chiffres du site.
+   Le chiffre héros, sa courbe sur douze mois, et les quatre mesures qui
+   l'entourent sous un filet. Ni pastille « données de démonstration », ni
+   note sur l'acquisition mise en retrait : ce sont les chiffres du site.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 function AudienceSlide4() {
   const ink = useInk();
-  const accent = useAccent();
 
   return (
-    <SlideBody>
+    <SlideBody padding="88px 120px">
       <Eyebrow>{S4_AUDIENCE.eyebrow}</Eyebrow>
 
-      <Rise delay={0.08} y={20}>
-        <p className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em", marginTop: 22 }}>
+      <Rise delay={0.28} y={18}>
+        <h2 className="t-h1" style={{ color: ink.primary, marginTop: 24, fontSize: 60 }}>
           {S4_AUDIENCE.title[0]}
-        </p>
+        </h2>
       </Rise>
 
       <div
         style={{
-          marginTop: 40,
           flex: 1,
-          minHeight: 0,
           display: "grid",
-          gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.15fr)",
+          gridTemplateColumns: "760px 1fr",
           gap: 90,
           alignItems: "center",
+          marginTop: 30,
         }}
       >
+        {/* Le chiffre héros */}
         <div>
-          <Rise delay={0.3} y={18}>
-            <p className="t-micro" style={{ color: accent, letterSpacing: "0.15em", marginBottom: 18 }}>
-              {S4_AUDIENCE.periode}
-            </p>
-            <p
-              style={{
-                fontSize: 148,
-                fontWeight: 900,
-                letterSpacing: "-0.05em",
-                color: ink.primary,
-                lineHeight: 0.94,
-              }}
-            >
-              {S4_AUDIENCE.hero.value}
-            </p>
-            <p style={{ fontSize: 27, fontWeight: 500, color: ink.secondary, marginTop: 12 }}>
-              {S4_AUDIENCE.hero.label}
-            </p>
-          </Rise>
-        </div>
-
-        <div style={{ display: "grid", gap: 0 }}>
-          {S4_AUDIENCE.stats.map((st, i) => (
-            <Rise key={st.label} delay={0.5 + i * 0.12} y={12}>
+          <Rise delay={0.5} y={20}>
+            <div>
+              <div className="t-micro" style={{ color: ink.faint }}>
+                {S4_AUDIENCE.hero.label}
+              </div>
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  justifyContent: "space-between",
-                  gap: 30,
-                  padding: "20px 0",
-                  borderBottom: `1px solid ${ink.rule}`,
+                  fontSize: 148,
+                  fontWeight: 900,
+                  letterSpacing: "-0.05em",
+                  lineHeight: 1,
+                  color: ink.primary,
+                  marginTop: 16,
+                  fontVariantNumeric: "tabular-nums",
                 }}
               >
-                <span style={{ fontSize: 24, fontWeight: 500, color: ink.secondary }}>{st.label}</span>
-                <span style={{ fontSize: 40, fontWeight: 800, color: ink.primary, letterSpacing: "-0.032em" }}>
+                {S4_AUDIENCE.hero.value}
+              </div>
+            </div>
+          </Rise>
+
+          <div style={{ marginTop: 26 }}>
+            <Sparkline series={S4_AUDIENCE.heroSeries} width={520} height={92} delay={0.9} />
+            <Rise delay={1.6} y={8}>
+              <div className="t-micro" style={{ color: ink.faint, marginTop: 12 }}>
+                {S4_AUDIENCE.heroTrend} · {S4_AUDIENCE.periode}
+              </div>
+            </Rise>
+          </div>
+        </div>
+
+        {/* Les mesures qui l'entourent */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "36px 56px" }}>
+          {S4_AUDIENCE.stats.map((st, i) => (
+            <Rise key={st.label} delay={0.8 + i * 0.09} y={16}>
+              <div style={{ borderTop: `1px solid ${ink.rule}`, paddingTop: 22 }}>
+                <div
+                  className="t-h2"
+                  style={{ color: ink.primary, fontSize: 46, fontVariantNumeric: "tabular-nums" }}
+                >
                   {st.value}
-                </span>
+                </div>
+                <div className="t-micro" style={{ color: ink.muted, marginTop: 12 }}>
+                  {st.label}
+                </div>
               </div>
             </Rise>
           ))}
@@ -1529,87 +1540,122 @@ function AudienceSlide4() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   PRÉVISION D'AUDIENCE · reprise de la V1
+   OÙ NOUS NOUS SITUONS · les barres de la V1, sans changement
 
-   Quatre points, trois leviers. La barre est proportionnelle à la racine du
-   volume : en linéaire, 8 400 à côté de 320 000 ne se voit pas, et c'est
-   justement l'écart que la slide doit rendre lisible.
+   Elle suit immédiatement l'audience : le chiffre vient d'être annoncé, la
+   slide le met à l'échelle du secteur.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function BenchmarkSlide4() {
+  const ink = useInk();
+
+  const rows = S4_BENCHMARK.rows.map((r) => ({
+    name: r.name,
+    value: r.visits,
+    isUs: r.us,
+  }));
+
+  return (
+    <SlideBody padding="80px 120px 64px">
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 60 }}>
+        <div>
+          <Eyebrow>{S4_BENCHMARK.eyebrow}</Eyebrow>
+          <Rise delay={0.28} y={18}>
+            <h2 className="t-h1" style={{ color: ink.primary, marginTop: 24, fontSize: 60 }}>
+              {S4_BENCHMARK.headline}
+            </h2>
+          </Rise>
+        </div>
+        <Rise delay={0.6} y={10}>
+          <p className="t-micro" style={{ color: ink.faint, textAlign: "right" }}>
+            {S4_BENCHMARK.source}
+          </p>
+        </Rise>
+      </div>
+
+      <div style={{ flex: 1, display: "grid", placeItems: "center" }}>
+        <BenchmarkBars rows={rows} unit={S4_BENCHMARK.unit} startDelay={0.55} />
+      </div>
+
+      <Rise delay={1.8} y={16}>
+        <div>
+          <Rule delay={1.7} width="100%" accentWidth={200} />
+          <p
+            className="t-h3 t-editorial"
+            style={{ color: ink.primary, fontSize: 34, marginTop: 24, maxWidth: 1500 }}
+          >
+            {S4_BENCHMARK.caption}
+          </p>
+        </div>
+      </Rise>
+    </SlideBody>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PRÉVISION D'AUDIENCE · la courbe de la V1, sans changement
+
+   Quatre points, les multiplicateurs entre eux, trois leviers dessous.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 function TrajectorySlide4() {
   const ink = useInk();
   const accent = useAccent();
-  const max = Math.max(...S4_TRAJECTORY.points.map((p) => p.value));
+
+  const points = S4_TRAJECTORY.points.map((p) => ({
+    label: p.label,
+    value: p.value,
+    state: p.state,
+  }));
 
   return (
-    <SlideBody>
-      <Eyebrow>{S4_TRAJECTORY.eyebrow}</Eyebrow>
-
-      <Rise delay={0.08} y={20}>
-        <p className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em", marginTop: 22 }}>
-          {S4_TRAJECTORY.title[0]}
-        </p>
-      </Rise>
-
-      <div style={{ marginTop: 44, display: "grid", gap: 18 }}>
-        {S4_TRAJECTORY.points.map((pt, i) => {
-          const cible = pt.state === "target";
-          return (
-            <Rise key={pt.label} delay={0.3 + i * 0.16} y={14}>
-              <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-                <span style={{ width: 190, fontSize: 25, fontWeight: 600, color: ink.secondary }}>
-                  {pt.label}
-                </span>
-                <span
-                  style={{
-                    height: 34,
-                    width: `${Math.sqrt(pt.value / max) * 62}%`,
-                    background: cible ? "rgba(57,255,136,0.16)" : accent,
-                    border: `2px solid ${accent}`,
-                    borderRadius: 3,
-                  }}
-                />
-                <span style={{ fontSize: 34, fontWeight: 800, color: ink.primary, letterSpacing: "-0.03em" }}>
-                  {pt.value.toLocaleString("fr-FR")}
-                </span>
-              </div>
-            </Rise>
-          );
-        })}
-        <Rise delay={0.95} y={8}>
-          <p style={{ fontSize: 19, color: ink.faint, marginLeft: 218 }}>{S4_TRAJECTORY.unit}</p>
+    <SlideBody padding="72px 120px 56px">
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 60 }}>
+        <div>
+          <Eyebrow>{S4_TRAJECTORY.eyebrow}</Eyebrow>
+          <Rise delay={0.28} y={18}>
+            <h2 className="t-h1" style={{ color: ink.primary, marginTop: 22, fontSize: 58 }}>
+              {S4_TRAJECTORY.title[0]}
+            </h2>
+          </Rise>
+        </div>
+        <Rise delay={0.6} y={10}>
+          <p className="t-micro" style={{ color: ink.faint, textAlign: "right", maxWidth: 460 }}>
+            {S4_TRAJECTORY.note}
+          </p>
         </Rise>
+      </div>
+
+      <div style={{ display: "grid", placeItems: "center", marginTop: 34 }}>
+        <TrajectoryChart points={points} unit={S4_TRAJECTORY.unit} startDelay={0.55} height={460} />
       </div>
 
       <div
         style={{
-          marginTop: 46,
-          flex: 1,
-          minHeight: 0,
           display: "grid",
-          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-          gap: 48,
-          alignItems: "start",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gap: 56,
+          marginTop: 10,
         }}
       >
         {S4_TRAJECTORY.levers.map((l, i) => (
-          <Rise key={l.index} delay={1.1 + i * 0.14} y={14}>
-            <div style={{ paddingTop: 16, borderTop: `2px solid ${accent}` }}>
-              <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 10 }}>
-                {l.index}
+          <Rise key={l.index} delay={1.6 + i * 0.16} y={18}>
+            <div style={{ borderTop: `1px solid ${ink.rule}`, paddingTop: 22 }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 10 }}>
+                <span className="t-micro" style={{ color: accent, letterSpacing: "0.14em" }}>
+                  {l.index}
+                </span>
+                <span className="t-h3" style={{ color: ink.primary, fontSize: 26 }}>
+                  {l.title}
+                </span>
+              </div>
+              <p className="t-body" style={{ color: ink.muted }}>
+                {l.body}
               </p>
-              <p style={{ fontSize: 27, fontWeight: 800, color: ink.primary, letterSpacing: "-0.026em" }}>
-                {l.title}
-              </p>
-              <p style={{ fontSize: 20, color: ink.muted, marginTop: 10, lineHeight: 1.45 }}>{l.body}</p>
             </div>
           </Rise>
         ))}
       </div>
-
-      <Rise delay={1.7} y={8}>
-        <p style={{ fontSize: 18, color: ink.faint, fontStyle: "italic" }}>{S4_TRAJECTORY.note}</p>
-      </Rise>
     </SlideBody>
   );
 }
@@ -1733,6 +1779,7 @@ export const S4_VIEWS: Record<string, ComponentType> = {
 
   /* Acte V — preuve d'exécution */
   audience: AudienceSlide4,
+  benchmark: BenchmarkSlide4,
   etat: StatusSlide,
   derriere: () => <TeamSlideRef showSkills={false} maxLines={2} />,
 

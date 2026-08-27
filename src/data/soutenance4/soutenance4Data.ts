@@ -251,6 +251,14 @@ export const S4_SLIDES: readonly DeckSlide[] = [
       "QUESTION : combien de monde lit déjà ce média ? Les chiffres de septembre 2024 à août 2025, relevés sur l'analytics du site. Ne pas s'excuser de leur taille : ils décrivent un socle construit sans acquisition payante et sans IA, et c'est ce socle qui rend la trajectoire crédible. Zéro partenariat : le dire franchement, c'est ce que la slide modèle vient chercher.",
   },
   {
+    id: "benchmark",
+    label: "Où nous nous situons",
+    act: "preuves",
+    seconds: 45,
+    speakerNotes:
+      "QUESTION : est-ce que ce chiffre est petit ? Oui, et c'est l'information. Les ordres de grandeur du secteur se comptent en millions de visites par mois : le marché existe et il est occupé par des acteurs installés. La slide sert à situer la trajectoire, pas à se comparer à armes égales.",
+  },
+  {
     id: "publications",
     label: "Ce que nous publions déjà",
     act: "preuves",
@@ -649,7 +657,11 @@ export const S4_AUDIENCE = {
   eyebrow: "L'audience",
   title: ["Où en est l'audience."],
   periode: "Septembre 2024 → août 2025",
-  hero: { value: "8 400", label: "visiteurs par mois" },
+  hero: { value: "8 400", label: "Visiteurs / mois" },
+  /* Courbe des douze derniers mois sous le chiffre héros. À recaler sur
+     l'export analytics : seul le point d'arrivée (8 400) est relevé. */
+  heroSeries: [5200, 5900, 6400, 7100, 7800, 9200, 10400, 9800, 8900, 8200, 8100, 8400],
+  heroTrend: "12 derniers mois",
   stats: [
     { label: "Pages vues / mois", value: "15 000" },
     { label: "Articles publiés", value: "40" },
@@ -665,6 +677,11 @@ export const S4_BENCHMARK = {
   /* Libellé, unité et source tiennent ensemble : la matrice de couverture
      occupe déjà la scène, et le bandeau doit tenir sur une seule ligne. */
   label: "Où nous nous situons · visites / mois · SimilarWeb",
+  eyebrow: "Benchmark",
+  headline: "Où nous nous situons.",
+  unit: "visites / mois",
+  source: "SimilarWeb · estimation",
+  caption: "Un marché qui se compte en millions de visites par mois : c'est la place qu'une petite structure peut venir prendre.",
   rows: [
     { name: "Statista", visits: 9_100_000, us: false },
     { name: "Our World in Data", visits: 4_200_000, us: false },
