@@ -732,7 +732,7 @@ export const S4_EDITORIAL_DEMANDS = [
 
 export const S4_AUDIENCE = {
   eyebrow: "L'audience",
-  title: ["Où en est l'audience."],
+  title: ["L'audience au moment de notre V2."],
   periode: "Septembre 2024 → août 2025",
   hero: { value: "8 400", label: "Visiteurs / mois" },
   /* Courbe des douze derniers mois sous le chiffre héros. À recaler sur
