@@ -38,24 +38,24 @@ export const A_COMPLETER = "{À COMPLÉTER}";
 
 export const S4_ACTS = [
   "probleme",
-  "produit",
+  "reponse",
   "marche",
-  "distribution",
+  "ia",
   "fabrication",
-  "preuve",
-  "modele",
-  "echelle",
+  "preuves",
+  "business",
+  "conclusion",
 ] as const;
 
 export const S4_ACT_LABELS: Record<string, string> = {
   probleme: "I · Le problème",
-  produit: "II · Le produit",
-  marche: "III · Le marché",
-  distribution: "IV · La distribution",
-  fabrication: "V · La fabrication",
-  preuve: "VI · Preuve d'exécution",
-  modele: "VII · Le modèle économique",
-  echelle: "VIII · Passage à l'échelle",
+  reponse: "II · Notre réponse",
+  marche: "III · Marché et concurrence",
+  ia: "IV · L'IA et la différence",
+  fabrication: "V · Qui fabrique, et comment",
+  preuves: "VI · Les preuves",
+  business: "VII · Le modèle économique",
+  conclusion: "VIII · Conclusion",
 };
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -111,28 +111,11 @@ export const S4_SLIDES: readonly DeckSlide[] = [
     speakerNotes:
       "QUESTION : personne ne fait déjà ça ? Ne pas attaquer les médias — ils font leur métier. Dire ce que chaque famille apporte, puis nommer les cinq verbes que personne ne réunit. C'est le trou dans lequel le produit va se poser à la slide suivante.",
   },
-  {
-    id: "positionnement",
-    label: "Le positionnement",
-    act: "probleme",
-    seconds: 60,
-    speakerNotes:
-      "QUESTION : pourquoi ce produit face aux médias, aux plateformes data et à ChatGPT ? On enchaîne directement sur la promesse éditoriale, sans passer par les chiffres de marché : ils viennent bien plus loin, une fois la preuve faite. Ne jamais dire « meilleur ». Dire « à l'intersection ». Les quatre familles font bien leur métier ; aucune ne réunit les quatre gestes. C'est cette intersection qui est la place.",
-  },
-  {
-    id: "reprise",
-    label: "Quatre ans d'histoire",
-    act: "probleme",
-    seconds: 65,
-    tone: "dark",
-    speakerNotes:
-      "QUESTION : depuis quand ce projet existe-t-il ? Trois versions, un même projet. Ce qui a changé n'est pas l'idée mais ce qu'on peut en faire : la V1 butait sur le coût du recoupement manuel, la V4 le fait faire. Ne pas s'excuser du temps écoulé — c'est ce temps qui rend la démonstration crédible.",
-  },
-  /* ── ACTE II — LE PRODUIT ────────────────────────────────────────────── */
+  /* ── ACTE II — NOTRE RÉPONSE ─────────────────────────────────────────── */
   {
     id: "reponse",
     label: "La réponse",
-    act: "produit",
+    act: "reponse",
     seconds: 40,
     speakerNotes:
       "QUESTION : quelle est la réponse ? Le produit apparaît comme conséquence, pas comme annonce. Ne parler ni de modèle économique, ni d'IA, ni d'automatisation : uniquement de ce que le lecteur obtient. Si le jury pose une question business ici, répondre « j'y viens » et avancer.",
@@ -140,7 +123,7 @@ export const S4_SLIDES: readonly DeckSlide[] = [
   {
     id: "lecture",
     label: "Trois profondeurs",
-    act: "produit",
+    act: "reponse",
     seconds: 70,
     speakerNotes:
       "QUESTION : combien de temps me faut-il pour comprendre ? C'est la proposition de valeur centrale, et elle arrivait en slide 23 en V2. Prendre un exemple et le tenir : la dette française. Trente secondes pour le chiffre, deux minutes pour le situer, cinq pour l'instruire. Finir sur la source : c'est la traçabilité qui fait la différence.",
@@ -148,12 +131,20 @@ export const S4_SLIDES: readonly DeckSlide[] = [
   {
     id: "promesse",
     label: "La promesse éditoriale",
-    act: "produit",
+    act: "reponse",
     seconds: 75,
     speakerNotes:
       "QUESTION : qu'est-ce qui distingue un article TED ? Quatre exigences, et surtout la phrase finale, à laisser tomber seule : nous n'apportons pas la réponse, nous apportons de quoi se faire la sienne, vite. C'est la fin de l'acte produit — marquer un temps avant de passer au positionnement.",
   },
-  /* ── ACTE III — LE MARCHÉ ────────────────────────────────────────────── */
+  /* ── ACTE III — MARCHÉ ET CONCURRENCE ────────────────────────────────── */
+  {
+    id: "positionnement",
+    label: "Le positionnement",
+    act: "marche",
+    seconds: 60,
+    speakerNotes:
+      "QUESTION : pourquoi ce produit face aux médias, aux plateformes data et à ChatGPT ? On enchaîne directement sur la promesse éditoriale, sans passer par les chiffres de marché : ils viennent bien plus loin, une fois la preuve faite. Ne jamais dire « meilleur ». Dire « à l'intersection ». Les quatre familles font bien leur métier ; aucune ne réunit les quatre gestes. C'est cette intersection qui est la place.",
+  },
   {
     id: "marche",
     label: "Le marché",
@@ -178,11 +169,11 @@ export const S4_SLIDES: readonly DeckSlide[] = [
     speakerNotes:
       "QUESTION : que couvrent-ils, et que laissent-ils ? La matrice se lit en colonnes : chaque acteur fait bien une ou deux choses. Notre ligne est la seule qui les tienne toutes — le dire une fois, sans insister, la matrice a déjà parlé.",
   },
-  /* ── ACTE IV — LA DISTRIBUTION ───────────────────────────────────────── */
+  /* ── ACTE IV — L'IA ET LA DIFFÉRENCE ─────────────────────────────────── */
   {
     id: "bascule",
     label: "L'IA déplace la distribution",
-    act: "distribution",
+    act: "ia",
     seconds: 55,
     tone: "dark",
     steps: 3,
@@ -192,31 +183,48 @@ export const S4_SLIDES: readonly DeckSlide[] = [
   {
     id: "canal",
     label: "Devenir une source",
-    act: "distribution",
+    act: "ia",
     seconds: 75,
     tone: "dark",
     steps: 3,
     speakerNotes:
       "QUESTION : quelle est notre stratégie face à l'IA ? Ne pas la concurrencer, devenir une source qu'elle cite. Énumérer vite les conditions du GEO — faits datés, sources primaires, méthode stable — sans en faire un cours. Finir sur la phrase, qui est la meilleure du deck : la citation nous rend visibles, l'exploration nous rend nécessaires.",
   },
-  /* ── ACTE V — LA FABRICATION ─────────────────────────────────────────── */
+  {
+    id: "recoupement",
+    label: "Le recoupement",
+    act: "ia",
+    seconds: 70,
+    tone: "dark",
+    speakerNotes:
+      "QUESTION : que fait TED que le lecteur faisait tout seul ? C'est la slide 3 retournée. Le dire explicitement : au début, ce travail était à la charge du lecteur ; ici, il est à la nôtre. Puis la phrase qui prépare la suite : fait à la main, article après article, ce travail serait hors de prix.",
+  },
   {
     id: "pivot",
     label: "Pivot",
-    act: "fabrication",
+    act: "ia",
     seconds: 20,
     tone: "dark",
     speakerNotes:
       "QUESTION : est-ce que c'est juste un média de plus ? Trois lignes, trois silences. C'est la rupture du deck : on quitte le front office pour l'atelier. Ne rien ajouter à l'oral, laisser les phrases tomber.",
   },
+  /* ── ACTE V — QUI FABRIQUE, ET COMMENT ───────────────────────────────── */
   {
-    id: "recoupement",
-    label: "Le recoupement",
+    id: "derriere",
+    label: "Derrière le produit",
     act: "fabrication",
-    seconds: 70,
+    seconds: 45,
+    speakerNotes:
+      "QUESTION : qui tient tout ça ? Ne surtout pas laisser l'impression « je fais tout seul, donc c'est fragile ». Le message est inverse : une structure légère par construction, parce que la charge courante est portée par l'automatisation. Compétences utiles d'un côté, agents de l'autre. Enchaîner : le produit existe, il est fabriqué, il est tenu — reste à dire à qui il s'adresse et comment il gagne de l'argent.",
+  },
+  {
+    id: "reprise",
+    label: "Quatre ans d'histoire",
+    act: "fabrication",
+    seconds: 65,
     tone: "dark",
     speakerNotes:
-      "QUESTION : que fait TED que le lecteur faisait tout seul ? C'est la slide 3 retournée. Le dire explicitement : au début, ce travail était à la charge du lecteur ; ici, il est à la nôtre. Puis la phrase qui prépare la suite : fait à la main, article après article, ce travail serait hors de prix.",
+      "QUESTION : depuis quand ce projet existe-t-il ? Trois versions, un même projet. Ce qui a changé n'est pas l'idée mais ce qu'on peut en faire : la V1 butait sur le coût du recoupement manuel, la V4 le fait faire. Ne pas s'excuser du temps écoulé — c'est ce temps qui rend la démonstration crédible.",
   },
   {
     id: "pipeline",
@@ -250,37 +258,11 @@ export const S4_SLIDES: readonly DeckSlide[] = [
     speakerNotes:
       "QUESTION : et le cadre légal ? Quatre garanties, quatre coches, et on avance. Ne pas faire un cours de droit : le message est que le risque a été anticipé, pas qu'on maîtrise l'AI Act article par article. Si le jury creuse, l'annexe juridique existe (touche A).",
   },
-  /* ── ACTE VI — PREUVE D'EXÉCUTION ────────────────────────────────────── */
-  {
-    id: "etat",
-    label: "Ce qui existe déjà",
-    act: "preuve",
-    seconds: 70,
-    speakerNotes:
-      "QUESTION : est-ce construit, ou est-ce une idée ? La slide est une preuve, pas un calendrier. Assumer franchement ce qui est suspendu et pourquoi : on ralentit pour fiabiliser avant de changer d'échelle. Un jury préfère une suspension expliquée à une progression floue.",
-  },
-  {
-    id: "derriere",
-    label: "Derrière le produit",
-    act: "preuve",
-    seconds: 45,
-    speakerNotes:
-      "QUESTION : qui tient tout ça ? Ne surtout pas laisser l'impression « je fais tout seul, donc c'est fragile ». Le message est inverse : une structure légère par construction, parce que la charge courante est portée par l'automatisation. Compétences utiles d'un côté, agents de l'autre. Enchaîner : le produit existe, il est fabriqué, il est tenu — reste à dire à qui il s'adresse et comment il gagne de l'argent.",
-  },
-  /* ── ACTE VII — LE MODÈLE ÉCONOMIQUE ─────────────────────────────────── */
-  {
-    id: "acquisition",
-    label: "Nos canaux d'acquisition",
-    act: "modele",
-    seconds: 50,
-    tone: "dark",
-    speakerNotes:
-      "QUESTION : par où le lecteur arrive-t-il ? Aller là où il est déjà plutôt que d'attendre qu'il vienne. La boucle se referme : le format court amène sur le site, le site nourrit le format court. C'est aussi ce qui rend le modèle sans paywall tenable.",
-  },
+  /* ── ACTE VI — LES PREUVES ───────────────────────────────────────────── */
   {
     id: "publications",
     label: "Ce que nous publions déjà",
-    act: "modele",
+    act: "preuves",
     seconds: 55,
     speakerNotes:
       "QUESTION : est-ce que ça tourne déjà ? Trois publications réelles, pas des maquettes. Laisser les captures parler et ne commenter que ce que le jury ne peut pas voir : la fréquence et le circuit de production.",
@@ -288,7 +270,7 @@ export const S4_SLIDES: readonly DeckSlide[] = [
   {
     id: "partenariats",
     label: "Partenariats éventuels",
-    act: "modele",
+    act: "preuves",
     seconds: 45,
     // Le carrousel de visuels avance avec la flèche : sans ces trois états,
     // il restait bloqué sur le premier et la slide passait à la suivante.
@@ -297,9 +279,27 @@ export const S4_SLIDES: readonly DeckSlide[] = [
       "QUESTION : avec qui la construction est-elle envisageable ? Des pistes, pas des accords — le dire franchement si la question vient. Ce qui compte est la cohérence avec le positionnement, pas le nom. Les trois visuels défilent à la flèche : c'est au troisième seulement qu'on passe à la slide suivante.",
   },
   {
+    id: "etat",
+    label: "Ce qui existe déjà",
+    act: "preuves",
+    seconds: 70,
+    speakerNotes:
+      "QUESTION : est-ce construit, ou est-ce une idée ? La slide est une preuve, pas un calendrier. Assumer franchement ce qui est suspendu et pourquoi : on ralentit pour fiabiliser avant de changer d'échelle. Un jury préfère une suspension expliquée à une progression floue.",
+  },
+  {
+    id: "acquisition",
+    label: "Nos canaux d'acquisition",
+    act: "preuves",
+    seconds: 50,
+    tone: "dark",
+    speakerNotes:
+      "QUESTION : par où le lecteur arrive-t-il ? Aller là où il est déjà plutôt que d'attendre qu'il vienne. La boucle se referme : le format court amène sur le site, le site nourrit le format court. C'est aussi ce qui rend le modèle sans paywall tenable.",
+  },
+  /* ── ACTE VII — LE MODÈLE ÉCONOMIQUE ─────────────────────────────────── */
+  {
     id: "modele",
     label: "Le modèle",
-    act: "modele",
+    act: "business",
     seconds: 50,
     speakerNotes:
       "QUESTION : comment ce média gagne-t-il de l'argent ? Une phrase par moteur, pas plus. Le point qui compte : pas de paywall. L'audience est la recette, donc tout ce qui augmente l'audience augmente directement le potentiel.",
@@ -307,16 +307,15 @@ export const S4_SLIDES: readonly DeckSlide[] = [
   {
     id: "trajectoire",
     label: "La trajectoire",
-    act: "modele",
+    act: "business",
     seconds: 60,
     speakerNotes:
       "QUESTION : est-ce que ça devient viable ? Dernière slide avant la demande : c'est elle qui doit rester à l'écran dans la tête du jury quand arrive le besoin de financement. La courbe se dessine année après année. Deux chiffres à laisser à l'écran : rentabilité projetée en année 2, et le résultat net de l'année 2. Si le jury conteste, assumer que ce sont des projections du business plan et proposer l'annexe détaillée (touche A).",
   },
-  /* ── ACTE VIII — PASSAGE À L'ÉCHELLE ─────────────────────────────────── */
   {
     id: "financement",
     label: "Le financement",
-    act: "echelle",
+    act: "business",
     seconds: 55,
     speakerNotes:
       "QUESTION : que débloquent 27 500 € ? Ne pas présenter un besoin, présenter un déblocage. La répartition d'abord, le jalon ensuite. Le financement participatif en capital est aussi un canal de notoriété : c'est un argument, pas un pis-aller.",
@@ -324,16 +323,17 @@ export const S4_SLIDES: readonly DeckSlide[] = [
   {
     id: "chaine",
     label: "Une chaîne, plusieurs marchés",
-    act: "echelle",
+    act: "business",
     seconds: 55,
     tone: "dark",
     speakerNotes:
       "QUESTION : jusqu'où ça peut aller ? La géopolitique n'est pas la limite du projet, c'est son premier terrain de validation. Ce qui se réplique, c'est la chaîne — sources, data, recoupement, structuration, visualisation, distribution. Seuls le panel et l'audience changent.",
   },
+  /* ── ACTE VIII — CONCLUSION ──────────────────────────────────────────── */
   {
     id: "conclusion",
     label: "Conclusion",
-    act: "echelle",
+    act: "conclusion",
     seconds: 45,
     tone: "dark",
     speakerNotes:
