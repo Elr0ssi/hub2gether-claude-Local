@@ -107,9 +107,18 @@ export const S4_SLIDES: readonly DeckSlide[] = [
     label: "Ce qui manque",
     act: "probleme",
     seconds: 45,
-    steps: 3,
+    steps: 2,
     speakerNotes:
       "QUESTION : personne ne fait déjà ça ? Ne pas attaquer les médias — ils font leur métier. Dire ce que chaque famille apporte, puis nommer les cinq verbes que personne ne réunit. C'est le trou dans lequel le produit va se poser à la slide suivante.",
+  },
+  {
+    id: "reprise",
+    label: "Quatre ans d'histoire",
+    act: "probleme",
+    seconds: 65,
+    tone: "dark",
+    speakerNotes:
+      "QUESTION : depuis quand ce projet existe-t-il ? Trois versions, un même projet. Ce qui a changé n'est pas l'idée mais ce qu'on peut en faire : la V1 butait sur le coût du recoupement manuel, la V4 le fait faire. Ne pas s'excuser du temps écoulé — c'est ce temps qui rend la démonstration crédible.",
   },
   /* ── ACTE II — NOTRE RÉPONSE ─────────────────────────────────────────── */
   {
@@ -144,14 +153,6 @@ export const S4_SLIDES: readonly DeckSlide[] = [
     seconds: 60,
     speakerNotes:
       "QUESTION : pourquoi ce produit face aux médias, aux plateformes data et à ChatGPT ? On enchaîne directement sur la promesse éditoriale, sans passer par les chiffres de marché : ils viennent bien plus loin, une fois la preuve faite. Ne jamais dire « meilleur ». Dire « à l'intersection ». Les quatre familles font bien leur métier ; aucune ne réunit les quatre gestes. C'est cette intersection qui est la place.",
-  },
-  {
-    id: "marche",
-    label: "Le marché",
-    act: "marche",
-    seconds: 45,
-    speakerNotes:
-      "QUESTION : y a-t-il une demande ? Le marché ouvre désormais le volet économique, après la preuve d'exécution : le jury a vu le produit et sait qu'il est construit, la question devient à qui il se vend. Deux ou trois chiffres, pas davantage, et chacun sert une conclusion.",
   },
   {
     id: "acteurs",
@@ -218,15 +219,6 @@ export const S4_SLIDES: readonly DeckSlide[] = [
       "QUESTION : qui tient tout ça ? Ne surtout pas laisser l'impression « je fais tout seul, donc c'est fragile ». Le message est inverse : une structure légère par construction, parce que la charge courante est portée par l'automatisation. Compétences utiles d'un côté, agents de l'autre. Enchaîner : le produit existe, il est fabriqué, il est tenu — reste à dire à qui il s'adresse et comment il gagne de l'argent.",
   },
   {
-    id: "reprise",
-    label: "Quatre ans d'histoire",
-    act: "fabrication",
-    seconds: 65,
-    tone: "dark",
-    speakerNotes:
-      "QUESTION : depuis quand ce projet existe-t-il ? Trois versions, un même projet. Ce qui a changé n'est pas l'idée mais ce qu'on peut en faire : la V1 butait sur le coût du recoupement manuel, la V4 le fait faire. Ne pas s'excuser du temps écoulé — c'est ce temps qui rend la démonstration crédible.",
-  },
-  {
     id: "pipeline",
     label: "Le pipeline",
     act: "fabrication",
@@ -259,6 +251,14 @@ export const S4_SLIDES: readonly DeckSlide[] = [
       "QUESTION : et le cadre légal ? Quatre garanties, quatre coches, et on avance. Ne pas faire un cours de droit : le message est que le risque a été anticipé, pas qu'on maîtrise l'AI Act article par article. Si le jury creuse, l'annexe juridique existe (touche A).",
   },
   /* ── ACTE VI — LES PREUVES ───────────────────────────────────────────── */
+  {
+    id: "audience",
+    label: "Où en est l'audience",
+    act: "preuves",
+    seconds: 50,
+    speakerNotes:
+      "QUESTION : combien de monde lit déjà ce média ? Les chiffres de septembre 2024 à août 2025, relevés sur l'analytics du site. Ne pas s'excuser de leur taille : ils décrivent un socle construit sans acquisition payante et sans IA, et c'est ce socle qui rend la trajectoire crédible. Zéro partenariat : le dire franchement, c'est ce que la slide modèle vient chercher.",
+  },
   {
     id: "publications",
     label: "Ce que nous publions déjà",
@@ -303,6 +303,14 @@ export const S4_SLIDES: readonly DeckSlide[] = [
     seconds: 50,
     speakerNotes:
       "QUESTION : comment ce média gagne-t-il de l'argent ? Une phrase par moteur, pas plus. Le point qui compte : pas de paywall. L'audience est la recette, donc tout ce qui augmente l'audience augmente directement le potentiel.",
+  },
+  {
+    id: "previsionnel",
+    label: "Prévision d'audience",
+    act: "business",
+    seconds: 50,
+    speakerNotes:
+      "QUESTION : jusqu'où cette audience peut-elle aller ? Trois leviers, pas une extrapolation : la reprise du pipeline, la profondeur de catalogue, la distribution sociale. Assumer que c'est une cible conditionnée à la refonte, pas une projection statistique — la note le dit, la voix doit le confirmer.",
   },
   {
     id: "trajectoire",
@@ -652,4 +660,72 @@ export const S4_UNLOCK = {
   milestoneLabel: "Ce que cela permet d'atteindre",
   milestone: A_COMPLETER,
   milestoneNote: "Jalon à arrêter : volume de publication visé, ou date de relance.",
+} as const;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   AUDIENCE, BENCHMARK ET PRÉVISIONNEL
+
+   Repris de la soutenance V1, avec les montants relevés sur la période
+   septembre 2024 → août 2025. La pastille « données de démonstration » et la
+   note sur l'acquisition mise en retrait sont retirées : les chiffres sont
+   ceux du site, ils n'ont pas à s'excuser.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export const S4_AUDIENCE = {
+  eyebrow: "L'audience",
+  title: ["Où en est l'audience."],
+  periode: "Septembre 2024 → août 2025",
+  hero: { value: "8 400", label: "visiteurs par mois" },
+  stats: [
+    { label: "Pages vues / mois", value: "15 000" },
+    { label: "Articles publiés", value: "40" },
+    { label: "Durée moyenne", value: "2 min 40 s" },
+    { label: "Partenariats", value: "0" },
+  ],
+} as const;
+
+/* Où nous nous situons, sous la matrice de couverture. L'ordre de grandeur
+   est le propos : une petite structure sur un marché qui se compte en
+   millions de visites. Le multiplicateur est calculé, pas écrit. */
+export const S4_BENCHMARK = {
+  /* Libellé, unité et source tiennent ensemble : la matrice de couverture
+     occupe déjà la scène, et le bandeau doit tenir sur une seule ligne. */
+  label: "Où nous nous situons · visites / mois · SimilarWeb",
+  rows: [
+    { name: "Statista", visits: 9_100_000, us: false },
+    { name: "Our World in Data", visits: 4_200_000, us: false },
+    { name: "Visual Capitalist", visits: 1_800_000, us: false },
+    { name: "Les Décodeurs", visits: 950_000, us: false },
+    { name: "The Essential Data", visits: 8_400, us: true },
+  ],
+} as const;
+
+export const S4_TRAJECTORY = {
+  eyebrow: "Prévisionnel",
+  title: ["Prévision d'audience."],
+  unit: "visiteurs par mois",
+  points: [
+    { label: "Aujourd'hui", value: 8_400, state: "actual" as const },
+    { label: "Fin d'année", value: 45_000, state: "target" as const },
+    { label: "Année + 1", value: 140_000, state: "target" as const },
+    { label: "Année + 2", value: 320_000, state: "target" as const },
+  ],
+  levers: [
+    { index: "01", title: "Réactivation du pipeline", body: "Reprise de la publication et de l'actualisation automatisées une fois la nouvelle architecture fiabilisée." },
+    { index: "02", title: "SEO et profondeur de catalogue", body: "Chaque sujet couvert reste indexé et continue d'attirer du trafic bien après sa publication." },
+    { index: "03", title: "Distribution sociale", body: "Les visualisations sont nativement partageables : elles circulent sans dépendre du seul référencement." },
+  ],
+  note: "Trajectoire cible conditionnée à la livraison de la refonte, et non projection statistique.",
+} as const;
+
+/* Ce qu'il faut vendre pour que la ligne « partenariats » du plan tienne.
+   Sept mille cinq cents euros le partenariat n'est pas un montant qu'un
+   annonceur signe à ce stade ; à cinq cents, il faut en faire vingt. */
+export const S4_PARTNER_TARGET = {
+  label: "Ce que cela suppose",
+  count: "20",
+  countLabel: "partenariats par an",
+  price: "500 €",
+  priceLabel: "par partenariat",
+  note: "Montants à recaler sur le business plan définitif.",
 } as const;

@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import { Fragment, type ComponentType } from "react";
+import { Fragment, type ComponentType, type ReactNode } from "react";
 import {
   DUR,
   EASE as DECK_EASE,
@@ -599,7 +599,11 @@ export function PlayersSlide() {
    06 — LA CONCURRENCE
    ═══════════════════════════════════════════════════════════════════════ */
 
-export function CompetitionSlide() {
+export function CompetitionSlide({
+  /* Un bandeau rendu sous la matrice. Absent par défaut, donc les V2 et V3
+     s'affichent exactement comme avant ; la V4 y pose son benchmark. */
+  footer,
+}: { footer?: ReactNode } = {}) {
   const ink = useInk();
 
   return (
@@ -614,11 +618,13 @@ export function CompetitionSlide() {
         <CoverageMatrix axes={COMPETITION_AXES} rows={COMPETITION} startDelay={0.3} />
       </div>
 
-      <Rise delay={1.05} y={10}>
-        <div className="t-small" style={{ color: ink.faint, marginTop: 26, maxWidth: 1120 }}>
-          {COMPETITION.find((c) => c.id === "courrier")?.limit}
-        </div>
-      </Rise>
+      {footer ?? (
+        <Rise delay={1.05} y={10}>
+          <div className="t-small" style={{ color: ink.faint, marginTop: 26, maxWidth: 1120 }}>
+            {COMPETITION.find((c) => c.id === "courrier")?.limit}
+          </div>
+        </Rise>
+      )}
     </SlideBody>
   );
 }
@@ -831,7 +837,11 @@ export function AiShiftSlide() {
    09 — MODÈLE ÉCONOMIQUE
    ═══════════════════════════════════════════════════════════════════════ */
 
-export function RevenueSlide() {
+export function RevenueSlide({
+  /* Rendu sous les moteurs de revenus. Absent par défaut ; la V4 y pose le
+     nombre de partenariats nécessaires. */
+  footer,
+}: { footer?: ReactNode } = {}) {
   const ink = useInk();
   const accent = useAccent();
 
@@ -926,6 +936,8 @@ export function RevenueSlide() {
           </p>
         </div>
       </Rise>
+
+      {footer}
     </SlideBody>
   );
 }
@@ -1405,7 +1417,10 @@ export function RoadmapSlide() {
    15 — CONCLUSION
    ═══════════════════════════════════════════════════════════════════════ */
 
-export function ConclusionSlide() {
+export function ConclusionSlide({
+  /* La signature de bas de slide. Rendue par défaut ; la V4 la retire. */
+  showSignature = true,
+}: { showSignature?: boolean } = {}) {
   const ink = useInk();
   const accent = useAccent();
 
@@ -1449,11 +1464,13 @@ export function ConclusionSlide() {
           ))}
         </div>
 
-        <Rise delay={1.5} y={10}>
-          <p className="t-small" style={{ color: ink.faint, marginTop: 44, letterSpacing: "0.1em" }}>
-            {CONCLUSION.signature.wordmark} · {CONCLUSION.signature.tagline}
-          </p>
-        </Rise>
+        {showSignature && (
+          <Rise delay={1.5} y={10}>
+            <p className="t-small" style={{ color: ink.faint, marginTop: 44, letterSpacing: "0.1em" }}>
+              {CONCLUSION.signature.wordmark} · {CONCLUSION.signature.tagline}
+            </p>
+          </Rise>
+        )}
       </div>
     </SlideBody>
   );

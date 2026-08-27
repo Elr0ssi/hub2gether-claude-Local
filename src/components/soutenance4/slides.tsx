@@ -40,7 +40,6 @@ import {
   EditorialSlideRef,
   FinanceSlide,
   HistorySlideRef,
-  MarketSlide,
   PartnershipsSlide,
   PipelineSlideRef,
   PivotSlide,
@@ -63,6 +62,10 @@ import { GEO } from "@/data/soutenance2/soutenance2Data";
 import {
   S4_SLIDES,
   S4_ANSWER,
+  S4_AUDIENCE,
+  S4_BENCHMARK,
+  S4_PARTNER_TARGET,
+  S4_TRAJECTORY,
   S4_ATTENTION,
   S4_CHANNEL,
   S4_COVER,
@@ -500,93 +503,79 @@ function MissingSlide() {
         ))}
       </div>
 
-      {/* Une seule colonne : le bloc de verbes qui occupait la droite est
-          sorti, et une grille à deux colonnes dont l'une est vide laisse un
-          trou plutôt qu'un blanc. */}
+      {/* Trois colonnes numérotées plutôt qu'une pile à gauche : les trois
+          familles se lisent d'un coup et occupent la scène, au lieu de laisser
+          les deux tiers droits vides. */}
       <div
         style={{
-          marginTop: 30,
+          marginTop: 54,
           display: "grid",
-          gap: 90,
-          alignItems: "center",
-          flex: 1,
-          minHeight: 0,
-          maxWidth: 1180,
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 56,
+          alignItems: "start",
         }}
       >
-        <div>
-          <div style={{ display: "grid", gap: 40 }}>
-            {S4_MISSING.families.map((f, i) => (
-              <Rise key={f.label} delay={0.12 + i * 0.22} y={18}>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 24 }}>
-                  <span
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      background: ink.muted,
-                      flexShrink: 0,
-                      transform: "translateY(-8px)",
-                    }}
-                  />
-                  <div>
-                    <div
-                      style={{
-                        fontSize: 40,
-                        fontWeight: 800,
-                        letterSpacing: "-0.034em",
-                        color: ink.primary,
-                        lineHeight: 1.06,
-                      }}
-                    >
-                      {f.label}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 29,
-                        fontWeight: 500,
-                        letterSpacing: "-0.02em",
-                        color: ink.secondary,
-                        marginTop: 4,
-                      }}
-                    >
-                      {f.body}
-                    </div>
-                  </div>
-                </div>
-              </Rise>
-            ))}
-          </div>
-
-          {/* La charnière n'arrive qu'au deuxième temps : c'est elle qui ouvre
-              l'espace, et l'ouvrir tout de suite reviendrait à donner la
-              réponse avant d'avoir posé la question. */}
-          <div
-            style={{
-              marginTop: 54,
-              maxWidth: 640,
-              opacity: step >= 1 ? 1 : 0,
-              transform: step >= 1 ? "none" : "translateY(14px)",
-              transition: "opacity 0.55s ease, transform 0.55s ease",
-            }}
-          >
-            <div style={{ height: 3, background: accent, width: 108 }} />
-            <p
-              style={{
-                marginTop: 26,
-                fontSize: 33,
-                fontWeight: 700,
-                letterSpacing: "-0.026em",
-                color: ink.primary,
-                lineHeight: 1.24,
-              }}
-            >
-              {S4_MISSING.bridge}
-            </p>
-          </div>
-        </div>
-
+        {S4_MISSING.families.map((f, i) => (
+          <Rise key={f.label} delay={0.14 + i * 0.2} y={18}>
+            <div style={{ paddingTop: 18, borderTop: `2px solid ${accent}` }}>
+              <div
+                className="t-micro"
+                style={{ color: accent, letterSpacing: "0.16em", marginBottom: 18 }}
+              >
+                {String(i + 1).padStart(2, "0")}
+              </div>
+              <div
+                style={{
+                  fontSize: 40,
+                  fontWeight: 800,
+                  letterSpacing: "-0.034em",
+                  color: ink.primary,
+                  lineHeight: 1.06,
+                }}
+              >
+                {f.label}
+              </div>
+              <div
+                style={{
+                  fontSize: 27,
+                  fontWeight: 500,
+                  letterSpacing: "-0.02em",
+                  color: ink.secondary,
+                  marginTop: 10,
+                }}
+              >
+                {f.body}
+              </div>
+            </div>
+          </Rise>
+        ))}
       </div>
+
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          alignContent: "center",
+          opacity: step >= 1 ? 1 : 0,
+          transform: step >= 1 ? "none" : "translateY(14px)",
+          transition: "opacity 0.55s ease, transform 0.55s ease",
+        }}
+      >
+        <div style={{ height: 3, background: accent, width: 108 }} />
+        <p
+          className="t-h2"
+          style={{
+            marginTop: 28,
+            color: ink.primary,
+            letterSpacing: "-0.035em",
+            maxWidth: 1240,
+          }}
+        >
+          {S4_MISSING.bridge}
+        </p>
+      </div>
+
     </SlideBody>
   );
 }
@@ -1570,6 +1559,260 @@ function TraceSlide() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   OÙ EN EST L'AUDIENCE · reprise de la V1
+
+   Un chiffre en très grand, quatre mesures sous un filet, et la période. Ni
+   pastille « données de démonstration », ni note d'excuse sur l'acquisition
+   mise en retrait : ce sont les chiffres du site.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function AudienceSlide4() {
+  const ink = useInk();
+  const accent = useAccent();
+
+  return (
+    <SlideBody>
+      <Eyebrow>{S4_AUDIENCE.eyebrow}</Eyebrow>
+
+      <Rise delay={0.08} y={20}>
+        <p className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em", marginTop: 22 }}>
+          {S4_AUDIENCE.title[0]}
+        </p>
+      </Rise>
+
+      <div
+        style={{
+          marginTop: 40,
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.15fr)",
+          gap: 90,
+          alignItems: "center",
+        }}
+      >
+        <div>
+          <Rise delay={0.3} y={18}>
+            <p className="t-micro" style={{ color: accent, letterSpacing: "0.15em", marginBottom: 18 }}>
+              {S4_AUDIENCE.periode}
+            </p>
+            <p
+              style={{
+                fontSize: 148,
+                fontWeight: 900,
+                letterSpacing: "-0.05em",
+                color: ink.primary,
+                lineHeight: 0.94,
+              }}
+            >
+              {S4_AUDIENCE.hero.value}
+            </p>
+            <p style={{ fontSize: 27, fontWeight: 500, color: ink.secondary, marginTop: 12 }}>
+              {S4_AUDIENCE.hero.label}
+            </p>
+          </Rise>
+        </div>
+
+        <div style={{ display: "grid", gap: 0 }}>
+          {S4_AUDIENCE.stats.map((st, i) => (
+            <Rise key={st.label} delay={0.5 + i * 0.12} y={12}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  justifyContent: "space-between",
+                  gap: 30,
+                  padding: "20px 0",
+                  borderBottom: `1px solid ${ink.rule}`,
+                }}
+              >
+                <span style={{ fontSize: 24, fontWeight: 500, color: ink.secondary }}>{st.label}</span>
+                <span style={{ fontSize: 40, fontWeight: 800, color: ink.primary, letterSpacing: "-0.032em" }}>
+                  {st.value}
+                </span>
+              </div>
+            </Rise>
+          ))}
+        </div>
+      </div>
+    </SlideBody>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PRÉVISION D'AUDIENCE · reprise de la V1
+
+   Quatre points, trois leviers. La barre est proportionnelle à la racine du
+   volume : en linéaire, 8 400 à côté de 320 000 ne se voit pas, et c'est
+   justement l'écart que la slide doit rendre lisible.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function TrajectorySlide4() {
+  const ink = useInk();
+  const accent = useAccent();
+  const max = Math.max(...S4_TRAJECTORY.points.map((p) => p.value));
+
+  return (
+    <SlideBody>
+      <Eyebrow>{S4_TRAJECTORY.eyebrow}</Eyebrow>
+
+      <Rise delay={0.08} y={20}>
+        <p className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em", marginTop: 22 }}>
+          {S4_TRAJECTORY.title[0]}
+        </p>
+      </Rise>
+
+      <div style={{ marginTop: 44, display: "grid", gap: 18 }}>
+        {S4_TRAJECTORY.points.map((pt, i) => {
+          const cible = pt.state === "target";
+          return (
+            <Rise key={pt.label} delay={0.3 + i * 0.16} y={14}>
+              <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
+                <span style={{ width: 190, fontSize: 25, fontWeight: 600, color: ink.secondary }}>
+                  {pt.label}
+                </span>
+                <span
+                  style={{
+                    height: 34,
+                    width: `${Math.sqrt(pt.value / max) * 62}%`,
+                    background: cible ? "rgba(57,255,136,0.16)" : accent,
+                    border: `2px solid ${accent}`,
+                    borderRadius: 3,
+                  }}
+                />
+                <span style={{ fontSize: 34, fontWeight: 800, color: ink.primary, letterSpacing: "-0.03em" }}>
+                  {pt.value.toLocaleString("fr-FR")}
+                </span>
+              </div>
+            </Rise>
+          );
+        })}
+        <Rise delay={0.95} y={8}>
+          <p style={{ fontSize: 19, color: ink.faint, marginLeft: 218 }}>{S4_TRAJECTORY.unit}</p>
+        </Rise>
+      </div>
+
+      <div
+        style={{
+          marginTop: 46,
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 48,
+          alignItems: "start",
+        }}
+      >
+        {S4_TRAJECTORY.levers.map((l, i) => (
+          <Rise key={l.index} delay={1.1 + i * 0.14} y={14}>
+            <div style={{ paddingTop: 16, borderTop: `2px solid ${accent}` }}>
+              <p className="t-micro" style={{ color: accent, letterSpacing: "0.14em", marginBottom: 10 }}>
+                {l.index}
+              </p>
+              <p style={{ fontSize: 27, fontWeight: 800, color: ink.primary, letterSpacing: "-0.026em" }}>
+                {l.title}
+              </p>
+              <p style={{ fontSize: 20, color: ink.muted, marginTop: 10, lineHeight: 1.45 }}>{l.body}</p>
+            </div>
+          </Rise>
+        ))}
+      </div>
+
+      <Rise delay={1.7} y={8}>
+        <p style={{ fontSize: 18, color: ink.faint, fontStyle: "italic" }}>{S4_TRAJECTORY.note}</p>
+      </Rise>
+    </SlideBody>
+  );
+}
+
+/* Le bandeau de mise en perspective, posé sous la matrice de couverture. */
+function BenchmarkFooter() {
+  const ink = useInk();
+  const accent = useAccent();
+  const nous = S4_BENCHMARK.rows.find((r) => r.us);
+
+  /* Notre chiffre d'abord, puis les autres en multiples de celui-ci. Répéter
+     les cinq volumes en toutes lettres faisait deux lignes, et la matrice de
+     couverture ne laisse la place que pour une. Le multiple dit la même chose
+     en trois caractères, et c'est lui le propos. */
+  return (
+    <Rise delay={1.05} y={10}>
+      <div
+        style={{
+          marginTop: 14,
+          paddingTop: 12,
+          borderTop: `1px solid ${ink.rule}`,
+          display: "flex",
+          alignItems: "baseline",
+          gap: 24,
+          flexWrap: "wrap",
+        }}
+      >
+        <span className="t-micro" style={{ color: accent, letterSpacing: "0.13em" }}>
+          {S4_BENCHMARK.label}
+        </span>
+        {nous && (
+          <span style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+            <span style={{ fontSize: 24, fontWeight: 800, color: accent, letterSpacing: "-0.024em" }}>
+              {nous.visits.toLocaleString("fr-FR")}
+            </span>
+            <span style={{ fontSize: 16, color: ink.primary, fontWeight: 700 }}>{nous.name}</span>
+          </span>
+        )}
+        {S4_BENCHMARK.rows
+          .filter((r) => !r.us)
+          .map((r) => (
+            <span key={r.name} style={{ display: "flex", alignItems: "baseline", gap: 7 }}>
+              <span style={{ fontSize: 16, color: ink.faint }}>{r.name}</span>
+              {nous && (
+                <span style={{ fontSize: 20, fontWeight: 800, color: ink.secondary, letterSpacing: "-0.02em" }}>
+                  ×{Math.round(r.visits / nous.visits).toLocaleString("fr-FR")}
+                </span>
+              )}
+            </span>
+          ))}
+      </div>
+    </Rise>
+  );
+}
+
+/* Ce qu'il faut vendre pour que la ligne « partenariats » du plan tienne. */
+function PartnerTargetFooter() {
+  const ink = useInk();
+  const accent = useAccent();
+
+  return (
+    <Rise delay={1.2} y={12}>
+      <div
+        style={{
+          marginTop: 14,
+          paddingTop: 14,
+          borderTop: `1px solid ${ink.rule}`,
+          display: "flex",
+          alignItems: "baseline",
+          gap: 34,
+          flexWrap: "wrap",
+        }}
+      >
+        <span className="t-micro" style={{ color: accent, letterSpacing: "0.13em" }}>
+          {S4_PARTNER_TARGET.label}
+        </span>
+        {[
+          [S4_PARTNER_TARGET.count, S4_PARTNER_TARGET.countLabel],
+          [S4_PARTNER_TARGET.price, S4_PARTNER_TARGET.priceLabel],
+        ].map(([v, l]) => (
+          <span key={l} style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
+            <span style={{ fontSize: 30, fontWeight: 800, color: ink.primary, letterSpacing: "-0.03em" }}>{v}</span>
+            <span style={{ fontSize: 19, color: ink.secondary }}>{l}</span>
+          </span>
+        ))}
+        <span style={{ fontSize: 16, color: ink.faint, fontStyle: "italic" }}>{S4_PARTNER_TARGET.note}</span>
+      </div>
+    </Rise>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    LE REGISTRE
    ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -1601,23 +1844,24 @@ export const S4_VIEWS: Record<string, ComponentType> = {
   tracabilite: TraceSlide,
 
   /* Acte V — preuve d'exécution */
+  audience: AudienceSlide4,
   etat: StatusSlide,
   derriere: () => <TeamSlideRef showSkills={false} maxLines={2} />,
 
   /* Acte VI — le modèle économique */
-  marche: MarketSlide,
   acteurs: PlayersSlide,
-  concurrence: CompetitionSlide,
+  concurrence: () => <CompetitionSlide footer={<BenchmarkFooter />} />,
   acquisition: () => <AcquisitionSlide showPay={false} />,
   publications: () => <PublicationsSlide index={sectionNo("publications")} />,
   partenariats: () => (
     <PartnershipsSlide index={sectionNo("partenariats")} showCriteria={false} airy />
   ),
-  modele: RevenueSlide,
+  modele: () => <RevenueSlide footer={<PartnerTargetFooter />} />,
+  previsionnel: TrajectorySlide4,
   trajectoire: FinanceSlide,
 
   /* Acte VII — passage à l'échelle */
   financement: UnlockSlide,
   chaine: RoadmapSlide,
-  conclusion: ConclusionSlide,
+  conclusion: () => <ConclusionSlide showSignature={false} />,
 };
