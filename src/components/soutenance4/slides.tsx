@@ -71,7 +71,6 @@ import {
   S4_COVER,
   S4_DEPTH,
   S4_ECONOMICS,
-  S4_MISSING,
   S4_PARADOX,
   S4_POSITIONING,
   S4_READER_WORK,
@@ -466,116 +465,6 @@ function ReaderWorkSlide() {
           </div>
         </div>
       </div>
-    </SlideBody>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   04 — CE QUI MANQUE
-
-   Ne pas attaquer les médias : chacun fait son métier. Le trou est nommé à
-   droite, en très gros, parce que c'est là que le produit viendra se poser.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-function MissingSlide() {
-  const ink = useInk();
-  const accent = useAccent();
-  const step = useSlideStep();
-
-  /* Trois pressions sur la flèche : les trois familles, puis la charnière,
-     puis les verbes qui tombent un par un. La slide se lisait d'un bloc, donc
-     elle ne racontait rien — et le vide de sa moitié droite était le vide
-     d'une promesse pas encore faite. */
-  return (
-    <SlideBody>
-      <Eyebrow>{S4_MISSING.eyebrow}</Eyebrow>
-
-      <div style={{ marginTop: 22 }}>
-        {S4_MISSING.title.map((line, i) => (
-          <Rise key={line} delay={0.04 + i * 0.14} y={20}>
-            <p
-              className="t-h2"
-              style={{ color: i === 1 ? ink.primary : ink.secondary, letterSpacing: "-0.035em" }}
-            >
-              {line}
-            </p>
-          </Rise>
-        ))}
-      </div>
-
-      {/* Trois colonnes numérotées plutôt qu'une pile à gauche : les trois
-          familles se lisent d'un coup et occupent la scène, au lieu de laisser
-          les deux tiers droits vides. */}
-      <div
-        style={{
-          marginTop: 54,
-          display: "grid",
-          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-          gap: 56,
-          alignItems: "start",
-        }}
-      >
-        {S4_MISSING.families.map((f, i) => (
-          <Rise key={f.label} delay={0.14 + i * 0.2} y={18}>
-            <div style={{ paddingTop: 18, borderTop: `2px solid ${accent}` }}>
-              <div
-                className="t-micro"
-                style={{ color: accent, letterSpacing: "0.16em", marginBottom: 18 }}
-              >
-                {String(i + 1).padStart(2, "0")}
-              </div>
-              <div
-                style={{
-                  fontSize: 40,
-                  fontWeight: 800,
-                  letterSpacing: "-0.034em",
-                  color: ink.primary,
-                  lineHeight: 1.06,
-                }}
-              >
-                {f.label}
-              </div>
-              <div
-                style={{
-                  fontSize: 27,
-                  fontWeight: 500,
-                  letterSpacing: "-0.02em",
-                  color: ink.secondary,
-                  marginTop: 10,
-                }}
-              >
-                {f.body}
-              </div>
-            </div>
-          </Rise>
-        ))}
-      </div>
-
-      <div
-        style={{
-          flex: 1,
-          minHeight: 0,
-          display: "grid",
-          alignContent: "center",
-          opacity: step >= 1 ? 1 : 0,
-          transform: step >= 1 ? "none" : "translateY(14px)",
-          transition: "opacity 0.55s ease, transform 0.55s ease",
-        }}
-      >
-        <div style={{ height: 3, background: accent, width: 108 }} />
-        <p
-          className="t-h2"
-          style={{
-            marginTop: 28,
-            color: ink.primary,
-            letterSpacing: "-0.035em",
-            maxWidth: 1240,
-          }}
-        >
-          {S4_MISSING.bridge}
-        </p>
-      </div>
-
     </SlideBody>
   );
 }
@@ -1823,7 +1712,6 @@ export const S4_VIEWS: Record<string, ComponentType> = {
   attention: AttentionSlide,
   travail: ReaderWorkSlide,
   reprise: HistorySlideRef,
-  manque: MissingSlide,
   reponse: AnswerSlide,
 
   /* Acte II — le produit */

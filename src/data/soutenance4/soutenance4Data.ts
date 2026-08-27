@@ -103,15 +103,6 @@ export const S4_SLIDES: readonly DeckSlide[] = [
       "QUESTION : concrètement, qu'est-ce qui coûte au lecteur ? Les sources arrivent, puis la chaîne d'opérations se déroule. Insister : l'information existe, elle est même surabondante. Ce qui manque, c'est le travail de mise en relation, et il est aujourd'hui à la charge du lecteur. Cette idée reviendra à l'acte V, retournée : c'est nous qui le prendrons en charge.",
   },
   {
-    id: "manque",
-    label: "Ce qui manque",
-    act: "probleme",
-    seconds: 45,
-    steps: 2,
-    speakerNotes:
-      "QUESTION : personne ne fait déjà ça ? Ne pas attaquer les médias — ils font leur métier. Dire ce que chaque famille apporte, puis nommer les cinq verbes que personne ne réunit. C'est le trou dans lequel le produit va se poser à la slide suivante.",
-  },
-  {
     id: "reprise",
     label: "Quatre ans d'histoire",
     act: "probleme",
@@ -441,23 +432,6 @@ export const S4_READER_WORK = {
   statement: ["L'information existe.", "Le travail de recoupement reste à sa charge."],
 } as const;
 
-/* 04 — CE QUI MANQUE
-   Ne pas attaquer les médias : dire ce que chaque famille fait bien, puis
-   nommer ce que personne ne réunit. C'est ce trou que le produit vient
-   occuper à la slide suivante. */
-export const S4_MISSING = {
-  eyebrow: "Ce qui manque",
-  /* La slide n'avait qu'un sur-titre. Deux lignes suffisent à dire ce qu'elle
-     démontre : chacun fait sa part, et personne ne rassemble. */
-  title: ["Tout existe.", "Rien n'est réuni."],
-  families: [
-    { label: "Les médias", body: "racontent l'actualité." },
-    { label: "Les bases de données", body: "donnent les chiffres." },
-    { label: "Les moteurs et les IA", body: "répondent aux questions." },
-  ],
-  bridge: "Mais il manque un espace où l'on puisse tout faire en même temps.",
-} as const;
-
 /* 05 — LA RÉPONSE
    Le produit apparaît comme conséquence des quatre slides précédentes, pas
    comme une annonce. Rien sur le modèle, rien sur l'IA, rien sur la
@@ -515,7 +489,7 @@ export const S4_POSITIONING = {
     { id: "medias", label: "Médias", body: "Le récit, l'actualité, la mise en perspective." },
     { id: "data", label: "Data et statistiques", body: "Le chiffre brut, l'autorité de la source." },
     { id: "moteurs", label: "Moteurs et IA", body: "La réponse immédiate à une question posée." },
-    { id: "pure", label: "Pure players data-éditorial", body: "Le format long, l'enquête chiffrée." },
+    { id: "pure", label: "Format long, enquête chiffrée", body: "Le dossier fouillé, publié loin de l'actualité." },
   ],
   /** Les quatre gestes qui définissent l'intersection. */
   axes: ["Data", "Éditorial", "Comparaison", "Exploration"],
