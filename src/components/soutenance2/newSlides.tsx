@@ -991,7 +991,12 @@ export function FundingSlide() {
    CE QU'ON ATTEND D'UN ARTICLE
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export function EditorialSlide() {
+export function EditorialSlide({
+  /* Les quatre exigences. Absentes, la V2 et la V3 gardent les leurs. */
+  demands,
+}: {
+  demands?: readonly { n: string; label: string; body: string; examples: string }[];
+} = {}) {
   const ink = useInk();
   const accent = useAccent();
 
@@ -1014,7 +1019,7 @@ export function EditorialSlide() {
           alignContent: "center",
         }}
       >
-        {EDITORIAL.demands.map((d, i) => (
+        {(demands ?? EDITORIAL.demands).map((d, i) => (
           <motion.div
             key={d.n}
             initial={{ opacity: 0, x: -22 }}

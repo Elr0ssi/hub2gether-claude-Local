@@ -701,6 +701,35 @@ export const S4_FINANCE_YEAR2 = {
   value: "+20 208 €",
 } as const;
 
+/* Les quatre exigences, en version allegee : la V2 les developpait en une
+   phrase chacune, la V4 les reduit a ce qui se lit d'un coup d'oeil. */
+export const S4_EDITORIAL_DEMANDS = [
+  {
+    n: "01",
+    label: "Le bon sujet",
+    body: "Tendances de recherche, forums, une du jour",
+    examples: "Iran · Ukraine · Yémen · midterms",
+  },
+  {
+    n: "02",
+    label: "Plusieurs regards",
+    body: "Un même fait, plusieurs sources.",
+    examples: "10 français · 15 internationaux",
+  },
+  {
+    n: "03",
+    label: "Le recul historique",
+    body: "Comparer pour donner du sens.",
+    examples: "Comparaisons pays",
+  },
+  {
+    n: "04",
+    label: "La transparence",
+    body: "Chaque donnée reste traçable, datée, rattachée à sa source.",
+    examples: "Source · date · méthode",
+  },
+] as const;
+
 export const S4_AUDIENCE = {
   eyebrow: "L'audience",
   title: ["Où en est l'audience."],

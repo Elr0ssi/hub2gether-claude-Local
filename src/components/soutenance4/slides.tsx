@@ -76,6 +76,7 @@ import {
   S4_COVER,
   S4_DEPTH,
   S4_ECONOMICS,
+  S4_EDITORIAL_DEMANDS,
   S4_FINANCE_YEARS,
   S4_FINANCE_YEAR2,
   S4_REVENUE_PROJECTION,
@@ -1818,7 +1819,7 @@ export const S4_VIEWS: Record<string, ComponentType> = {
 
   /* Acte II — le produit */
   lecture: DepthSlide,
-  promesse: EditorialSlideRef,
+  promesse: () => <EditorialSlideRef demands={S4_EDITORIAL_DEMANDS} />,
 
   /* Acte III — pourquoi il y a une place */
   positionnement: PositioningSlide,
