@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PUBS } from "@/data/pubs";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Clock, Tag, ExternalLink, Info } from "lucide-react";
@@ -55,7 +56,25 @@ function formatDate(iso: string, locale: string) {
   });
 }
 
-function AdSlot({ format }: { format: "vertical" | "horizontal" }) {
+function AdSlot({ format, slot }: { format: "vertical" | "horizontal"; slot?: 1 | 2 | 3 }) {
+  if (slot) {
+    return (
+      <div
+        style={{
+          width: format === "vertical" ? "160px" : "100%",
+          borderRadius: "8px",
+          overflow: "hidden",
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={PUBS[slot]}
+          alt="Publicité"
+          style={{ width: "100%", height: "auto", display: "block" }}
+        />
+      </div>
+    );
+  }
   const dim = format === "vertical"
     ? { width: "160px", height: "600px", label: "160×600" }
     : { width: "100%", height: "90px", label: "728×90" };
@@ -165,7 +184,7 @@ export default async function ArticlePage({ params }: PageProps) {
       <div className="flex justify-center gap-6">
         {/* Left ad — desktop only */}
         <aside className="hidden xl:flex flex-col flex-shrink-0 pt-10" style={{ width: "160px" }}>
-          <AdSlot format="vertical" />
+          <AdSlot format="vertical" slot={1} />
         </aside>
 
         {/* Article content column */}
@@ -384,7 +403,7 @@ export default async function ArticlePage({ params }: PageProps) {
 
         {/* Right ad — desktop only */}
         <aside className="hidden xl:flex flex-col flex-shrink-0 pt-10" style={{ width: "160px" }}>
-          <AdSlot format="vertical" />
+          <AdSlot format="vertical" slot={1} />
         </aside>
       </div>{/* end ad + article layout */}
 

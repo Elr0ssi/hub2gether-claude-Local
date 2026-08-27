@@ -1,5 +1,7 @@
 "use client";
 
+import { PUBS } from "@/data/pubs";
+
 /**
  * Vertical advertising slot living in the margin outside the site's content
  * column. Nothing is sold into it yet, so it renders a house placeholder at
@@ -11,7 +13,31 @@
  * The rails leave the layout below the width at which they would start eating
  * into the content column — see `.eco-ad-rail`.
  */
-export function AdRail({ side }: { side: "left" | "right" }) {
+
+export function AdRail({ side, slot }: { side: "left" | "right"; slot?: 1 | 2 | 3 }) {
+  const creative = slot ? PUBS[slot] : null;
+
+  if (creative) {
+    return (
+      <aside
+        className="eco-ad-rail"
+        aria-label={`Publicité ${side === "left" ? "gauche" : "droite"}`}
+      >
+        {/* La creative est au format 4:5 du site, pas au 160x600 du cadre
+            d'attente : le bloc epouse l'image plutot que de la centrer dans
+            une carte vide. */}
+        <div className="eco-ad-slot" style={{ display: "block", height: "auto" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={creative}
+            alt="Publicité"
+            style={{ width: "100%", height: "auto", display: "block" }}
+          />
+        </div>
+      </aside>
+    );
+  }
+
   return (
     <aside
       className="eco-ad-rail"

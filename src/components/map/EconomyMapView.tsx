@@ -171,7 +171,7 @@ export function EconomyMapView() {
         {!isFullscreen && <SectionFlowCurves sectionRef={mapSectionRef} index={0} />}
         <div className="eco-section-body">
           <div className="eco-section-row">
-          <AdRail side="left" />
+          <AdRail side="left" slot={1} />
           <div className="eco-section-main">
             <AdBanner />
       {/* Map card */}
@@ -374,7 +374,7 @@ export function EconomyMapView() {
       </div>
 
           </div>
-          <AdRail side="right" />
+          <AdRail side="right" slot={1} />
           </div>
         </div>
       </section>
@@ -384,7 +384,7 @@ export function EconomyMapView() {
         <SectionFlowCurves sectionRef={rankSectionRef} index={1} />
         <div className="eco-section-body">
           <div className="eco-section-row">
-          <AdRail side="left" />
+          <AdRail side="left" slot={2} />
           <div className="eco-section-main">
             <AdBanner />
             <EconomyRankingsTable
@@ -403,7 +403,7 @@ export function EconomyMapView() {
               }}
             />
           </div>
-          <AdRail side="right" />
+          <AdRail side="right" slot={2} />
           </div>
         </div>
       </section>
@@ -413,7 +413,7 @@ export function EconomyMapView() {
         <SectionFlowCurves sectionRef={articleSectionRef} index={2} />
         <div className="eco-section-body">
           <div className="eco-section-row">
-          <AdRail side="left" />
+          <AdRail side="left" slot={3} />
           <div className="eco-section-main">
             <AdBanner />
             <MapArticleSection
@@ -423,7 +423,7 @@ export function EconomyMapView() {
               spacing={0}
             />
           </div>
-          <AdRail side="right" />
+          <AdRail side="right" slot={3} />
           </div>
         </div>
       </section>
