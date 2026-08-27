@@ -286,14 +286,6 @@ export const S4_SLIDES: readonly DeckSlide[] = [
       "QUESTION : avec qui la construction est-elle envisageable ? Des pistes, pas des accords — le dire franchement si la question vient. Ce qui compte est la cohérence avec le positionnement, pas le nom. Les trois visuels défilent à la flèche : c'est au troisième seulement qu'on passe à la slide suivante.",
   },
   {
-    id: "etat",
-    label: "Ce qui existe déjà",
-    act: "preuves",
-    seconds: 70,
-    speakerNotes:
-      "QUESTION : est-ce construit, ou est-ce une idée ? La slide est une preuve, pas un calendrier. Assumer franchement ce qui est suspendu et pourquoi : on ralentit pour fiabiliser avant de changer d'échelle. Un jury préfère une suspension expliquée à une progression floue.",
-  },
-  {
     id: "acquisition",
     label: "Nos canaux d'acquisition",
     act: "preuves",
@@ -728,6 +720,16 @@ export const S4_EDITORIAL_DEMANDS = [
     body: "Chaque donnée reste traçable, datée, rattachée à sa source.",
     examples: "Source · date · méthode",
   },
+] as const;
+
+/* Le tableau d'audience de la slide publications, cote V4 : les mesures
+   viennent d'Instagram, pas de l'analytics du site. */
+export const S4_PUBLICATIONS_AUDIENCE = [
+  { label: "Depuis", value: "Mars 2026" },
+  { label: "Publications", value: "14" },
+  { label: "Vues cumulées", value: "62 300" },
+  { label: "Like total", value: "8 400" },
+  { label: "Abonnés", value: "6 300" },
 ] as const;
 
 export const S4_AUDIENCE = {

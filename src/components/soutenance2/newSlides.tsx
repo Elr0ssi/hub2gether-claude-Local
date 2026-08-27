@@ -169,7 +169,18 @@ export function PublicationsSlide({
      Sans reglage, la V2 et la V3 affichent exactement ce qu'elles affichaient. */
   hideMetrics,
   showNote = true,
-}: { index: string; hideMetrics?: readonly string[]; showNote?: boolean }) {
+  /* Surcharges de libelles. Absentes, la V2 et la V3 ne bougent pas. */
+  eyebrow = "Nos publications",
+  audienceLabel,
+  metrics,
+}: {
+  index: string;
+  hideMetrics?: readonly string[];
+  showNote?: boolean;
+  eyebrow?: string;
+  audienceLabel?: string;
+  metrics?: readonly { label: string; value: string | null }[];
+}) {
   const ink = useInk();
   const accent = useAccent();
 
@@ -178,7 +189,7 @@ export function PublicationsSlide({
      désormais la leur, juste après. */
   return (
     <SlideBody>
-      <Eyebrow>Nos publications</Eyebrow>
+      <Eyebrow>{eyebrow}</Eyebrow>
       <Title lines={PUBLICATIONS.title} />
 
       <div
@@ -203,10 +214,10 @@ export function PublicationsSlide({
         <Rise delay={0.6} y={14}>
           <div>
             <p className="t-micro" style={{ color: accent, marginBottom: 14 }}>
-              {PUBLICATIONS.audience.label}
+              {audienceLabel ?? PUBLICATIONS.audience.label}
             </p>
             <div style={{ display: "grid", gap: 12 }}>
-              {PUBLICATIONS.audience.metrics
+              {(metrics ?? PUBLICATIONS.audience.metrics)
                 .filter((m) => !hideMetrics?.includes(m.label))
                 .map((m) => (
                 <div

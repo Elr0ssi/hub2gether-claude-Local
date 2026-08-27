@@ -52,7 +52,6 @@ import {
   PublicationsSlide,
   RevenueSlide,
   RoadmapSlide,
-  StatusSlide,
   TeamSlideRef,
   UnlockSlide,
 } from "./reused";
@@ -70,6 +69,7 @@ import {
   S4_AUDIENCE,
   S4_BENCHMARK,
   S4_PARTNER_TARGET,
+  S4_PUBLICATIONS_AUDIENCE,
   S4_TRAJECTORY,
   S4_ATTENTION,
   S4_CHANNEL,
@@ -1837,18 +1837,21 @@ export const S4_VIEWS: Record<string, ComponentType> = {
   /* Acte V — preuve d'exécution */
   audience: AudienceSlide4,
   benchmark: BenchmarkSlide4,
-  etat: StatusSlide,
   derriere: () => <TeamSlideRef showSkills={false} maxLines={2} />,
 
   /* Acte VI — le modèle économique */
   acteurs: PlayersSlide4,
   concurrence: () => <CompetitionSlide showLegend={false} colWidth={190} footer={<></>} />,
   acquisition: () => <AcquisitionSlide showPay={false} />,
-  publications: () => <PublicationsSlide
+  publications: () => (
+    <PublicationsSlide
       index={sectionNo("publications")}
-      hideMetrics={["Taux d'engagement"]}
+      eyebrow="Nos publications sur les réseaux sociaux"
+      audienceLabel="Audience · Instagram"
+      metrics={S4_PUBLICATIONS_AUDIENCE}
       showNote={false}
-    />,
+    />
+  ),
   partenariats: () => (
     <PartnershipsSlide index={sectionNo("partenariats")} showCriteria={false} airy showVisuals />
   ),
