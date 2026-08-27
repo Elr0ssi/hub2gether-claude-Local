@@ -14,7 +14,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import { useMemo, useState, type ComponentType } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { countryFr } from "@/data/countryNamesFr";
 import { getYearData } from "@/data/economy/economy";
 import {
@@ -866,6 +866,15 @@ function ShiftSlide() {
   const i = Math.min(step, beats.length - 1);
   const beat = beats[i];
 
+  /* Le sens de la fleche : le temps sortant part du cote d'ou vient le
+     suivant, sinon le remplacement se lit comme un clignotement plutot que
+     comme un mouvement. */
+  const precedent = useRef(i);
+  const sens = i >= precedent.current ? 1 : -1;
+  useEffect(() => {
+    precedent.current = i;
+  }, [i]);
+
   return (
     <SlideBody style={{ paddingTop: 72, paddingBottom: 78 }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
@@ -893,19 +902,35 @@ function ShiftSlide() {
       </div>
 
       <div style={{ flex: 1, display: "grid", placeItems: "center" }}>
-        <AnimatePresence mode="wait">
+        {/* `popLayout` laisse le temps entrant demarrer avant que le sortant
+            n'ait fini de partir : les deux se croisent, et le remplacement se
+            voit. Le ressort porte la translation, la duree fixe porte
+            l'opacite et le flou — un ressort sur une opacite traine. */}
+        <AnimatePresence mode="popLayout" initial={false} custom={sens}>
           <motion.div
             key={beat.id}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.45, ease: DECK_EASE }}
+            custom={sens}
+            variants={{
+              entre: (d: number) => ({ opacity: 0, x: d * 120, scale: 0.94, filter: "blur(6px)" }),
+              pose: { opacity: 1, x: 0, scale: 1, filter: "blur(0px)" },
+              sort: (d: number) => ({ opacity: 0, x: d * -120, scale: 0.94, filter: "blur(6px)" }),
+            }}
+            initial="entre"
+            animate="pose"
+            exit="sort"
+            transition={{
+              x: { type: "spring", stiffness: 220, damping: 28, mass: 0.9 },
+              scale: { type: "spring", stiffness: 220, damping: 28, mass: 0.9 },
+              opacity: { duration: 0.3, ease: DECK_EASE },
+              filter: { duration: 0.34, ease: DECK_EASE },
+            }}
           >
             <ShiftChain
               label={beat.label}
               chain={beat.chain}
               caption={beat.caption}
-              startDelay={0.05}
+              startDelay={0.02}
+              stagger={0.09}
               highlightLast={i > 0}
             />
           </motion.div>

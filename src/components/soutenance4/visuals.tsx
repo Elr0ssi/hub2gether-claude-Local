@@ -271,6 +271,9 @@ export function ShiftChain({
   caption,
   startDelay = 0,
   highlightLast = false,
+  /* Ecart entre deux maillons. Serre, la chaine se monte pendant que le bloc
+     glisse en place ; large, elle se lit maillon par maillon. */
+  stagger = 0.18,
 }: {
   label: string;
   chain: readonly string[];
@@ -278,6 +281,7 @@ export function ShiftChain({
   caption?: string;
   startDelay?: number;
   highlightLast?: boolean;
+  stagger?: number;
 }) {
   const ink = useInk();
   const accent = useAccent();
@@ -299,7 +303,7 @@ export function ShiftChain({
           const strong = highlightLast && last;
           return (
             <div key={node} style={{ display: "flex", alignItems: "center" }}>
-              <Rise delay={startDelay + 0.15 + i * 0.18} y={0}>
+              <Rise delay={startDelay + 0.15 + i * stagger} y={0}>
                 <span
                   style={{
                     display: "inline-block",
@@ -324,7 +328,7 @@ export function ShiftChain({
                     stroke={ink.rule}
                     width={2}
                     opacity={1}
-                    delay={startDelay + 0.15 + i * 0.18 + 0.12}
+                    delay={startDelay + 0.15 + i * stagger + 0.12}
                     duration={0.3}
                   />
                   <motion.path
@@ -334,7 +338,7 @@ export function ShiftChain({
                     fill="none"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ duration: 0.2, delay: startDelay + 0.15 + i * 0.18 + 0.36 }}
+                    transition={{ duration: 0.2, delay: startDelay + 0.15 + i * stagger + 0.36 }}
                   />
                 </svg>
               )}
@@ -344,7 +348,7 @@ export function ShiftChain({
       </div>
 
       {caption && (
-        <Rise delay={startDelay + 0.15 + chain.length * 0.18} y={8}>
+        <Rise delay={startDelay + 0.15 + chain.length * stagger} y={8}>
           <p style={{ marginTop: 16, fontSize: 22, color: ink.secondary, letterSpacing: "-0.014em" }}>
             {caption}
           </p>
