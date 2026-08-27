@@ -773,11 +773,15 @@ export const S4_TRAJECTORY = {
   eyebrow: "Prévisionnel",
   title: ["Prévision d'audience."],
   unit: "visiteurs par mois",
+  /* Hypotheses du business plan. Aucun de ces points n'est releve : ils sont
+     tous marques comme cibles, sinon le premier se lirait comme la mesure du
+     jour, que la slide audience donne a 8 400. */
   points: [
-    { label: "Aujourd'hui", value: 8_400, state: "actual" as const },
-    { label: "Fin d'année", value: 45_000, state: "target" as const },
-    { label: "Année + 1", value: 140_000, state: "target" as const },
-    { label: "Année + 2", value: 320_000, state: "target" as const },
+    { label: "Année 1", value: 50_000, state: "target" as const },
+    { label: "Année 2", value: 200_000, state: "target" as const },
+    { label: "Année 3", value: 500_000, state: "target" as const },
+    { label: "Année 4", value: 800_000, state: "target" as const },
+    { label: "Année 5", value: 1_200_000, state: "target" as const },
   ],
   levers: [
     { index: "01", title: "Réactivation du pipeline" },
