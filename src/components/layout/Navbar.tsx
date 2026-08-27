@@ -6,6 +6,9 @@ import { Globe, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { THEMES } from "@/data/themes";
 
+/** Grisees dans le menu, mais toujours en ligne : leurs pages repondent. */
+const NAV_A_VENIR = new Set(["empires", "politics", "military", "epidemics"]);
+
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -50,74 +53,6 @@ export function Navbar() {
         {/* nowrap keeps the row a single line once the eighth tab appears at xl */}
         <nav className="hidden md:flex items-center gap-0.5 whitespace-nowrap">
           <Link
-            href="/preview"
-            className={cn(
-              "relative px-2.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-150",
-              pathname === "/preview"
-                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
-                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
-            )}
-          >
-            Présentation
-            {pathname === "/preview" && (
-              <span
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
-                style={{ background: "var(--accent)" }}
-              />
-            )}
-          </Link>
-          <Link
-            href="/soutenance-4"
-            className={cn(
-              "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
-              pathname === "/soutenance-4"
-                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
-                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
-            )}
-          >
-            Soutenance 4
-            {pathname === "/soutenance-4" && (
-              <span
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
-                style={{ background: "var(--accent)" }}
-              />
-            )}
-          </Link>
-          <Link
-            href="/soutenance-3"
-            className={cn(
-              "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
-              pathname === "/soutenance-3"
-                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
-                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
-            )}
-          >
-            Soutenance 3
-            {pathname === "/soutenance-3" && (
-              <span
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
-                style={{ background: "var(--accent)" }}
-              />
-            )}
-          </Link>
-          <Link
-            href="/soutenance-2"
-            className={cn(
-              "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
-              pathname === "/soutenance-2"
-                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
-                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
-            )}
-          >
-            Soutenance 2
-            {pathname === "/soutenance-2" && (
-              <span
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
-                style={{ background: "var(--accent)" }}
-              />
-            )}
-          </Link>
-          <Link
             href="/test-article"
             className={cn(
               "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
@@ -134,51 +69,23 @@ export function Navbar() {
               />
             )}
           </Link>
-          <Link
-            href="/presentation"
-            className={cn(
-              // The navbar already runs past the viewport below ~1100px with
-              // seven tabs; an eighth would push "Comparer" further off. The
-              // deck is an internal tool, so its tab only appears where there
-              // is room — below lg the navbar is exactly as it was.
-              "relative hidden xl:inline-block px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
-              pathname === "/presentation"
-                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
-                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
-            )}
-          >
-            Soutenance
-            {pathname === "/presentation" && (
-              <span
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
-                style={{ background: "var(--accent)" }}
-              />
-            )}
-          </Link>
           {THEMES.map((theme) => {
             const isActive =
               pathname === `/map/${theme.slug}` ||
               pathname.startsWith(`/map/${theme.slug}/`);
 
-            if (!theme.available) {
+            if (!theme.available || NAV_A_VENIR.has(theme.id)) {
+              /* La pastille « Bientôt » ne se repete pas sur chaque onglet :
+                 une seule, posee apres le dernier, dit la meme chose sans
+                 charger la barre. */
               return (
                 <div
                   key={theme.id}
-                  className="relative px-2.5 py-1.5 rounded-lg text-sm font-medium cursor-not-allowed opacity-50 flex items-center gap-1.5"
+                  className="relative px-2.5 py-1.5 rounded-lg text-sm font-medium cursor-not-allowed opacity-50"
                   style={{ color: "var(--ink-4)" }}
-                  title={`${theme.label}, Bientôt disponible ${theme.comingSoonLabel ?? ""}`}
+                  title={`${theme.label}, bientôt disponible`}
                 >
                   {theme.label}
-                  <span
-                    className="text-xs px-1.5 py-0.5 rounded-md font-semibold"
-                    style={{
-                      background: "var(--surface-2)",
-                      color: "var(--ink-4)",
-                      fontSize: "0.65rem",
-                    }}
-                  >
-                    Bientôt
-                  </span>
                 </div>
               );
             }
@@ -204,6 +111,16 @@ export function Navbar() {
               </Link>
             );
           })}
+          <span
+            className="ml-1 px-1.5 py-0.5 rounded-md font-semibold"
+            style={{
+              background: "var(--surface-2)",
+              color: "var(--ink-4)",
+              fontSize: "0.65rem",
+            }}
+          >
+            Bientôt
+          </span>
         </nav>
 
         <div className="flex items-center gap-2 shrink-0">
