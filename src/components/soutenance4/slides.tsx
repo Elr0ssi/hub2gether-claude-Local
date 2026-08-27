@@ -1251,9 +1251,6 @@ function SplitSlide() {
               </span>
             ))}
           </div>
-          <p style={{ fontSize: 19, color: ink.faint, maxWidth: 760, lineHeight: 1.4 }}>
-            {S4_SPLIT.note}
-          </p>
         </div>
       </Rise>
     </SlideBody>
@@ -1696,14 +1693,13 @@ function TrajectorySlide4() {
             </h2>
           </Rise>
         </div>
-        <Rise delay={0.6} y={10}>
-          <p className="t-micro" style={{ color: ink.faint, textAlign: "right", maxWidth: 460 }}>
-            {S4_TRAJECTORY.note}
-          </p>
-        </Rise>
       </div>
 
-      <div style={{ display: "grid", placeItems: "center", marginTop: 34 }}>
+      {/* Tout ce qui n'est pas le titre se centre dans la hauteur restante :
+          sans la note ni les trois descriptions, le bloc se serait colle en
+          haut de la scene. */}
+      <div style={{ flex: 1, minHeight: 0, display: "grid", alignContent: "center", gap: 40 }}>
+      <div style={{ display: "grid", placeItems: "center" }}>
         <TrajectoryChart points={points} unit={S4_TRAJECTORY.unit} startDelay={0.55} height={460} />
       </div>
 
@@ -1712,7 +1708,6 @@ function TrajectorySlide4() {
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
           gap: 56,
-          marginTop: 10,
         }}
       >
         {S4_TRAJECTORY.levers.map((l, i) => (
@@ -1726,12 +1721,10 @@ function TrajectorySlide4() {
                   {l.title}
                 </span>
               </div>
-              <p className="t-body" style={{ color: ink.muted }}>
-                {l.body}
-              </p>
             </div>
           </Rise>
         ))}
+      </div>
       </div>
     </SlideBody>
   );
@@ -1809,7 +1802,7 @@ export const S4_VIEWS: Record<string, ComponentType> = {
   /* Acte IV — la fabrication */
   pivot: PivotSlide,
   recoupement: CrossCheckSlide,
-  pipeline: PipelineSlideRef,
+  pipeline: () => <PipelineSlideRef showHandBodies={false} />,
   partage: SplitSlide,
   economie: EconomicsSlide,
   tracabilite: TraceSlide,
@@ -1824,7 +1817,11 @@ export const S4_VIEWS: Record<string, ComponentType> = {
   acteurs: PlayersSlide4,
   concurrence: () => <CompetitionSlide showLegend={false} colWidth={190} footer={<></>} />,
   acquisition: () => <AcquisitionSlide showPay={false} />,
-  publications: () => <PublicationsSlide index={sectionNo("publications")} />,
+  publications: () => <PublicationsSlide
+      index={sectionNo("publications")}
+      hideMetrics={["Taux d'engagement"]}
+      showNote={false}
+    />,
   partenariats: () => (
     <PartnershipsSlide index={sectionNo("partenariats")} showCriteria={false} airy showVisuals />
   ),
@@ -1834,6 +1831,6 @@ export const S4_VIEWS: Record<string, ComponentType> = {
 
   /* Acte VII — passage à l'échelle */
   financement: UnlockSlide,
-  chaine: RoadmapSlide,
+  chaine: () => <RoadmapSlide showProofBody={false} showReplicateNote={false} />,
   conclusion: () => <ConclusionSlide showSignature={false} />,
 };

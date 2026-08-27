@@ -112,19 +112,6 @@ export function UnlockSlide() {
             </p>
           </Rise>
 
-          <Rise delay={0.4} y={14}>
-            <div style={{ marginTop: 34 }}>
-              <p style={{ fontSize: 27, fontWeight: 800, color: ink.primary, letterSpacing: "-0.025em" }}>
-                {FUNDING.instrument.label}
-              </p>
-              <p style={{ fontSize: 20, color: ink.muted, marginTop: 12, lineHeight: 1.5 }}>
-                {FUNDING.instrument.body}
-              </p>
-              <p style={{ fontSize: 19, color: ink.faint, marginTop: 14 }}>
-                {FUNDING.ticket.label} · {FUNDING.ticket.value}
-              </p>
-            </div>
-          </Rise>
         </div>
 
         {/* L'emploi des fonds */}
@@ -153,11 +140,6 @@ export function UnlockSlide() {
               </Rise>
             ))}
           </div>
-          <Rise delay={1.1} y={8}>
-            <p style={{ fontSize: 18, color: ink.faint, marginTop: 16, fontStyle: "italic" }}>
-              {FUNDING.note}
-            </p>
-          </Rise>
         </div>
 
         {/* Les trois raisons, puis le jalon */}
@@ -177,41 +159,6 @@ export function UnlockSlide() {
         </div>
       </div>
 
-      {/* Le déblocage : ce que la V2 ne disait pas. */}
-      <Rise delay={1.4} y={16}>
-        <div
-          style={{
-            marginTop: 30,
-            borderTop: `1px solid ${ink.rule}`,
-            paddingTop: 28,
-            display: "flex",
-            alignItems: "center",
-            gap: 34,
-            flexWrap: "wrap",
-          }}
-        >
-          <span style={{ fontSize: 26, fontWeight: 700, color: ink.secondary, letterSpacing: "-0.02em" }}>
-            {S4_UNLOCK.milestoneLabel}
-          </span>
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              border: `2px dashed ${accent}`,
-              borderRadius: 4,
-              padding: "12px 26px",
-              color: accent,
-              fontSize: 24,
-              fontWeight: 800,
-            }}
-          >
-            à arrêter
-          </span>
-          <span style={{ fontSize: 18, color: ink.faint, fontStyle: "italic" }}>
-            {S4_UNLOCK.milestoneNote}
-          </span>
-        </div>
-      </Rise>
     </SlideBody>
   );
 }

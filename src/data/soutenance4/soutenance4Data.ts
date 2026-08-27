@@ -583,7 +583,6 @@ export const S4_SPLIT = {
     { label: "Publication", who: "human" as const },
   ],
   statement: ["Les agents exécutent.", "L'humain décide."],
-  note: "Retirer les quatre mains humaines doublerait le débit et coûterait ce qui sépare le projet d'un site généré automatiquement.",
 } as const;
 
 /* 20 — L'ÉCONOMIE DE L'AUTOMATISATION
@@ -750,11 +749,10 @@ export const S4_TRAJECTORY = {
     { label: "Année + 2", value: 320_000, state: "target" as const },
   ],
   levers: [
-    { index: "01", title: "Réactivation du pipeline", body: "Reprise de la publication et de l'actualisation automatisées une fois la nouvelle architecture fiabilisée." },
-    { index: "02", title: "SEO et profondeur de catalogue", body: "Chaque sujet couvert reste indexé et continue d'attirer du trafic bien après sa publication." },
-    { index: "03", title: "Distribution sociale", body: "Les visualisations sont nativement partageables : elles circulent sans dépendre du seul référencement." },
+    { index: "01", title: "Réactivation du pipeline" },
+    { index: "02", title: "SEO et profondeur de catalogue" },
+    { index: "03", title: "Distribution sociale" },
   ],
-  note: "Trajectoire cible conditionnée à la livraison de la refonte, et non projection statistique.",
 } as const;
 
 /* Ce qu'il faut vendre pour que la ligne « partenariats » du plan tienne.

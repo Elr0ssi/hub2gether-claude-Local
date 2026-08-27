@@ -163,7 +163,13 @@ function PublicationCard({
   );
 }
 
-export function PublicationsSlide({ index }: { index: string }) {
+export function PublicationsSlide({
+  index,
+  /* Mesures a retirer du tableau d'audience, et note de bas de bloc.
+     Sans reglage, la V2 et la V3 affichent exactement ce qu'elles affichaient. */
+  hideMetrics,
+  showNote = true,
+}: { index: string; hideMetrics?: readonly string[]; showNote?: boolean }) {
   const ink = useInk();
   const accent = useAccent();
 
@@ -200,7 +206,9 @@ export function PublicationsSlide({ index }: { index: string }) {
               {PUBLICATIONS.audience.label}
             </p>
             <div style={{ display: "grid", gap: 12 }}>
-              {PUBLICATIONS.audience.metrics.map((m) => (
+              {PUBLICATIONS.audience.metrics
+                .filter((m) => !hideMetrics?.includes(m.label))
+                .map((m) => (
                 <div
                   key={m.label}
                   style={{
@@ -221,9 +229,11 @@ export function PublicationsSlide({ index }: { index: string }) {
                 </div>
               ))}
             </div>
-            <p className="t-small" style={{ color: ink.faint, marginTop: 14, lineHeight: 1.5 }}>
-              {PUBLICATIONS.audience.note}
-            </p>
+            {showNote && (
+              <p className="t-small" style={{ color: ink.faint, marginTop: 14, lineHeight: 1.5 }}>
+                {PUBLICATIONS.audience.note}
+              </p>
+            )}
           </div>
         </Rise>
       </div>
@@ -684,7 +694,11 @@ export function PartnersSlide({ index: _index }: { index?: string }) {
    et le commentaire les accompagne au pied du second tableau.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export function WorkshopSlide() {
+export function WorkshopSlide({
+  /* Les descriptions sous les deux gestes humains. Affichees par defaut ;
+     la V4 ne garde que les intitules. */
+  showHandBodies = true,
+}: { showHandBodies?: boolean } = {}) {
   const ink = useInk();
   const accent = useAccent();
 
@@ -738,9 +752,11 @@ export function WorkshopSlide() {
               <p className="t-h3" style={{ color: ink.primary, letterSpacing: "-0.025em" }}>
                 {h.label}
               </p>
-              <p className="t-small" style={{ color: ink.muted, marginTop: 8, lineHeight: 1.5 }}>
-                {h.body}
-              </p>
+              {showHandBodies && (
+                <p className="t-small" style={{ color: ink.muted, marginTop: 8, lineHeight: 1.5 }}>
+                  {h.body}
+                </p>
+              )}
             </div>
           </Rise>
         ))}

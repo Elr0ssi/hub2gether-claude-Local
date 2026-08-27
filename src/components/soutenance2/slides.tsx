@@ -1342,7 +1342,12 @@ export function FinanceSlide({
    14 — ROADMAP
    ═══════════════════════════════════════════════════════════════════════ */
 
-export function RoadmapSlide() {
+export function RoadmapSlide({
+  /* La description de la preuve et la note de bas de colonne. Affichees par
+     defaut ; la V4 les retire. */
+  showProofBody = true,
+  showReplicateNote = true,
+}: { showProofBody?: boolean; showReplicateNote?: boolean } = {}) {
   const ink = useInk();
   const accent = useAccent();
 
@@ -1380,9 +1385,11 @@ export function RoadmapSlide() {
             <p className="t-h2" style={{ color: ink.primary, letterSpacing: "-0.035em", marginTop: 12 }}>
               {ROADMAP.proof.theme}
             </p>
-            <p className="t-small" style={{ color: ink.muted, marginTop: 14, lineHeight: 1.55 }}>
-              {ROADMAP.proof.body}
-            </p>
+            {showProofBody && (
+              <p className="t-small" style={{ color: ink.muted, marginTop: 14, lineHeight: 1.55 }}>
+                {ROADMAP.proof.body}
+              </p>
+            )}
             <div style={{ display: "grid", gap: 10, marginTop: 22 }}>
               {ROADMAP.proof.metrics.map((m) => (
                 <div
@@ -1449,9 +1456,11 @@ export function RoadmapSlide() {
           </Rise>
 
           <Rise delay={1.15} y={10}>
-            <p className="t-small" style={{ color: ink.faint, marginTop: 14 }}>
-              {ROADMAP.replicateNote}
-            </p>
+            {showReplicateNote && (
+              <p className="t-small" style={{ color: ink.faint, marginTop: 14 }}>
+                {ROADMAP.replicateNote}
+              </p>
+            )}
           </Rise>
         </div>
       </div>
