@@ -1,0 +1,41 @@
+{
+  "iso3": "MAF",
+  "iso2": "MF",
+  "nom": "Saint-Martin",
+  "indicateurs": {
+    "balance_commerciale": {
+      "libelle": "Balance extérieure des biens et services",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NE.RSB.GNFS.CD)",
+      "valeurs": {}
+    },
+    "inflation": {
+      "libelle": "Inflation (prix à la consommation)",
+      "unite": "%",
+      "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+      "valeurs": {}
+    },
+    "pib": {
+      "libelle": "PIB",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NY.GDP.MKTP.CD)",
+      "valeurs": {
+        "2011": 775875748.523832,
+        "2014": 772921958.529509,
+        "2019": 652206037.103874,
+        "2021": 649206262.847519
+      }
+    },
+    "pib_par_habitant": {
+      "libelle": "PIB par habitant",
+      "unite": "USD",
+      "source": "Banque mondiale · WDI (NY.GDP.PCAP.CD)",
+      "valeurs": {
+        "2011": 20930.5821177758,
+        "2014": 20638.7705882379,
+        "2019": 19033.0649634889,
+        "2021": 21668.3776525323
+      }
+    }
+  }
+}

@@ -8,13 +8,19 @@ import { EconomyMapViewLoader } from "@/components/map/EconomyMapViewLoader";
 import { PoliticsMapViewLoader } from "@/components/map/PoliticsMapViewLoader";
 import { MilitaryMapViewLoader } from "@/components/map/MilitaryMapViewLoader";
 import { FAQSection } from "@/components/faq/FAQSection";
+import { AdBanner } from "@/components/layout/AdRail";
 import { ArticleGrid } from "@/components/articles/ArticleGrid";
 import { ServerDataSummary } from "@/components/seo/ServerDataSummary";
 import { DATASET_SCHEMAS, jsonLdString } from "@/lib/schema";
 import { getThemeById } from "@/data/themes";
 import { getFaqsByTheme } from "@/data/faqs";
+import { buildEconomyDataFaqs } from "@/data/economy/faqs";
+import { ECONOMY_YEARS, DEFAULT_YEAR } from "@/data/economy/economy";
 import { getArticlesByTheme } from "@/data/articles";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { CategoryHero } from "@/components/category/CategoryHero";
+import { hasCategoryHero } from "@/data/categoryHeroes";
 import type { ThemeId } from "@/types";
 
 interface PageProps {
@@ -36,7 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (theme === "empires") {
     return {
-      title: "Carte empire romain interactif — Expansion territoriale 500 BC à 1453 AD",
+      title: "Carte empire romain interactif · Expansion territoriale 500 BC à 1453 AD",
       description:
         "Carte interactive de l'Empire romain de 500 av. J.-C. à 1453 ap. J.-C. Suivez l'expansion territoriale, les périodes clés et le contexte historique de la plus grande puissance de l'Antiquité.",
       keywords: [
@@ -53,7 +59,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ],
       alternates: { canonical: "/map/empires" },
       openGraph: {
-        title: "Carte empire romain interactif — The Essential Data",
+        title: "Carte empire romain interactif · The Essential Data",
         description:
           "De la cité latine (500 av. J.-C.) à la chute de Constantinople (1453). Explorez l'empire romain en 7 étapes clés avec données historiques.",
         type: "website",
@@ -63,7 +69,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (theme === "epidemics") {
     return {
-      title: "Carte épidémies mondiales — COVID-19, VIH, Peste Noire, Hantavirus, HMPV 2025",
+      title: "Carte épidémies mondiales · COVID-19, VIH, Peste Noire, Hantavirus, HMPV 2025",
       description:
         "Carte interactive des grandes épidémies mondiales : COVID-19, VIH/SIDA, Peste Noire (1347), Hantavirus et HMPV 2025. Cas confirmés, décès et taux de létalité par pays.",
       keywords: [
@@ -82,7 +88,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ],
       alternates: { canonical: "/map/epidemics" },
       openGraph: {
-        title: "Carte épidémies mondiales — COVID, VIH, Peste Noire | The Essential Data",
+        title: "Carte épidémies mondiales · COVID, VIH, Peste Noire | The Essential Data",
         description:
           "Visualisez l'impact de 5 épidémies majeures par pays : Peste Noire (1347), COVID-19, VIH/SIDA, Hantavirus, HMPV 2025. Données OMS et CDC.",
         type: "website",
@@ -92,7 +98,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (theme === "economy") {
     return {
-      title: "Carte PIB par pays 2025 — Dette publique, Chômage, Économie mondiale",
+      title: "Carte PIB par pays 2025 · Dette publique, Chômage, Économie mondiale",
       description:
         "Carte interactive du PIB par pays en 2025 (projections FMI). Comparez la dette publique, le taux de chômage et les grandes entreprises de 70+ pays de 2000 à 2025. Données FMI et Banque mondiale.",
       keywords: [
@@ -111,9 +117,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ],
       alternates: { canonical: "/map/economy" },
       openGraph: {
-        title: "Carte PIB par pays 2025 — Économie mondiale | The Essential Data",
+        title: "Carte PIB par pays 2025 · Économie mondiale | The Essential Data",
         description:
-          "PIB, dette publique, chômage et entreprises pour 70+ pays de 2000 à 2025. Projections FMI avril 2025 — vue YTD en temps réel.",
+          "PIB, dette publique, chômage et entreprises pour 70+ pays de 2000 à 2025. Projections FMI avril 2025, vue YTD en temps réel.",
         type: "website",
       },
     };
@@ -121,9 +127,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (theme === "politics") {
     return {
-      title: "Carte politique mondiale — Régimes et orientations politiques 1900–2025",
+      title: "Carte politique mondiale · Régimes et orientations politiques 1900-2025",
       description:
-        "Explorez les régimes politiques et les orientations idéologiques de 20+ pays depuis 1900. Démocraties, dictatures, totalitarismes — naviguez sur une frise chronologique interactive.",
+        "Explorez les régimes politiques et les orientations idéologiques de 20+ pays depuis 1900. Démocraties, dictatures, totalitarismes, naviguez sur une frise chronologique interactive.",
       keywords: [
         "carte politique mondiale",
         "régimes politiques par pays",
@@ -135,7 +141,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ],
       alternates: { canonical: "/map/politics" },
       openGraph: {
-        title: "Carte politique mondiale 1900–2025 — The Essential Data",
+        title: "Carte politique mondiale 1900-2025 · The Essential Data",
         description:
           "Régimes et orientations politiques de 20+ pays depuis 1900. Frise chronologique interactive.",
         type: "website",
@@ -144,7 +150,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   return {
-    title: `${themeData.label} — Carte interactive`,
+    title: `${themeData.label} · Carte interactive`,
     description: themeData.description,
     alternates: { canonical: `/map/${theme}` },
   };
@@ -160,14 +166,24 @@ export default async function MapPage({ params, searchParams }: PageProps) {
     notFound();
   }
 
-  const faqs = getFaqsByTheme(theme);
   const themeArticles = getArticlesByTheme(theme);
   const initialYear = year ? parseInt(year) : 117;
 
   const isEpidemics = theme === "epidemics";
   const isEconomy = theme === "economy";
+
+  // The economy page drops the reference tables that used to sit under the
+  // map; the same figures are carried by the FAQ instead, where they land in
+  // the FAQPage structured data rather than in a table crawlers skim past.
+  const faqs = isEconomy
+    ? [
+        ...getFaqsByTheme(theme),
+        ...buildEconomyDataFaqs(ECONOMY_YEARS.find((y) => y.year === DEFAULT_YEAR)),
+      ]
+    : getFaqsByTheme(theme);
   const isPolitics = theme === "politics";
   const isMilitary = theme === "military";
+  const showCategoryHero = hasCategoryHero(theme);
   const datasetSchema = DATASET_SCHEMAS[theme];
 
   return (
@@ -178,7 +194,13 @@ export default async function MapPage({ params, searchParams }: PageProps) {
           dangerouslySetInnerHTML={{ __html: jsonLdString(datasetSchema) }}
         />
       )}
-      {/* Page header */}
+      {/* Full-viewport category introduction — themes with a hero configuration
+          get the globe scene, the others keep the compact text header. */}
+      {showCategoryHero && <CategoryHero themeId={theme} />}
+
+      {/* Page header — replaced by the hero above when one is configured, so
+          the page keeps exactly one H1. */}
+      {!showCategoryHero && (
       <div className="max-w-7xl mx-auto px-6 pt-10 pb-6">
         <div className="mb-2">
           <span className="accent-badge text-xs capitalize">{themeData.label}</span>
@@ -198,9 +220,9 @@ export default async function MapPage({ params, searchParams }: PageProps) {
         </h1>
         <p className="text-body" style={{ maxWidth: "600px" }}>
           {isEpidemics
-            ? "Visualisez l'impact de cinq grandes épidémies — Peste Noire, COVID-19, VIH/SIDA, Hantavirus et HMPV 2025 — pays par pays. Cas confirmés, décès et taux de létalité. Vue YTD disponible pour les maladies actives."
+            ? "Visualisez l'impact de cinq grandes épidémies, Peste Noire, COVID-19, VIH/SIDA, Hantavirus et HMPV 2025, pays par pays. Cas confirmés, décès et taux de létalité. Vue YTD disponible pour les maladies actives."
             : isEconomy
-            ? "Comparez le PIB, la dette publique, le chômage et les entreprises de 70+ pays de 2000 à 2025. Projections FMI avril 2025 — vue en temps réel (YTD) disponible pour l'année en cours."
+            ? "Comparez le PIB, la dette publique, le chômage et les entreprises de 70+ pays de 2000 à 2025. Projections FMI avril 2025, vue en temps réel (YTD) disponible pour l'année en cours."
             : isPolitics
             ? "Explorez les régimes politiques et les orientations idéologiques de 20+ pays depuis 1900. Naviguez sur la frise chronologique pour voir comment le monde politique a évolué d'une décennie à l'autre."
             : isMilitary
@@ -210,9 +232,15 @@ export default async function MapPage({ params, searchParams }: PageProps) {
             : themeData.description}
         </p>
       </div>
+      )}
 
-      {/* Interactive map */}
-      <div className="max-w-7xl mx-auto px-6 pb-8">
+      {/* Interactive map — the economy view lays out its own full-bleed
+          sections (mint ground edge to edge, ad rails in the margins), so it
+          is not wrapped in the centred content column the other themes use. */}
+      <ScrollReveal
+        className={isEconomy ? undefined : "max-w-7xl mx-auto px-6 pb-8"}
+        offset={showCategoryHero ? 0 : undefined}
+      >
         <Suspense
           fallback={
             <div
@@ -235,7 +263,7 @@ export default async function MapPage({ params, searchParams }: PageProps) {
             <MapViewLoader theme={themeData.id as ThemeId} initialYear={initialYear} />
           )}
         </Suspense>
-      </div>
+      </ScrollReveal>
 
       {/* Articles — only for empires; other themes use MapArticleSection built into their map views */}
       {themeArticles.length > 0 && !isEconomy && !isEpidemics && !isPolitics && !isMilitary && (
@@ -248,11 +276,29 @@ export default async function MapPage({ params, searchParams }: PageProps) {
         </div>
       )}
 
-      {/* Data summary for crawlers */}
-      <ServerDataSummary theme={theme} />
+      {/* Data summary for crawlers — economy serves the same figures through
+          its FAQ, so the table block is not rendered twice. */}
+      {!isEconomy && <ServerDataSummary theme={theme} />}
 
-      {/* FAQ */}
-      {faqs.length > 0 && <FAQSection items={faqs} />}
+      {/* FAQ — on the economy page it is the last stop of the scroll run, so
+          it carries the same anchor class as the sections above it. */}
+      {faqs.length > 0 &&
+        (isEconomy ? (
+          // The FAQ is the last stop of the run, so it takes a banner on both
+          // sides where the margin rails cannot fit — nothing follows it to
+          // carry one.
+          <div className="eco-snap-target">
+            <div className="max-w-7xl mx-auto px-6">
+              <AdBanner />
+            </div>
+            <FAQSection items={faqs} />
+            <div className="max-w-7xl mx-auto px-6 pb-10">
+              <AdBanner />
+            </div>
+          </div>
+        ) : (
+          <FAQSection items={faqs} />
+        ))}
     </Layout>
   );
 }

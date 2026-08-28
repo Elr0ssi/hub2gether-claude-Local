@@ -1,4 +1,5 @@
-import { ECONOMY_YEARS } from "@/data/economy/economy";
+import { ECONOMY_YEARS, SOURCES_SOCLE } from "@/data/economy/economy";
+import { countryFr } from "@/data/countryNamesFr";
 import { EPIDEMICS } from "@/data/epidemics/epidemics";
 import { getMilitaryData } from "@/data/military/military";
 import { POLITICS_COUNTRIES } from "@/data/politics/politics";
@@ -59,21 +60,37 @@ function EconomySummary() {
   if (!year2025) return null;
 
   const entries = Object.entries(year2025.countries);
+  const mds = (v: number) => Math.round(v).toLocaleString("fr-FR");
 
-  const topGdp = [...entries]
-    .sort((a, b) => b[1].gdp - a[1].gdp)
+  const topGdp = entries
+    .filter(([, d]) => d.gdp !== undefined)
+    .sort((a, b) => (b[1].gdp ?? 0) - (a[1].gdp ?? 0))
     .slice(0, 15)
-    .map(([name, d], i) => [i + 1, name, `${d.gdp.toLocaleString("fr-FR")} Mds €`, `${d.debt_ratio} %`, `${d.unemployment} %`]);
+    .map(([name, d], i) => [
+      i + 1,
+      countryFr(name),
+      `${mds(d.gdp ?? 0)} Mds €`,
+      d.debt_ratio === undefined ? "-" : `${d.debt_ratio} %`,
+      d.unemployment === undefined ? "-" : `${d.unemployment} %`,
+    ]);
 
-  const topDebt = [...entries]
-    .filter(([, d]) => d.debt_ratio != null)
-    .sort((a, b) => b[1].debt_ratio - a[1].debt_ratio)
+  const topDebt = entries
+    .filter(([, d]) => d.debt_ratio !== undefined)
+    .sort((a, b) => (b[1].debt_ratio ?? 0) - (a[1].debt_ratio ?? 0))
     .slice(0, 15)
-    .map(([name, d], i) => [i + 1, name, `${d.debt_ratio} %`, `${(d.debt_amount ?? 0).toLocaleString("fr-FR")} Mds €`]);
+    .map(([name, d], i) => [
+      i + 1,
+      countryFr(name),
+      `${d.debt_ratio} %`,
+      d.debt_amount === undefined ? "-" : `${mds(d.debt_amount)} Mds €`,
+    ]);
 
   return (
     <section aria-label="Données économiques mondiales 2025">
-      <h2>Top 15 PIB mondial 2025 (FMI)</h2>
+      <h2>Top 15 PIB mondial 2025</h2>
+      <p style={{ fontSize: "0.75rem", color: "var(--ink-3)", margin: "0 0 0.6rem" }}>
+        Source : {SOURCES_SOCLE.gdp.source}.
+      </p>
       <Table
         headers={["#", "Pays", "PIB (Mds €)", "Dette/PIB", "Chômage"]}
         rows={topGdp}
@@ -111,14 +128,14 @@ function EpidemicsSummary() {
 
   return (
     <section aria-label="Données épidémies mondiales">
-      <h2>COVID-19 — Top 15 pays par décès cumulés (source OMS)</h2>
+      <h2>COVID-19 · Top 15 pays par décès cumulés (source OMS)</h2>
       <Table
         headers={["#", "Pays", "Cas confirmés", "Décès"]}
         rows={topDeaths}
       />
       {topHiv.length > 0 && (
         <>
-          <h3 style={{ marginTop: "1.5rem" }}>VIH/SIDA — Top 10 pays prévalence (source ONUSIDA)</h3>
+          <h3 style={{ marginTop: "1.5rem" }}>VIH/SIDA · Top 10 pays prévalence (source ONUSIDA)</h3>
           <Table
             headers={["#", "Pays", "Personnes infectées", "Décès cumulés"]}
             rows={topHiv}
@@ -161,7 +178,7 @@ function PoliticsSummary() {
   const currentLeaders = POLITICS_COUNTRIES.map((country) => {
     const current = country.periods.find((p) => p.from <= currentYear && p.to >= currentYear);
     if (!current) return null;
-    return [country.name, current.regime, current.orientation, current.leader, current.party ?? "—"];
+    return [country.name, current.regime, current.orientation, current.leader, current.party ?? "-"];
   }).filter(Boolean) as (string | number)[][];
 
   return (
@@ -179,12 +196,12 @@ function EmpiresSummary() {
   const rows = ROMAN_TIMELINE.map((entry) => [
     entry.year > 0 ? `${entry.year} ap. J.-C.` : `${Math.abs(entry.year)} av. J.-C.`,
     entry.label,
-    entry.description ?? "—",
+    entry.description ?? "-",
   ]);
 
   return (
     <section aria-label="Chronologie empire romain">
-      <h2>Chronologie de l&apos;Empire romain — 500 av. J.-C. à 1453 ap. J.-C.</h2>
+      <h2>Chronologie de l&apos;Empire romain, 500 av. J.-C. à 1453 ap. J.-C.</h2>
       <Table
         headers={["Année", "Période", "Description"]}
         rows={rows}

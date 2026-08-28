@@ -381,23 +381,11 @@ body {
 
 @media (min-width: 900px) {
   .hero-section-wrapper {
-    height: 500vh;
+    height: 400vh;
   }
   .hero-sticky {
     position: sticky;
     top: 0;
-  }
-  .hero-grid {
-    grid-template-columns: 42% 58% !important;
-  }
-  .hero-articles-col {
-    display: flex !important;
-  }
-}
-
-@media (max-width: 899px) {
-  .hero-articles-col {
-    display: none !important;
   }
 }
 
@@ -481,4 +469,503 @@ body {
 
 .rsm-geography:focus {
   outline: none;
+}
+
+/* ============================================
+   PRÉSENTATION 2 — snap between scrollytelling acts
+   Scoped with :has() so the rule is inert on every other page. `proximity`
+   (not `mandatory`) so it only pulls near a boundary and never fights the
+   long sticky runways in between.
+   ============================================ */
+
+/* No scroll snapping on the home page. Snapping between the hero and the map
+   scene pulled the reader down off the globe on its own, which read as the
+   page taking over; the descent is an ordinary scroll now. The anchors stay
+   as position markers — the locked pair between the last category and the
+   articles is driven in JS, not by CSS. */
+.p2-snap-target {
+  scroll-margin-top: var(--navbar-height);
+}
+
+/* ============================================
+   Economy category — full-height sections
+   The map, the ranking table and the articles each own a viewport. The ground
+   stays the page's own, and the only decoration is the sheaf of curves drawn
+   behind each card, which drifts with the scroll. A scroll gesture inside the
+   run moves to the next section in one step (see useScrollTeleport); the CSS
+   snap below is the fallback when that stands down.
+   ============================================ */
+
+/* No CSS scroll snapping here. The roll animates the scroll position over
+   ~1.7s; snapping would treat every frame of that as a scroll that has ended
+   and yank the page onto the nearest stop, which is exactly the drop the roll
+   exists to remove. The anchors stay as position markers for the hook. */
+.eco-snap-target {
+  scroll-margin-top: var(--navbar-height);
+}
+
+.eco-section {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: calc(100vh - var(--navbar-height));
+  padding: clamp(20px, 3.5vh, 44px) 0;
+}
+
+.eco-section-body {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 0 clamp(16px, 3vw, 40px);
+}
+
+/* The row inside the arrival wrapper is what actually holds the three
+   columns; the wrapper between them is only there to animate. */
+.eco-section-row {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 28px;
+  width: 100%;
+}
+
+.eco-section-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 1280px;
+}
+
+/* Tighter gutters and gaps below the desktop breakpoint, so the rails and the
+   content both fit on a laptop instead of the rails being dropped. */
+@media (max-width: 1439px) {
+  .eco-section-body { padding: 0 clamp(12px, 1.6vw, 24px); }
+  .eco-section-row { gap: 18px; }
+}
+
+/* ── Ad slots ─────────────────────────────────────────────────────────────
+   Two shapes for one job. Above 1180px the margins carry vertical rails; the
+   content column gives way instead of forcing them off screen, which is why
+   they used to vanish on a laptop and only appear on an external display.
+   Below that the same slot lies down above the block it belongs to, so the
+   reader keeps the full width for the map, the ranking and the articles. */
+.eco-ad-rail {
+  display: none;
+  flex: 0 0 140px;
+  width: 140px;
+}
+
+.eco-ad-banner { display: block; width: 100%; margin-bottom: 16px; }
+
+@media (min-width: 1180px) {
+  .eco-ad-rail { display: block; flex-basis: 140px; width: 140px; }
+  .eco-ad-banner { display: none; }
+}
+
+@media (min-width: 1440px) {
+  .eco-ad-rail { flex-basis: 160px; width: 160px; }
+  .eco-ad-slot { width: 160px; }
+}
+
+.eco-ad-banner-slot {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  width: 100%;
+  max-width: 970px;
+  margin: 0 auto;
+  height: 90px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.eco-ad-banner-visual {
+  position: relative;
+  flex: 0 0 34%;
+  max-width: 260px;
+  background: linear-gradient(120deg, #0B2F1D 0%, #114A2C 60%, #0D7A40 100%);
+}
+
+.eco-ad-banner-tag {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  padding: 2px 7px;
+  border-radius: 100px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(57, 255, 136, 0.35);
+  color: #39ff88;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.eco-ad-banner-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.eco-ad-banner-title {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #0d7a40;
+}
+
+.eco-ad-banner-rules { display: flex; flex-direction: column; gap: 6px; }
+.eco-ad-banner-rules > span {
+  height: 6px;
+  border-radius: 100px;
+  background: var(--surface-2);
+}
+
+.eco-ad-banner-size {
+  flex: 0 0 auto;
+  align-self: center;
+  margin-right: 14px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+  color: var(--ink-4);
+  font-size: 0.58rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* On a phone the visual half would leave no room for anything else. */
+@media (max-width: 560px) {
+  .eco-ad-banner-slot { height: 76px; gap: 12px; }
+  .eco-ad-banner-visual { flex-basis: 38%; }
+  .eco-ad-banner-size { display: none; }
+  .eco-ad-banner-title { font-size: 0.58rem; letter-spacing: 0.06em; }
+  .eco-ad-banner-copy { padding-right: 12px; }
+}
+
+.eco-ad-slot {
+  width: 140px;
+  position: sticky;
+  top: calc(var(--navbar-height) + 24px);
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  max-height: calc(100vh - var(--navbar-height) - 96px);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+/* Recommendation carousel — a slim rail so the horizontal overflow is
+   discoverable without the scrollbar sitting on top of the cards. */
+.reco-rail {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(57, 255, 136, 0.45) transparent;
+}
+.reco-rail::-webkit-scrollbar { height: 6px; }
+.reco-rail::-webkit-scrollbar-track { background: transparent; }
+.reco-rail::-webkit-scrollbar-thumb {
+  background: rgba(57, 255, 136, 0.45);
+  border-radius: 100px;
+}
+.reco-rail::-webkit-scrollbar-thumb:hover { background: rgba(57, 255, 136, 0.7); }
+
+/* ============================================
+   Présentation 2 — scroll runways
+   The reduced-motion collapse lives here rather than in a JS branch: asking
+   `useReducedMotion` during render makes the server markup and the first
+   client render disagree, which is a hydration error on precisely the
+   machines that asked for less motion.
+   ============================================ */
+
+.p2-hero-runway {
+  position: relative;
+  height: 190vh;
+  /* La piste n'est qu'une longueur de défilement : elle ne doit rien
+     intercepter. Seul son panneau collant compte, et lui reprend la main. */
+  pointer-events: none;
+  /* Above the story scene, which is pulled up underneath it: the hero's pane
+     always paints over the scene until it has scrolled out. */
+  z-index: 2;
+}
+
+.p2-story-runway {
+  position: relative;
+  z-index: 1;
+  height: calc(var(--p2-story-vh, 500) * 1vh);
+  /* Pulled up by exactly one sticky panel, so this scene pins in the very box
+     the hero's pane occupied, at the very frame the hero unpins. The pane and
+     the real panel then show the same content in the same place: the hero
+     slides up over an identical image and the swap cannot be seen. Any other
+     offset and the reader watches two copies of the section pass each other. */
+  margin-top: calc(-100vh + var(--navbar-height));
+}
+
+.p2-story-stage {
+  position: sticky;
+  top: var(--navbar-height);
+  height: calc(100vh - var(--navbar-height));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p2-hero-runway { height: 100vh; }
+  .p2-story-runway { height: auto; margin-top: 0; }
+  .p2-story-stage { position: relative; top: auto; height: auto; }
+}
+
+/* ── Test article — the format under trial ────────────────────────────────
+   Three two-column rows that all collapse at the same width, so the reading
+   column never has to hold a chart and a commentary side by side once there
+   is no room for both. */
+.ta-open-row,
+.ta-chart-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 26px;
+  align-items: start;
+}
+
+.ta-perspective-row,
+.ta-source-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+@media (min-width: 760px) {
+  .ta-source-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 900px) {
+  .ta-open-row { grid-template-columns: minmax(0, 1fr) 300px; gap: 34px; }
+  .ta-chart-row { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 32px; }
+  .ta-perspective-row { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+}
+
+/* Une page de lecture, pas une carte : sur un téléphone la gouttière commune
+   à la section économie (12px) collait le texte au bord de l'écran. Ici la
+   colonne garde une marge où poser le pouce et l'œil. */
+@media (max-width: 1179px) {
+  .ta-page.eco-section-body { padding-left: clamp(18px, 5vw, 28px); padding-right: clamp(18px, 5vw, 28px); }
+}
+
+@media (max-width: 640px) {
+  .ta-open-row,
+  .ta-chart-row { gap: 20px; }
+  .ta-perspective-row,
+  .ta-source-row { gap: 11px; }
+}
+
+/* ── Leaflet — the interactive world map ──────────────────────────────────
+   Leaflet paints its own chrome; three things of it have to be answered. */
+
+/* A clicked country is an SVG path, and the browser rings a focused path with
+   a rectangle — the box that appeared around a country the moment it was
+   selected. The selection is already drawn in the path's own stroke. */
+.leaflet-container .leaflet-interactive:focus,
+.leaflet-container .leaflet-interactive:focus-visible {
+  outline: none;
+}
+
+/* ── Petits écrans : l'échelle de la page économie ────────────────────────
+   La page est composée pour un grand écran. En dessous, ce n'est pas la
+   disposition qui gêne — elle passe déjà en colonne — mais la taille : les
+   chiffres, les cartes et le panneau de détail gardent leur corps de bureau
+   et le lecteur ne voit plus un pays d'un seul tenant.
+
+   Les tailles viennent de classes utilitaires, donc une règle plus
+   spécifique les reprend. Ce qui est écrit en style inline est traité dans
+   les composants, où seul `clamp()` peut gagner. */
+
+@media (max-width: 1023px) {
+  .eco-snap .text-3xl { font-size: 1.5rem; line-height: 1.15; }
+  .eco-snap .text-2xl { font-size: 1.3rem; line-height: 1.15; }
+  .eco-snap .text-xl { font-size: 1.1rem; line-height: 1.2; }
+  .eco-snap .text-base { font-size: 0.92rem; }
+  .eco-snap .text-sm { font-size: 0.84rem; }
+}
+
+@media (max-width: 640px) {
+  .eco-snap .text-3xl { font-size: 1.28rem; }
+  .eco-snap .text-2xl { font-size: 1.12rem; }
+  .eco-snap .text-xl { font-size: 1rem; }
+  .eco-snap .text-base { font-size: 0.86rem; }
+  .eco-snap .text-sm { font-size: 0.8rem; }
+  .eco-snap .text-xs { font-size: 0.7rem; }
+
+  /* Les cartes d'articles recommandées : une carte pleine largeur plutôt
+     qu'une carte de bureau qui déborde du pouce. */
+  .eco-snap .w-72 { width: 15rem; }
+}
+
+/* ── Le panneau de détail d'un pays ───────────────────────────────────────
+   En feuille sur la carte, il dispose de toute la hauteur de la rangée ; ce
+   qui reste à gagner est de l'air. On resserre les blocs et on descend d'un
+   cran les tailles, pour que le pays se lise d'un seul tenant plutôt qu'en
+   deux écrans de défilement interne. */
+@media (max-width: 1023px) {
+  .eco-panel .px-4 { padding-left: 0.8rem; padding-right: 0.8rem; }
+  .eco-panel .py-4 { padding-top: 0.7rem; padding-bottom: 0.7rem; }
+  .eco-panel .py-3 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+  .eco-panel .px-3 { padding-left: 0.6rem; padding-right: 0.6rem; }
+  .eco-panel .py-2\.5 { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+  .eco-panel .py-2 { padding-top: 0.35rem; padding-bottom: 0.35rem; }
+  .eco-panel .gap-5 { gap: 0.75rem; }
+  .eco-panel .gap-3 { gap: 0.5rem; }
+  .eco-panel .gap-2 { gap: 0.375rem; }
+  .eco-panel .gap-1\.5 { gap: 0.25rem; }
+  .eco-panel .py-16 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+  .eco-panel .text-3xl { font-size: 1.5rem; line-height: 1.1; }
+  .eco-panel .text-2xl { font-size: 1.3rem; line-height: 1.1; }
+  .eco-panel .text-xl { font-size: 1.1rem; line-height: 1.15; }
+  .eco-panel .text-base { font-size: 0.9rem; }
+  .eco-panel .text-sm { font-size: 0.82rem; }
+  .eco-panel .text-xs { font-size: 0.72rem; }
+}
+
+@media (max-width: 640px) {
+  .eco-panel .px-4 { padding-left: 0.7rem; padding-right: 0.7rem; }
+  .eco-panel .py-4 { padding-top: 0.55rem; padding-bottom: 0.55rem; }
+  .eco-panel .gap-5 { gap: 0.6rem; }
+  .eco-panel .text-3xl { font-size: 1.32rem; }
+  .eco-panel .text-2xl { font-size: 1.16rem; }
+  .eco-panel .text-xl { font-size: 1rem; }
+  .eco-panel .text-base { font-size: 0.84rem; }
+  .eco-panel .text-sm { font-size: 0.78rem; }
+  .eco-panel .text-xs { font-size: 0.68rem; }
+}
+
+/* ── Le classement mondial ────────────────────────────────────────────────
+   Cinq colonnes tiennent sur un écran large ; sur un téléphone elles
+   poussaient le chiffre principal hors du cadre. On garde le rang, le pays et
+   la mesure affichée par la carte — les autres restent accessibles en
+   changeant de mesure, et figurent dans la fiche du pays. */
+@media (max-width: 640px) {
+  .eco-rank-extra { display: none; }
+  /* Un nom long se replie plutôt que de pousser le chiffre hors du cadre. */
+  .eco-rank-country { white-space: normal !important; }
+  .eco-snap table .px-4 { padding-left: 0.55rem; padding-right: 0.55rem; }
+  .eco-snap table .px-3 { padding-left: 0.45rem; padding-right: 0.45rem; }
+  .eco-snap table .py-2\.5 { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ÉCRAN D'ORDINATEUR PORTABLE
+
+   Une page réglée pour un grand écran n'est pas seulement « un peu serrée »
+   sur un portable : elle est fausse. 1280x800, c'est 470px de hauteur utile
+   une fois la barre, le titre et le pied de section déduits — la moitié d'un
+   moniteur de bureau. Ce palier ramène l'échelle à cette hauteur-là. Il se
+   déclenche sur la largeur d'un portable ou sur sa hauteur, parce qu'un
+   portable branché sur un grand écran garde sa largeur mais gagne la place.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── La barre de navigation ───────────────────────────────────────────────
+   Huit onglets, un logo et un bouton : à 1280px la somme dépassait la
+   colonne et « Comparer » sortait de l'écran. On resserre la rangée plutôt
+   que d'en retirer un onglet. */
+@media (max-width: 1599px) {
+  .site-nav-row { gap: 1.1rem; padding-left: 1rem; padding-right: 1rem; }
+  .site-nav-row nav > a,
+  .site-nav-row nav > div { padding-left: 0.42rem; padding-right: 0.42rem; font-size: 0.82rem; }
+}
+
+@media (max-width: 1279px) {
+  .site-nav-row { gap: 0.7rem; }
+  .site-nav-row nav > a,
+  .site-nav-row nav > div { padding-left: 0.3rem; padding-right: 0.3rem; font-size: 0.78rem; }
+}
+
+/* Sur un écran bas, la barre elle-même rend 8px à la page. Tout ce qui se
+   mesure à partir d'elle suit, la variable étant la seule source. */
+@media (max-height: 900px) {
+  :root { --navbar-height: 56px; }
+  .site-nav { height: 56px; }
+}
+
+/* ── La page économie ─────────────────────────────────────────────────────
+   Le même cran de réduction que sur une tablette : les titres, les chiffres
+   et l'air entre les blocs. */
+@media (max-width: 1279px), (max-height: 900px) {
+  .eco-snap .text-3xl { font-size: 1.5rem; line-height: 1.15; }
+  .eco-snap .text-2xl { font-size: 1.3rem; line-height: 1.15; }
+  .eco-snap .text-xl { font-size: 1.1rem; line-height: 1.2; }
+  .eco-snap .text-base { font-size: 0.92rem; }
+  .eco-snap .text-sm { font-size: 0.84rem; }
+
+  /* La fiche d'un pays : à 470px de rangée elle débordait de sa colonne. */
+  .eco-panel .px-4 { padding-left: 0.8rem; padding-right: 0.8rem; }
+  .eco-panel .py-4 { padding-top: 0.7rem; padding-bottom: 0.7rem; }
+  .eco-panel .py-3 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+  .eco-panel .px-3 { padding-left: 0.6rem; padding-right: 0.6rem; }
+  .eco-panel .py-2\.5 { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+  .eco-panel .py-2 { padding-top: 0.35rem; padding-bottom: 0.35rem; }
+  .eco-panel .gap-5 { gap: 0.7rem; }
+  .eco-panel .gap-3 { gap: 0.5rem; }
+  .eco-panel .gap-2 { gap: 0.375rem; }
+  .eco-panel .gap-1\.5 { gap: 0.25rem; }
+  .eco-panel .text-3xl { font-size: 1.4rem; line-height: 1.1; }
+  .eco-panel .text-2xl { font-size: 1.24rem; line-height: 1.1; }
+  .eco-panel .text-xl { font-size: 1.05rem; line-height: 1.15; }
+  .eco-panel .text-base { font-size: 0.88rem; }
+  .eco-panel .text-sm { font-size: 0.8rem; }
+  .eco-panel .text-xs { font-size: 0.7rem; }
+}
+
+/* ── Le test article ──────────────────────────────────────────────────────
+   Une colonne de lecture reste une colonne de lecture, mais ses titres de
+   partie et ses encadrés étaient dimensionnés pour un grand écran. */
+/* La FAQ ferme la course de sections de la page économie. Elle dépassait
+   l'écran d'une centaine de pixels, et une section plus haute que l'écran est
+   lue au défilement et non au saut : le lecteur défilait un peu avant que la
+   section suivante n'arrive, ce qui se ressent comme un accroc. Resserrée,
+   elle redevient un arrêt franc. */
+@media (max-height: 900px) {
+  .eco-snap-target > section { padding-top: 28px; padding-bottom: 28px; }
+  .eco-snap-target .mb-10 { margin-bottom: 1rem; }
+  .eco-snap-target .pb-10 { padding-bottom: 1rem; }
+  .eco-snap-target .grid.gap-4 { gap: 0.6rem; }
+  .eco-snap-target .card .px-5 { padding-left: 0.9rem; padding-right: 0.9rem; }
+  .eco-snap-target .card .py-4 { padding-top: 0.55rem; padding-bottom: 0.55rem; }
+}
+
+@media (max-height: 900px) {
+  .ta-page .ta-open-row,
+  .ta-page .ta-chart-row { gap: 24px; }
+  /* Le bandeau, le titre et le chapeau occupaient l'écran entier avant le
+     premier paragraphe. */
+  .ta-hero-head { padding-top: 22px !important; }
+}
+
+/* La vignette d'une carte d'article. Le ratio vit ici et non en style inline,
+   pour qu'il puisse se raccourcir quand la carte se raccourcit. */
+.eco-card-media { aspect-ratio: 16 / 10; }
+
+@media (max-width: 640px) {
+  .eco-card-media { aspect-ratio: 16 / 7; }
+}
+
+/* Sur un écran très bas, la section des articles dépassait de quelques
+   dizaines de pixels, ce qui suffit à rendre son arrêt mou : une section plus
+   haute que l'écran se lit au défilement, pas au saut. La vignette est ce qui
+   se raccourcit le mieux sans rien retirer au lecteur. */
+@media (max-height: 780px) {
+  .eco-card-media { aspect-ratio: 16 / 7; }
+  .eco-snap .py-16 { padding-top: 2rem; padding-bottom: 2rem; }
+}
+
+/* Le classement sur un écran bas : des lignes un cran plus serrées, pour que
+   la fenêtre du tableau porte deux ou trois pays de plus sans grandir. */
+@media (max-height: 900px) {
+  .eco-snap table .py-2\.5 { padding-top: 0.4rem; padding-bottom: 0.4rem; }
 }

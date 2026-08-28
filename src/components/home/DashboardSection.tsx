@@ -58,7 +58,7 @@ const METRICS = [
     bg: "rgba(239,68,68,0.06)",
     border: "rgba(239,68,68,0.20)",
     Icon: Activity,
-    detail: "OMS · données 2020–2024",
+    detail: "OMS · données 2020-2024",
     href: "/map/epidemics",
     cols: 1,
   },
@@ -167,7 +167,7 @@ export function DashboardSection() {
           </div>
 
           <p style={{ fontSize: "0.92rem", color: "#6B6B6B", lineHeight: 1.6 }}>
-            Données de référence — FMI, Banque mondiale, OMS, SIPRI, V-Dem 2024–2025
+            Données de référence · FMI, Banque mondiale, OMS, SIPRI, V-Dem 2024-2025
           </p>
         </motion.div>
 

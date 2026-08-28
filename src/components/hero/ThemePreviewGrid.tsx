@@ -42,7 +42,7 @@ export function ThemePreviewGrid({ themes }: ThemePreviewGridProps) {
           </h2>
           <p className="text-body mx-auto" style={{ maxWidth: "520px", color: "var(--ink-3)" }}>
             Chaque thème offre un prisme analytique distinct pour comprendre
-            comment le monde s&apos;est construit — et comment il fonctionne aujourd&apos;hui.
+            comment le monde s&apos;est construit, et comment il fonctionne aujourd&apos;hui.
           </p>
         </motion.div>
       </div>
@@ -196,7 +196,7 @@ export function ThemePreviewGrid({ themes }: ThemePreviewGridProps) {
           }}
         >
           <Sparkles size={12} />
-          Nouvelles thématiques en développement — économie mondiale, conflits armés, mortalité
+          Nouvelles thématiques en développement · économie mondiale, conflits armés, mortalité
         </div>
       </motion.div>
     </section>

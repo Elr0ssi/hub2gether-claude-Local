@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, GeoJSON, ZoomControl } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, ZoomControl, useMap } from "react-leaflet";
 import type { FeatureCollection, Feature } from "geojson";
-import type { PathOptions, Layer } from "leaflet";
+import type { PathOptions, Layer, LatLngBoundsExpression } from "leaflet";
 import type { EconomyYear, EconomyMetricId } from "@/types";
 import { ECONOMY_METRICS } from "@/data/economy/economy";
 import {
@@ -36,6 +36,80 @@ const TILES = {
 
 export type LeafletTileStyle = keyof typeof TILES;
 
+/**
+ * The whole world and no further. Cut at ±85° because Mercator sends the poles
+ * to infinity — past that there is no map to show, only the blank the reader
+ * was falling into.
+ */
+const WORLD: LatLngBoundsExpression = [
+  [-85, -180],
+  [85, 180],
+];
+
+/**
+ * Unwraps rings that cross the antimeridian.
+ *
+ * Russia's arctic rings, Fiji and Antarctica each step straight from +179° to
+ * -180°. Drawn literally, the fill joins the far right of the map to the far
+ * left and lays a band of country colour across the whole width — the green
+ * bars at the top of the map, sitting at exactly Russia's arctic latitudes.
+ * Carrying an offset along the ring keeps it continuous; the part that ends up
+ * past ±180° falls outside the world bounds and is simply not shown.
+ */
+function unwrapAntimeridian(data: FeatureCollection): FeatureCollection {
+  const ring = (coords: number[][]) => {
+    let offset = 0;
+    for (let i = 1; i < coords.length; i++) {
+      const step = coords[i][0] + offset - coords[i - 1][0];
+      if (step > 180) offset -= 360;
+      else if (step < -180) offset += 360;
+      coords[i][0] += offset;
+    }
+  };
+
+  for (const feature of data.features) {
+    const geom = feature.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon | null;
+    if (!geom) continue;
+    const polygons =
+      geom.type === "Polygon"
+        ? [geom.coordinates as number[][][]]
+        : (geom.coordinates as number[][][][]);
+    for (const polygon of polygons) for (const r of polygon) ring(r);
+  }
+  return data;
+}
+
+/**
+ * Keeps the map full of map.
+ *
+ * Two faults have the same cause — a viewport free to leave the world. Below a
+ * certain zoom the projection is narrower than the box, which is where the
+ * bands above and below the map came from; and with no bounds the reader could
+ * drag the world off the side entirely. The floor is recomputed on resize
+ * because it depends on the box, not on the data.
+ */
+function HoldTheWorld() {
+  const map = useMap();
+
+  useEffect(() => {
+    const apply = () => {
+      // `inside` asks for the zoom at which the bounds *fill* the container
+      // rather than fit inside it: exactly the level below which bands appear.
+      const floor = map.getBoundsZoom(WORLD, true);
+      map.setMinZoom(floor);
+      map.setMaxBounds(WORLD);
+      if (map.getZoom() < floor) map.setZoom(floor);
+    };
+    apply();
+    map.on("resize", apply);
+    return () => {
+      map.off("resize", apply);
+    };
+  }, [map]);
+
+  return null;
+}
+
 interface EconomyLeafletMapProps {
   economyYear: EconomyYear;
   metric: EconomyMetricId;
@@ -62,8 +136,9 @@ export function EconomyLeafletMap({
     fetch(GEO_URL)
       .then((r) => r.json())
       .then((data: FeatureCollection) => {
-        cacheRef.current = data;
-        setGeoData(data);
+        const clean = unwrapAntimeridian(data);
+        cacheRef.current = clean;
+        setGeoData(clean);
       })
       .catch(() => {});
   }, []);
@@ -94,27 +169,11 @@ export function EconomyLeafletMap({
     };
   };
 
-  const formatValue = (name: string): string => {
-    const data = economyYear.countries[name];
-    if (!data) return name;
-    const v = data[metric] as number;
-    const unit = metricDef?.unit ?? "";
-    if (metric === "gdp" || metric === "companies") {
-      return `${name}<br/>${metricDef?.label} : <strong>${v.toLocaleString("fr-FR")} ${unit}</strong>`;
-    }
-    return `${name}<br/>${metricDef?.label} : <strong>${v.toLocaleString("fr-FR")} ${unit}</strong>`;
-  };
-
   const onEachFeature = (feature: Feature, layer: Layer) => {
     const name: string = (feature.properties as Record<string, string>)?.name ?? "";
     const hasData = Boolean(economyYear.countries[name]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const l = layer as any;
-
-    l.bindTooltip(
-      hasData ? formatValue(name) : name,
-      { direction: "auto", className: "leaflet-economy-tooltip" }
-    );
 
     if (hasData) {
       l.on("click", () => onCountryClick(name));
@@ -131,17 +190,26 @@ export function EconomyLeafletMap({
       <MapContainer
         center={[20, 10]}
         zoom={2}
-        minZoom={1}
         maxZoom={18}
+        // Fractional zoom, so the floor can sit exactly where the world fills
+        // the box instead of one whole level above or below it.
+        zoomSnap={0}
+        zoomDelta={0.4}
+        maxBounds={WORLD}
+        maxBoundsViscosity={1}
+        worldCopyJump={false}
         style={{ width: "100%", height: fillHeight ? "100%" : "480px", background: tileStyle === "satellite" ? "#0a0a0a" : "#F5F5F5" }}
         zoomControl={false}
       >
+        <HoldTheWorld />
         <ZoomControl position="topright" />
         <TileLayer
           key={tileStyle}
           url={TILES[tileStyle].url}
           attribution={TILES[tileStyle].attribution}
           maxZoom={18}
+          noWrap
+          bounds={WORLD}
         />
         {geoData && (
           <GeoJSON
@@ -180,18 +248,6 @@ export function EconomyLeafletMap({
         </p>
       </div>
 
-      <style>{`
-        .leaflet-economy-tooltip {
-          background: rgba(255,255,255,0.95);
-          border: 1px solid #E8E8E8;
-          border-radius: 8px;
-          padding: 6px 10px;
-          font-size: 12px;
-          color: #0A0A0A;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-        }
-        .leaflet-economy-tooltip::before { display: none; }
-      `}</style>
     </div>
   );
 }

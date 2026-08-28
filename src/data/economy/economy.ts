@@ -1,8 +1,6 @@
-import type { EconomyYear, EconomyMetric } from "@/types";
-import { getPopulationMillions } from "./populationData";
-import { getTradeBalanceBn } from "./tradeBalanceHistory";
-import { getDebtByCountry } from "./debtData";
+import type { EconomyYear, EconomyMetric, CountryEconomyData } from "@/types";
 import { getLaborByCountry } from "./laborData";
+import SOCLE from "./genere/socle-economie.json";
 
 export const ECONOMY_METRICS: EconomyMetric[] = [
   {
@@ -77,7 +75,13 @@ export const ECONOMY_METRICS: EconomyMetric[] = [
   },
 ];
 
-export const ECONOMY_YEARS: EconomyYear[] = [
+/* Les blocs ci-dessous sont ce qui reste de la saisie manuelle : dette,
+   chômage, nombre d'entreprises et principales sociétés, sur sept années. Le
+   PIB, le PIB par habitant, la balance extérieure et l'inflation qu'ils
+   portaient encore sont ignorés — la base les fournit, sur soixante-six
+   années. Ces blocs disparaîtront quand les CSV correspondants seront
+   importés à leur tour. */
+const SAISIE_MANUELLE: EconomyYear[] = [
   // ── 2000 ──────────────────────────────────────────────────────────────────
   {
     year: 2000,
@@ -518,7 +522,7 @@ export const ECONOMY_YEARS: EconomyYear[] = [
   {
     year: 2020,
     label: "2020",
-    dataNote: "Source : Banque mondiale, FMI, OIT. Année COVID — forte contraction mondiale.",
+    dataNote: "Source : Banque mondiale, FMI, OIT. Année COVID, forte contraction mondiale.",
     countries: {
       "United States of America": { gdp: 21_060, debt_ratio: 133, unemployment: 8.1,  companies: 32_000 },
       China:                       { gdp: 14_720, debt_ratio: 51,  unemployment: 5.6,  companies: 44_000 },
@@ -997,30 +1001,121 @@ export const ECONOMY_YEARS: EconomyYear[] = [
   },
 ];
 
-for (const yr of ECONOMY_YEARS) {
-  for (const [countryName, data] of Object.entries(yr.countries)) {
-    const population = getPopulationMillions(countryName, yr.year);
-    if (population) {
-      data.gdp_per_capita = Math.round((data.gdp * 1000) / population);
+/* ══ Raccordement à la base ═════════════════════════════════════════════════
+   ECONOMY_YEARS n'est plus une table écrite à la main : elle est construite
+   ici, année par année, à partir du socle. Les quatre indicateurs que la base
+   couvre — PIB, PIB par habitant, balance extérieure, inflation — viennent
+   d'elle et de nulle part ailleurs, sur les soixante-six années publiées.
+
+   Ce que cela règle : la frise proposait toutes les années mais ne disposait
+   que de sept jeux de chiffres, si bien que 2014, 2015, 2016 et 2017
+   affichaient le même PIB. Chaque année porte désormais ses propres valeurs.
+
+   Ce que cela laisse en suspens : la dette, le chômage et le nombre
+   d'entreprises restent saisis à la main sur sept années. Sur les autres, ils
+   sont absents — et un pays sans valeur sort en gris plutôt que d'hériter du
+   chiffre d'une année voisine, qui ne serait pas le sien. */
+
+type SocleFiche = { iso3: string; iso2: string; series: (number | null)[][] };
+const SOCLE_PAYS = SOCLE.pays as Record<string, SocleFiche>;
+
+/* Les séries d'un pays sont rangées dans l'ordre déclaré par le socle : on lit
+   cet ordre plutôt que de le supposer. */
+const CHAMPS_SOCLE = ([
+  ["gdp", "gdp"],
+  ["gdp_per_capita", "gdp_per_capita"],
+  ["trade_balance", "trade_balance"],
+  ["inflation", "inflation"],
+] as [string, keyof CountryEconomyData][]).map(
+  ([colonne, champ]) => [SOCLE.colonnes.indexOf(colonne), champ] as const
+);
+
+/* Trois pays étaient saisis sous un nom que le fond de carte n'emploie pas :
+   ils n'ont jamais été coloriés, faute d'être reconnus. Le socle utilise les
+   noms de la carte ; ces trois-là les rejoignent, avec leurs chiffres
+   manuels. */
+const ALIAS_CARTE: Record<string, string> = {
+  "Czech Republic": "Czechia",
+  "Dominican Republic": "Dominican Rep.",
+  "Ivory Coast": "Côte d'Ivoire",
+};
+
+const SAISIE_PAR_ANNEE = new Map<number, EconomyYear["countries"]>();
+for (const yr of SAISIE_MANUELLE) {
+  for (const [saisi, carte] of Object.entries(ALIAS_CARTE)) {
+    const data = yr.countries[saisi];
+    if (!data) continue;
+    yr.countries[carte] = { ...data, ...yr.countries[carte] };
+    delete yr.countries[saisi];
+  }
+  SAISIE_PAR_ANNEE.set(yr.year, yr.countries);
+}
+
+const NOTE_SOURCES =
+  "Sources : Banque mondiale (WDI) — PIB, PIB/hab., balance extérieure ; " +
+  "FMI (IFS) — inflation. Montants en milliards.";
+
+export const ECONOMY_YEARS: EconomyYear[] = SOCLE.annees.map((annee, rang) => {
+  const countries: EconomyYear["countries"] = {};
+
+  // 1. La base, seule source des quatre indicateurs qu'elle couvre.
+  for (const [nom, fiche] of Object.entries(SOCLE_PAYS)) {
+    const cellule: CountryEconomyData = {};
+    let porte = false;
+    for (const [serie, champ] of CHAMPS_SOCLE) {
+      const v = fiche.series[serie]?.[rang];
+      if (v === null || v === undefined) continue;
+      (cellule[champ] as number) = v;
+      porte = true;
     }
-    const tradeBalance = getTradeBalanceBn(countryName, yr.year);
-    if (tradeBalance !== undefined) {
-      data.trade_balance = tradeBalance;
-    }
-    data.debt_amount = Math.round((data.gdp * data.debt_ratio) / 100);
-    // Inflation, population active and âge de la retraite are single-snapshot
-    // values (no per-year history available) — applied flatly across every year.
-    const debt = getDebtByCountry(countryName);
-    if (debt) {
-      data.inflation = debt.inflation_2024;
-    }
-    const labor = getLaborByCountry(countryName);
-    if (labor) {
-      data.active_population = labor.active_population_millions;
-      data.retirement_age = labor.retirement_age;
+    // Une année que la source ne publie pas pour ce pays ne fait pas une
+    // entrée vide : le pays sort en gris, et le classement l'ignore.
+    if (porte) countries[nom] = cellule;
+  }
+
+  // 2. Ce qui reste saisi à la main, là où cette année-là a été saisie.
+  const saisie = SAISIE_PAR_ANNEE.get(annee);
+  if (saisie) {
+    for (const [nom, d] of Object.entries(saisie)) {
+      const cible = (countries[nom] ??= {});
+      if (d.debt_ratio !== undefined) cible.debt_ratio = d.debt_ratio;
+      if (d.unemployment !== undefined) cible.unemployment = d.unemployment;
+      if (d.companies !== undefined) cible.companies = d.companies;
+      if (d.top_companies !== undefined) cible.top_companies = d.top_companies;
     }
   }
+
+  // 3. Les grandeurs dérivées, calculées seulement quand leurs deux termes
+  //    existent — un montant de dette sans ratio de dette n'existe pas.
+  for (const [nom, d] of Object.entries(countries)) {
+    if (d.gdp !== undefined && d.debt_ratio !== undefined) {
+      d.debt_amount = Math.round((d.gdp * d.debt_ratio) / 100);
+    }
+    const labor = getLaborByCountry(nom);
+    if (labor) {
+      d.active_population = labor.active_population_millions;
+      d.retirement_age = labor.retirement_age;
+    }
+  }
+
+  const avecSaisie = saisie
+    ? " Dette, chômage et entreprises : estimations."
+    : " Dette, chômage et entreprises : non renseignés pour cette année.";
+  return {
+    year: annee,
+    label: String(annee),
+    dataNote: `${NOTE_SOURCES} Valeurs ${annee}.${avecSaisie}`,
+    countries,
+  };
+});
+
+/** Code ISO2 d'un pays, pour son drapeau. Absent si le pays n'est pas en base. */
+export function iso2DePays(name: string): string | undefined {
+  return SOCLE_PAYS[name]?.iso2;
 }
+
+/** Source d'affichage d'une métrique, telle que la base la déclare. */
+export const SOURCES_SOCLE = SOCLE.sources as Record<string, { indicateur: string; libelle: string; source: string }>;
 
 export function getYearData(year: number): EconomyYear | undefined {
   return ECONOMY_YEARS.find((y) => y.year === year);

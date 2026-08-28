@@ -1,0 +1,67 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SOUTENANCE 3 — LA PASSE TYPOGRAPHIQUE
+
+   La V2 avait été calibrée sur un écran de portable, pas sur un mur. Certains
+   textes descendaient à 13 px de scène : projetés, ils deviennent illisibles à
+   trois mètres, et ce sont souvent eux qui portent l'argument.
+
+   Tout ce fichier est enfermé sous `.ted-deck-v4`. La V1 et la V2 ne le voient
+   jamais : elles gardent exactement l'échelle qu'elles ont aujourd'hui.
+
+   RÈGLE APPLIQUÉE — rien de porteur de sens sous 18 px, rien du tout sous 16.
+   Là où le texte ne tient plus une fois grossi, c'est le texte qui a été
+   raccourci, jamais la police qui a été redescendue.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Les libellés de structure : sur-titres, index, intitulés de colonne. Ils ne
+   portent pas l'argument mais ils orientent la lecture, et à 13 px ils ne
+   l'orientaient plus. */
+.ted-deck-v4 .t-micro {
+  font-size: 18px;
+  letter-spacing: 0.13em;
+}
+
+.ted-deck-v4 .t-eyebrow {
+  font-size: 19px;
+  letter-spacing: 0.18em;
+}
+
+/* Le bas de l'échelle. `t-small` servait aussi bien à une légende qu'à une
+   explication de fond : au premier usage 17 px passait, au second non. */
+.ted-deck-v4 .t-small {
+  font-size: 21px;
+  line-height: 1.45;
+}
+
+.ted-deck-v4 .t-body {
+  font-size: 24px;
+  line-height: 1.5;
+}
+
+.ted-deck-v4 .t-lead {
+  font-size: 31px;
+}
+
+/* NOTE — une règle générale a été essayée ici, puis retirée : elle posait
+   `font-size: max(1em, 16px)` sur tous les p, span et div de la scène. Elle
+   remontait bien les petits textes, mais sa spécificité dépassait celle de
+   `.ted-deck .t-h2`, si bien que les titres tombaient eux aussi à 16 px. Un
+   filet de sécurité qui écrase ce qu'il protège n'en est pas un ; ce qui suit
+   vise nommément les tailles fautives. */
+
+/* Les tailles écrites en style en ligne échappent à toute règle de feuille :
+   c'est le cas des détails de nœuds du plan de travail, des compétences de la
+   slide équipe et des légendes de capture, tous figés à 13 ou 14 px dans les
+   composants repris de la V2.
+
+   Le sélecteur d'attribut vise exactement ces déclarations-là, et rien d'autre :
+   un élément dont le style en ligne dit « font-size:13px » est, par
+   construction, un des éléments à remonter. La V2, hors de ce scope, garde ses
+   valeurs. */
+.ted-deck-v4 .ted-stage [style*="font-size:13px"] {
+  font-size: 19px !important;
+}
+
+.ted-deck-v4 .ted-stage [style*="font-size:14px"] {
+  font-size: 20px !important;
+}

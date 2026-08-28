@@ -1,0 +1,402 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   THE ESSENTIAL DATA — PRESENTATION SYSTEM
+   Scoped stylesheet, loaded only by /presentation. Extends the product tokens
+   from globals.css (--accent, --ink-*, --surface, --ease-spring …) with a
+   projection-scale type ramp.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ted-deck {
+  /* ── Stage geometry ──────────────────────────────────────────────────── */
+  --stage-w: 1920px;
+  --stage-h: 1080px;
+  --gutter: 120px;
+
+  /* ── Deck surfaces ───────────────────────────────────────────────────── */
+  --deck-bg: #050505;
+  --slide-light: #fafafa;
+  --slide-white: #ffffff;
+  --slide-dark: #0a0a0a;
+
+  /* ── Ink on dark ─────────────────────────────────────────────────────── */
+  --ink-inv: #ffffff;
+  --ink-inv-2: rgba(255, 255, 255, 0.72);
+  --ink-inv-3: rgba(255, 255, 255, 0.48);
+  --ink-inv-4: rgba(255, 255, 255, 0.28);
+  --rule-inv: rgba(255, 255, 255, 0.14);
+
+  /* ── Rules ───────────────────────────────────────────────────────────── */
+  --rule: #ececec;
+  --rule-strong: #d8d8d8;
+
+  /* ── Motion ──────────────────────────────────────────────────────────── */
+  --ted-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  font-family: var(--font-inter), Inter, system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "cv11", "ss01", "ss02", "cv01", "cv09";
+}
+
+/* Deck takes over the viewport entirely. */
+.ted-deck-root {
+  position: fixed;
+  inset: 0;
+  background: var(--deck-bg);
+  overflow: hidden;
+  color: var(--ink);
+}
+
+/* ── Stage: fixed 1920×1080 design canvas, scaled to fit ───────────────── */
+.ted-stage-frame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* The stage keeps its 1920×1080 layout box and is only visually scaled, so it
+   is centred by anchoring its own centre to the frame's centre — `place-items:
+   center` would start-align it as soon as the box is wider than the frame
+   (which is exactly what happens once the presenter rail takes 400px). */
+.ted-stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--stage-w);
+  height: var(--stage-h);
+  margin-left: calc(var(--stage-w) / -2);
+  margin-top: calc(var(--stage-h) / -2);
+  transform-origin: center center;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TYPE RAMP — sized for 1920×1080 projection
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ted-deck .t-display-xl {
+  font-size: 148px;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 0.92;
+}
+
+.ted-deck .t-display {
+  font-size: 104px;
+  font-weight: 900;
+  letter-spacing: -0.042em;
+  line-height: 1.02;
+}
+
+.ted-deck .t-h1 {
+  font-size: 76px;
+  font-weight: 900;
+  letter-spacing: -0.038em;
+  line-height: 1.06;
+}
+
+.ted-deck .t-h2 {
+  font-size: 54px;
+  font-weight: 800;
+  letter-spacing: -0.032em;
+  line-height: 1.12;
+}
+
+.ted-deck .t-h3 {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.024em;
+  line-height: 1.2;
+}
+
+.ted-deck .t-lead {
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.011em;
+}
+
+.ted-deck .t-body {
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: -0.006em;
+}
+
+.ted-deck .t-small {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Uppercase micro-label — the product's signature eyebrow, scaled up. */
+.ted-deck .t-eyebrow {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.ted-deck .t-micro {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Numeric / mono-ish register for indices and data. */
+.ted-deck .t-index {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Editorial serif — reserved for pivotal accroches. Playfair Display is
+   already loaded by globals.css. */
+.ted-deck .t-editorial {
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.ted-deck .accent {
+  color: var(--accent);
+}
+
+/* Green underline used to connect / highlight a single data point. */
+.ted-deck .accent-rule {
+  background: var(--accent);
+  box-shadow: 0 0 18px rgba(57, 255, 136, 0.45);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHROME — progress, slide number, controls
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ted-chrome {
+  position: absolute;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.ted-chrome-progress {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.ted-controls {
+  position: absolute;
+  right: 28px;
+  bottom: 26px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.35s var(--ted-ease);
+}
+
+.ted-deck-root:hover .ted-controls,
+.ted-controls:focus-within {
+  opacity: 1;
+}
+
+.ted-ctrl {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.18s var(--ted-ease), color 0.18s var(--ted-ease),
+    border-color 0.18s var(--ted-ease);
+}
+
+.ted-ctrl:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.ted-ctrl-on-light {
+  color: var(--ink-4);
+}
+.ted-ctrl-on-light:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--ink);
+}
+
+.ted-ctrl-on-dark {
+  color: var(--ink-inv-3);
+}
+.ted-ctrl-on-dark:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.ted-ctrl:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PRESENTER MODE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ted-presenter-rail {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 400px;
+  background: #0d0d0d;
+  border-left: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 30px 30px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  color: var(--ink-inv-2);
+  z-index: 60;
+  overflow-y: auto;
+}
+
+.ted-presenter-block {
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  padding-top: 16px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   OVERVIEW (sommaire) — hidden by default, opened with "O"
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ted-overview {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  background: rgba(5, 5, 5, 0.985);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 56px 64px;
+  overflow-y: auto;
+}
+
+.ted-overview-item {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-inv-3);
+  cursor: pointer;
+  transition: background 0.16s var(--ted-ease), color 0.16s var(--ted-ease);
+}
+
+.ted-overview-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.ted-overview-item[data-active="true"] {
+  color: #fff;
+  border-color: rgba(57, 255, 136, 0.32);
+  background: rgba(57, 255, 136, 0.07);
+}
+
+.ted-overview-item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PLACEHOLDERS — media + data slots to be filled manually
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ted-media {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.018) 0%,
+    rgba(0, 0, 0, 0.045) 100%
+  );
+  border: 1px solid var(--rule);
+}
+
+.ted-media[data-tone="dark"] {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.035) 0%,
+    rgba(255, 255, 255, 0.012) 100%
+  );
+  border-color: var(--rule-inv);
+}
+
+/* Corner ticks — reads as a framing mark, not as a broken image. */
+.ted-media-tick {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border-color: var(--accent);
+  border-style: solid;
+  border-width: 0;
+  opacity: 0.5;
+}
+
+.ted-data-slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 11px;
+  border-radius: 7px;
+  background: rgba(57, 255, 136, 0.08);
+  border: 1px dashed rgba(57, 255, 136, 0.42);
+  color: #0d7a40;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.ted-data-slot[data-tone="dark"] {
+  color: var(--accent);
+  background: rgba(57, 255, 136, 0.07);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   REDUCED MOTION — kill every deck animation, keep the layout
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .ted-deck *,
+  .ted-deck *::before,
+  .ted-deck *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* En plein écran, les commandes s'effacent : la slide est projetée, elles
+   n'ont plus à figurer dans le champ. Le survol les rappelle, de sorte
+   qu'elles restent atteignables à la souris comme au clavier. */
+.ted-controls-hidden {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.ted-controls-hidden:hover,
+.ted-controls-hidden:focus-within {
+  opacity: 1;
+}

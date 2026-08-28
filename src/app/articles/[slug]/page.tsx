@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PUBS } from "@/data/pubs";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Clock, Tag, ExternalLink, Info } from "lucide-react";
@@ -55,7 +56,25 @@ function formatDate(iso: string, locale: string) {
   });
 }
 
-function AdSlot({ format }: { format: "vertical" | "horizontal" }) {
+function AdSlot({ format, slot }: { format: "vertical" | "horizontal"; slot?: 1 | 2 | 3 }) {
+  if (slot) {
+    return (
+      <div
+        style={{
+          width: format === "vertical" ? "160px" : "100%",
+          borderRadius: "8px",
+          overflow: "hidden",
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={PUBS[slot]}
+          alt="Publicité"
+          style={{ width: "100%", height: "auto", display: "block" }}
+        />
+      </div>
+    );
+  }
   const dim = format === "vertical"
     ? { width: "160px", height: "600px", label: "160×600" }
     : { width: "100%", height: "90px", label: "728×90" };
@@ -165,7 +184,7 @@ export default async function ArticlePage({ params }: PageProps) {
       <div className="flex justify-center gap-6">
         {/* Left ad — desktop only */}
         <aside className="hidden xl:flex flex-col flex-shrink-0 pt-10" style={{ width: "160px" }}>
-          <AdSlot format="vertical" />
+          <AdSlot format="vertical" slot={1} />
         </aside>
 
         {/* Article content column */}
@@ -238,7 +257,7 @@ export default async function ArticlePage({ params }: PageProps) {
             <span
               className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
               style={{ background: "rgba(57,255,136,0.12)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)" }}
-              title="Contenu synthétisé par IA à partir de sources vérifiées — Conformité EU AI Act"
+              title="Contenu synthétisé par IA à partir de sources vérifiées · Conformité EU AI Act"
             >
               <Info size={9} />
               Synthèse IA
@@ -362,7 +381,7 @@ export default async function ArticlePage({ params }: PageProps) {
                       )}
                       {(src.outlet || src.year) && (
                         <span style={{ color: "var(--ink-4)" }}>
-                          {" — "}
+                          {" · "}
                           {[src.outlet, src.year].filter(Boolean).join(", ")}
                         </span>
                       )}
@@ -384,7 +403,7 @@ export default async function ArticlePage({ params }: PageProps) {
 
         {/* Right ad — desktop only */}
         <aside className="hidden xl:flex flex-col flex-shrink-0 pt-10" style={{ width: "160px" }}>
-          <AdSlot format="vertical" />
+          <AdSlot format="vertical" slot={1} />
         </aside>
       </div>{/* end ad + article layout */}
 
