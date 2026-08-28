@@ -1414,14 +1414,17 @@ export function IdeaSlide() {
   );
 }
 
-export function LaterSlide() {
+export function LaterSlide({
+  /* Le surtitre. Absent, la V2 et la V3 gardent le leur. */
+  eyebrow,
+}: { eyebrow?: string } = {}) {
   const ink = useInk();
   const accent = useAccent();
   const { later } = STORY;
 
   return (
     <SlideBody>
-      <Eyebrow>{later.eyebrow}</Eyebrow>
+      <Eyebrow>{eyebrow ?? later.eyebrow}</Eyebrow>
       <Title lines={later.title} />
 
       <div

@@ -1814,7 +1814,7 @@ export const S4_VIEWS: Record<string, ComponentType> = {
   paradoxe: ParadoxSlide,
   attention: AttentionSlide,
   travail: ReaderWorkSlide,
-  reprise: HistorySlideRef,
+  reprise: () => <HistorySlideRef eyebrow="Huit ans d'histoire" />,
   reponse: AnswerSlide,
 
   /* Acte II — le produit */

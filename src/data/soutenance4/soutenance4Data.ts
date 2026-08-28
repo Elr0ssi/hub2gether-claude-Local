@@ -104,7 +104,7 @@ export const S4_SLIDES: readonly DeckSlide[] = [
   },
   {
     id: "reprise",
-    label: "Quatre ans d'histoire",
+    label: "Huit ans d'histoire",
     act: "probleme",
     seconds: 65,
     tone: "dark",
