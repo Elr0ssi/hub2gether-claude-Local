@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, GeoJSON, ZoomControl, useMap } from "react-leaflet";
+import { AttributionControl, MapContainer, TileLayer, GeoJSON, ZoomControl, useMap } from "react-leaflet";
 import type { FeatureCollection, Feature } from "geojson";
 import type { PathOptions, Layer, LatLngBoundsExpression } from "leaflet";
 import type { EconomyYear, EconomyMetricId } from "@/types";
@@ -30,7 +30,7 @@ const TILES = {
   satellite: {
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution:
-      "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
+      '&copy; <a href="https://www.esri.com/en-us/legal/copyright-trademarks" target="_blank" rel="noreferrer">Esri</a>',
   },
 } as const;
 
@@ -200,9 +200,11 @@ export function EconomyLeafletMap({
         worldCopyJump={false}
         style={{ width: "100%", height: fillHeight ? "100%" : "480px", background: tileStyle === "satellite" ? "#0a0a0a" : "#F5F5F5" }}
         zoomControl={false}
+        attributionControl={false}
       >
         <HoldTheWorld />
         <ZoomControl position="topright" />
+        <AttributionControl position="bottomright" prefix={false} />
         <TileLayer
           key={tileStyle}
           url={TILES[tileStyle].url}
@@ -221,7 +223,10 @@ export function EconomyLeafletMap({
         )}
       </MapContainer>
 
-      {/* Legend */}
+      {/* La legende. Absente en vue satellite : l'imagerie remplit deja le
+          cadre, et le pave blanc y masquait un coin de carte pour redire une
+          echelle que le panneau lateral donne en chiffres. */}
+      {tileStyle !== "satellite" && (
       <div
         className="absolute bottom-5 left-3 px-3 py-2.5 rounded-xl z-[1000]"
         style={{
@@ -247,6 +252,7 @@ export function EconomyLeafletMap({
           Transparent = données insuffisantes
         </p>
       </div>
+      )}
 
     </div>
   );

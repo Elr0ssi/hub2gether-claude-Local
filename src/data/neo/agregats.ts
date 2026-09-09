@@ -58,6 +58,69 @@ export function classement(annee: number, n = 10): RangPays[] {
     .slice(0, n);
 }
 
+/** Le top N de chaque année couverte, pour que la timeline puisse jouer. */
+export function classementsParAnnee(n = 8): Record<number, RangPays[]> {
+  const out: Record<number, RangPays[]> = {};
+  for (const y of ECONOMY_YEARS) {
+    const rangs = Object.entries(y.countries)
+      .filter(([, d]) => d.gdp !== undefined)
+      .map(([nom, d]) => ({ nom: countryFr(nom), pib: d.gdp as number }))
+      .sort((a, b) => b.pib - a.pib)
+      .slice(0, n);
+    if (rangs.length) out[y.year] = rangs;
+  }
+  return out;
+}
+
+export interface AgregatAnnee {
+  annee: number;
+  pib: number;
+  pays: number;
+  inflation: number | null;
+  excedent: number;
+  paysBalance: number;
+}
+
+/** Les agrégats de chaque année, pour que les compteurs suivent le curseur. */
+export function agregatsParAnnee(): AgregatAnnee[] {
+  const out: AgregatAnnee[] = [];
+  for (const y of ECONOMY_YEARS) {
+    let pib = 0;
+    let pays = 0;
+    let excedent = 0;
+    let paysBalance = 0;
+    const infl: number[] = [];
+    for (const d of Object.values(y.countries)) {
+      if (d.gdp !== undefined) {
+        pib += d.gdp;
+        pays += 1;
+      }
+      if (d.trade_balance !== undefined) {
+        paysBalance += 1;
+        if (d.trade_balance > 0) excedent += 1;
+      }
+      if (d.inflation !== undefined) infl.push(d.inflation);
+    }
+    if (!pays) continue;
+    infl.sort((a, b) => a - b);
+    const med =
+      infl.length === 0
+        ? null
+        : infl.length % 2
+          ? infl[(infl.length - 1) / 2]
+          : (infl[infl.length / 2 - 1] + infl[infl.length / 2]) / 2;
+    out.push({
+      annee: y.year,
+      pib: Math.round(pib),
+      pays,
+      inflation: med === null ? null : Math.round(med * 10) / 10,
+      excedent,
+      paysBalance,
+    });
+  }
+  return out;
+}
+
 /** Les quatre compteurs du bandeau, pour l'année la plus récente couverte. */
 export function compteurs(annee: number) {
   const y = ECONOMY_YEARS.find((e) => e.year === annee);
