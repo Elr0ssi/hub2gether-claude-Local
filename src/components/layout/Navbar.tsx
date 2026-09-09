@@ -90,16 +90,16 @@ export function Navbar() {
             )}
           </Link>
           <Link
-            href="/test-article"
+            href="/lecture/pib-par-pays-2025-classement-complet"
             className={cn(
               "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
-              pathname.startsWith("/test-article")
+              pathname.startsWith("/lecture")
                 ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
                 : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
             )}
           >
-            Test Article
-            {pathname.startsWith("/test-article") && (
+            Lecture
+            {pathname.startsWith("/lecture") && (
               <span
                 className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
                 style={{ background: "var(--accent)" }}
