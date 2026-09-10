@@ -381,23 +381,11 @@ body {
 
 @media (min-width: 900px) {
   .hero-section-wrapper {
-    height: 500vh;
+    height: 400vh;
   }
   .hero-sticky {
     position: sticky;
     top: 0;
-  }
-  .hero-grid {
-    grid-template-columns: 42% 58% !important;
-  }
-  .hero-articles-col {
-    display: flex !important;
-  }
-}
-
-@media (max-width: 899px) {
-  .hero-articles-col {
-    display: none !important;
   }
 }
 
@@ -482,3 +470,1521 @@ body {
 .rsm-geography:focus {
   outline: none;
 }
+
+/* ============================================
+   PRÉSENTATION 2 — snap between scrollytelling acts
+   Scoped with :has() so the rule is inert on every other page. `proximity`
+   (not `mandatory`) so it only pulls near a boundary and never fights the
+   long sticky runways in between.
+   ============================================ */
+
+/* No scroll snapping on the home page. Snapping between the hero and the map
+   scene pulled the reader down off the globe on its own, which read as the
+   page taking over; the descent is an ordinary scroll now. The anchors stay
+   as position markers — the locked pair between the last category and the
+   articles is driven in JS, not by CSS. */
+.p2-snap-target {
+  scroll-margin-top: var(--navbar-height);
+}
+
+/* ============================================
+   Economy category — full-height sections
+   The map, the ranking table and the articles each own a viewport. The ground
+   stays the page's own, and the only decoration is the sheaf of curves drawn
+   behind each card, which drifts with the scroll. A scroll gesture inside the
+   run moves to the next section in one step (see useScrollTeleport); the CSS
+   snap below is the fallback when that stands down.
+   ============================================ */
+
+/* No CSS scroll snapping here. The roll animates the scroll position over
+   ~1.7s; snapping would treat every frame of that as a scroll that has ended
+   and yank the page onto the nearest stop, which is exactly the drop the roll
+   exists to remove. The anchors stay as position markers for the hook. */
+.eco-snap-target {
+  scroll-margin-top: var(--navbar-height);
+}
+
+.eco-section {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: calc(100vh - var(--navbar-height));
+  padding: clamp(20px, 3.5vh, 44px) 0;
+}
+
+.eco-section-body {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 0 clamp(16px, 3vw, 40px);
+}
+
+/* The row inside the arrival wrapper is what actually holds the three
+   columns; the wrapper between them is only there to animate. */
+.eco-section-row {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 28px;
+  width: 100%;
+}
+
+.eco-section-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 1280px;
+}
+
+/* Tighter gutters and gaps below the desktop breakpoint, so the rails and the
+   content both fit on a laptop instead of the rails being dropped. */
+@media (max-width: 1439px) {
+  .eco-section-body { padding: 0 clamp(12px, 1.6vw, 24px); }
+  .eco-section-row { gap: 18px; }
+}
+
+/* ── Ad slots ─────────────────────────────────────────────────────────────
+   Two shapes for one job. Above 1180px the margins carry vertical rails; the
+   content column gives way instead of forcing them off screen, which is why
+   they used to vanish on a laptop and only appear on an external display.
+   Below that the same slot lies down above the block it belongs to, so the
+   reader keeps the full width for the map, the ranking and the articles. */
+.eco-ad-rail {
+  display: none;
+  flex: 0 0 140px;
+  width: 140px;
+}
+
+.eco-ad-banner { display: block; width: 100%; margin-bottom: 16px; }
+
+@media (min-width: 1180px) {
+  .eco-ad-rail { display: block; flex-basis: 140px; width: 140px; }
+  .eco-ad-banner { display: none; }
+}
+
+@media (min-width: 1440px) {
+  .eco-ad-rail { flex-basis: 160px; width: 160px; }
+  .eco-ad-slot { width: 160px; }
+}
+
+.eco-ad-banner-slot {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  width: 100%;
+  max-width: 970px;
+  margin: 0 auto;
+  height: 90px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.eco-ad-banner-visual {
+  position: relative;
+  flex: 0 0 34%;
+  max-width: 260px;
+  background: linear-gradient(120deg, #0B2F1D 0%, #114A2C 60%, #0D7A40 100%);
+}
+
+.eco-ad-banner-tag {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  padding: 2px 7px;
+  border-radius: 100px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(57, 255, 136, 0.35);
+  color: #39ff88;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.eco-ad-banner-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.eco-ad-banner-title {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #0d7a40;
+}
+
+.eco-ad-banner-rules { display: flex; flex-direction: column; gap: 6px; }
+.eco-ad-banner-rules > span {
+  height: 6px;
+  border-radius: 100px;
+  background: var(--surface-2);
+}
+
+.eco-ad-banner-size {
+  flex: 0 0 auto;
+  align-self: center;
+  margin-right: 14px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+  color: var(--ink-4);
+  font-size: 0.58rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* On a phone the visual half would leave no room for anything else. */
+@media (max-width: 560px) {
+  .eco-ad-banner-slot { height: 76px; gap: 12px; }
+  .eco-ad-banner-visual { flex-basis: 38%; }
+  .eco-ad-banner-size { display: none; }
+  .eco-ad-banner-title { font-size: 0.58rem; letter-spacing: 0.06em; }
+  .eco-ad-banner-copy { padding-right: 12px; }
+}
+
+.eco-ad-slot {
+  width: 140px;
+  position: sticky;
+  top: calc(var(--navbar-height) + 24px);
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  max-height: calc(100vh - var(--navbar-height) - 96px);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+/* Recommendation carousel — a slim rail so the horizontal overflow is
+   discoverable without the scrollbar sitting on top of the cards. */
+.reco-rail {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(57, 255, 136, 0.45) transparent;
+}
+.reco-rail::-webkit-scrollbar { height: 6px; }
+.reco-rail::-webkit-scrollbar-track { background: transparent; }
+.reco-rail::-webkit-scrollbar-thumb {
+  background: rgba(57, 255, 136, 0.45);
+  border-radius: 100px;
+}
+.reco-rail::-webkit-scrollbar-thumb:hover { background: rgba(57, 255, 136, 0.7); }
+
+/* ============================================
+   Présentation 2 — scroll runways
+   The reduced-motion collapse lives here rather than in a JS branch: asking
+   `useReducedMotion` during render makes the server markup and the first
+   client render disagree, which is a hydration error on precisely the
+   machines that asked for less motion.
+   ============================================ */
+
+.p2-hero-runway {
+  position: relative;
+  height: 190vh;
+  /* La piste n'est qu'une longueur de défilement : elle ne doit rien
+     intercepter. Seul son panneau collant compte, et lui reprend la main. */
+  pointer-events: none;
+  /* Above the story scene, which is pulled up underneath it: the hero's pane
+     always paints over the scene until it has scrolled out. */
+  z-index: 2;
+}
+
+.p2-story-runway {
+  position: relative;
+  z-index: 1;
+  height: calc(var(--p2-story-vh, 500) * 1vh);
+  /* Pulled up by exactly one sticky panel, so this scene pins in the very box
+     the hero's pane occupied, at the very frame the hero unpins. The pane and
+     the real panel then show the same content in the same place: the hero
+     slides up over an identical image and the swap cannot be seen. Any other
+     offset and the reader watches two copies of the section pass each other. */
+  margin-top: calc(-100vh + var(--navbar-height));
+}
+
+.p2-story-stage {
+  position: sticky;
+  top: var(--navbar-height);
+  height: calc(100vh - var(--navbar-height));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p2-hero-runway { height: 100vh; }
+  .p2-story-runway { height: auto; margin-top: 0; }
+  .p2-story-stage { position: relative; top: auto; height: auto; }
+}
+
+/* ── Test article — the format under trial ────────────────────────────────
+   Three two-column rows that all collapse at the same width, so the reading
+   column never has to hold a chart and a commentary side by side once there
+   is no room for both. */
+.ta-open-row,
+.ta-chart-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 26px;
+  align-items: start;
+}
+
+.ta-perspective-row,
+.ta-source-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+@media (min-width: 760px) {
+  .ta-source-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 900px) {
+  .ta-open-row { grid-template-columns: minmax(0, 1fr) 300px; gap: 34px; }
+  .ta-chart-row { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 32px; }
+  .ta-perspective-row { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+}
+
+/* Une page de lecture, pas une carte : sur un téléphone la gouttière commune
+   à la section économie (12px) collait le texte au bord de l'écran. Ici la
+   colonne garde une marge où poser le pouce et l'œil. */
+@media (max-width: 1179px) {
+  .ta-page.eco-section-body { padding-left: clamp(18px, 5vw, 28px); padding-right: clamp(18px, 5vw, 28px); }
+}
+
+@media (max-width: 640px) {
+  .ta-open-row,
+  .ta-chart-row { gap: 20px; }
+  .ta-perspective-row,
+  .ta-source-row { gap: 11px; }
+}
+
+/* ── Leaflet — the interactive world map ──────────────────────────────────
+   Leaflet paints its own chrome; three things of it have to be answered. */
+
+/* A clicked country is an SVG path, and the browser rings a focused path with
+   a rectangle — the box that appeared around a country the moment it was
+   selected. The selection is already drawn in the path's own stroke. */
+.leaflet-container .leaflet-interactive:focus,
+.leaflet-container .leaflet-interactive:focus-visible {
+  outline: none;
+}
+
+/* ── Petits écrans : l'échelle de la page économie ────────────────────────
+   La page est composée pour un grand écran. En dessous, ce n'est pas la
+   disposition qui gêne — elle passe déjà en colonne — mais la taille : les
+   chiffres, les cartes et le panneau de détail gardent leur corps de bureau
+   et le lecteur ne voit plus un pays d'un seul tenant.
+
+   Les tailles viennent de classes utilitaires, donc une règle plus
+   spécifique les reprend. Ce qui est écrit en style inline est traité dans
+   les composants, où seul `clamp()` peut gagner. */
+
+@media (max-width: 1023px) {
+  .eco-snap .text-3xl { font-size: 1.5rem; line-height: 1.15; }
+  .eco-snap .text-2xl { font-size: 1.3rem; line-height: 1.15; }
+  .eco-snap .text-xl { font-size: 1.1rem; line-height: 1.2; }
+  .eco-snap .text-base { font-size: 0.92rem; }
+  .eco-snap .text-sm { font-size: 0.84rem; }
+}
+
+@media (max-width: 640px) {
+  .eco-snap .text-3xl { font-size: 1.28rem; }
+  .eco-snap .text-2xl { font-size: 1.12rem; }
+  .eco-snap .text-xl { font-size: 1rem; }
+  .eco-snap .text-base { font-size: 0.86rem; }
+  .eco-snap .text-sm { font-size: 0.8rem; }
+  .eco-snap .text-xs { font-size: 0.7rem; }
+
+  /* Les cartes d'articles recommandées : une carte pleine largeur plutôt
+     qu'une carte de bureau qui déborde du pouce. */
+  .eco-snap .w-72 { width: 15rem; }
+}
+
+/* ── Le panneau de détail d'un pays ───────────────────────────────────────
+   En feuille sur la carte, il dispose de toute la hauteur de la rangée ; ce
+   qui reste à gagner est de l'air. On resserre les blocs et on descend d'un
+   cran les tailles, pour que le pays se lise d'un seul tenant plutôt qu'en
+   deux écrans de défilement interne. */
+@media (max-width: 1023px) {
+  .eco-panel .px-4 { padding-left: 0.8rem; padding-right: 0.8rem; }
+  .eco-panel .py-4 { padding-top: 0.7rem; padding-bottom: 0.7rem; }
+  .eco-panel .py-3 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+  .eco-panel .px-3 { padding-left: 0.6rem; padding-right: 0.6rem; }
+  .eco-panel .py-2\.5 { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+  .eco-panel .py-2 { padding-top: 0.35rem; padding-bottom: 0.35rem; }
+  .eco-panel .gap-5 { gap: 0.75rem; }
+  .eco-panel .gap-3 { gap: 0.5rem; }
+  .eco-panel .gap-2 { gap: 0.375rem; }
+  .eco-panel .gap-1\.5 { gap: 0.25rem; }
+  .eco-panel .py-16 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+  .eco-panel .text-3xl { font-size: 1.5rem; line-height: 1.1; }
+  .eco-panel .text-2xl { font-size: 1.3rem; line-height: 1.1; }
+  .eco-panel .text-xl { font-size: 1.1rem; line-height: 1.15; }
+  .eco-panel .text-base { font-size: 0.9rem; }
+  .eco-panel .text-sm { font-size: 0.82rem; }
+  .eco-panel .text-xs { font-size: 0.72rem; }
+}
+
+@media (max-width: 640px) {
+  .eco-panel .px-4 { padding-left: 0.7rem; padding-right: 0.7rem; }
+  .eco-panel .py-4 { padding-top: 0.55rem; padding-bottom: 0.55rem; }
+  .eco-panel .gap-5 { gap: 0.6rem; }
+  .eco-panel .text-3xl { font-size: 1.32rem; }
+  .eco-panel .text-2xl { font-size: 1.16rem; }
+  .eco-panel .text-xl { font-size: 1rem; }
+  .eco-panel .text-base { font-size: 0.84rem; }
+  .eco-panel .text-sm { font-size: 0.78rem; }
+  .eco-panel .text-xs { font-size: 0.68rem; }
+}
+
+/* ── Le classement mondial ────────────────────────────────────────────────
+   Cinq colonnes tiennent sur un écran large ; sur un téléphone elles
+   poussaient le chiffre principal hors du cadre. On garde le rang, le pays et
+   la mesure affichée par la carte — les autres restent accessibles en
+   changeant de mesure, et figurent dans la fiche du pays. */
+@media (max-width: 640px) {
+  .eco-rank-extra { display: none; }
+  /* Un nom long se replie plutôt que de pousser le chiffre hors du cadre. */
+  .eco-rank-country { white-space: normal !important; }
+  .eco-snap table .px-4 { padding-left: 0.55rem; padding-right: 0.55rem; }
+  .eco-snap table .px-3 { padding-left: 0.45rem; padding-right: 0.45rem; }
+  .eco-snap table .py-2\.5 { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ÉCRAN D'ORDINATEUR PORTABLE
+
+   Une page réglée pour un grand écran n'est pas seulement « un peu serrée »
+   sur un portable : elle est fausse. 1280x800, c'est 470px de hauteur utile
+   une fois la barre, le titre et le pied de section déduits — la moitié d'un
+   moniteur de bureau. Ce palier ramène l'échelle à cette hauteur-là. Il se
+   déclenche sur la largeur d'un portable ou sur sa hauteur, parce qu'un
+   portable branché sur un grand écran garde sa largeur mais gagne la place.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── La barre de navigation ───────────────────────────────────────────────
+   Huit onglets, un logo et un bouton : à 1280px la somme dépassait la
+   colonne et « Comparer » sortait de l'écran. On resserre la rangée plutôt
+   que d'en retirer un onglet. */
+@media (max-width: 1599px) {
+  .site-nav-row { gap: 1.1rem; padding-left: 1rem; padding-right: 1rem; }
+  .site-nav-row nav > a,
+  .site-nav-row nav > div { padding-left: 0.42rem; padding-right: 0.42rem; font-size: 0.82rem; }
+}
+
+@media (max-width: 1279px) {
+  .site-nav-row { gap: 0.7rem; }
+  .site-nav-row nav > a,
+  .site-nav-row nav > div { padding-left: 0.3rem; padding-right: 0.3rem; font-size: 0.78rem; }
+}
+
+/* Sur un écran bas, la barre elle-même rend 8px à la page. Tout ce qui se
+   mesure à partir d'elle suit, la variable étant la seule source. */
+@media (max-height: 900px) {
+  :root { --navbar-height: 56px; }
+  .site-nav { height: 56px; }
+}
+
+/* ── La page économie ─────────────────────────────────────────────────────
+   Le même cran de réduction que sur une tablette : les titres, les chiffres
+   et l'air entre les blocs. */
+@media (max-width: 1279px), (max-height: 900px) {
+  .eco-snap .text-3xl { font-size: 1.5rem; line-height: 1.15; }
+  .eco-snap .text-2xl { font-size: 1.3rem; line-height: 1.15; }
+  .eco-snap .text-xl { font-size: 1.1rem; line-height: 1.2; }
+  .eco-snap .text-base { font-size: 0.92rem; }
+  .eco-snap .text-sm { font-size: 0.84rem; }
+
+  /* La fiche d'un pays : à 470px de rangée elle débordait de sa colonne. */
+  .eco-panel .px-4 { padding-left: 0.8rem; padding-right: 0.8rem; }
+  .eco-panel .py-4 { padding-top: 0.7rem; padding-bottom: 0.7rem; }
+  .eco-panel .py-3 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+  .eco-panel .px-3 { padding-left: 0.6rem; padding-right: 0.6rem; }
+  .eco-panel .py-2\.5 { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+  .eco-panel .py-2 { padding-top: 0.35rem; padding-bottom: 0.35rem; }
+  .eco-panel .gap-5 { gap: 0.7rem; }
+  .eco-panel .gap-3 { gap: 0.5rem; }
+  .eco-panel .gap-2 { gap: 0.375rem; }
+  .eco-panel .gap-1\.5 { gap: 0.25rem; }
+  .eco-panel .text-3xl { font-size: 1.4rem; line-height: 1.1; }
+  .eco-panel .text-2xl { font-size: 1.24rem; line-height: 1.1; }
+  .eco-panel .text-xl { font-size: 1.05rem; line-height: 1.15; }
+  .eco-panel .text-base { font-size: 0.88rem; }
+  .eco-panel .text-sm { font-size: 0.8rem; }
+  .eco-panel .text-xs { font-size: 0.7rem; }
+}
+
+/* ── Le test article ──────────────────────────────────────────────────────
+   Une colonne de lecture reste une colonne de lecture, mais ses titres de
+   partie et ses encadrés étaient dimensionnés pour un grand écran. */
+/* La FAQ ferme la course de sections de la page économie. Elle dépassait
+   l'écran d'une centaine de pixels, et une section plus haute que l'écran est
+   lue au défilement et non au saut : le lecteur défilait un peu avant que la
+   section suivante n'arrive, ce qui se ressent comme un accroc. Resserrée,
+   elle redevient un arrêt franc. */
+@media (max-height: 900px) {
+  .eco-snap-target > section { padding-top: 28px; padding-bottom: 28px; }
+  .eco-snap-target .mb-10 { margin-bottom: 1rem; }
+  .eco-snap-target .pb-10 { padding-bottom: 1rem; }
+  .eco-snap-target .grid.gap-4 { gap: 0.6rem; }
+  .eco-snap-target .card .px-5 { padding-left: 0.9rem; padding-right: 0.9rem; }
+  .eco-snap-target .card .py-4 { padding-top: 0.55rem; padding-bottom: 0.55rem; }
+}
+
+@media (max-height: 900px) {
+  .ta-page .ta-open-row,
+  .ta-page .ta-chart-row { gap: 24px; }
+  /* Le bandeau, le titre et le chapeau occupaient l'écran entier avant le
+     premier paragraphe. */
+  .ta-hero-head { padding-top: 22px !important; }
+}
+
+/* La vignette d'une carte d'article. Le ratio vit ici et non en style inline,
+   pour qu'il puisse se raccourcir quand la carte se raccourcit. */
+.eco-card-media { aspect-ratio: 16 / 10; }
+
+@media (max-width: 640px) {
+  .eco-card-media { aspect-ratio: 16 / 7; }
+}
+
+/* Sur un écran très bas, la section des articles dépassait de quelques
+   dizaines de pixels, ce qui suffit à rendre son arrêt mou : une section plus
+   haute que l'écran se lit au défilement, pas au saut. La vignette est ce qui
+   se raccourcit le mieux sans rien retirer au lecteur. */
+@media (max-height: 780px) {
+  .eco-card-media { aspect-ratio: 16 / 7; }
+  .eco-snap .py-16 { padding-top: 2rem; padding-bottom: 2rem; }
+}
+
+/* Le classement sur un écran bas : des lignes un cran plus serrées, pour que
+   la fenêtre du tableau porte deux ou trois pays de plus sans grandir. */
+@media (max-height: 900px) {
+  .eco-snap table .py-2\.5 { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   NEO — la console
+
+   Une hauteur d'écran, pas une de plus. Tout est porté par `.nc` : rien
+   d'ici ne peut atteindre le reste du site.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.nc {
+  position: relative;
+  height: calc(100vh - var(--navbar-height));
+  min-height: 620px;
+  background: #06070a;
+  color: #edf2ef;
+  display: flex;
+  flex-direction: column;
+  padding: 16px clamp(14px, 2.2vw, 30px) 10px;
+  gap: 12px;
+  overflow: hidden;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Un balayage très lent, pour que le fond ne soit pas mort. */
+.nc-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 50% at 22% 8%, rgba(57, 255, 136, 0.09), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.016) 0 1px, transparent 1px 3px);
+  animation: nc-derive 14s ease-in-out infinite alternate;
+}
+@keyframes nc-derive {
+  from { transform: translateY(0); opacity: 0.75; }
+  to   { transform: translateY(-14px); opacity: 1; }
+}
+
+/* ── La barre de tête ────────────────────────────────────────────────────── */
+
+.nc-tete {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.nc-tete-gauche { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.nc-tete-droite { display: flex; justify-content: flex-end; gap: 8px; }
+
+.nc-vivant {
+  width: 7px; height: 7px; border-radius: 7px; background: #39ff88;
+  align-self: center;
+  animation: nc-bat 2s ease-out infinite;
+}
+@keyframes nc-bat {
+  0%   { box-shadow: 0 0 0 0 rgba(57, 255, 136, 0.6); }
+  70%  { box-shadow: 0 0 0 9px rgba(57, 255, 136, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(57, 255, 136, 0); }
+}
+
+.nc-titre {
+  font-size: clamp(19px, 1.9vw, 27px);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+}
+.nc-titre span { color: #39ff88; }
+.nc-sous { font-size: 11.5px; color: #565e5b; letter-spacing: 0.04em; }
+
+.nc-annee { display: flex; align-items: center; gap: 14px; }
+.nc-annee-n {
+  font-size: clamp(30px, 3.4vw, 48px);
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.nc-play {
+  width: 34px; height: 34px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(57, 255, 136, 0.4);
+  background: rgba(57, 255, 136, 0.1);
+  color: #39ff88;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.18s;
+}
+.nc-play:hover { background: rgba(57, 255, 136, 0.2); transform: scale(1.06); }
+
+.nc-btn {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #edf2ef;
+  transition: border-color 0.18s, background 0.18s;
+  white-space: nowrap;
+}
+.nc-btn:hover { border-color: rgba(57, 255, 136, 0.5); background: rgba(57, 255, 136, 0.08); }
+.nc-btn-plein { background: #39ff88; border-color: #39ff88; color: #05070a; }
+.nc-btn-plein:hover { background: #5cffa0; border-color: #5cffa0; }
+
+/* ── La grille ───────────────────────────────────────────────────────────── */
+
+.nc-grille {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 340px);
+  grid-template-rows: auto minmax(0, 1fr) minmax(0, 0.72fr);
+  grid-template-areas:
+    "kpis   rangs"
+    "courbe rangs"
+    "courbe lire";
+  gap: 12px;
+}
+.nc-kpis {
+  grid-area: kpis;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.nc-panneau {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.022);
+  padding: 12px 14px 13px;
+}
+/* Les équerres : le repère visuel d'un instrument, pas d'une carte web. */
+.nc-eq { position: absolute; width: 9px; height: 9px; border-color: rgba(57, 255, 136, 0.55); }
+.nc-eq-tl { top: -1px; left: -1px; border-top: 2px solid; border-left: 2px solid; border-radius: 12px 0 0 0; }
+.nc-eq-br { bottom: -1px; right: -1px; border-bottom: 2px solid; border-right: 2px solid; border-radius: 0 0 12px 0; }
+
+.nc-panneau-tete {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.nc-panneau-corps { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.db-case .nc-panneau-corps { overflow: auto; }
+
+.nc-label {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #565e5b;
+  font-weight: 700;
+}
+.nc-mini { font-size: 10.5px; color: #565e5b; letter-spacing: 0.03em; }
+.nc-mini-lien { color: #39ff88; }
+.nc-kpi-s { font-size: 11px; color: #565e5b; margin-top: 7px; }
+
+/* ── La courbe ───────────────────────────────────────────────────────────── */
+
+.nc-courbe {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  cursor: crosshair;
+  touch-action: none;
+}
+.nc-piste { position: relative; margin-top: 10px; padding-bottom: 18px; }
+.nc-piste-fond {
+  display: block;
+  height: 3px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.nc-piste-fait { display: block; height: 100%; background: #39ff88; }
+.nc-decennies { position: relative; height: 16px; }
+.nc-dec {
+  position: absolute;
+  top: 4px;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #565e5b;
+  letter-spacing: 0.06em;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0 3px;
+  transition: color 0.18s;
+}
+.nc-dec:hover { color: #edf2ef; }
+.nc-dec-actif { color: #39ff88; }
+
+/* ── Le classement ───────────────────────────────────────────────────────── */
+
+.nc-rangs { display: flex; flex-direction: column; justify-content: space-between; flex: 1; min-height: 0; gap: 2px; }
+.nc-rang {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 84px) 1fr auto;
+  gap: 9px;
+  align-items: center;
+}
+.nc-rang-n { font-size: 9.5px; color: #565e5b; }
+.nc-rang-nom {
+  font-size: 12.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nc-rang-piste { height: 6px; border-radius: 6px; background: rgba(255, 255, 255, 0.07); overflow: hidden; }
+.nc-rang-barre { display: block; height: 100%; border-radius: 6px; }
+.nc-rang-val { font-size: 11px; color: #8e9793; min-width: 56px; text-align: right; }
+
+/* ── À lire ──────────────────────────────────────────────────────────────── */
+
+.nc-lire { display: flex; flex-direction: column; gap: 1px; flex: 1; min-height: 0; overflow: hidden; }
+.nc-lire-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  transition: background 0.18s;
+}
+.nc-lire-item:hover { background: rgba(57, 255, 136, 0.07); }
+.nc-lire-theme { font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #39ff88; font-weight: 700; }
+.nc-lire-titre {
+  font-size: 12.5px;
+  line-height: 1.3;
+  color: #edf2ef;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nc-pied {
+  position: relative;
+  font-size: 10.5px;
+  color: #565e5b;
+  line-height: 1.45;
+  max-width: 900px;
+}
+
+/* En dessous de deux colonnes, la console redevient une page qui défile. */
+@media (max-width: 1080px) {
+  .nc { height: auto; overflow: visible; }
+  .nc-grille {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas: "kpis" "courbe" "rangs" "lire";
+  }
+  .nc-courbe { min-height: 220px; }
+  .nc-tete { grid-template-columns: 1fr; }
+  .nc-tete-droite { justify-content: flex-start; }
+}
+@media (max-width: 640px) {
+  .nc-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nc-scan, .nc-vivant { animation: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMPARER — les commandes partagées avec le tableau de bord
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cp-champs { display: flex; gap: 4px; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, 0.05); }
+.cp-champ {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 0;
+  background: none;
+  color: #8e9793;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.18s, background 0.18s;
+}
+.cp-champ:hover { color: #edf2ef; }
+.cp-champ-actif { background: #39ff88; color: #05070a; }
+
+/* ── La sélection ────────────────────────────────────────────────────────── */
+
+.cp-selection {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cp-puce {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: #edf2ef;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s;
+}
+.cp-puce:hover { border-color: rgba(255, 120, 120, 0.5); background: rgba(255, 120, 120, 0.08); }
+.cp-puce-point { width: 8px; height: 8px; border-radius: 8px; }
+.cp-puce-x { color: #565e5b; font-size: 14px; line-height: 1; }
+
+.cp-recherche { position: relative; }
+.cp-recherche input {
+  width: 190px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: #edf2ef;
+  font-size: 12.5px;
+  outline: none;
+}
+.cp-recherche input::placeholder { color: #565e5b; }
+.cp-recherche input:focus { border-color: rgba(57, 255, 136, 0.5); border-style: solid; }
+
+.cp-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  width: 230px;
+  padding: 5px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #0c0e12;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+  list-style: none;
+}
+.cp-suggestions button {
+  width: 100%;
+  text-align: left;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: #edf2ef;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.cp-suggestions button:hover:not(:disabled) { background: rgba(57, 255, 136, 0.12); }
+.cp-suggestions button:disabled { color: #565e5b; cursor: default; }
+.cp-suggestions span { color: #565e5b; font-size: 11px; }
+
+.cp-bascule {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+  font-size: 12.5px;
+  color: #8e9793;
+  cursor: pointer;
+  user-select: none;
+}
+.cp-bascule input { accent-color: #39ff88; width: 15px; height: 15px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMMUNITY — le forum
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.fo-wrap {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding-left: clamp(18px, 3.4vw, 48px);
+  padding-right: clamp(18px, 3.4vw, 48px);
+}
+
+.fo-hero {
+  position: relative;
+  overflow: hidden;
+  background: #07080a;
+  color: #edf2ef;
+  padding: clamp(38px, 5.5vh, 66px) 0 clamp(34px, 5vh, 56px);
+}
+.fo-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 65% 90% at 18% 0%, #000 25%, transparent 100%);
+}
+.fo-hero > * { position: relative; }
+
+.fo-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #39ff88;
+  font-weight: 700;
+}
+.fo-pulse {
+  width: 7px; height: 7px; border-radius: 7px; background: #39ff88;
+  animation: fo-bat 2.2s ease-out infinite;
+}
+@keyframes fo-bat {
+  0%   { box-shadow: 0 0 0 0 rgba(57, 255, 136, 0.55); }
+  70%  { box-shadow: 0 0 0 10px rgba(57, 255, 136, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(57, 255, 136, 0); }
+}
+
+.fo-titre {
+  font-size: clamp(30px, 4.2vw, 58px);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  font-weight: 900;
+  margin-top: 16px;
+}
+.fo-titre span { color: #39ff88; }
+.fo-chapo { font-size: clamp(14.5px, 1.15vw, 17px); line-height: 1.55; color: #8e9793; margin-top: 16px; max-width: 620px; }
+.fo-stats { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 22px; font-size: 13px; color: #8e9793; }
+.fo-stats strong { color: #edf2ef; font-size: 20px; font-weight: 900; margin-right: 6px; font-variant-numeric: tabular-nums; }
+
+/* ── Le corps ────────────────────────────────────────────────────────────── */
+
+.fo-corps {
+  display: grid;
+  grid-template-columns: minmax(0, 330px) minmax(0, 1fr);
+  gap: 26px;
+  align-items: start;
+  padding: 24px 0 70px;
+}
+@media (max-width: 940px) {
+  .fo-corps { grid-template-columns: minmax(0, 1fr); }
+  .fo-liste { position: static !important; max-height: none !important; }
+}
+
+.fo-liste { position: sticky; top: calc(var(--navbar-height) + 16px); max-height: calc(100vh - var(--navbar-height) - 40px); display: flex; flex-direction: column; gap: 10px; }
+
+.fo-barre { display: flex; align-items: center; justify-content: space-between; }
+.fo-tri { display: flex; gap: 3px; padding: 3px; border-radius: 999px; background: var(--surface-2); }
+.fo-tri button {
+  padding: 6px 14px; border: 0; border-radius: 999px; background: none;
+  font-size: 12.5px; font-weight: 700; color: var(--ink-3); cursor: pointer; transition: all 0.16s;
+}
+.fo-tri button.on { background: var(--ink); color: #fff; }
+
+.fo-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.fo-tags button {
+  padding: 5px 11px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--ink-3); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.16s;
+}
+.fo-tags button:hover { border-color: var(--ink-5); color: var(--ink); }
+.fo-tags button.on { background: var(--accent-dim); border-color: var(--accent-border); color: #0d7a40; }
+
+.fo-fils { list-style: none; display: flex; flex-direction: column; gap: 7px; overflow-y: auto; padding-right: 4px; }
+.fo-fil {
+  display: flex; flex-direction: column; gap: 7px; width: 100%; text-align: left;
+  padding: 13px 14px; border-radius: var(--radius-lg);
+  border: 1px solid var(--border); background: var(--surface); cursor: pointer;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+}
+.fo-fil:hover { border-color: var(--ink-5); transform: translateX(2px); }
+.fo-fil-on { border-color: #0d7a40; box-shadow: 0 0 0 1px #0d7a40 inset; }
+.fo-fil-tete { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.fo-fil-theme {
+  font-size: 10px; letter-spacing: 0.11em; text-transform: uppercase; font-weight: 800;
+  color: #0d7a40; background: var(--accent-dim); padding: 3px 8px; border-radius: 999px;
+}
+.fo-fil-epingle {
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;
+  color: var(--ink-4); background: var(--surface-2); padding: 3px 8px; border-radius: 999px;
+}
+.fo-fil-ancre { margin-left: auto; font-size: 12.5px; font-weight: 900; color: var(--ink); font-variant-numeric: tabular-nums; }
+.fo-fil-titre { font-size: 14.5px; font-weight: 700; line-height: 1.32; color: var(--ink); letter-spacing: -0.015em; }
+.fo-fil-pied { font-size: 11.5px; color: var(--ink-4); }
+
+/* ── Le panneau ──────────────────────────────────────────────────────────── */
+
+.fo-panneau {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  padding: clamp(18px, 2.2vw, 30px);
+  box-shadow: var(--shadow-card);
+}
+
+.fo-ouverture-tete { display: flex; gap: 14px; align-items: flex-start; }
+.fo-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--ink-4); }
+.fo-ouverture-titre { font-size: clamp(20px, 2vw, 28px); font-weight: 900; letter-spacing: -0.03em; line-height: 1.2; color: var(--ink); margin-top: 10px; }
+
+.fo-ancre {
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  margin: 18px 0 6px; padding: 12px 16px;
+  border-radius: var(--radius-md); background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+}
+.fo-ancre strong { font-size: 24px; font-weight: 900; letter-spacing: -0.035em; color: #0d7a40; font-variant-numeric: tabular-nums; }
+.fo-ancre span { font-size: 13px; color: var(--ink-2); }
+.fo-ancre em { margin-left: auto; font-size: 11px; color: var(--ink-4); font-style: normal; }
+
+.fo-para { font-size: 15.5px; line-height: 1.68; color: var(--ink-2); margin-top: 14px; }
+
+.fo-angles { margin-top: 20px; padding: 15px 17px; border-radius: var(--radius-md); background: var(--surface-2); }
+.fo-angles-t { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 800; color: var(--ink-4); }
+.fo-angles ul { list-style: none; margin-top: 10px; display: grid; gap: 7px; }
+.fo-angles li { font-size: 14px; line-height: 1.5; color: var(--ink-2); padding-left: 16px; position: relative; }
+.fo-angles li::before { content: "→"; position: absolute; left: 0; color: #0d7a40; }
+
+.fo-liens { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 18px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.fo-lien { font-size: 13.5px; font-weight: 700; color: #0d7a40; }
+.fo-lien:hover { text-decoration: underline; }
+.fo-lien-doux { color: var(--ink-3); font-weight: 600; }
+
+/* ── Les votes ───────────────────────────────────────────────────────────── */
+
+.fo-votes { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; padding-top: 2px; }
+.fo-votes-c { gap: 0; }
+.fo-fleche {
+  border: 0; background: none; color: var(--ink-5); cursor: pointer; padding: 3px 4px; border-radius: 5px;
+  transition: color 0.15s, background 0.15s;
+  display: inline-flex;
+}
+.fo-fleche:hover { color: #0d7a40; background: var(--accent-dim); }
+.fo-fleche-bas:hover { color: #c2410c; background: rgba(194, 65, 12, 0.09); }
+.fo-fleche-on { color: #0d7a40; }
+.fo-fleche-on-bas { color: #c2410c; }
+.fo-score { font-size: 12.5px; font-weight: 800; color: var(--ink-2); font-variant-numeric: tabular-nums; min-width: 18px; text-align: center; }
+.fo-score-up { color: #0d7a40; }
+.fo-score-down { color: #c2410c; }
+
+/* ── Écrire ──────────────────────────────────────────────────────────────── */
+
+.fo-repondre { margin-top: 18px; }
+.fo-repondre textarea {
+  width: 100%; resize: vertical; min-height: 74px;
+  padding: 12px 14px; border-radius: var(--radius-md);
+  border: 1px solid var(--border); background: var(--surface-2);
+  font: inherit; font-size: 14.5px; line-height: 1.55; color: var(--ink);
+  outline: none; transition: border-color 0.16s, background 0.16s;
+}
+.fo-repondre textarea:focus { border-color: #0d7a40; background: var(--surface); }
+.fo-repondre-pied { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 9px; }
+.fo-repondre-pied input {
+  padding: 7px 12px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--surface); font: inherit; font-size: 12.5px; color: var(--ink); outline: none; width: 190px;
+}
+.fo-repondre-pied input:focus { border-color: #0d7a40; }
+.fo-astuce { font-size: 11px; color: var(--ink-4); margin-right: auto; }
+
+.fo-btn {
+  padding: 8px 17px; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--surface); font-size: 13px; font-weight: 700; color: var(--ink-2); cursor: pointer; transition: all 0.16s;
+}
+.fo-btn-fantome:hover { border-color: var(--ink-5); }
+.fo-btn-plein { background: var(--ink); border-color: var(--ink); color: #fff; }
+.fo-btn-plein:hover:not(:disabled) { background: #000; }
+.fo-btn:disabled { opacity: 0.4; cursor: default; }
+
+/* ── Les messages ────────────────────────────────────────────────────────── */
+
+.fo-messages { margin-top: 26px; display: flex; flex-direction: column; gap: 4px; }
+.fo-messages-t { font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; font-weight: 800; color: var(--ink-4); margin-bottom: 8px; }
+
+.fo-msg { padding-left: 0; }
+.fo-msg-corps { display: flex; gap: 12px; padding: 11px 0; border-top: 1px solid var(--border-light); }
+.fo-msg-tete { display: flex; align-items: baseline; gap: 7px; font-size: 12px; color: var(--ink-4); }
+.fo-msg-tete strong { color: var(--ink); font-size: 13px; font-weight: 700; }
+.fo-msg-texte { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); margin-top: 5px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.fo-msg-actions { display: flex; gap: 14px; margin-top: 7px; }
+.fo-msg-actions button {
+  border: 0; background: none; padding: 0; cursor: pointer;
+  font-size: 12px; font-weight: 700; color: var(--ink-4); transition: color 0.15s;
+}
+.fo-msg-actions button:hover { color: #0d7a40; }
+.fo-msg .fo-msg { border-left: 2px solid var(--border); padding-left: 12px; }
+
+.fo-note {
+  font-size: 12.5px; line-height: 1.6; color: var(--ink-4);
+  margin-top: 28px; padding-left: 13px; border-left: 2px solid var(--border);
+}
+
+@media (prefers-reduced-motion: reduce) { .fo-pulse { animation: none; } }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LECTURE — le format d'article
+
+   Porté par `.lx`. Le format publié sur /articles n'est pas concerné.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.lx-wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-left: clamp(18px, 3.4vw, 48px);
+  padding-right: clamp(18px, 3.4vw, 48px);
+}
+
+.lx-progression {
+  position: fixed;
+  top: var(--navbar-height);
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  transform-origin: 0 50%;
+  z-index: 60;
+}
+
+/* ── L'ouverture ─────────────────────────────────────────────────────────── */
+
+.lx-hero { position: relative; overflow: hidden; padding: clamp(40px, 6vh, 76px) 0 clamp(28px, 4vh, 44px); }
+.lx-hero-fond {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 70% at 12% 0%, rgba(57, 255, 136, 0.14), transparent 68%),
+    linear-gradient(var(--bg), var(--bg));
+}
+.lx-hero > * { position: relative; }
+
+.lx-fil { display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: var(--ink-4); }
+.lx-fil a { color: var(--ink-3); }
+.lx-fil a:hover { color: #0d7a40; }
+
+.lx-titre {
+  font-size: clamp(30px, 4.4vw, 60px);
+  line-height: 1.04;
+  letter-spacing: -0.042em;
+  font-weight: 900;
+  color: var(--ink);
+  margin-top: 16px;
+  max-width: 17ch;
+}
+@media (min-width: 900px) { .lx-titre { max-width: 20ch; } }
+
+.lx-chapo {
+  font-size: clamp(16px, 1.4vw, 21px);
+  line-height: 1.55;
+  color: var(--ink-3);
+  margin-top: 20px;
+  max-width: 62ch;
+}
+.lx-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 24px; font-size: 12.5px; color: var(--ink-4); }
+.lx-badge {
+  font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 800;
+  color: #0d7a40; background: var(--accent-dim); padding: 4px 10px; border-radius: 999px;
+}
+
+/* ── La mise en page ─────────────────────────────────────────────────────── */
+
+.lx-corps {
+  display: grid;
+  grid-template-columns: minmax(0, 250px) minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: start;
+  padding-bottom: 70px;
+}
+@media (max-width: 1000px) {
+  .lx-corps { grid-template-columns: minmax(0, 1fr); }
+  .lx-sommaire { position: static !important; }
+  .lx-sommaire ol { max-height: none !important; }
+}
+
+.lx-sommaire { position: sticky; top: calc(var(--navbar-height) + 26px); }
+.lx-sommaire-t { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 800; color: var(--ink-4); }
+.lx-sommaire ol { list-style: none; margin-top: 12px; display: flex; flex-direction: column; gap: 2px; max-height: 52vh; overflow-y: auto; }
+.lx-sommaire a {
+  display: block;
+  font-size: 13px;
+  line-height: 1.38;
+  color: var(--ink-4);
+  padding: 6px 0 6px 12px;
+  border-left: 2px solid var(--border);
+  transition: color 0.16s, border-color 0.16s;
+}
+.lx-sommaire a:hover { color: var(--ink-2); }
+.lx-sommaire a.on { color: var(--ink); font-weight: 700; border-left-color: #0d7a40; }
+
+.lx-outils { display: flex; flex-direction: column; gap: 7px; margin-top: 22px; }
+.lx-outil {
+  display: block; text-align: center;
+  padding: 9px 12px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--surface);
+  font-size: 12.5px; font-weight: 700; color: var(--ink-2);
+  transition: all 0.16s;
+}
+.lx-outil:hover { border-color: var(--accent-border); background: var(--accent-dim); color: #0d7a40; }
+
+.lx-colonne { max-width: 68ch; }
+
+/* ── Les blocs ───────────────────────────────────────────────────────────── */
+
+.lx-bref {
+  padding: 20px 22px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  margin-bottom: 34px;
+}
+.lx-bref-t { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 800; color: #0d7a40; }
+.lx-bref-p { font-size: 16.5px; line-height: 1.6; color: var(--ink); margin-top: 11px; font-weight: 500; }
+.lx-bref-chiffres { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 16px; padding-top: 15px; border-top: 1px solid var(--border-light); }
+.lx-bref-chiffres span { display: flex; flex-direction: column; font-size: 11.5px; color: var(--ink-4); }
+.lx-bref-chiffres strong { font-size: 22px; font-weight: 900; letter-spacing: -0.03em; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+.lx-lead { font-size: 19px; line-height: 1.62; color: var(--ink-2); font-weight: 500; margin-bottom: 26px; }
+
+.lx-h2 {
+  position: relative;
+  font-size: clamp(22px, 2.2vw, 31px);
+  line-height: 1.18;
+  letter-spacing: -0.032em;
+  font-weight: 900;
+  color: var(--ink);
+  margin: 46px 0 16px;
+  scroll-margin-top: calc(var(--navbar-height) + 24px);
+}
+.lx-h2-rule { position: absolute; left: -22px; top: 0.42em; width: 12px; height: 2px; background: #0d7a40; }
+@media (max-width: 1000px) { .lx-h2-rule { display: none; } }
+
+.lx-h3 { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); margin-bottom: 12px; }
+
+.lx-texte p { font-size: 16.5px; line-height: 1.78; color: var(--ink-2); margin-bottom: 17px; }
+/* Une capitale à l'entrée du premier paragraphe : le lecteur sait où commencer. */
+.lx-texte-capitale > p:first-child::first-letter {
+  float: left;
+  font-size: 3.4em;
+  line-height: 0.82;
+  font-weight: 900;
+  padding: 4px 10px 0 0;
+  color: #0d7a40;
+}
+
+.lx-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin: 30px 0;
+}
+.lx-stat { background: var(--surface); padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 5px; }
+.lx-stat-v { font-size: 28px; font-weight: 900; letter-spacing: -0.035em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.lx-stat-l { font-size: 12.5px; color: var(--ink-3); line-height: 1.35; }
+.lx-stat-n { font-size: 11px; color: var(--ink-4); }
+
+.lx-encadre {
+  margin: 30px 0;
+  padding: 18px 22px;
+  border-radius: var(--radius-lg);
+  background: var(--accent-dim);
+  border-left: 3px solid #0d7a40;
+}
+.lx-encadre-t { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 800; color: #0d7a40; }
+.lx-encadre p { font-size: 16px; line-height: 1.62; color: var(--ink); margin-top: 9px; font-weight: 500; }
+
+.lx-citation { margin: 36px 0; padding-left: 22px; border-left: 3px solid var(--ink-5); }
+.lx-citation p { font-size: 21px; line-height: 1.45; letter-spacing: -0.02em; color: var(--ink); font-weight: 600; }
+.lx-citation cite { display: block; margin-top: 12px; font-size: 12.5px; color: var(--ink-4); font-style: normal; }
+
+.lx-liste-bloc { margin: 30px 0; }
+.lx-liste { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.lx-liste li { display: flex; gap: 13px; align-items: baseline; }
+.lx-liste-p {
+  flex-shrink: 0; min-width: 20px;
+  font-size: 12px; font-weight: 800; color: #0d7a40; font-variant-numeric: tabular-nums;
+}
+.lx-liste-t { font-size: 16px; line-height: 1.6; color: var(--ink-2); }
+.lx-liste-n { display: block; font-size: 13px; color: var(--ink-4); margin-top: 3px; }
+
+.lx-graph, .lx-tableau { margin: 34px 0; padding: 20px 22px; border-radius: var(--radius-lg); border: 1px solid var(--border); background: var(--surface); }
+.lx-graph figcaption, .lx-tableau figcaption { display: flex; flex-direction: column; gap: 4px; margin-bottom: 18px; }
+.lx-graph-t { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+.lx-graph-s { font-size: 12.5px; color: var(--ink-4); }
+.lx-tableau figcaption { font-size: 15px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+.lx-graph-corps { display: flex; flex-direction: column; gap: 11px; }
+.lx-graph-ligne { display: grid; grid-template-columns: minmax(0, 118px) 1fr auto; gap: 12px; align-items: center; }
+.lx-graph-nom { font-size: 13px; color: var(--ink-2); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lx-graph-piste { height: 10px; border-radius: 10px; background: var(--surface-2); overflow: hidden; }
+.lx-graph-barre { display: block; height: 100%; border-radius: 10px; }
+.lx-graph-v { font-size: 12.5px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; min-width: 72px; text-align: right; }
+.lx-graph-n { grid-column: 2 / -1; font-size: 11.5px; color: var(--ink-4); }
+
+.lx-tableau-defile { overflow-x: auto; }
+.lx-tableau table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.lx-tableau th, .lx-tableau td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--border-light); white-space: nowrap; }
+.lx-tableau thead th { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-4); font-weight: 800; }
+.lx-tableau tbody th { font-weight: 700; color: var(--ink); }
+.lx-tableau tbody td { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+.lx-frise { margin: 34px 0; }
+.lx-frise ol { list-style: none; display: flex; flex-direction: column; gap: 0; }
+.lx-frise li { display: grid; grid-template-columns: 84px 1fr; gap: 16px; padding: 13px 0 13px 0; border-left: 2px solid var(--border); padding-left: 18px; margin-left: 6px; position: relative; }
+.lx-frise li::before { content: ""; position: absolute; left: -5px; top: 20px; width: 8px; height: 8px; border-radius: 8px; background: #0d7a40; }
+.lx-frise-d { font-size: 12.5px; font-weight: 800; color: #0d7a40; font-variant-numeric: tabular-nums; }
+.lx-frise-t { font-size: 15px; font-weight: 700; color: var(--ink); }
+.lx-frise-x { grid-column: 2; font-size: 14px; line-height: 1.55; color: var(--ink-3); margin-top: 4px; }
+
+.lx-cartes { margin: 34px 0; }
+.lx-cartes-grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+.lx-carte { display: flex; flex-direction: column; gap: 4px; padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--surface); }
+.lx-carte-e { font-size: 20px; }
+.lx-carte-n { font-size: 14px; font-weight: 800; color: var(--ink); }
+.lx-carte-d { font-size: 13px; color: var(--ink-2); line-height: 1.45; }
+.lx-carte-s { font-size: 11.5px; color: var(--ink-4); }
+
+/* ── Les pieds de page de l'article ──────────────────────────────────────── */
+
+.lx-methode { margin: 44px 0 0; padding: 20px 22px; border-radius: var(--radius-lg); background: var(--surface-2); }
+.lx-methode-t { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 800; color: var(--ink-4); }
+.lx-methode ul { list-style: none; margin-top: 12px; display: flex; flex-direction: column; gap: 9px; }
+.lx-methode li { font-size: 13.5px; line-height: 1.6; color: var(--ink-3); padding-left: 16px; position: relative; }
+.lx-methode li::before { content: "·"; position: absolute; left: 4px; color: #0d7a40; font-weight: 900; }
+.lx-methode-l { display: inline-block; margin-top: 14px; font-size: 13px; font-weight: 700; color: #0d7a40; }
+
+.lx-sources { margin-top: 34px; padding-top: 22px; border-top: 1px solid var(--border); }
+.lx-sources-t { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 800; color: var(--ink-4); }
+.lx-sources ol { margin-top: 12px; padding-left: 18px; display: flex; flex-direction: column; gap: 7px; }
+.lx-sources li { font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
+.lx-sources a { color: #0d7a40; }
+.lx-sources a:hover { text-decoration: underline; }
+.lx-sources-o { color: var(--ink-4); }
+
+.lx-relance { margin-top: 36px; padding: 24px 26px; border-radius: var(--radius-xl); background: #07080a; color: #edf2ef; }
+.lx-relance-t { font-size: 19px; font-weight: 900; letter-spacing: -0.028em; }
+.lx-relance-p { font-size: 14.5px; line-height: 1.55; color: #8e9793; margin-top: 8px; max-width: 46ch; }
+.lx-relance-b {
+  display: inline-block; margin-top: 16px;
+  padding: 10px 20px; border-radius: 999px;
+  background: var(--accent); color: #05070a; font-size: 13.5px; font-weight: 800;
+}
+
+.lx-suite { padding-bottom: 70px; }
+.lx-suite-t { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 800; color: var(--ink-4); margin-bottom: 14px; }
+.lx-suite-grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.lx-suite-c {
+  display: flex; flex-direction: column; gap: 9px;
+  padding: 20px; border-radius: var(--radius-lg);
+  border: 1px solid var(--border); background: var(--surface);
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.lx-suite-c:hover { border-color: var(--accent-border); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+.lx-suite-m { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 800; color: #0d7a40; }
+.lx-suite-h { font-size: 15.5px; font-weight: 700; line-height: 1.35; color: var(--ink); letter-spacing: -0.02em; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE TABLEAU DE BORD
+
+   Il réutilise les panneaux de la console (`.nc-panneau`, `.nc-label`…).
+   Ici, la page défile : sept vues ne tiennent pas dans une hauteur d'écran,
+   et les forcer les rendrait toutes illisibles.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.db {
+  position: relative;
+  min-height: calc(100vh - var(--navbar-height));
+  background: #06070a;
+  color: #edf2ef;
+  padding: 16px clamp(14px, 2.2vw, 30px) 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.db-tete {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.db-tete-g { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.db-tete-d { display: flex; gap: 8px; }
+@media (max-width: 1080px) {
+  .db-tete { grid-template-columns: 1fr; }
+}
+
+/* ── Les réglages ────────────────────────────────────────────────────────── */
+
+.db-reglages-boite { overflow: hidden; position: relative; }
+.db-reglages {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 14px 16px;
+}
+.db-reglages-l {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.db-reglage {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 8px 11px; border-radius: 9px; background: rgba(255, 255, 255, 0.03);
+}
+.db-reglage label { display: inline-flex; align-items: center; gap: 9px; font-size: 12.5px; cursor: pointer; }
+.db-reglage input { accent-color: #39ff88; width: 15px; height: 15px; }
+.db-tailles { display: flex; gap: 2px; }
+.db-tailles button {
+  width: 24px; height: 22px; border: 1px solid rgba(255, 255, 255, 0.14);
+  background: none; color: #565e5b; font-size: 10px; font-weight: 800;
+  border-radius: 6px; cursor: pointer; transition: all 0.16s;
+}
+.db-tailles button:hover { color: #edf2ef; }
+.db-tailles button.on { background: #39ff88; border-color: #39ff88; color: #05070a; }
+
+.db-reglages-pied {
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  margin-top: 13px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.db-croise { display: inline-flex; align-items: center; gap: 9px; font-size: 12.5px; color: #8e9793; }
+.db-croise select {
+  padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.16);
+  background: #0c0e12; color: #edf2ef; font-size: 12.5px; outline: none;
+}
+
+/* ── Le curseur d'année ──────────────────────────────────────────────────── */
+
+.db-annee { display: flex; align-items: center; gap: 12px; margin-left: auto; min-width: 260px; }
+.db-annee-n { font-size: 20px; font-weight: 900; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.db-scrub { flex: 1; accent-color: #39ff88; }
+@media (max-width: 900px) { .db-annee { margin-left: 0; width: 100%; } }
+
+/* ── La grille ───────────────────────────────────────────────────────────── */
+
+.db-grille {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* Une hauteur de rangée fixe : sans elle, la vue la plus haute étire toute
+     la ligne et la page redevient une pile de sections. */
+  grid-auto-rows: 290px;
+  gap: 12px;
+  align-items: stretch;
+}
+@media (max-width: 1080px) { .db-grille { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .db-grille { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 1080px) { .db-case { grid-column: span 2 !important; } }
+@media (max-width: 700px) { .db-case { grid-column: span 1 !important; } }
+
+.db-case { height: 100%; min-height: 0; cursor: default; }
+.db-case-glisse { opacity: 0.4; }
+.db-case-tete { cursor: grab; }
+.db-case-tete:active { cursor: grabbing; }
+.db-poignee { color: #565e5b; margin-right: 8px; letter-spacing: 0.1em; }
+
+.db-pied { position: relative; font-size: 10.5px; color: #565e5b; line-height: 1.5; max-width: 900px; }
+
+/* ── Les vues ────────────────────────────────────────────────────────────── */
+
+.db-scene { position: relative; flex: 1; min-height: 130px; display: flex; }
+.db-svg { flex: 1; min-height: 0; width: 100%; cursor: crosshair; touch-action: none; }
+.db-marqueurs { position: absolute; inset: 14px 6px; pointer-events: none; }
+.db-marqueur {
+  position: absolute; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px;
+  border-radius: 11px; border: 2.5px solid; background: #06070a;
+}
+
+.db-fiches { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+.db-fiche { border-top: 2px solid; border-radius: 8px; background: rgba(255, 255, 255, 0.03); padding: 12px 13px; }
+.db-fiche-nom { font-size: 14px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 10px; }
+.db-fiche-grille { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.db-fiche-l { display: block; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #565e5b; }
+.db-fiche-v { display: block; font-size: 15px; font-weight: 800; letter-spacing: -0.025em; margin-top: 3px; font-variant-numeric: tabular-nums; }
+.db-fiche-e { display: block; font-size: 10px; margin-top: 2px; }
+.db-fiche-e.up { color: #39ff88; }
+.db-fiche-e.down { color: #ff7b72; }
+
+.db-barres { display: flex; flex-direction: column; justify-content: center; gap: 10px; flex: 1; }
+.db-barre { display: grid; grid-template-columns: minmax(0, 92px) 1fr auto; gap: 10px; align-items: center; }
+.db-barre-nom { font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.db-barre-piste { height: 9px; border-radius: 9px; background: rgba(255, 255, 255, 0.07); overflow: hidden; }
+.db-barre-fait { display: block; height: 100%; border-radius: 9px; }
+.db-barre-v { font-size: 11.5px; color: #8e9793; min-width: 74px; text-align: right; font-variant-numeric: tabular-nums; }
+
+.db-nuage { flex: 1; display: flex; flex-direction: column; min-height: 170px; }
+.db-nuage-cadre { flex: 1; display: grid; grid-template-columns: 16px 1fr; grid-template-rows: 1fr 16px; gap: 6px; }
+.db-axe-y { grid-row: 1; writing-mode: vertical-rl; transform: rotate(180deg); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #565e5b; text-align: center; }
+.db-axe-x { grid-column: 2; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #565e5b; text-align: center; }
+.db-nuage-zone { position: relative; border-left: 1px solid rgba(255, 255, 255, 0.12); border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+.db-nuage-grille { position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(255, 255, 255, 0.06); }
+.db-point { position: absolute; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius: 11px; }
+.db-point-l {
+  position: absolute; left: 15px; top: -4px; white-space: nowrap;
+  font-size: 10.5px; color: #8e9793;
+}
+
+.db-rangs-l { position: absolute; right: 2px; top: 8px; bottom: 8px; display: flex; flex-direction: column; justify-content: space-between; font-size: 9.5px; color: #565e5b; }
+
+.db-tableau { overflow-x: auto; flex: 1; }
+.db-tableau table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.db-tableau th, .db-tableau td { padding: 8px 10px; text-align: right; border-bottom: 1px solid rgba(255, 255, 255, 0.07); white-space: nowrap; }
+.db-tableau thead th { font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #565e5b; font-weight: 800; }
+.db-tableau tbody th { text-align: left; font-weight: 700; }
+.db-tableau tbody td { color: #8e9793; font-variant-numeric: tabular-nums; }
+.db-pastille { display: inline-block; width: 8px; height: 8px; border-radius: 8px; margin-right: 8px; }
+
+.db-ecarts { display: flex; flex-direction: column; justify-content: center; gap: 8px; flex: 1; }
+.db-ecarts-ref { font-size: 11px; color: #565e5b; margin-bottom: 4px; }
+.db-ecart { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 7px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
+.db-ecart span { font-size: 12.5px; color: #8e9793; }
+.db-ecart strong { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+
+.db-note { font-size: 11px; color: #565e5b; margin: auto; }

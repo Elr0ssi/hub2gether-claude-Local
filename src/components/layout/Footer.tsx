@@ -46,8 +46,7 @@ export function Footer() {
                   ) : (
                     <span className="text-small opacity-50 cursor-not-allowed">
                       {theme.label}{" "}
-                      <span style={{ fontSize: "0.7rem" }}>
-                        — {theme.comingSoonLabel ?? "Bientôt"}
+                      <span style={{ fontSize: "0.7rem" }}>, {theme.comingSoonLabel ?? "Bientôt"}
                       </span>
                     </span>
                   )}
@@ -91,7 +90,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="text-small hover:text-[var(--ink)] transition-colors"
                 >
-                  AWMC — Sources cartographiques
+                  AWMC, Sources cartographiques
                 </a>
               </li>
             </ul>

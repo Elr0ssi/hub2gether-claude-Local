@@ -120,7 +120,7 @@ export function TranslationBubble({ text, rect, fromLang, toLang }: Props) {
             minWidth: 60,
           }}
         >
-          {loading ? "…" : error ? "Indisponible" : (translation ?? "—")}
+          {loading ? "…" : error ? "Indisponible" : (translation ?? "-")}
         </div>
 
         {/* Caret arrow */}

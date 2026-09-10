@@ -214,7 +214,7 @@ function ComparisonRow({
             <span className="text-xs" style={{ color: "var(--ink-3)" }}>{nameA}</span>
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-semibold tabular-nums" style={{ color: a >= b ? "#0D7A40" : "var(--ink-3)" }}>
-                {valueA !== null ? fmt(a, unit) : "—"}
+                {valueA !== null ? fmt(a, unit) : "-"}
               </span>
               {rankA !== null && rankA !== undefined && (
                 <span className="tabular-nums px-1.5 py-0.5 rounded-md font-bold" style={{ color: "#0D7A40", background: "rgba(57,255,136,0.12)", border: "1px solid rgba(57,255,136,0.3)", fontSize: "0.58rem" }}>
@@ -240,7 +240,7 @@ function ComparisonRow({
             <span className="text-xs" style={{ color: "var(--ink-3)" }}>{nameB}</span>
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-semibold tabular-nums" style={{ color: b >= a ? "#0D7A40" : "var(--ink-3)" }}>
-                {valueB !== null ? fmt(b, unit) : "—"}
+                {valueB !== null ? fmt(b, unit) : "-"}
               </span>
               {rankB !== null && rankB !== undefined && (
                 <span className="tabular-nums px-1.5 py-0.5 rounded-md font-bold" style={{ color: "#0D7A40", background: "rgba(57,255,136,0.12)", border: "1px solid rgba(57,255,136,0.3)", fontSize: "0.58rem" }}>
@@ -526,7 +526,7 @@ export function ComparisonView() {
 
       {/* Note de source */}
       <p className="text-xs text-center" style={{ color: "var(--ink-4)" }}>
-        Sources : Banque mondiale, FMI, OIT, BP Statistical Review, SIPRI, FAO, IISS Military Balance — données 2023/2024
+        Sources : Banque mondiale, FMI, OIT, BP Statistical Review, SIPRI, FAO, IISS Military Balance · données 2023/2024
       </p>
     </div>
   );

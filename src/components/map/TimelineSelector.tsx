@@ -55,7 +55,7 @@ export function TimelineSelector({
                 key={entry.year}
                 role="radio"
                 aria-checked={isActive}
-                aria-label={`${formatYear(entry.year)} — ${entry.label}`}
+                aria-label={`${formatYear(entry.year)} · ${entry.label}`}
                 onClick={() => onChange(entry.year)}
                 className="flex flex-col items-center gap-2 group focus:outline-none"
                 style={{ minWidth: 0 }}
@@ -109,7 +109,7 @@ export function TimelineSelector({
                       lineHeight: 1.3,
                     }}
                   >
-                    {entry.label.split("—")[0].trim()}
+                    {entry.label.split("-")[0].trim()}
                   </motion.span>
                 )}
               </button>
