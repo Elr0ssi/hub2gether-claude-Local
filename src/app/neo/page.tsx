@@ -4,6 +4,7 @@ import { NeoConsole } from "@/components/neo/NeoConsole";
 import { agregatsParAnnee, classementsParAnnee } from "@/data/neo/agregats";
 import { ARTICLES } from "@/data/articles";
 import { THEMES } from "@/data/themes";
+import { FILS } from "@/data/community/fils";
 
 export const metadata: Metadata = {
   title: "La base, en direct · The Essential Data",
@@ -45,11 +46,59 @@ export default function NeoPage() {
     }
   }
 
+  /* La une : le premier article du tour de rubriques, puis les suivants. */
+  const tous = [...parTheme.values()].flatMap((l) => l.slice(0, 2));
+  const vedette = tous[0] ?? ARTICLES[0];
+  const une = {
+    slug: vedette.slug,
+    titre: vedette.title,
+    theme: THEMES.find((t) => t.id === vedette.theme)?.label ?? vedette.theme,
+    chapo: vedette.excerpt,
+    minutes: vedette.readingTime,
+  };
+  const secondaires = tous
+    .filter((a) => a.slug !== vedette.slug)
+    .slice(0, 4)
+    .map((a) => ({
+      slug: a.slug,
+      titre: a.title,
+      theme: THEMES.find((t) => t.id === a.theme)?.label ?? a.theme,
+      minutes: a.readingTime,
+    }));
+
+  const LIGNES: Record<string, string> = {
+    economy: "PIB, dette, inflation et balances, depuis 1960.",
+    politics: "Régimes, transitions et libertés publiques.",
+    epidemics: "Diffusion, létalité et réponses comparées.",
+    military: "Budgets, effectifs et arsenaux en regard.",
+    empires: "Ce que les cartes anciennes disent d'aujourd'hui.",
+    conflicts: "Zones actives et différends territoriaux.",
+  };
+
   return (
     <div style={{ background: "#06070A", minHeight: "100vh" }}>
       <Navbar />
       <main style={{ paddingTop: "var(--navbar-height)" }}>
-        <NeoConsole agregats={agregats} rangs={rangs} articles={articles} />
+        <NeoConsole
+          agregats={agregats}
+          rangs={rangs}
+          articles={articles}
+          une={une}
+          secondaires={secondaires}
+          fils={FILS.slice(0, 4).map((f) => ({
+            id: f.id,
+            titre: f.titre,
+            ancre: f.ancre.valeur,
+            libelle: f.ancre.libelle,
+            theme: f.themeLabel,
+          }))}
+          terrains={THEMES.map((t) => ({
+            slug: t.slug,
+            label: t.label,
+            ligne: LIGNES[t.id] ?? "",
+            ouverte: t.id === "economy",
+          }))}
+        />
       </main>
     </div>
   );

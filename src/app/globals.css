@@ -979,8 +979,10 @@ body {
 
 .nc {
   position: relative;
+  /* La console tient dans l'ecran d'ouverture ; la une commence juste en
+     dessous, a la limite du pli. */
   height: calc(100vh - var(--navbar-height));
-  min-height: 620px;
+  min-height: 600px;
   background: #06070a;
   color: #edf2ef;
   display: flex;
@@ -2143,3 +2145,77 @@ body {
 .dc-porte-f { margin-top: auto; font-size: 18px; color: #39ff88; }
 
 @media (prefers-reduced-motion: reduce) { .dc-defiler { animation: none; } }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIVE — la une, sous la console
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.nl-page { background: #06070a; }
+.nl { padding: 0 clamp(14px, 2.2vw, 30px) 70px; color: #edf2ef; }
+
+.nl-bandeau { display: flex; align-items: center; gap: 16px; padding: 46px 0 22px; }
+.nl-bandeau-t { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 800; color: #39ff88; white-space: nowrap; }
+.nl-bandeau-r { flex: 1; height: 1px; background: rgba(255, 255, 255, 0.12); }
+
+/* ── La une ──────────────────────────────────────────────────────────────── */
+
+.nl-une-grille { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 14px; }
+@media (max-width: 900px) { .nl-une-grille { grid-template-columns: minmax(0, 1fr); } }
+
+.nl-vedette {
+  position: relative; overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 16px;
+  background: linear-gradient(150deg, rgba(57, 255, 136, 0.07), rgba(255, 255, 255, 0.02) 55%);
+  transition: border-color 0.22s;
+}
+.nl-vedette:hover { border-color: rgba(57, 255, 136, 0.45); }
+.nl-vedette > a { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 14px; padding: clamp(22px, 3vw, 40px); min-height: 280px; }
+.nl-vedette-m { font-size: 10.5px; letter-spacing: 0.15em; text-transform: uppercase; color: #39ff88; font-weight: 800; }
+.nl-vedette-t { font-size: clamp(24px, 2.7vw, 38px); line-height: 1.1; letter-spacing: -0.035em; font-weight: 900; max-width: 20ch; }
+.nl-vedette-c { font-size: 15px; line-height: 1.6; color: #8e9793; max-width: 56ch; }
+.nl-vedette-f { margin-top: auto; font-size: 13.5px; font-weight: 800; color: #39ff88; }
+.nl-vedette-sig { position: absolute; left: 0; right: 0; bottom: 0; height: 96px; width: 100%; z-index: 1; }
+
+.nl-secondaires { display: grid; grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.nl-second {
+  display: flex; flex-direction: column; gap: 7px; height: 100%; justify-content: center;
+  padding: 15px 17px; border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.025);
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+.nl-second:hover { border-color: rgba(57, 255, 136, 0.4); background: rgba(57, 255, 136, 0.05); transform: translateX(3px); }
+.nl-second-m { font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #39ff88; font-weight: 800; }
+.nl-second-t { font-size: 14px; font-weight: 700; line-height: 1.32; letter-spacing: -0.018em; }
+
+/* ── Le forum ────────────────────────────────────────────────────────────── */
+
+.nl-fils { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.nl-fil {
+  display: flex; flex-direction: column; gap: 6px; height: 100%; min-height: 158px;
+  padding: 20px; border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.025);
+  transition: border-color 0.2s, transform 0.2s;
+}
+.nl-fil:hover { border-color: rgba(57, 255, 136, 0.42); transform: translateY(-3px); }
+.nl-fil-chiffre { font-size: 26px; font-weight: 900; letter-spacing: -0.04em; color: #39ff88; font-variant-numeric: tabular-nums; }
+.nl-fil-libelle { font-size: 10.5px; color: #565e5b; }
+.nl-fil-titre { font-size: 14px; font-weight: 600; line-height: 1.35; margin-top: 6px; }
+.nl-fil-theme { margin-top: auto; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #565e5b; font-weight: 700; }
+
+/* ── Les terrains ────────────────────────────────────────────────────────── */
+
+.nl-terrains-grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.nl-terrain {
+  display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 132px;
+  padding: 18px; border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.02);
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+.nl-terrain-on:hover { border-color: rgba(57, 255, 136, 0.42); background: rgba(57, 255, 136, 0.05); transform: translateY(-3px); }
+.nl-terrain-t { font-size: 17px; font-weight: 800; letter-spacing: -0.028em; }
+.nl-terrain-c { font-size: 12.5px; line-height: 1.45; color: #8e9793; }
+.nl-terrain-f { margin-top: auto; font-size: 12px; font-weight: 800; color: #39ff88; }
+.nl-terrain-soon { color: #565e5b; letter-spacing: 0.12em; text-transform: uppercase; font-size: 10px; }
+.nl-terrain:not(.nl-terrain-on) .nl-terrain-t,
+.nl-terrain:not(.nl-terrain-on) .nl-terrain-c { color: #565e5b; }

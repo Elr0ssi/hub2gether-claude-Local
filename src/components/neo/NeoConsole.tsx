@@ -217,9 +217,13 @@ export interface ConsoleProps {
   agregats: AgregatAnnee[];
   rangs: Record<number, RangPays[]>;
   articles: { slug: string; titre: string; theme: string }[];
+  une: { slug: string; titre: string; theme: string; chapo: string; minutes: number };
+  secondaires: { slug: string; titre: string; theme: string; minutes: number }[];
+  fils: { id: string; titre: string; ancre: string; libelle: string; theme: string }[];
+  terrains: { slug: string; label: string; ligne: string; ouverte: boolean }[];
 }
 
-export function NeoConsole({ agregats, rangs, articles }: ConsoleProps) {
+export function NeoConsole({ agregats, rangs, articles, une, secondaires, fils, terrains }: ConsoleProps) {
   const [i, setI] = useState(agregats.length - 1);
   const [joue, setJoue] = useState(false);
   const a = agregats[i];
@@ -277,7 +281,8 @@ export function NeoConsole({ agregats, rangs, articles }: ConsoleProps) {
   ];
 
   return (
-    <div className="nc">
+    <div className="nl-page">
+      <div className="nc">
       <div className="nc-scan" aria-hidden="true" />
 
       {/* ── La barre de tête ─────────────────────────────────────────────── */}
@@ -404,6 +409,145 @@ export function NeoConsole({ agregats, rangs, articles }: ConsoleProps) {
         officiel : la couverture s&apos;élargit avec le temps, et le nombre de pays est donné avec
         chaque valeur.
       </p>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          LA UNE
+
+          La console dit l'état de la base ; ce qui suit dit ce qu'on en a
+          fait. Un média se lit, il ne se contemple pas.
+          ═══════════════════════════════════════════════════════════════════ */}
+      <div className="nl">
+        <section className="nl-une">
+          <div className="nl-bandeau">
+            <span className="nl-bandeau-t">À la une</span>
+            <span className="nl-bandeau-r" aria-hidden="true" />
+            <Link href={`/lecture/${une.slug}`} className="nc-mini nc-mini-lien">
+              toutes les publications →
+            </Link>
+          </div>
+
+          <div className="nl-une-grille">
+            <motion.article
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-70px" }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="nl-vedette"
+            >
+              <Link href={`/lecture/${une.slug}`}>
+                <span className="nl-vedette-m">
+                  {une.theme} · {une.minutes} min
+                </span>
+                <h2 className="nl-vedette-t">{une.titre}</h2>
+                <p className="nl-vedette-c">{une.chapo}</p>
+                <span className="nl-vedette-f">Lire l&apos;article →</span>
+              </Link>
+              {/* La courbe de la base en filigrane : l'article et la donnée
+                  sont le même objet, autant le montrer. */}
+              <svg className="nl-vedette-sig" viewBox="0 0 400 90" preserveAspectRatio="none" aria-hidden="true">
+                <path
+                  d={agregats
+                    .map((a, k) => {
+                      const mx = Math.max(...agregats.map((z) => z.pib));
+                      return `${k ? "L" : "M"} ${((k / (agregats.length - 1)) * 400).toFixed(1)} ${(90 - (a.pib / mx) * 78).toFixed(1)}`;
+                    })
+                    .join(" ")}
+                  fill="none"
+                  stroke={VERT}
+                  strokeOpacity={0.3}
+                  strokeWidth={1.5}
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
+            </motion.article>
+
+            <div className="nl-secondaires">
+              {secondaires.map((a, k) => (
+                <motion.div
+                  key={a.slug}
+                  initial={{ opacity: 0, x: 22 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.5, delay: k * 0.07, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <Link href={`/lecture/${a.slug}`} className="nl-second">
+                    <span className="nl-second-m">
+                      {a.theme} · {a.minutes} min
+                    </span>
+                    <span className="nl-second-t">{a.titre}</span>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Le forum ─────────────────────────────────────────────────── */}
+        <section className="nl-forum">
+          <div className="nl-bandeau">
+            <span className="nl-bandeau-t">Ce qui se discute</span>
+            <span className="nl-bandeau-r" aria-hidden="true" />
+            <Link href="/community" className="nc-mini nc-mini-lien">
+              ouvrir le forum →
+            </Link>
+          </div>
+          <div className="nl-fils">
+            {fils.map((f, k) => (
+              <motion.div
+                key={f.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.5, delay: k * 0.07, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <Link href="/community" className="nl-fil">
+                  <span className="nl-fil-chiffre">{f.ancre}</span>
+                  <span className="nl-fil-libelle">{f.libelle}</span>
+                  <span className="nl-fil-titre">{f.titre}</span>
+                  <span className="nl-fil-theme">{f.theme}</span>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Les terrains ─────────────────────────────────────────────── */}
+        <section className="nl-terrains">
+          <div className="nl-bandeau">
+            <span className="nl-bandeau-t">Les terrains</span>
+            <span className="nl-bandeau-r" aria-hidden="true" />
+            <Link href="/decouvrir" className="nc-mini nc-mini-lien">
+              tout le média →
+            </Link>
+          </div>
+          <div className="nl-terrains-grille">
+            {terrains.map((t, k) =>
+              t.ouverte ? (
+                <motion.div
+                  key={t.slug}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.45, delay: k * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <Link href={`/map/${t.slug}`} className="nl-terrain nl-terrain-on">
+                    <span className="nl-terrain-t">{t.label}</span>
+                    <span className="nl-terrain-c">{t.ligne}</span>
+                    <span className="nl-terrain-f">Explorer →</span>
+                  </Link>
+                </motion.div>
+              ) : (
+                <div key={t.slug} className="nl-terrain">
+                  <span className="nl-terrain-t">{t.label}</span>
+                  <span className="nl-terrain-c">{t.ligne}</span>
+                  <span className="nl-terrain-f nl-terrain-soon">Bientôt</span>
+                </div>
+              )
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
