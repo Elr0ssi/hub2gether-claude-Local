@@ -1118,6 +1118,7 @@ body {
   margin-bottom: 10px;
 }
 .nc-panneau-corps { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.db-case .nc-panneau-corps { overflow: auto; }
 
 .nc-label {
   font-size: 10px;
@@ -1238,36 +1239,8 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   COMPARER — le tableau de bord
-
-   Il réutilise les panneaux de la console (`.nc-panneau`, `.nc-label`…) et
-   n'ajoute que ce qui lui est propre.
+   COMPARER — les commandes partagées avec le tableau de bord
    ═══════════════════════════════════════════════════════════════════════════ */
-
-.cp {
-  position: relative;
-  height: calc(100vh - var(--navbar-height));
-  min-height: 640px;
-  background: #06070a;
-  color: #edf2ef;
-  display: flex;
-  flex-direction: column;
-  padding: 16px clamp(14px, 2.2vw, 30px) 14px;
-  gap: 12px;
-  overflow: hidden;
-}
-
-.cp-tete {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: center;
-  gap: 18px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-.cp-tete-gauche { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-.cp-tete-droite { display: flex; gap: 8px; }
 
 .cp-champs { display: flex; gap: 4px; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, 0.05); }
 .cp-champ {
@@ -1365,81 +1338,6 @@ body {
   user-select: none;
 }
 .cp-bascule input { accent-color: #39ff88; width: 15px; height: 15px; }
-
-/* ── La grille ───────────────────────────────────────────────────────────── */
-
-.cp-grille {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(0, 320px);
-  grid-template-rows: minmax(0, 1.25fr) minmax(0, 1fr);
-  grid-template-areas:
-    "courbes barres"
-    "courbes ecarts";
-  gap: 12px;
-}
-.cp-courbes { flex: 1; min-height: 0; width: 100%; cursor: crosshair; touch-action: none; }
-
-.cp-barres { justify-content: center; gap: 11px; }
-.cp-barre { display: grid; grid-template-columns: minmax(0, 92px) 1fr auto; gap: 10px; align-items: center; }
-.cp-barre-nom {
-  font-size: 12.5px;
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.cp-barre-piste { height: 9px; border-radius: 9px; background: rgba(255, 255, 255, 0.07); overflow: hidden; }
-.cp-barre-fait { display: block; height: 100%; border-radius: 9px; }
-.cp-barre-val { font-size: 11.5px; color: #8e9793; min-width: 74px; text-align: right; font-variant-numeric: tabular-nums; }
-
-.cp-ecarts { justify-content: center; gap: 9px; }
-.cp-ecart {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-}
-.cp-ecart-nom { font-size: 12.5px; color: #8e9793; }
-.cp-ecart-v { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-
-.cp-note { font-size: 10.5px; color: #565e5b; line-height: 1.5; }
-.cp-note-bas { margin-top: auto; padding-top: 10px; }
-.cp-vide { font-size: 13px; color: #565e5b; margin: auto; }
-
-@media (max-width: 1080px) {
-  .cp { height: auto; overflow: visible; }
-  .cp-grille {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: none;
-    grid-template-areas: "courbes" "barres" "ecarts";
-  }
-  .cp-courbes { min-height: 240px; }
-  .cp-tete { grid-template-columns: 1fr; }
-  .cp-bascule { margin-left: 0; }
-}
-
-/* Les repères de l'année courante. Ils vivent en HTML au-dessus du tracé :
-   dans un SVG étiré en X et en Y, un cercle devient un ovale. */
-.cp-scene { position: relative; flex: 1; min-height: 0; display: flex; }
-.cp-marqueurs {
-  position: absolute;
-  inset: 14px 6px;
-  pointer-events: none;
-}
-.cp-marqueur {
-  position: absolute;
-  width: 11px;
-  height: 11px;
-  margin: -5.5px 0 0 -5.5px;
-  border-radius: 11px;
-  border: 2.5px solid;
-  background: #06070a;
-}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    COMMUNITY — le forum
@@ -1927,3 +1825,166 @@ body {
 .lx-suite-c:hover { border-color: var(--accent-border); transform: translateY(-2px); box-shadow: var(--shadow-hover); }
 .lx-suite-m { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 800; color: #0d7a40; }
 .lx-suite-h { font-size: 15.5px; font-weight: 700; line-height: 1.35; color: var(--ink); letter-spacing: -0.02em; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE TABLEAU DE BORD
+
+   Il réutilise les panneaux de la console (`.nc-panneau`, `.nc-label`…).
+   Ici, la page défile : sept vues ne tiennent pas dans une hauteur d'écran,
+   et les forcer les rendrait toutes illisibles.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.db {
+  position: relative;
+  min-height: calc(100vh - var(--navbar-height));
+  background: #06070a;
+  color: #edf2ef;
+  padding: 16px clamp(14px, 2.2vw, 30px) 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.db-tete {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.db-tete-g { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.db-tete-d { display: flex; gap: 8px; }
+@media (max-width: 1080px) {
+  .db-tete { grid-template-columns: 1fr; }
+}
+
+/* ── Les réglages ────────────────────────────────────────────────────────── */
+
+.db-reglages-boite { overflow: hidden; position: relative; }
+.db-reglages {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 14px 16px;
+}
+.db-reglages-l {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.db-reglage {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 8px 11px; border-radius: 9px; background: rgba(255, 255, 255, 0.03);
+}
+.db-reglage label { display: inline-flex; align-items: center; gap: 9px; font-size: 12.5px; cursor: pointer; }
+.db-reglage input { accent-color: #39ff88; width: 15px; height: 15px; }
+.db-tailles { display: flex; gap: 2px; }
+.db-tailles button {
+  width: 24px; height: 22px; border: 1px solid rgba(255, 255, 255, 0.14);
+  background: none; color: #565e5b; font-size: 10px; font-weight: 800;
+  border-radius: 6px; cursor: pointer; transition: all 0.16s;
+}
+.db-tailles button:hover { color: #edf2ef; }
+.db-tailles button.on { background: #39ff88; border-color: #39ff88; color: #05070a; }
+
+.db-reglages-pied {
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  margin-top: 13px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.db-croise { display: inline-flex; align-items: center; gap: 9px; font-size: 12.5px; color: #8e9793; }
+.db-croise select {
+  padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.16);
+  background: #0c0e12; color: #edf2ef; font-size: 12.5px; outline: none;
+}
+
+/* ── Le curseur d'année ──────────────────────────────────────────────────── */
+
+.db-annee { display: flex; align-items: center; gap: 12px; margin-left: auto; min-width: 260px; }
+.db-annee-n { font-size: 20px; font-weight: 900; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.db-scrub { flex: 1; accent-color: #39ff88; }
+@media (max-width: 900px) { .db-annee { margin-left: 0; width: 100%; } }
+
+/* ── La grille ───────────────────────────────────────────────────────────── */
+
+.db-grille {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* Une hauteur de rangée fixe : sans elle, la vue la plus haute étire toute
+     la ligne et la page redevient une pile de sections. */
+  grid-auto-rows: 290px;
+  gap: 12px;
+  align-items: stretch;
+}
+@media (max-width: 1080px) { .db-grille { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .db-grille { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 1080px) { .db-case { grid-column: span 2 !important; } }
+@media (max-width: 700px) { .db-case { grid-column: span 1 !important; } }
+
+.db-case { height: 100%; min-height: 0; cursor: default; }
+.db-case-glisse { opacity: 0.4; }
+.db-case-tete { cursor: grab; }
+.db-case-tete:active { cursor: grabbing; }
+.db-poignee { color: #565e5b; margin-right: 8px; letter-spacing: 0.1em; }
+
+.db-pied { position: relative; font-size: 10.5px; color: #565e5b; line-height: 1.5; max-width: 900px; }
+
+/* ── Les vues ────────────────────────────────────────────────────────────── */
+
+.db-scene { position: relative; flex: 1; min-height: 130px; display: flex; }
+.db-svg { flex: 1; min-height: 0; width: 100%; cursor: crosshair; touch-action: none; }
+.db-marqueurs { position: absolute; inset: 14px 6px; pointer-events: none; }
+.db-marqueur {
+  position: absolute; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px;
+  border-radius: 11px; border: 2.5px solid; background: #06070a;
+}
+
+.db-fiches { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+.db-fiche { border-top: 2px solid; border-radius: 8px; background: rgba(255, 255, 255, 0.03); padding: 12px 13px; }
+.db-fiche-nom { font-size: 14px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 10px; }
+.db-fiche-grille { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.db-fiche-l { display: block; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #565e5b; }
+.db-fiche-v { display: block; font-size: 15px; font-weight: 800; letter-spacing: -0.025em; margin-top: 3px; font-variant-numeric: tabular-nums; }
+.db-fiche-e { display: block; font-size: 10px; margin-top: 2px; }
+.db-fiche-e.up { color: #39ff88; }
+.db-fiche-e.down { color: #ff7b72; }
+
+.db-barres { display: flex; flex-direction: column; justify-content: center; gap: 10px; flex: 1; }
+.db-barre { display: grid; grid-template-columns: minmax(0, 92px) 1fr auto; gap: 10px; align-items: center; }
+.db-barre-nom { font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.db-barre-piste { height: 9px; border-radius: 9px; background: rgba(255, 255, 255, 0.07); overflow: hidden; }
+.db-barre-fait { display: block; height: 100%; border-radius: 9px; }
+.db-barre-v { font-size: 11.5px; color: #8e9793; min-width: 74px; text-align: right; font-variant-numeric: tabular-nums; }
+
+.db-nuage { flex: 1; display: flex; flex-direction: column; min-height: 170px; }
+.db-nuage-cadre { flex: 1; display: grid; grid-template-columns: 16px 1fr; grid-template-rows: 1fr 16px; gap: 6px; }
+.db-axe-y { grid-row: 1; writing-mode: vertical-rl; transform: rotate(180deg); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #565e5b; text-align: center; }
+.db-axe-x { grid-column: 2; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #565e5b; text-align: center; }
+.db-nuage-zone { position: relative; border-left: 1px solid rgba(255, 255, 255, 0.12); border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+.db-nuage-grille { position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(255, 255, 255, 0.06); }
+.db-point { position: absolute; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; border-radius: 11px; }
+.db-point-l {
+  position: absolute; left: 15px; top: -4px; white-space: nowrap;
+  font-size: 10.5px; color: #8e9793;
+}
+
+.db-rangs-l { position: absolute; right: 2px; top: 8px; bottom: 8px; display: flex; flex-direction: column; justify-content: space-between; font-size: 9.5px; color: #565e5b; }
+
+.db-tableau { overflow-x: auto; flex: 1; }
+.db-tableau table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.db-tableau th, .db-tableau td { padding: 8px 10px; text-align: right; border-bottom: 1px solid rgba(255, 255, 255, 0.07); white-space: nowrap; }
+.db-tableau thead th { font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: #565e5b; font-weight: 800; }
+.db-tableau tbody th { text-align: left; font-weight: 700; }
+.db-tableau tbody td { color: #8e9793; font-variant-numeric: tabular-nums; }
+.db-pastille { display: inline-block; width: 8px; height: 8px; border-radius: 8px; margin-right: 8px; }
+
+.db-ecarts { display: flex; flex-direction: column; justify-content: center; gap: 8px; flex: 1; }
+.db-ecarts-ref { font-size: 11px; color: #565e5b; margin-bottom: 4px; }
+.db-ecart { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 7px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); }
+.db-ecart span { font-size: 12.5px; color: #8e9793; }
+.db-ecart strong { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+
+.db-note { font-size: 11px; color: #565e5b; margin: auto; }

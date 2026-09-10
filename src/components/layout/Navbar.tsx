@@ -52,9 +52,26 @@ export function Navbar() {
         {/* Theme navigation */}
         {/* nowrap keeps the row a single line once the eighth tab appears at xl */}
         <nav className="hidden md:flex items-center gap-0.5 whitespace-nowrap">
-          {/* Les deux entrees « neo ». Elles s'ajoutent, elles ne remplacent
-              rien : l'accueil actuel reste sur / et les anciennes pages sont
+          {/* Les entrees « neo ». Elles s'ajoutent, elles ne remplacent rien :
+              l'accueil actuel reste sur / et les anciennes pages sont
               inchangees. */}
+          <Link
+            href="/decouvrir"
+            className={cn(
+              "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
+              pathname === "/decouvrir"
+                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
+                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
+            )}
+          >
+            Découvrir
+            {pathname === "/decouvrir" && (
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
+                style={{ background: "var(--accent)" }}
+              />
+            )}
+          </Link>
           <Link
             href="/neo"
             className={cn(
@@ -83,6 +100,23 @@ export function Navbar() {
           >
             Community
             {pathname === "/community" && (
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
+                style={{ background: "var(--accent)" }}
+              />
+            )}
+          </Link>
+          <Link
+            href="/test-article"
+            className={cn(
+              "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
+              pathname.startsWith("/test-article")
+                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
+                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
+            )}
+          >
+            Test Article
+            {pathname.startsWith("/test-article") && (
               <span
                 className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
                 style={{ background: "var(--accent)" }}
