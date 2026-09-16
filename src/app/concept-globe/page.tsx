@@ -1,0 +1,23 @@
+import type { Metadata } from "next";
+import { ConceptPage } from "@/components/concept/ConceptPage";
+
+export const metadata: Metadata = {
+  title: "Concept · The Essential Data",
+  description:
+    "Prototype de direction artistique : l'univers The Essential Data, ses rubriques en orbite et son fil éditorial.",
+  /* Un prototype ne doit pas se retrouver dans l'index à côté des pages
+     réelles : même marque, deux promesses différentes. */
+  robots: { index: false, follow: false },
+};
+
+/**
+ * La route de démonstration.
+ *
+ * Volontairement autonome : ni `Layout`, ni `Navbar`, ni `Footer` du site.
+ * Elle porte son propre en-tête minimal et sa propre feuille de style, de
+ * sorte qu'aucune page existante ne peut être affectée, et qu'on puisse la
+ * supprimer d'un seul coup si la direction n'est pas retenue.
+ */
+export default function ConceptGlobePage() {
+  return <ConceptPage />;
+}
