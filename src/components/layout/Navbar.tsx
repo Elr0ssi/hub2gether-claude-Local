@@ -55,6 +55,26 @@ export function Navbar() {
           {/* Les entrees « neo ». Elles s'ajoutent, elles ne remplacent rien :
               l'accueil actuel reste sur / et les anciennes pages sont
               inchangees. */}
+          {/* Le prototype de direction artistique. La page reste autonome —
+              elle n'affiche pas cette barre — mais il faut pouvoir y entrer
+              depuis le site. */}
+          <Link
+            href="/concept-globe"
+            className={cn(
+              "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
+              pathname === "/concept-globe"
+                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
+                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
+            )}
+          >
+            Concept
+            {pathname === "/concept-globe" && (
+              <span
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
+                style={{ background: "var(--accent)" }}
+              />
+            )}
+          </Link>
           <Link
             href="/decouvrir"
             className={cn(
