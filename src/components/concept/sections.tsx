@@ -12,6 +12,8 @@ import {
   CITATION,
 } from "@/data/concept/conceptData";
 import { Compteur, Enseigne, ImagePlaceholder, LENT, Monte } from "./pieces";
+import { GlobeMonde } from "./GlobeMonde";
+import type { FichePays } from "@/data/concept/conceptGeo";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LES SECTIONS QUI SUIVENT LE GLOBE
@@ -66,7 +68,17 @@ export function LiveTicker() {
 
 /* ── La carte ────────────────────────────────────────────────────────────── */
 
-export function InteractiveMapPreview() {
+export function InteractiveMapPreview({
+  donnees,
+  annee,
+  regions,
+  vues,
+}: {
+  donnees: Record<string, FichePays>;
+  annee: number;
+  regions: readonly { id: string; label: string; pays: readonly string[] }[];
+  vues: Record<string, { lat: number; lon: number }>;
+}) {
   return (
     <section className="cg-section">
       <div className="cg-wrap">
@@ -77,60 +89,14 @@ export function InteractiveMapPreview() {
             <span className="cg-h2-doux">Autrement.</span>
           </h2>
           <p className="cg-chapo">
-            Une carte interactive, des indicateurs clés et des analyses pour chaque pays.
+            Un globe interactif, des indicateurs clés et des analyses pour chaque pays. Faites-le
+            tourner, choisissez un territoire.
           </p>
         </Monte>
 
-        <div className="cg-carte-grille">
-          <Monte delay={0.1}>
-            {/* La zone d'accueil de la vraie carte : mêmes dimensions, même
-                cadre. Il suffira d'y monter le composant existant. */}
-            <div className="cg-carte-zone" data-slot="CARTE_INTERACTIVE">
-              <span className="cg-carte-mention">ZONE_CARTE_INTERACTIVE</span>
-              <svg className="cg-carte-fond" viewBox="0 0 600 320" aria-hidden="true" preserveAspectRatio="none">
-                {Array.from({ length: 13 }, (_, k) => (
-                  <line key={`h${k}`} x1="0" x2="600" y1={k * 26} y2={k * 26} stroke="rgba(255,255,255,0.05)" />
-                ))}
-                {Array.from({ length: 21 }, (_, k) => (
-                  <line key={`v${k}`} x1={k * 30} x2={k * 30} y1="0" y2="320" stroke="rgba(255,255,255,0.05)" />
-                ))}
-                {[
-                  [178, 118],
-                  [196, 132],
-                  [214, 108],
-                  [300, 96],
-                  [318, 126],
-                  [356, 150],
-                  [402, 118],
-                  [438, 168],
-                  [262, 198],
-                  [206, 214],
-                ].map(([x, y], k) => (
-                  <circle key={k} cx={x} cy={y} r={k === 3 ? 4 : 2.4} fill={k === 3 ? "#D6A77A" : "rgba(244,242,238,0.42)"} />
-                ))}
-              </svg>
-            </div>
-          </Monte>
-
-          <Monte delay={0.2}>
-            <aside className="cg-fiche">
-              <p className="cg-fiche-pays">
-                <span aria-hidden="true">{FICHE_PAYS.drapeau}</span> {FICHE_PAYS.pays}
-              </p>
-              <dl className="cg-fiche-l">
-                {FICHE_PAYS.mesures.map((m) => (
-                  <div key={m.label}>
-                    <dt>{m.label}</dt>
-                    <dd>{m.valeur}</dd>
-                  </div>
-                ))}
-              </dl>
-              <button type="button" className="cg-lien-fleche">
-                Voir la fiche pays <span aria-hidden="true">→</span>
-              </button>
-            </aside>
-          </Monte>
-        </div>
+        <Monte delay={0.08}>
+          <GlobeMonde donnees={donnees} annee={annee} regions={regions} vues={vues} />
+        </Monte>
 
         <Monte delay={0.14}>
           <div className="cg-couverture">
@@ -139,6 +105,103 @@ export function InteractiveMapPreview() {
                 <strong>{c.valeur}</strong> {c.label}
               </span>
             ))}
+          </div>
+        </Monte>
+      </div>
+    </section>
+  );
+}
+
+/* ── Les flux : d'où viennent les données ────────────────────────────────── */
+
+const SOURCES = [
+  { id: "presse", label: "Presse internationale", detail: "25 titres, 9 langues" },
+  { id: "institutions", label: "Institutions", detail: "Banque mondiale, FMI, OMS" },
+  { id: "ouvertes", label: "Données ouvertes", detail: "INSEE, Eurostat, OCDE" },
+  { id: "terrain", label: "Terrain", detail: "Rapports, registres, archives" },
+];
+
+export function FluxSources() {
+  return (
+    <section className="cg-section cg-flux">
+      <div className="cg-wrap">
+        <Enseigne>La fabrique</Enseigne>
+        <Monte>
+          <h2 className="cg-h2">
+            Quatre flux<span className="cg-pt">.</span>
+            <br />
+            <span className="cg-h2-doux">Une seule sortie.</span>
+          </h2>
+          <p className="cg-chapo">
+            Rien ne sort qui n&apos;ait été vu par plusieurs sources. Les convergences font la
+            donnée, les divergences font l&apos;article.
+          </p>
+        </Monte>
+
+        <div className="cg-flux-scene">
+          {/* Les quatre entrées, à gauche */}
+          <div className="cg-flux-entrees">
+            {SOURCES.map((s, k) => (
+              <Monte key={s.id} delay={k * 0.1} y={18}>
+                <div className="cg-flux-entree">
+                  <span className="cg-flux-n">{String(k + 1).padStart(2, "0")}</span>
+                  <span className="cg-flux-t">{s.label}</span>
+                  <span className="cg-flux-d">{s.detail}</span>
+                </div>
+              </Monte>
+            ))}
+          </div>
+
+          {/* Les courbes qui se rejoignent */}
+          <svg className="cg-flux-toile" viewBox="0 0 420 340" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="cg-flux-g" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#d6a77a" stopOpacity="0.08" />
+                <stop offset="65%" stopColor="#d6a77a" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#9ec7d8" stopOpacity="0.9" />
+              </linearGradient>
+            </defs>
+            {[42, 128, 214, 300].map((y, k) => (
+              <g key={y}>
+                <path
+                  d={`M 0 ${y} C 150 ${y}, 220 170, 420 170`}
+                  fill="none"
+                  stroke="url(#cg-flux-g)"
+                  strokeWidth="1.2"
+                />
+                {/* Une impulsion parcourt chaque flux : on voit que ça circule. */}
+                <circle r="2.6" fill="#d6a77a" className="cg-flux-bille">
+                  <animateMotion
+                    dur={`${5.2 + k * 0.9}s`}
+                    repeatCount="indefinite"
+                    path={`M 0 ${y} C 150 ${y}, 220 170, 420 170`}
+                  />
+                </circle>
+              </g>
+            ))}
+          </svg>
+
+          {/* La sortie */}
+          <Monte delay={0.28}>
+            <div className="cg-flux-sortie">
+              <span className="cg-flux-sortie-m" aria-hidden="true" />
+              <span className="cg-flux-sortie-t">The Essential Data</span>
+              <span className="cg-flux-sortie-d">Recoupé, daté, sourcé</span>
+            </div>
+          </Monte>
+        </div>
+
+        {/* Le prix pour le lecteur */}
+        <Monte delay={0.2}>
+          <div className="cg-gratuit">
+            <span className="cg-gratuit-v">
+              <Compteur valeur={0} suffixe=" €" duree={1.2} />
+            </span>
+            <span className="cg-gratuit-l">
+              <strong>Le prix pour le lecteur.</strong>
+              Pas de mur payant, pas de compte obligatoire. Le média est financé par son audience,
+              pas par ses lecteurs.
+            </span>
           </div>
         </Monte>
       </div>

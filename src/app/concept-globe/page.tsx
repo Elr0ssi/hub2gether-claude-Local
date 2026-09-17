@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ConceptPage } from "@/components/concept/ConceptPage";
+import { donneesPays, REGIONS, VUES } from "@/data/concept/conceptGeo";
 
 export const metadata: Metadata = {
   title: "Concept · The Essential Data",
@@ -19,5 +20,8 @@ export const metadata: Metadata = {
  * supprimer d'un seul coup si la direction n'est pas retenue.
  */
 export default function ConceptGlobePage() {
-  return <ConceptPage />;
+  /* Le globe du prototype affiche de vraies valeurs : la page serveur lit le
+     socle et n'envoie que la fiche de chaque pays. */
+  const { annee, pays } = donneesPays();
+  return <ConceptPage donnees={pays} annee={annee} regions={REGIONS} vues={VUES} />;
 }

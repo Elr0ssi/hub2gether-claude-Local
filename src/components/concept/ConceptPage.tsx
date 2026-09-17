@@ -7,12 +7,14 @@ import { UniverseGlobe, type PositionNoeud } from "./UniverseGlobe";
 import { ImagePlaceholder, LENT } from "./pieces";
 import {
   FeaturedStories,
+  FluxSources,
   InteractiveMapPreview,
   LiveTicker,
   NewsletterSection,
   NumbersSection,
   TopicExplorer,
 } from "./sections";
+import type { FichePays } from "@/data/concept/conceptGeo";
 import "./concept.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -26,7 +28,14 @@ import "./concept.css";
 
 const NAV = ["Monde", "Économie", "Géopolitique", "Sociétés", "Ressources", "Analyses"];
 
-export function ConceptPage() {
+export interface ConceptProps {
+  donnees: Record<string, FichePays>;
+  annee: number;
+  regions: readonly { id: string; label: string; pays: readonly string[] }[];
+  vues: Record<string, { lat: number; lon: number }>;
+}
+
+export function ConceptPage({ donnees, annee, regions, vues }: ConceptProps) {
   const [actif, setActif] = useState<string | null>(null);
   const [fige, setFige] = useState<string | null>(null);
   const [souris, setSouris] = useState({ x: 0, y: 0 });
@@ -264,7 +273,8 @@ export function ConceptPage() {
         </svg>
 
         <LiveTicker />
-        <InteractiveMapPreview />
+        <InteractiveMapPreview donnees={donnees} annee={annee} regions={regions} vues={vues} />
+        <FluxSources />
         <FeaturedStories />
         <TopicExplorer />
         <NumbersSection />

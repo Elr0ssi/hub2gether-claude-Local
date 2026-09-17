@@ -17,6 +17,32 @@ export const LENT = [0.22, 1, 0.36, 1] as const;
  * remplacer ce composant par une balise `img` pointant sur
  * `/concept/<nom>.png` une fois les visuels déposés.
  */
+/* Une teinte par famille de sujet, pour que le cadre vide donne déjà une
+   idée du rythme de la page. Ce ne sont pas des images : ce sont des fonds
+   dégradés, générés en CSS, que le PNG viendra recouvrir. */
+const TEINTES: Record<string, [string, string]> = {
+  ECONOMIE: ["#4a2f16", "#0d1218"],
+  GEOPOLITIQUE: ["#16304a", "#0d1218"],
+  CLIMAT: ["#123b33", "#0d1218"],
+  RESSOURCES: ["#4a2a18", "#0d1218"],
+  SOCIETES: ["#33304a", "#0d1218"],
+  ANALYSES: ["#2c3238", "#0d1218"],
+  ARTICLE_01: ["#4a2a18", "#0b1016"],
+  ARTICLE_02: ["#3d3418", "#0b1016"],
+  ARTICLE_03: ["#123b33", "#0b1016"],
+  ARTICLE_04: ["#16304a", "#0b1016"],
+  THEME_01: ["#4a2f16", "#0b1016"],
+  THEME_02: ["#16304a", "#0b1016"],
+  THEME_03: ["#123b33", "#0b1016"],
+  THEME_04: ["#4a2a18", "#0b1016"],
+  THEME_05: ["#33304a", "#0b1016"],
+};
+
+function teinte(nom: string): [string, string] {
+  const cle = Object.keys(TEINTES).find((k) => nom.includes(k));
+  return cle ? TEINTES[cle] : ["#1a2029", "#0b1016"];
+}
+
 export function ImagePlaceholder({
   nom,
   ratio = "16 / 9",
@@ -26,10 +52,22 @@ export function ImagePlaceholder({
   ratio?: string;
   className?: string;
 }) {
+  const [a, b] = teinte(nom);
   return (
-    <div className={`image-placeholder ${className}`} style={{ aspectRatio: ratio }} data-png={nom}>
-      <span className="image-placeholder-croix" aria-hidden="true" />
-      <span className="image-placeholder-nom">{nom}</span>
+    <div
+      className={`image-placeholder ${className}`}
+      style={
+        {
+          aspectRatio: ratio,
+          "--ph-a": a,
+          "--ph-b": b,
+        } as React.CSSProperties
+      }
+      data-png={nom}
+    >
+      <span className="image-placeholder-lueur" aria-hidden="true" />
+      <span className="image-placeholder-trame" aria-hidden="true" />
+      <span className="image-placeholder-etiquette">{nom}</span>
     </div>
   );
 }
