@@ -6,12 +6,15 @@ import { TOPICS } from "@/data/concept/conceptData";
 import { UniverseGlobe, type PositionNoeud } from "./UniverseGlobe";
 import { ImagePlaceholder, LENT } from "./pieces";
 import {
+  Classements,
   FeaturedStories,
   FluxSources,
   InteractiveMapPreview,
   LiveTicker,
+  Methode,
   NewsletterSection,
   NumbersSection,
+  Questions,
   TopicExplorer,
 } from "./sections";
 import type { FichePays } from "@/data/concept/conceptGeo";
@@ -274,9 +277,12 @@ export function ConceptPage({ donnees, annee, regions, vues }: ConceptProps) {
 
         <LiveTicker />
         <InteractiveMapPreview donnees={donnees} annee={annee} regions={regions} vues={vues} />
+        <Classements donnees={donnees} annee={annee} />
         <FluxSources />
+        <Methode />
         <FeaturedStories />
         <TopicExplorer />
+        <Questions />
         <NumbersSection />
         <NewsletterSection />
       </div>

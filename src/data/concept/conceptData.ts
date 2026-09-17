@@ -153,3 +153,53 @@ export const PREUVES = [
 ];
 
 export const CITATION = ["Les données ne changent pas le monde.", "Ce que l'on en fait, oui."];
+
+/* ── Le texte des sections ajoutées ──────────────────────────────────────────
+   Du texte, pas des données : rien ici n'est un chiffre présenté comme mesuré. */
+
+export const ETAPES = [
+  {
+    n: "01",
+    titre: "Collecte",
+    ligne: "Plusieurs sources par sujet : institutions, données ouvertes, presse internationale, documents de terrain.",
+  },
+  {
+    n: "02",
+    titre: "Recoupement",
+    ligne: "Un chiffre qui n'apparaît qu'une fois n'est pas publié. Les divergences entre sources sont signalées, pas lissées.",
+  },
+  {
+    n: "03",
+    titre: "Mise en contexte",
+    ligne: "Une valeur seule ne dit rien. On la replace dans sa série, dans son voisinage et dans son ordre de grandeur.",
+  },
+  {
+    n: "04",
+    titre: "Écriture assistée",
+    ligne: "L'IA aide à structurer et à rédiger. Elle ne choisit pas le sujet et ne valide aucun chiffre.",
+  },
+  {
+    n: "05",
+    titre: "Relecture et publication",
+    ligne: "Une relecture humaine avant la mise en ligne. Chaque chiffre conserve sa source et son millésime.",
+  },
+];
+
+export const QUESTIONS = [
+  {
+    q: "D'où viennent les chiffres ?",
+    r: "De sources publiques et identifiables : Banque mondiale, FMI, OCDE, Eurostat, instituts nationaux. Chaque valeur garde le nom de sa source et l'année à laquelle elle se rapporte.",
+  },
+  {
+    q: "Que fait l'IA, et que ne fait-elle pas ?",
+    r: "Elle assiste la structuration et la rédaction, et accélère la lecture de gros volumes de documents. Elle ne choisit pas les sujets, ne valide pas un chiffre et ne publie rien seule : une relecture humaine précède chaque mise en ligne.",
+  },
+  {
+    q: "Pourquoi certaines années sont-elles absentes ?",
+    r: "Parce que la source ne les publie pas. Une année manquante reste manquante : elle n'est ni estimée, ni extrapolée, ni remplacée par un zéro — qui serait une valeur, donc une erreur.",
+  },
+  {
+    q: "Pourquoi l'accès est-il gratuit ?",
+    r: "Le média est financé par son audience, pas par ses lecteurs : pas de mur payant, pas de compte obligatoire pour lire.",
+  },
+];

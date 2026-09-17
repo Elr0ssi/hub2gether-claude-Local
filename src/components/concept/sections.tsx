@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   FICHE_PAYS,
   MARCHES,
@@ -10,6 +10,8 @@ import {
   THEMES_EXPLORER,
   UNE,
   CITATION,
+  ETAPES,
+  QUESTIONS,
 } from "@/data/concept/conceptData";
 import { Compteur, Enseigne, ImagePlaceholder, LENT, Monte } from "./pieces";
 import { GlobeMonde } from "./GlobeMonde";
@@ -409,6 +411,208 @@ export function NewsletterSection() {
           <span className="cg-pied-note">Prototype de direction artistique · non indexé</span>
         </div>
       </footer>
+    </section>
+  );
+}
+
+/* ── Les classements vivants ──────────────────────────────────────────────
+   Trois lectures du même socle. Les valeurs sont réelles ; un pays sans
+   donnée pour l'indicateur choisi n'apparaît pas — il n'est pas classé
+   dernier, ce qui serait une affirmation que la source ne fait pas. */
+
+const VUES_CLASSEMENT = [
+  { id: "pib", label: "Les plus grandes économies", unite: "md", sens: -1 },
+  { id: "pibHab", label: "Le PIB par habitant", unite: "eur", sens: -1 },
+  { id: "inflation", label: "L'inflation la plus forte", unite: "pct", sens: -1 },
+] as const;
+
+function valeurFr(v: number, unite: "md" | "eur" | "pct") {
+  if (unite === "pct") return `${v.toFixed(1).replace(".", ",")} %`;
+  if (unite === "eur") return `${Math.round(v).toLocaleString("fr-FR")} €`;
+  return Math.abs(v) >= 1000
+    ? `${(v / 1000).toFixed(1).replace(".", ",")} T€`
+    : `${Math.round(v).toLocaleString("fr-FR")} Md€`;
+}
+
+export function Classements({
+  donnees,
+  annee,
+}: {
+  donnees: Record<string, FichePays>;
+  annee: number;
+}) {
+  const [vue, setVue] = useState<(typeof VUES_CLASSEMENT)[number]["id"]>("pib");
+  const spec = VUES_CLASSEMENT.find((v) => v.id === vue) ?? VUES_CLASSEMENT[0];
+
+  const liste = useMemo(() => {
+    const l = Object.values(donnees)
+      .map((d) => ({ fr: d.fr, v: d[spec.id] }))
+      .filter((o): o is { fr: string; v: number } => typeof o.v === "number" && Number.isFinite(o.v))
+      .sort((a, b) => (b.v - a.v) * (spec.sens === -1 ? 1 : -1))
+      .slice(0, 8);
+    const haut = l.length ? Math.max(...l.map((o) => Math.abs(o.v))) : 1;
+    return l.map((o) => ({ ...o, part: Math.abs(o.v) / haut }));
+  }, [donnees, spec]);
+
+  return (
+    <section className="cg-section cg-classements">
+      <div className="cg-wrap">
+        <Enseigne>Le monde en chiffres</Enseigne>
+        <Monte>
+          <h2 className="cg-h2">
+            Ce que dit le socle<span className="cg-pt">.</span>
+            <br />
+            <span className="cg-h2-doux">Millésime {annee}.</span>
+          </h2>
+        </Monte>
+
+        <div className="cg-cl-onglets" role="tablist" aria-label="Classement affiché">
+          {VUES_CLASSEMENT.map((v) => (
+            <button
+              key={v.id}
+              type="button"
+              role="tab"
+              aria-selected={vue === v.id}
+              className={`cg-cl-onglet${vue === v.id ? " cg-cl-onglet-on" : ""}`}
+              onClick={() => setVue(v.id)}
+            >
+              {v.label}
+            </button>
+          ))}
+        </div>
+
+        <ol className="cg-cl-liste">
+          {liste.map((o, k) => (
+            <li key={`${vue}-${o.fr}`} className="cg-cl-ligne">
+              <span className="cg-cl-rang">{String(k + 1).padStart(2, "0")}</span>
+              <span className="cg-cl-nom">{o.fr}</span>
+              <span className="cg-cl-piste">
+                <motion.span
+                  className="cg-cl-barre"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: o.part }}
+                  transition={{ duration: 0.75, delay: k * 0.045, ease: LENT }}
+                />
+              </span>
+              <span className="cg-cl-v">{valeurFr(o.v, spec.unite)}</span>
+            </li>
+          ))}
+        </ol>
+
+        <p className="cg-cl-source">
+          Banque mondiale (WDI) · {annee} · les pays sans valeur publiée pour cet
+          indicateur ne figurent pas au classement.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ── D'une source à un article ────────────────────────────────────────────── */
+
+export function Methode() {
+  return (
+    <section className="cg-section cg-methode">
+      <div className="cg-wrap">
+        <Enseigne>La méthode</Enseigne>
+        <Monte>
+          <h2 className="cg-h2">
+            D&apos;une source<span className="cg-pt">.</span>
+            <br />
+            <span className="cg-h2-doux">à un article.</span>
+          </h2>
+          <p className="cg-chapo">
+            Cinq étapes, toujours les mêmes. C&apos;est la répétition qui rend le
+            résultat vérifiable — pas la vitesse.
+          </p>
+        </Monte>
+
+        <ol className="cg-etapes">
+          {ETAPES.map((e, k) => (
+            <Monte key={e.n} delay={k * 0.09} y={24}>
+              <li className="cg-etape">
+                <span className="cg-etape-n">{e.n}</span>
+                <span className="cg-etape-fil" aria-hidden="true" />
+                <h3 className="cg-etape-t">{e.titre}</h3>
+                <p className="cg-etape-l">{e.ligne}</p>
+              </li>
+            </Monte>
+          ))}
+        </ol>
+
+        <Monte delay={0.3}>
+          <figure className="cg-trace">
+            <figcaption className="cg-trace-h">Ce qu&apos;un chiffre emporte avec lui</figcaption>
+            <div className="cg-trace-corps">
+              <span className="cg-trace-v">3,4 T€</span>
+              <dl className="cg-trace-d">
+                <div>
+                  <dt>Indicateur</dt>
+                  <dd>PIB nominal, France</dd>
+                </div>
+                <div>
+                  <dt>Source</dt>
+                  <dd>Banque mondiale (WDI)</dd>
+                </div>
+                <div>
+                  <dt>Millésime</dt>
+                  <dd>2025</dd>
+                </div>
+                <div>
+                  <dt>Recoupement</dt>
+                  <dd>FMI, Eurostat</dd>
+                </div>
+              </dl>
+            </div>
+          </figure>
+        </Monte>
+      </div>
+    </section>
+  );
+}
+
+/* ── Les questions qu'on nous pose ───────────────────────────────────────── */
+
+export function Questions() {
+  const [ouvert, setOuvert] = useState<number | null>(0);
+  return (
+    <section className="cg-section cg-questions">
+      <div className="cg-wrap">
+        <Enseigne>Les questions qu&apos;on nous pose</Enseigne>
+        <div className="cg-q-liste">
+          {QUESTIONS.map((q, k) => {
+            const on = ouvert === k;
+            return (
+              <Monte key={q.q} delay={k * 0.07} y={18}>
+                <div className={`cg-q${on ? " cg-q-on" : ""}`}>
+                  <button
+                    type="button"
+                    className="cg-q-t"
+                    aria-expanded={on}
+                    onClick={() => setOuvert(on ? null : k)}
+                  >
+                    {q.q}
+                    <span className="cg-q-signe" aria-hidden="true" />
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {on && (
+                      <motion.div
+                        className="cg-q-r"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.38, ease: LENT }}
+                      >
+                        <p>{q.r}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </Monte>
+            );
+          })}
+        </div>
+      </div>
     </section>
   );
 }

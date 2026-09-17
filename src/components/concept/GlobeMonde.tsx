@@ -44,12 +44,55 @@ function fmt(v: number | null, genre: "md" | "eur" | "pct"): string {
   return `${Math.round(v).toLocaleString("fr-FR")} Md€`;
 }
 
+type Indic = "pib" | "pibHab" | "inflation" | "balance";
+
+const INDICS: {
+  id: Indic;
+  label: string;
+  genre: "md" | "eur" | "pct";
+  forme: "log" | "signe";
+  /** −1 : la rampe divergente est retournée (un déficit doit être rouge). */
+  sens: 1 | -1;
+  note: string;
+}[] = [
+  { id: "pib", label: "PIB", genre: "md", forme: "log", sens: 1, note: "échelle logarithmique" },
+  { id: "pibHab", label: "PIB / habitant", genre: "eur", forme: "log", sens: 1, note: "échelle logarithmique" },
+  { id: "inflation", label: "Inflation", genre: "pct", forme: "signe", sens: 1, note: "échelle centrée sur zéro" },
+  { id: "balance", label: "Balance commerciale", genre: "md", forme: "signe", sens: -1, note: "échelle centrée sur zéro" },
+];
+
+/* Rampe séquentielle d'une seule teinte, du sombre au clair : sur un fond de
+   nuit, c'est la clarté qui porte la magnitude. On s'arrête avant les pas les
+   plus sombres, qui se confondraient avec l'océan. */
+const BLEUS = [
+  "#104281", "#184f95", "#1c5cab", "#256abf", "#2a78d6", "#3987e5",
+  "#5598e7", "#6da7ec", "#86b6ef", "#9ec5f4", "#b7d3f6", "#cde2fb",
+];
+
+/* Rampe divergente : deux teintes opposées et un gris au milieu. Le milieu ne
+   doit surtout pas être une couleur — sinon « zéro » se lit comme une valeur. */
+const DIVERGENTE = [
+  "#b7d3f6", "#86b6ef", "#5598e7", "#2a78d6", "#1c5cab",
+  "#5c6371",
+  "#9c3737", "#bd3a3a", "#d03b3b", "#dc5a52", "#e6796b",
+];
+
+/* Une donnée absente n'est pas une valeur basse : elle a sa propre couleur,
+   hors rampe, et sa mention dans la légende. */
+const SANS = "#1b212b";
+
+function palier(rampe: string[], t: number): string {
+  const i = Math.round(Math.max(0, Math.min(1, t)) * (rampe.length - 1));
+  return rampe[i];
+}
+
 export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
   const cv = useRef<HTMLCanvasElement>(null);
   const [pays, setPays] = useState<Pays[]>([]);
   const [choisi, setChoisi] = useState<string | null>("France");
   const [survol, setSurvol] = useState<string | null>(null);
   const [region, setRegion] = useState("monde");
+  const [indic, setIndic] = useState<Indic>("pib");
   const [etiquettes, setEtiquettes] = useState<{ nom: string; x: number; y: number; vu: boolean; dy: number }[]>([]);
 
   /* La caméra : deux angles, tirés vers une cible. Le rendu lit ces refs
@@ -81,24 +124,34 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
               ? [f.geometry.coordinates as number[][][]]
               : (f.geometry.coordinates as number[][][][]);
           const anneaux: Anneau[] = [];
-          let sx = 0;
-          let sy = 0;
-          let n = 0;
+          /* L'aire vraie, par la formule du lacet pondérée par cos(lat). Le
+             nombre de sommets ne dit rien de la taille — la Norvège en a plus
+             que la Libye — et c'est l'aire qui départage deux pays au clic. */
           let aire = 0;
+          let plusGrand = { aire: -1, centre: [0, 0] as [number, number] };
           for (const poly of brut) {
             const ext = poly[0];
             if (!ext) continue;
             const a: Anneau = ext.map((c) => [c[0], c[1]] as [number, number]);
             anneaux.push(a);
-            aire += a.length;
-            for (const [x, y] of a) {
-              sx += x;
-              sy += y;
-              n++;
+            let lacet = 0;
+            let cx = 0;
+            let cy = 0;
+            for (let i = 0, j = a.length - 1; i < a.length; j = i++) {
+              const k = Math.cos((((a[i][1] + a[j][1]) / 2) * Math.PI) / 180);
+              lacet += (a[j][0] - a[i][0]) * (a[j][1] + a[i][1]) * k;
+              cx += a[i][0];
+              cy += a[i][1];
             }
+            const sa = Math.abs(lacet) / 2;
+            aire += sa;
+            /* Le centre vient du plus grand morceau : celui de la France doit
+               tomber sur l'Hexagone, pas au milieu de l'Atlantique entre la
+               métropole et la Guyane. */
+            if (sa > plusGrand.aire) plusGrand = { aire: sa, centre: [cx / a.length, cy / a.length] };
           }
           if (!anneaux.length) continue;
-          out.push({ nom, anneaux, centre: [sx / n, sy / n], aire });
+          out.push({ nom, anneaux, centre: plusGrand.centre, aire });
         }
         setPays(out);
       })
@@ -133,6 +186,26 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
     const ro = new ResizeObserver(redim);
     ro.observe(c);
 
+    /* Une donnée absente reçoit une hachure, pas un gris : sur une rampe
+       divergente, un gris uni se confondrait avec « autour de zéro ». */
+    const hach = document.createElement("canvas");
+    hach.width = 8;
+    hach.height = 8;
+    const hctx = hach.getContext("2d");
+    if (hctx) {
+      hctx.fillStyle = SANS;
+      hctx.fillRect(0, 0, 8, 8);
+      hctx.strokeStyle = "rgba(150,170,200,0.28)";
+      hctx.lineWidth = 1;
+      hctx.beginPath();
+      hctx.moveTo(-2, 6);
+      hctx.lineTo(6, -2);
+      hctx.moveTo(2, 10);
+      hctx.lineTo(10, 2);
+      hctx.stroke();
+    }
+    const motif = hctx ? ctx.createPattern(hach, "repeat") : null;
+
     let brut = 0;
     const boucle = () => {
       /* Rattrapage : la caméra glisse vers sa cible au lieu d'y sauter. */
@@ -161,7 +234,24 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
         const z1 = x * sl + z * cl;
         const y2 = y * cp - z1 * sp;
         const z2 = y * sp + z1 * cp;
-        return { x: cx + x1 * R, y: cy - y2 * R, visible: z2 > 0 };
+        return { x: cx + x1 * R, y: cy - y2 * R, z: z2, visible: z2 > 0 };
+      };
+
+      /* Le point exact où un segment franchit le bord du disque. Sans lui, un
+         pays à cheval sur le limbe saute du dernier sommet vu au premier
+         sommet revu — et se remplit en travers. Dichotomie : la trajectoire
+         entre deux sommets n'est pas linéaire à l'écran. */
+      const bord = (lo1: number, la1: number, lo2: number, la2: number) => {
+        const vu1 = proj(lo1, la1).visible;
+        let a = 0;
+        let b = 1;
+        for (let i = 0; i < 14; i++) {
+          const m = (a + b) / 2;
+          if (proj(lo1 + (lo2 - lo1) * m, la1 + (la2 - la1) * m).visible === vu1) a = m;
+          else b = m;
+        }
+        const m = (a + b) / 2;
+        return proj(lo1 + (lo2 - lo1) * m, la1 + (la2 - la1) * m);
       };
 
       ctx.clearRect(0, 0, L, H);
@@ -227,38 +317,53 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
         let quelqueChose = false;
         for (const a of p.anneaux) {
           let ouvert = false;
+          let prec: { lon: number; lat: number; vu: boolean } | null = null;
           for (const [lon, lat] of a) {
             const q = proj(lon, lat);
-            if (!q.visible) {
-              ouvert = false;
-              continue;
+            /* Un anneau qui franchit l'antiméridien saute de +180 à −180 : sans
+               coupure, le tracé traverse tout le globe en une barre. */
+            const saut = prec !== null && Math.abs(lon - prec.lon) > 180;
+            if (saut) ouvert = false;
+            if (prec && !saut && prec.vu !== q.visible) {
+              const b = bord(prec.lon, prec.lat, lon, lat);
+              if (ouvert) ctx.lineTo(b.x, b.y);
+              else ctx.moveTo(b.x, b.y);
+              ouvert = true;
+              quelqueChose = true;
             }
-            if (ouvert) ctx.lineTo(q.x, q.y);
-            else ctx.moveTo(q.x, q.y);
-            ouvert = true;
-            quelqueChose = true;
+            if (q.visible) {
+              if (ouvert) ctx.lineTo(q.x, q.y);
+              else ctx.moveTo(q.x, q.y);
+              ouvert = true;
+              quelqueChose = true;
+            } else {
+              ouvert = false;
+            }
+            prec = { lon, lat, vu: q.visible };
           }
           ctx.closePath();
         }
         if (!quelqueChose) return;
+        /* Le pays garde sa couleur d'échelle même sélectionné : la sélection
+           s'ajoute, elle n'efface pas la donnée. Sinon on ne lit plus la
+           valeur de celui qu'on vient justement de choisir. */
+        const teinte = refCouleurs.current.get(p.nom);
+        ctx.fillStyle = teinte ?? (motif ?? SANS);
+        ctx.fill();
         if (mode === "actif") {
-          ctx.shadowColor = "rgba(150,200,255,0.85)";
-          ctx.shadowBlur = 26;
-          ctx.fillStyle = "#cfe2ff";
-          ctx.fill();
+          ctx.shadowColor = "rgba(180,215,255,0.9)";
+          ctx.shadowBlur = 24;
+          ctx.strokeStyle = "rgba(240,248,255,0.98)";
+          ctx.lineWidth = 2;
+          ctx.stroke();
           ctx.shadowBlur = 0;
-          ctx.strokeStyle = "rgba(226,240,255,0.95)";
+        } else if (mode === "survol") {
+          ctx.fillStyle = "rgba(255,255,255,0.22)";
+          ctx.fill();
+          ctx.strokeStyle = "rgba(210,232,255,0.75)";
           ctx.lineWidth = 1;
           ctx.stroke();
-        } else if (mode === "survol") {
-          ctx.fillStyle = "rgba(120,165,240,0.55)";
-          ctx.fill();
-          ctx.strokeStyle = "rgba(180,210,255,0.5)";
-          ctx.lineWidth = 0.7;
-          ctx.stroke();
         } else {
-          ctx.fillStyle = "#16224a";
-          ctx.fill();
           ctx.strokeStyle = "rgba(90,130,210,0.35)";
           ctx.lineWidth = 0.55;
           ctx.stroke();
@@ -292,7 +397,10 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
       const ordre = mis
         .map((nom) => ({ nom, p: pays.find((q) => q.nom === nom) }))
         .filter((o): o is { nom: string; p: Pays } => Boolean(o.p))
+        /* Trop près du bord, le pays n'est plus qu'un copeau écrasé : la
+           pastille pointerait vers rien. On la retire. */
         .map((o) => ({ ...o, q: proj(o.p.centre[0], o.p.centre[1]) }))
+        .map((o) => ({ ...o, q: { ...o.q, visible: o.q.visible && o.q.z > 0.2 } }))
         .sort((a, b) => b.q.y - a.q.y);
 
       for (const o of ordre) {
@@ -376,6 +484,62 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
     [pays]
   );
 
+  /* ── L'échelle de couleurs ─────────────────────────────────────────────
+     Les bornes sont prises aux centiles extrêmes, pas au min/max : un seul
+     pays hors norme écraserait toute la rampe. Le PIB passe en logarithmique,
+     faute de quoi la quasi-totalité du monde se retrouve au même pas. */
+  const echelle = useMemo(() => {
+    const spec = INDICS.find((i) => i.id === indic) ?? INDICS[0];
+    const tri = Object.values(donnees)
+      .map((d) => d[spec.id])
+      .filter((v): v is number => typeof v === "number" && Number.isFinite(v))
+      .sort((a, b) => a - b);
+    const centile = (f: number) =>
+      tri.length ? tri[Math.min(tri.length - 1, Math.max(0, Math.round(f * (tri.length - 1))))] : 0;
+
+    const couleurs = new Map<string, string>();
+    let gauche: string;
+    let droite: string;
+    let stops: string[];
+
+    if (spec.forme === "log") {
+      const bas = Math.max(centile(0.02), 0.01);
+      /* En logarithmique, le maximum réel ne déforme pas la rampe — et le
+         couper au 98e centile mettrait les quatre premières économies du
+         monde au même pas, ce qui est exactement ce qu'on veut éviter. */
+      const haut = Math.max(centile(1), bas * 10);
+      const lb = Math.log10(bas);
+      const lh = Math.log10(haut);
+      for (const [nom, d] of Object.entries(donnees)) {
+        const v = d[spec.id];
+        if (typeof v !== "number" || !Number.isFinite(v) || v <= 0) continue;
+        couleurs.set(nom, palier(BLEUS, (Math.log10(v) - lb) / (lh - lb)));
+      }
+      gauche = fmt(bas, spec.genre);
+      droite = fmt(haut, spec.genre);
+      stops = BLEUS;
+    } else {
+      /* Bornes au 8e / 92e centile : deux ou trois pays en hyperinflation
+         suffiraient à ramener tout le reste sur le même pas. Ce qui dépasse
+         est ramené à la borne — et la légende le dit avec un « ≤ / ≥ ». */
+      const m = Math.max(Math.abs(centile(0.08)), Math.abs(centile(0.92)), 0.01);
+      stops = spec.sens === 1 ? DIVERGENTE : [...DIVERGENTE].reverse();
+      for (const [nom, d] of Object.entries(donnees)) {
+        const v = d[spec.id];
+        if (typeof v !== "number" || !Number.isFinite(v)) continue;
+        couleurs.set(nom, palier(stops, (Math.max(-m, Math.min(m, v)) / m + 1) / 2));
+      }
+      const deborde = tri.length > 0 && (tri[0] < -m || tri[tri.length - 1] > m);
+      gauche = (deborde ? "≤ " : "") + fmt(-m, spec.genre);
+      droite = (deborde ? "≥ " : "") + fmt(m, spec.genre);
+    }
+    const absents = Object.keys(donnees).length - couleurs.size;
+    return { spec, couleurs, gauche, droite, stops, absents };
+  }, [donnees, indic]);
+
+  const refCouleurs = useRef(echelle.couleurs);
+  refCouleurs.current = echelle.couleurs;
+
   const fiche = choisi ? donnees[choisi] : undefined;
   /* L'en-tête du panneau suit le pays affiché, pas l'onglet : on peut cliquer
      un pays hors de la région courante, et annoncer « Europe » sur le Niger
@@ -412,6 +576,22 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
             }}
           >
             {r.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── L'indicateur qui colore le globe ──────────────────────────────── */}
+      <div className="gm-indics" role="tablist" aria-label="Indicateur affiché">
+        {INDICS.map((i) => (
+          <button
+            key={i.id}
+            type="button"
+            role="tab"
+            aria-selected={indic === i.id}
+            className={`gm-indic${indic === i.id ? " gm-indic-on" : ""}`}
+            onClick={() => setIndic(i.id)}
+          >
+            {i.label}
           </button>
         ))}
       </div>
@@ -479,6 +659,27 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
                 </span>
               );
             })}
+          </div>
+
+          <div className="gm-echelle">
+            <div className="gm-echelle-ligne">
+              <span className="gm-echelle-b">{echelle.gauche}</span>
+              <span
+                className="gm-echelle-barre"
+                style={{ background: `linear-gradient(90deg, ${echelle.stops.join(", ")})` }}
+              />
+              <span className="gm-echelle-b">{echelle.droite}</span>
+            </div>
+            <p className="gm-echelle-p">
+              {echelle.spec.label} · {echelle.spec.note}
+              {echelle.absents > 0 && (
+                <>
+                  {" · "}
+                  <span className="gm-echelle-sans" aria-hidden="true" />
+                  {echelle.absents} sans donnée
+                </>
+              )}
+            </p>
           </div>
 
           <p className="gm-aide">
