@@ -114,6 +114,14 @@ export interface InteractiveGlobeIconsProps {
   markerSize?: string;
   /** Set to false to skip rendering entirely (e.g. once scrolled past). */
   active?: boolean;
+  /** Badge disc fill. Defaults to the light-surface white used on the home page. */
+  badgeBackground?: string;
+  /** Badge shadow / ring. Defaults to the light-surface one. */
+  badgeShadow?: string;
+  /** Icon stroke colour. Defaults to the accent. */
+  iconColor?: string;
+  /** Body of the sphere. Defaults to the near-white used on the home page. */
+  sphereColor?: string;
 }
 
 export default function InteractiveGlobeIcons({
@@ -121,6 +129,10 @@ export default function InteractiveGlobeIcons({
   accent = DEFAULT_ACCENT,
   markerSize = "clamp(38px, 5.2vw, 56px)",
   active = true,
+  badgeBackground = "#fff",
+  badgeShadow = "0 8px 22px rgba(16,24,20,0.16), 0 0 0 1px rgba(16,24,20,0.04)",
+  iconColor,
+  sphereColor = "#f6f8f7",
 }: InteractiveGlobeIconsProps = {}) {
   const mountRef = useRef<HTMLDivElement>(null);
   const markerElsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -183,7 +195,7 @@ export default function InteractiveGlobeIcons({
     // --- Solid base sphere ---
     const baseGeom = new THREE.SphereGeometry(GLOBE_RADIUS, 96, 96);
     const baseMat = new THREE.MeshStandardMaterial({
-      color: 0xf6f8f7,
+      color: new THREE.Color(sphereColor).getHex(),
       roughness: 0.92,
       metalness: 0.02,
     });
@@ -471,7 +483,7 @@ export default function InteractiveGlobeIcons({
     };
     // `markers` / `accent` are expected to be module-level constants (see
     // src/data/categoryHeroes.ts) so the scene is built once per category.
-  }, [markers, accent]);
+  }, [markers, accent, sphereColor]);
 
   return (
     <div
@@ -493,8 +505,8 @@ export default function InteractiveGlobeIcons({
               width: markerSize,
               height: markerSize,
               borderRadius: "50%",
-              background: "#fff",
-              boxShadow: "0 8px 22px rgba(16,24,20,0.16), 0 0 0 1px rgba(16,24,20,0.04)",
+              background: badgeBackground,
+              boxShadow: badgeShadow,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -518,7 +530,7 @@ export default function InteractiveGlobeIcons({
                 pointerEvents: "none",
               }}
             />
-            <Icon size={18} color={accent} strokeWidth={2.3} style={{ position: "relative" }} />
+            <Icon size={18} color={iconColor ?? accent} strokeWidth={2.3} style={{ position: "relative" }} />
           </div>
         );
       })}

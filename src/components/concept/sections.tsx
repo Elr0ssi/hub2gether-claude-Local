@@ -12,6 +12,7 @@ import {
   CITATION,
   ETAPES,
   QUESTIONS,
+  TOPICS,
 } from "@/data/concept/conceptData";
 import { Compteur, Enseigne, ImagePlaceholder, LENT, Monte } from "./pieces";
 import { GlobeMonde } from "./GlobeMonde";
@@ -612,6 +613,38 @@ export function Questions() {
             );
           })}
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* ── Les six rubriques ────────────────────────────────────────────────────
+   Elles tournaient auparavant en orbite autour de la sphère abstraite. Le
+   globe en points ne porte plus d'étiquettes flottantes : les rubriques
+   reprennent leur place ici, lisibles d'un coup d'œil. */
+
+export function Rubriques() {
+  return (
+    <section className="cg-section cg-rubriques">
+      <div className="cg-wrap">
+        <Enseigne>Six regards sur le monde</Enseigne>
+        <ul className="cg-rub-l">
+          {TOPICS.map((t, k) => (
+            <Monte key={t.id} delay={k * 0.07} y={22}>
+              <li className="cg-rub">
+                <span className="cg-rub-tige" style={{ background: t.teinte }} aria-hidden="true" />
+                <h3 className="cg-rub-t" style={{ color: t.teinte }}>
+                  {t.label}
+                </h3>
+                <span className="cg-rub-v">{t.module.valeur}</span>
+                <span className="cg-rub-l2">{t.module.legende}</span>
+              </li>
+            </Monte>
+          ))}
+        </ul>
+        <p className="cg-demo-mini cg-demo-bloc">
+          Prototype · les valeurs de cette bande sont des valeurs de démonstration, non mesurées.
+        </p>
       </div>
     </section>
   );

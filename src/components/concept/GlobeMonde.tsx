@@ -19,6 +19,17 @@ import type { FichePays } from "@/data/concept/conceptGeo";
 
 const RAD = Math.PI / 180;
 
+/** Arc sinus en degrés, borné : à l'écran, un déplacement n'est pas
+    proportionnel à l'angle tourné — c'est son arc sinus. */
+const ARC = (t: number) => (Math.asin(Math.max(-1, Math.min(1, t))) * 180) / Math.PI;
+
+/** Un angle admet deux solutions ; on garde celle qui bouge le moins. */
+const ecart = (x: number, ref: number) => Math.abs(((x - ref + 540) % 360) - 180);
+const plusProche = (cands: number[], ref: number) =>
+  cands
+    .map((x) => ((x + 540) % 360) - 180)
+    .reduce((m, x) => (ecart(x, ref) < ecart(m, ref) ? x : m));
+
 type Anneau = [number, number][];
 interface Pays {
   nom: string;
@@ -99,8 +110,11 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
      soixante fois par seconde sans repasser par React. */
   const cam = useRef({ lon: -30, lat: 14 });
   const cible = useRef({ lon: -30, lat: 14 });
-  const glisse = useRef<{ x: number; y: number } | null>(null);
+  const glisse = useRef<{ x: number; y: number; a: number; b: number; lon: number; lat: number } | null>(null);
   const aBouge = useRef(false);
+  /* Dès la première interaction, le globe cesse de dériver : sinon le pays
+     qu'on vient de choisir repart tout seul hors du centre. */
+  const touche = useRef(false);
   const refChoisi = useRef(choisi);
   const refSurvol = useRef(survol);
   const refRegion = useRef(region);
@@ -135,20 +149,34 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
             const a: Anneau = ext.map((c) => [c[0], c[1]] as [number, number]);
             anneaux.push(a);
             let lacet = 0;
-            let cx = 0;
-            let cy = 0;
+            /* Le centroïde pondéré par l'aire, pas la moyenne des sommets :
+               une côte très découpée concentre les sommets et tirerait le
+               centre vers elle — la caméra se recalait alors à côté du pays. */
+            let gx = 0;
+            let gy = 0;
+            let deux = 0;
+            let sx = 0;
+            let sy = 0;
             for (let i = 0, j = a.length - 1; i < a.length; j = i++) {
               const k = Math.cos((((a[i][1] + a[j][1]) / 2) * Math.PI) / 180);
               lacet += (a[j][0] - a[i][0]) * (a[j][1] + a[i][1]) * k;
-              cx += a[i][0];
-              cy += a[i][1];
+              const croix = a[j][0] * a[i][1] - a[i][0] * a[j][1];
+              deux += croix;
+              gx += (a[j][0] + a[i][0]) * croix;
+              gy += (a[j][1] + a[i][1]) * croix;
+              sx += a[i][0];
+              sy += a[i][1];
             }
             const sa = Math.abs(lacet) / 2;
             aire += sa;
+            const centreAnneau: [number, number] =
+              Math.abs(deux) > 1e-9
+                ? [gx / (3 * deux), gy / (3 * deux)]
+                : [sx / a.length, sy / a.length];
             /* Le centre vient du plus grand morceau : celui de la France doit
                tomber sur l'Hexagone, pas au milieu de l'Atlantique entre la
                métropole et la Guyane. */
-            if (sa > plusGrand.aire) plusGrand = { aire: sa, centre: [cx / a.length, cy / a.length] };
+            if (sa > plusGrand.aire) plusGrand = { aire: sa, centre: centreAnneau };
           }
           if (!anneaux.length) continue;
           out.push({ nom, anneaux, centre: plusGrand.centre, aire });
@@ -210,9 +238,24 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
     const boucle = () => {
       /* Rattrapage : la caméra glisse vers sa cible au lieu d'y sauter. */
       const dl = ((cible.current.lon - cam.current.lon + 540) % 360) - 180;
-      cam.current.lon += dl * 0.07;
-      cam.current.lat += (cible.current.lat - cam.current.lat) * 0.07;
-      if (!doux && !glisse.current && Math.abs(dl) < 0.4) cam.current.lon -= 0.035;
+      const dp = cible.current.lat - cam.current.lat;
+      /* On colle à la cible quand il ne reste presque rien : un rattrapage
+         exponentiel ne l'atteint jamais tout à fait, et le pays qu'on vient
+         de choisir continuerait de glisser imperceptiblement. */
+      if (Math.abs(dl) < 0.05 && Math.abs(dp) < 0.05) {
+        cam.current.lon = cible.current.lon;
+        cam.current.lat = cible.current.lat;
+      } else {
+        cam.current.lon += dl * 0.07;
+        cam.current.lat += dp * 0.07;
+      }
+      /* La dérive libre, avant toute interaction : elle emmène la cible avec
+         elle, sinon elle tire contre le rattrapage et le globe fait du
+         surplace. Au premier geste, elle s'arrête pour de bon. */
+      if (!doux && !touche.current && !glisse.current) {
+        cam.current.lon -= 0.035;
+        cible.current.lon -= 0.035;
+      }
       cible.current.lon = ((cible.current.lon + 540) % 360) - 180;
 
       const R = Math.min(L, H) * 0.44;
@@ -436,6 +479,25 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
   }, [pays, regions]);
 
   /* ── Le pointage ───────────────────────────────────────────────────────── */
+  /* Le rayon dessiné, et donc la conversion pixel → degré, dépend de la taille
+     de la scène : on le relit à chaque geste plutôt que de le figer. */
+  /* Un pas constant en degrés par pixel fait déraper le globe : à l'écran, un
+     déplacement n'est pas proportionnel à l'angle — c'est son arc sinus. On
+     ancre donc le geste au point saisi et on résout la rotation qui le ramène
+     sous le curseur. Le pays qu'on attrape reste sous le doigt. */
+  /* Les coordonnées du curseur ramenées au disque, en unités de rayon. */
+  const disque = useCallback((ev: { clientX: number; clientY: number }) => {
+    const c = cv.current;
+    if (!c) return null;
+    const r = c.getBoundingClientRect();
+    const R = Math.min(r.width, r.height) * 0.44;
+    if (R <= 0) return null;
+    return {
+      u: (ev.clientX - r.left - r.width / 2) / R,
+      v: -(ev.clientY - r.top - r.height / 2) / R,
+    };
+  }, []);
+
   const versLonLat = useCallback(
     (ev: React.PointerEvent) => {
       const c = cv.current;
@@ -603,20 +665,48 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
             ref={cv}
             className="gm-canvas"
             onPointerDown={(e) => {
-              glisse.current = { x: e.clientX, y: e.clientY };
+              const g = versLonLat(e);
+              /* On retient le point géographique saisi, pas un delta. À chaque
+                 mouvement on résout la caméra qui le ramène exactement sous le
+                 curseur : c'est ce qui fait qu'un pays attrapé ne glisse pas
+                 entre les doigts, y compris en diagonale. */
+              glisse.current = g
+                ? { x: e.clientX, y: e.clientY, a: g.lon, b: g.lat, lon: cam.current.lon, lat: cam.current.lat }
+                : null;
               aBouge.current = false;
+              touche.current = true;
               (e.target as HTMLElement).setPointerCapture(e.pointerId);
             }}
             onPointerMove={(e) => {
               if (glisse.current) {
-                const dx = e.clientX - glisse.current.x;
-                const dy = e.clientY - glisse.current.y;
-                if (Math.abs(dx) + Math.abs(dy) > 3) aBouge.current = true;
-                cible.current.lon -= dx * 0.32;
-                cible.current.lat = Math.max(-78, Math.min(78, cible.current.lat + dy * 0.28));
-                cam.current.lon -= dx * 0.32;
-                cam.current.lat = Math.max(-78, Math.min(78, cam.current.lat + dy * 0.28));
-                glisse.current = { x: e.clientX, y: e.clientY };
+                const q = glisse.current;
+                if (Math.abs(e.clientX - q.x) + Math.abs(e.clientY - q.y) > 3) aBouge.current = true;
+                const d = disque(e);
+                if (d) {
+                  const cb = Math.cos(q.b * RAD);
+                  /* Longitude : à l'écran, x = cos(lat)·sin(lon + camLon). */
+                  let lon = q.lon;
+                  if (cb > 0.08) {
+                    const s0 = ARC(d.u / cb);
+                    lon = plusProche([s0 - q.a, 180 - s0 - q.a], q.lon);
+                  }
+                  /* Latitude : y = sin(lat)·cos(camLat) − z·sin(camLat), soit
+                     une seule cosinusoïde une fois la longitude connue. */
+                  const z1 = cb * Math.cos((q.a + lon) * RAD);
+                  const yy = Math.sin(q.b * RAD);
+                  const r = Math.hypot(yy, z1);
+                  let lat = q.lat;
+                  if (r > 1e-6) {
+                    const k = (Math.acos(Math.max(-1, Math.min(1, d.v / r))) * 180) / Math.PI;
+                    const phi = (Math.atan2(z1, yy) * 180) / Math.PI;
+                    lat = plusProche([k - phi, -k - phi], q.lat);
+                  }
+                  lat = Math.max(-78, Math.min(78, lat));
+                  cam.current.lon = lon;
+                  cam.current.lat = lat;
+                  cible.current.lon = lon;
+                  cible.current.lat = lat;
+                }
                 return;
               }
               const g = versLonLat(e);
@@ -630,6 +720,7 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
               const g = versLonLat(e);
               const p = g ? paysSous(g.lon, g.lat) : null;
               if (p) {
+                touche.current = true;
                 setChoisi(p.nom);
                 /* On recentre doucement sur le pays choisi. */
                 cible.current = { lon: p.centre[0], lat: Math.max(-60, Math.min(60, p.centre[1])) };

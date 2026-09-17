@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { TOPICS } from "@/data/concept/conceptData";
-import { UniverseGlobe, type PositionNoeud } from "./UniverseGlobe";
-import { ImagePlaceholder, LENT } from "./pieces";
+import { BarChart3, CloudSun, Flag, Layers, TrendingUp, Users } from "lucide-react";
+import { LENT } from "./pieces";
 import {
   Classements,
   FeaturedStories,
@@ -15,10 +15,30 @@ import {
   NewsletterSection,
   NumbersSection,
   Questions,
+  Rubriques,
   TopicExplorer,
 } from "./sections";
 import type { FichePays } from "@/data/concept/conceptGeo";
 import "./concept.css";
+
+/* Le globe en points du site — le même composant que la page d'accueil, servi
+   ici avec une palette sombre. Chargé côté client seulement : il monte une
+   scène WebGL, qui n'a rien à faire dans le rendu serveur. */
+const GlobePoints = dynamic(() => import("@/components/globe/InteractiveGlobeIcons"), {
+  ssr: false,
+  loading: () => null,
+});
+
+/* Les rubriques, posées sur de vraies coordonnées : elles tournent donc avec
+   le globe au lieu de flotter à côté. */
+const MARQUEURS = [
+  { id: "economie", lat: 50, lon: 12, icon: TrendingUp },
+  { id: "geopolitique", lat: 39, lon: -98, icon: Flag },
+  { id: "societes", lat: 22, lon: 79, icon: Users },
+  { id: "ressources", lat: -25, lon: 133, icon: Layers },
+  { id: "climat", lat: -12, lon: -55, icon: CloudSun },
+  { id: "analyses", lat: 36, lon: 138, icon: BarChart3 },
+];
 
 /* ═══════════════════════════════════════════════════════════════════════════
    PROTOTYPE — LA PAGE
@@ -39,15 +59,7 @@ export interface ConceptProps {
 }
 
 export function ConceptPage({ donnees, annee, regions, vues }: ConceptProps) {
-  const [actif, setActif] = useState<string | null>(null);
-  const [fige, setFige] = useState<string | null>(null);
-  const [souris, setSouris] = useState({ x: 0, y: 0 });
   const [pret, setPret] = useState(false);
-
-  /* Les étiquettes sont écrites directement dans le DOM par la boucle du
-     canvas : les faire passer par l'état React à soixante images par seconde
-     rendrait la page saccadée. */
-  const noeuds = useRef<Record<string, HTMLDivElement | null>>({});
 
   const scene = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: scene, offset: ["start start", "end start"] });
@@ -63,29 +75,6 @@ export function ConceptPage({ donnees, annee, regions, vues }: ConceptProps) {
     const t = setTimeout(() => setPret(true), 60);
     return () => clearTimeout(t);
   }, []);
-
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const bouge = (e: PointerEvent) => {
-      setSouris({ x: e.clientX / window.innerWidth - 0.5, y: e.clientY / window.innerHeight - 0.5 });
-    };
-    window.addEventListener("pointermove", bouge, { passive: true });
-    return () => window.removeEventListener("pointermove", bouge);
-  }, []);
-
-  const place = useCallback((positions: PositionNoeud[]) => {
-    for (const p of positions) {
-      const el = noeuds.current[p.id];
-      if (!el) continue;
-      /* Derrière la sphère, l'étiquette recule : plus petite, plus pâle. */
-      const echelle = 0.86 + p.avant * 0.14;
-      el.style.transform = `translate3d(${p.x}px, ${p.y}px, 0) translate(-50%, -50%) scale(${echelle})`;
-      el.style.opacity = String(0.34 + p.avant * 0.66);
-      el.style.zIndex = String(Math.round(p.avant * 10) + 1);
-    }
-  }, []);
-
-  const vise = fige ?? actif;
 
   return (
     <div className="cg">
@@ -125,7 +114,15 @@ export function ConceptPage({ donnees, annee, regions, vues }: ConceptProps) {
         <div className="cg-scene-colle">
           <div className="cg-globe-ancre">
           <motion.div className="cg-globe" style={{ y: globeY, scale: globeS, opacity: globeO }}>
-            <UniverseGlobe topics={TOPICS} onNodes={place} actif={vise} souris={souris} />
+            <GlobePoints
+              markers={MARQUEURS}
+              accent="#9EC7D8"
+              sphereColor="#070E16"
+              badgeBackground="rgba(10,16,24,0.88)"
+              badgeShadow="0 10px 28px rgba(0,0,0,0.55), 0 0 0 1px rgba(158,199,216,0.22)"
+              iconColor="#CFE4EE"
+              markerSize="clamp(34px, 4.4vw, 48px)"
+            />
 
             {/* Le nom, au centre de la sphère */}
             <motion.div
@@ -138,47 +135,6 @@ export function ConceptPage({ donnees, annee, regions, vues }: ConceptProps) {
               <span>Essential Data</span>
             </motion.div>
 
-            {/* Les rubriques en orbite */}
-            <div className="cg-noeuds">
-              {TOPICS.map((t, k) => (
-                <motion.div
-                  key={t.id}
-                  ref={(el) => {
-                    noeuds.current[t.id] = el;
-                  }}
-                  className={`cg-noeud${vise === t.id ? " cg-noeud-on" : ""}${vise && vise !== t.id ? " cg-noeud-off" : ""}`}
-                  initial={{ opacity: 0 }}
-                  animate={pret ? { opacity: 1 } : {}}
-                  transition={{ duration: 1.1, delay: 2.3 + k * 0.16, ease: LENT }}
-                  onMouseEnter={() => setActif(t.id)}
-                  onMouseLeave={() => setActif(null)}
-                  onClick={() => setFige((f) => (f === t.id ? null : t.id))}
-                  role="button"
-                  tabIndex={0}
-                  onFocus={() => setActif(t.id)}
-                  onBlur={() => setActif(null)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setFige((f) => (f === t.id ? null : t.id));
-                    }
-                  }}
-                >
-                  <span className="cg-noeud-tige" style={{ background: t.teinte }} aria-hidden="true" />
-                  <span className="cg-noeud-label" style={{ color: t.teinte }}>
-                    {t.label}
-                  </span>
-                  <span className="cg-fragment">
-                    <ImagePlaceholder nom={t.module.image} ratio="16 / 10" className="cg-fragment-img" />
-                    <span className="cg-fragment-v">{t.module.valeur}</span>
-                    <span className="cg-fragment-l">{t.module.legende}</span>
-                    <span className="cg-fragment-f" aria-hidden="true">
-                      →
-                    </span>
-                  </span>
-                </motion.div>
-              ))}
-            </div>
           </motion.div>
           </div>
 
@@ -275,6 +231,7 @@ export function ConceptPage({ donnees, annee, regions, vues }: ConceptProps) {
           />
         </svg>
 
+        <Rubriques />
         <LiveTicker />
         <InteractiveMapPreview donnees={donnees} annee={annee} regions={regions} vues={vues} />
         <Classements donnees={donnees} annee={annee} />
