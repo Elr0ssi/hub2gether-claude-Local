@@ -1157,3 +1157,147 @@
   .gm-scene::after { animation: none; }
   .cg-enseigne-r::after { opacity: 0.5; transform: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE ÉCONOMIE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cg-nav-on { color: var(--encre) !important; }
+.cg-nav-on::after {
+  content: "";
+  display: block;
+  height: 1px;
+  margin-top: 5px;
+  background: linear-gradient(90deg, var(--froid), transparent);
+}
+
+.cg-eco-haut { padding-top: clamp(130px, 17vh, 210px); }
+.cg-eco-h1 { margin-top: 20px; max-width: 16ch; }
+
+.cg-eco-cles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 26px;
+  margin: 60px 0 0;
+  padding-top: 26px;
+  border-top: 1px solid var(--bord-fin);
+}
+@media (max-width: 860px) { .cg-eco-cles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.cg-eco-cles dt { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--encre-3); }
+.cg-eco-cles dd {
+  margin: 9px 0 4px;
+  font-size: clamp(24px, 2.6vw, 34px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--encre);
+}
+.cg-eco-cles span { font-size: 12px; color: var(--encre-2); }
+
+/* ── La frise ────────────────────────────────────────────────────────────── */
+
+.cg-frise-s { padding-top: 0; }
+.cg-frise {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  padding-bottom: 4px;
+}
+.cg-an {
+  position: relative;
+  padding: 10px 13px 9px;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--encre-3);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.cg-an:hover { color: var(--encre-2); }
+.cg-an-on { color: var(--encre); }
+.cg-an-t {
+  display: block;
+  height: 14px;
+  margin: 0 auto 7px;
+  width: 1px;
+  background: var(--bord);
+  transition: height 0.35s cubic-bezier(0.22, 1, 0.36, 1), background 0.35s;
+}
+.cg-an:hover .cg-an-t { height: 20px; }
+.cg-an-on .cg-an-t { height: 28px; background: linear-gradient(180deg, var(--froid), var(--chaud)); }
+.cg-frise-n { margin-top: 20px; max-width: 76ch; font-size: 11.5px; line-height: 1.65; color: var(--encre-3); }
+
+/* ── Le classement ───────────────────────────────────────────────────────── */
+
+.cg-filtre {
+  width: min(230px, 42vw);
+  padding: 8px 13px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.03);
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--encre);
+}
+.cg-filtre::placeholder { color: var(--encre-3); }
+.cg-filtre:focus { outline: none; border-color: rgba(158, 199, 216, 0.5); }
+
+.cg-tab-cadre {
+  max-height: 560px;
+  overflow: auto;
+  border: 1px solid var(--bord-fin);
+  border-radius: 12px;
+  scrollbar-width: thin;
+}
+.cg-tab { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.cg-tab thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0;
+  text-align: right;
+  font-weight: 400;
+  /* Opaque : les lignes passent dessous au défilement. */
+  background: #0a1017;
+  border-bottom: 1px solid var(--bord);
+}
+.cg-tab thead th.cg-tab-r, .cg-tab thead th.cg-tab-p { text-align: left; padding: 13px 14px; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--encre-3); }
+.cg-tri {
+  width: 100%;
+  padding: 13px 14px;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: right;
+  color: var(--encre-3);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.25s;
+}
+.cg-tri:hover { color: var(--encre-2); }
+.cg-tri-on { color: var(--froid); }
+.cg-tab tbody tr { cursor: pointer; transition: background 0.2s; }
+.cg-tab tbody tr:hover { background: rgba(255, 255, 255, 0.035); }
+.cg-tab-on { background: rgba(158, 199, 216, 0.12) !important; }
+.cg-tab td {
+  padding: 11px 14px;
+  text-align: right;
+  font-size: 13px;
+  color: var(--encre);
+  border-bottom: 1px solid var(--bord-fin);
+}
+.cg-tab td.cg-tab-r { text-align: left; font-size: 10.5px; color: var(--encre-3); }
+.cg-tab td.cg-tab-p { text-align: left; white-space: nowrap; }
+.cg-tab-vide { color: var(--encre-3) !important; }
+
+.cg-eco-arts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 1080px) { .cg-eco-arts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.cg-second-c { margin-top: 8px; font-size: 12.5px; line-height: 1.6; color: var(--encre-2); }
+/* Deux sections qui se suivent additionnent leurs marges : entre le globe et
+   son classement, cela faisait un écran de vide. */
+.cg-eco-rang { padding-top: clamp(40px, 5vh, 70px); }

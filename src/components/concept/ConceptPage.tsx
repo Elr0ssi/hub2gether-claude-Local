@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionTemplate, useScroll, useTransform } from "framer-motion";
 import { BarChart3, CloudSun, Flag, Layers, TrendingUp, Users } from "lucide-react";
-import { LENT } from "./pieces";
+import { EnTete, LENT } from "./pieces";
 import {
   Classements,
   FeaturedStories,
@@ -47,8 +47,6 @@ const MARQUEURS = [
    remonte et sort par le haut en laissant ses orbites derrière. Le fond ne
    change jamais.
    ═══════════════════════════════════════════════════════════════════════════ */
-
-const NAV = ["Monde", "Économie", "Géopolitique", "Sociétés", "Ressources", "Analyses"];
 
 export interface ConceptProps {
   articles: FicheArticle[];
@@ -127,36 +125,7 @@ export function ConceptPage({ articles, reperes, donnees, annee, regions, vues }
 
   return (
     <div className="cg">
-      {/* ── L'en-tête ────────────────────────────────────────────────────── */}
-      <header className="cg-header">
-        <div className="cg-header-l">
-          <a href="#" className="cg-logo">
-            <span className="cg-logo-m" aria-hidden="true" />
-            The Essential Data
-          </a>
-          <nav className="cg-nav">
-            {NAV.map((n) => (
-              <a key={n} href={`#${n.toLowerCase()}`}>
-                {n}
-              </a>
-            ))}
-          </nav>
-          <div className="cg-header-d">
-            <span className="cg-demo-mini" title="Les valeurs de cette maquette ne sont pas mesurées">
-              prototype · démonstration
-            </span>
-            <button type="button" className="cg-header-b" aria-label="Recherche">
-              Recherche
-            </button>
-            <button type="button" className="cg-header-b">
-              FR
-            </button>
-            <button type="button" className="cg-header-b cg-header-b-vif">
-              Se connecter
-            </button>
-          </div>
-        </div>
-      </header>
+      <EnTete actif="Monde" />
 
       {/* ── Le globe de fond, sur toute la traversée ─────────────────────── */}
       <motion.div

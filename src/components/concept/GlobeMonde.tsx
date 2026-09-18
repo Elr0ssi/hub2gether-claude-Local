@@ -52,6 +52,11 @@ interface Pays {
 
 interface Props {
   donnees: Record<string, FichePays>;
+  /* La sélection peut être pilotée de l'extérieur — par une ligne de
+     classement, par exemple. Sans ces deux propriétés, le globe la garde
+     pour lui : les pages qui ne s'en servent pas ne changent pas. */
+  choisi?: string | null;
+  onChoisi?: (nom: string | null) => void;
   annee: number;
   regions: readonly { id: string; label: string; pays: readonly string[] }[];
   vues: Record<string, { lat: number; lon: number }>;
@@ -108,10 +113,25 @@ function palier(rampe: string[], t: number): string {
   return rampe[i];
 }
 
-export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
+export function GlobeMonde({
+  donnees,
+  annee,
+  regions,
+  vues,
+  choisi: choisiPilote,
+  onChoisi,
+}: Props) {
   const cv = useRef<HTMLCanvasElement>(null);
   const [pays, setPays] = useState<Pays[]>([]);
-  const [choisi, setChoisi] = useState<string | null>("France");
+  const [choisiLocal, setChoisiLocal] = useState<string | null>("France");
+  const choisi = choisiPilote !== undefined ? choisiPilote : choisiLocal;
+  const setChoisi = useCallback(
+    (n: string | null) => {
+      if (onChoisi) onChoisi(n);
+      else setChoisiLocal(n);
+    },
+    [onChoisi],
+  );
   const [survol, setSurvol] = useState<string | null>(null);
   const [region, setRegion] = useState("monde");
   const [indic, setIndic] = useState<Indic>("pib");

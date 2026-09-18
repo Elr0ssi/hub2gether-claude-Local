@@ -10,7 +10,7 @@ import {
   ETAPES,
   QUESTIONS,
 } from "@/data/concept/conceptData";
-import { Compteur, Enseigne, ImagePlaceholder, LENT, Monte } from "./pieces";
+import { Compteur, Enseigne, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
 import { GlobeMonde } from "./GlobeMonde";
 import { HorizonTerre } from "./HorizonTerre";
 import type { FicheArticle, FichePays, Repere } from "@/data/concept/conceptGeo";
@@ -410,18 +410,7 @@ export function NewsletterSection() {
         </Monte>
       </div>
 
-      <footer className="cg-pied">
-        <div className="cg-wrap cg-pied-l">
-          <span>The Essential Data</span>
-          <nav>
-            <a href="#monde">Monde</a>
-            <a href="#economie">Économie</a>
-            <a href="#geopolitique">Géopolitique</a>
-            <a href="#analyses">Analyses</a>
-          </nav>
-          <span className="cg-pied-note">Prototype de direction artistique · non indexé</span>
-        </div>
-      </footer>
+      <Pied />
     </section>
   );
 }

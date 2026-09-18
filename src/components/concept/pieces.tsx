@@ -151,3 +151,66 @@ export function Enseigne({ children, droite }: { children: React.ReactNode; droi
     </div>
   );
 }
+
+/* ── L'en-tête et le pied, partagés par les pages du prototype ──────────── */
+
+const NAV: { label: string; href: string }[] = [
+  { label: "Monde", href: "/concept-globe" },
+  { label: "Économie", href: "/concept-globe/economie" },
+  { label: "Géopolitique", href: "/concept-globe#geopolitique" },
+  { label: "Sociétés", href: "/concept-globe#societes" },
+  { label: "Ressources", href: "/concept-globe#ressources" },
+  { label: "Analyses", href: "/concept-globe#analyses" },
+];
+
+export function EnTete({ actif }: { actif?: string }) {
+  return (
+    <header className="cg-header">
+      <div className="cg-header-l">
+        <a href="/concept-globe" className="cg-logo">
+          <span className="cg-logo-m" aria-hidden="true" />
+          The Essential Data
+        </a>
+        <nav className="cg-nav">
+          {NAV.map((n) => (
+            <a key={n.label} href={n.href} className={actif === n.label ? "cg-nav-on" : undefined}>
+              {n.label}
+            </a>
+          ))}
+        </nav>
+        <div className="cg-header-d">
+          <span className="cg-demo-mini" title="Les valeurs de cette maquette ne sont pas mesurées">
+            prototype · démonstration
+          </span>
+          <button type="button" className="cg-header-b" aria-label="Recherche">
+            Recherche
+          </button>
+          <button type="button" className="cg-header-b">
+            FR
+          </button>
+          <button type="button" className="cg-header-b cg-header-b-vif">
+            Se connecter
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export function Pied() {
+  return (
+    <footer className="cg-pied">
+      <div className="cg-wrap cg-pied-l">
+        <span>The Essential Data</span>
+        <nav>
+          {NAV.slice(0, 4).map((n) => (
+            <a key={n.label} href={n.href}>
+              {n.label}
+            </a>
+          ))}
+        </nav>
+        <span className="cg-pied-note">Prototype de direction artistique · non indexé</span>
+      </div>
+    </footer>
+  );
+}
