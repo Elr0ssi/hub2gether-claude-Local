@@ -4,7 +4,7 @@ import { Layout } from "@/components/layout/Layout";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Méthodologie — The Essential Data",
+  title: "Méthodologie · The Essential Data",
   description:
     "Découvrez comment The Essential Data collecte, synthétise et vérifie ses données. Transparence totale sur nos sources, notre approche éditoriale et notre conformité EU AI Act.",
   alternates: {
@@ -101,7 +101,7 @@ export default function MethodologyPage() {
               className="text-xs font-medium px-2.5 py-1 rounded-full"
               style={{ background: "rgba(57,255,136,0.12)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)" }}
             >
-              EU AI Act — Conformité
+              EU AI Act · Conformité
             </span>
           </div>
           <h1

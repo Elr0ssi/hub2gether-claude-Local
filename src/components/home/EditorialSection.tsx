@@ -62,7 +62,7 @@ export function EditorialSection() {
                 marginBottom: 12,
               }}
             >
-              § 02 — Briefings régionaux
+              § 02 · Briefings régionaux
             </p>
             <h2
               style={{

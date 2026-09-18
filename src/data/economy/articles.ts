@@ -16,7 +16,7 @@ export const ECONOMY_ARTICLES: Article[] = [
     featured: true,
     heroImage:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Financial_district_Manhattan.jpg/1280px-Financial_district_Manhattan.jpg",
-    heroCaption: "Manhattan, New York — cœur financier de la première économie mondiale.",
+    heroCaption: "Manhattan, New York · cœur financier de la première économie mondiale.",
     body: [
       {
         type: "lead",
@@ -34,7 +34,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
       {
         type: "chart",
-        title: "PIB nominal des 15 premières économies mondiales — 2025",
+        title: "PIB nominal des 15 premières économies mondiales · 2025",
         subtitle: "Projections FMI, World Economic Outlook avril 2025",
         unit: "Milliards €",
         bars: [
@@ -57,7 +57,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
       {
         type: "map-highlight",
-        title: "Carte des grandes puissances économiques mondiales — 2025",
+        title: "Carte des grandes puissances économiques mondiales · 2025",
         subtitle: "PIB nominal, projections FMI. Intensité de couleur = poids économique.",
         countries: {
           us: { color: "#C0392B", label: "30 337 Md€ (#1)" },
@@ -78,9 +78,9 @@ export const ECONOMY_ARTICLES: Article[] = [
         },
         legend: [
           { color: "#C0392B", label: "> 20 000 Md€ (Hyper-puissance)" },
-          { color: "#E74C3C", label: "10 000–20 000 Md€ (Superpuissance)" },
-          { color: "#3498DB", label: "2 000–10 000 Md€ (Grande puissance)" },
-          { color: "#27AE60", label: "1 000–2 000 Md€ (Puissance régionale)" },
+          { color: "#E74C3C", label: "10 000-20 000 Md€ (Superpuissance)" },
+          { color: "#3498DB", label: "2 000-10 000 Md€ (Grande puissance)" },
+          { color: "#27AE60", label: "1 000-2 000 Md€ (Puissance régionale)" },
           { color: "#95A5A6", label: "< 1 000 Md€ (Économie intermédiaire)" },
         ],
       },
@@ -91,70 +91,70 @@ export const ECONOMY_ARTICLES: Article[] = [
           {
             name: "États-Unis",
             emoji: "🇺🇸",
-            detail: "30 337 Mds€ — Rang #1",
+            detail: "30 337 Mds€ · Rang #1",
             subdetail:
               "Portée par la tech (Apple, Microsoft, Nvidia) et une consommation intérieure robuste. Taux de chômage : 3,7%. Le dollar demeure la principale monnaie de réserve mondiale (44% des réserves).",
           },
           {
             name: "Chine",
             emoji: "🇨🇳",
-            detail: "19 535 Mds€ — Rang #2",
+            detail: "19 535 Mds€ · Rang #2",
             subdetail:
               "Ralentissement de l'immobilier (crise Evergrande encore présente), mais exportations manufacturières toujours dominantes. Croissance : +4,6%. Deuxième économie mondiale depuis 2010.",
           },
           {
             name: "Allemagne",
             emoji: "🇩🇪",
-            detail: "4 460 Mds€ — Rang #3",
+            detail: "4 460 Mds€ · Rang #3",
             subdetail:
               "Première économie européenne. Après deux années de récession technique (2023-2024), reprise modérée portée par l'export industriel (automobile, machines-outils, chimie).",
           },
           {
             name: "Japon",
             emoji: "🇯🇵",
-            detail: "4 300 Mds€ — Rang #4",
+            detail: "4 300 Mds€ · Rang #4",
             subdetail:
               "Yen structurellement faible depuis 2022, ce qui avantage les exportateurs (Toyota, Sony, Canon). Vieillissement démographique comme principal défi économique long terme.",
           },
           {
             name: "Inde",
             emoji: "🇮🇳",
-            detail: "3 900 Mds€ — Rang #5",
+            detail: "3 900 Mds€ · Rang #5",
             subdetail:
               "Plus forte croissance du G20 : +6,5%. Démographie favorable (1,44 Md hab., âge médian 28 ans) et services numériques en plein essor. Bangalore, hub IT mondial.",
           },
           {
             name: "Royaume-Uni",
             emoji: "🇬🇧",
-            detail: "3 587 Mds€ — Rang #6",
+            detail: "3 587 Mds€ · Rang #6",
             subdetail:
               "Effets post-Brexit persistants sur les échanges avec l'UE (-15% d'exports estimés). Mais la finance de la City et le secteur créatif maintiennent le rang.",
           },
           {
             name: "France",
             emoji: "🇫🇷",
-            detail: "3 274 Mds€ — Rang #7",
+            detail: "3 274 Mds€ · Rang #7",
             subdetail:
               "Croissance +1,1%. Dette à 113% du PIB. Luxe (LVMH, Hermès) et aéronautique (Airbus) restent les moteurs d'export. Déficit public persistant sous pression des marchés.",
           },
           {
             name: "Italie",
             emoji: "🇮🇹",
-            detail: "2 356 Mds€ — Rang #8",
+            detail: "2 356 Mds€ · Rang #8",
             subdetail:
               "Reprise post-COVID solide portée par le tourisme (+80 millions de visiteurs/an) et le PNRR européen (200 Md€). Dette : 137% du PIB, sous surveillance BCE.",
           },
           {
             name: "Brésil",
             emoji: "🇧🇷",
-            detail: "2 331 Mds€ — Rang #9",
+            detail: "2 331 Mds€ · Rang #9",
             subdetail:
               "Première économie d'Amérique latine. Agri-business (1er exportateur mondial de soja, café, sucre), pétrole pré-sal et commodités minières. Croissance +2,9%.",
           },
           {
             name: "Canada",
             emoji: "🇨🇦",
-            detail: "2 277 Mds€ — Rang #10",
+            detail: "2 277 Mds€ · Rang #10",
             subdetail:
               "Économie de ressources (énergie, mines, bois) fortement intégrée aux États-Unis via l'ACEUM. Forte immigration (+500 000/an) soutient la demande intérieure.",
           },
@@ -164,7 +164,7 @@ export const ECONOMY_ARTICLES: Article[] = [
         type: "text",
         heading: "L'ascension irrésistible de l'Inde",
         content:
-          "L'Inde est devenue le symbole des reconfigurations économiques du XXIe siècle. Avec une croissance projetée à +6,5% en 2025, elle est la seule grande économie à croître aussi vite parmi le G20. Sa population de 1,44 milliard d'habitants — dont une médiane d'âge de 28 ans seulement — constitue un réservoir de main-d'œuvre et de consommateurs sans équivalent mondial. Le secteur des services numériques (IT, BPO, fintech) représente désormais plus de 8% du PIB indien, faisant de Bangalore, Hyderabad et Pune des pôles tech reconnus mondialement. L'Inde devrait dépasser le Japon d'ici 2026 et le Royaume-Uni en 2027 selon les projections FMI. Premier exportateur mondial d'acier en 2024, elle investit également massivement dans les énergies renouvelables (500 GW solaire d'ici 2030).",
+          "L'Inde est devenue le symbole des reconfigurations économiques du XXIe siècle. Avec une croissance projetée à +6,5% en 2025, elle est la seule grande économie à croître aussi vite parmi le G20. Sa population de 1,44 milliard d'habitants, dont une médiane d'âge de 28 ans seulement, constitue un réservoir de main-d'œuvre et de consommateurs sans équivalent mondial. Le secteur des services numériques (IT, BPO, fintech) représente désormais plus de 8% du PIB indien, faisant de Bangalore, Hyderabad et Pune des pôles tech reconnus mondialement. L'Inde devrait dépasser le Japon d'ici 2026 et le Royaume-Uni en 2027 selon les projections FMI. Premier exportateur mondial d'acier en 2024, elle investit également massivement dans les énergies renouvelables (500 GW solaire d'ici 2030).",
       },
       {
         type: "comparison-table",
@@ -234,17 +234,17 @@ export const ECONOMY_ARTICLES: Article[] = [
         images: [
           {
             url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Financial_district_Manhattan.jpg/1280px-Financial_district_Manhattan.jpg",
-            caption: "Manhattan, New York — le quartier financier de la première économie mondiale",
+            caption: "Manhattan, New York · le quartier financier de la première économie mondiale",
             credit: "Wikimedia Commons",
           },
           {
             url: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Camponotus_flavomarginatus_ant.jpg/1280px-Camponotus_flavomarginatus_ant.jpg",
-            caption: "Shanghai Pudong — vitrine architecturale de l'essor économique chinois",
+            caption: "Shanghai Pudong · vitrine architecturale de l'essor économique chinois",
             credit: "Wikimedia Commons",
           },
           {
             url: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Frankfurt_am_Main_-_Skyline_%28Simon_Waldherr%29_edit.jpg/1280px-Frankfurt_am_Main_-_Skyline_%28Simon_Waldherr%29_edit.jpg",
-            caption: "Francfort — capitale financière de la zone euro et siège de la BCE",
+            caption: "Francfort · capitale financière de la zone euro et siège de la BCE",
             credit: "Wikimedia Commons / Simon Waldherr",
           },
         ],
@@ -253,7 +253,7 @@ export const ECONOMY_ARTICLES: Article[] = [
     sources: [
         { title: "World Economic Outlook, April 2025", outlet: "FMI", year: "2025", url: "https://www.imf.org/en/Publications/WEO" },
         { title: "World Development Indicators", outlet: "Banque mondiale", year: "2024", url: "https://data.worldbank.org" },
-        { title: "GDP and main aggregates — National accounts", outlet: "Eurostat", year: "2025" },
+        { title: "GDP and main aggregates · National accounts", outlet: "Eurostat", year: "2025" },
         { title: "Perspectives de l'économie mondiale", outlet: "OCDE", year: "2025", url: "https://stats.oecd.org" },
     ],
   },
@@ -278,21 +278,21 @@ export const ECONOMY_ARTICLES: Article[] = [
       {
         type: "lead",
         content:
-          "La dette publique de la France atteint 113 % de son PIB en 2025, soit environ 3 250 milliards d'euros. Un chiffre qui suscite régulièrement l'inquiétude des agences de notation et des investisseurs — mais qui doit être mis en perspective avec les autres grandes économies mondiales. Car si la règle de Maastricht fixe la limite à 60 %, la réalité des grands États souverains est bien plus nuancée.",
+          "La dette publique de la France atteint 113 % de son PIB en 2025, soit environ 3 250 milliards d'euros. Un chiffre qui suscite régulièrement l'inquiétude des agences de notation et des investisseurs, mais qui doit être mis en perspective avec les autres grandes économies mondiales. Car si la règle de Maastricht fixe la limite à 60 %, la réalité des grands États souverains est bien plus nuancée.",
       },
       {
         type: "stats",
         items: [
           { value: "113 %", label: "Dette/PIB France 2025", note: "Projections FMI" },
-          { value: "254 %", label: "Japon — record G7", note: "Pourtant taux bas" },
+          { value: "254 %", label: "Japon · record G7", note: "Pourtant taux bas" },
           { value: "64 %", label: "Allemagne", note: "Quasi-conforme Maastricht" },
           { value: "3 250 Md€", label: "Dette France valeur abs.", note: "Estimation 2025" },
         ],
       },
       {
         type: "map-highlight",
-        title: "La dette publique mondiale par pays — 2025",
-        subtitle: "Ratio dette/PIB en % — Source : FMI Fiscal Monitor 2024",
+        title: "La dette publique mondiale par pays · 2025",
+        subtitle: "Ratio dette/PIB en % · Source : FMI Fiscal Monitor 2024",
         countries: {
           JP: { color: "#C0392B", label: "Japon 254%" },
           GR: { color: "#C0392B", label: "Grèce 163%" },
@@ -314,16 +314,16 @@ export const ECONOMY_ARTICLES: Article[] = [
         },
         legend: [
           { color: "#C0392B", label: "Très élevée > 130%" },
-          { color: "#E74C3C", label: "Élevée 110–130%" },
-          { color: "#E67E22", label: "Modérée-haute 90–110%" },
-          { color: "#F39C12", label: "Modérée 70–90%" },
-          { color: "#F1C40F", label: "Sous contrôle 50–70%" },
+          { color: "#E74C3C", label: "Élevée 110-130%" },
+          { color: "#E67E22", label: "Modérée-haute 90-110%" },
+          { color: "#F39C12", label: "Modérée 70-90%" },
+          { color: "#F1C40F", label: "Sous contrôle 50-70%" },
           { color: "#2ECC71", label: "Faible < 50%" },
         ],
       },
       {
         type: "chart",
-        title: "Ratio dette publique / PIB — comparaison internationale 2025",
+        title: "Ratio dette publique / PIB · comparaison internationale 2025",
         subtitle: "Données FMI, World Economic Outlook avril 2025 (% du PIB)",
         unit: "% du PIB",
         bars: [
@@ -356,31 +356,31 @@ export const ECONOMY_ARTICLES: Article[] = [
           },
           {
             date: "1993",
-            title: "35 % du PIB — premier choc",
+            title: "35 % du PIB · premier choc",
             description:
               "La récession de 1993 et les dépenses sociales creusent le déficit. Première prise de conscience de la dérive.",
           },
           {
             date: "2007",
-            title: "64 % du PIB — seuil de Maastricht dépassé",
+            title: "64 % du PIB · seuil de Maastricht dépassé",
             description:
               "À la veille de la crise financière mondiale, la France dépasse déjà la règle des 60 % de Maastricht.",
           },
           {
             date: "2010",
-            title: "82 % du PIB — après la crise de 2008",
+            title: "82 % du PIB · après la crise de 2008",
             description:
               "Les plans de relance post-crise financière et la chute des recettes fiscales propulsent la dette.",
           },
           {
             date: "2020",
-            title: "114 % du PIB — COVID-19",
+            title: "114 % du PIB · COVID-19",
             description:
               "Le « quoi qu'il en coûte » de Macron : 70 milliards de dépenses supplémentaires pour sauvegarder l'économie.",
           },
           {
             date: "2025",
-            title: "113 % du PIB — stabilisation fragile",
+            title: "113 % du PIB · stabilisation fragile",
             description:
               "Légère décrue liée à l'inflation (qui gonfle le PIB nominal), mais déficit persistant à -5,5% du PIB.",
           },
@@ -390,7 +390,7 @@ export const ECONOMY_ARTICLES: Article[] = [
         type: "text",
         heading: "Ce que le ratio dette/PIB ne dit pas",
         content:
-          "Le ratio dette/PIB est un indicateur pratique, mais réducteur. Ce qui importe réellement pour la soutenabilité d'une dette souveraine, c'est la capacité à la refinancer (liquidité des marchés obligataires), la devise d'émission (la France emprunte en euros, monnaie qu'elle ne contrôle pas seule), la croissance économique (qui « dilue » mécaniquement la dette dans le temps), et la confiance des investisseurs. Le Japon en est l'exemple parfait : avec 254 % de dette/PIB, il emprunte à des taux proches de zéro parce que sa dette est détenue à 90 % par des agents nationaux (Banque du Japon, fonds de pension). La France, elle, est détenue à environ 55 % par des non-résidents — d'où une vulnérabilité plus grande aux variations de sentiment des marchés.",
+          "Le ratio dette/PIB est un indicateur pratique, mais réducteur. Ce qui importe réellement pour la soutenabilité d'une dette souveraine, c'est la capacité à la refinancer (liquidité des marchés obligataires), la devise d'émission (la France emprunte en euros, monnaie qu'elle ne contrôle pas seule), la croissance économique (qui « dilue » mécaniquement la dette dans le temps), et la confiance des investisseurs. Le Japon en est l'exemple parfait : avec 254 % de dette/PIB, il emprunte à des taux proches de zéro parce que sa dette est détenue à 90 % par des agents nationaux (Banque du Japon, fonds de pension). La France, elle, est détenue à environ 55 % par des non-résidents, d'où une vulnérabilité plus grande aux variations de sentiment des marchés.",
       },
       {
         type: "comparison-table",
@@ -409,7 +409,7 @@ export const ECONOMY_ARTICLES: Article[] = [
         type: "image-text",
         heading: "Le coût de la charge d'intérêts : un piège qui s'accélère",
         content:
-          "Avec la remontée des taux directeurs de la BCE (0 % en 2021 → 4,5 % en 2023-2024), la charge d'intérêts de la dette française est passée de 35 milliards à plus de 55 milliards d'euros annuels en 2025. Elle représente désormais plus que le budget de l'Éducation nationale. C'est un effet « boule de neige » classique : plus la dette est élevée, plus les intérêts pèsent, plus le déficit se creuse. Pour sortir de ce piège, la croissance nominale doit être supérieure au taux d'intérêt moyen — ce qui n'est pas garanti dans un contexte européen atone.",
+          "Avec la remontée des taux directeurs de la BCE (0 % en 2021 → 4,5 % en 2023-2024), la charge d'intérêts de la dette française est passée de 35 milliards à plus de 55 milliards d'euros annuels en 2025. Elle représente désormais plus que le budget de l'Éducation nationale. C'est un effet « boule de neige » classique : plus la dette est élevée, plus les intérêts pèsent, plus le déficit se creuse. Pour sortir de ce piège, la croissance nominale doit être supérieure au taux d'intérêt moyen, ce qui n'est pas garanti dans un contexte européen atone.",
         imageUrl:
           "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Bercy2.jpg/1280px-Bercy2.jpg",
         imageAlt: "Ministère de l'Économie à Bercy",
@@ -426,7 +426,7 @@ export const ECONOMY_ARTICLES: Article[] = [
           },
           {
             text: "Réforme structurelle des dépenses publiques",
-            note: "La France dépense 57 % du PIB — record OCDE. Rationalisation nécessaire mais politiquement difficile.",
+            note: "La France dépense 57 % du PIB, record OCDE. Rationalisation nécessaire mais politiquement difficile.",
           },
           {
             text: "Soutien de la BCE via le TPI (Transmission Protection Instrument)",
@@ -445,7 +445,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       {
         type: "highlight",
         content:
-          "La France fait face à une contrainte rare : elle ne peut ni dévaluer (zone euro), ni imprimer de monnaie (BCE indépendante). Sa seule voie de sortie est la croissance, la réforme ou la négociation européenne. Un trilemme que l'Allemagne a résolu en maintenant une orthodoxie budgétaire stricte — au prix d'un sous-investissement public dénoncé par de nombreux économistes.",
+          "La France fait face à une contrainte rare : elle ne peut ni dévaluer (zone euro), ni imprimer de monnaie (BCE indépendante). Sa seule voie de sortie est la croissance, la réforme ou la négociation européenne. Un trilemme que l'Allemagne a résolu en maintenant une orthodoxie budgétaire stricte, au prix d'un sous-investissement public dénoncé par de nombreux économistes.",
       },
       {
         type: "quote",
@@ -458,12 +458,12 @@ export const ECONOMY_ARTICLES: Article[] = [
         images: [
           {
             url: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Bercy2.jpg/1280px-Bercy2.jpg",
-            caption: "Le ministère de l'Économie français, à Bercy — gestionnaire des 3 250 milliards de dette",
+            caption: "Le ministère de l'Économie français, à Bercy · gestionnaire des 3 250 milliards de dette",
             credit: "Wikimedia Commons",
           },
           {
             url: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/ECB_new_building_Frankfurt_2015.jpg/1280px-ECB_new_building_Frankfurt_2015.jpg",
-            caption: "La Banque centrale européenne à Francfort — garante de la stabilité financière de la zone euro",
+            caption: "La Banque centrale européenne à Francfort · garante de la stabilité financière de la zone euro",
             credit: "Wikimedia Commons",
           },
         ],
@@ -471,10 +471,10 @@ export const ECONOMY_ARTICLES: Article[] = [
     ],
     sources: [
         { title: "Fiscal Monitor: Putting a Lid on Public Debt", outlet: "FMI", year: "2024", url: "https://www.imf.org/en/Publications/FM" },
-        { title: "General government debt — % of GDP", outlet: "OCDE", year: "2025", url: "https://stats.oecd.org" },
-        { title: "Projet de loi de finances 2025 — Rapport économique", outlet: "Ministère de l'Économie français", year: "2024" },
+        { title: "General government debt · % of GDP", outlet: "OCDE", year: "2025", url: "https://stats.oecd.org" },
+        { title: "Projet de loi de finances 2025 · Rapport économique", outlet: "Ministère de l'Économie français", year: "2024" },
         { title: "Global Debt Database", outlet: "FMI", year: "2024" },
-        { title: "Zone euro : soutenabilité des dettes souveraines", outlet: "BCE — Banque centrale européenne", year: "2024" },
+        { title: "Zone euro : soutenabilité des dettes souveraines", outlet: "BCE · Banque centrale européenne", year: "2024" },
     ],
   },
 
@@ -485,7 +485,7 @@ export const ECONOMY_ARTICLES: Article[] = [
     slug: "pib-mondial-geopolitique-puissance",
     title: "Le PIB comme outil de puissance géopolitique",
     excerpt:
-      "La richesse économique n'est pas qu'un chiffre — c'est un vecteur de pouvoir diplomatique, militaire et culturel. Décryptage de la manière dont le PIB façonne l'ordre mondial.",
+      "La richesse économique n'est pas qu'un chiffre, c'est un vecteur de pouvoir diplomatique, militaire et culturel. Décryptage de la manière dont le PIB façonne l'ordre mondial.",
     theme: "economy",
     publishedAt: "2025-03-10",
     readingTime: 13,
@@ -511,7 +511,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
       {
         type: "chart",
-        title: "Budgets militaires mondiaux 2025 — les 10 premiers",
+        title: "Budgets militaires mondiaux 2025 · les 10 premiers",
         subtitle: "Stockholm International Peace Research Institute (SIPRI), 2025",
         unit: "Milliards €",
         bars: [
@@ -531,11 +531,11 @@ export const ECONOMY_ARTICLES: Article[] = [
         type: "text",
         heading: "La relation PIB-puissance militaire : une équation quasi-mécanique",
         content:
-          "Il existe une corrélation forte entre PIB et budget militaire. Les États-Unis consacrent environ 3,5 % de leur PIB à la défense — soit plus de 916 milliards de dollars en 2025, davantage que les dix pays suivants réunis. La Chine, avec un budget estimé à 225 milliards (1,2 % du PIB), reste très loin mais rattrape rapidement, avec des taux de croissance militaire de +7 % par an depuis 2015. Cette asymétrie explique pourquoi Washington peut maintenir 750 bases militaires dans 80 pays : c'est une puissance économique convertie en projection globale. La règle historique des 2 % du PIB pour l'OTAN est directement une déclinaison de ce principe : la puissance économique doit se traduire en capacité défensive.",
+          "Il existe une corrélation forte entre PIB et budget militaire. Les États-Unis consacrent environ 3,5 % de leur PIB à la défense, soit plus de 916 milliards de dollars en 2025, davantage que les dix pays suivants réunis. La Chine, avec un budget estimé à 225 milliards (1,2 % du PIB), reste très loin mais rattrape rapidement, avec des taux de croissance militaire de +7 % par an depuis 2015. Cette asymétrie explique pourquoi Washington peut maintenir 750 bases militaires dans 80 pays : c'est une puissance économique convertie en projection globale. La règle historique des 2 % du PIB pour l'OTAN est directement une déclinaison de ce principe : la puissance économique doit se traduire en capacité défensive.",
       },
       {
         type: "map-highlight",
-        title: "Carte des alliances économico-militaires mondiales — 2025",
+        title: "Carte des alliances économico-militaires mondiales · 2025",
         subtitle: "Appartenance aux blocs économiques et alliances de sécurité",
         countries: {
           us: { color: "#2980B9", label: "OTAN + G7" },
@@ -563,7 +563,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
       {
         type: "comparison-table",
-        title: "PIB, dépenses militaires et influence diplomatique — grandes puissances 2025",
+        title: "PIB, dépenses militaires et influence diplomatique · grandes puissances 2025",
         headers: ["Pays", "PIB nominal", "Budget défense", "% PIB défense", "Sièges ONU/FMI"],
         rows: [
           { label: "États-Unis", flag: "us", cells: ["30 337 Md€", "916 Md€", "3,5%", "Droit de veto / 17,4%"] },
@@ -592,7 +592,7 @@ export const ECONOMY_ARTICLES: Article[] = [
           },
           {
             date: "2008",
-            title: "Crise financière — l'Occident vacille",
+            title: "Crise financière · l'Occident vacille",
             description:
               "La crise des subprimes ébranle la confiance dans le modèle économique occidental. La Chine sort relativement indemne avec +9,6% de croissance.",
           },
@@ -625,7 +625,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       {
         type: "highlight",
         content:
-          "En 2000, la Chine représentait 12 % du PIB américain. En 2025, ce chiffre dépasse 64 %. Cette convergence est la principale variable de la géopolitique du XXIe siècle — et explique que chaque décision économique de Washington ou Pékin soit désormais analysée à travers un prisme stratégique.",
+          "En 2000, la Chine représentait 12 % du PIB américain. En 2025, ce chiffre dépasse 64 %. Cette convergence est la principale variable de la géopolitique du XXIe siècle, et explique que chaque décision économique de Washington ou Pékin soit désormais analysée à travers un prisme stratégique.",
       },
       {
         type: "list",
@@ -638,7 +638,7 @@ export const ECONOMY_ARTICLES: Article[] = [
           },
           {
             text: "Contrôle des infrastructures financières",
-            note: "SWIFT, dollar de réserve, systèmes de clearing — armes de sanctions économiques.",
+            note: "SWIFT, dollar de réserve, systèmes de clearing · armes de sanctions économiques.",
           },
           {
             text: "Diplomatie par les investissements",
@@ -650,11 +650,11 @@ export const ECONOMY_ARTICLES: Article[] = [
           },
           {
             text: "Soft power culturel",
-            note: "Universités, médias, divertissement — la puissance douce amplifie la puissance dure.",
+            note: "Universités, médias, divertissement · la puissance douce amplifie la puissance dure.",
           },
           {
             text: "Contrôle des ressources critiques",
-            note: "Terres rares, lithium, uranium — les matières premières de la transition énergétique sont le nouveau pétrole.",
+            note: "Terres rares, lithium, uranium · les matières premières de la transition énergétique sont le nouveau pétrole.",
           },
         ],
       },
@@ -665,11 +665,11 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
     ],
     sources: [
-        { title: "World Economic Outlook — Database April 2025", outlet: "FMI", year: "2025", url: "https://www.imf.org/en/Publications/WEO" },
+        { title: "World Economic Outlook · Database April 2025", outlet: "FMI", year: "2025", url: "https://www.imf.org/en/Publications/WEO" },
         { title: "GDP (current US$) by country", outlet: "Banque mondiale", year: "2024", url: "https://data.worldbank.org" },
         { title: "Géopolitique économique : rapports de force", outlet: "OCDE", year: "2024" },
         { title: "Asian Development Outlook 2024", outlet: "Asian Development Bank", year: "2024" },
-        { title: "China GDP growth slows — Perspectives 2025", outlet: "Financial Times", year: "2024" },
+        { title: "China GDP growth slows · Perspectives 2025", outlet: "Financial Times", year: "2024" },
     ],
   },
 
@@ -688,17 +688,17 @@ export const ECONOMY_ARTICLES: Article[] = [
     featured: false,
     heroImage:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/ECB_new_building_Frankfurt_2015.jpg/1280px-ECB_new_building_Frankfurt_2015.jpg",
-    heroCaption: "La Banque centrale européenne à Francfort — pivot de la gestion de la dette en zone euro.",
+    heroCaption: "La Banque centrale européenne à Francfort · pivot de la gestion de la dette en zone euro.",
     body: [
       {
         type: "lead",
         content:
-          "La dette publique mondiale a explosé depuis 2008 et plus encore depuis 2020. Le total mondial frôle désormais 100 000 milliards de dollars — soit environ 92 % du PIB planétaire. Pourtant, les crises de la dette souveraine restent rares. Ce qui déclenche une crise, ce n'est pas un ratio, c'est une perte de confiance des marchés : une rupture soudaine dans la conviction que l'État débiteur pourra honorer ses engagements.",
+          "La dette publique mondiale a explosé depuis 2008 et plus encore depuis 2020. Le total mondial frôle désormais 100 000 milliards de dollars, soit environ 92 % du PIB planétaire. Pourtant, les crises de la dette souveraine restent rares. Ce qui déclenche une crise, ce n'est pas un ratio, c'est une perte de confiance des marchés : une rupture soudaine dans la conviction que l'État débiteur pourra honorer ses engagements.",
       },
       {
         type: "stats",
         items: [
-          { value: "254 %", label: "Japon — record G7", note: "90% détenus par résidents" },
+          { value: "254 %", label: "Japon · record G7", note: "90% détenus par résidents" },
           { value: "137 %", label: "Italie", note: "Sous surveillance BCE" },
           { value: "123 %", label: "États-Unis", note: "Monnaie de réserve mondiale" },
           { value: "64 %", label: "Allemagne", note: "Orthodoxie budgétaire" },
@@ -706,7 +706,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
       {
         type: "chart",
-        title: "Dette publique brute 2025 — top 20 mondial",
+        title: "Dette publique brute 2025 · top 20 mondial",
         subtitle: "FMI, World Economic Outlook avril 2025 (% du PIB)",
         unit: "% du PIB",
         bars: [
@@ -731,7 +731,7 @@ export const ECONOMY_ARTICLES: Article[] = [
         type: "text",
         heading: "La dette japonaise : l'anomalie qui dérange les modèles",
         content:
-          "Le Japon est l'anomalie statistique parfaite. Avec 254 % de dette publique brute/PIB, il devrait — selon toutes les théories classiques — être en crise permanente. Or, il emprunte à des taux inférieurs à 1 % depuis des décennies. La raison est structurelle : environ 90 % de la dette japonaise est détenue par des résidents — notamment la Banque du Japon (qui en détient plus de 50 %) et les fonds de pension nationaux. Dans une économie à fort excédent d'épargne et à faible inflation historique, les ménages et les institutions japonaises investissent massivement dans des obligations d'État considérées comme un actif sans risque domestique. Ce modèle ne peut pas être repliqué par des pays dont la dette est détenue majoritairement par des non-résidents — comme la France (55 % de détention étrangère) ou la Grèce.",
+          "Le Japon est l'anomalie statistique parfaite. Avec 254 % de dette publique brute/PIB, il devrait, selon toutes les théories classiques, être en crise permanente. Or, il emprunte à des taux inférieurs à 1 % depuis des décennies. La raison est structurelle : environ 90 % de la dette japonaise est détenue par des résidents, notamment la Banque du Japon (qui en détient plus de 50 %) et les fonds de pension nationaux. Dans une économie à fort excédent d'épargne et à faible inflation historique, les ménages et les institutions japonaises investissent massivement dans des obligations d'État considérées comme un actif sans risque domestique. Ce modèle ne peut pas être repliqué par des pays dont la dette est détenue majoritairement par des non-résidents, comme la France (55 % de détention étrangère) ou la Grèce.",
       },
       {
         type: "comparison-table",
@@ -750,7 +750,7 @@ export const ECONOMY_ARTICLES: Article[] = [
         type: "image-text",
         heading: "La crise grecque 2010-2015 : la leçon de la perte de confiance",
         content:
-          "En 2010, la Grèce avait une dette de 127 % du PIB — inférieure à celle du Japon actuel. Mais la crise qu'elle a traversée a failli faire éclater la zone euro. Pourquoi ? Parce que la Grèce empruntait en euros (monnaie qu'elle ne peut pas imprimer), que sa dette était détenue par des banques françaises et allemandes non-résidentes, que sa croissance était anémique et son économie peu compétitive, et que les marchés ont perdu confiance simultanément. Le spread (écart avec l'Allemagne) a explosé à 35 % en 2012. Seule l'intervention de la BCE (« Whatever it takes » de Draghi, juillet 2012) a stoppé la contagion. Cet épisode a redéfini la gestion de la dette souveraine en zone euro.",
+          "En 2010, la Grèce avait une dette de 127 % du PIB, inférieure à celle du Japon actuel. Mais la crise qu'elle a traversée a failli faire éclater la zone euro. Pourquoi ? Parce que la Grèce empruntait en euros (monnaie qu'elle ne peut pas imprimer), que sa dette était détenue par des banques françaises et allemandes non-résidentes, que sa croissance était anémique et son économie peu compétitive, et que les marchés ont perdu confiance simultanément. Le spread (écart avec l'Allemagne) a explosé à 35 % en 2012. Seule l'intervention de la BCE (« Whatever it takes » de Draghi, juillet 2012) a stoppé la contagion. Cet épisode a redéfini la gestion de la dette souveraine en zone euro.",
         imageUrl:
           "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/ECB_new_building_Frankfurt_2015.jpg/1280px-ECB_new_building_Frankfurt_2015.jpg",
         imageAlt: "BCE Francfort",
@@ -758,7 +758,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
       {
         type: "timeline",
-        title: "Les grandes crises de la dette souveraine — 1994 à 2025",
+        title: "Les grandes crises de la dette souveraine · 1994 à 2025",
         items: [
           {
             date: "1994-1995",
@@ -768,15 +768,15 @@ export const ECONOMY_ARTICLES: Article[] = [
           },
           {
             date: "1997-1998",
-            title: "Crise asiatique — Thaïlande, Corée, Indonésie",
+            title: "Crise asiatique · Thaïlande, Corée, Indonésie",
             description:
               "Attaques spéculatives sur les monnaies asiatiques. Le baht thaïlandais s'effondre. PIB indonésien : -13% en 1998. Leçon : la dette en devises étrangères est un piège.",
           },
           {
             date: "2001",
-            title: "Default argentin — 100 Md$ de dette",
+            title: "Default argentin · 100 Md$ de dette",
             description:
-              "L'Argentine fait défaut sur 100 milliards de dollars — le plus grand défaut souverain de l'histoire à l'époque. Fin du Currency Board (peso = dollar).",
+              "L'Argentine fait défaut sur 100 milliards de dollars, le plus grand défaut souverain de l'histoire à l'époque. Fin du Currency Board (peso = dollar).",
           },
           {
             date: "2010-2015",
@@ -786,7 +786,7 @@ export const ECONOMY_ARTICLES: Article[] = [
           },
           {
             date: "2022",
-            title: "Sri Lanka — premier défaut post-COVID",
+            title: "Sri Lanka · premier défaut post-COVID",
             description:
               "Le Sri Lanka fait défaut sur 51 Md$ de dette. Effondrement des réserves de change, pénuries massives. Sauvetage FMI en 2023.",
           },
@@ -822,7 +822,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       {
         type: "highlight",
         content:
-          "La dette publique mondiale a augmenté de 60 000 milliards de dollars entre 2020 et 2025. C'est l'équivalent du PIB de la planète entière. Cette explosion sans précédent en temps de paix est le legs économique de la pandémie — et une contrainte majeure pour les décennies à venir.",
+          "La dette publique mondiale a augmenté de 60 000 milliards de dollars entre 2020 et 2025. C'est l'équivalent du PIB de la planète entière. Cette explosion sans précédent en temps de paix est le legs économique de la pandémie, et une contrainte majeure pour les décennies à venir.",
       },
       {
         type: "quote",
@@ -831,10 +831,10 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
     ],
     sources: [
-        { title: "Fiscal Monitor 2024 — Appendix Tables", outlet: "FMI", year: "2024", url: "https://www.imf.org/en/Publications/FM" },
-        { title: "General Government Gross Debt — OECD Data", outlet: "OCDE", year: "2025" },
-        { title: "Japan's Debt — sustainability analysis", outlet: "FMI Article IV Japan", year: "2024" },
-        { title: "EU Excessive Deficit Procedure — Member States", outlet: "Commission européenne", year: "2024" },
+        { title: "Fiscal Monitor 2024 · Appendix Tables", outlet: "FMI", year: "2024", url: "https://www.imf.org/en/Publications/FM" },
+        { title: "General Government Gross Debt · OECD Data", outlet: "OCDE", year: "2025" },
+        { title: "Japan's Debt · sustainability analysis", outlet: "FMI Article IV Japan", year: "2024" },
+        { title: "EU Excessive Deficit Procedure · Member States", outlet: "Commission européenne", year: "2024" },
         { title: "Global Debt Database 2024", outlet: "FMI", year: "2024" },
     ],
   },
@@ -854,12 +854,12 @@ export const ECONOMY_ARTICLES: Article[] = [
     featured: false,
     heroImage:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Unemployment_office_crop.jpg/1280px-Unemployment_office_crop.jpg",
-    heroCaption: "File d'attente dans un bureau de chômage — une réalité encore très présente dans de nombreux pays.",
+    heroCaption: "File d'attente dans un bureau de chômage · une réalité encore très présente dans de nombreux pays.",
     body: [
       {
         type: "lead",
         content:
-          "Le taux de chômage est l'un des indicateurs économiques les plus politiquement sensibles. Il mesure la fracture entre ceux qui participent à l'économie formelle et ceux qui en sont exclus — avec toutes les nuances que les méthodologies nationales ne capturent pas. Car derrière les chiffres officiels se cachent le sous-emploi, le chômage structurel des jeunes, la précarité invisible du secteur informel et les inégalités de genre profondes.",
+          "Le taux de chômage est l'un des indicateurs économiques les plus politiquement sensibles. Il mesure la fracture entre ceux qui participent à l'économie formelle et ceux qui en sont exclus, avec toutes les nuances que les méthodologies nationales ne capturent pas. Car derrière les chiffres officiels se cachent le sous-emploi, le chômage structurel des jeunes, la précarité invisible du secteur informel et les inégalités de genre profondes.",
       },
       {
         type: "stats",
@@ -872,7 +872,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
       {
         type: "chart",
-        title: "Taux de chômage — grandes économies mondiales 2025",
+        title: "Taux de chômage · grandes économies mondiales 2025",
         subtitle: "Organisation internationale du travail (OIT) / FMI, données 2025",
         unit: "% de la population active",
         bars: [
@@ -895,7 +895,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
       {
         type: "map-highlight",
-        title: "Carte des taux de chômage mondiaux — 2025",
+        title: "Carte des taux de chômage mondiaux · 2025",
         subtitle: "OIT / FMI 2025. Vert = faible chômage, Rouge = chômage élevé.",
         countries: {
           jp: { color: "#2ECC71", label: "2,6% (très faible)" },
@@ -916,9 +916,9 @@ export const ECONOMY_ARTICLES: Article[] = [
         },
         legend: [
           { color: "#2ECC71", label: "< 3% : Plein emploi" },
-          { color: "#3498DB", label: "3–5% : Faible chômage" },
-          { color: "#F39C12", label: "5–7% : Modéré" },
-          { color: "#E74C3C", label: "7–12% : Élevé" },
+          { color: "#3498DB", label: "3-5% : Faible chômage" },
+          { color: "#F39C12", label: "5-7% : Modéré" },
+          { color: "#E74C3C", label: "7-12% : Élevé" },
           { color: "#922B21", label: "> 12% : Critique" },
         ],
       },
@@ -926,11 +926,11 @@ export const ECONOMY_ARTICLES: Article[] = [
         type: "text",
         heading: "Le chômage des jeunes : une bombe à retardement sociale",
         content:
-          "Au-delà des taux globaux, le chômage des jeunes (15-24 ans) révèle les fractures les plus profondes. En Espagne, il dépasse 25 % — soit un jeune Espagnol sur quatre sans emploi. En Grèce, ce chiffre était de 30 % encore en 2023. En Italie, le taux NEET (ni en emploi, ni en formation, ni en études) atteint 19 %. Ces niveaux structurels ne se résorbent pas en quelques années de croissance : ils laissent des «cicatrices» permanentes (scarring effect) sur la trajectoire professionnelle des individus concernés — perte de compétences, dépression, déqualification. À l'opposé, le Japon et l'Allemagne maintiennent un apprentissage dual qui intègre les jeunes très tôt dans le marché du travail, avec un taux de chômage des 15-24 ans inférieur à 5 %.",
+          "Au-delà des taux globaux, le chômage des jeunes (15-24 ans) révèle les fractures les plus profondes. En Espagne, il dépasse 25 %, soit un jeune Espagnol sur quatre sans emploi. En Grèce, ce chiffre était de 30 % encore en 2023. En Italie, le taux NEET (ni en emploi, ni en formation, ni en études) atteint 19 %. Ces niveaux structurels ne se résorbent pas en quelques années de croissance : ils laissent des «cicatrices» permanentes (scarring effect) sur la trajectoire professionnelle des individus concernés, perte de compétences, dépression, déqualification. À l'opposé, le Japon et l'Allemagne maintiennent un apprentissage dual qui intègre les jeunes très tôt dans le marché du travail, avec un taux de chômage des 15-24 ans inférieur à 5 %.",
       },
       {
         type: "comparison-table",
-        title: "Chômage global vs chômage des jeunes — comparaison internationale 2025",
+        title: "Chômage global vs chômage des jeunes · comparaison internationale 2025",
         headers: ["Pays", "Taux global", "Chômage 15-24 ans", "Taux NEET", "Part emploi informel"],
         rows: [
           { label: "Espagne", flag: "es", cells: ["11,5%", "26,2%", "13%", "15%"] },
@@ -987,16 +987,16 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
       {
         type: "quote",
-        text: "Le plein emploi n'est pas qu'un objectif économique. C'est un fondement de la cohésion sociale. Les pays qui maintiennent durablement un chômage élevé — notamment chez les jeunes — paient une facture sociale et politique qui dépasse de loin le coût des allocations versées.",
+        text: "Le plein emploi n'est pas qu'un objectif économique. C'est un fondement de la cohésion sociale. Les pays qui maintiennent durablement un chômage élevé, notamment chez les jeunes, paient une facture sociale et politique qui dépasse de loin le coût des allocations versées.",
         source: "OIT, Rapport mondial sur l'emploi et les questions sociales 2025",
       },
     ],
     sources: [
         { title: "World Employment and Social Outlook 2024", outlet: "Organisation Internationale du Travail (OIT)", year: "2024", url: "https://www.ilo.org" },
-        { title: "Unemployment rate by country — OECD Statistics", outlet: "OCDE", year: "2025" },
-        { title: "World Development Report 2024 — Inequality", outlet: "Banque mondiale", year: "2024" },
-        { title: "Labour market statistics — Eurostat", outlet: "Eurostat", year: "2025" },
-        { title: "Global Inequality Report — Oxfam 2024", outlet: "Oxfam International", year: "2024" },
+        { title: "Unemployment rate by country · OECD Statistics", outlet: "OCDE", year: "2025" },
+        { title: "World Development Report 2024 · Inequality", outlet: "Banque mondiale", year: "2024" },
+        { title: "Labour market statistics · Eurostat", outlet: "Eurostat", year: "2025" },
+        { title: "Global Inequality Report · Oxfam 2024", outlet: "Oxfam International", year: "2024" },
     ],
   },
 
@@ -1015,7 +1015,7 @@ export const ECONOMY_ARTICLES: Article[] = [
     featured: false,
     heroImage:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/US-China_Flags.jpg/1280px-US-China_Flags.jpg",
-    heroCaption: "Les drapeaux américain et chinois — symboles de la rivalité économique centrale du XXIe siècle.",
+    heroCaption: "Les drapeaux américain et chinois · symboles de la rivalité économique centrale du XXIe siècle.",
     body: [
       {
         type: "lead",
@@ -1027,7 +1027,7 @@ export const ECONOMY_ARTICLES: Article[] = [
         items: [
           { value: "12 %", label: "PIB Chine/USA en 2000", note: "Rapport de force d'alors" },
           { value: "64 %", label: "PIB Chine/USA en 2025", note: "Convergence spectaculaire" },
-          { value: "600 Md€+", label: "Taxes et sanctions mutuelles", note: "Guerre commerciale 2018–2025" },
+          { value: "600 Md€+", label: "Taxes et sanctions mutuelles", note: "Guerre commerciale 2018-2025" },
           { value: "2030", label: "Dépassement possible (PPA)", note: "Si tendances maintenues" },
         ],
       },
@@ -1051,11 +1051,11 @@ export const ECONOMY_ARTICLES: Article[] = [
         type: "text",
         heading: "La montée en puissance chinoise : 30 ans d'une ascension sans précédent",
         content:
-          "En 1990, la Chine était une économie pauvre de 360 millions de dollars de PIB, soit 6 % du PIB américain. En 35 ans, elle est devenue la deuxième économie mondiale avec 19 535 milliards d'euros de PIB nominal. Cette croissance a sorti 800 millions de personnes de la pauvreté — le plus grand succès de développement économique de l'histoire humaine. Le moteur initial était simple : travail bon marché, exportations manufacturières massives et accueil d'IDE. Mais la stratégie a évolué : depuis Made in China 2025 (2015), Pékin vise la montée en gamme dans les secteurs stratégiques — semi-conducteurs, IA, véhicules électriques, énergies renouvelables, spatial, biotechnologies.",
+          "En 1990, la Chine était une économie pauvre de 360 millions de dollars de PIB, soit 6 % du PIB américain. En 35 ans, elle est devenue la deuxième économie mondiale avec 19 535 milliards d'euros de PIB nominal. Cette croissance a sorti 800 millions de personnes de la pauvreté, le plus grand succès de développement économique de l'histoire humaine. Le moteur initial était simple : travail bon marché, exportations manufacturières massives et accueil d'IDE. Mais la stratégie a évolué : depuis Made in China 2025 (2015), Pékin vise la montée en gamme dans les secteurs stratégiques, semi-conducteurs, IA, véhicules électriques, énergies renouvelables, spatial, biotechnologies.",
       },
       {
         type: "comparison-table",
-        title: "États-Unis vs Chine — comparatif économique et technologique 2025",
+        title: "États-Unis vs Chine · comparatif économique et technologique 2025",
         headers: ["Indicateur", "États-Unis", "Chine", "Écart / Tendance"],
         rows: [
           { label: "PIB nominal", cells: ["30 337 Md€", "19 535 Md€", "USA +55%"] },
@@ -1072,7 +1072,7 @@ export const ECONOMY_ARTICLES: Article[] = [
         type: "image-text",
         heading: "La guerre des semi-conducteurs : la bataille centrale",
         content:
-          "Les semi-conducteurs sont le pétrole du XXIe siècle. Les puces avancées sont indispensables à l'IA, aux systèmes d'armes modernes, aux télécommunications 5G et à l'automatisation industrielle. En octobre 2022, l'administration Biden a déclenché la « guerre des puces » : interdiction d'exporter vers la Chine des semi-conducteurs avancés (≤14 nm) et des équipements de fabrication (notamment ASML, l'unique fabricant mondial de lithographie EUV). L'objectif : retarder de 10 ans le développement des capacités chinoises en IA. La réponse chinoise : un plan de 150 milliards de dollars pour atteindre l'autonomie dans les semi-conducteurs d'ici 2030. Résultat partiel : Huawei a sorti en 2023 le Mate 60 Pro avec un chip 7 nm produit par SMIC — en contournement partiel des sanctions.",
+          "Les semi-conducteurs sont le pétrole du XXIe siècle. Les puces avancées sont indispensables à l'IA, aux systèmes d'armes modernes, aux télécommunications 5G et à l'automatisation industrielle. En octobre 2022, l'administration Biden a déclenché la « guerre des puces » : interdiction d'exporter vers la Chine des semi-conducteurs avancés (≤14 nm) et des équipements de fabrication (notamment ASML, l'unique fabricant mondial de lithographie EUV). L'objectif : retarder de 10 ans le développement des capacités chinoises en IA. La réponse chinoise : un plan de 150 milliards de dollars pour atteindre l'autonomie dans les semi-conducteurs d'ici 2030. Résultat partiel : Huawei a sorti en 2023 le Mate 60 Pro avec un chip 7 nm produit par SMIC, en contournement partiel des sanctions.",
         imageUrl:
           "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/US-China_Flags.jpg/1280px-US-China_Flags.jpg",
         imageAlt: "Drapeaux USA et Chine",
@@ -1114,7 +1114,7 @@ export const ECONOMY_ARTICLES: Article[] = [
           },
           {
             date: "2025",
-            title: "Retour des droits de douane — 2.0",
+            title: "Retour des droits de douane · 2.0",
             description:
               "La nouvelle administration américaine relève les taxes sur les importations chinoises à 60-100%. La dé-mondialisation s'accélère avec le « friendshoring ».",
           },
@@ -1122,7 +1122,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
       {
         type: "map-highlight",
-        title: "Le monde fracturé : zones d'influence économique USA vs Chine — 2025",
+        title: "Le monde fracturé : zones d'influence économique USA vs Chine · 2025",
         subtitle: "Appartenance aux zones de dépendance commerciale et technologique",
         countries: {
           us: { color: "#2980B9", label: "Sphère USA (noyau dur)" },
@@ -1182,18 +1182,18 @@ export const ECONOMY_ARTICLES: Article[] = [
       {
         type: "highlight",
         content:
-          "En parité de pouvoir d'achat (PPA), la Chine a déjà dépassé les États-Unis depuis 2016. Ce basculement, souvent ignoré dans les médias, signifie que l'économie chinoise produit désormais plus de biens et services réels que l'américaine — même si en termes nominaux (en dollars courants), les USA maintiennent leur avance.",
+          "En parité de pouvoir d'achat (PPA), la Chine a déjà dépassé les États-Unis depuis 2016. Ce basculement, souvent ignoré dans les médias, signifie que l'économie chinoise produit désormais plus de biens et services réels que l'américaine, même si en termes nominaux (en dollars courants), les USA maintiennent leur avance.",
       },
       {
         type: "quote",
-        text: "La grande question n'est pas de savoir si la Chine va dépasser les États-Unis, mais de savoir si les deux puissances peuvent coexister pacifiquement alors que le fossé de puissance se referme. C'est le 'piège de Thucydide' — et l'histoire n'est pas rassurante.",
+        text: "La grande question n'est pas de savoir si la Chine va dépasser les États-Unis, mais de savoir si les deux puissances peuvent coexister pacifiquement alors que le fossé de puissance se referme. C'est le 'piège de Thucydide', et l'histoire n'est pas rassurante.",
         source: "Graham Allison, Harvard Kennedy School, « Destined for War », réédition 2024",
       },
     ],
     sources: [
-        { title: "World Economic Outlook — US-China tensions", outlet: "FMI", year: "2025", url: "https://www.imf.org/en/Publications/WEO" },
+        { title: "World Economic Outlook · US-China tensions", outlet: "FMI", year: "2025", url: "https://www.imf.org/en/Publications/WEO" },
         { title: "US-China Economic and Trade Relations", outlet: "Congressional Research Service", year: "2024" },
-        { title: "OECD Economic Surveys — China 2024", outlet: "OCDE", year: "2024" },
+        { title: "OECD Economic Surveys · China 2024", outlet: "OCDE", year: "2024" },
         { title: "The Great Decoupling: how US-China rivalry reshapes global trade", outlet: "Financial Times", year: "2024" },
         { title: "China Trade Statistics 2024", outlet: "General Administration of Customs China / Reuters", year: "2024" },
     ],
@@ -1214,7 +1214,7 @@ export const ECONOMY_ARTICLES: Article[] = [
     featured: false,
     heroImage:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/800px-Apple_logo_black.svg.png",
-    heroCaption: "Apple — la première entreprise à avoir dépassé une capitalisation boursière de 3 000 milliards de dollars.",
+    heroCaption: "Apple · la première entreprise à avoir dépassé une capitalisation boursière de 3 000 milliards de dollars.",
     body: [
       {
         type: "lead",
@@ -1233,36 +1233,36 @@ export const ECONOMY_ARTICLES: Article[] = [
       {
         type: "map-highlight",
         title: "Origine géographique des 500 plus grandes entreprises mondiales",
-        subtitle: "Fortune Global 500 — 2024 : répartition par pays de siège social",
+        subtitle: "Fortune Global 500-2024 : répartition par pays de siège social",
         countries: {
-          US: { color: "#C0392B", label: "USA — 136 entreprises" },
-          CN: { color: "#E74C3C", label: "Chine — 124 entreprises" },
-          JP: { color: "#E67E22", label: "Japon — 47 entreprises" },
-          DE: { color: "#F39C12", label: "Allemagne — 26 entreprises" },
-          FR: { color: "#F39C12", label: "France — 23 entreprises" },
-          GB: { color: "#F39C12", label: "Royaume-Uni — 15 entreprises" },
-          KR: { color: "#F1C40F", label: "Corée du Sud — 14 entreprises" },
-          CH: { color: "#F1C40F", label: "Suisse — 12 entreprises" },
-          NL: { color: "#F1C40F", label: "Pays-Bas — 10 entreprises" },
-          CA: { color: "#2ECC71", label: "Canada — 9 entreprises" },
-          AU: { color: "#2ECC71", label: "Australie — 7 entreprises" },
-          IN: { color: "#2ECC71", label: "Inde — 7 entreprises" },
-          BR: { color: "#2ECC71", label: "Brésil — 6 entreprises" },
-          IT: { color: "#2ECC71", label: "Italie — 5 entreprises" },
-          SA: { color: "#2ECC71", label: "Arabie Saoudite — 4 entreprises" },
-          SG: { color: "#2ECC71", label: "Singapour — 3 entreprises" },
+          US: { color: "#C0392B", label: "USA · 136 entreprises" },
+          CN: { color: "#E74C3C", label: "Chine · 124 entreprises" },
+          JP: { color: "#E67E22", label: "Japon · 47 entreprises" },
+          DE: { color: "#F39C12", label: "Allemagne · 26 entreprises" },
+          FR: { color: "#F39C12", label: "France · 23 entreprises" },
+          GB: { color: "#F39C12", label: "Royaume-Uni · 15 entreprises" },
+          KR: { color: "#F1C40F", label: "Corée du Sud · 14 entreprises" },
+          CH: { color: "#F1C40F", label: "Suisse · 12 entreprises" },
+          NL: { color: "#F1C40F", label: "Pays-Bas · 10 entreprises" },
+          CA: { color: "#2ECC71", label: "Canada · 9 entreprises" },
+          AU: { color: "#2ECC71", label: "Australie · 7 entreprises" },
+          IN: { color: "#2ECC71", label: "Inde · 7 entreprises" },
+          BR: { color: "#2ECC71", label: "Brésil · 6 entreprises" },
+          IT: { color: "#2ECC71", label: "Italie · 5 entreprises" },
+          SA: { color: "#2ECC71", label: "Arabie Saoudite · 4 entreprises" },
+          SG: { color: "#2ECC71", label: "Singapour · 3 entreprises" },
         },
         legend: [
           { color: "#C0392B", label: "USA : domination technologique" },
           { color: "#E74C3C", label: "Chine : montée en puissance" },
           { color: "#E67E22", label: "Japon : 3e place stable" },
-          { color: "#F39C12", label: "Europe : 10–26 entreprises" },
+          { color: "#F39C12", label: "Europe : 10-26 entreprises" },
           { color: "#2ECC71", label: "Émergents : présence croissante" },
         ],
       },
       {
         type: "chart",
-        title: "Capitalisation boursière des 10 plus grandes entreprises mondiales — 2025",
+        title: "Capitalisation boursière des 10 plus grandes entreprises mondiales · 2025",
         subtitle: "En milliards d'euros. Sources : Bloomberg, Yahoo Finance (mars 2025).",
         unit: "Milliards €",
         bars: [
@@ -1282,11 +1282,11 @@ export const ECONOMY_ARTICLES: Article[] = [
         type: "text",
         heading: "Le phénomène des Magnificent Seven : une concentration sans précédent",
         content:
-          "Les «Magnificent Seven» — Apple, Microsoft, Nvidia, Amazon, Alphabet, Meta et Tesla — représentent à eux seuls environ 30 % de la capitalisation totale du S&P 500 (500 premières entreprises américaines). C'est une concentration historiquement inédite. En 2000, les 7 premières valeurs de l'indice représentaient 15 %. Cette concentration n'est pas le fruit du hasard : elle reflète la logique des plateformes numériques (effets réseau massifs, coûts marginaux proches de zéro, données comme actif stratégique) et les avantages de l'IA. Ces entreprises génèrent des marges bénéficiaires de 20-35 % — inimaginables dans l'industrie traditionnelle — grâce à leur position de monopole ou quasi-monopole sur leurs marchés.",
+          "Les «Magnificent Seven», Apple, Microsoft, Nvidia, Amazon, Alphabet, Meta et Tesla, représentent à eux seuls environ 30 % de la capitalisation totale du S&P 500 (500 premières entreprises américaines). C'est une concentration historiquement inédite. En 2000, les 7 premières valeurs de l'indice représentaient 15 %. Cette concentration n'est pas le fruit du hasard : elle reflète la logique des plateformes numériques (effets réseau massifs, coûts marginaux proches de zéro, données comme actif stratégique) et les avantages de l'IA. Ces entreprises génèrent des marges bénéficiaires de 20-35 %, inimaginables dans l'industrie traditionnelle, grâce à leur position de monopole ou quasi-monopole sur leurs marchés.",
       },
       {
         type: "comparison-table",
-        title: "Les Magnificent Seven — données financières clés 2024",
+        title: "Les Magnificent Seven · données financières clés 2024",
         headers: ["Entreprise", "Chiffre d'affaires", "Bénéfice net", "Marge nette", "Employés", "Secteur dominant"],
         rows: [
           { label: "Apple", flag: "us", cells: ["391 Md$", "97 Md$", "25%", "150 000", "Matériel + Ecosystème"] },
@@ -1302,7 +1302,7 @@ export const ECONOMY_ARTICLES: Article[] = [
         type: "image-text",
         heading: "Nvidia et l'ère de l'IA : la plus grande création de richesse de l'histoire",
         content:
-          "Nvidia est le cas le plus spectaculaire de l'histoire boursière récente. En janvier 2023, la capitalisation de Nvidia était de 360 milliards de dollars. En juin 2024, elle dépassait 3 340 milliards. Soit une multiplication par 9 en 18 mois. Le catalyseur : la révolution de l'IA générative, dont les GPU (processeurs graphiques) de Nvidia sont l'infrastructure essentielle. Son chip H100, utilisé pour entraîner GPT-4, Gemini et tous les grands modèles de fondation, se vend à 30 000 dollars l'unité — avec des listes d'attente de 12 à 18 mois. En 2024, la marge brute de Nvidia a dépassé 70 % — un record absolu pour une entreprise industrielle.",
+          "Nvidia est le cas le plus spectaculaire de l'histoire boursière récente. En janvier 2023, la capitalisation de Nvidia était de 360 milliards de dollars. En juin 2024, elle dépassait 3 340 milliards. Soit une multiplication par 9 en 18 mois. Le catalyseur : la révolution de l'IA générative, dont les GPU (processeurs graphiques) de Nvidia sont l'infrastructure essentielle. Son chip H100, utilisé pour entraîner GPT-4, Gemini et tous les grands modèles de fondation, se vend à 30 000 dollars l'unité, avec des listes d'attente de 12 à 18 mois. En 2024, la marge brute de Nvidia a dépassé 70 %, un record absolu pour une entreprise industrielle.",
         imageUrl:
           "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/800px-Apple_logo_black.svg.png",
         imageAlt: "Logo Apple",
@@ -1310,7 +1310,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
       {
         type: "timeline",
-        title: "L'ascension des géants tech — jalons clés (2004-2025)",
+        title: "L'ascension des géants tech · jalons clés (2004-2025)",
         items: [
           {
             date: "2004",
@@ -1389,9 +1389,9 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
     ],
     sources: [
-        { title: "Fortune Global 500 — 2024 Rankings", outlet: "Fortune Magazine", year: "2024", url: "https://fortune.com/global500/" },
+        { title: "Fortune Global 500-2024 Rankings", outlet: "Fortune Magazine", year: "2024", url: "https://fortune.com/global500/" },
         { title: "Global largest companies by market cap", outlet: "S&P Global / Bloomberg", year: "2024" },
-        { title: "World Investment Report 2024 — TNCs", outlet: "CNUCED / UNCTAD", year: "2024" },
+        { title: "World Investment Report 2024 · TNCs", outlet: "CNUCED / UNCTAD", year: "2024" },
         { title: "Amazon, Microsoft, Nvidia: the rise of US tech giants", outlet: "Financial Times", year: "2024" },
         { title: "Saudi Aramco, ADNOC: state oil companies rankings", outlet: "Reuters", year: "2024" },
     ],
@@ -1412,12 +1412,12 @@ export const ECONOMY_ARTICLES: Article[] = [
     featured: false,
     heroImage:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/SARS-CoV-2_without_background.png/1200px-SARS-CoV-2_without_background.png",
-    heroCaption: "Le coronavirus SARS-CoV-2 — agent pathogène de la plus grande crise économique mondiale depuis 1945.",
+    heroCaption: "Le coronavirus SARS-CoV-2 · agent pathogène de la plus grande crise économique mondiale depuis 1945.",
     body: [
       {
         type: "lead",
         content:
-          "En 2020, le PIB mondial s'est contracté de 3,5 % — la plus forte récession depuis la Seconde Guerre mondiale. Mais derrière ce chiffre global se cachent des trajectoires radicalement différentes : la Chine a terminé l'année en territoire positif (+2,3 %), tandis que certaines économies ouvertes au tourisme ont vu leur PIB chuter de plus de 10 %. Une crise sans précédent qui a redéfini le rôle de l'État, les limites des banques centrales et l'architecture des filets de sécurité sociaux.",
+          "En 2020, le PIB mondial s'est contracté de 3,5 %, la plus forte récession depuis la Seconde Guerre mondiale. Mais derrière ce chiffre global se cachent des trajectoires radicalement différentes : la Chine a terminé l'année en territoire positif (+2,3 %), tandis que certaines économies ouvertes au tourisme ont vu leur PIB chuter de plus de 10 %. Une crise sans précédent qui a redéfini le rôle de l'État, les limites des banques centrales et l'architecture des filets de sécurité sociaux.",
       },
       {
         type: "stats",
@@ -1430,7 +1430,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
       {
         type: "chart",
-        title: "Variation du PIB réel en 2020 — les économies les plus touchées et les plus résilientes",
+        title: "Variation du PIB réel en 2020 · les économies les plus touchées et les plus résilientes",
         subtitle: "FMI, World Economic Outlook janvier 2021. En % de variation annuelle.",
         unit: "% variation PIB réel 2020",
         bars: [
@@ -1453,7 +1453,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
       {
         type: "map-highlight",
-        title: "Impact du COVID-19 sur le PIB en 2020 — carte mondiale",
+        title: "Impact du COVID-19 sur le PIB en 2020 · carte mondiale",
         subtitle: "Variation annuelle du PIB réel 2020. Source : FMI.",
         countries: {
           es: { color: "#922B21", label: "-11% (très sévère)" },
@@ -1491,19 +1491,19 @@ export const ECONOMY_ARTICLES: Article[] = [
         items: [
           {
             date: "Janvier 2020",
-            title: "Confinement de Wuhan — premier choc",
+            title: "Confinement de Wuhan · premier choc",
             description:
               "La Chine confine 50 millions de personnes. Les marchés mondiaux commencent à anticiper un choc d'approvisionnement mais restent calmes.",
           },
           {
             date: "Mars 2020",
-            title: "Pandémie mondiale — crash boursier historique",
+            title: "Pandémie mondiale · crash boursier historique",
             description:
-              "L'OMS déclare la pandémie. Le S&P 500 chute de 34% en 33 jours — la chute la plus rapide de l'histoire. Fermetures d'économies mondiales simultanées.",
+              "L'OMS déclare la pandémie. Le S&P 500 chute de 34% en 33 jours, la chute la plus rapide de l'histoire. Fermetures d'économies mondiales simultanées.",
           },
           {
             date: "Mars-Avril 2020",
-            title: "Réponse des banques centrales — bazooka monétaire",
+            title: "Réponse des banques centrales · bazooka monétaire",
             description:
               "Fed : taux à 0% + 700 Md$ QE. BCE : PEPP de 750 Md€. BoJ, BoE, RBA : mêmes actions. Injection totale : ~10 000 Md$ en 6 semaines.",
           },
@@ -1515,13 +1515,13 @@ export const ECONOMY_ARTICLES: Article[] = [
           },
           {
             date: "Novembre 2020",
-            title: "Annonce des vaccins — espoir financier",
+            title: "Annonce des vaccins · espoir financier",
             description:
-              "Pfizer/BioNTech annoncent un vaccin efficace à 90%. Les marchés rebondissent de 15% en une semaine — la plus forte hausse hebdomadaire depuis 1987.",
+              "Pfizer/BioNTech annoncent un vaccin efficace à 90%. Les marchés rebondissent de 15% en une semaine, la plus forte hausse hebdomadaire depuis 1987.",
           },
           {
             date: "2021",
-            title: "Rebond économique — mais aussi inflation",
+            title: "Rebond économique · mais aussi inflation",
             description:
               "PIB mondial : +6,0% en 2021, rebond record. Mais la combinaison de relances massives et de perturbations des chaînes d'approvisionnement déclenche une inflation à 8-10% en 2022.",
           },
@@ -1559,14 +1559,14 @@ export const ECONOMY_ARTICLES: Article[] = [
         items: [
           {
             text: "Les États ont une capacité d'intervention budgétaire bien supérieure à ce que les dogmes pensaient",
-            note: "16 000 Md€ de relances en 2020 sans déclencher de crise de la dette immédiate — un résultat inattendu pour les économistes orthodoxes.",
+            note: "16 000 Md€ de relances en 2020 sans déclencher de crise de la dette immédiate · un résultat inattendu pour les économistes orthodoxes.",
           },
           {
             text: "La fragilité des chaînes d'approvisionnement mondiales trop longues",
             note: "Pénuries de semi-conducteurs, de masques, de médicaments : le just-in-time poussé à l'extrême a montré ses limites.",
           },
           {
-            text: "La banque centrale n'est pas le seul filet de sécurité — mais c'est le plus rapide",
+            text: "La banque centrale n'est pas le seul filet de sécurité · mais c'est le plus rapide",
             note: "Les QE massifs de 2020 ont évité un effondrement systémique. Mais au prix d'une inflation record en 2022.",
           },
           {
@@ -1574,7 +1574,7 @@ export const ECONOMY_ARTICLES: Article[] = [
             note: "Actifs financiers +40% (bénéficiaires : 20% supérieur) vs pertes d'emploi massives (touchant les 40% inférieurs).",
           },
           {
-            text: "La numérisation est un choc de productivité — pour certains",
+            text: "La numérisation est un choc de productivité · pour certains",
             note: "Les économies avancées avec un fort secteur numérique (USA, Corée, Taïwan) ont mieux résisté que celles dépendantes du tourisme ou de l'industrie lourde.",
           },
           {
@@ -1590,13 +1590,13 @@ export const ECONOMY_ARTICLES: Article[] = [
           {
             url: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/SARS-CoV-2_without_background.png/1200px-SARS-CoV-2_without_background.png",
             caption:
-              "Le SARS-CoV-2 — une pandémie virale devenue la plus grande crise économique mondiale depuis la Seconde Guerre mondiale",
+              "Le SARS-CoV-2 · une pandémie virale devenue la plus grande crise économique mondiale depuis la Seconde Guerre mondiale",
             credit: "CDC / Wikimedia Commons",
           },
           {
             url: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Financial_district_Manhattan.jpg/1280px-Financial_district_Manhattan.jpg",
             caption:
-              "Wall Street vide au printemps 2020 — les marchés financiers ont perdu 30% en 33 jours avant de rebondir grâce aux interventions des banques centrales",
+              "Wall Street vide au printemps 2020 · les marchés financiers ont perdu 30% en 33 jours avant de rebondir grâce aux interventions des banques centrales",
             credit: "Wikimedia Commons",
           },
         ],
@@ -1604,7 +1604,7 @@ export const ECONOMY_ARTICLES: Article[] = [
       {
         type: "highlight",
         content:
-          "Le coût total de la pandémie COVID-19 pour l'économie mondiale est estimé à 12 000 milliards de dollars entre 2020 et 2022 — soit l'équivalent de la production économique annuelle de la Chine. C'est le plus grand choc économique soudain de l'histoire moderne.",
+          "Le coût total de la pandémie COVID-19 pour l'économie mondiale est estimé à 12 000 milliards de dollars entre 2020 et 2022, soit l'équivalent de la production économique annuelle de la Chine. C'est le plus grand choc économique soudain de l'histoire moderne.",
       },
       {
         type: "quote",
@@ -1613,10 +1613,10 @@ export const ECONOMY_ARTICLES: Article[] = [
       },
     ],
     sources: [
-        { title: "World Economic Outlook, October 2021 — Recovery During a Pandemic", outlet: "FMI", year: "2021", url: "https://www.imf.org/en/Publications/WEO" },
-        { title: "Global Economic Prospects — Post-COVID Recovery", outlet: "Banque mondiale", year: "2022" },
-        { title: "COVID-19 fiscal measures and economic impact", outlet: "FMI — Fiscal Monitor", year: "2021" },
-        { title: "Our World in Data — COVID and GDP", outlet: "Our World in Data / University of Oxford", year: "2022", url: "https://ourworldindata.org/covid-gdp" },
+        { title: "World Economic Outlook, October 2021 · Recovery During a Pandemic", outlet: "FMI", year: "2021", url: "https://www.imf.org/en/Publications/WEO" },
+        { title: "Global Economic Prospects · Post-COVID Recovery", outlet: "Banque mondiale", year: "2022" },
+        { title: "COVID-19 fiscal measures and economic impact", outlet: "FMI · Fiscal Monitor", year: "2021" },
+        { title: "Our World in Data · COVID and GDP", outlet: "Our World in Data / University of Oxford", year: "2022", url: "https://ourworldindata.org/covid-gdp" },
         { title: "The economic fallout of COVID-19 in numbers", outlet: "OCDE", year: "2022" },
     ],
   },
