@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { LineSegments2 } from "three/examples/jsm/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
-import type { EconomyMetricId, EconomyYear } from "@/types";
+import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import { getCountryFillColorEconomy, getMaxMetricValue } from "@/lib/economyColors";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -47,6 +47,38 @@ function chooseTextureSize(renderer: THREE.WebGLRenderer) {
   // gaining detail and only gains blur.
   ZOOM_CEILING = roomy ? 5 : 2.6;
 }
+/** La teinte d'un pays pour la métrique affichée. */
+type Remplissage = (
+  nom: string,
+  countries: Record<string, CountryEconomyData>,
+  maxValue: number,
+  metric: EconomyMetricId,
+) => string;
+
+export interface PaletteGlobe {
+  oceanProfond?: string;
+  oceanMoyen?: string;
+  oceanPlateau?: string;
+  terreSansDonnee?: string;
+  frontiere?: string;
+  graticule?: string;
+  accent?: string;
+  remplissage?: Remplissage;
+}
+
+let REMPLISSAGE: Remplissage = getCountryFillColorEconomy;
+
+function appliquePalette(p?: PaletteGlobe) {
+  OCEAN_DEEP = p?.oceanProfond ?? "#7DB4C4";
+  OCEAN_MID = p?.oceanMoyen ?? "#8DC3D2";
+  OCEAN_SHELF = p?.oceanPlateau ?? "#9DD1DE";
+  LAND_NO_DATA = p?.terreSansDonnee ?? "#A6C7B7";
+  BORDER = p?.frontiere ?? "rgba(255,255,255,0.97)";
+  GRATICULE = p?.graticule ?? "rgba(255,255,255,0.10)";
+  ACCENT = p?.accent ?? "#39FF88";
+  REMPLISSAGE = p?.remplissage ?? getCountryFillColorEconomy;
+}
+
 const PICK_W = 2048;
 const PICK_H = 1024;
 
@@ -54,11 +86,20 @@ const PICK_H = 1024;
  * Brand palette. The water is a clear teal rather than a deep one: the map is
  * read for its greens, and a dark sea drags every one of them down with it.
  */
-const OCEAN_DEEP = "#7DB4C4";
-const OCEAN_MID = "#8DC3D2";
-const OCEAN_SHELF = "#9DD1DE";
+/*
+ * La palette est modifiable — le prototype sombre réutilise ce globe tel
+ * quel et n'a besoin que d'en changer les teintes.
+ *
+ * Variables de module, comme TEXTURE_W plus haut : elles sont posées une
+ * fois, avant toute peinture, par appliquePalette(). Cela suppose un seul
+ * globe monté à la fois, ce qui est le cas — une page, un globe. Sans
+ * palette, tout garde exactement les valeurs d'origine.
+ */
+let OCEAN_DEEP = "#7DB4C4";
+let OCEAN_MID = "#8DC3D2";
+let OCEAN_SHELF = "#9DD1DE";
 /** Not a class on the ramp: pale and washed out, so it never reads as one. */
-const LAND_NO_DATA = "#A6C7B7";
+let LAND_NO_DATA = "#A6C7B7";
 /**
  * Borders have to survive two neighbouring greens a class apart — and the
  * texture is minified about two to one on screen, so a line painted at a
@@ -66,10 +107,10 @@ const LAND_NO_DATA = "#A6C7B7";
  * couple of pixels, and no wider: past this an archipelago disappears inside
  * its own outline.
  */
-const BORDER = "rgba(255,255,255,0.97)";
+let BORDER = "rgba(255,255,255,0.97)";
 const BORDER_WIDTH = 3.2;
-const GRATICULE = "rgba(255,255,255,0.10)";
-const ACCENT = "#39FF88";
+let GRATICULE = "rgba(255,255,255,0.10)";
+let ACCENT = "#39FF88";
 /** Land raised off the water, in texels: white is land, black is sea. */
 const RELIEF_BLUR = 4;
 const RELIEF_SCALE = 0.028;
@@ -650,6 +691,8 @@ interface Props {
   onCountryHover?: (name: string | null) => void;
   /** Show the photography instead of the choropleth. */
   satellite?: boolean;
+  /** Teintes de remplacement. Absente, le globe garde exactement les siennes. */
+  palette?: PaletteGlobe;
 }
 
 export function EconomyGlobe({
@@ -659,7 +702,13 @@ export function EconomyGlobe({
   onCountryClick,
   onCountryHover,
   satellite = false,
+  palette,
 }: Props) {
+  /* Posée pendant le rendu, donc avant tout effet : la carte de base est
+     peinte au montage, et une palette appliquée après serait arrivée trop
+     tard pour l'océan, le graticule et les frontières. */
+  appliquePalette(palette);
+
   const mountRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
 
@@ -720,7 +769,7 @@ export function EconomyGlobe({
         for (const name of Object.keys(economyYear.countries)) {
           const feat = byName.get(name);
           if (!feat) continue;
-          const fill = getCountryFillColorEconomy(name, economyYear.countries, maxValue, metric);
+          const fill = REMPLISSAGE(name, economyYear.countries, maxValue, metric);
           if (fill === "#EBEBEB") continue;
           ctx.fillStyle = fill;
           traceFeature(ctx, feat, TEXTURE_W, TEXTURE_H);
@@ -744,7 +793,7 @@ export function EconomyGlobe({
       for (const name of Object.keys(economyYear.countries)) {
         const feat = byName.get(name);
         if (!feat) continue;
-        const fill = getCountryFillColorEconomy(name, economyYear.countries, maxValue, metric);
+        const fill = REMPLISSAGE(name, economyYear.countries, maxValue, metric);
         // The flat map's "no value" grey would punch a hole in the ocean here.
         if (fill === "#EBEBEB") continue;
         ctx.fillStyle = fill;

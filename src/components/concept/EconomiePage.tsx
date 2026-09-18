@@ -4,8 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
 import type { SocleEco } from "@/data/concept/conceptEconomie";
+import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
-import { GlobeMonde } from "./GlobeMonde";
+import { GlobeEco, type MetriqueEco } from "./GlobeEco";
 import "./concept.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -40,6 +41,27 @@ interface Rang {
 
 type Col = "pib" | "pibHab" | "inflation" | "balance" | "dette" | "chomage";
 
+/* Les identifiants du site, pour que le globe et le classement parlent de la
+   même chose. Ce sont ceux de la base, pas des noms réinventés ici. */
+const METRIQUES: MetriqueEco[] = [
+  { id: "gdp", label: "PIB", unite: "md" },
+  { id: "debt_ratio", label: "Dette / PIB", unite: "pct" },
+  { id: "unemployment", label: "Chômage", unite: "pct" },
+  { id: "inflation", label: "Inflation", unite: "pct" },
+  { id: "gdp_per_capita", label: "PIB / habitant", unite: "eur" },
+  { id: "trade_balance", label: "Balance", unite: "md" },
+];
+
+/** La colonne du classement qui correspond à chaque métrique. */
+const COL_DE: Record<string, Col> = {
+  gdp: "pib",
+  debt_ratio: "dette",
+  unemployment: "chomage",
+  inflation: "inflation",
+  gdp_per_capita: "pibHab",
+  trade_balance: "balance",
+};
+
 const COLONNES: { id: Col; label: string; unite: "md" | "eur" | "pct" }[] = [
   { id: "pib", label: "PIB", unite: "md" },
   { id: "pibHab", label: "PIB / hab.", unite: "eur" },
@@ -61,6 +83,11 @@ function val(v: number | null, unite: "md" | "eur" | "pct") {
 export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) {
   const [annee, setAnnee] = useState(socle.annees[socle.annees.length - 1]);
   const [col, setCol] = useState<Col>("pib");
+  /* La métrique du globe et la colonne triée sont liées : cliquer « Dette »
+     sur le globe trie le classement sur la dette, et l'inverse aussi. C'est
+     ce que faisait la carte du site, et c'est ce qui évite deux états qui
+     racontent deux choses. */
+  const [metrique, setMetrique] = useState<EconomyMetricId>("gdp");
   const [sens, setSens] = useState<1 | -1>(-1);
   const [filtre, setFiltre] = useState("");
   const [choisi, setChoisi] = useState<string | null>("France");
@@ -109,6 +136,40 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
     });
   }, [rangs, col, sens, filtre]);
 
+  /* L'année remise au format de la base : le globe du site lit un EconomyYear,
+     et on le reconstruit depuis le format compact plutôt que d'expédier au
+     navigateur seize millésimes entiers. */
+  const anneeEco = useMemo<EconomyYear>(() => {
+    const countries: Record<string, CountryEconomyData> = {};
+    for (const r of rangs) {
+      countries[r.nom] = {
+        gdp: r.pib ?? undefined,
+        gdp_per_capita: r.pibHab ?? undefined,
+        inflation: r.inflation ?? undefined,
+        trade_balance: r.balance ?? undefined,
+        debt_ratio: r.dette ?? undefined,
+        unemployment: r.chomage ?? undefined,
+      };
+    }
+    return { year: annee, label: String(annee), dataNote: "", countries };
+  }, [rangs, annee]);
+
+  /* La série du pays choisi, millésime par millésime, pour la courbe. Une
+     année sans valeur reste nulle : la courbe se coupe, elle ne descend pas
+     à zéro. */
+  const serie = useMemo(() => {
+    const idx = choisi ? socle.pays.findIndex((p) => p.nom === choisi) : -1;
+    const colonne = ["pib", "pibHab", "inflation", "balance", "dette", "chomage", "population"].indexOf(
+      COL_DE[metrique] ?? "pib",
+    );
+    return socle.annees.map((a) => {
+      if (idx < 0 || colonne < 0) return { annee: a, v: null };
+      const l = (socle.lignes[a] ?? []).find((x) => x[0] === idx);
+      const v = l ? l[colonne + 1] : null;
+      return { annee: a, v: typeof v === "number" && Number.isFinite(v) ? v : null };
+    });
+  }, [socle, choisi, metrique]);
+
   /* Ce que lit le globe : la même année, la même base. */
   const donnees = useMemo<Record<string, FichePays>>(() => {
     const o: Record<string, FichePays> = {};
@@ -151,6 +212,17 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
   const trier = (c: Col) => {
     if (c === col) setSens((s) => (s === 1 ? -1 : 1));
     else {
+      setCol(c);
+      setSens(-1);
+      const m = METRIQUES.find((x) => COL_DE[x.id] === c);
+      if (m) setMetrique(m.id);
+    }
+  };
+
+  const changeMetrique = (id: EconomyMetricId) => {
+    setMetrique(id);
+    const c = COL_DE[id];
+    if (c) {
       setCol(c);
       setSens(-1);
     }
@@ -210,16 +282,17 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
             Le globe, millésime {annee}
           </Enseigne>
 
-          <GlobeMonde
-            donnees={donnees}
-            annee={annee}
-            regions={regions}
-            vues={vues}
+          <GlobeEco
+            annee={anneeEco}
+            metrique={METRIQUES.find((m) => m.id === metrique) ?? METRIQUES[0]}
+            metriques={METRIQUES}
+            onMetrique={changeMetrique}
             choisi={choisi}
             onChoisi={setChoisi}
-            indicateurs={["pib", "dette", "chomage", "inflation", "pibHab", "population"]}
-            montrerRegions={false}
+            nomFr={(n) => socle.pays.find((p) => p.nom === n)?.fr ?? n}
+            serie={serie}
             sousLeGlobe={
+
               /* La frise est collée au globe : changer d'année et regarder le
                  résultat est un seul geste, et l'envoyer dans une section
                  au-dessus obligeait à remonter pour chaque millésime. */
