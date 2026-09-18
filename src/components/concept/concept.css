@@ -82,39 +82,58 @@
    saisissable, et c'est lui qui rouvre le reste. */
 .cg-header-replie { background: none; backdrop-filter: none; pointer-events: none; }
 .cg-header-replie .cg-logo { pointer-events: auto; }
-.cg-header-replie .cg-header-l { gap: 0; }
+/* Le nom garde sa place quoi qu'il arrive : la gouttière du menu ne se
+   referme pas, elle se vide. Sinon le titre glissait vers la gauche à
+   chaque repli et revenait à chaque survol. */
+.cg-header-replie .cg-header-l { gap: clamp(24px, 4vw, 64px); }
 
 /* Le nom devient un jeton flou posé sur la page : sans fond, il se perdrait
    sur un globe clair. */
-.cg-header-replie .cg-logo {
-  padding: 9px 15px;
-  margin: -9px -15px;
+/* Le jeton est dessiné derrière le nom, pas autour : une marge négative pour
+   compenser une rustine le décalait de quinze pixels au moment du repli, et
+   le nom doit rester strictement où il est. */
+.cg-logo { position: relative; }
+.cg-logo::before {
+  content: "";
+  position: absolute;
+  inset: -9px -15px;
+  z-index: -1;
   border-radius: 999px;
   border: 1px solid transparent;
+  background: rgba(8, 13, 20, 0);
+  backdrop-filter: blur(0px);
+  transition: background 0.4s, border-color 0.4s, backdrop-filter 0.4s;
+}
+.cg-header-replie .cg-logo::before {
   background: rgba(8, 13, 20, 0.55);
   backdrop-filter: blur(10px);
-  transition: border-color 0.4s, background 0.4s;
 }
-.cg-header-replie:hover .cg-logo {
-  border-color: var(--bord-fin);
-  background: rgba(8, 13, 20, 0.78);
+.cg-header-replie:hover .cg-logo::before {
+  background: rgba(8, 13, 20, 0);
+  border-color: transparent;
+  backdrop-filter: blur(0px);
 }
 
+/* Le menu s'ouvre comme un rideau, de la gauche vers la droite : il est
+   masqué par sa propre largeur, et c'est ce masque qui se retire. Un simple
+   fondu ne dit pas d'où le menu vient. */
 .cg-nav,
 .cg-header-d {
   transition:
-    opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.52s cubic-bezier(0.22, 1, 0.36, 1),
-    visibility 0.42s;
+    clip-path 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  clip-path: inset(0 0 0 0);
 }
-/* Tout rentre vers la gauche, dans le nom, plutôt que de disparaître sur
-   place : c'est le mouvement qui dit où le menu est parti. */
 .cg-header-replie .cg-nav,
 .cg-header-replie .cg-header-d {
   opacity: 0;
-  visibility: hidden;
-  transform: translateX(-34px);
+  pointer-events: none;
+  clip-path: inset(0 100% 0 0);
 }
+/* Les liens eux-mêmes arrivent en léger décalé, l'un après l'autre. */
+.cg-nav a { transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s; }
+.cg-header-replie .cg-nav a { transform: translateX(-14px); }
+.cg-header-replie:hover .cg-nav a { transform: none; }
 .cg-header-replie:hover {
   background: linear-gradient(180deg, rgba(5, 8, 12, 0.82), transparent);
   backdrop-filter: blur(6px);
@@ -123,11 +142,9 @@
 .cg-header-replie:hover .cg-nav,
 .cg-header-replie:hover .cg-header-d {
   opacity: 1;
-  visibility: visible;
-  transform: none;
+  pointer-events: auto;
+  clip-path: inset(0 0 0 0);
 }
-.cg-header-replie:hover .cg-header-l { gap: clamp(24px, 4vw, 64px); }
-.cg-header-replie:hover .cg-logo { backdrop-filter: none; background: none; border-color: transparent; }
 
 @media (prefers-reduced-motion: reduce) {
   .cg-nav, .cg-header-d { transition: none; }
@@ -708,6 +725,13 @@
   background: radial-gradient(ellipse 60% 60% at 50% 45%, rgba(7, 16, 31, 0.82), rgba(4, 7, 14, 0.92) 70%);
   overflow: hidden;
 }
+.gm-colonne { display: flex; flex-direction: column; min-width: 0; }
+.gm-sous { margin-top: 22px; }
+.gm-sous .cg-frise2 { margin-top: 0; }
+.gm-sous .cg-frise2-tete { margin-bottom: 16px; }
+.gm-sous .cg-frise2-an { font-size: clamp(26px, 2.6vw, 34px); }
+.gm-sous .cg-frise-n { margin-top: 14px; }
+
 .gm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; touch-action: none; }
 .gm-canvas:active { cursor: grabbing; }
 
@@ -796,7 +820,31 @@
   font-variant-numeric: tabular-nums;
 }
 .gm-vedette-l { font-size: 11.5px; letter-spacing: 0.04em; color: var(--encre-2); }
+/* Les autres indicateurs, dans la fiche du pays : de petits rectangles
+   posés côte à côte plutôt qu'une liste. On les vise, on clique, le globe
+   change de couleur sans quitter le pays. */
+.gm-mesures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin: 22px 0 0;
+}
+.gm-mesures > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 11px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: border-color 0.3s, background 0.3s;
+}
+.gm-mesures > div:hover { border-color: var(--bord); background: rgba(255, 255, 255, 0.05); }
+.gm-mesures dt { font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--encre-3); }
+.gm-mesures dd { margin: 0; font-size: 13px; color: var(--encre); font-variant-numeric: tabular-nums; }
+
 .gm-mesure-b {
+  width: 100%;
   padding: 0;
   border: none;
   background: none;
@@ -910,6 +958,16 @@
 }
 .cg-cl-fleches button:hover { color: var(--encre); border-color: var(--bord); background: rgba(255, 255, 255, 0.05); }
 
+.cg-cl-grille {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 44px;
+}
+@media (max-width: 1080px) { .cg-cl-grille { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .cg-cl-grille { grid-template-columns: minmax(0, 1fr); } }
+.cg-cl-grille .cg-fiche { width: auto; height: 100%; }
+
 .cg-cl-piste {
   display: flex;
   user-select: none;
@@ -950,12 +1008,10 @@
   opacity: 0.85;
 }
 .cg-fiche { position: relative; }
-.cg-cl-piste > *:nth-child(6n + 1) .cg-fiche { --fiche-t: linear-gradient(90deg, #3987e5, transparent); }
-.cg-cl-piste > *:nth-child(6n + 2) .cg-fiche { --fiche-t: linear-gradient(90deg, #D6A77A, transparent); }
-.cg-cl-piste > *:nth-child(6n + 3) .cg-fiche { --fiche-t: linear-gradient(90deg, #41C7A5, transparent); }
-.cg-cl-piste > *:nth-child(6n + 4) .cg-fiche { --fiche-t: linear-gradient(90deg, #9B8BE0, transparent); }
-.cg-cl-piste > *:nth-child(6n + 5) .cg-fiche { --fiche-t: linear-gradient(90deg, #6da7ec, transparent); }
-.cg-cl-piste > *:nth-child(6n + 6) .cg-fiche { --fiche-t: linear-gradient(90deg, #FF8E6E, transparent); }
+.cg-cl-grille > *:nth-child(4n + 1) .cg-fiche { --fiche-t: linear-gradient(90deg, #3987e5, transparent); }
+.cg-cl-grille > *:nth-child(4n + 2) .cg-fiche { --fiche-t: linear-gradient(90deg, #D6A77A, transparent); }
+.cg-cl-grille > *:nth-child(4n + 3) .cg-fiche { --fiche-t: linear-gradient(90deg, #41C7A5, transparent); }
+.cg-cl-grille > *:nth-child(4n + 4) .cg-fiche { --fiche-t: linear-gradient(90deg, #9B8BE0, transparent); }
 .cg-fiche-h { margin-bottom: 16px; }
 .cg-fiche-i {
   font-size: 10px;

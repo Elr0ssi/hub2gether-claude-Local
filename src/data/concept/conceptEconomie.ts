@@ -1,5 +1,6 @@
 import { ECONOMY_YEARS } from "@/data/economy/economy";
 import { countryFr } from "@/data/countryNamesFr";
+import { getPopulationMillions } from "@/data/economy/populationData";
 import { ECONOMY_ARTICLES } from "@/data/economy/articles";
 import { FAQS_ECONOMY } from "@/data/economy/faqs";
 import type { FicheArticle } from "./conceptGeo";
@@ -18,7 +19,7 @@ import type { FicheArticle } from "./conceptGeo";
  * sept fois la même chose.
  */
 
-/** [idPays, pib, pibHab, inflation, balance, dette, chômage] */
+/** [idPays, pib, pibHab, inflation, balance, dette, chômage, population] */
 export type Ligne = (number | null)[];
 
 export interface SocleEco {
@@ -60,6 +61,10 @@ export function socleEco(): SocleEco {
       });
       /* Une fiche vide sur les six indicateurs n'a rien à dire : on ne
          l'envoie pas plutôt que de faire une ligne de tirets. */
+      /* La population vient d'une autre table du site, qui ne couvre que
+         quelques millésimes : ailleurs elle reste absente, pas estimée. */
+      const pop = getPopulationMillions(nom, y.year);
+      vals.push(pop === undefined || !Number.isFinite(pop) ? null : Math.round(pop * 10) / 10);
       if (vals.every((v) => v === null)) continue;
       l.push([id, ...vals]);
     }

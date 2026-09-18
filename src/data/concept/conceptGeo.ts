@@ -20,6 +20,11 @@ export interface FichePays {
   pibHab: number | null;
   inflation: number | null;
   balance: number | null;
+  /* Facultatifs : la page Monde n'en a pas besoin, la page Économie s'en
+     sert. Absents, les indicateurs correspondants ne sont pas proposés. */
+  dette?: number | null;
+  chomage?: number | null;
+  population?: number | null;
 }
 
 export function donneesPays(): { annee: number; pays: Record<string, FichePays> } {
@@ -32,6 +37,9 @@ export function donneesPays(): { annee: number; pays: Record<string, FichePays> 
       pibHab: d.gdp_per_capita ?? null,
       inflation: d.inflation ?? null,
       balance: d.trade_balance ?? null,
+      dette: d.debt_ratio ?? null,
+      chomage: d.unemployment ?? null,
+      population: getPopulationMillions(nom, y.year) ?? null,
     };
   }
   return { annee: y.year, pays };

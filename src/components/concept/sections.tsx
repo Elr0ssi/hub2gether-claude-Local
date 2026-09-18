@@ -421,16 +421,18 @@ export function NewsletterSection() {
    pas classé dernier, ce qui serait une affirmation que la source ne fait
    pas. */
 
+/* Quatre fiches, posées côte à côte. Il y en avait six qui défilaient
+   latéralement : trop, et le défilement n'ajoutait rien qu'un geste de plus
+   pour voir ce qui aurait pu tenir à l'écran. */
 const FICHES = [
   { id: "pib", label: "Les plus grandes économies", court: "PIB", unite: "md", sens: 1 },
-  { id: "pibHab", label: "Le PIB par habitant", court: "PIB / hab.", unite: "eur", sens: 1 },
+  { id: "dette", label: "La dette la plus lourde", court: "Dette / PIB", unite: "pct", sens: 1 },
   { id: "inflation", label: "L'inflation la plus forte", court: "Inflation", unite: "pct", sens: 1 },
-  { id: "inflation", label: "Les prix les plus stables", court: "Inflation", unite: "pct", sens: 0 },
-  { id: "balance", label: "Les plus gros excédents", court: "Balance", unite: "md", sens: 1 },
-  { id: "balance", label: "Les plus gros déficits", court: "Balance", unite: "md", sens: -1 },
+  { id: "population", label: "Les pays les plus peuplés", court: "Démographie", unite: "hab", sens: 1 },
 ] as const;
 
-function valeurFr(v: number, unite: "md" | "eur" | "pct") {
+function valeurFr(v: number, unite: "md" | "eur" | "pct" | "hab") {
+  if (unite === "hab") return `${v.toFixed(1).replace(".", ",")} M`;
   if (unite === "pct") return `${v.toFixed(1).replace(".", ",")} %`;
   if (unite === "eur") return `${Math.round(v).toLocaleString("fr-FR")} €`;
   return Math.abs(v) >= 1000
@@ -445,78 +447,25 @@ export function Classements({
   donnees: Record<string, FichePays>;
   annee: number;
 }) {
-  const piste = useRef<HTMLDivElement>(null);
-  const prise = useRef<{ x: number; g: number } | null>(null);
 
   const fiches = useMemo(
     () =>
       FICHES.map((f) => {
         const l = Object.values(donnees)
-          .map((d) => ({ fr: d.fr, v: d[f.id] }))
+          .map((d) => ({ fr: d.fr, v: d[f.id] ?? null }))
           .filter((o): o is { fr: string; v: number } => typeof o.v === "number" && Number.isFinite(o.v))
-          /* sens 0 : « les plus stables » ne veut pas dire la plus forte
-             déflation mais l'écart le plus faible à zéro. */
-          .sort((a, b) => (f.sens === 0 ? Math.abs(a.v) - Math.abs(b.v) : (b.v - a.v) * f.sens))
+          .sort((a, b) => (b.v - a.v) * f.sens)
           .slice(0, 5);
         const haut = l.length ? Math.max(...l.map((o) => Math.abs(o.v))) : 1;
-        /* Pour un classement de stabilité, la barre la plus longue revient au
-           plus stable : l'échelle s'inverse. */
-        return {
-          ...f,
-          lignes: l.map((o) => ({
-            ...o,
-            part: f.sens === 0 ? 1 - Math.abs(o.v) / (haut || 1) * 0.86 : Math.abs(o.v) / haut,
-          })),
-        };
+        return { ...f, lignes: l.map((o) => ({ ...o, part: Math.abs(o.v) / haut })) };
       }),
     [donnees],
   );
 
-  /* Le glisser à la souris double le défilement natif : sur un pavé tactile
-     on pousse la piste, à la souris on l'attrape. */
-  const glisser = {
-    onPointerDown: (e: React.PointerEvent) => {
-      const el = piste.current;
-      if (!el) return;
-      prise.current = { x: e.clientX, g: el.scrollLeft };
-      el.setPointerCapture(e.pointerId);
-    },
-    onPointerMove: (e: React.PointerEvent) => {
-      const el = piste.current;
-      if (!el || !prise.current) return;
-      el.scrollLeft = prise.current.g - (e.clientX - prise.current.x);
-    },
-    onPointerUp: () => {
-      prise.current = null;
-    },
-    onPointerCancel: () => {
-      prise.current = null;
-    },
-  };
-
-  const pousse = (sens: 1 | -1) => {
-    const el = piste.current;
-    if (!el) return;
-    el.scrollBy({ left: sens * Math.max(260, el.clientWidth * 0.62), behavior: "smooth" });
-  };
-
   return (
     <section className="cg-section cg-classements">
       <div className="cg-wrap">
-        <Enseigne
-          droite={
-            <span className="cg-cl-fleches">
-              <button type="button" onClick={() => pousse(-1)} aria-label="Classements précédents">
-                ←
-              </button>
-              <button type="button" onClick={() => pousse(1)} aria-label="Classements suivants">
-                →
-              </button>
-            </span>
-          }
-        >
-          Le monde en chiffres
-        </Enseigne>
+        <Enseigne>Le monde en chiffres</Enseigne>
         <Monte>
           <h2 className="cg-h2">
             Ce que dit le socle<span className="cg-pt">.</span>
@@ -525,7 +474,7 @@ export function Classements({
           </h2>
         </Monte>
 
-        <div ref={piste} className="cg-cl-piste" {...glisser}>
+        <div className="cg-cl-grille">
           {fiches.map((f, k) => (
             <Monte key={`${f.id}-${f.sens}`} delay={Math.min(k, 3) * 0.08} y={22}>
               <article className="cg-fiche">

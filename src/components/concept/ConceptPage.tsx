@@ -157,7 +157,7 @@ export function ConceptPage({ articles, reperes, donnees, annee, regions, vues }
               className="cg-eyebrow"
               initial={{ opacity: 0, y: 10 }}
               animate={pret ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 1.1, delay: 2.7, ease: LENT }}
+              transition={{ duration: 1.1, delay: 0.35, ease: LENT }}
             >
               Des données pour comprendre le monde
             </motion.p>
@@ -168,7 +168,7 @@ export function ConceptPage({ articles, reperes, donnees, annee, regions, vues }
                   key={l}
                   initial={{ opacity: 0, y: 28 }}
                   animate={pret ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 1.3, delay: 2.85 + k * 0.13, ease: LENT }}
+                  transition={{ duration: 1.3, delay: 0.5 + k * 0.1, ease: LENT }}
                 >
                   {l}
                 </motion.span>
@@ -179,7 +179,7 @@ export function ConceptPage({ articles, reperes, donnees, annee, regions, vues }
               className="cg-hero-c"
               initial={{ opacity: 0, y: 16 }}
               animate={pret ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 1.2, delay: 3.35, ease: LENT }}
+              transition={{ duration: 1.2, delay: 0.85, ease: LENT }}
             >
               Des données fiables, des sources nommées, une méthode constante.
             </motion.p>
@@ -188,7 +188,7 @@ export function ConceptPage({ articles, reperes, donnees, annee, regions, vues }
               className="cg-hero-bas"
               initial={{ opacity: 0, y: 16 }}
               animate={pret ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 1.2, delay: 3.55, ease: LENT }}
+              transition={{ duration: 1.2, delay: 1.0, ease: LENT }}
             >
               <button type="button" className="cg-cta">
                 Explorer l&apos;univers <span aria-hidden="true">→</span>
@@ -206,7 +206,7 @@ export function ConceptPage({ articles, reperes, donnees, annee, regions, vues }
             className="cg-defiler"
             initial={{ opacity: 0 }}
             animate={pret ? { opacity: 1 } : {}}
-            transition={{ duration: 1.4, delay: 4.4 }}
+            transition={{ duration: 1.4, delay: 1.35 }}
             aria-hidden="true"
           >
             défiler

@@ -57,13 +57,20 @@ interface Props {
      pour lui : les pages qui ne s'en servent pas ne changent pas. */
   choisi?: string | null;
   onChoisi?: (nom: string | null) => void;
+  /** Les indicateurs proposés, dans l'ordre. Par défaut ceux de la page Monde. */
+  indicateurs?: Indic[];
+  /** Les onglets de région : utiles sur une page d'accueil, encombrants ailleurs. */
+  montrerRegions?: boolean;
+  /** Ce qui vient se glisser sous le globe — une frise, par exemple. */
+  sousLeGlobe?: React.ReactNode;
   annee: number;
   regions: readonly { id: string; label: string; pays: readonly string[] }[];
   vues: Record<string, { lat: number; lon: number }>;
 }
 
-function fmt(v: number | null, genre: "md" | "eur" | "pct"): string {
-  if (v === null) return "—";
+function fmt(v: number | null | undefined, genre: "md" | "eur" | "pct" | "hab"): string {
+  if (v === null || v === undefined) return "—";
+  if (genre === "hab") return `${v.toFixed(1).replace(".", ",")} M`;
   if (genre === "pct") return `${v.toFixed(1).replace(".", ",")} %`;
   if (genre === "eur") return `${Math.round(v).toLocaleString("fr-FR")} €`;
   const a = Math.abs(v);
@@ -71,22 +78,30 @@ function fmt(v: number | null, genre: "md" | "eur" | "pct"): string {
   return `${Math.round(v).toLocaleString("fr-FR")} Md€`;
 }
 
-type Indic = "pib" | "pibHab" | "inflation" | "balance";
+type Indic = "pib" | "pibHab" | "inflation" | "balance" | "dette" | "chomage" | "population";
 
-const INDICS: {
+interface SpecIndic {
   id: Indic;
   label: string;
-  genre: "md" | "eur" | "pct";
+  genre: "md" | "eur" | "pct" | "hab";
   forme: "log" | "signe";
   /** −1 : la rampe divergente est retournée (un déficit doit être rouge). */
   sens: 1 | -1;
   note: string;
-}[] = [
-  { id: "pib", label: "PIB", genre: "md", forme: "log", sens: 1, note: "échelle logarithmique" },
-  { id: "pibHab", label: "PIB / habitant", genre: "eur", forme: "log", sens: 1, note: "échelle logarithmique" },
-  { id: "inflation", label: "Inflation", genre: "pct", forme: "signe", sens: 1, note: "échelle centrée sur zéro" },
-  { id: "balance", label: "Balance commerciale", genre: "md", forme: "signe", sens: -1, note: "échelle centrée sur zéro" },
-];
+}
+
+const CATALOGUE: Record<Indic, SpecIndic> = {
+  pib: { id: "pib", label: "PIB", genre: "md", forme: "log", sens: 1, note: "échelle logarithmique" },
+  pibHab: { id: "pibHab", label: "PIB / habitant", genre: "eur", forme: "log", sens: 1, note: "échelle logarithmique" },
+  inflation: { id: "inflation", label: "Inflation", genre: "pct", forme: "signe", sens: 1, note: "échelle centrée sur zéro" },
+  balance: { id: "balance", label: "Balance commerciale", genre: "md", forme: "signe", sens: -1, note: "échelle centrée sur zéro" },
+  dette: { id: "dette", label: "Dette / PIB", genre: "pct", forme: "log", sens: 1, note: "échelle logarithmique" },
+  chomage: { id: "chomage", label: "Chômage", genre: "pct", forme: "log", sens: 1, note: "échelle logarithmique" },
+  population: { id: "population", label: "Démographie", genre: "hab", forme: "log", sens: 1, note: "échelle logarithmique" },
+};
+
+/** Ce que la page Monde propose depuis toujours : on ne change rien pour elle. */
+const DEFAUT: Indic[] = ["pib", "pibHab", "inflation", "balance"];
 
 /* Rampe séquentielle d'une seule teinte, du sombre au clair : sur un fond de
    nuit, c'est la clarté qui porte la magnitude. On s'arrête avant les pas les
@@ -120,6 +135,9 @@ export function GlobeMonde({
   vues,
   choisi: choisiPilote,
   onChoisi,
+  indicateurs = DEFAUT,
+  montrerRegions = true,
+  sousLeGlobe,
 }: Props) {
   const cv = useRef<HTMLCanvasElement>(null);
   const [pays, setPays] = useState<Pays[]>([]);
@@ -134,7 +152,7 @@ export function GlobeMonde({
   );
   const [survol, setSurvol] = useState<string | null>(null);
   const [region, setRegion] = useState("monde");
-  const [indic, setIndic] = useState<Indic>("pib");
+  const [indic, setIndic] = useState<Indic>(indicateurs[0] ?? "pib");
 
   /* La caméra : deux angles, tirés vers une cible. Le rendu lit ces refs
      soixante fois par seconde sans repasser par React. */
@@ -396,13 +414,28 @@ export function GlobeMonde({
       ctx.globalAlpha = e;
 
       /* L'océan, et l'atmosphère qui déborde du disque. */
-      const atm = ctx.createRadialGradient(cx, cy, R * 0.86, cx, cy, R * 1.22);
-      atm.addColorStop(0, "rgba(64,120,220,0.28)");
-      atm.addColorStop(0.5, "rgba(64,120,220,0.10)");
-      atm.addColorStop(1, "rgba(64,120,220,0)");
-      ctx.fillStyle = atm;
+      /* L'atmosphère : deux couches plutôt qu'une. La première déborde loin et
+         très doucement — c'est elle qui fond le disque dans la page ; la
+         seconde serre le limbe et lui donne son éclat. Une seule couche donne
+         soit un bord net, soit un halo mou, jamais les deux. */
+      const large = ctx.createRadialGradient(cx, cy, R * 0.72, cx, cy, R * 1.55);
+      large.addColorStop(0, "rgba(64,120,220,0.22)");
+      large.addColorStop(0.42, "rgba(70,130,230,0.11)");
+      large.addColorStop(0.72, "rgba(80,140,235,0.04)");
+      large.addColorStop(1, "rgba(80,140,235,0)");
+      ctx.fillStyle = large;
       ctx.beginPath();
-      ctx.arc(cx, cy, R * 1.22, 0, Math.PI * 2);
+      ctx.arc(cx, cy, R * 1.55, 0, Math.PI * 2);
+      ctx.fill();
+
+      const serre = ctx.createRadialGradient(cx, cy, R * 0.965, cx, cy, R * 1.11);
+      serre.addColorStop(0, "rgba(150,205,255,0)");
+      serre.addColorStop(0.32, "rgba(150,205,255,0.5)");
+      serre.addColorStop(0.55, "rgba(120,180,250,0.24)");
+      serre.addColorStop(1, "rgba(110,170,245,0)");
+      ctx.fillStyle = serre;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R * 1.11, 0, Math.PI * 2);
       ctx.fill();
 
       const mer = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.35, R * 0.1, cx, cy, R);
@@ -537,12 +570,17 @@ export function GlobeMonde({
       for (const p of pays) if (p.nom === sur && p.nom !== sel) dessinePays(p, "survol");
       for (const p of pays) if (p.nom === sel) dessinePays(p, "actif");
 
-      /* Le liseré du limbe, par-dessus tout. */
-      ctx.strokeStyle = "rgba(120,175,255,0.55)";
-      ctx.lineWidth = 1.2;
+      /* Le liseré du limbe, par-dessus tout, doublé d'une lueur : c'est ce
+         qui donne l'impression d'une atmosphère éclairée par la tranche. */
+      ctx.save();
+      ctx.shadowColor = "rgba(150,205,255,0.75)";
+      ctx.shadowBlur = 16;
+      ctx.strokeStyle = "rgba(186,222,255,0.8)";
+      ctx.lineWidth = 1.1;
       ctx.beginPath();
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
       ctx.stroke();
+      ctx.restore();
 
       ctx.globalAlpha = 1;
       brut = requestAnimationFrame(boucle);
@@ -637,7 +675,7 @@ export function GlobeMonde({
      pays hors norme écraserait toute la rampe. Le PIB passe en logarithmique,
      faute de quoi la quasi-totalité du monde se retrouve au même pas. */
   const echelle = useMemo(() => {
-    const spec = INDICS.find((i) => i.id === indic) ?? INDICS[0];
+    const spec = CATALOGUE[indic] ?? CATALOGUE.pib;
     const tri = Object.values(donnees)
       .map((d) => d[spec.id])
       .filter((v): v is number => typeof v === "number" && Number.isFinite(v))
@@ -715,6 +753,8 @@ export function GlobeMonde({
 
   return (
     <div className="gm">
+      {montrerRegions && (
+        <>
       {/* ── Les régions ──────────────────────────────────────────────────── */}
       <div className="gm-regions" role="tablist">
         {regions.map((r) => (
@@ -738,10 +778,12 @@ export function GlobeMonde({
           </button>
         ))}
       </div>
+        </>
+      )}
 
       {/* ── L'indicateur qui colore le globe ──────────────────────────────── */}
       <div className="gm-indics" role="tablist" aria-label="Indicateur affiché">
-        {INDICS.map((i) => (
+        {indicateurs.map((k) => CATALOGUE[k]).map((i) => (
           <button
             key={i.id}
             type="button"
@@ -756,7 +798,8 @@ export function GlobeMonde({
       </div>
 
       <div className="gm-corps">
-        {/* ── Le globe ───────────────────────────────────────────────────── */}
+        {/* ── Le globe, et ce qu'on glisse dessous ───────────────────────── */}
+        <div className="gm-colonne">
         <div className="gm-scene">
           <canvas
             ref={cv}
@@ -859,6 +902,9 @@ export function GlobeMonde({
           </p>
         </div>
 
+        {sousLeGlobe && <div className="gm-sous">{sousLeGlobe}</div>}
+        </div>
+
         {/* ── Le panneau ─────────────────────────────────────────────────── */}
         <aside className="gm-panneau">
           <AnimatePresence mode="wait">
@@ -892,7 +938,10 @@ export function GlobeMonde({
                   {/* Les autres indicateurs, cliquables : c'est ici qu'on change
                       ce que le globe colore, sans quitter la fiche du pays. */}
                   <dl className="gm-mesures">
-                    {INDICS.filter((i) => i.id !== echelle.spec.id).map((i) => (
+                    {indicateurs
+                      .map((k) => CATALOGUE[k])
+                      .filter((i) => i.id !== echelle.spec.id)
+                      .map((i) => (
                       <div key={i.id}>
                         <dt>
                           <button type="button" className="gm-mesure-b" onClick={() => setIndic(i.id)}>

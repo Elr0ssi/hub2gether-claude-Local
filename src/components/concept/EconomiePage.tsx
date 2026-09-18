@@ -35,6 +35,7 @@ interface Rang {
   balance: number | null;
   dette: number | null;
   chomage: number | null;
+  population: number | null;
 }
 
 type Col = "pib" | "pibHab" | "inflation" | "balance" | "dette" | "chomage";
@@ -64,7 +65,6 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
   const [filtre, setFiltre] = useState("");
   const [choisi, setChoisi] = useState<string | null>("France");
   const [ouvert, setOuvert] = useState<number | null>(0);
-  const tableau = useRef<HTMLDivElement>(null);
   const rail = useRef<HTMLDivElement>(null);
   const tire = useRef(false);
 
@@ -86,9 +86,9 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
   /* Les lignes de l'année, reconstituées depuis le format compact. */
   const rangs = useMemo<Rang[]>(() => {
     const l = socle.lignes[annee] ?? [];
-    return l.map(([id, pib, pibHab, inflation, balance, dette, chomage]) => {
+    return l.map(([id, pib, pibHab, inflation, balance, dette, chomage, population]) => {
       const p = socle.pays[id as number];
-      return { nom: p.nom, fr: p.fr, pib, pibHab, inflation, balance, dette, chomage };
+      return { nom: p.nom, fr: p.fr, pib, pibHab, inflation, balance, dette, chomage, population };
     });
   }, [socle, annee]);
 
@@ -113,7 +113,16 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
   const donnees = useMemo<Record<string, FichePays>>(() => {
     const o: Record<string, FichePays> = {};
     for (const r of rangs) {
-      o[r.nom] = { fr: r.fr, pib: r.pib, pibHab: r.pibHab, inflation: r.inflation, balance: r.balance };
+      o[r.nom] = {
+        fr: r.fr,
+        pib: r.pib,
+        pibHab: r.pibHab,
+        inflation: r.inflation,
+        balance: r.balance,
+        dette: r.dette,
+        chomage: r.chomage,
+        population: r.population,
+      };
     }
     return o;
   }, [rangs]);
@@ -138,27 +147,6 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
     const tete = [...rangs].filter((r) => r.pib !== null).sort((a, b) => (b.pib as number) - (a.pib as number))[0];
     return { pib, n, med, tete };
   }, [rangs]);
-
-  /* Les six premiers de la colonne triée : des raccourcis, pas un classement
-     — on les met sous la frise pour aller droit à un pays sans parcourir
-     cent quatre-vingts lignes. */
-  const tete = useMemo(
-    () =>
-      [...rangs]
-        .filter((r) => r[col] !== null)
-        .sort((a, b) => (b[col] as number) - (a[col] as number))
-        .slice(0, 6),
-    [rangs, col],
-  );
-
-  /* Choisir dans le classement fait défiler jusqu'à la ligne : autrement, on
-     clique un pays sur le globe et rien ne bouge dans un tableau de cent
-     quatre-vingts lignes. */
-  useEffect(() => {
-    if (!choisi || !tableau.current) return;
-    const el = tableau.current.querySelector<HTMLElement>(`[data-pays="${CSS.escape(choisi)}"]`);
-    el?.scrollIntoView({ block: "nearest" });
-  }, [choisi, tries]);
 
   const trier = (c: Col) => {
     if (c === col) setSens((s) => (s === 1 ? -1 : 1));
@@ -215,129 +203,13 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
         </div>
       </section>
 
-      {/* ── La frise ─────────────────────────────────────────────────────── */}
-      <section className="cg-section cg-frise-s">
+      {/* ── Le globe, sa frise et ses raccourcis ─────────────────────────── */}
+      <section className="cg-section cg-eco-globe">
         <div className="cg-wrap">
           <Enseigne droite={<span className="cg-demo-mini">Banque mondiale (WDI) · FMI</span>}>
-            La frise
+            Le globe, millésime {annee}
           </Enseigne>
 
-          <div className="cg-frise2">
-            <div className="cg-frise2-tete">
-              <span className="cg-frise2-an">{annee}</span>
-              <span className="cg-frise2-l">millésime affiché</span>
-            </div>
-
-            {/* Une ligne, un point. Les jalons sont marqués sur la ligne, et
-                l'on peut viser un jalon, glisser le point, ou pousser aux
-                flèches — un curseur qui ne répond qu'à la souris exclut ceux
-                qui n'en tiennent pas. */}
-            <div
-              ref={rail}
-              className="cg-frise2-rail"
-              role="slider"
-              tabIndex={0}
-              aria-label="Millésime affiché"
-              aria-valuemin={socle.annees[0]}
-              aria-valuemax={socle.annees[socle.annees.length - 1]}
-              aria-valuenow={annee}
-              aria-valuetext={String(annee)}
-              onPointerDown={(e) => {
-                e.currentTarget.setPointerCapture(e.pointerId);
-                tire.current = true;
-                viseX(e.clientX);
-              }}
-              onPointerMove={(e) => tire.current && viseX(e.clientX)}
-              onPointerUp={() => {
-                tire.current = false;
-              }}
-              onPointerCancel={() => {
-                tire.current = false;
-              }}
-              onKeyDown={(e) => {
-                const i = socle.annees.indexOf(annee);
-                if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
-                  e.preventDefault();
-                  setAnnee(socle.annees[Math.max(0, i - 1)]);
-                } else if (e.key === "ArrowRight" || e.key === "ArrowUp") {
-                  e.preventDefault();
-                  setAnnee(socle.annees[Math.min(socle.annees.length - 1, i + 1)]);
-                } else if (e.key === "Home") {
-                  e.preventDefault();
-                  setAnnee(socle.annees[0]);
-                } else if (e.key === "End") {
-                  e.preventDefault();
-                  setAnnee(socle.annees[socle.annees.length - 1]);
-                }
-              }}
-            >
-              <span className="cg-frise2-ligne" aria-hidden="true" />
-              <span
-                className="cg-frise2-faite"
-                aria-hidden="true"
-                style={{ width: `${pct(annee)}%` }}
-              />
-              {socle.annees.map((a) => (
-                <span
-                  key={a}
-                  className={`cg-frise2-jalon${a === annee ? " cg-frise2-jalon-on" : ""}`}
-                  style={{ left: `${pct(a)}%` }}
-                  aria-hidden="true"
-                />
-              ))}
-              <span className="cg-frise2-point" aria-hidden="true" style={{ left: `${pct(annee)}%` }} />
-            </div>
-
-            <div className="cg-frise2-bornes" aria-hidden="true">
-              {socle.annees.map((a) => (
-                <button
-                  key={a}
-                  type="button"
-                  className={`cg-frise2-b${a === annee ? " cg-frise2-b-on" : ""}`}
-                  style={{ left: `${pct(a)}%` }}
-                  onClick={() => setAnnee(a)}
-                  tabIndex={-1}
-                >
-                  {a}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* ── Les raccourcis ──────────────────────────────────────────── */}
-          <div className="cg-raccourcis">
-            <p className="cg-raccourcis-t">
-              En tête sur « {COLONNES.find((c) => c.id === col)?.label} », en {annee}
-            </p>
-            <div className="cg-raccourcis-l">
-              {tete.map((r, i) => (
-                <button
-                  key={r.nom}
-                  type="button"
-                  className={`cg-racc${choisi === r.nom ? " cg-racc-on" : ""}`}
-                  onClick={() => setChoisi(r.nom)}
-                >
-                  <span className="cg-racc-r">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="cg-racc-n">{r.fr}</span>
-                  <span className="cg-racc-v">
-                    {val(r[col], COLONNES.find((c) => c.id === col)?.unite ?? "md")}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <p className="cg-frise-n">
-            Les millésimes affichés sont ceux publiés par la source. Rien n&apos;est interpolé entre
-            deux jalons : une année absente reste absente.
-          </p>
-        </div>
-      </section>
-
-      {/* ── Le globe ─────────────────────────────────────────────────────── */}
-      <section className="cg-section">
-        <div className="cg-wrap">
-          <Enseigne>Le globe, millésime {annee}</Enseigne>
           <GlobeMonde
             donnees={donnees}
             annee={annee}
@@ -345,6 +217,94 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
             vues={vues}
             choisi={choisi}
             onChoisi={setChoisi}
+            indicateurs={["pib", "dette", "chomage", "inflation", "pibHab", "population"]}
+            montrerRegions={false}
+            sousLeGlobe={
+              /* La frise est collée au globe : changer d'année et regarder le
+                 résultat est un seul geste, et l'envoyer dans une section
+                 au-dessus obligeait à remonter pour chaque millésime. */
+              <div className="cg-frise2">
+                <div className="cg-frise2-tete">
+                  <span className="cg-frise2-an">{annee}</span>
+                  <span className="cg-frise2-l">millésime affiché</span>
+                </div>
+
+                {/* Une ligne, un point. On vise un jalon, on glisse le point,
+                    ou on pousse aux flèches — un curseur qui ne répond qu'à la
+                    souris exclut ceux qui n'en tiennent pas. */}
+                <div
+                  ref={rail}
+                  className="cg-frise2-rail"
+                  role="slider"
+                  tabIndex={0}
+                  aria-label="Millésime affiché"
+                  aria-valuemin={socle.annees[0]}
+                  aria-valuemax={socle.annees[socle.annees.length - 1]}
+                  aria-valuenow={annee}
+                  aria-valuetext={String(annee)}
+                  onPointerDown={(e) => {
+                    e.currentTarget.setPointerCapture(e.pointerId);
+                    tire.current = true;
+                    viseX(e.clientX);
+                  }}
+                  onPointerMove={(e) => tire.current && viseX(e.clientX)}
+                  onPointerUp={() => {
+                    tire.current = false;
+                  }}
+                  onPointerCancel={() => {
+                    tire.current = false;
+                  }}
+                  onKeyDown={(e) => {
+                    const i = socle.annees.indexOf(annee);
+                    if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+                      e.preventDefault();
+                      setAnnee(socle.annees[Math.max(0, i - 1)]);
+                    } else if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+                      e.preventDefault();
+                      setAnnee(socle.annees[Math.min(socle.annees.length - 1, i + 1)]);
+                    } else if (e.key === "Home") {
+                      e.preventDefault();
+                      setAnnee(socle.annees[0]);
+                    } else if (e.key === "End") {
+                      e.preventDefault();
+                      setAnnee(socle.annees[socle.annees.length - 1]);
+                    }
+                  }}
+                >
+                  <span className="cg-frise2-ligne" aria-hidden="true" />
+                  <span className="cg-frise2-faite" aria-hidden="true" style={{ width: `${pct(annee)}%` }} />
+                  {socle.annees.map((a) => (
+                    <span
+                      key={a}
+                      className={`cg-frise2-jalon${a === annee ? " cg-frise2-jalon-on" : ""}`}
+                      style={{ left: `${pct(a)}%` }}
+                      aria-hidden="true"
+                    />
+                  ))}
+                  <span className="cg-frise2-point" aria-hidden="true" style={{ left: `${pct(annee)}%` }} />
+                </div>
+
+                <div className="cg-frise2-bornes" aria-hidden="true">
+                  {socle.annees.map((a) => (
+                    <button
+                      key={a}
+                      type="button"
+                      className={`cg-frise2-b${a === annee ? " cg-frise2-b-on" : ""}`}
+                      style={{ left: `${pct(a)}%` }}
+                      onClick={() => setAnnee(a)}
+                      tabIndex={-1}
+                    >
+                      {a}
+                    </button>
+                  ))}
+                </div>
+
+                <p className="cg-frise-n">
+                  Les millésimes affichés sont ceux publiés par la source. Rien n&apos;est interpolé
+                  entre deux jalons : une année absente reste absente.
+                </p>
+              </div>
+            }
           />
         </div>
       </section>
@@ -367,7 +327,7 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
             Le classement {annee}
           </Enseigne>
 
-          <div ref={tableau} className="cg-tab-cadre">
+          <div className="cg-tab-cadre">
             <table className="cg-tab">
               <thead>
                 <tr>
