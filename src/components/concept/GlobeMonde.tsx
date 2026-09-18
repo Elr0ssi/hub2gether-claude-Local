@@ -104,7 +104,6 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
   const [survol, setSurvol] = useState<string | null>(null);
   const [region, setRegion] = useState("monde");
   const [indic, setIndic] = useState<Indic>("pib");
-  const [etiquettes, setEtiquettes] = useState<{ nom: string; x: number; y: number; vu: boolean; dy: number }[]>([]);
 
   /* La caméra : deux angles, tirés vers une cible. Le rendu lit ces refs
      soixante fois par seconde sans repasser par React. */
@@ -115,6 +114,12 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
   /* Dès la première interaction, le globe cesse de dériver : sinon le pays
      qu'on vient de choisir repart tout seul hors du centre. */
   const touche = useRef(false);
+  /* L'entrée en scène : le globe ne se montre pas avant que la section
+     arrive. Il monte alors depuis le bas en grossissant, avec un tour sur
+     lui-même qui s'amortit — le temps du relais avec le globe de fond. */
+  const debut = useRef<number | null>(null);
+  const fini = useRef(false);
+  const [entre, setEntre] = useState(false);
   const refChoisi = useRef(choisi);
   const refSurvol = useRef(survol);
   const refRegion = useRef(region);
@@ -191,6 +196,36 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
     };
   }, []);
 
+  useEffect(() => {
+    const c = cv.current;
+    if (!c) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      debut.current = performance.now() - 5000;
+      setEntre(true);
+      return;
+    }
+    /* On n'observe qu'une fois la mise en page stabilisée : pendant le
+       chargement, la page est plus courte et la section peut traverser le
+       champ sans que personne ne l'ait vue — l'entrée se jouerait alors
+       dans le vide. */
+    let io: IntersectionObserver | null = null;
+    const t = setTimeout(() => {
+      io = new IntersectionObserver(
+        (entrees) => {
+          if (!entrees[0]?.isIntersecting || debut.current !== null) return;
+          debut.current = performance.now();
+          io?.disconnect();
+        },
+        { threshold: 0.45 },
+      );
+      io.observe(c);
+    }, 700);
+    return () => {
+      clearTimeout(t);
+      io?.disconnect();
+    };
+  }, []);
+
   /* ── Le rendu ──────────────────────────────────────────────────────────── */
   useEffect(() => {
     const c = cv.current;
@@ -258,14 +293,27 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
       }
       cible.current.lon = ((cible.current.lon + 540) % 360) - 180;
 
-      const R = Math.min(L, H) * 0.44;
+      /* L'entrée : de presque rien à sa taille, en montant depuis le bas.
+         Le tour supplémentaire ne touche que le rendu, jamais la caméra —
+         sinon le pointage serait faux pendant l'animation. */
+      const brutAp = debut.current === null ? 0 : (performance.now() - debut.current) / 1900;
+      const ap = Math.max(0, Math.min(1, brutAp));
+      const e = 1 - Math.pow(1 - ap, 3);
+      if (ap >= 1 && !fini.current) {
+        fini.current = true;
+        setEntre(true);
+      }
+      const tour = (1 - e) * (1 - e) * 430;
+
+      const R = Math.min(L, H) * 0.44 * (0.07 + 0.93 * e);
       const cx = L / 2;
-      const cy = H / 2;
+      const cy = H / 2 + (1 - e) * H * 0.5;
       /* cam.lon est la longitude au centre de l'écran. Avec le signe inverse,
          cliquer sur un pays envoyait la caméra sur son miroir : les États-Unis
          (−99°) faisaient basculer le globe sur la Chine (+99°). */
-      const sl = Math.sin(cam.current.lon * RAD);
-      const cl = Math.cos(cam.current.lon * RAD);
+      const lonVue = cam.current.lon + tour;
+      const sl = Math.sin(lonVue * RAD);
+      const cl = Math.cos(lonVue * RAD);
       const sp = Math.sin(cam.current.lat * RAD);
       const cp = Math.cos(cam.current.lat * RAD);
 
@@ -301,6 +349,11 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
       };
 
       ctx.clearRect(0, 0, L, H);
+      if (e <= 0) {
+        brut = requestAnimationFrame(boucle);
+        return;
+      }
+      ctx.globalAlpha = e;
 
       /* L'océan, et l'atmosphère qui déborde du disque. */
       const atm = ctx.createRadialGradient(cx, cy, R * 0.86, cx, cy, R * 1.22);
@@ -361,6 +414,15 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
       const dessinePays = (p: Pays, mode: "fond" | "survol" | "actif") => {
         ctx.beginPath();
         let quelqueChose = false;
+        /* On relève l'emprise à l'écran au passage : la trame lumineuse du
+           pays choisi a besoin de savoir où poser ses points. */
+        const bbox = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+        const borne = (x: number, y: number) => {
+          if (x < bbox.x0) bbox.x0 = x;
+          if (y < bbox.y0) bbox.y0 = y;
+          if (x > bbox.x1) bbox.x1 = x;
+          if (y > bbox.y1) bbox.y1 = y;
+        };
         for (const a of p.anneaux) {
           let ouvert = false;
           let prec: { lon: number; lat: number; vu: boolean } | null = null;
@@ -380,6 +442,7 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
             if (q.visible) {
               if (ouvert) ctx.lineTo(q.x, q.y);
               else ctx.moveTo(q.x, q.y);
+              borne(q.x, q.y);
               ouvert = true;
               quelqueChose = true;
             } else {
@@ -397,10 +460,57 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
         ctx.fillStyle = teinte ?? (motif ?? SANS);
         ctx.fill();
         if (mode === "actif") {
-          ctx.shadowColor = "rgba(180,215,255,0.9)";
-          ctx.shadowBlur = 24;
-          ctx.strokeStyle = "rgba(240,248,255,0.98)";
-          ctx.lineWidth = 2;
+          /* Le pays choisi s'allume de l'intérieur : une trame de points
+             chauds, découpée au tracé du pays, puis un liseré net. C'est la
+             lumière qui désigne, pas un aplat — un aplat effacerait la
+             donnée et couperait le pays du reste de la carte. */
+          ctx.save();
+          ctx.clip();
+          /* Le fond du pays choisi bascule dans le chaud : ce sont ses
+             lumières qui doivent porter, et une teinte froide sous elles les
+             éteignait. La valeur, elle, reste lisible dans le panneau. */
+          ctx.fillStyle = "#1c1109";
+          ctx.fill();
+          const g = ctx.createRadialGradient(
+            (bbox.x0 + bbox.x1) / 2,
+            (bbox.y0 + bbox.y1) / 2,
+            1,
+            (bbox.x0 + bbox.x1) / 2,
+            (bbox.y0 + bbox.y1) / 2,
+            Math.max(24, Math.hypot(bbox.x1 - bbox.x0, bbox.y1 - bbox.y0) * 0.62),
+          );
+          g.addColorStop(0, "rgba(255,176,96,0.62)");
+          g.addColorStop(0.55, "rgba(216,120,50,0.3)");
+          g.addColorStop(1, "rgba(150,70,25,0.12)");
+          ctx.fillStyle = g;
+          ctx.fill();
+
+          /* Grille en coordonnées écran, décalée par un bruit stable : une
+             grille régulière se lit comme une texture imprimée, pas comme
+             des lumières. Le pas suit la taille à l'écran, sinon un petit
+             pays n'attrape aucun point. */
+          const etendue = Math.max(bbox.x1 - bbox.x0, bbox.y1 - bbox.y0);
+          const pasP = Math.max(2.6, Math.min(5.4, etendue / 20));
+          for (let gy = bbox.y0; gy <= bbox.y1; gy += pasP) {
+            for (let gx = bbox.x0; gx <= bbox.x1; gx += pasP) {
+              const h = Math.sin(gx * 12.9898 + gy * 78.233) * 43758.5453;
+              const f = h - Math.floor(h);
+              if (f < 0.24) continue;
+              const dx = ((f * 7) % 1) * pasP - pasP / 2;
+              const dy = ((f * 13) % 1) * pasP - pasP / 2;
+              const vif = f > 0.9;
+              ctx.fillStyle = vif ? "rgba(255,250,236,1)" : `rgba(255,206,146,${0.42 + f * 0.55})`;
+              ctx.beginPath();
+              ctx.arc(gx + dx, gy + dy, vif ? 1.25 : 0.78, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+          ctx.restore();
+
+          ctx.shadowColor = "rgba(255,186,116,0.85)";
+          ctx.shadowBlur = 26;
+          ctx.strokeStyle = "rgba(255,226,190,0.98)";
+          ctx.lineWidth = 1.6;
           ctx.stroke();
           ctx.shadowBlur = 0;
         } else if (mode === "survol") {
@@ -427,51 +537,7 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
       ctx.arc(cx, cy, R, 0, Math.PI * 2);
       ctx.stroke();
 
-      /* Les étiquettes flottantes de la région affichée. */
-      const mis = regions.find((r) => r.id === refRegion.current)?.pays ?? [];
-      const et: { nom: string; x: number; y: number; vu: boolean; dy: number }[] = [];
-      /* En Europe, cinq pays tiennent dans un mouchoir de poche : sans
-         déplacement, les pastilles se superposent et deviennent illisibles.
-         On pose donc chaque pastille en la remontant tant qu'elle chevauche
-         une voisine déjà posée. La largeur est estimée depuis le libellé :
-         mesurer le DOM ici coûterait un reflow à chaque image. */
-      const PAS = 52;
-      const HAUT = 46;
-      const boites: { x: number; y: number; demi: number }[] = [];
-      /* Les pays les plus au sud d'abord : ils gardent leur place, les
-         voisins du nord montent. L'ordre est stable d'une image à l'autre. */
-      const ordre = mis
-        .map((nom) => ({ nom, p: pays.find((q) => q.nom === nom) }))
-        .filter((o): o is { nom: string; p: Pays } => Boolean(o.p))
-        /* Trop près du bord, le pays n'est plus qu'un copeau écrasé : la
-           pastille pointerait vers rien. On la retire. */
-        .map((o) => ({ ...o, q: proj(o.p.centre[0], o.p.centre[1]) }))
-        .map((o) => ({ ...o, q: { ...o.q, visible: o.q.visible && o.q.z > 0.2 } }))
-        .sort((a, b) => b.q.y - a.q.y);
-
-      for (const o of ordre) {
-        const d = donnees[o.nom];
-        const demi = (Math.max(String(d?.fr ?? o.nom).length * 7.4 + 26, 78)) / 2;
-        let dy = 0;
-        if (o.q.visible) {
-          /* On essaie au-dessus puis au-dessous, en s'éloignant par paliers :
-             une pile qui ne monterait que vers le haut finirait par sortir de
-             la scène et la pastille disparaîtrait. */
-          for (const essai of [0, -PAS, PAS, -2 * PAS, 2 * PAS, -3 * PAS, 3 * PAS]) {
-            dy = essai;
-            const libre = !boites.some(
-              (b) =>
-                Math.abs(b.x - o.q.x) < b.demi + demi + 10 &&
-                Math.abs(b.y - (o.q.y + dy)) < HAUT,
-            );
-            if (libre) break;
-          }
-          boites.push({ x: o.q.x, y: o.q.y + dy, demi });
-        }
-        et.push({ nom: o.nom, x: o.q.x, y: o.q.y, vu: o.q.visible, dy });
-      }
-      setEtiquettes(et);
-
+      ctx.globalAlpha = 1;
       brut = requestAnimationFrame(boucle);
     };
     brut = requestAnimationFrame(boucle);
@@ -667,6 +733,7 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
           <canvas
             ref={cv}
             className="gm-canvas"
+            style={{ pointerEvents: entre ? "auto" : "none" }}
             onPointerDown={(e) => {
               const g = versLonLat(e);
               /* On retient le point géographique saisi, pas un delta. À chaque
@@ -723,10 +790,11 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
               const g = versLonLat(e);
               const p = g ? paysSous(g.lon, g.lat) : null;
               if (p) {
+                /* On ne recentre pas : déplacer le globe sous le doigt de
+                   quelqu'un qui vient de viser un pays lui fait perdre ce
+                   qu'il regardait. Le choix s'affiche, la vue ne bouge pas. */
                 touche.current = true;
                 setChoisi(p.nom);
-                /* On recentre doucement sur le pays choisi. */
-                cible.current = { lon: p.centre[0], lat: Math.max(-60, Math.min(60, p.centre[1])) };
               }
             }}
             onPointerLeave={() => {
@@ -736,25 +804,6 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
           />
 
           {/* Les pastilles flottantes, façon terminal de marché */}
-          <div className="gm-etiquettes" aria-hidden="true">
-            {etiquettes.map((e) => {
-              const d = donnees[e.nom];
-              if (!d || !e.vu) return null;
-              return (
-                <span
-                  key={e.nom}
-                  className={`gm-pastille${choisi === e.nom ? " gm-pastille-on" : ""}`}
-                  style={{
-                    transform: `translate3d(${e.x}px, ${e.y + e.dy}px, 0) translate(-50%, -140%)`,
-                  }}
-                >
-                  <span className="gm-pastille-n">{d.fr}</span>
-                  <span className="gm-pastille-v">{fmt(d.pib, "md")}</span>
-                </span>
-              );
-            })}
-          </div>
-
           <div className="gm-echelle">
             <div className="gm-echelle-ligne">
               <span className="gm-echelle-b">{echelle.gauche}</span>

@@ -13,6 +13,7 @@ import {
 } from "@/data/concept/conceptData";
 import { Compteur, Enseigne, ImagePlaceholder, LENT, Monte } from "./pieces";
 import { GlobeMonde } from "./GlobeMonde";
+import { HorizonTerre } from "./HorizonTerre";
 import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -391,19 +392,10 @@ export function NumbersSection() {
 export function NewsletterSection() {
   return (
     <section className="cg-section cg-sortie">
-      {/* L'horizon : la sphère du début qui repasse, à peine. */}
+      {/* La courbe de la planète, vue de nuit : c'est sur elle que se pose
+          le dernier bloc de la page. */}
       <div className="cg-horizon" aria-hidden="true">
-        <svg viewBox="0 0 1400 320" preserveAspectRatio="none">
-          <defs>
-            <linearGradient id="cg-horizon-g" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#9EC7D8" stopOpacity="0.28" />
-              <stop offset="100%" stopColor="#9EC7D8" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          <ellipse cx="700" cy="560" rx="900" ry="470" fill="none" stroke="url(#cg-horizon-g)" strokeWidth="1" />
-          <ellipse cx="700" cy="600" rx="1120" ry="540" fill="none" stroke="rgba(214,167,122,0.16)" strokeWidth="1" />
-          <ellipse cx="700" cy="640" rx="1340" ry="610" fill="none" stroke="rgba(244,242,238,0.07)" strokeWidth="1" />
-        </svg>
+        <HorizonTerre />
       </div>
 
       <div className="cg-wrap cg-sortie-corps">
