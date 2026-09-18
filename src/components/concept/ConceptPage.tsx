@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useMotionTemplate, useScroll, useTransform } from "framer-motion";
 import { BarChart3, CloudSun, Flag, Layers, TrendingUp, Users } from "lucide-react";
 import { LENT } from "./pieces";
 import {
@@ -15,10 +15,9 @@ import {
   NewsletterSection,
   NumbersSection,
   Questions,
-  Rubriques,
   TopicExplorer,
 } from "./sections";
-import type { FichePays } from "@/data/concept/conceptGeo";
+import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
 import "./concept.css";
 
 /* Le globe en points du site — le même composant que la page d'accueil, servi
@@ -52,24 +51,65 @@ const MARQUEURS = [
 const NAV = ["Monde", "Économie", "Géopolitique", "Sociétés", "Ressources", "Analyses"];
 
 export interface ConceptProps {
+  articles: FicheArticle[];
   donnees: Record<string, FichePays>;
   annee: number;
   regions: readonly { id: string; label: string; pays: readonly string[] }[];
   vues: Record<string, { lat: number; lon: number }>;
 }
 
-export function ConceptPage({ donnees, annee, regions, vues }: ConceptProps) {
+export function ConceptPage({ articles, donnees, annee, regions, vues }: ConceptProps) {
   const [pret, setPret] = useState(false);
 
   const scene = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: scene, offset: ["start start", "end start"] });
-  /* Le globe monte, grandit et s'efface : il ne disparaît pas, il sort du
-     cadre par le haut pendant que la suite arrive. */
-  const globeY = useTransform(scrollYProgress, [0, 1], ["0%", "-38%"]);
-  const globeS = useTransform(scrollYProgress, [0, 1], [1, 1.5]);
-  const globeO = useTransform(scrollYProgress, [0, 0.62, 1], [1, 0.6, 0.12]);
   const texteY = useTransform(scrollYProgress, [0, 1], ["0%", "-26%"]);
   const texteO = useTransform(scrollYProgress, [0, 0.45], [1, 0]);
+
+  /* ── Le globe de fond ───────────────────────────────────────────────────
+     Il n'appartient plus au hero : c'est une couche fixe qui traverse tout le
+     haut de la page. En descendant, il recule — il plonge, rétrécit, se
+     floute — et arrive derrière le globe interactif au moment précis où
+     celui-ci entre à l'écran. Le relais se fait sans coupure : on ne voit pas
+     un globe disparaître et un autre apparaître, on voit le premier passer
+     derrière le second.
+
+     La course est mesurée en pixels plutôt qu'en fraction d'élément : la
+     couche est fixe, elle n'a pas de progression propre à observer. */
+  const relais = useRef<HTMLDivElement>(null);
+  const [fin, setFin] = useState(1400);
+  useEffect(() => {
+    const mesure = () => {
+      const el = relais.current;
+      if (!el) return;
+      const haut = el.getBoundingClientRect().top + window.scrollY;
+      setFin(Math.max(500, haut + el.offsetHeight * 0.4 - window.innerHeight * 0.5));
+    };
+    mesure();
+    const t = setTimeout(mesure, 400);
+    window.addEventListener("resize", mesure);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("resize", mesure);
+    };
+  }, []);
+
+  const { scrollY } = useScroll();
+  const fondY = useTransform(scrollY, [0, fin * 0.55, fin], [0, 150, 40]);
+  const fondX = useTransform(scrollY, [0, fin], ["0%", "-27%"]);
+  const fondS = useTransform(scrollY, [0, fin * 0.18, fin], [1, 1.1, 0.52]);
+  const fondO = useTransform(
+    scrollY,
+    [0, fin * 0.5, fin * 0.85, fin, fin * 1.3],
+    [1, 0.62, 0.3, 0.12, 0],
+  );
+  const fondFlouPx = useTransform(scrollY, [0, fin * 0.35, fin], [0, 3, 13]);
+  const fondFlou = useMotionTemplate`blur(${fondFlouPx}px)`;
+
+  /* Passé le relais, la scène WebGL n'a plus rien à montrer : on arrête sa
+     boucle au lieu de la laisser tourner sous un flou à 12 %. */
+  const [fondVivant, setFondVivant] = useState(true);
+  useEffect(() => scrollY.on("change", (v) => setFondVivant(v < fin * 1.3)), [scrollY, fin]);
 
   useEffect(() => {
     const t = setTimeout(() => setPret(true), 60);
@@ -109,35 +149,29 @@ export function ConceptPage({ donnees, annee, regions, vues }: ConceptProps) {
         </div>
       </header>
 
-      {/* ── La scène : globe collé, contenu qui passe devant ─────────────── */}
+      {/* ── Le globe de fond, sur toute la traversée ─────────────────────── */}
+      <motion.div
+        className="cg-fond-globe"
+        style={{ y: fondY, x: fondX, scale: fondS, opacity: fondO, filter: fondFlou }}
+        aria-hidden="true"
+      >
+        <div className="cg-fond-globe-i">
+          <GlobePoints
+            markers={MARQUEURS}
+            accent="#9EC7D8"
+            sphereColor="#070E16"
+            badgeBackground="rgba(10,16,24,0.88)"
+            badgeShadow="0 10px 28px rgba(0,0,0,0.55), 0 0 0 1px rgba(158,199,216,0.22)"
+            iconColor="#CFE4EE"
+            markerSize="clamp(30px, 3.6vw, 42px)"
+            active={fondVivant}
+          />
+        </div>
+      </motion.div>
+
+      {/* ── La scène : le texte passe devant le globe ─────────────────────── */}
       <div ref={scene} className="cg-scene">
         <div className="cg-scene-colle">
-          <div className="cg-globe-ancre">
-          <motion.div className="cg-globe" style={{ y: globeY, scale: globeS, opacity: globeO }}>
-            <GlobePoints
-              markers={MARQUEURS}
-              accent="#9EC7D8"
-              sphereColor="#070E16"
-              badgeBackground="rgba(10,16,24,0.88)"
-              badgeShadow="0 10px 28px rgba(0,0,0,0.55), 0 0 0 1px rgba(158,199,216,0.22)"
-              iconColor="#CFE4EE"
-              markerSize="clamp(34px, 4.4vw, 48px)"
-            />
-
-            {/* Le nom, au centre de la sphère */}
-            <motion.div
-              className="cg-centre"
-              initial={{ opacity: 0, letterSpacing: "0.5em" }}
-              animate={pret ? { opacity: 1, letterSpacing: "0.26em" } : {}}
-              transition={{ duration: 1.6, delay: 1.9, ease: LENT }}
-            >
-              <span>The</span>
-              <span>Essential Data</span>
-            </motion.div>
-
-          </motion.div>
-          </div>
-
           {/* ── Le bloc éditorial, à gauche ──────────────────────────────── */}
           <div className="cg-hero-ancre">
           <motion.div className="cg-hero-texte" style={{ y: texteY, opacity: texteO }}>
@@ -169,9 +203,7 @@ export function ConceptPage({ donnees, annee, regions, vues }: ConceptProps) {
               animate={pret ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 1.2, delay: 3.35, ease: LENT }}
             >
-              Des données fiables. Des analyses éclairées.
-              <br />
-              Pour comprendre les grands enjeux d&apos;aujourd&apos;hui et anticiper ceux de demain.
+              Des données fiables, des sources nommées, une méthode constante.
             </motion.p>
 
             <motion.div
@@ -189,16 +221,6 @@ export function ConceptPage({ donnees, annee, regions, vues }: ConceptProps) {
               </span>
             </motion.div>
 
-            <motion.p
-              className="cg-murmure"
-              initial={{ opacity: 0 }}
-              animate={pret ? { opacity: 1 } : {}}
-              transition={{ duration: 1.6, delay: 4.1, ease: LENT }}
-            >
-              « Les données ne changent pas le monde.
-              <br />
-              Ce que l&apos;on en fait, oui. »
-            </motion.p>
           </motion.div>
           </div>
 
@@ -231,13 +253,14 @@ export function ConceptPage({ donnees, annee, regions, vues }: ConceptProps) {
           />
         </svg>
 
-        <Rubriques />
         <LiveTicker />
-        <InteractiveMapPreview donnees={donnees} annee={annee} regions={regions} vues={vues} />
+        <div ref={relais}>
+          <InteractiveMapPreview donnees={donnees} annee={annee} regions={regions} vues={vues} />
+        </div>
         <Classements donnees={donnees} annee={annee} />
         <FluxSources />
         <Methode />
-        <FeaturedStories />
+        <FeaturedStories articles={articles} />
         <TopicExplorer />
         <Questions />
         <NumbersSection />

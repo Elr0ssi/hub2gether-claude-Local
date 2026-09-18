@@ -136,7 +136,7 @@
 
 /* ── La scène ────────────────────────────────────────────────────────────── */
 
-.cg-scene { position: relative; z-index: 1; height: 172vh; }
+.cg-scene { position: relative; z-index: 1; height: 122vh; }
 .cg-scene-colle {
   position: sticky;
   top: 0;
@@ -144,92 +144,27 @@
   overflow: hidden;
 }
 
-/* L'ancrage et l'animation sont séparés : framer-motion écrit sa propre
-   propriété `transform` sur l'élément qu'il anime, et effacerait un
-   `translate(-50%, -50%)` posé au même endroit. */
-.cg-globe-ancre {
+/* Le globe de fond traverse tout le haut de la page : il est fixe, et c'est
+   le défilement qui le fait reculer. L'ancrage et l'animation sont séparés —
+   framer-motion écrit sa propre propriété `transform` sur l'élément qu'il
+   anime et effacerait un `translate(-50%, -50%)` posé au même endroit. */
+.cg-fond-globe {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  will-change: transform, opacity, filter;
+}
+.cg-fond-globe-i {
   position: absolute;
   top: 50%;
-  left: 60%;
-  width: min(58vw, 940px);
-  height: min(88vh, 940px);
+  left: 71%;
+  width: min(46vw, 720px);
+  height: min(74vh, 720px);
   transform: translate(-50%, -50%);
 }
-.cg-globe { position: absolute; inset: 0; will-change: transform, opacity; }
 .cg-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-.cg-centre {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  text-align: center;
-  pointer-events: none;
-}
-.cg-centre span {
-  font-size: clamp(10px, 0.82vw, 12.5px);
-  font-weight: 400;
-  text-transform: uppercase;
-  color: rgba(244, 242, 238, 0.82);
-}
-.cg-centre span:last-child { color: var(--chaud); }
-
-/* ── Les rubriques en orbite ─────────────────────────────────────────────── */
-
-.cg-noeuds { position: absolute; inset: 0; }
-.cg-noeud {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  cursor: pointer;
-  will-change: transform, opacity;
-  transition: filter 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.cg-noeud-off { filter: saturate(0.4); }
-
-.cg-noeud-tige { width: 16px; height: 1px; opacity: 0.55; }
-.cg-noeud-label {
-  font-size: 11.5px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transition: letter-spacing 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.cg-noeud-on .cg-noeud-label { letter-spacing: 0.2em; }
-
-/* Le fragment éditorial : il n'existe qu'au survol, et il flotte. */
-.cg-fragment {
-  position: absolute;
-  left: calc(100% + 14px);
-  top: 50%;
-  width: 196px;
-  transform: translate(-6px, -50%) scale(0.97);
-  opacity: 0;
-  pointer-events: none;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid var(--bord);
-  border-radius: 10px;
-  background: rgba(12, 19, 26, 0.88);
-  backdrop-filter: blur(10px);
-  transition:
-    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.cg-noeud-on .cg-fragment { opacity: 1; transform: translate(0, -50%) scale(1); }
-.cg-fragment-img { width: 100%; }
-.cg-fragment-v { font-size: 20px; font-weight: 400; letter-spacing: -0.02em; }
-.cg-fragment-l { font-size: 11.5px; color: var(--encre-2); }
-.cg-fragment-f { position: absolute; right: 12px; bottom: 11px; font-size: 13px; color: var(--chaud); }
 
 /* ── Le bloc éditorial ───────────────────────────────────────────────────── */
 
@@ -238,7 +173,7 @@
   top: 50%;
   left: clamp(28px, 4.4vw, 76px);
   transform: translateY(-50%);
-  max-width: 500px;
+  max-width: 460px;
   z-index: 3;
 }
 .cg-hero-texte { will-change: transform, opacity; }
@@ -411,22 +346,18 @@
 .cg-direct { padding-top: clamp(28px, 4vh, 58px); padding-bottom: clamp(70px, 9vh, 130px); }
 .cg-fil {
   overflow: hidden;
-  border-top: 1px solid var(--bord-fin);
-  border-bottom: 1px solid var(--bord-fin);
-  padding: 18px 0;
+  cursor: grab;
+  touch-action: pan-y;
+  /* Les deux bords s'effacent : le fil sort du cadre au lieu d'y être coupé. */
   mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
 }
-.cg-fil-piste { display: flex; width: max-content; animation: cg-defile 46s linear infinite; }
-.cg-fil:hover .cg-fil-piste { animation-play-state: paused; }
-@keyframes cg-defile { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-
-.cg-cours {
-  display: inline-flex;
+.cg-fil:active { cursor: grabbing; }
+.cg-fil-piste {
+  display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 0 34px;
-  border-right: 1px solid var(--bord-fin);
-  white-space: nowrap;
+  gap: 42px;
+  width: max-content;
+  will-change: transform;
 }
 .cg-cours-n { font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--encre-3); }
 .cg-cours-v { font-size: 17px; font-weight: 400; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
@@ -633,7 +564,7 @@
 /* ── En dessous du desktop ───────────────────────────────────────────────── */
 
 @media (max-width: 1080px) {
-  .cg-globe { left: 50%; width: 92vw; opacity: 0.4; }
+  .cg-fond-globe-i { left: 50%; width: 92vw; height: 92vw; opacity: 0.4; }
   .cg-hero-texte { left: clamp(20px, 5vw, 48px); right: clamp(20px, 5vw, 48px); max-width: none; }
   .cg-carte-grille,
   .cg-une { grid-template-columns: minmax(0, 1fr); }
@@ -645,7 +576,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cg-fil-piste { animation: none; }
+  
   .cg-defiler { animation: none; }
   .cg-point-vif { animation: none; }
 }
@@ -684,7 +615,9 @@
   min-height: 520px;
   border: 1px solid var(--bord-fin);
   border-radius: 12px;
-  background: radial-gradient(ellipse 60% 60% at 50% 45%, #07101f, #04070e 70%);
+  /* Translucide : le globe de fond, arrivé derrière, doit encore se
+     deviner à travers — c'est là que le relais se lit. */
+  background: radial-gradient(ellipse 60% 60% at 50% 45%, rgba(7, 16, 31, 0.82), rgba(4, 7, 14, 0.92) 70%);
   overflow: hidden;
 }
 .gm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; touch-action: none; }
@@ -1035,3 +968,130 @@
   min-height: 2.24em;
 }
 .cg-rub-l2 { font-size: 12.5px; line-height: 1.55; color: var(--encre-2); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA COULEUR
+
+   Le fond reste une nuit. La couleur n'arrive donc pas par des aplats — elle
+   arrive par des traits : filets qui parcourent les règles de section, bord
+   du globe qui s'allume par intermittence, halos très bas sous quelques
+   blocs. Assez pour que la page ne soit pas grise, jamais assez pour passer
+   devant le texte.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@property --cg-tour {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* ── Le filet des règles de section ──────────────────────────────────────── */
+
+.cg-enseigne-r {
+  position: relative;
+  overflow: hidden;
+  background: var(--bord-fin);
+}
+.cg-enseigne-r::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(158, 199, 216, 0) 30%,
+    rgba(158, 199, 216, 0.9) 45%,
+    rgba(214, 167, 122, 0.85) 55%,
+    rgba(214, 167, 122, 0) 70%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: cg-filet 7.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+@keyframes cg-filet {
+  0% { transform: translateX(-100%); }
+  55%, 100% { transform: translateX(100%); }
+}
+
+/* ── Le bord du globe interactif ─────────────────────────────────────────── */
+
+.gm-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--cg-tour),
+    transparent 0deg 190deg,
+    rgba(158, 199, 216, 0.85) 244deg,
+    rgba(120, 220, 255, 0.95) 262deg,
+    rgba(214, 167, 122, 0.7) 280deg,
+    transparent 330deg 360deg
+  );
+  /* Seul l'anneau d'un pixel garde la couleur : le centre est découpé. */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: cg-tourne 11s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+@keyframes cg-tourne {
+  to { --cg-tour: 360deg; }
+}
+
+/* Deux éclats aux angles : ils respirent, décalés, pour que le cadre ne soit
+   jamais tout à fait immobile. */
+.gm-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 34% 40% at 0% 0%, rgba(120, 200, 255, 0.16), transparent 70%),
+    radial-gradient(ellipse 34% 40% at 100% 100%, rgba(214, 167, 122, 0.13), transparent 70%);
+  animation: cg-respire 6.5s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 1;
+}
+@keyframes cg-respire {
+  from { opacity: 0.45; }
+  to { opacity: 1; }
+}
+
+/* ── Les halos de section ────────────────────────────────────────────────── */
+
+.cg-methode::before,
+.cg-questions::before,
+.cg-classements::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+.cg-classements::before {
+  background: radial-gradient(ellipse 52% 46% at 78% 22%, rgba(60, 130, 220, 0.11), transparent 68%);
+}
+.cg-methode::before {
+  background: radial-gradient(ellipse 60% 44% at 12% 78%, rgba(214, 167, 122, 0.09), transparent 66%);
+}
+.cg-questions::before {
+  background: radial-gradient(ellipse 48% 40% at 88% 60%, rgba(65, 199, 165, 0.08), transparent 66%);
+}
+
+/* ── Les étapes de la méthode ────────────────────────────────────────────── */
+
+.cg-etape-fil {
+  background: linear-gradient(90deg, var(--froid), rgba(214, 167, 122, 0.5) 45%, transparent);
+  opacity: 0.75;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-enseigne-r::after,
+  .gm-scene::before,
+  .gm-scene::after { animation: none; }
+  .cg-enseigne-r::after { opacity: 0.5; transform: none; }
+}

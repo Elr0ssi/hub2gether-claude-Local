@@ -1,5 +1,6 @@
 import { ECONOMY_YEARS } from "@/data/economy/economy";
 import { countryFr } from "@/data/countryNamesFr";
+import { ARTICLES } from "@/data/articles";
 
 /**
  * Les données pays du globe du prototype.
@@ -44,7 +45,8 @@ export const REGIONS = [
   { id: "afrique", label: "Afrique", pays: ["Nigeria", "South Africa", "Egypt", "Kenya", "Morocco"] },
 ] as const;
 
-/** Où poser la caméra quand on change de région. */
+/** Où poser la caméra quand on change de région : de vraies longitudes, au
+    centre de l'écran. */
 export const VUES: Record<string, { lat: number; lon: number }> = {
   monde: { lat: 14, lon: -30 },
   ameriques: { lat: 12, lon: -84 },
@@ -52,3 +54,41 @@ export const VUES: Record<string, { lat: number; lon: number }> = {
   asie: { lat: 26, lon: 104 },
   afrique: { lat: 4, lon: 20 },
 };
+
+/* ── Les articles ────────────────────────────────────────────────────────────
+   On lit la base d'articles du site, pas une liste inventée pour la maquette.
+   Seuls les champs affichés partent au navigateur — le corps des articles
+   pèse plusieurs centaines de kilo-octets et n'a rien à faire ici. */
+
+export interface FicheArticle {
+  slug: string;
+  titre: string;
+  chapo: string;
+  rubrique: string;
+  duree: string;
+}
+
+const RUBRIQUES: Record<string, string> = {
+  economy: "Économie",
+  empires: "Empires",
+  epidemics: "Épidémies",
+  military: "Militaire",
+  politics: "Politique",
+};
+
+export function articlesEnUne(n = 4): FicheArticle[] {
+  return [...ARTICLES]
+    /* Les articles mis en avant d'abord, puis les plus récents. */
+    .sort((a, b) => {
+      const f = Number(Boolean(b.featured)) - Number(Boolean(a.featured));
+      return f !== 0 ? f : (b.publishedAt ?? "").localeCompare(a.publishedAt ?? "");
+    })
+    .slice(0, n)
+    .map((a) => ({
+      slug: a.slug,
+      titre: a.title,
+      chapo: a.excerpt,
+      rubrique: RUBRIQUES[a.theme] ?? a.theme,
+      duree: a.readingTime ? `${a.readingTime} min` : "—",
+    }));
+}

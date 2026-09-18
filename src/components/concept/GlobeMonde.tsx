@@ -253,16 +253,19 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
          elle, sinon elle tire contre le rattrapage et le globe fait du
          surplace. Au premier geste, elle s'arrête pour de bon. */
       if (!doux && !touche.current && !glisse.current) {
-        cam.current.lon -= 0.035;
-        cible.current.lon -= 0.035;
+        cam.current.lon += 0.035;
+        cible.current.lon += 0.035;
       }
       cible.current.lon = ((cible.current.lon + 540) % 360) - 180;
 
       const R = Math.min(L, H) * 0.44;
       const cx = L / 2;
       const cy = H / 2;
-      const sl = Math.sin(-cam.current.lon * RAD);
-      const cl = Math.cos(-cam.current.lon * RAD);
+      /* cam.lon est la longitude au centre de l'écran. Avec le signe inverse,
+         cliquer sur un pays envoyait la caméra sur son miroir : les États-Unis
+         (−99°) faisaient basculer le globe sur la Chine (+99°). */
+      const sl = Math.sin(cam.current.lon * RAD);
+      const cl = Math.cos(cam.current.lon * RAD);
       const sp = Math.sin(cam.current.lat * RAD);
       const cp = Math.cos(cam.current.lat * RAD);
 
@@ -514,8 +517,8 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
       const cp = Math.cos(cam.current.lat * RAD);
       const y1 = dy * cp + z * sp;
       const z1 = -dy * sp + z * cp;
-      const sl = Math.sin(-cam.current.lon * RAD);
-      const cl = Math.cos(-cam.current.lon * RAD);
+      const sl = Math.sin(cam.current.lon * RAD);
+      const cl = Math.cos(cam.current.lon * RAD);
       const x0 = dx * cl + z1 * sl;
       const z0 = -dx * sl + z1 * cl;
       const lat = Math.asin(Math.max(-1, Math.min(1, y1))) / RAD;
@@ -688,11 +691,11 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
                   let lon = q.lon;
                   if (cb > 0.08) {
                     const s0 = ARC(d.u / cb);
-                    lon = plusProche([s0 - q.a, 180 - s0 - q.a], q.lon);
+                    lon = plusProche([q.a - s0, q.a - (180 - s0)], q.lon);
                   }
                   /* Latitude : y = sin(lat)·cos(camLat) − z·sin(camLat), soit
                      une seule cosinusoïde une fois la longitude connue. */
-                  const z1 = cb * Math.cos((q.a + lon) * RAD);
+                  const z1 = cb * Math.cos((q.a - lon) * RAD);
                   const yy = Math.sin(q.b * RAD);
                   const r = Math.hypot(yy, z1);
                   let lat = q.lat;

@@ -1,22 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   FICHE_PAYS,
   MARCHES,
   PREUVES,
-  SECONDAIRES,
   THEMES_EXPLORER,
-  UNE,
   CITATION,
   ETAPES,
   QUESTIONS,
-  TOPICS,
 } from "@/data/concept/conceptData";
 import { Compteur, Enseigne, ImagePlaceholder, LENT, Monte } from "./pieces";
 import { GlobeMonde } from "./GlobeMonde";
-import type { FichePays } from "@/data/concept/conceptGeo";
+import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LES SECTIONS QUI SUIVENT LE GLOBE
@@ -42,8 +39,39 @@ function Micro({ forme, sens }: { forme: number[]; sens: number }) {
 
 export function LiveTicker() {
   /* Le flux est doublé et défile en continu : on veut la sensation d'un fil
-     qui tourne, pas cinq cartes posées côte à côte. */
-  const suite = [...MARCHES, ...MARCHES];
+     qui tourne, pas cinq cartes posées côte à côte. Le défilement est écrit
+     dans le DOM par une boucle plutôt que par une animation CSS — sans cela,
+     on ne peut pas l'attraper pour le faire glisser à la main. */
+  /* Quatre exemplaires, pas deux : on reboucle sur la largeur d'un seul, et
+     il faut donc qu'il reste au moins un écran de contenu au-delà du point de
+     bouclage — sinon un trou apparaît à droite dès qu'on tire le fil. */
+  const COPIES = 4;
+  const suite = Array.from({ length: COPIES }, () => MARCHES).flat();
+  const piste = useRef<HTMLDivElement>(null);
+  const pos = useRef(0);
+  const prise = useRef<{ x: number; pos: number } | null>(null);
+
+  useEffect(() => {
+    const el = piste.current;
+    if (!el) return;
+    const doux = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let brut = 0;
+    let avant = performance.now();
+    const boucle = (t: number) => {
+      const dt = Math.min(64, t - avant);
+      avant = t;
+      /* La largeur d'un exemplaire : au-delà, le suivant a pris exactement sa
+         place et l'on reboucle sans saut visible. */
+      const pas = el.scrollWidth / COPIES || 1;
+      if (!prise.current && !doux) pos.current += (dt / 1000) * 46;
+      pos.current = ((pos.current % pas) + pas) % pas;
+      el.style.transform = `translate3d(${-pos.current}px, 0, 0)`;
+      brut = requestAnimationFrame(boucle);
+    };
+    brut = requestAnimationFrame(boucle);
+    return () => cancelAnimationFrame(brut);
+  }, []);
+
   return (
     <section className="cg-section cg-direct">
       <div className="cg-wrap">
@@ -51,8 +79,24 @@ export function LiveTicker() {
           <span className="cg-point-vif" aria-hidden="true" /> En direct
         </Enseigne>
       </div>
-      <div className="cg-fil">
-        <div className="cg-fil-piste">
+      <div
+        className="cg-fil"
+        onPointerDown={(e) => {
+          prise.current = { x: e.clientX, pos: pos.current };
+          (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+        }}
+        onPointerMove={(e) => {
+          if (!prise.current) return;
+          pos.current = prise.current.pos - (e.clientX - prise.current.x);
+        }}
+        onPointerUp={() => {
+          prise.current = null;
+        }}
+        onPointerCancel={() => {
+          prise.current = null;
+        }}
+      >
+        <div ref={piste} className="cg-fil-piste">
           {suite.map((m, k) => (
             <span key={`${m.nom}-${k}`} className="cg-cours">
               <span className="cg-cours-n">{m.nom}</span>
@@ -194,19 +238,6 @@ export function FluxSources() {
           </Monte>
         </div>
 
-        {/* Le prix pour le lecteur */}
-        <Monte delay={0.2}>
-          <div className="cg-gratuit">
-            <span className="cg-gratuit-v">
-              <Compteur valeur={0} suffixe=" €" duree={1.2} />
-            </span>
-            <span className="cg-gratuit-l">
-              <strong>Le prix pour le lecteur.</strong>
-              Pas de mur payant, pas de compte obligatoire. Le média est financé par son audience,
-              pas par ses lecteurs.
-            </span>
-          </div>
-        </Monte>
       </div>
     </section>
   );
@@ -214,7 +245,13 @@ export function FluxSources() {
 
 /* ── À la une ────────────────────────────────────────────────────────────── */
 
-export function FeaturedStories() {
+export function FeaturedStories({ articles }: { articles: FicheArticle[] }) {
+  /* Les titres, les chapôs et les rubriques viennent de la base d'articles du
+     site, pas d'une liste écrite pour la maquette. Les visuels restent des
+     réserves : les PNG définitifs seront déposés plus tard. */
+  const [une, ...autres] = articles;
+  if (!une) return null;
+
   return (
     <section className="cg-section">
       <div className="cg-wrap">
@@ -227,17 +264,13 @@ export function FeaturedStories() {
           viewport={{ once: true, margin: "-110px" }}
           transition={{ duration: 1.1, ease: LENT }}
         >
-          <ImagePlaceholder nom={UNE.image} ratio="21 / 9" className="cg-une-img" />
+          <ImagePlaceholder nom="IMAGE_PNG_ARTICLE_01" ratio="21 / 9" className="cg-une-img" />
           <div className="cg-une-texte">
             <span className="cg-rubrique">
-              {UNE.rubrique} · {UNE.duree}
+              {une.rubrique} · {une.duree}
             </span>
-            <h3 className="cg-une-t">
-              {UNE.titre[0]}
-              <br />
-              {UNE.titre[1]}
-            </h3>
-            <p className="cg-une-c">{UNE.chapo}</p>
+            <h3 className="cg-une-t">{une.titre}</h3>
+            <p className="cg-une-c">{une.chapo}</p>
             <span className="cg-lien-fleche">
               Lire l&apos;article <span aria-hidden="true">→</span>
             </span>
@@ -245,16 +278,16 @@ export function FeaturedStories() {
         </motion.article>
 
         <div className="cg-secondaires">
-          {SECONDAIRES.map((a, k) => (
+          {autres.map((a, k) => (
             <motion.article
-              key={a.titre}
+              key={a.slug}
               className="cg-second"
               initial={{ opacity: 0, y: 46 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.9, delay: 0.12 + k * 0.12, ease: LENT }}
             >
-              <ImagePlaceholder nom={a.image} ratio="4 / 3" />
+              <ImagePlaceholder nom={`IMAGE_PNG_ARTICLE_0${k + 2}`} ratio="4 / 3" />
               <span className="cg-rubrique">
                 {a.rubrique} · {a.duree}
               </span>
@@ -541,32 +574,6 @@ export function Methode() {
           ))}
         </ol>
 
-        <Monte delay={0.3}>
-          <figure className="cg-trace">
-            <figcaption className="cg-trace-h">Ce qu&apos;un chiffre emporte avec lui</figcaption>
-            <div className="cg-trace-corps">
-              <span className="cg-trace-v">3,4 T€</span>
-              <dl className="cg-trace-d">
-                <div>
-                  <dt>Indicateur</dt>
-                  <dd>PIB nominal, France</dd>
-                </div>
-                <div>
-                  <dt>Source</dt>
-                  <dd>Banque mondiale (WDI)</dd>
-                </div>
-                <div>
-                  <dt>Millésime</dt>
-                  <dd>2025</dd>
-                </div>
-                <div>
-                  <dt>Recoupement</dt>
-                  <dd>FMI, Eurostat</dd>
-                </div>
-              </dl>
-            </div>
-          </figure>
-        </Monte>
       </div>
     </section>
   );
@@ -623,29 +630,3 @@ export function Questions() {
    globe en points ne porte plus d'étiquettes flottantes : les rubriques
    reprennent leur place ici, lisibles d'un coup d'œil. */
 
-export function Rubriques() {
-  return (
-    <section className="cg-section cg-rubriques">
-      <div className="cg-wrap">
-        <Enseigne>Six regards sur le monde</Enseigne>
-        <ul className="cg-rub-l">
-          {TOPICS.map((t, k) => (
-            <Monte key={t.id} delay={k * 0.07} y={22}>
-              <li className="cg-rub">
-                <span className="cg-rub-tige" style={{ background: t.teinte }} aria-hidden="true" />
-                <h3 className="cg-rub-t" style={{ color: t.teinte }}>
-                  {t.label}
-                </h3>
-                <span className="cg-rub-v">{t.module.valeur}</span>
-                <span className="cg-rub-l2">{t.module.legende}</span>
-              </li>
-            </Monte>
-          ))}
-        </ul>
-        <p className="cg-demo-mini cg-demo-bloc">
-          Prototype · les valeurs de cette bande sont des valeurs de démonstration, non mesurées.
-        </p>
-      </div>
-    </section>
-  );
-}
