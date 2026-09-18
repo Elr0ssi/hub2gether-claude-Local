@@ -696,11 +696,22 @@ export function GlobeMonde({
     (choisi ? regions.find((r) => r.id !== "monde" && r.pays.includes(choisi)) : undefined) ??
     regions.find((r) => r.id === "monde");
 
+  /* Le rang se lit sur l'indicateur affiché : annoncer un rang de PIB sous
+     une carte d'inflation serait un faux repère. Les pays sans valeur ne
+     comptent pas — ils ne sont pas derniers, ils ne sont pas classés. */
   const rangMondial = useMemo(() => {
-    if (!fiche?.pib) return null;
-    const mieux = Object.values(donnees).filter((d) => (d.pib ?? -1) > (fiche.pib as number)).length;
-    return mieux + 1;
-  }, [fiche, donnees]);
+    const v = fiche ? fiche[echelle.spec.id] : null;
+    if (typeof v !== "number" || !Number.isFinite(v)) return null;
+    const mieux = Object.values(donnees).filter((d) => {
+      const w = d[echelle.spec.id];
+      return typeof w === "number" && Number.isFinite(w) && w > v;
+    }).length;
+    const total = Object.values(donnees).filter((d) => {
+      const w = d[echelle.spec.id];
+      return typeof w === "number" && Number.isFinite(w);
+    }).length;
+    return { rang: mieux + 1, total };
+  }, [fiche, donnees, echelle]);
 
   return (
     <div className="gm">
@@ -862,18 +873,33 @@ export function GlobeMonde({
                 <>
                   <p className="gm-panneau-sur">{region_?.label} · {annee}</p>
                   <h3 className="gm-panneau-t">{fiche.fr}</h3>
-                  {rangMondial && <p className="gm-rang">{rangMondial}<sup>e</sup> PIB mondial</p>}
 
+                  {/* L'indicateur affiché, en grand, et son rang. */}
+                  <p className="gm-vedette">{fmt(fiche[echelle.spec.id], echelle.spec.genre)}</p>
+                  <p className="gm-vedette-l">
+                    {echelle.spec.label}
+                    {rangMondial && (
+                      <>
+                        {" · "}
+                        <span className="gm-rang">
+                          {rangMondial.rang}
+                          <sup>e</sup> sur {rangMondial.total}
+                        </span>
+                      </>
+                    )}
+                  </p>
+
+                  {/* Les autres indicateurs, cliquables : c'est ici qu'on change
+                      ce que le globe colore, sans quitter la fiche du pays. */}
                   <dl className="gm-mesures">
-                    {[
-                      { l: "PIB", v: fmt(fiche.pib, "md") },
-                      { l: "PIB par habitant", v: fmt(fiche.pibHab, "eur") },
-                      { l: "Inflation", v: fmt(fiche.inflation, "pct") },
-                      { l: "Balance commerciale", v: fmt(fiche.balance, "md") },
-                    ].map((m) => (
-                      <div key={m.l}>
-                        <dt>{m.l}</dt>
-                        <dd>{m.v}</dd>
+                    {INDICS.filter((i) => i.id !== echelle.spec.id).map((i) => (
+                      <div key={i.id}>
+                        <dt>
+                          <button type="button" className="gm-mesure-b" onClick={() => setIndic(i.id)}>
+                            {i.label}
+                          </button>
+                        </dt>
+                        <dd>{fmt(fiche[i.id], i.genre)}</dd>
                       </div>
                     ))}
                   </dl>
@@ -884,7 +910,7 @@ export function GlobeMonde({
                   <p className="gm-source">Banque mondiale (WDI) · {annee}</p>
                 </>
               ) : (
-                <p className="gm-vide">Cliquez un pays sur le globe.</p>
+                <p className="gm-vide">Cliquez un pays sur le globe pour ouvrir sa fiche.</p>
               )}
             </motion.div>
           </AnimatePresence>

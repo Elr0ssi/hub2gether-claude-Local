@@ -164,8 +164,20 @@ const NAV: { label: string; href: string }[] = [
 ];
 
 export function EnTete({ actif }: { actif?: string }) {
+  /* En haut de page le menu est là, entier. Dès qu'on descend il se replie
+     dans le nom : tout part vers la gauche et s'efface, et il ne reste qu'un
+     jeton posé sur la page. On le rouvre en passant dessus. C'est la seule
+     façon de garder une barre fixe sans lui donner une bande de l'écran. */
+  const [replie, setReplie] = useState(false);
+  useEffect(() => {
+    const lis = () => setReplie(window.scrollY > 64);
+    lis();
+    window.addEventListener("scroll", lis, { passive: true });
+    return () => window.removeEventListener("scroll", lis);
+  }, []);
+
   return (
-    <header className="cg-header">
+    <header className={`cg-header${replie ? " cg-header-replie" : ""}`}>
       <div className="cg-header-l">
         <a href="/concept-globe" className="cg-logo">
           <span className="cg-logo-m" aria-hidden="true" />
