@@ -212,11 +212,21 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
     const t = setTimeout(() => {
       io = new IntersectionObserver(
         (entrees) => {
-          if (!entrees[0]?.isIntersecting || debut.current !== null) return;
-          debut.current = performance.now();
-          io?.disconnect();
+          const dedans = Boolean(entrees[0]?.isIntersecting);
+          if (dedans) {
+            /* On ne se déconnecte pas : l'entrée doit se rejouer à chaque
+               retour, qu'on arrive par le haut ou par le bas. */
+            if (debut.current === null) debut.current = performance.now();
+          } else {
+            /* Sorti du champ, le globe s'efface. Il ne reste pas figé en
+               attendant qu'on repasse : c'est son arrivée qui fait le relais
+               avec le globe de fond, et elle doit pouvoir recommencer. */
+            debut.current = null;
+            fini.current = false;
+            setEntre(false);
+          }
         },
-        { threshold: 0.45 },
+        { threshold: 0.4 },
       );
       io.observe(c);
     }, 700);
@@ -414,15 +424,6 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
       const dessinePays = (p: Pays, mode: "fond" | "survol" | "actif") => {
         ctx.beginPath();
         let quelqueChose = false;
-        /* On relève l'emprise à l'écran au passage : la trame lumineuse du
-           pays choisi a besoin de savoir où poser ses points. */
-        const bbox = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
-        const borne = (x: number, y: number) => {
-          if (x < bbox.x0) bbox.x0 = x;
-          if (y < bbox.y0) bbox.y0 = y;
-          if (x > bbox.x1) bbox.x1 = x;
-          if (y > bbox.y1) bbox.y1 = y;
-        };
         for (const a of p.anneaux) {
           let ouvert = false;
           let prec: { lon: number; lat: number; vu: boolean } | null = null;
@@ -442,7 +443,6 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
             if (q.visible) {
               if (ouvert) ctx.lineTo(q.x, q.y);
               else ctx.moveTo(q.x, q.y);
-              borne(q.x, q.y);
               ouvert = true;
               quelqueChose = true;
             } else {
@@ -460,57 +460,10 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
         ctx.fillStyle = teinte ?? (motif ?? SANS);
         ctx.fill();
         if (mode === "actif") {
-          /* Le pays choisi s'allume de l'intérieur : une trame de points
-             chauds, découpée au tracé du pays, puis un liseré net. C'est la
-             lumière qui désigne, pas un aplat — un aplat effacerait la
-             donnée et couperait le pays du reste de la carte. */
-          ctx.save();
-          ctx.clip();
-          /* Le fond du pays choisi bascule dans le chaud : ce sont ses
-             lumières qui doivent porter, et une teinte froide sous elles les
-             éteignait. La valeur, elle, reste lisible dans le panneau. */
-          ctx.fillStyle = "#1c1109";
-          ctx.fill();
-          const g = ctx.createRadialGradient(
-            (bbox.x0 + bbox.x1) / 2,
-            (bbox.y0 + bbox.y1) / 2,
-            1,
-            (bbox.x0 + bbox.x1) / 2,
-            (bbox.y0 + bbox.y1) / 2,
-            Math.max(24, Math.hypot(bbox.x1 - bbox.x0, bbox.y1 - bbox.y0) * 0.62),
-          );
-          g.addColorStop(0, "rgba(255,176,96,0.62)");
-          g.addColorStop(0.55, "rgba(216,120,50,0.3)");
-          g.addColorStop(1, "rgba(150,70,25,0.12)");
-          ctx.fillStyle = g;
-          ctx.fill();
-
-          /* Grille en coordonnées écran, décalée par un bruit stable : une
-             grille régulière se lit comme une texture imprimée, pas comme
-             des lumières. Le pas suit la taille à l'écran, sinon un petit
-             pays n'attrape aucun point. */
-          const etendue = Math.max(bbox.x1 - bbox.x0, bbox.y1 - bbox.y0);
-          const pasP = Math.max(2.6, Math.min(5.4, etendue / 20));
-          for (let gy = bbox.y0; gy <= bbox.y1; gy += pasP) {
-            for (let gx = bbox.x0; gx <= bbox.x1; gx += pasP) {
-              const h = Math.sin(gx * 12.9898 + gy * 78.233) * 43758.5453;
-              const f = h - Math.floor(h);
-              if (f < 0.24) continue;
-              const dx = ((f * 7) % 1) * pasP - pasP / 2;
-              const dy = ((f * 13) % 1) * pasP - pasP / 2;
-              const vif = f > 0.9;
-              ctx.fillStyle = vif ? "rgba(255,250,236,1)" : `rgba(255,206,146,${0.42 + f * 0.55})`;
-              ctx.beginPath();
-              ctx.arc(gx + dx, gy + dy, vif ? 1.25 : 0.78, 0, Math.PI * 2);
-              ctx.fill();
-            }
-          }
-          ctx.restore();
-
-          ctx.shadowColor = "rgba(255,186,116,0.85)";
-          ctx.shadowBlur = 26;
-          ctx.strokeStyle = "rgba(255,226,190,0.98)";
-          ctx.lineWidth = 1.6;
+          ctx.shadowColor = "rgba(180,215,255,0.9)";
+          ctx.shadowBlur = 24;
+          ctx.strokeStyle = "rgba(240,248,255,0.98)";
+          ctx.lineWidth = 2;
           ctx.stroke();
           ctx.shadowBlur = 0;
         } else if (mode === "survol") {

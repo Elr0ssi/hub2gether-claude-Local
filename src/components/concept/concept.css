@@ -795,11 +795,12 @@
    LES CLASSEMENTS, LA MÉTHODE, LES QUESTIONS
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.cg-cl-onglets { display: flex; gap: 6px; flex-wrap: wrap; margin: 38px 0 26px; }
-.cg-cl-onglet {
-  padding: 8px 16px;
+.cg-cl-fleches { display: flex; gap: 6px; }
+.cg-cl-fleches button {
+  width: 30px;
+  height: 30px;
   border: 1px solid var(--bord-fin);
-  border-radius: 999px;
+  border-radius: 50%;
   background: none;
   font: inherit;
   font-size: 13px;
@@ -807,39 +808,73 @@
   cursor: pointer;
   transition: color 0.3s, border-color 0.3s, background 0.3s;
 }
-.cg-cl-onglet:hover { color: var(--encre); border-color: var(--bord); }
-.cg-cl-onglet-on {
-  color: var(--encre);
-  border-color: rgba(158, 199, 216, 0.45);
-  background: rgba(158, 199, 216, 0.08);
-}
+.cg-cl-fleches button:hover { color: var(--encre); border-color: var(--bord); background: rgba(255, 255, 255, 0.05); }
 
-.cg-cl-liste { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--bord-fin); }
-.cg-cl-ligne {
-  display: grid;
-  grid-template-columns: 34px minmax(120px, 190px) minmax(0, 1fr) minmax(86px, auto);
-  align-items: center;
+.cg-cl-piste {
+  display: flex;
   gap: 16px;
-  padding: 13px 0;
-  border-bottom: 1px solid var(--bord-fin);
+  margin-top: 44px;
+  padding-bottom: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  cursor: grab;
+  /* Le dernier bord s'efface : la piste doit se lire comme une suite qui
+     continue, pas comme un bloc coupé net. */
+  mask-image: linear-gradient(90deg, #000 0 92%, transparent);
 }
-.cg-cl-rang { font-size: 11px; letter-spacing: 0.08em; color: var(--encre-3); font-variant-numeric: tabular-nums; }
-.cg-cl-nom { font-size: 14.5px; color: var(--encre); }
-.cg-cl-piste { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.05); overflow: hidden; }
-.cg-cl-barre {
-  display: block;
-  height: 100%;
+.cg-cl-piste::-webkit-scrollbar { display: none; }
+.cg-cl-piste:active { cursor: grabbing; }
+.cg-cl-piste > * { scroll-snap-align: start; flex: 0 0 auto; }
+
+.cg-fiche {
+  width: clamp(250px, 26vw, 310px);
+  padding: 18px 20px 20px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(158, 199, 216, 0.05), rgba(255, 255, 255, 0.012));
+  transition: border-color 0.35s, background 0.35s;
+}
+.cg-fiche:hover { border-color: rgba(158, 199, 216, 0.35); }
+.cg-fiche-h { margin-bottom: 16px; }
+.cg-fiche-i {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--chaud);
+}
+.cg-fiche-t { margin: 7px 0 0; font-size: 15px; font-weight: 400; line-height: 1.32; color: var(--encre); }
+
+.cg-fiche-l { list-style: none; margin: 0; padding: 0; }
+.cg-fiche-l li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 9px;
+  padding: 9px 0 10px;
+  border-top: 1px solid var(--bord-fin);
+}
+.cg-fiche-r { font-size: 10px; color: var(--encre-3); font-variant-numeric: tabular-nums; }
+.cg-fiche-n {
+  font-size: 13px;
+  color: var(--encre);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cg-fiche-v { font-size: 12.5px; color: var(--froid); font-variant-numeric: tabular-nums; }
+.cg-fiche-b {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
   transform-origin: left center;
-  border-radius: 3px;
-  /* Une seule teinte : la barre porte une magnitude, pas une identité. */
   background: linear-gradient(90deg, #1c5cab, #6da7ec);
 }
-.cg-cl-v { font-size: 14px; color: var(--froid); text-align: right; font-variant-numeric: tabular-nums; }
+
 .cg-cl-source { margin-top: 18px; font-size: 11.5px; line-height: 1.6; color: var(--encre-3); }
-@media (max-width: 720px) {
-  .cg-cl-ligne { grid-template-columns: 28px minmax(0, 1fr) auto; }
-  .cg-cl-piste { display: none; }
-}
 
 .cg-etapes {
   list-style: none;

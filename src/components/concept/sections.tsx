@@ -442,14 +442,18 @@ export function NewsletterSection() {
 }
 
 /* ── Les classements vivants ──────────────────────────────────────────────
-   Trois lectures du même socle. Les valeurs sont réelles ; un pays sans
-   donnée pour l'indicateur choisi n'apparaît pas — il n'est pas classé
-   dernier, ce qui serait une affirmation que la source ne fait pas. */
+   Un carrousel de petites fiches, chacune un classement. Les valeurs sont
+   réelles ; un pays sans donnée pour l'indicateur n'apparaît pas — il n'est
+   pas classé dernier, ce qui serait une affirmation que la source ne fait
+   pas. */
 
-const VUES_CLASSEMENT = [
-  { id: "pib", label: "Les plus grandes économies", unite: "md", sens: -1 },
-  { id: "pibHab", label: "Le PIB par habitant", unite: "eur", sens: -1 },
-  { id: "inflation", label: "L'inflation la plus forte", unite: "pct", sens: -1 },
+const FICHES = [
+  { id: "pib", label: "Les plus grandes économies", court: "PIB", unite: "md", sens: 1 },
+  { id: "pibHab", label: "Le PIB par habitant", court: "PIB / hab.", unite: "eur", sens: 1 },
+  { id: "inflation", label: "L'inflation la plus forte", court: "Inflation", unite: "pct", sens: 1 },
+  { id: "inflation", label: "Les prix les plus stables", court: "Inflation", unite: "pct", sens: 0 },
+  { id: "balance", label: "Les plus gros excédents", court: "Balance", unite: "md", sens: 1 },
+  { id: "balance", label: "Les plus gros déficits", court: "Balance", unite: "md", sens: -1 },
 ] as const;
 
 function valeurFr(v: number, unite: "md" | "eur" | "pct") {
@@ -467,23 +471,78 @@ export function Classements({
   donnees: Record<string, FichePays>;
   annee: number;
 }) {
-  const [vue, setVue] = useState<(typeof VUES_CLASSEMENT)[number]["id"]>("pib");
-  const spec = VUES_CLASSEMENT.find((v) => v.id === vue) ?? VUES_CLASSEMENT[0];
+  const piste = useRef<HTMLDivElement>(null);
+  const prise = useRef<{ x: number; g: number } | null>(null);
 
-  const liste = useMemo(() => {
-    const l = Object.values(donnees)
-      .map((d) => ({ fr: d.fr, v: d[spec.id] }))
-      .filter((o): o is { fr: string; v: number } => typeof o.v === "number" && Number.isFinite(o.v))
-      .sort((a, b) => (b.v - a.v) * (spec.sens === -1 ? 1 : -1))
-      .slice(0, 8);
-    const haut = l.length ? Math.max(...l.map((o) => Math.abs(o.v))) : 1;
-    return l.map((o) => ({ ...o, part: Math.abs(o.v) / haut }));
-  }, [donnees, spec]);
+  const fiches = useMemo(
+    () =>
+      FICHES.map((f) => {
+        const l = Object.values(donnees)
+          .map((d) => ({ fr: d.fr, v: d[f.id] }))
+          .filter((o): o is { fr: string; v: number } => typeof o.v === "number" && Number.isFinite(o.v))
+          /* sens 0 : « les plus stables » ne veut pas dire la plus forte
+             déflation mais l'écart le plus faible à zéro. */
+          .sort((a, b) => (f.sens === 0 ? Math.abs(a.v) - Math.abs(b.v) : (b.v - a.v) * f.sens))
+          .slice(0, 5);
+        const haut = l.length ? Math.max(...l.map((o) => Math.abs(o.v))) : 1;
+        /* Pour un classement de stabilité, la barre la plus longue revient au
+           plus stable : l'échelle s'inverse. */
+        return {
+          ...f,
+          lignes: l.map((o) => ({
+            ...o,
+            part: f.sens === 0 ? 1 - Math.abs(o.v) / (haut || 1) * 0.86 : Math.abs(o.v) / haut,
+          })),
+        };
+      }),
+    [donnees],
+  );
+
+  /* Le glisser à la souris double le défilement natif : sur un pavé tactile
+     on pousse la piste, à la souris on l'attrape. */
+  const glisser = {
+    onPointerDown: (e: React.PointerEvent) => {
+      const el = piste.current;
+      if (!el) return;
+      prise.current = { x: e.clientX, g: el.scrollLeft };
+      el.setPointerCapture(e.pointerId);
+    },
+    onPointerMove: (e: React.PointerEvent) => {
+      const el = piste.current;
+      if (!el || !prise.current) return;
+      el.scrollLeft = prise.current.g - (e.clientX - prise.current.x);
+    },
+    onPointerUp: () => {
+      prise.current = null;
+    },
+    onPointerCancel: () => {
+      prise.current = null;
+    },
+  };
+
+  const pousse = (sens: 1 | -1) => {
+    const el = piste.current;
+    if (!el) return;
+    el.scrollBy({ left: sens * Math.max(260, el.clientWidth * 0.62), behavior: "smooth" });
+  };
 
   return (
     <section className="cg-section cg-classements">
       <div className="cg-wrap">
-        <Enseigne>Le monde en chiffres</Enseigne>
+        <Enseigne
+          droite={
+            <span className="cg-cl-fleches">
+              <button type="button" onClick={() => pousse(-1)} aria-label="Classements précédents">
+                ←
+              </button>
+              <button type="button" onClick={() => pousse(1)} aria-label="Classements suivants">
+                →
+              </button>
+            </span>
+          }
+        >
+          Le monde en chiffres
+        </Enseigne>
         <Monte>
           <h2 className="cg-h2">
             Ce que dit le socle<span className="cg-pt">.</span>
@@ -492,38 +551,34 @@ export function Classements({
           </h2>
         </Monte>
 
-        <div className="cg-cl-onglets" role="tablist" aria-label="Classement affiché">
-          {VUES_CLASSEMENT.map((v) => (
-            <button
-              key={v.id}
-              type="button"
-              role="tab"
-              aria-selected={vue === v.id}
-              className={`cg-cl-onglet${vue === v.id ? " cg-cl-onglet-on" : ""}`}
-              onClick={() => setVue(v.id)}
-            >
-              {v.label}
-            </button>
+        <div ref={piste} className="cg-cl-piste" {...glisser}>
+          {fiches.map((f, k) => (
+            <Monte key={`${f.id}-${f.sens}`} delay={Math.min(k, 3) * 0.08} y={22}>
+              <article className="cg-fiche">
+                <header className="cg-fiche-h">
+                  <span className="cg-fiche-i">{f.court}</span>
+                  <h3 className="cg-fiche-t">{f.label}</h3>
+                </header>
+                <ol className="cg-fiche-l">
+                  {f.lignes.map((o, i) => (
+                    <li key={o.fr}>
+                      <span className="cg-fiche-r">{String(i + 1).padStart(2, "0")}</span>
+                      <span className="cg-fiche-n">{o.fr}</span>
+                      <span className="cg-fiche-v">{valeurFr(o.v, f.unite)}</span>
+                      <motion.span
+                        className="cg-fiche-b"
+                        initial={{ scaleX: 0 }}
+                        whileInView={{ scaleX: o.part }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.7, delay: 0.1 + i * 0.05, ease: LENT }}
+                      />
+                    </li>
+                  ))}
+                </ol>
+              </article>
+            </Monte>
           ))}
         </div>
-
-        <ol className="cg-cl-liste">
-          {liste.map((o, k) => (
-            <li key={`${vue}-${o.fr}`} className="cg-cl-ligne">
-              <span className="cg-cl-rang">{String(k + 1).padStart(2, "0")}</span>
-              <span className="cg-cl-nom">{o.fr}</span>
-              <span className="cg-cl-piste">
-                <motion.span
-                  className="cg-cl-barre"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: o.part }}
-                  transition={{ duration: 0.75, delay: k * 0.045, ease: LENT }}
-                />
-              </span>
-              <span className="cg-cl-v">{valeurFr(o.v, spec.unite)}</span>
-            </li>
-          ))}
-        </ol>
 
         <p className="cg-cl-source">
           Banque mondiale (WDI) · {annee} · les pays sans valeur publiée pour cet
