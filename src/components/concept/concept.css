@@ -142,7 +142,11 @@
   top: 0;
   height: 100vh;
   overflow: hidden;
+  /* Transparente au pointeur : c'est ce qui laisse attraper le globe de
+     fond, qui est en dessous. Le bloc de texte, lui, se réactive. */
+  pointer-events: none;
 }
+.cg-hero-ancre, .cg-defiler { pointer-events: auto; }
 
 /* Le globe de fond traverse tout le haut de la page : il est fixe, et c'est
    le défilement qui le fait reculer. L'ancrage et l'animation sont séparés —
@@ -348,6 +352,10 @@
   overflow: hidden;
   cursor: grab;
   touch-action: pan-y;
+  /* Tirer une piste ne doit pas sélectionner son texte : le surlignage bleu
+     par-dessus le fil est le premier signe qu'on a attrapé la mauvaise chose. */
+  user-select: none;
+  -webkit-user-select: none;
   /* Les deux bords s'effacent : le fil sort du cadre au lieu d'y être coupé. */
   mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
 }
@@ -359,9 +367,16 @@
   width: max-content;
   will-change: transform;
 }
+.cg-cours {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  white-space: nowrap;
+}
 .cg-cours-n { font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--encre-3); }
 .cg-cours-v { font-size: 17px; font-weight: 400; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .cg-micro { opacity: 0.9; }
+.cg-cours-note { font-size: 10.5px; padding-left: 2px; border-left: 1px solid var(--bord-fin); padding-left: 12px; letter-spacing: 0.06em; color: var(--encre-3); }
 .cg-cours-d { font-size: 12px; font-variant-numeric: tabular-nums; }
 .cg-cours-d.up { color: var(--vert); }
 .cg-cours-d.down { color: var(--rouge); }
@@ -528,7 +543,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: clamp(470px, 64vh, 780px);
+  height: clamp(320px, 40vh, 470px);
   pointer-events: none;
   z-index: 0;
 }
@@ -812,6 +827,8 @@
 
 .cg-cl-piste {
   display: flex;
+  user-select: none;
+  -webkit-user-select: none;
   gap: 16px;
   margin-top: 44px;
   padding-bottom: 10px;
@@ -836,6 +853,24 @@
   transition: border-color 0.35s, background 0.35s;
 }
 .cg-fiche:hover { border-color: rgba(158, 199, 216, 0.35); }
+/* Un filet de couleur par fiche, dans un ordre fixe : il distingue les
+   classements sans rien encoder — la couleur ne porte aucune valeur ici. */
+.cg-fiche::before {
+  content: "";
+  position: absolute;
+  inset: -1px -1px auto -1px;
+  height: 2px;
+  border-radius: 12px 12px 0 0;
+  background: var(--fiche-t, var(--froid));
+  opacity: 0.85;
+}
+.cg-fiche { position: relative; }
+.cg-cl-piste > *:nth-child(6n + 1) .cg-fiche { --fiche-t: linear-gradient(90deg, #3987e5, transparent); }
+.cg-cl-piste > *:nth-child(6n + 2) .cg-fiche { --fiche-t: linear-gradient(90deg, #D6A77A, transparent); }
+.cg-cl-piste > *:nth-child(6n + 3) .cg-fiche { --fiche-t: linear-gradient(90deg, #41C7A5, transparent); }
+.cg-cl-piste > *:nth-child(6n + 4) .cg-fiche { --fiche-t: linear-gradient(90deg, #9B8BE0, transparent); }
+.cg-cl-piste > *:nth-child(6n + 5) .cg-fiche { --fiche-t: linear-gradient(90deg, #6da7ec, transparent); }
+.cg-cl-piste > *:nth-child(6n + 6) .cg-fiche { --fiche-t: linear-gradient(90deg, #FF8E6E, transparent); }
 .cg-fiche-h { margin-bottom: 16px; }
 .cg-fiche-i {
   font-size: 10px;

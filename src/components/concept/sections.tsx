@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   FICHE_PAYS,
-  MARCHES,
   PREUVES,
   THEMES_EXPLORER,
   CITATION,
@@ -14,7 +13,7 @@ import {
 import { Compteur, Enseigne, ImagePlaceholder, LENT, Monte } from "./pieces";
 import { GlobeMonde } from "./GlobeMonde";
 import { HorizonTerre } from "./HorizonTerre";
-import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
+import type { FicheArticle, FichePays, Repere } from "@/data/concept/conceptGeo";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LES SECTIONS QUI SUIVENT LE GLOBE
@@ -25,29 +24,16 @@ import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
 
 /* ── En direct ───────────────────────────────────────────────────────────── */
 
-function Micro({ forme, sens }: { forme: number[]; sens: number }) {
-  const max = Math.max(...forme);
-  const min = Math.min(...forme);
-  const d = forme
-    .map((v, k) => `${k ? "L" : "M"} ${(k / (forme.length - 1)) * 54} ${18 - ((v - min) / (max - min || 1)) * 15}`)
-    .join(" ");
-  return (
-    <svg width="54" height="20" viewBox="0 0 54 20" aria-hidden="true" className="cg-micro">
-      <path d={d} fill="none" stroke={sens > 0 ? "#41C7A5" : "#FF6474"} strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  );
-}
+export function LiveTicker({ reperes, annee }: { reperes: Repere[]; annee: number }) {
+  /* Ce ne sont pas des cours : ce sont des agrégats du socle, au millésime
+     publié. Le bandeau l'annonce plutôt que de mimer un flux temps réel qui
+     n'existe pas — et il n'y a donc rien à rafraîchir.
 
-export function LiveTicker() {
-  /* Le flux est doublé et défile en continu : on veut la sensation d'un fil
-     qui tourne, pas cinq cartes posées côte à côte. Le défilement est écrit
-     dans le DOM par une boucle plutôt que par une animation CSS — sans cela,
-     on ne peut pas l'attraper pour le faire glisser à la main. */
-  /* Quatre exemplaires, pas deux : on reboucle sur la largeur d'un seul, et
-     il faut donc qu'il reste au moins un écran de contenu au-delà du point de
-     bouclage — sinon un trou apparaît à droite dès qu'on tire le fil. */
+     Le défilement est écrit dans le DOM par une boucle plutôt que par une
+     animation CSS : sans cela, on ne peut pas l'attraper pour le faire
+     glisser à la main. */
   const COPIES = 4;
-  const suite = Array.from({ length: COPIES }, () => MARCHES).flat();
+  const suite = Array.from({ length: COPIES }, () => reperes).flat();
   const piste = useRef<HTMLDivElement>(null);
   const pos = useRef(0);
   const prise = useRef<{ x: number; pos: number } | null>(null);
@@ -64,7 +50,7 @@ export function LiveTicker() {
       /* La largeur d'un exemplaire : au-delà, le suivant a pris exactement sa
          place et l'on reboucle sans saut visible. */
       const pas = el.scrollWidth / COPIES || 1;
-      if (!prise.current && !doux) pos.current += (dt / 1000) * 46;
+      if (!prise.current && !doux) pos.current += (dt / 1000) * 42;
       pos.current = ((pos.current % pas) + pas) % pas;
       el.style.transform = `translate3d(${-pos.current}px, 0, 0)`;
       brut = requestAnimationFrame(boucle);
@@ -73,11 +59,13 @@ export function LiveTicker() {
     return () => cancelAnimationFrame(brut);
   }, []);
 
+  if (!reperes.length) return null;
+
   return (
     <section className="cg-section cg-direct">
       <div className="cg-wrap">
-        <Enseigne droite={<span className="cg-demo-mini">valeurs de démonstration</span>}>
-          <span className="cg-point-vif" aria-hidden="true" /> En direct
+        <Enseigne droite={<span className="cg-demo-mini">Banque mondiale · {annee}</span>}>
+          <span className="cg-point-vif" aria-hidden="true" /> Le socle en bref
         </Enseigne>
       </div>
       <div
@@ -102,10 +90,7 @@ export function LiveTicker() {
             <span key={`${m.nom}-${k}`} className="cg-cours">
               <span className="cg-cours-n">{m.nom}</span>
               <span className="cg-cours-v">{m.valeur}</span>
-              <Micro forme={m.forme} sens={m.sens} />
-              <span className={`cg-cours-d ${m.sens > 0 ? "up" : "down"}`}>
-                {m.sens > 0 ? "▲" : "▼"} {m.delta.replace(/^[+−]/, "")}
-              </span>
+              <span className="cg-cours-note">{m.note}</span>
             </span>
           ))}
         </div>

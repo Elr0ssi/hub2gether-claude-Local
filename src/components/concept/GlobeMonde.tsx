@@ -34,6 +34,17 @@ type Anneau = [number, number][];
 interface Pays {
   nom: string;
   anneaux: Anneau[];
+  /* Les mêmes anneaux, en vecteurs unitaires, à plat. C'est ce que lit la
+     boucle de rendu : quatre appels trigonométriques par sommet et par image
+     coûtaient plus cher que tout le reste du dessin réuni, et c'est ce qui
+     faisait saccader la rotation. En prime, la question de l'antiméridien
+     disparaît — entre 179° et −179° il n'y a qu'un pas minuscule dans
+     l'espace, alors qu'en longitude c'est un saut de 358°. C'est ce saut qui
+     déchirait la Russie. */
+  vecteurs: Float64Array[];
+  /* Un anneau qui franchit l'antiméridien fausse le test d'appartenance en
+     longitude : on le signale pour le décaler au moment du clic. */
+  coupe: boolean[];
   /** Le centre approché, pour poser l'étiquette et viser au clic. */
   centre: [number, number];
   aire: number;
@@ -143,6 +154,8 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
               ? [f.geometry.coordinates as number[][][]]
               : (f.geometry.coordinates as number[][][][]);
           const anneaux: Anneau[] = [];
+          const vecteurs: Float64Array[] = [];
+          const coupe: boolean[] = [];
           /* L'aire vraie, par la formule du lacet pondérée par cos(lat). Le
              nombre de sommets ne dit rien de la taille — la Norvège en a plus
              que la Libye — et c'est l'aire qui départage deux pays au clic. */
@@ -153,6 +166,19 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
             if (!ext) continue;
             const a: Anneau = ext.map((c) => [c[0], c[1]] as [number, number]);
             anneaux.push(a);
+            const v = new Float64Array(a.length * 3);
+            let franchit = false;
+            for (let i = 0; i < a.length; i++) {
+              const lo = a[i][0] * RAD;
+              const la = a[i][1] * RAD;
+              const co = Math.cos(la);
+              v[i * 3] = co * Math.sin(lo);
+              v[i * 3 + 1] = Math.sin(la);
+              v[i * 3 + 2] = co * Math.cos(lo);
+              if (i > 0 && Math.abs(a[i][0] - a[i - 1][0]) > 180) franchit = true;
+            }
+            vecteurs.push(v);
+            coupe.push(franchit);
             let lacet = 0;
             /* Le centroïde pondéré par l'aire, pas la moyenne des sommets :
                une côte très découpée concentre les sommets et tirerait le
@@ -184,7 +210,7 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
             if (sa > plusGrand.aire) plusGrand = { aire: sa, centre: centreAnneau };
           }
           if (!anneaux.length) continue;
-          out.push({ nom, anneaux, centre: plusGrand.centre, aire });
+          out.push({ nom, anneaux, vecteurs, coupe, centre: plusGrand.centre, aire });
         }
         setPays(out);
       })
@@ -306,14 +332,14 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
       /* L'entrée : de presque rien à sa taille, en montant depuis le bas.
          Le tour supplémentaire ne touche que le rendu, jamais la caméra —
          sinon le pointage serait faux pendant l'animation. */
-      const brutAp = debut.current === null ? 0 : (performance.now() - debut.current) / 1900;
+      const brutAp = debut.current === null ? 0 : (performance.now() - debut.current) / 1050;
       const ap = Math.max(0, Math.min(1, brutAp));
       const e = 1 - Math.pow(1 - ap, 3);
       if (ap >= 1 && !fini.current) {
         fini.current = true;
         setEntre(true);
       }
-      const tour = (1 - e) * (1 - e) * 430;
+      const tour = (1 - e) * (1 - e) * 330;
 
       const R = Math.min(L, H) * 0.44 * (0.07 + 0.93 * e);
       const cx = L / 2;
@@ -341,22 +367,6 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
         return { x: cx + x1 * R, y: cy - y2 * R, z: z2, visible: z2 > 0 };
       };
 
-      /* Le point exact où un segment franchit le bord du disque. Sans lui, un
-         pays à cheval sur le limbe saute du dernier sommet vu au premier
-         sommet revu — et se remplit en travers. Dichotomie : la trajectoire
-         entre deux sommets n'est pas linéaire à l'écran. */
-      const bord = (lo1: number, la1: number, lo2: number, la2: number) => {
-        const vu1 = proj(lo1, la1).visible;
-        let a = 0;
-        let b = 1;
-        for (let i = 0; i < 14; i++) {
-          const m = (a + b) / 2;
-          if (proj(lo1 + (lo2 - lo1) * m, la1 + (la2 - la1) * m).visible === vu1) a = m;
-          else b = m;
-        }
-        const m = (a + b) / 2;
-        return proj(lo1 + (lo2 - lo1) * m, la1 + (la2 - la1) * m);
-      };
 
       ctx.clearRect(0, 0, L, H);
       if (e <= 0) {
@@ -424,31 +434,55 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
       const dessinePays = (p: Pays, mode: "fond" | "survol" | "actif") => {
         ctx.beginPath();
         let quelqueChose = false;
-        for (const a of p.anneaux) {
+        for (const v of p.vecteurs) {
           let ouvert = false;
-          let prec: { lon: number; lat: number; vu: boolean } | null = null;
-          for (const [lon, lat] of a) {
-            const q = proj(lon, lat);
-            /* Un anneau qui franchit l'antiméridien saute de +180 à −180 : sans
-               coupure, le tracé traverse tout le globe en une barre. */
-            const saut = prec !== null && Math.abs(lon - prec.lon) > 180;
-            if (saut) ouvert = false;
-            if (prec && !saut && prec.vu !== q.visible) {
-              const b = bord(prec.lon, prec.lat, lon, lat);
-              if (ouvert) ctx.lineTo(b.x, b.y);
-              else ctx.moveTo(b.x, b.y);
+          let ax = 0;
+          let ay = 0;
+          let az = 0;
+          let premier = true;
+          for (let i = 0; i < v.length; i += 3) {
+            const x = v[i];
+            const y = v[i + 1];
+            const z = v[i + 2];
+            /* Rotation puis projection orthographique : huit multiplications,
+               aucune trigonométrie. */
+            const x1 = x * cl - z * sl;
+            const z1 = x * sl + z * cl;
+            const y2 = y * cp - z1 * sp;
+            const z2 = y * sp + z1 * cp;
+
+            if (!premier && az * z2 < 0) {
+              /* Le segment traverse le bord du disque. La profondeur varie
+                 linéairement le long du segment : le point de passage se
+                 résout d'un coup, sans tâtonner. Il est dans le plan de
+                 l'écran, donc à distance 1 du centre une fois normalisé. */
+              const t = az / (az - z2);
+              const bx = ax + (x1 - ax) * t;
+              const by = ay + (y2 - ay) * t;
+              const n = Math.hypot(bx, by) || 1;
+              const sx = cx + (bx / n) * R;
+              const sy = cy - (by / n) * R;
+              if (ouvert) ctx.lineTo(sx, sy);
+              else ctx.moveTo(sx, sy);
               ouvert = true;
               quelqueChose = true;
             }
-            if (q.visible) {
-              if (ouvert) ctx.lineTo(q.x, q.y);
-              else ctx.moveTo(q.x, q.y);
+
+            if (z2 > 0) {
+              const sx = cx + x1 * R;
+              const sy = cy - y2 * R;
+              if (ouvert) ctx.lineTo(sx, sy);
+              else ctx.moveTo(sx, sy);
               ouvert = true;
               quelqueChose = true;
             } else {
               ouvert = false;
             }
-            prec = { lon, lat, vu: q.visible };
+
+            ax = x1;
+            ay = y2;
+            az = z2;
+            premier = false;
           }
           ctx.closePath();
         }
@@ -553,12 +587,22 @@ export function GlobeMonde({ donnees, annee, regions, vues }: Props) {
          au plus grand : sinon la Russie avale ses voisins. */
       const tries = [...pays].sort((a, b) => a.aire - b.aire);
       for (const p of tries) {
-        for (const a of p.anneaux) {
+        for (let k = 0; k < p.anneaux.length; k++) {
+          const a = p.anneaux[k];
+          /* Un anneau à cheval sur l'antiméridien s'étale de −180 à +180 dans
+             ce repère : le lancer de rayon le croit large comme le monde et
+             la Russie avalait ses voisins. On repasse alors tout le monde en
+             0…360, point testé compris. */
+          const dec = p.coupe[k];
+          const nx = (x: number) => (dec && x < 0 ? x + 360 : x);
+          const px = dec && lon < 0 ? lon + 360 : lon;
           let dedans = false;
           for (let i = 0, j = a.length - 1; i < a.length; j = i++) {
-            const [xi, yi] = a[i];
-            const [xj, yj] = a[j];
-            if (yi > lat !== yj > lat && lon < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) dedans = !dedans;
+            const xi = nx(a[i][0]);
+            const yi = a[i][1];
+            const xj = nx(a[j][0]);
+            const yj = a[j][1];
+            if (yi > lat !== yj > lat && px < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) dedans = !dedans;
           }
           if (dedans) return p;
         }

@@ -1,6 +1,7 @@
 import { ECONOMY_YEARS } from "@/data/economy/economy";
 import { countryFr } from "@/data/countryNamesFr";
 import { ARTICLES } from "@/data/articles";
+import { getPopulationMillions } from "@/data/economy/populationData";
 
 /**
  * Les données pays du globe du prototype.
@@ -91,4 +92,80 @@ export function articlesEnUne(n = 4): FicheArticle[] {
       rubrique: RUBRIQUES[a.theme] ?? a.theme,
       duree: a.readingTime ? `${a.readingTime} min` : "—",
     }));
+}
+
+/* ── Le bandeau de repères ───────────────────────────────────────────────────
+   Des agrégats calculés sur le socle, pas des cours de marché inventés. Rien
+   ici n'est « en direct » : ce sont des millésimes annuels, et le bandeau le
+   dit. Une valeur qu'on ne peut pas calculer n'apparaît pas. */
+
+export interface Repere {
+  nom: string;
+  valeur: string;
+  note: string;
+}
+
+export function reperes(): { annee: number; liste: Repere[] } {
+  const y = ECONOMY_YEARS[ECONOMY_YEARS.length - 1];
+  const pays = Object.entries(y.countries);
+
+  let pib = 0;
+  let nPib = 0;
+  let excedent = 0;
+  let nBal = 0;
+  const inflations: number[] = [];
+  let pop = 0;
+  let nPop = 0;
+  let pibHabHaut: { nom: string; v: number } | null = null;
+
+  for (const [nom, d] of pays) {
+    if (d.gdp !== undefined) {
+      pib += d.gdp;
+      nPib += 1;
+    }
+    if (d.trade_balance !== undefined) {
+      nBal += 1;
+      if (d.trade_balance > 0) excedent += 1;
+    }
+    if (d.inflation !== undefined) inflations.push(d.inflation);
+    if (d.gdp_per_capita !== undefined && (!pibHabHaut || d.gdp_per_capita > pibHabHaut.v)) {
+      pibHabHaut = { nom: countryFr(nom), v: d.gdp_per_capita };
+    }
+    const p = getPopulationMillions(nom, y.year);
+    if (p !== undefined) {
+      pop += p;
+      nPop += 1;
+    }
+  }
+
+  inflations.sort((a, b) => a - b);
+  const med = inflations.length
+    ? inflations.length % 2
+      ? inflations[(inflations.length - 1) / 2]
+      : (inflations[inflations.length / 2 - 1] + inflations[inflations.length / 2]) / 2
+    : null;
+
+  const fr = (n: number) => Math.round(n).toLocaleString("fr-FR");
+  const liste: Repere[] = [];
+  if (nPib) {
+    liste.push({ nom: "PIB mondial", valeur: `${(pib / 1000).toFixed(1).replace(".", ",")} T€`, note: `${nPib} pays` });
+  }
+  if (nPop) {
+    liste.push({ nom: "Population", valeur: `${(pop / 1000).toFixed(2).replace(".", ",")} Md`, note: `${nPop} pays` });
+  }
+  if (med !== null) {
+    liste.push({ nom: "Inflation médiane", valeur: `${med.toFixed(1).replace(".", ",")} %`, note: `${inflations.length} pays` });
+  }
+  if (nBal) {
+    liste.push({ nom: "Balances excédentaires", valeur: `${excedent} / ${nBal}`, note: "pays" });
+  }
+  if (nPib) {
+    liste.push({ nom: "PIB moyen par pays", valeur: `${fr(pib / nPib)} Md€`, note: `${nPib} pays` });
+  }
+  if (pibHabHaut) {
+    liste.push({ nom: "PIB / habitant le plus haut", valeur: `${fr(pibHabHaut.v)} €`, note: pibHabHaut.nom });
+  }
+  liste.push({ nom: "Pays au socle", valeur: String(pays.length), note: "fiches" });
+
+  return { annee: y.year, liste };
 }

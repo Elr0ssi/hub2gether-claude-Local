@@ -125,9 +125,12 @@ export function HorizonTerre() {
       /* On montre un tiers de la sphère, pas une mince tranche : au-delà, le
          bord visible ne couvre plus que les pôles — et il n'y a pas de villes
          au pôle. */
-      const R = Math.max(L * 0.46, 430);
+      /* Le disque tient dans la largeur et sa calotte reste entière : trop
+         gros, on ne voyait plus le haut de la courbe et beaucoup trop de
+         corps en dessous. */
+      const R = Math.max(L * 0.4, 340);
       const cx = L * 0.5;
-      const cy = H + R * 0.08;
+      const cy = H + R * 0.45;
 
       /* Cadré sur l'Atlantique : une face tout en terres donnerait un semis
          uniforme, où l'on ne reconnaît plus rien. C'est le vide de l'océan

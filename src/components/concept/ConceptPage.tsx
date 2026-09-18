@@ -17,7 +17,7 @@ import {
   Questions,
   TopicExplorer,
 } from "./sections";
-import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
+import type { FicheArticle, FichePays, Repere } from "@/data/concept/conceptGeo";
 import "./concept.css";
 
 /* Le globe en points du site — le même composant que la page d'accueil, servi
@@ -52,13 +52,14 @@ const NAV = ["Monde", "Économie", "Géopolitique", "Sociétés", "Ressources", 
 
 export interface ConceptProps {
   articles: FicheArticle[];
+  reperes: Repere[];
   donnees: Record<string, FichePays>;
   annee: number;
   regions: readonly { id: string; label: string; pays: readonly string[] }[];
   vues: Record<string, { lat: number; lon: number }>;
 }
 
-export function ConceptPage({ articles, donnees, annee, regions, vues }: ConceptProps) {
+export function ConceptPage({ articles, reperes, donnees, annee, regions, vues }: ConceptProps) {
   const [pret, setPret] = useState(false);
 
   const scene = useRef<HTMLDivElement>(null);
@@ -107,9 +108,17 @@ export function ConceptPage({ articles, donnees, annee, regions, vues }: Concept
   const fondFlou = useMotionTemplate`blur(${fondFlouPx}px)`;
 
   /* Passé le relais, la scène WebGL n'a plus rien à montrer : on arrête sa
-     boucle au lieu de la laisser tourner sous un flou à 12 %. */
+     boucle au lieu de la laisser tourner sous un flou à 12 %. On coupe avant
+     le globe interactif — deux scènes qui tournent en même temps, c'est lui
+     qui perd des images, et c'est celui qu'on manipule. */
   const [fondVivant, setFondVivant] = useState(true);
-  useEffect(() => scrollY.on("change", (v) => setFondVivant(v < fin * 1.3)), [scrollY, fin]);
+  useEffect(() => scrollY.on("change", (v) => setFondVivant(v < fin * 0.92)), [scrollY, fin]);
+
+  /* Tant qu'on est dans le hero, le globe de fond se laisse attraper et
+     tourner. Passé ce point il redevient transparent au pointeur : il est
+     fixe, et il couvrirait sinon une bande de la page à chaque section. */
+  const [fondPrise, setFondPrise] = useState(true);
+  useEffect(() => scrollY.on("change", (v) => setFondPrise(v < fin * 0.34)), [scrollY, fin]);
 
   useEffect(() => {
     const t = setTimeout(() => setPret(true), 60);
@@ -155,7 +164,7 @@ export function ConceptPage({ articles, donnees, annee, regions, vues }: Concept
         style={{ y: fondY, x: fondX, scale: fondS, opacity: fondO, filter: fondFlou }}
         aria-hidden="true"
       >
-        <div className="cg-fond-globe-i">
+        <div className="cg-fond-globe-i" style={{ pointerEvents: fondPrise ? "auto" : "none" }}>
           <GlobePoints
             markers={MARQUEURS}
             accent="#9EC7D8"
@@ -253,7 +262,7 @@ export function ConceptPage({ articles, donnees, annee, regions, vues }: Concept
           />
         </svg>
 
-        <LiveTicker />
+        <LiveTicker reperes={reperes} annee={annee} />
         <div ref={relais}>
           <InteractiveMapPreview donnees={donnees} annee={annee} regions={regions} vues={vues} />
         </div>
