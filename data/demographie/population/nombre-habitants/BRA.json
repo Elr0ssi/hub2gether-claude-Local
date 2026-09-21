@@ -1,0 +1,17 @@
+{
+  "country": "BRA",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Brésil",
+  "iso2": "BR",
+  "data": {
+    "2000": 174.8,
+    "2005": 186.1,
+    "2010": 196.4,
+    "2015": 204.5,
+    "2020": 213.2,
+    "2023": 211.1,
+    "2025": 212
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "country": "CAN",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Canada",
+  "iso2": "CA",
+  "data": {
+    "2000": 615,
+    "2014": 1400,
+    "2024": 2300
+  }
+}

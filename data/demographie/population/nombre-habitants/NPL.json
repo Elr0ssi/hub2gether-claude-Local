@@ -1,0 +1,17 @@
+{
+  "country": "NPL",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Népal",
+  "iso2": "NP",
+  "data": {
+    "2000": 24,
+    "2005": 25.9,
+    "2010": 27,
+    "2015": 28.6,
+    "2020": 29.7,
+    "2023": 30,
+    "2025": 30.5
+  }
+}

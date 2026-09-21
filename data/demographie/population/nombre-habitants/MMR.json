@@ -1,0 +1,17 @@
+{
+  "country": "MMR",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Birmanie",
+  "iso2": "MM",
+  "data": {
+    "2000": 46.8,
+    "2005": 48.5,
+    "2010": 50.1,
+    "2015": 51.9,
+    "2020": 53.4,
+    "2023": 54.6,
+    "2025": 55
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "country": "MMR",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Birmanie",
+  "iso2": "MM",
+  "data": {
+    "2000": 97,
+    "2005": 76,
+    "2010": 67,
+    "2015": 37,
+    "2020": 39,
+    "2023": 62
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "KOR",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Corée du Sud",
+  "iso2": "KR",
+  "data": {
+    "2000": 47,
+    "2005": 48.1,
+    "2010": 49.6,
+    "2015": 51,
+    "2020": 51.8,
+    "2023": 51.7,
+    "2025": 51.7
+  }
+}

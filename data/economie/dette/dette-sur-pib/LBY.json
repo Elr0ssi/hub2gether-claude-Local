@@ -1,0 +1,28 @@
+{
+  "country": "LBY",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Libye",
+  "iso2": "LY",
+  "data": {
+    "2000": 63,
+    "2005": 16,
+    "2010": 4,
+    "2015": 37,
+    "2020": 190,
+    "2023": 158,
+    "2025": 155
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 63.4,
+        "2014": 6.1,
+        "2024": 158
+      }
+    }
+  ]
+}

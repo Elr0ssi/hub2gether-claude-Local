@@ -1,0 +1,17 @@
+{
+  "country": "KWT",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Koweït",
+  "iso2": "KW",
+  "data": {
+    "2000": 1,
+    "2005": 2.2,
+    "2010": 2.1,
+    "2015": 3,
+    "2020": 3.4,
+    "2023": 2.1,
+    "2025": 2.4
+  }
+}

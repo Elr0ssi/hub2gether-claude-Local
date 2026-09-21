@@ -1,0 +1,14 @@
+{
+  "country": "OMN",
+  "indicator": "EXPORTS",
+  "unit": "MD_USD",
+  "source": "OMC · FMI (WEO) · Banque mondiale (BOP)",
+  "name": "Oman",
+  "iso2": "OM",
+  "data": {
+    "2024": 45
+  },
+  "notes": [
+    "La source date ces valeurs « 2024/2025 » sans trancher. Elles sont rangées sous 2024, millésime le plus récent que la source nomme explicitement."
+  ]
+}

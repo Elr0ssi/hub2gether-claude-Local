@@ -1,0 +1,16 @@
+{
+  "country": "BHR",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Bahreïn",
+  "iso2": "BH",
+  "data": {
+    "2000": 70,
+    "2005": 82,
+    "2010": 90,
+    "2015": 95,
+    "2020": 98,
+    "2023": 100
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "PHL",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Philippines",
+  "iso2": "PH",
+  "data": {
+    "2000": 700,
+    "2005": 820,
+    "2010": 920,
+    "2015": 1000,
+    "2020": 1060,
+    "2023": 1100,
+    "2025": 3600
+  }
+}

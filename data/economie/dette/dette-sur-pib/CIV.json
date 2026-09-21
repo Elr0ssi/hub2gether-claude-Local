@@ -1,0 +1,28 @@
+{
+  "country": "CIV",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Côte d'Ivoire",
+  "iso2": "CI",
+  "data": {
+    "2000": 116,
+    "2005": 81,
+    "2010": 68,
+    "2015": 47,
+    "2020": 48,
+    "2023": 52,
+    "2025": 52
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 88.9,
+        "2014": 36.8,
+        "2024": 51.5
+      }
+    }
+  ]
+}

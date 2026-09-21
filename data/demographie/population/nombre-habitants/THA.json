@@ -1,0 +1,17 @@
+{
+  "country": "THA",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Thaïlande",
+  "iso2": "TH",
+  "data": {
+    "2000": 62.3,
+    "2005": 64.6,
+    "2010": 66.4,
+    "2015": 68.7,
+    "2020": 69.8,
+    "2023": 71.8,
+    "2025": 71.6
+  }
+}

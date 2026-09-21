@@ -1,0 +1,14 @@
+{
+  "country": "VNM",
+  "indicator": "RETIREMENT_AGE",
+  "unit": "ANNEES",
+  "source": "OCDE · OIT — estimations 2023",
+  "name": "Viêt Nam",
+  "iso2": "VN",
+  "data": {
+    "2023": 62
+  },
+  "notes": [
+    "La source ne publie qu'une valeur, datée 2023. Elle est rangée sous 2023 et non répétée sur les autres années : aucune année n'est inventée."
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "country": "URY",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Uruguay",
+  "iso2": "UY",
+  "data": {
+    "2000": 45,
+    "2005": 71,
+    "2010": 43,
+    "2015": 49,
+    "2020": 73,
+    "2023": 61
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 39,
+        "2014": 58,
+        "2024": 70
+      }
+    }
+  ]
+}

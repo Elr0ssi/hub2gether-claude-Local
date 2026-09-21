@@ -1,0 +1,17 @@
+{
+  "country": "CHE",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Suisse",
+  "iso2": "CH",
+  "data": {
+    "2000": 2.6,
+    "2005": 3.8,
+    "2010": 3.5,
+    "2015": 3.2,
+    "2020": 4.8,
+    "2023": 2,
+    "2025": 2.6
+  }
+}

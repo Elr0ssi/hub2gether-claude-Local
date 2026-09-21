@@ -1,0 +1,17 @@
+{
+  "country": "CIV",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Côte d'Ivoire",
+  "iso2": "CI",
+  "data": {
+    "2000": 3.3,
+    "2005": 3.1,
+    "2010": 3,
+    "2015": 2.9,
+    "2020": 3,
+    "2023": 3,
+    "2025": 2.8
+  }
+}

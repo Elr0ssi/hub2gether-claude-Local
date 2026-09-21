@@ -1,0 +1,16 @@
+{
+  "country": "BHR",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Bahreïn",
+  "iso2": "BH",
+  "data": {
+    "2000": 5.2,
+    "2005": 6.5,
+    "2010": 3.7,
+    "2015": 4,
+    "2020": 4.9,
+    "2023": 4.9
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "country": "ISR",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Israël",
+  "iso2": "IL",
+  "data": {
+    "2000": 79,
+    "2005": 96,
+    "2010": 71,
+    "2015": 64,
+    "2020": 72,
+    "2023": 62,
+    "2025": 62
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 73,
+        "2014": 66,
+        "2024": 62
+      }
+    }
+  ]
+}

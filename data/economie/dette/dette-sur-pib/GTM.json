@@ -1,0 +1,27 @@
+{
+  "country": "GTM",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Guatemala",
+  "iso2": "GT",
+  "data": {
+    "2000": 22,
+    "2005": 21,
+    "2010": 24,
+    "2015": 24,
+    "2020": 32,
+    "2023": 28
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 22,
+        "2014": 25,
+        "2024": 29
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "country": "ISR",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Israël",
+  "iso2": "IL",
+  "data": {
+    "2000": 6.3,
+    "2005": 6.9,
+    "2010": 7.6,
+    "2015": 8.3,
+    "2020": 9.2,
+    "2023": 9.8,
+    "2025": 10
+  }
+}

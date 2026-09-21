@@ -1,0 +1,17 @@
+{
+  "country": "BEL",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Belgique",
+  "iso2": "BE",
+  "data": {
+    "2000": 10.3,
+    "2005": 10.5,
+    "2010": 11,
+    "2015": 11.3,
+    "2020": 11.5,
+    "2023": 11.7,
+    "2025": 11.8
+  }
+}

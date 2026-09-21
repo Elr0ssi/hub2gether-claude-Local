@@ -1,0 +1,16 @@
+{
+  "country": "SVK",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Slovaquie",
+  "iso2": "SK",
+  "data": {
+    "2000": 350,
+    "2005": 420,
+    "2010": 470,
+    "2015": 500,
+    "2020": 520,
+    "2023": 530
+  }
+}

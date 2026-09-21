@@ -1,0 +1,21 @@
+{
+  "indicateur": "POPULATION",
+  "libelle": "Population",
+  "unite": "MILLIONS_HAB",
+  "categorie": "demographie/population",
+  "chemin": "data/demographie/population/nombre-habitants",
+  "sources": [
+    "ONU · Banque mondiale — estimations sur 7 millésimes repères"
+  ],
+  "annees": [
+    2000,
+    2005,
+    2010,
+    2015,
+    2020,
+    2023,
+    2025
+  ],
+  "paysCouverts": 99,
+  "misAJour": "2026-09-21"
+}

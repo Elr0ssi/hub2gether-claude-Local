@@ -1,0 +1,17 @@
+{
+  "country": "HND",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Honduras",
+  "iso2": "HN",
+  "data": {
+    "2000": 6.4,
+    "2005": 7.1,
+    "2010": 7.9,
+    "2015": 8.7,
+    "2020": 9.9,
+    "2023": 10.4,
+    "2025": 10.6
+  }
+}

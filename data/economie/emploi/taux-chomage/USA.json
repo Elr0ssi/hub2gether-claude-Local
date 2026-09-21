@@ -1,0 +1,17 @@
+{
+  "country": "USA",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "États-Unis",
+  "iso2": "US",
+  "data": {
+    "2000": 4,
+    "2005": 5.1,
+    "2010": 9.6,
+    "2015": 5.3,
+    "2020": 8.1,
+    "2023": 3.6,
+    "2025": 4.3
+  }
+}

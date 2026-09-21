@@ -1,0 +1,17 @@
+{
+  "country": "MOZ",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Mozambique",
+  "iso2": "MZ",
+  "data": {
+    "2000": 3.5,
+    "2005": 3.3,
+    "2010": 3.2,
+    "2015": 3.4,
+    "2020": 3.4,
+    "2023": 3.3,
+    "2025": 3.7
+  }
+}

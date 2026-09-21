@@ -1,0 +1,28 @@
+{
+  "country": "CAN",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Canada",
+  "iso2": "CA",
+  "data": {
+    "2000": 82,
+    "2005": 71,
+    "2010": 81,
+    "2015": 91,
+    "2020": 118,
+    "2023": 107,
+    "2025": 97
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 65.8,
+        "2014": 85,
+        "2024": 94.2
+      }
+    }
+  ]
+}

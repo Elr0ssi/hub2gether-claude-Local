@@ -1,0 +1,17 @@
+{
+  "country": "ETH",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Éthiopie",
+  "iso2": "ET",
+  "data": {
+    "2000": 66.4,
+    "2005": 76.3,
+    "2010": 87.6,
+    "2015": 101,
+    "2020": 117.2,
+    "2023": 126.5,
+    "2025": 132.1
+  }
+}

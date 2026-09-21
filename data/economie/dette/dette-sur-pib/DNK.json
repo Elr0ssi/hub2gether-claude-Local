@@ -1,0 +1,28 @@
+{
+  "country": "DNK",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Danemark",
+  "iso2": "DK",
+  "data": {
+    "2000": 52,
+    "2005": 37,
+    "2010": 42,
+    "2015": 40,
+    "2020": 42,
+    "2023": 30,
+    "2025": 32
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 51.1,
+        "2014": 44.8,
+        "2024": 31.5
+      }
+    }
+  ]
+}

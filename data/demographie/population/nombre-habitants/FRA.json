@@ -1,0 +1,17 @@
+{
+  "country": "FRA",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "France",
+  "iso2": "FR",
+  "data": {
+    "2000": 60.9,
+    "2005": 62.7,
+    "2010": 64.6,
+    "2015": 66.5,
+    "2020": 67.4,
+    "2023": 68.2,
+    "2025": 68.4
+  }
+}

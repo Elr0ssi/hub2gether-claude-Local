@@ -1,0 +1,28 @@
+{
+  "country": "ZMB",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Zambie",
+  "iso2": "ZM",
+  "data": {
+    "2000": 195,
+    "2005": 107,
+    "2010": 25,
+    "2015": 62,
+    "2020": 131,
+    "2023": 130,
+    "2025": 99
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 98.4,
+        "2014": 38.6,
+        "2024": 98.2
+      }
+    }
+  ]
+}

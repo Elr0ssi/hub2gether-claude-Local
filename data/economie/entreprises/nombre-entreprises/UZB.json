@@ -1,0 +1,16 @@
+{
+  "country": "UZB",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Ouzbékistan",
+  "iso2": "UZ",
+  "data": {
+    "2000": 260,
+    "2005": 300,
+    "2010": 360,
+    "2015": 400,
+    "2020": 430,
+    "2023": 450
+  }
+}

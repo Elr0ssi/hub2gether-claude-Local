@@ -1,0 +1,28 @@
+{
+  "country": "MAR",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Maroc",
+  "iso2": "MA",
+  "data": {
+    "2000": 75,
+    "2005": 65,
+    "2010": 52,
+    "2015": 64,
+    "2020": 76,
+    "2023": 72,
+    "2025": 77
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 66.5,
+        "2014": 63.8,
+        "2024": 78.2
+      }
+    }
+  ]
+}

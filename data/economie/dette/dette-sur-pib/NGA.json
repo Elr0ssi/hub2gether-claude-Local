@@ -1,0 +1,28 @@
+{
+  "country": "NGA",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Nigeria",
+  "iso2": "NG",
+  "data": {
+    "2000": 62,
+    "2005": 18,
+    "2010": 13,
+    "2015": 12,
+    "2020": 23,
+    "2023": 38,
+    "2025": 37
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 67.9,
+        "2014": 11.5,
+        "2024": 34.8
+      }
+    }
+  ]
+}

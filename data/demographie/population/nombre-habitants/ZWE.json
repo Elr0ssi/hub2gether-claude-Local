@@ -1,0 +1,17 @@
+{
+  "country": "ZWE",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Zimbabwe",
+  "iso2": "ZW",
+  "data": {
+    "2000": 11.9,
+    "2005": 12,
+    "2010": 12.7,
+    "2015": 13.8,
+    "2020": 15.5,
+    "2023": 16.3,
+    "2025": 16.7
+  }
+}

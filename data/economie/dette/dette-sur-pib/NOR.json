@@ -1,0 +1,28 @@
+{
+  "country": "NOR",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Norvège",
+  "iso2": "NO",
+  "data": {
+    "2000": 32,
+    "2005": 47,
+    "2010": 43,
+    "2015": 32,
+    "2020": 47,
+    "2023": 40,
+    "2025": 18
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 33.5,
+        "2014": 28.7,
+        "2024": 17
+      }
+    }
+  ]
+}

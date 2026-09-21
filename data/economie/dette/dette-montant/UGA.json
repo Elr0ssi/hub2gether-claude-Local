@@ -1,0 +1,13 @@
+{
+  "country": "UGA",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Ouganda",
+  "iso2": "UG",
+  "data": {
+    "2000": 3,
+    "2014": 7,
+    "2024": 22
+  }
+}

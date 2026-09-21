@@ -1,0 +1,16 @@
+{
+  "country": "BGR",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Bulgarie",
+  "iso2": "BG",
+  "data": {
+    "2000": 220,
+    "2005": 280,
+    "2010": 330,
+    "2015": 350,
+    "2020": 370,
+    "2023": 380
+  }
+}

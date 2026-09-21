@@ -1,0 +1,17 @@
+{
+  "country": "KHM",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Cambodge",
+  "iso2": "KH",
+  "data": {
+    "2000": 12.2,
+    "2005": 13.4,
+    "2010": 14.4,
+    "2015": 15.5,
+    "2020": 16.5,
+    "2023": 16.9,
+    "2025": 17.4
+  }
+}

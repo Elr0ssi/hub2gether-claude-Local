@@ -1,0 +1,17 @@
+{
+  "country": "EGY",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Égypte",
+  "iso2": "EG",
+  "data": {
+    "2000": 9.1,
+    "2005": 11.2,
+    "2010": 9,
+    "2015": 12.8,
+    "2020": 7.3,
+    "2023": 7.1,
+    "2025": 7
+  }
+}

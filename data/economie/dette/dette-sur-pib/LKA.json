@@ -1,0 +1,16 @@
+{
+  "country": "LKA",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Sri Lanka",
+  "iso2": "LK",
+  "data": {
+    "2000": 96,
+    "2005": 91,
+    "2010": 86,
+    "2015": 77,
+    "2020": 101,
+    "2023": 120
+  }
+}

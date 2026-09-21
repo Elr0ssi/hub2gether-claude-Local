@@ -1,0 +1,17 @@
+{
+  "country": "SAU",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Arabie saoudite",
+  "iso2": "SA",
+  "data": {
+    "2000": 4.6,
+    "2005": 5.9,
+    "2010": 5.6,
+    "2015": 5.6,
+    "2020": 7.4,
+    "2023": 6,
+    "2025": 3.9
+  }
+}

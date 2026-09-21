@@ -1,0 +1,17 @@
+{
+  "country": "MYS",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Malaisie",
+  "iso2": "MY",
+  "data": {
+    "2000": 23.4,
+    "2005": 26,
+    "2010": 28.6,
+    "2015": 30.7,
+    "2020": 32.4,
+    "2023": 33.6,
+    "2025": 34
+  }
+}

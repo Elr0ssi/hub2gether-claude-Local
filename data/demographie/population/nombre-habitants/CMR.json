@@ -1,0 +1,17 @@
+{
+  "country": "CMR",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Cameroun",
+  "iso2": "CM",
+  "data": {
+    "2000": 15.5,
+    "2005": 17.8,
+    "2010": 20.3,
+    "2015": 23.3,
+    "2020": 26.5,
+    "2023": 28.6,
+    "2025": 29.3
+  }
+}

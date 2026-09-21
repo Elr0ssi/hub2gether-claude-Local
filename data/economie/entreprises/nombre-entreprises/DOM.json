@@ -1,0 +1,16 @@
+{
+  "country": "DOM",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "République dominicaine",
+  "iso2": "DO",
+  "data": {
+    "2000": 220,
+    "2005": 270,
+    "2010": 340,
+    "2015": 380,
+    "2020": 400,
+    "2023": 430
+  }
+}

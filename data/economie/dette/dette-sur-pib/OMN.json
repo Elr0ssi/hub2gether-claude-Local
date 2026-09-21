@@ -1,0 +1,16 @@
+{
+  "country": "OMN",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Oman",
+  "iso2": "OM",
+  "data": {
+    "2000": 19,
+    "2005": 9,
+    "2010": 8,
+    "2015": 15,
+    "2020": 82,
+    "2023": 38
+  }
+}

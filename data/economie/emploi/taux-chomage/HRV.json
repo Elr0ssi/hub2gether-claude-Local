@@ -1,0 +1,16 @@
+{
+  "country": "HRV",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Croatie",
+  "iso2": "HR",
+  "data": {
+    "2000": 16.1,
+    "2005": 12.7,
+    "2010": 11.8,
+    "2015": 16.2,
+    "2020": 7.5,
+    "2023": 6.3
+  }
+}

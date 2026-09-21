@@ -1,0 +1,17 @@
+{
+  "country": "UKR",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Ukraine",
+  "iso2": "UA",
+  "data": {
+    "2000": 48.9,
+    "2005": 46.9,
+    "2010": 45.4,
+    "2015": 42.9,
+    "2020": 41.7,
+    "2023": 36.7,
+    "2025": 35
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "FRA",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "France",
+  "iso2": "FR",
+  "data": {
+    "2000": 2900,
+    "2005": 3100,
+    "2010": 3300,
+    "2015": 3500,
+    "2020": 3900,
+    "2023": 4400,
+    "2025": 4800
+  }
+}

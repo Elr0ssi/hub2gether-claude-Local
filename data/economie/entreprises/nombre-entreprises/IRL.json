@@ -1,0 +1,16 @@
+{
+  "country": "IRL",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Irlande",
+  "iso2": "IE",
+  "data": {
+    "2000": 180,
+    "2005": 210,
+    "2010": 210,
+    "2015": 240,
+    "2020": 260,
+    "2023": 280
+  }
+}

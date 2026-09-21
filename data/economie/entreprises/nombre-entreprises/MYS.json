@@ -1,0 +1,17 @@
+{
+  "country": "MYS",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Malaisie",
+  "iso2": "MY",
+  "data": {
+    "2000": 1100,
+    "2005": 1200,
+    "2010": 1400,
+    "2015": 1500,
+    "2020": 1600,
+    "2023": 1700,
+    "2025": 1700
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "SDN",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Soudan",
+  "iso2": "SD",
+  "data": {
+    "2000": 18,
+    "2005": 16.3,
+    "2010": 19.7,
+    "2015": 19.8,
+    "2020": 19.7,
+    "2023": 19.8,
+    "2025": 20
+  }
+}

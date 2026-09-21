@@ -1,0 +1,17 @@
+{
+  "country": "VEN",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Venezuela",
+  "iso2": "VE",
+  "data": {
+    "2000": 24.4,
+    "2005": 26.6,
+    "2010": 28.7,
+    "2015": 30.5,
+    "2020": 28.4,
+    "2023": 28.3,
+    "2025": 28.5
+  }
+}

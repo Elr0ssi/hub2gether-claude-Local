@@ -1,0 +1,17 @@
+{
+  "country": "GHA",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Ghana",
+  "iso2": "GH",
+  "data": {
+    "2000": 19,
+    "2005": 21.8,
+    "2010": 24.8,
+    "2015": 27.6,
+    "2020": 31.1,
+    "2023": 33.5,
+    "2025": 34.4
+  }
+}

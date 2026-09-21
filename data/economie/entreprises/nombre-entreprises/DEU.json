@@ -1,0 +1,17 @@
+{
+  "country": "DEU",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Allemagne",
+  "iso2": "DE",
+  "data": {
+    "2000": 3700,
+    "2005": 3600,
+    "2010": 3600,
+    "2015": 3600,
+    "2020": 3500,
+    "2023": 3500,
+    "2025": 4100
+  }
+}

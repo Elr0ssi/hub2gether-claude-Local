@@ -1,0 +1,17 @@
+{
+  "country": "MEX",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Mexique",
+  "iso2": "MX",
+  "data": {
+    "2000": 4200,
+    "2005": 4600,
+    "2010": 4900,
+    "2015": 5000,
+    "2020": 5100,
+    "2023": 4600,
+    "2025": 5200
+  }
+}

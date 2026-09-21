@@ -1,0 +1,17 @@
+{
+  "country": "SEN",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Sénégal",
+  "iso2": "SN",
+  "data": {
+    "2000": 9.6,
+    "2005": 11.1,
+    "2010": 12.8,
+    "2015": 14.6,
+    "2020": 16.7,
+    "2023": 17.8,
+    "2025": 18.3
+  }
+}

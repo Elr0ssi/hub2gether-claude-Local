@@ -1,0 +1,16 @@
+{
+  "country": "IRL",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Irlande",
+  "iso2": "IE",
+  "data": {
+    "2000": 4.3,
+    "2005": 4.4,
+    "2010": 13.9,
+    "2015": 9.4,
+    "2020": 5.9,
+    "2023": 4.4
+  }
+}

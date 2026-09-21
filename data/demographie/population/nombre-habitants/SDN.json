@@ -1,0 +1,17 @@
+{
+  "country": "SDN",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Soudan",
+  "iso2": "SD",
+  "data": {
+    "2000": 27.4,
+    "2005": 32.4,
+    "2010": 35.6,
+    "2015": 38.6,
+    "2020": 43.4,
+    "2023": 47.9,
+    "2025": 50.4
+  }
+}

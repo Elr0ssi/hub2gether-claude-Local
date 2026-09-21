@@ -1,0 +1,16 @@
+{
+  "country": "BLR",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Biélorussie",
+  "iso2": "BY",
+  "data": {
+    "2000": 2.1,
+    "2005": 1.5,
+    "2010": 0.8,
+    "2015": 1,
+    "2020": 4,
+    "2023": 3.8
+  }
+}

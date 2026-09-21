@@ -1,0 +1,17 @@
+{
+  "country": "USA",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "États-Unis",
+  "iso2": "US",
+  "data": {
+    "2000": 282,
+    "2005": 296,
+    "2010": 309,
+    "2015": 321,
+    "2020": 331,
+    "2023": 335,
+    "2025": 340
+  }
+}

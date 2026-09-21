@@ -1,0 +1,16 @@
+{
+  "country": "SRB",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Serbie",
+  "iso2": "RS",
+  "data": {
+    "2000": 130,
+    "2005": 200,
+    "2010": 270,
+    "2015": 290,
+    "2020": 310,
+    "2023": 320
+  }
+}

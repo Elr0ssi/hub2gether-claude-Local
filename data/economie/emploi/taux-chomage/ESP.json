@@ -1,0 +1,17 @@
+{
+  "country": "ESP",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Espagne",
+  "iso2": "ES",
+  "data": {
+    "2000": 13.9,
+    "2005": 9.2,
+    "2010": 19.9,
+    "2015": 22.1,
+    "2020": 15.5,
+    "2023": 11.7,
+    "2025": 11.2
+  }
+}

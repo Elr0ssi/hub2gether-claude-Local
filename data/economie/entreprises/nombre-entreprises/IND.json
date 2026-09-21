@@ -1,0 +1,17 @@
+{
+  "country": "IND",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Inde",
+  "iso2": "IN",
+  "data": {
+    "2000": 7500,
+    "2005": 10000,
+    "2010": 15000,
+    "2015": 22000,
+    "2020": 30000,
+    "2023": 35000,
+    "2025": 16000
+  }
+}

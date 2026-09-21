@@ -1,0 +1,13 @@
+{
+  "country": "FRA",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "France",
+  "iso2": "FR",
+  "data": {
+    "2000": 910,
+    "2014": 2500,
+    "2024": 3800
+  }
+}

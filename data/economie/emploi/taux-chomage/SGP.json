@@ -1,0 +1,17 @@
+{
+  "country": "SGP",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Singapour",
+  "iso2": "SG",
+  "data": {
+    "2000": 3.1,
+    "2005": 3.1,
+    "2010": 2.2,
+    "2015": 1.9,
+    "2020": 3,
+    "2023": 2,
+    "2025": 2.2
+  }
+}

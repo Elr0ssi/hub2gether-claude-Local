@@ -1,0 +1,17 @@
+{
+  "country": "VNM",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Viêt Nam",
+  "iso2": "VN",
+  "data": {
+    "2000": 500,
+    "2005": 780,
+    "2010": 1050,
+    "2015": 1300,
+    "2020": 1550,
+    "2023": 1800,
+    "2025": 2100
+  }
+}

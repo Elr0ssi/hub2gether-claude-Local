@@ -1,0 +1,17 @@
+{
+  "country": "ITA",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Italie",
+  "iso2": "IT",
+  "data": {
+    "2000": 56.9,
+    "2005": 58.6,
+    "2010": 59.2,
+    "2015": 60.7,
+    "2020": 59.6,
+    "2023": 58.9,
+    "2025": 58.8
+  }
+}

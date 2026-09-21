@@ -1,0 +1,17 @@
+{
+  "country": "DEU",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Allemagne",
+  "iso2": "DE",
+  "data": {
+    "2000": 82.2,
+    "2005": 82.5,
+    "2010": 81.8,
+    "2015": 81.7,
+    "2020": 83.2,
+    "2023": 84.4,
+    "2025": 84.5
+  }
+}

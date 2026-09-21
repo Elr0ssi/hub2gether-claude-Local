@@ -1,0 +1,17 @@
+{
+  "country": "IRQ",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Irak",
+  "iso2": "IQ",
+  "data": {
+    "2000": 150,
+    "2005": 200,
+    "2010": 350,
+    "2015": 400,
+    "2020": 450,
+    "2023": 480,
+    "2025": 480
+  }
+}

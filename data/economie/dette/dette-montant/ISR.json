@@ -1,0 +1,13 @@
+{
+  "country": "ISR",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Israël",
+  "iso2": "IL",
+  "data": {
+    "2000": 80,
+    "2014": 210,
+    "2024": 320
+  }
+}

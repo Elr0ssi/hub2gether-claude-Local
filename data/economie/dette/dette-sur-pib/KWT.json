@@ -1,0 +1,17 @@
+{
+  "country": "KWT",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Koweït",
+  "iso2": "KW",
+  "data": {
+    "2000": 22,
+    "2005": 8,
+    "2010": 11,
+    "2015": 11,
+    "2020": 11,
+    "2023": 3,
+    "2025": 22
+  }
+}

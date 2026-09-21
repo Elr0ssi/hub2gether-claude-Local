@@ -1,0 +1,28 @@
+{
+  "country": "VNM",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Viêt Nam",
+  "iso2": "VN",
+  "data": {
+    "2000": 36,
+    "2005": 42,
+    "2010": 56,
+    "2015": 62,
+    "2020": 56,
+    "2023": 34,
+    "2025": 34
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 38.4,
+        "2014": 53.4,
+        "2024": 59.2
+      }
+    }
+  ]
+}

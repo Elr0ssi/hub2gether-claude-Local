@@ -1,0 +1,17 @@
+{
+  "country": "PHL",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Philippines",
+  "iso2": "PH",
+  "data": {
+    "2000": 78,
+    "2005": 86.3,
+    "2010": 94,
+    "2015": 101.7,
+    "2020": 109.6,
+    "2023": 117.3,
+    "2025": 120
+  }
+}

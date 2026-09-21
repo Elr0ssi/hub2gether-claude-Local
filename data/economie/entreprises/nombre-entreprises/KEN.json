@@ -1,0 +1,17 @@
+{
+  "country": "KEN",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Kenya",
+  "iso2": "KE",
+  "data": {
+    "2000": 350,
+    "2005": 460,
+    "2010": 620,
+    "2015": 760,
+    "2020": 890,
+    "2023": 1000,
+    "2025": 870
+  }
+}

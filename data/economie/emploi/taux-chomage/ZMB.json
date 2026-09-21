@@ -1,0 +1,17 @@
+{
+  "country": "ZMB",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Zambie",
+  "iso2": "ZM",
+  "data": {
+    "2000": 11.2,
+    "2005": 12.6,
+    "2010": 13.1,
+    "2015": 13.3,
+    "2020": 11.1,
+    "2023": 11.5,
+    "2025": 12.4
+  }
+}

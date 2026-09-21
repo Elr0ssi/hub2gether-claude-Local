@@ -1,0 +1,17 @@
+{
+  "country": "FIN",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Finlande",
+  "iso2": "FI",
+  "data": {
+    "2000": 470,
+    "2005": 510,
+    "2010": 540,
+    "2015": 560,
+    "2020": 580,
+    "2023": 580,
+    "2025": 530
+  }
+}

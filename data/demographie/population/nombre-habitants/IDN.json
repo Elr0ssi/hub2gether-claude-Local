@@ -1,0 +1,17 @@
+{
+  "country": "IDN",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Indonésie",
+  "iso2": "ID",
+  "data": {
+    "2000": 211.5,
+    "2005": 226.1,
+    "2010": 241.8,
+    "2015": 258.4,
+    "2020": 271.9,
+    "2023": 277.5,
+    "2025": 282
+  }
+}

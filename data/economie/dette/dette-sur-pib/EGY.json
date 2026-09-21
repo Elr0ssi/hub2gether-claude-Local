@@ -1,0 +1,28 @@
+{
+  "country": "EGY",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Égypte",
+  "iso2": "EG",
+  "data": {
+    "2000": 89,
+    "2005": 104,
+    "2010": 82,
+    "2015": 89,
+    "2020": 90,
+    "2023": 93,
+    "2025": 92
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 60,
+        "2014": 88,
+        "2024": 95
+      }
+    }
+  ]
+}

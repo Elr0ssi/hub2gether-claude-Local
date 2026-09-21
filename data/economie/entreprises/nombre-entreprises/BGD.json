@@ -1,0 +1,17 @@
+{
+  "country": "BGD",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Bangladesh",
+  "iso2": "BD",
+  "data": {
+    "2000": 680,
+    "2005": 850,
+    "2010": 1100,
+    "2015": 1300,
+    "2020": 1430,
+    "2023": 1500,
+    "2025": 2400
+  }
+}

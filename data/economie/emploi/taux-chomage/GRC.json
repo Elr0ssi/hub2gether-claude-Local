@@ -1,0 +1,17 @@
+{
+  "country": "GRC",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Grèce",
+  "iso2": "GR",
+  "data": {
+    "2000": 11.2,
+    "2005": 9.9,
+    "2010": 12.7,
+    "2015": 24.9,
+    "2020": 16.3,
+    "2023": 11.2,
+    "2025": 10.2
+  }
+}

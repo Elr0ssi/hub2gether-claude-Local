@@ -1,0 +1,28 @@
+{
+  "country": "DEU",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Allemagne",
+  "iso2": "DE",
+  "data": {
+    "2000": 58,
+    "2005": 67,
+    "2010": 82,
+    "2015": 71,
+    "2020": 69,
+    "2023": 66,
+    "2025": 67
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 60.1,
+        "2014": 74.7,
+        "2024": 65.5
+      }
+    }
+  ]
+}

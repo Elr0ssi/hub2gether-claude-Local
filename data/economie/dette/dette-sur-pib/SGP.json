@@ -1,0 +1,28 @@
+{
+  "country": "SGP",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Singapour",
+  "iso2": "SG",
+  "data": {
+    "2000": 104,
+    "2005": 100,
+    "2010": 98,
+    "2015": 110,
+    "2020": 134,
+    "2023": 131,
+    "2025": 168
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 72.3,
+        "2014": 96.5,
+        "2024": 168
+      }
+    }
+  ]
+}

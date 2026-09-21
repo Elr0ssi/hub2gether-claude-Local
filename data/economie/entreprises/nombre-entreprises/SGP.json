@@ -1,0 +1,17 @@
+{
+  "country": "SGP",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Singapour",
+  "iso2": "SG",
+  "data": {
+    "2000": 340,
+    "2005": 380,
+    "2010": 410,
+    "2015": 440,
+    "2020": 450,
+    "2023": 460,
+    "2025": 1600
+  }
+}

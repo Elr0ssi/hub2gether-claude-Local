@@ -1,0 +1,17 @@
+{
+  "country": "LBY",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Libye",
+  "iso2": "LY",
+  "data": {
+    "2000": 12,
+    "2005": 15,
+    "2010": 18,
+    "2015": 22,
+    "2020": 20,
+    "2023": 20,
+    "2025": 20
+  }
+}

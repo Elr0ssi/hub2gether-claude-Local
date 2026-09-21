@@ -1,0 +1,28 @@
+{
+  "country": "AUS",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Australie",
+  "iso2": "AU",
+  "data": {
+    "2000": 19,
+    "2005": 12,
+    "2010": 20,
+    "2015": 44,
+    "2020": 57,
+    "2023": 53,
+    "2025": 48
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 25.4,
+        "2014": 34.4,
+        "2024": 46.2
+      }
+    }
+  ]
+}

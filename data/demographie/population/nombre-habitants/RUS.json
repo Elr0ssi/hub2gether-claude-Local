@@ -1,0 +1,17 @@
+{
+  "country": "RUS",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Russie",
+  "iso2": "RU",
+  "data": {
+    "2000": 146.6,
+    "2005": 143.2,
+    "2010": 142.8,
+    "2015": 144.1,
+    "2020": 144.1,
+    "2023": 143.8,
+    "2025": 143.5
+  }
+}

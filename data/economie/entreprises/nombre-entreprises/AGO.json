@@ -1,0 +1,17 @@
+{
+  "country": "AGO",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Angola",
+  "iso2": "AO",
+  "data": {
+    "2000": 130,
+    "2005": 180,
+    "2010": 250,
+    "2015": 300,
+    "2020": 330,
+    "2023": 350,
+    "2025": 480
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "SGP",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Singapour",
+  "iso2": "SG",
+  "data": {
+    "2000": 4,
+    "2005": 4.3,
+    "2010": 5.1,
+    "2015": 5.5,
+    "2020": 5.7,
+    "2023": 5.9,
+    "2025": 6
+  }
+}

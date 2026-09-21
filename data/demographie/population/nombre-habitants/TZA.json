@@ -1,0 +1,17 @@
+{
+  "country": "TZA",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Tanzanie",
+  "iso2": "TZ",
+  "data": {
+    "2000": 34,
+    "2005": 38.8,
+    "2010": 44.3,
+    "2015": 51.5,
+    "2020": 59.7,
+    "2023": 67.4,
+    "2025": 69.9
+  }
+}

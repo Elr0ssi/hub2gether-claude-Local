@@ -1,0 +1,17 @@
+{
+  "country": "ETH",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Éthiopie",
+  "iso2": "ET",
+  "data": {
+    "2000": 130,
+    "2005": 170,
+    "2010": 220,
+    "2015": 280,
+    "2020": 340,
+    "2023": 410,
+    "2025": 720
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "DEU",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Allemagne",
+  "iso2": "DE",
+  "data": {
+    "2000": 7.8,
+    "2005": 11.2,
+    "2010": 7.1,
+    "2015": 4.6,
+    "2020": 3.8,
+    "2023": 3,
+    "2025": 3.4
+  }
+}

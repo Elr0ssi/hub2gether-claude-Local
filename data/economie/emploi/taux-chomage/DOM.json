@@ -1,0 +1,16 @@
+{
+  "country": "DOM",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "République dominicaine",
+  "iso2": "DO",
+  "data": {
+    "2000": 13.9,
+    "2005": 18,
+    "2010": 14.4,
+    "2015": 14,
+    "2020": 7.8,
+    "2023": 6.1
+  }
+}

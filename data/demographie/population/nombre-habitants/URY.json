@@ -1,0 +1,17 @@
+{
+  "country": "URY",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Uruguay",
+  "iso2": "UY",
+  "data": {
+    "2000": 3.3,
+    "2005": 3.3,
+    "2010": 3.4,
+    "2015": 3.4,
+    "2020": 3.4,
+    "2023": 3.4,
+    "2025": 3.4
+  }
+}

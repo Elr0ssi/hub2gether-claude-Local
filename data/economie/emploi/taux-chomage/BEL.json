@@ -1,0 +1,17 @@
+{
+  "country": "BEL",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Belgique",
+  "iso2": "BE",
+  "data": {
+    "2000": 6.9,
+    "2005": 8.5,
+    "2010": 8.3,
+    "2015": 8.5,
+    "2020": 5.6,
+    "2023": 5.5,
+    "2025": 5.4
+  }
+}

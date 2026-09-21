@@ -1,0 +1,17 @@
+{
+  "country": "MYS",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Malaisie",
+  "iso2": "MY",
+  "data": {
+    "2000": 3,
+    "2005": 3.6,
+    "2010": 3.3,
+    "2015": 3.1,
+    "2020": 4.5,
+    "2023": 3.3,
+    "2025": 3.3
+  }
+}

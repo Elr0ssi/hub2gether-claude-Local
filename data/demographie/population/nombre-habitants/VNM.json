@@ -1,0 +1,17 @@
+{
+  "country": "VNM",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Viêt Nam",
+  "iso2": "VN",
+  "data": {
+    "2000": 79,
+    "2005": 84,
+    "2010": 88.4,
+    "2015": 92.7,
+    "2020": 97.3,
+    "2023": 99.5,
+    "2025": 100.3
+  }
+}

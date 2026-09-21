@@ -1,0 +1,16 @@
+{
+  "country": "SRB",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Serbie",
+  "iso2": "RS",
+  "data": {
+    "2000": 15,
+    "2005": 21.8,
+    "2010": 19.2,
+    "2015": 17.5,
+    "2020": 9.1,
+    "2023": 9.6
+  }
+}

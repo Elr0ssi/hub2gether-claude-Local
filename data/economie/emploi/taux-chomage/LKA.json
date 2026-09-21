@@ -1,0 +1,16 @@
+{
+  "country": "LKA",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Sri Lanka",
+  "iso2": "LK",
+  "data": {
+    "2000": 8,
+    "2005": 7.7,
+    "2010": 4.9,
+    "2015": 4.7,
+    "2020": 5.5,
+    "2023": 5.3
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "country": "CZE",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Tchéquie",
+  "iso2": "CZ",
+  "data": {
+    "2000": 30,
+    "2014": 110,
+    "2024": 150
+  }
+}

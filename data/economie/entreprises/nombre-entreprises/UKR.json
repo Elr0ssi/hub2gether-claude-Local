@@ -1,0 +1,17 @@
+{
+  "country": "UKR",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Ukraine",
+  "iso2": "UA",
+  "data": {
+    "2000": 900,
+    "2005": 1100,
+    "2010": 1200,
+    "2015": 1050,
+    "2020": 950,
+    "2023": 800,
+    "2025": 700
+  }
+}

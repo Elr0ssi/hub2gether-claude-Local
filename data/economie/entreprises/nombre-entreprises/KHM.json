@@ -1,0 +1,16 @@
+{
+  "country": "KHM",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Cambodge",
+  "iso2": "KH",
+  "data": {
+    "2000": 60,
+    "2005": 80,
+    "2010": 100,
+    "2015": 110,
+    "2020": 115,
+    "2023": 120
+  }
+}

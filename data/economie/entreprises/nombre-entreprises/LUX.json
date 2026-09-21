@@ -1,0 +1,16 @@
+{
+  "country": "LUX",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Luxembourg",
+  "iso2": "LU",
+  "data": {
+    "2000": 75,
+    "2005": 85,
+    "2010": 95,
+    "2015": 100,
+    "2020": 105,
+    "2023": 120
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "BRA",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Brésil",
+  "iso2": "BR",
+  "data": {
+    "2000": 5400,
+    "2005": 6900,
+    "2010": 9500,
+    "2015": 12000,
+    "2020": 16000,
+    "2023": 19000,
+    "2025": 19000
+  }
+}

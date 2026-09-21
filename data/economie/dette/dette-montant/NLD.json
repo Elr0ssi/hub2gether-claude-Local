@@ -1,0 +1,13 @@
+{
+  "country": "NLD",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Pays-Bas",
+  "iso2": "NL",
+  "data": {
+    "2000": 390,
+    "2014": 800,
+    "2024": 1000
+  }
+}

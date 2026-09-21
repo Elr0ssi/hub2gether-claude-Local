@@ -1,0 +1,17 @@
+{
+  "country": "DZA",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Algérie",
+  "iso2": "DZ",
+  "data": {
+    "2000": 31.2,
+    "2005": 33.5,
+    "2010": 36,
+    "2015": 39.5,
+    "2020": 43.5,
+    "2023": 45.6,
+    "2025": 46.8
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "country": "ARG",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Argentine",
+  "iso2": "AR",
+  "data": {
+    "2000": 51,
+    "2005": 72,
+    "2010": 44,
+    "2015": 53,
+    "2020": 102,
+    "2023": 90,
+    "2025": 96
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 50.1,
+        "2014": 60,
+        "2024": 96
+      }
+    }
+  ]
+}

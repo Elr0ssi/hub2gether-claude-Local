@@ -1,0 +1,16 @@
+{
+  "country": "CRI",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Costa Rica",
+  "iso2": "CR",
+  "data": {
+    "2000": 44,
+    "2005": 42,
+    "2010": 36,
+    "2015": 42,
+    "2020": 68,
+    "2023": 63
+  }
+}

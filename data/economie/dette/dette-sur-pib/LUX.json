@@ -1,0 +1,16 @@
+{
+  "country": "LUX",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Luxembourg",
+  "iso2": "LU",
+  "data": {
+    "2000": 6,
+    "2005": 6,
+    "2010": 19,
+    "2015": 22,
+    "2020": 25,
+    "2023": 25
+  }
+}

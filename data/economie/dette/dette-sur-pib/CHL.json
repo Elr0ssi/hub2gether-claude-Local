@@ -1,0 +1,28 @@
+{
+  "country": "CHL",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Chili",
+  "iso2": "CL",
+  "data": {
+    "2000": 13,
+    "2005": 7,
+    "2010": 9,
+    "2015": 17,
+    "2020": 33,
+    "2023": 38,
+    "2025": 38
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 20.5,
+        "2014": 15.6,
+        "2024": 37.4
+      }
+    }
+  ]
+}

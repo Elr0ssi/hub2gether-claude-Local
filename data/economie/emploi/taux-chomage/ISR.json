@@ -1,0 +1,17 @@
+{
+  "country": "ISR",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Israël",
+  "iso2": "IL",
+  "data": {
+    "2000": 8.8,
+    "2005": 9,
+    "2010": 6.6,
+    "2015": 5.3,
+    "2020": 4.3,
+    "2023": 3.5,
+    "2025": 3.7
+  }
+}

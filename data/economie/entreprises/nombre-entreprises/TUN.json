@@ -1,0 +1,17 @@
+{
+  "country": "TUN",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Tunisie",
+  "iso2": "TN",
+  "data": {
+    "2000": 260,
+    "2005": 320,
+    "2010": 370,
+    "2015": 390,
+    "2020": 405,
+    "2023": 420,
+    "2025": 430
+  }
+}

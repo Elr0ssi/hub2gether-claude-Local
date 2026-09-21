@@ -1,0 +1,17 @@
+{
+  "country": "ISR",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Israël",
+  "iso2": "IL",
+  "data": {
+    "2000": 300,
+    "2005": 330,
+    "2010": 380,
+    "2015": 410,
+    "2020": 430,
+    "2023": 450,
+    "2025": 1100
+  }
+}

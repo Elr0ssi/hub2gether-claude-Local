@@ -1,0 +1,17 @@
+{
+  "country": "CAN",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Canada",
+  "iso2": "CA",
+  "data": {
+    "2000": 2500,
+    "2005": 2700,
+    "2010": 2900,
+    "2015": 3200,
+    "2020": 3500,
+    "2023": 3700,
+    "2025": 3500
+  }
+}

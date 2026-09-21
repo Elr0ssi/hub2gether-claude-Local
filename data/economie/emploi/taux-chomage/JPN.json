@@ -1,0 +1,17 @@
+{
+  "country": "JPN",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Japon",
+  "iso2": "JP",
+  "data": {
+    "2000": 4.7,
+    "2005": 4.4,
+    "2010": 5.1,
+    "2015": 3.4,
+    "2020": 2.8,
+    "2023": 2.6,
+    "2025": 2.5
+  }
+}

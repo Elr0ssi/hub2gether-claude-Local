@@ -1,0 +1,17 @@
+{
+  "country": "CAN",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Canada",
+  "iso2": "CA",
+  "data": {
+    "2000": 30.7,
+    "2005": 32.3,
+    "2010": 34,
+    "2015": 35.7,
+    "2020": 38,
+    "2023": 39.9,
+    "2025": 41.5
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "MAR",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Maroc",
+  "iso2": "MA",
+  "data": {
+    "2000": 28.8,
+    "2005": 30.5,
+    "2010": 32.4,
+    "2015": 34.9,
+    "2020": 36.7,
+    "2023": 37.8,
+    "2025": 38.1
+  }
+}

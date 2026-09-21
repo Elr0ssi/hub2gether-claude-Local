@@ -1,0 +1,17 @@
+{
+  "country": "AUT",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Autriche",
+  "iso2": "AT",
+  "data": {
+    "2000": 8,
+    "2005": 8.2,
+    "2010": 8.4,
+    "2015": 8.6,
+    "2020": 8.9,
+    "2023": 9.1,
+    "2025": 9.2
+  }
+}

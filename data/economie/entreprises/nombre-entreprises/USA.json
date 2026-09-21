@@ -1,0 +1,17 @@
+{
+  "country": "USA",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "États-Unis",
+  "iso2": "US",
+  "data": {
+    "2000": 27000,
+    "2005": 29000,
+    "2010": 30000,
+    "2015": 31000,
+    "2020": 32000,
+    "2023": 33000,
+    "2025": 34000
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "country": "AUT",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Autriche",
+  "iso2": "AT",
+  "data": {
+    "2000": 180,
+    "2014": 350,
+    "2024": 460
+  }
+}

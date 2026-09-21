@@ -1,0 +1,26 @@
+{
+  "country": "ARG",
+  "indicator": "INFLATION",
+  "unit": "PCT",
+  "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+  "name": "Argentine",
+  "iso2": "AR",
+  "data": {
+    "2018": 34.2772237131003,
+    "2019": 53.5483043492339,
+    "2020": 42.0150947376509,
+    "2021": 48.4093786255199,
+    "2022": 72.430757531824,
+    "2023": 133.488935594175,
+    "2024": 219.883929014578
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2024": 209
+      }
+    }
+  ]
+}

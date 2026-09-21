@@ -1,0 +1,14 @@
+{
+  "country": "CZE",
+  "indicator": "IMPORTS",
+  "unit": "MD_USD",
+  "source": "OMC · FMI (WEO) · Banque mondiale (BOP)",
+  "name": "Tchéquie",
+  "iso2": "CZ",
+  "data": {
+    "2024": 180
+  },
+  "notes": [
+    "La source date ces valeurs « 2024/2025 » sans trancher. Elles sont rangées sous 2024, millésime le plus récent que la source nomme explicitement."
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "country": "ESP",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Espagne",
+  "iso2": "ES",
+  "data": {
+    "2000": 40.3,
+    "2005": 43.4,
+    "2010": 46.6,
+    "2015": 46.4,
+    "2020": 47.4,
+    "2023": 47.9,
+    "2025": 48.4
+  }
+}

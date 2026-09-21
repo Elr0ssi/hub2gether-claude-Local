@@ -1,0 +1,16 @@
+{
+  "country": "GTM",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Guatemala",
+  "iso2": "GT",
+  "data": {
+    "2000": 3,
+    "2005": 3,
+    "2010": 4,
+    "2015": 2.9,
+    "2020": 3.3,
+    "2023": 2.8
+  }
+}

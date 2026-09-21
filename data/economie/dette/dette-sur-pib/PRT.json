@@ -1,0 +1,28 @@
+{
+  "country": "PRT",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Portugal",
+  "iso2": "PT",
+  "data": {
+    "2000": 50,
+    "2005": 67,
+    "2010": 96,
+    "2015": 129,
+    "2020": 135,
+    "2023": 99,
+    "2025": 99
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 49.5,
+        "2014": 130.2,
+        "2024": 100.6
+      }
+    }
+  ]
+}

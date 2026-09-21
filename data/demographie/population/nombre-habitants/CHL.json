@@ -1,0 +1,17 @@
+{
+  "country": "CHL",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Chili",
+  "iso2": "CL",
+  "data": {
+    "2000": 15.4,
+    "2005": 16.3,
+    "2010": 17.1,
+    "2015": 17.9,
+    "2020": 19.1,
+    "2023": 19.6,
+    "2025": 19.8
+  }
+}

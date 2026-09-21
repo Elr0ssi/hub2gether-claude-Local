@@ -1,0 +1,28 @@
+{
+  "country": "TUN",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Tunisie",
+  "iso2": "TN",
+  "data": {
+    "2000": 62,
+    "2005": 59,
+    "2010": 41,
+    "2015": 55,
+    "2020": 88,
+    "2023": 85,
+    "2025": 87
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 54.2,
+        "2014": 52.8,
+        "2024": 84.9
+      }
+    }
+  ]
+}

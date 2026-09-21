@@ -1,0 +1,17 @@
+{
+  "country": "ITA",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Italie",
+  "iso2": "IT",
+  "data": {
+    "2000": 4500,
+    "2005": 4700,
+    "2010": 4800,
+    "2015": 5200,
+    "2020": 5700,
+    "2023": 5900,
+    "2025": 5500
+  }
+}

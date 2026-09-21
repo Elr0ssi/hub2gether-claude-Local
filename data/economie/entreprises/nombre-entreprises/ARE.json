@@ -1,0 +1,17 @@
+{
+  "country": "ARE",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Émirats arabes unis",
+  "iso2": "AE",
+  "data": {
+    "2000": 260,
+    "2005": 350,
+    "2010": 430,
+    "2015": 500,
+    "2020": 530,
+    "2023": 560,
+    "2025": 1300
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "IRL",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Irlande",
+  "iso2": "IE",
+  "data": {
+    "2000": 3.8,
+    "2005": 4.1,
+    "2010": 4.6,
+    "2015": 4.7,
+    "2020": 5,
+    "2023": 5.2,
+    "2025": 5.4
+  }
+}

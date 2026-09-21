@@ -215,6 +215,7 @@ export const PAYS = {
   TUN: { iso2: "TN", nom: "Tunisie" },
   TUR: { iso2: "TR", nom: "Turquie" },
   TUV: { iso2: "TV", nom: "Tuvalu" },
+  TWN: { iso2: "TW", nom: "Taïwan" },
   TZA: { iso2: "TZ", nom: "Tanzanie" },
   UGA: { iso2: "UG", nom: "Ouganda" },
   UKR: { iso2: "UA", nom: "Ukraine" },

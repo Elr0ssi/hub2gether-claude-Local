@@ -1,0 +1,28 @@
+{
+  "country": "GHA",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Ghana",
+  "iso2": "GH",
+  "data": {
+    "2000": 123,
+    "2005": 70,
+    "2010": 46,
+    "2015": 73,
+    "2020": 78,
+    "2023": 84,
+    "2025": 88
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 123.4,
+        "2014": 67.9,
+        "2024": 87.5
+      }
+    }
+  ]
+}

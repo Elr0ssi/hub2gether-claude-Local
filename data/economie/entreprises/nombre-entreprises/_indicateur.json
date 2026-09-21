@@ -1,0 +1,21 @@
+{
+  "indicateur": "COMPANIES",
+  "libelle": "Nombre d'entreprises enregistrées",
+  "unite": "MILLIERS",
+  "categorie": "economie/entreprises",
+  "chemin": "data/economie/entreprises/nombre-entreprises",
+  "sources": [
+    "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères"
+  ],
+  "annees": [
+    2000,
+    2005,
+    2010,
+    2015,
+    2020,
+    2023,
+    2025
+  ],
+  "paysCouverts": 99,
+  "misAJour": "2026-09-21"
+}

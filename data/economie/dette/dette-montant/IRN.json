@@ -1,0 +1,13 @@
+{
+  "country": "IRN",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Iran",
+  "iso2": "IR",
+  "data": {
+    "2000": 20,
+    "2014": 40,
+    "2024": 70
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "country": "NPL",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Népal",
+  "iso2": "NP",
+  "data": {
+    "2000": 61,
+    "2005": 57,
+    "2010": 37,
+    "2015": 26,
+    "2020": 44,
+    "2023": 44
+  }
+}

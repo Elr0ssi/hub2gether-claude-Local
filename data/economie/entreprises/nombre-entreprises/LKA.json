@@ -1,0 +1,16 @@
+{
+  "country": "LKA",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Sri Lanka",
+  "iso2": "LK",
+  "data": {
+    "2000": 180,
+    "2005": 230,
+    "2010": 290,
+    "2015": 330,
+    "2020": 350,
+    "2023": 380
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "BGD",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Bangladesh",
+  "iso2": "BD",
+  "data": {
+    "2000": 131.6,
+    "2005": 142.3,
+    "2010": 152.1,
+    "2015": 160,
+    "2020": 167.4,
+    "2023": 172,
+    "2025": 174.7
+  }
+}

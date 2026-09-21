@@ -1,0 +1,21 @@
+{
+  "indicateur": "DEBT_TO_GDP",
+  "libelle": "Dette publique rapportée au PIB",
+  "unite": "PCT",
+  "categorie": "economie/dette",
+  "chemin": "data/economie/dette/dette-sur-pib",
+  "sources": [
+    "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères"
+  ],
+  "annees": [
+    2000,
+    2005,
+    2010,
+    2015,
+    2020,
+    2023,
+    2025
+  ],
+  "paysCouverts": 99,
+  "misAJour": "2026-09-21"
+}

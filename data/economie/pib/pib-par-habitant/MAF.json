@@ -1,0 +1,14 @@
+{
+  "country": "MAF",
+  "indicator": "GDP_PER_CAPITA",
+  "unit": "USD",
+  "source": "Banque mondiale · WDI (NY.GDP.PCAP.CD)",
+  "name": "Saint-Martin",
+  "iso2": "MF",
+  "data": {
+    "2011": 20930.5821177758,
+    "2014": 20638.7705882379,
+    "2019": 19033.0649634889,
+    "2021": 21668.3776525323
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "PAK",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Pakistan",
+  "iso2": "PK",
+  "data": {
+    "2000": 142.3,
+    "2005": 158.5,
+    "2010": 179.4,
+    "2015": 199.4,
+    "2020": 220.9,
+    "2023": 240.5,
+    "2025": 247.5
+  }
+}

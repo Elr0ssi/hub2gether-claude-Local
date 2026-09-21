@@ -1,0 +1,16 @@
+{
+  "country": "CRI",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "name": "Costa Rica",
+  "iso2": "CR",
+  "data": {
+    "2000": 160,
+    "2005": 200,
+    "2010": 230,
+    "2015": 255,
+    "2020": 265,
+    "2023": 280
+  }
+}

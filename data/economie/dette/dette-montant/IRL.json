@@ -1,0 +1,13 @@
+{
+  "country": "IRL",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Irlande",
+  "iso2": "IE",
+  "data": {
+    "2000": 50,
+    "2014": 220,
+    "2024": 290
+  }
+}

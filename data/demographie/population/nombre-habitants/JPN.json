@@ -1,0 +1,17 @@
+{
+  "country": "JPN",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale — estimations sur 7 millésimes repères",
+  "name": "Japon",
+  "iso2": "JP",
+  "data": {
+    "2000": 127,
+    "2005": 128,
+    "2010": 128,
+    "2015": 127,
+    "2020": 126,
+    "2023": 124,
+    "2025": 123
+  }
+}
