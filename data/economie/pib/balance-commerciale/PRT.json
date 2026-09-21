@@ -65,7 +65,7 @@
   },
   "autres_sources": [
     {
-      "source": "FMI · OMC · Banque mondiale — estimations sur 7 dates repères",
+      "source": "FMI · OMC · Banque mondiale · estimations sur 7 dates repères",
       "unit": "MD_USD",
       "data": {
         "2000": -10,

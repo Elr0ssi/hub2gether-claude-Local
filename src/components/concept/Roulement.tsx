@@ -262,7 +262,7 @@ export function Odometre({
     });
   }, [cases, cible, continu, couleur, dec, depuis, doux, duree, parSeconde, tours, unite, vide]);
 
-  if (vide) return <span className={className}>—</span>;
+  if (vide) return <span className={className}>n.d.</span>;
 
   if (doux) {
     const txt =

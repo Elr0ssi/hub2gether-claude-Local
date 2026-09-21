@@ -2,7 +2,7 @@
   "country": "AUT",
   "indicator": "DEBT_TO_GDP",
   "unit": "PCT",
-  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 dates repères",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
   "name": "Autriche",
   "iso2": "AT",
   "data": {
@@ -16,7 +16,7 @@
   },
   "autres_sources": [
     {
-      "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
       "unit": "PCT",
       "data": {
         "2000": 67.1,

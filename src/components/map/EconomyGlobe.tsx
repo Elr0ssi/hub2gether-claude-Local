@@ -693,6 +693,14 @@ interface Props {
   satellite?: boolean;
   /** Teintes de remplacement. Absente, le globe garde exactement les siennes. */
   palette?: PaletteGlobe;
+  /**
+   * Le vide laissé autour de la sphère, en proportion du cadrage serré. 1,18
+   * laisse dix-huit pour cent de marge : c'est la valeur d'origine, et celle
+   * qui s'applique quand rien n'est passé — la page économie du site est donc
+   * rendue exactement comme avant. Une valeur plus basse rapproche la caméra
+   * et la sphère occupe davantage son cadre.
+   */
+  marge?: number;
 }
 
 export function EconomyGlobe({
@@ -703,11 +711,17 @@ export function EconomyGlobe({
   onCountryHover,
   satellite = false,
   palette,
+  marge = 1.18,
 }: Props) {
   /* Posée pendant le rendu, donc avant tout effet : la carte de base est
      peinte au montage, et une palette appliquée après serait arrivée trop
      tard pour l'océan, le graticule et les frontières. */
   appliquePalette(palette);
+
+  /* La marge passe par une référence : l'effet qui monte la scène ne se rejoue
+     pas quand elle change, et la caméra la relit à chaque cadrage. */
+  const margeRef = useRef(marge);
+  margeRef.current = marge;
 
   const mountRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
@@ -956,7 +970,6 @@ export function EconomyGlobe({
     // Distance is derived from the box rather than fixed: the sphere is framed
     // by whichever of the two axes is tighter, so its whole circumference is
     // always inside the frame with an even margin, at any aspect ratio.
-    const MARGIN = 1.18;
     let baseDistance = 3.5;
     let zoom = 1;
     const ZOOM_MIN = 1;
@@ -975,7 +988,7 @@ export function EconomyGlobe({
 
     const applyCamera = () => {
       const dolly = Math.min(zoom, DOLLY_MAX);
-      camera.position.z = (baseDistance * MARGIN) / dolly;
+      camera.position.z = (baseDistance * margeRef.current) / dolly;
       // A projection scales with 1 / tan(fov / 2): narrowing the field by this
       // much magnifies by exactly the zoom the dolly did not deliver.
       camera.fov =

@@ -4,7 +4,6 @@ import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } fro
 import { AnimatePresence, motion } from "framer-motion";
 import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
 import { COLONNE, type LigneSource, type SocleEco } from "@/data/concept/conceptEconomie";
-import { Annonce } from "./Annonce";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
 import { gelerOdometres } from "./Roulement";
@@ -108,7 +107,7 @@ const COLONNES: { id: Col; label: string; unite: Unite; famille: string }[] = [
 ];
 
 function val(v: number | null, unite: Unite) {
-  if (v === null) return "—";
+  if (v === null) return "n.d.";
   if (unite === "ans") return `${Math.round(v)} ans`;
   if (unite === "k") return `${Math.round(v).toLocaleString("fr-FR")} k`;
   if (unite === "hab") return `${v.toFixed(1).replace(".", ",")} M`;
@@ -261,11 +260,9 @@ const Frise = memo(function Frise({
 
   return (
     <div className="cg-frise2">
-      <div className="cg-frise2-tete">
-        <span className="cg-frise2-an">{vue}</span>
-        <span className="cg-frise2-l">date affichée</span>
-      </div>
+      <span className="cg-frise2-an">{vue}</span>
 
+      <div className="cg-frise2-piste">
       {/* Une ligne, un point. On vise un repère, on glisse le point, ou on
           pousse aux flèches — un curseur qui ne répond qu'à la souris exclut
           ceux qui n'en tiennent pas. */}
@@ -345,6 +342,8 @@ const Frise = memo(function Frise({
               {a}
             </button>
           ))}
+      </div>
+
       </div>
 
       <p className="cg-frise-n">
@@ -508,6 +507,7 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
   const [sens, setSens] = useState<1 | -1>(-1);
   const [filtre, setFiltre] = useState("");
   const bande = useVu();
+  const haut = useVu(260);
   const [qArticle, setQArticle] = useState("");
   const [choisi, setChoisi] = useState<string | null>("France");
   const [ouvert, setOuvert] = useState<number | null>(0);
@@ -625,6 +625,31 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
     return articles.filter((a) => `${a.titre} ${a.chapo} ${a.mots ?? ""}`.toLowerCase().includes(q));
   }, [articles, qArticle]);
 
+  /* « D'où viennent ces chiffres » n'était pas une section : c'est une
+     question, et elle se range avec les autres. Les trois principes la
+     suivent, et les sources ferment la page. */
+  const questions = useMemo(
+    () => [
+      ...faq,
+      {
+        question: "D'où viennent ces chiffres ?",
+        answer:
+          "D'une seule base. Chaque indicateur y est rangé par pays et par date, sous son code ISO3, avec sa source. Rien n'est saisi deux fois : le chiffre que vous lisez sur le globe est le même objet que celui du classement et celui de la courbe. Le détail source par source est donné au bas de cette page.",
+      },
+      {
+        question: "Que se passe-t-il quand une donnée manque ?",
+        answer:
+          "Rien ne la remplace. Une année qu'une source ne publie pas n'est pas ramenée à zéro et n'est pas devinée d'après ses voisines. Le pays sort en gris sur le globe et porte la mention « n.d. » au classement : il n'est pas dernier, il n'est pas classé.",
+      },
+      {
+        question: "Tous les chiffres sont-ils mesurés ?",
+        answer:
+          "Non, et ceux qui ne le sont pas le disent. Le montant de la dette affiché ici est déduit du PIB et du ratio de dette, faute d'une série annuelle mesurée. La couverture de chaque indicateur est donnée telle qu'elle est, au bas de cette page : sept dates ne s'y présentent pas comme soixante-six.",
+      },
+    ],
+    [faq],
+  );
+
   const trier = useCallback((c: Col) => {
     if (c === col) setSens((s) => (s === 1 ? -1 : 1));
     else {
@@ -648,33 +673,34 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
     <div className="cg cg-eco">
       <EnTete actif="Économie" />
 
-      {/* Le rail d'annonce suit la lecture sans la couper. Il ne s'affiche
-          qu'au-delà de la largeur où il ne mange rien à la colonne. */}
-      <Annonce format="rail" className="an-colle" />
-
       {/* ── L'ouverture ──────────────────────────────────────────────────── */}
-      <section className="cg-section cg-eco-haut">
-        {/* Une ouverture courte et centrée. Un titre sur deux lignes, une
-            phrase, et l'on est dans la matière. Le grand bloc de texte et la
-            rangée de compteurs qui occupaient cet espace disaient beaucoup
-            avant d'avoir rien montré — et les compteurs prenaient des images
-            au glissement de la frise, juste en dessous. */}
+      {/* L'ouverture occupe la page. Rien d'autre que le titre, et en bas un
+          arc de cercle qui ferme l'écran comme un horizon : c'est lui qui dit
+          que la page continue, et il s'allume quand on descend vers le
+          globe. */}
+      <section className="cg-section cg-eco-haut" data-vu={haut.vu ? "1" : "0"}>
         <div className="cg-eco-lueur" aria-hidden="true" />
         <div className="cg-wrap">
-          <Monte>
-            <div className="cg-eco-ouv">
-              <p className="cg-eyebrow">Économie</p>
-              <h1 className="cg-h1 cg-eco-h1">
-                <Titre texte="Le socle économique" />
-              </h1>
-              <p className="cg-chapo cg-eco-ouv-c">
-                {socle.pays.length} pays, {socle.annees[0]}–
-                {socle.annees[socle.annees.length - 1]}, dix indicateurs.
-              </p>
-            </div>
-          </Monte>
+          <div className="cg-eco-ouv">
+            <p className="cg-eyebrow">Économie</p>
+            <h1 className="cg-h1 cg-eco-h1">
+              <Titre texte="Le socle économique" />
+            </h1>
+            <p className="cg-chapo cg-eco-ouv-c">
+              {socle.pays.length} pays, {socle.annees[0]}&ndash;
+              {socle.annees[socle.annees.length - 1]}, dix indicateurs.
+            </p>
+          </div>
+        </div>
+        <div className="cg-arc" aria-hidden="true">
+          <span className="cg-arc-trait" />
+          <span className="cg-arc-nappe" />
         </div>
       </section>
+
+      {/* Le témoin que l'arc regarde : dès qu'il entre dans l'écran, l'arc
+          s'allume et s'ouvre. */}
+      <div ref={haut.ref as React.RefObject<HTMLDivElement>} className="cg-temoin" aria-hidden="true" />
 
       {/* ── Le globe, sa frise et ses raccourcis ─────────────────────────── */}
       <section className="cg-section cg-eco-globe">
@@ -697,9 +723,6 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
         </div>
       </section>
 
-      <div className="cg-wrap cg-an-bande">
-        <Annonce format="bande" />
-      </div>
 
       {/* ── Le classement ────────────────────────────────────────────────── */}
       {/* Une bande claire, de bord à bord, qui s'ouvre au défilement. Après
@@ -762,30 +785,27 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
             onTrier={trier}
           />
           <p className="cg-bande-n">
-            {tries.length} pays affichés · un tiret signale une valeur que la source ne publie pas
+            {tries.length} pays affichés · « n.d. » signale une valeur que la source ne publie pas
             pour ce pays cette année-là ; ces pays passent en fin de tri, ils ne sont pas classés
             derniers. Cliquez une ligne pour la retrouver sur le globe.
           </p>
         </div>
       </section>
 
-      {/* ── Les recommandations, puis la lecture ─────────────────────────── */}
+      {/* ── Les articles ─────────────────────────────────────────────────── */}
       <section className="cg-section cg-lectures">
         <div className="cg-wrap">
-          <Enseigne
-            droite={
-              <input
-                className="cg-filtre"
-                type="search"
-                placeholder="Chercher un article"
-                value={qArticle}
-                onChange={(e) => setQArticle(e.target.value)}
-                aria-label="Chercher un article"
-              />
-            }
-          >
-            À lire sur l&apos;économie
-          </Enseigne>
+          <div className="cg-arts-tete">
+            <h2 className="cg-arts-h">Articles</h2>
+            <input
+              className="cg-filtre cg-filtre-gros"
+              type="search"
+              placeholder="Chercher un article"
+              value={qArticle}
+              onChange={(e) => setQArticle(e.target.value)}
+              aria-label="Chercher un article"
+            />
+          </div>
 
           {recos.length > 0 && !qArticle.trim() && (
             <div className="cg-recos">
@@ -806,95 +826,56 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
             </div>
           )}
 
-          {/* Défilement libre : plus d'accrochage par fiche. On s'arrête où
-              l'on veut, y compris entre deux. */}
-          <div
-            ref={rail2}
-            className="cg-arts"
-            onPointerDown={(e) => {
-              prise2.current = { x: e.clientX, g: e.currentTarget.scrollLeft };
-              e.currentTarget.setPointerCapture(e.pointerId);
-            }}
-            onPointerMove={(e) => {
-              if (!prise2.current || !rail2.current) return;
-              rail2.current.scrollLeft = prise2.current.g - (e.clientX - prise2.current.x);
-            }}
-            onPointerUp={() => {
-              prise2.current = null;
-            }}
-            onPointerCancel={() => {
-              prise2.current = null;
-            }}
-          >
-            {articlesVus.map((a, k) => (
-              <article key={a.slug} className="cg-art">
-                <ImagePlaceholder nom={`IMAGE_PNG_ECO_0${(k % 9) + 1}`} ratio="16 / 10" />
+          {articlesVus.length === 0 ? (
+            <p className="cg-frise-n">Aucun article ne correspond à cette recherche.</p>
+          ) : (
+            /* Un article en grand à gauche, le reste en carrousel à droite :
+               la première lecture se présente comme une lecture, pas comme la
+               première vignette d'une file. */
+            <div className="cg-arts-l">
+              <article className="cg-art cg-art-une">
+                <ImagePlaceholder nom="IMAGE_PNG_ECO_01" ratio="4 / 3" />
                 <span className="cg-rubrique">
-                  {a.rubrique} · {a.duree}
+                  {articlesVus[0].rubrique} · {articlesVus[0].duree}
                 </span>
-                <h4 className="cg-art-t">{a.titre}</h4>
-                <p className="cg-art-c">{a.chapo}</p>
+                <h3 className="cg-art-t">{articlesVus[0].titre}</h3>
+                <p className="cg-art-c">{articlesVus[0].chapo}</p>
               </article>
-            ))}
-            {articlesVus.length > 3 && <Annonce format="encart" className="an-dans-fil" />}
-            {articlesVus.length === 0 && (
-              <p className="cg-frise-n">Aucun article ne correspond à cette recherche.</p>
-            )}
-          </div>
-        </div>
-      </section>
 
-      {/* ── La méthode et les sources ────────────────────────────────────── */}
-      <section className="cg-section cg-methode2">
-        <div className="cg-wrap">
-          <Enseigne droite={<span className="cg-demo-mini">{sources.length} indicateurs</span>}>
-            D&apos;où viennent ces chiffres
-          </Enseigne>
-
-          <div className="cg-meth-l">
-            <article className="cg-meth">
-              <span className="cg-meth-n">01</span>
-              <h3 className="cg-meth-t">Une seule base</h3>
-              <p className="cg-meth-c">
-                Chaque indicateur est rangé par pays et par date, sous son code ISO3, avec sa
-                source. Rien n&apos;est saisi deux fois : le chiffre que vous lisez sur le globe est
-                le même objet que celui du classement et celui de la courbe.
-              </p>
-            </article>
-            <article className="cg-meth">
-              <span className="cg-meth-n">02</span>
-              <h3 className="cg-meth-t">Une absence reste une absence</h3>
-              <p className="cg-meth-c">
-                Une année qu&apos;une source ne publie pas n&apos;est pas ramenée à zéro et
-                n&apos;est pas devinée d&apos;après ses voisines. Le pays sort en gris sur le globe
-                et porte un tiret au classement : il n&apos;est pas dernier, il n&apos;est pas
-                classé.
-              </p>
-            </article>
-            <article className="cg-meth">
-              <span className="cg-meth-n">03</span>
-              <h3 className="cg-meth-t">Ce qui est calculé le dit</h3>
-              <p className="cg-meth-c">
-                Le montant de la dette affiché ici est déduit du PIB et du ratio de dette, faute
-                d&apos;une série annuelle mesurée. La couverture de chaque indicateur est donnée
-                ci-dessous, telle qu&apos;elle est — sept dates ne se présentent pas comme
-                soixante-six.
-              </p>
-            </article>
-          </div>
-
-          <div className="cg-sources">
-            <p className="cg-sources-t">Les sources, indicateur par indicateur</p>
-            <div className="cg-sources-l">
-              {sources.map((s) => (
-                <div key={s.libelle} className="cg-source">
-                  <span className="cg-source-l">{s.libelle}</span>
-                  <span className="cg-source-c">{s.couverture}</span>
-                  <span className="cg-source-s">{s.source}</span>
+              <div className="cg-arts-c">
+                <div
+                  ref={rail2}
+                  className="cg-arts"
+                  onPointerDown={(e) => {
+                    prise2.current = { x: e.clientX, g: e.currentTarget.scrollLeft };
+                    e.currentTarget.setPointerCapture(e.pointerId);
+                  }}
+                  onPointerMove={(e) => {
+                    if (!prise2.current || !rail2.current) return;
+                    rail2.current.scrollLeft = prise2.current.g - (e.clientX - prise2.current.x);
+                  }}
+                  onPointerUp={() => {
+                    prise2.current = null;
+                  }}
+                  onPointerCancel={() => {
+                    prise2.current = null;
+                  }}
+                >
+                  {articlesVus.slice(1).map((a, k) => (
+                    <article key={a.slug} className="cg-art">
+                      <ImagePlaceholder nom={`IMAGE_PNG_ECO_0${((k + 1) % 9) + 1}`} ratio="16 / 10" />
+                      <span className="cg-rubrique">
+                        {a.rubrique} · {a.duree}
+                      </span>
+                      <h4 className="cg-art-t">{a.titre}</h4>
+                      <p className="cg-art-c">{a.chapo}</p>
+                    </article>
+                  ))}
                 </div>
-              ))}
+                <div className="cg-arts-f" aria-hidden="true" />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
@@ -903,7 +884,7 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
         <div className="cg-wrap">
           <Enseigne>Les questions d&apos;économie</Enseigne>
           <div className="cg-q-liste">
-            {faq.map((q, k) => {
+            {questions.map((q, k) => {
               const on = ouvert === k;
               return (
                 <div key={q.question} className={`cg-q${on ? " cg-q-on" : ""}`}>
@@ -932,6 +913,21 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
                 </div>
               );
             })}
+          </div>
+
+          {/* Les sources, au pied des questions : c'est là qu'on vient
+              vérifier, une fois qu'on s'est demandé d'où sort un chiffre. */}
+          <div className="cg-sources">
+            <p className="cg-sources-t">Nos sources, indicateur par indicateur</p>
+            <div className="cg-sources-l">
+              {sources.map((o) => (
+                <div key={o.libelle} className="cg-source">
+                  <span className="cg-source-l">{o.libelle}</span>
+                  <span className="cg-source-c">{o.couverture}</span>
+                  <span className="cg-source-s">{o.source}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

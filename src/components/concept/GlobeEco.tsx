@@ -126,7 +126,7 @@ export function familleDe(id: EconomyMetricId): FamilleEco {
 }
 
 export function fmtEco(v: number | null | undefined, unite: MetriqueEco["unite"]): string {
-  if (v === null || v === undefined || !Number.isFinite(v)) return "—";
+  if (v === null || v === undefined || !Number.isFinite(v)) return "n.d.";
   if (unite === "ans") return `${Math.round(v)} ans`;
   if (unite === "k") return `${Math.round(v).toLocaleString("fr-FR")} k`;
   if (unite === "hab") return `${v.toFixed(1).replace(".", ",")} M`;
@@ -285,7 +285,15 @@ export function GlobeEco({
               selectedCountry={choisi}
               onCountryClick={(n) => onChoisi(n)}
               palette={PALETTE}
+              /* La sphère occupe davantage son cadre : la valeur d'origine
+                 laissait près d'un cinquième de vide autour d'elle. */
+              marge={1.06}
             />
+            {/* L'éclat qui sort de la sphère : un anneau de lumière posé sur
+                son bord, en fusion d'écran, qui respire. Il ne tourne pas avec
+                le globe — c'est une lumière, pas une matière. */}
+            <span className="ge-eclat" aria-hidden="true" />
+            <span className="ge-eclat ge-eclat-2" aria-hidden="true" />
             <div className="ge-echelle" aria-hidden="true">
               <span
                 className="ge-echelle-barre"

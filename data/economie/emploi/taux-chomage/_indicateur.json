@@ -5,7 +5,7 @@
   "categorie": "economie/emploi",
   "chemin": "data/economie/emploi/taux-chomage",
   "sources": [
-    "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 dates repères"
+    "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères"
   ],
   "annees": [
     2000,

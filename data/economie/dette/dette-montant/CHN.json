@@ -2,7 +2,7 @@
   "country": "CHN",
   "indicator": "DEBT_AMOUNT",
   "unit": "MD_EUR",
-  "source": "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
   "name": "Chine",
   "iso2": "CN",
   "data": {

@@ -108,7 +108,7 @@ export function articlesEco(n = 9): FicheArticle[] {
       titre: a.title,
       chapo: a.excerpt,
       rubrique: "Économie",
-      duree: a.readingTime ? `${a.readingTime} min` : "—",
+      duree: a.readingTime ? `${a.readingTime} min` : "durée inconnue",
       /* Mots-clés et titre : un article se rapproche de l'indicateur regardé
          par ce qu'il dit, pas par sa position dans la liste. */
       mots: [...(a.tags ?? []), a.title].join(" · ").toLowerCase(),

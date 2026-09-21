@@ -126,7 +126,7 @@ for (const f of fs.readdirSync(`${RACINE}/data/countries`).sort()) {
         — et le PIB qu'elle porte aussi, gardé comme seconde source ═════ */
 
 const SAISIE = litteral("src/data/economy/economy.ts", "SAISIE_MANUELLE");
-const SRC_SAISIE = "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 dates repères";
+const SRC_SAISIE = "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères";
 for (const an of SAISIE) {
   for (const [nom, d] of Object.entries(an.countries)) {
     const c = code(nom, "economy.ts/SAISIE_MANUELLE");
@@ -143,7 +143,7 @@ for (const an of SAISIE) {
 /* ═══ 3. laborData.ts : population active et âge de la retraite ══════════ */
 
 const LABOR = litteral("src/data/economy/laborData.ts", "LABOR_DATA");
-const SRC_LABOR = "OCDE · OIT — estimations 2023";
+const SRC_LABOR = "OCDE · OIT · estimations 2023";
 const NOTE_LABOR =
   "La source ne publie qu'une valeur, datée 2023. Elle est rangée sous 2023 et " +
   "non répétée sur les autres années : aucune année n'est inventée.";
@@ -159,7 +159,7 @@ for (const l of LABOR) {
 /* ═══ 4. debtData.ts : montant de la dette, ratio, inflation 2024 ════════ */
 
 const DETTE = litteral("src/data/economy/debtData.ts", "DEBT_DATA");
-const SRC_DETTE = "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)";
+const SRC_DETTE = "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)";
 for (const d of DETTE) {
   const c = code(d.name, "debtData.ts");
   if (!c) continue;
@@ -178,7 +178,7 @@ for (const d of DETTE) {
 
 const ANNEES_REPERE = litteral("src/data/economy/populationData.ts", "ECONOMY_YEARS_LIST");
 const BALANCE = litteral("src/data/economy/tradeBalanceHistory.ts", "TRADE_BALANCE_BY_COUNTRY");
-const SRC_BALANCE = "FMI · OMC · Banque mondiale — estimations sur 7 dates repères";
+const SRC_BALANCE = "FMI · OMC · Banque mondiale · estimations sur 7 dates repères";
 for (const [nom, serie] of Object.entries(BALANCE)) {
   const c = code(nom, "tradeBalanceHistory.ts");
   if (!c) continue;
@@ -203,7 +203,7 @@ for (const t of TRADE) {
 /* ═══ 6. populationData.ts → démographie ════════════════════════════════ */
 
 const POP = litteral("src/data/economy/populationData.ts", "POPULATION_BY_COUNTRY");
-const SRC_POP = "ONU · Banque mondiale — estimations sur 7 dates repères";
+const SRC_POP = "ONU · Banque mondiale · estimations sur 7 dates repères";
 for (const [nom, serie] of Object.entries(POP)) {
   const c = code(nom, "populationData.ts");
   if (!c) continue;

@@ -16,7 +16,7 @@
       ],
       "pays": 99,
       "sources": [
-        "ONU · Banque mondiale — estimations sur 7 dates repères"
+        "ONU · Banque mondiale · estimations sur 7 dates repères"
       ]
     },
     "dette-montant": {
@@ -30,7 +30,7 @@
       ],
       "pays": 88,
       "sources": [
-        "Economy · Capital — PIB et dettes du monde (relevés 2000, 2014, 2024)"
+        "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)"
       ]
     },
     "dette-sur-pib": {
@@ -48,7 +48,7 @@
       ],
       "pays": 99,
       "sources": [
-        "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 dates repères"
+        "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères"
       ]
     },
     "inflation": {
@@ -137,7 +137,7 @@
       ],
       "pays": 124,
       "sources": [
-        "OCDE · OIT — estimations 2023"
+        "OCDE · OIT · estimations 2023"
       ]
     },
     "population-active": {
@@ -149,7 +149,7 @@
       ],
       "pays": 124,
       "sources": [
-        "OCDE · OIT — estimations 2023"
+        "OCDE · OIT · estimations 2023"
       ]
     },
     "taux-chomage": {
@@ -167,7 +167,7 @@
       ],
       "pays": 99,
       "sources": [
-        "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 dates repères"
+        "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères"
       ]
     },
     "nombre-entreprises": {
@@ -185,7 +185,7 @@
       ],
       "pays": 99,
       "sources": [
-        "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 dates repères"
+        "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères"
       ]
     },
     "balance-commerciale": {
