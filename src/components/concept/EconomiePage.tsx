@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
 import { COLONNE, type Compteur as CompteurEco, type SocleEco } from "@/data/concept/conceptEconomie";
 import { CompteursEco } from "./CompteursEco";
+import { Annonce } from "./Annonce";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
 import { GlobeEco, familleDe, TOUTES } from "./GlobeEco";
@@ -115,8 +116,92 @@ function val(v: number | null, unite: Unite) {
     : `${Math.round(v).toLocaleString("fr-FR")} Md€`;
 }
 
+
+/* Deux cents lignes se reconstruisaient à chaque pixel de glissement sur la
+   frise : le tableau ne dépend pas de l'année visée, seulement de l'année
+   posée, et il n'a donc aucune raison de repasser par React entre-temps.
+   C'est ce qui rendait la frise poisseuse. */
+const Tableau = memo(function Tableau({
+  lignes,
+  colonnes,
+  col,
+  sens,
+  choisi,
+  onChoisi,
+  onTrier,
+}: {
+  lignes: Rang[];
+  colonnes: { id: Col; label: string; unite: Unite; famille: string }[];
+  col: Col;
+  sens: 1 | -1;
+  choisi: string | null;
+  onChoisi: (n: string) => void;
+  onTrier: (c: Col) => void;
+}) {
+  return (
+    <div className="cg-tab-cadre">
+      <table className="cg-tab">
+        <thead>
+          <tr>
+            <th className="cg-tab-r">#</th>
+            <th className="cg-tab-p">Pays</th>
+            {colonnes.map((c) => (
+              <th key={c.id}>
+                <button
+                  type="button"
+                  className={`cg-tri${col === c.id ? " cg-tri-on" : ""}`}
+                  onClick={() => onTrier(c.id)}
+                  aria-sort={col === c.id ? (sens === -1 ? "descending" : "ascending") : "none"}
+                >
+                  {c.label}
+                  <span aria-hidden="true">{col === c.id ? (sens === -1 ? " ↓" : " ↑") : ""}</span>
+                </button>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {lignes.map((r, i) => (
+            <tr
+              key={r.nom}
+              data-pays={r.nom}
+              className={choisi === r.nom ? "cg-tab-on" : undefined}
+              onClick={() => onChoisi(r.nom)}
+            >
+              <td className="cg-tab-r">{String(i + 1).padStart(2, "0")}</td>
+              <td className="cg-tab-p">{r.fr}</td>
+              {colonnes.map((c) => (
+                <td key={c.id} className={r[c.id] === null ? "cg-tab-vide" : undefined}>
+                  {val(r[c.id], c.unite)}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+});
+
 export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
+  /* Deux années : celle qu'on vise et celle qu'on affiche.
+     Repeindre la texture du globe et recalculer deux cents lignes à chaque
+     pixel de glissement rendait la frise poisseuse. Le point et le libellé
+     suivent le doigt immédiatement ; le reste de la page attend que le geste
+     se pose. */
+  const [anneeVue, setAnneeVue] = useState(socle.annees[socle.annees.length - 1]);
   const [annee, setAnnee] = useState(socle.annees[socle.annees.length - 1]);
+  const attente = useRef<number | null>(null);
+
+  const viseAnnee = useCallback((a: number, tout_de_suite = false) => {
+    setAnneeVue(a);
+    if (attente.current) clearTimeout(attente.current);
+    if (tout_de_suite) setAnnee(a);
+    else attente.current = window.setTimeout(() => setAnnee(a), 110);
+  }, []);
+  useEffect(() => () => {
+    if (attente.current) clearTimeout(attente.current);
+  }, []);
   const [col, setCol] = useState<Col>("pib");
   /* La métrique du globe et la colonne triée sont liées : cliquer « Dette »
      sur le globe trie le classement sur la dette, et l'inverse aussi. C'est
@@ -145,7 +230,7 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
     if (!el) return;
     const r = el.getBoundingClientRect();
     const t = Math.max(0, Math.min(1, (x - r.left) / (r.width || 1)));
-    setAnnee(socle.annees[Math.round(t * (socle.annees.length - 1))]);
+    viseAnnee(socle.annees[Math.round(t * (socle.annees.length - 1))]);
   };
 
   /* Les lignes de l'année, reconstituées depuis le format compact. */
@@ -227,27 +312,6 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
     });
   }, [socle, choisi, metrique]);
 
-  const cles = useMemo(() => {
-    let pib = 0;
-    let n = 0;
-    const infl: number[] = [];
-    for (const r of rangs) {
-      if (r.pib !== null) {
-        pib += r.pib;
-        n += 1;
-      }
-      if (r.inflation !== null) infl.push(r.inflation);
-    }
-    infl.sort((a, b) => a - b);
-    const med = infl.length
-      ? infl.length % 2
-        ? infl[(infl.length - 1) / 2]
-        : (infl[infl.length / 2 - 1] + infl[infl.length / 2]) / 2
-      : null;
-    const tete = [...rangs].filter((r) => r.pib !== null).sort((a, b) => (b.pib as number) - (a.pib as number))[0];
-    return { pib, n, med, tete };
-  }, [rangs]);
-
   /* Les colonnes de la famille en cours, plus le PIB qui sert de repère
      commun — on compare toujours quelque chose au poids de l'économie. */
   const colonnes = useMemo(() => {
@@ -278,7 +342,7 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
     return articles.filter((a) => `${a.titre} ${a.chapo} ${a.mots ?? ""}`.toLowerCase().includes(q));
   }, [articles, qArticle]);
 
-  const trier = (c: Col) => {
+  const trier = useCallback((c: Col) => {
     if (c === col) setSens((s) => (s === 1 ? -1 : 1));
     else {
       setCol(c);
@@ -286,7 +350,7 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
       const m = TOUTES.find((x) => COL_DE[x.id] === c);
       if (m) setMetrique(m.id);
     }
-  };
+  }, [col]);
 
   const changeMetrique = (id: EconomyMetricId) => {
     setMetrique(id);
@@ -298,8 +362,12 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
   };
 
   return (
-    <div className="cg">
+    <div className="cg cg-eco">
       <EnTete actif="Économie" />
+
+      {/* Le rail d'annonce suit la lecture sans la couper. Il ne s'affiche
+          qu'au-delà de la largeur où il ne mange rien à la colonne. */}
+      <Annonce format="rail" className="an-colle" />
 
       {/* ── L'ouverture ──────────────────────────────────────────────────── */}
       <section className="cg-section cg-eco-haut">
@@ -322,33 +390,10 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
           </Monte>
 
           <Monte delay={0.12}>
-            <dl className="cg-eco-cles">
-              <div>
-                <dt>PIB cumulé</dt>
-                <dd>{(cles.pib / 1000).toFixed(1).replace(".", ",")} T€</dd>
-                <span>{cles.n} pays renseignés</span>
-              </div>
-              <div>
-                <dt>Première économie</dt>
-                <dd>{cles.tete?.fr ?? "—"}</dd>
-                <span>{val(cles.tete?.pib ?? null, "md")}</span>
-              </div>
-              <div>
-                <dt>Inflation médiane</dt>
-                <dd>{cles.med === null ? "—" : `${cles.med.toFixed(1).replace(".", ",")} %`}</dd>
-                <span>millésime {annee}</span>
-              </div>
-              <div>
-                <dt>Fiches au classement</dt>
-                <dd>{rangs.length}</dd>
-                <span>sur {socle.pays.length} pays du socle</span>
-              </div>
-            </dl>
+            <CompteursEco compteurs={compteurs} annee={socle.annees[socle.annees.length - 1]} />
           </Monte>
         </div>
       </section>
-
-      <CompteursEco compteurs={compteurs} annee={socle.annees[socle.annees.length - 1]} />
 
       {/* ── Le globe, sa frise et ses raccourcis ─────────────────────────── */}
       <section className="cg-section cg-eco-globe">
@@ -364,6 +409,7 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
             choisi={choisi}
             onChoisi={setChoisi}
             nomFr={(n) => socle.pays.find((p) => p.nom === n)?.fr ?? n}
+            creancier={choisi ? socle.pays.find((p) => p.nom === choisi)?.creancier : undefined}
             serie={serie}
             sousLeGlobe={
 
@@ -372,7 +418,7 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
                  au-dessus obligeait à remonter pour chaque millésime. */
               <div className="cg-frise2">
                 <div className="cg-frise2-tete">
-                  <span className="cg-frise2-an">{annee}</span>
+                  <span className="cg-frise2-an">{anneeVue}</span>
                   <span className="cg-frise2-l">millésime affiché</span>
                 </div>
 
@@ -387,8 +433,8 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
                   aria-label="Millésime affiché"
                   aria-valuemin={socle.annees[0]}
                   aria-valuemax={socle.annees[socle.annees.length - 1]}
-                  aria-valuenow={annee}
-                  aria-valuetext={String(annee)}
+                  aria-valuenow={anneeVue}
+                  aria-valuetext={String(anneeVue)}
                   onPointerDown={(e) => {
                     e.currentTarget.setPointerCapture(e.pointerId);
                     tire.current = true;
@@ -397,29 +443,31 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
                   onPointerMove={(e) => tire.current && viseX(e.clientX)}
                   onPointerUp={() => {
                     tire.current = false;
+                    /* Le geste est fini : on n'attend plus. */
+                    viseAnnee(anneeVue, true);
                   }}
                   onPointerCancel={() => {
                     tire.current = false;
                   }}
                   onKeyDown={(e) => {
-                    const i = socle.annees.indexOf(annee);
+                    const i = socle.annees.indexOf(anneeVue);
                     if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
                       e.preventDefault();
-                      setAnnee(socle.annees[Math.max(0, i - 1)]);
+                      viseAnnee(socle.annees[Math.max(0, i - 1)], true);
                     } else if (e.key === "ArrowRight" || e.key === "ArrowUp") {
                       e.preventDefault();
-                      setAnnee(socle.annees[Math.min(socle.annees.length - 1, i + 1)]);
+                      viseAnnee(socle.annees[Math.min(socle.annees.length - 1, i + 1)], true);
                     } else if (e.key === "Home") {
                       e.preventDefault();
-                      setAnnee(socle.annees[0]);
+                      viseAnnee(socle.annees[0], true);
                     } else if (e.key === "End") {
                       e.preventDefault();
-                      setAnnee(socle.annees[socle.annees.length - 1]);
+                      viseAnnee(socle.annees[socle.annees.length - 1], true);
                     }
                   }}
                 >
                   <span className="cg-frise2-ligne" aria-hidden="true" />
-                  <span className="cg-frise2-faite" aria-hidden="true" style={{ width: `${pct(annee)}%` }} />
+                  <span className="cg-frise2-faite" aria-hidden="true" style={{ width: `${pct(anneeVue)}%` }} />
                   {socle.annees
                     .filter((a) => a % 10 === 0 || (a >= 2000 && a % 5 === 0))
                     .map((a) => (
@@ -430,7 +478,7 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
                         aria-hidden="true"
                       />
                     ))}
-                  <span className="cg-frise2-point" aria-hidden="true" style={{ left: `${pct(annee)}%` }} />
+                  <span className="cg-frise2-point" aria-hidden="true" style={{ left: `${pct(anneeVue)}%` }} />
                 </div>
 
                 <div className="cg-frise2-bornes" aria-hidden="true">
@@ -439,14 +487,14 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
                       partir de 2000 où la matière se resserre. Soixante-six
                       étiquettes côte à côte ne se lisent pas. */}
                   {socle.annees
-                    .filter((a) => a % 10 === 0 || (a >= 2000 && a % 5 === 0) || a === annee || a === socle.annees[socle.annees.length - 1])
+                    .filter((a) => a % 10 === 0 || (a >= 2000 && a % 5 === 0) || a === anneeVue || a === socle.annees[socle.annees.length - 1])
                     .map((a) => (
                       <button
                         key={a}
                         type="button"
-                        className={`cg-frise2-b${a === annee ? " cg-frise2-b-on" : ""}`}
+                        className={`cg-frise2-b${a === anneeVue ? " cg-frise2-b-on" : ""}`}
                         style={{ left: `${pct(a)}%` }}
-                        onClick={() => setAnnee(a)}
+                        onClick={() => viseAnnee(a, true)}
                         tabIndex={-1}
                       >
                         {a}
@@ -464,72 +512,74 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
         </div>
       </section>
 
+      <div className="cg-wrap cg-an-bande">
+        <Annonce format="bande" />
+      </div>
+
       {/* ── Le classement ────────────────────────────────────────────────── */}
-      <section className="cg-section cg-eco-rang">
+      {/* Un panneau clair, qui se lève au défilement : après trois sections
+          sombres, c'est la rupture qui signale « ici on compare », et un
+          tableau se lit mieux sur du clair que sur du noir. */}
+      <motion.section
+        className="cg-section cg-eco-rang"
+        initial={{ opacity: 0, y: 46 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-90px" }}
+        transition={{ duration: 0.85, ease: LENT }}
+      >
         <div className="cg-wrap">
-          <Enseigne
-            droite={
+          <motion.div
+            className="cg-clair"
+            initial={{ clipPath: "inset(8% 6% 8% 6% round 18px)" }}
+            whileInView={{ clipPath: "inset(0% 0% 0% 0% round 18px)" }}
+            viewport={{ once: true, margin: "-90px" }}
+            transition={{ duration: 1, ease: LENT }}
+          >
+            <div className="cg-clair-h">
+              <div>
+                <h2 className="cg-clair-t">Le classement</h2>
+                <label className="cg-an-choix">
+                  <span className="cg-an-choix-l">Millésime</span>
+                  <select
+                    value={annee}
+                    onChange={(e) => viseAnnee(Number(e.target.value), true)}
+                    aria-label="Millésime du classement"
+                  >
+                    {[...socle.annees].reverse().map((a) => (
+                      <option key={a} value={a}>
+                        {a}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
               <input
-                className="cg-filtre"
+                className="cg-filtre cg-filtre-clair"
                 type="search"
                 placeholder="Filtrer un pays"
                 value={filtre}
                 onChange={(e) => setFiltre(e.target.value)}
                 aria-label="Filtrer un pays"
               />
-            }
-          >
-            Le classement {annee}
-          </Enseigne>
+            </div>
 
-          <div className="cg-tab-cadre">
-            <table className="cg-tab">
-              <thead>
-                <tr>
-                  <th className="cg-tab-r">#</th>
-                  <th className="cg-tab-p">Pays</th>
-                  {colonnes.map((c) => (
-                    <th key={c.id}>
-                      <button
-                        type="button"
-                        className={`cg-tri${col === c.id ? " cg-tri-on" : ""}`}
-                        onClick={() => trier(c.id)}
-                        aria-sort={col === c.id ? (sens === -1 ? "descending" : "ascending") : "none"}
-                      >
-                        {c.label}
-                        <span aria-hidden="true">{col === c.id ? (sens === -1 ? " ↓" : " ↑") : ""}</span>
-                      </button>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {tries.map((r, i) => (
-                  <tr
-                    key={r.nom}
-                    data-pays={r.nom}
-                    className={choisi === r.nom ? "cg-tab-on" : undefined}
-                    onClick={() => setChoisi(r.nom)}
-                  >
-                    <td className="cg-tab-r">{String(i + 1).padStart(2, "0")}</td>
-                    <td className="cg-tab-p">{r.fr}</td>
-                    {colonnes.map((c) => (
-                      <td key={c.id} className={r[c.id] === null ? "cg-tab-vide" : undefined}>
-                        {val(r[c.id], c.unite)}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="cg-frise-n">
-            {tries.length} pays affichés · un tiret signale une valeur que la source ne publie pas
-            pour ce pays cette année-là ; ces pays passent en fin de tri, ils ne sont pas classés
-            derniers. Cliquez une ligne pour la retrouver sur le globe.
-          </p>
+            <Tableau
+              lignes={tries}
+              colonnes={colonnes}
+              col={col}
+              sens={sens}
+              choisi={choisi}
+              onChoisi={setChoisi}
+              onTrier={trier}
+            />
+            <p className="cg-clair-n">
+              {tries.length} pays affichés · un tiret signale une valeur que la source ne publie pas
+              pour ce pays cette année-là ; ces pays passent en fin de tri, ils ne sont pas classés
+              derniers. Cliquez une ligne pour la retrouver sur le globe.
+            </p>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── Les recommandations, puis la lecture ─────────────────────────── */}
       <section className="cg-section cg-lectures">
@@ -565,8 +615,8 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
             </div>
           )}
 
-          {/* Un carrousel : neuf articles posés à plat prendraient trois
-              écrans pour une section de lecture secondaire. */}
+          {/* Défilement libre : plus d'accrochage par fiche. On s'arrête où
+              l'on veut, y compris entre deux. */}
           <div
             ref={rail2}
             className="cg-arts"
@@ -585,26 +635,20 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
               prise2.current = null;
             }}
           >
-            {articlesVus.map((a) => (
+            {articlesVus.map((a, k) => (
               <article key={a.slug} className="cg-art">
-                <span className="cg-rubrique">{a.rubrique} · {a.duree}</span>
+                <ImagePlaceholder nom={`IMAGE_PNG_ECO_0${(k % 9) + 1}`} ratio="16 / 10" />
+                <span className="cg-rubrique">
+                  {a.rubrique} · {a.duree}
+                </span>
                 <h4 className="cg-art-t">{a.titre}</h4>
                 <p className="cg-art-c">{a.chapo}</p>
               </article>
             ))}
+            {articlesVus.length > 3 && <Annonce format="encart" className="an-dans-fil" />}
             {articlesVus.length === 0 && (
               <p className="cg-frise-n">Aucun article ne correspond à cette recherche.</p>
             )}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Un emplacement d'annonce ─────────────────────────────────────── */}
-      <section className="cg-section cg-pub-s">
-        <div className="cg-wrap">
-          <p className="cg-pub-l">Publicité</p>
-          <div className="cg-pub">
-            <ImagePlaceholder nom="IMAGE_PNG_PUB_ECO_01" ratio="8 / 1" />
           </div>
         </div>
       </section>

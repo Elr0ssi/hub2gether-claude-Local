@@ -7,6 +7,7 @@ import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import type { PaletteGlobe } from "@/components/map/EconomyGlobe";
 import { getValueIntensity } from "@/lib/economyColors";
 import { LENT } from "./pieces";
+import { Roulement } from "./Roulement";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE GLOBE ÉCONOMIE DU PROTOTYPE
@@ -122,6 +123,8 @@ interface Props {
   choisi: string | null;
   onChoisi: (nom: string | null) => void;
   nomFr: (nom: string) => string;
+  /** Le créancier principal, quand la famille regardée est celle de la dette. */
+  creancier?: string;
   /** La valeur de la métrique, année par année, pour la courbe d'évolution. */
   serie: { annee: number; v: number | null }[];
   sousLeGlobe?: React.ReactNode;
@@ -134,6 +137,7 @@ export function GlobeEco({
   choisi,
   onChoisi,
   nomFr,
+  creancier,
   serie,
   sousLeGlobe,
 }: Props) {
@@ -168,10 +172,15 @@ export function GlobeEco({
       const i = serie.findIndex((p) => p.annee === a);
       return (i / Math.max(1, serie.length - 1)) * 100;
     };
-    const d = pts
-      .map((p, k) => `${k === 0 ? "M" : "L"} ${x(p.annee).toFixed(2)} ${(28 - ((p.v - bas) / ampl) * 26).toFixed(2)}`)
-      .join(" ");
-    return { d, bas, haut };
+    const y = (v: number) => 30 - ((v - bas) / ampl) * 26;
+    const d = pts.map((p, k) => `${k === 0 ? "M" : "L"} ${x(p.annee).toFixed(2)} ${y(p.v).toFixed(2)}`).join(" ");
+    const a = pts[0];
+    const b = pts[pts.length - 1];
+    /* Les deux bouts de la série, avec leur année : une courbe sans repère
+       dit une forme, pas une histoire. On donne le départ et l'arrivée
+       plutôt que le minimum et le maximum — ce qu'on veut lire, c'est le
+       chemin parcouru. */
+    return { d, debut: a, fin: b, xDebut: x(a.annee), xFin: x(b.annee), yDebut: y(a.v), yFin: y(b.v) };
   }, [serie]);
 
   return (
@@ -240,9 +249,10 @@ export function GlobeEco({
 
                   <div className="ge-vedette">
                     <span className="ge-vedette-l">{metrique.label}</span>
-                    <span className="ge-vedette-v">
-                      {fmtEco(fiche[metrique.id] as number | undefined, metrique.unite)}
-                    </span>
+                    <Roulement
+                      className="ge-vedette-v"
+                      texte={fmtEco(fiche[metrique.id] as number | undefined, metrique.unite)}
+                    />
                     {rang && (
                       <span className="ge-vedette-r">
                         {rang.rang}
@@ -251,15 +261,20 @@ export function GlobeEco({
                     )}
                   </div>
 
+                  {famille.id === "dette" && creancier && (
+                    <p className="ge-note">Créancier principal · {creancier}</p>
+                  )}
+
                   <div className="ge-autres">
                     {famille.membres
                       .filter((m) => m.id !== metrique.id)
                       .map((m) => (
                         <button key={m.id} type="button" className="ge-autre" onClick={() => onMetrique(m.id)}>
                           <span className="ge-autre-l">{m.label}</span>
-                          <span className="ge-autre-v">
-                            {fmtEco(fiche[m.id] as number | undefined, m.unite)}
-                          </span>
+                          <Roulement
+                            className="ge-autre-v"
+                            texte={fmtEco(fiche[m.id] as number | undefined, m.unite)}
+                          />
                         </button>
                       ))}
                   </div>
@@ -268,14 +283,27 @@ export function GlobeEco({
                     <p className="ge-evo-t">Évolution · {metrique.label}</p>
                     {courbe ? (
                       <>
+                        {/* Les montants au-dessus de la courbe, à ses deux
+                            bouts : c'est là qu'on les cherche, pas sous
+                            l'axe. */}
+                        <div className="ge-evo-h">
+                          <span className="ge-evo-bout">
+                            <b>{fmtEco(courbe.debut.v, metrique.unite)}</b>
+                            {courbe.debut.annee}
+                          </span>
+                          <span className="ge-evo-bout ge-evo-bout-d">
+                            <b>{fmtEco(courbe.fin.v, metrique.unite)}</b>
+                            {courbe.fin.annee}
+                          </span>
+                        </div>
                         <svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">
                           <path d={courbe.d} fill="none" stroke="var(--froid)" strokeWidth="1.4"
                             vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
+                          <circle cx={courbe.xDebut} cy={courbe.yDebut} r="0.9" fill="var(--encre-3)"
+                            vectorEffect="non-scaling-stroke" />
+                          <circle cx={courbe.xFin} cy={courbe.yFin} r="1.3" fill="var(--froid)"
+                            vectorEffect="non-scaling-stroke" />
                         </svg>
-                        <p className="ge-evo-b">
-                          <span>{fmtEco(courbe.bas, metrique.unite)}</span>
-                          <span>{fmtEco(courbe.haut, metrique.unite)}</span>
-                        </p>
                       </>
                     ) : (
                       <p className="ge-evo-vide">

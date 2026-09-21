@@ -1664,7 +1664,18 @@ body:has(.cg) { background: #05080c; }
 .ge-evo { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--bord-fin); }
 .ge-evo-t { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--encre-3); }
 .ge-evo svg { display: block; width: 100%; height: 56px; margin-top: 10px; overflow: visible; }
-.ge-evo-b { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10.5px; color: var(--encre-3); font-variant-numeric: tabular-nums; }
+.ge-evo-h { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 12px; }
+.ge-evo-bout {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 10px;
+  color: var(--encre-3);
+  font-variant-numeric: tabular-nums;
+}
+.ge-evo-bout-d { text-align: right; }
+.ge-evo-bout b { font-size: 13px; font-weight: 400; color: var(--encre); }
+.ge-evo svg { margin-top: 4px; }
 .ge-evo-vide { margin-top: 10px; font-size: 11.5px; line-height: 1.55; color: var(--encre-3); }
 
 .ge-source { margin-top: 18px; font-size: 10.5px; letter-spacing: 0.05em; color: var(--encre-3); }
@@ -1698,31 +1709,33 @@ body:has(.cg) { background: #05080c; }
 /* ── Les compteurs ───────────────────────────────────────────────────────── */
 
 .cg-cpt-s { padding-top: clamp(30px, 4vh, 54px); }
-.cg-cpt-l {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
-}
-@media (max-width: 1080px) { .cg-cpt-l { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 560px) { .cg-cpt-l { grid-template-columns: minmax(0, 1fr); } }
+/* Un compteur par ligne : le montant est donné en euros, entier, et quinze
+   chiffres ne tiennent pas à cinq de front. C'est aussi ce qui laisse voir
+   les unités tourner. */
+.cg-cpt-l { display: flex; flex-direction: column; gap: 8px; }
 .cg-cpt {
   display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 16px 17px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 14px 18px;
   border: 1px solid var(--bord-fin);
   border-radius: 11px;
-  background: linear-gradient(180deg, rgba(158, 199, 216, 0.08), rgba(255, 255, 255, 0.03));
+  background: linear-gradient(90deg, rgba(158, 199, 216, 0.09), rgba(255, 255, 255, 0.025));
 }
-.cg-cpt-l2 { font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--encre-3); }
+.cg-cpt-t { display: flex; flex-direction: column; gap: 3px; }
+.cg-cpt-l2 { font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--encre-2); }
 .cg-cpt-v {
-  font-size: clamp(21px, 2.2vw, 28px);
-  line-height: 1.08;
-  letter-spacing: -0.03em;
+  font-size: clamp(20px, 2.4vw, 32px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
   color: var(--encre);
-  font-variant-numeric: tabular-nums;
 }
-.cg-cpt-n { font-size: 11px; color: var(--encre-2); }
+.cg-cpt-v::after { content: " €"; color: var(--encre-3); font-size: 0.6em; }
+.cg-cpt-n { font-size: 11px; color: var(--encre-3); }
+@media (max-width: 720px) {
+  .cg-cpt { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
 
 /* ── Les lectures ────────────────────────────────────────────────────────── */
 
@@ -1806,4 +1819,178 @@ body:has(.cg) { background: #05080c; }
   font-size: 10px;
   letter-spacing: 0.06em;
   color: var(--froid);
+}
+
+/* ── Le roulement des chiffres ───────────────────────────────────────────── */
+
+.rl {
+  display: inline-flex;
+  align-items: center;
+  /* Chiffres à chasse fixe : sans cela, chaque colonne aurait sa propre
+     largeur et le nombre respirerait à chaque roulement. */
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+.rl-fixe { display: inline-block; }
+.rl-fente {
+  display: inline-block;
+  /* Une hauteur de ligne entière, pas un cadratin : à 1em la fente coupait
+     le haut et le bas des chiffres, et l'on croyait le roulement bloqué
+     entre deux positions. */
+  height: 1.25em;
+  overflow: hidden;
+  width: 1ch;
+}
+.rl-colonne {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.42s cubic-bezier(0.25, 1, 0.4, 1);
+  will-change: transform;
+}
+.rl-colonne > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.25em;
+  line-height: 1.25;
+}
+@media (prefers-reduced-motion: reduce) { .rl-colonne { transition: none; } }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE PANNEAU CLAIR DU CLASSEMENT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cg-clair {
+  padding: 28px clamp(20px, 2.6vw, 38px) 26px;
+  border-radius: 18px;
+  /* Volontairement clair : après trois sections de nuit, c'est la rupture
+     qui dit « ici on compare ». Et un tableau de chiffres se lit mieux sur
+     du clair. */
+  background: linear-gradient(180deg, #f6f7f8, #eceef1);
+  color: #101720;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
+}
+.cg-clair-h {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.cg-clair-t {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 40px);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  color: #0b1119;
+}
+.cg-an-choix { display: inline-flex; align-items: center; gap: 9px; margin-top: 10px; }
+.cg-an-choix-l { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #5c6774; }
+.cg-an-choix select {
+  padding: 7px 12px;
+  border: 1px solid rgba(16, 23, 32, 0.18);
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: #101720;
+  cursor: pointer;
+}
+.cg-an-choix select:focus-visible { outline: 2px solid #1c5cab; outline-offset: 1px; }
+.cg-filtre-clair {
+  background: #fff;
+  border-color: rgba(16, 23, 32, 0.18);
+  color: #101720;
+}
+.cg-filtre-clair::placeholder { color: #7b8694; }
+
+/* Le tableau, sur clair */
+.cg-clair .cg-tab-cadre {
+  max-height: 520px;
+  border: 1px solid rgba(16, 23, 32, 0.12);
+  border-radius: 12px;
+  background: #fff;
+}
+.cg-clair .cg-tab thead th { background: #eef0f3; border-bottom: 1px solid rgba(16, 23, 32, 0.14); }
+.cg-clair .cg-tab thead th.cg-tab-r,
+.cg-clair .cg-tab thead th.cg-tab-p,
+.cg-clair .cg-tri { color: #5c6774; }
+.cg-clair .cg-tri:hover { color: #101720; }
+.cg-clair .cg-tri-on { color: #1c5cab; }
+.cg-clair .cg-tab td { color: #101720; border-bottom: 1px solid rgba(16, 23, 32, 0.075); }
+.cg-clair .cg-tab td.cg-tab-r { color: #8b95a2; }
+.cg-clair .cg-tab-vide { color: #a8b0ba !important; }
+.cg-clair .cg-tab tbody tr:nth-child(2n) { background: rgba(16, 23, 32, 0.022); }
+.cg-clair .cg-tab tbody tr:hover { background: rgba(28, 92, 171, 0.07); }
+.cg-clair .cg-tab-on { background: rgba(28, 92, 171, 0.13) !important; }
+.cg-clair-n { margin-top: 16px; max-width: 86ch; font-size: 11.5px; line-height: 1.6; color: #5c6774; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES EMPLACEMENTS D'ANNONCE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.an {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px dashed var(--bord);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.022);
+}
+.an-l {
+  position: relative;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+.an-trame { position: absolute; inset: 0; color: rgba(158, 199, 216, 0.16); pointer-events: none; }
+.an-trame svg { width: 100%; height: 100%; }
+.an-c { position: relative; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.an-f { font-size: 13px; color: var(--encre-2); font-variant-numeric: tabular-nums; }
+.an-n { font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--encre-3); }
+
+.an-bande { height: 118px; }
+.cg-an-bande { margin-bottom: clamp(30px, 4vh, 56px); }
+.an-encart { flex: 0 0 auto; width: 300px; align-self: stretch; }
+.an-dans-fil { margin-left: 4px; }
+
+/* Le rail : collé à gauche, et seulement là où il reste de la place à côté
+   de la colonne de lecture. Sous cette largeur il n'apparaît pas du tout —
+   un rail qui recouvre le texte n'est pas un emplacement, c'est une gêne. */
+.an-colle {
+  position: fixed;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 160px;
+  height: 600px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.an-colle .an-c { align-items: flex-start; }
+@media (max-width: 1620px) { .an-colle { display: none; } }
+
+/* ── Les fiches de lecture retrouvent leur visuel ────────────────────────── */
+
+.cg-arts { scroll-snap-type: none; }
+.cg-art { width: clamp(250px, 25vw, 310px); padding: 0 0 16px; overflow: hidden; }
+.cg-art .cg-rubrique { display: block; margin: 13px 16px 0; }
+.cg-art-t { margin: 8px 16px 0; }
+.cg-art-c { margin: 8px 16px 0; }
+.ge-note {
+  margin-top: 10px;
+  padding: 8px 11px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 11.5px;
+  color: var(--encre-2);
 }

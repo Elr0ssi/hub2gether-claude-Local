@@ -1,5 +1,6 @@
 import { ECONOMY_YEARS } from "@/data/economy/economy";
 import { countryFr } from "@/data/countryNamesFr";
+import { DEBT_DATA } from "@/data/economy/debtData";
 import { ECONOMY_ARTICLES } from "@/data/economy/articles";
 import { FAQS_ECONOMY } from "@/data/economy/faqs";
 import type { FicheArticle } from "./conceptGeo";
@@ -23,7 +24,10 @@ export type Ligne = (number | null)[];
 
 export interface SocleEco {
   annees: number[];
-  pays: { nom: string; fr: string }[];
+  /* Le créancier principal vient de la table de dette du site, pas du socle
+     annuel : c'est une information de contexte, la même que celle affichée
+     sur la carte économie. */
+  pays: { nom: string; fr: string; creancier?: string }[];
   lignes: Record<number, Ligne[]>;
 }
 
@@ -60,9 +64,11 @@ export const COLONNE: Record<string, number> = Object.fromEntries(
  * source ne publie pas pour un pays reste absente — elle ne devient pas
  * zéro, et le pays sort du classement de cette année-là.
  */
+const CREANCIER = new Map(DEBT_DATA.map((d) => [d.name, d.creditor]));
+
 export function socleEco(): SocleEco {
   const index = new Map<string, number>();
-  const pays: { nom: string; fr: string }[] = [];
+  const pays: SocleEco["pays"] = [];
   const lignes: Record<number, Ligne[]> = {};
 
   for (const y of ECONOMY_YEARS) {
@@ -72,7 +78,7 @@ export function socleEco(): SocleEco {
       if (id === undefined) {
         id = pays.length;
         index.set(nom, id);
-        pays.push({ nom, fr: countryFr(nom) });
+        pays.push({ nom, fr: countryFr(nom), creancier: CREANCIER.get(nom) });
       }
       const vals = CHAMPS.map(([c, dec]) => {
         const v = (d as Record<string, number | undefined>)[c];

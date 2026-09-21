@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import type { Compteur } from "@/data/concept/conceptEconomie";
 import { Enseigne } from "./pieces";
+import { Roulement } from "./Roulement";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LES COMPTEURS
@@ -21,26 +22,26 @@ function debutAnnee() {
 }
 
 export function CompteursEco({ compteurs, annee }: { compteurs: Compteur[]; annee: number }) {
-  const cases = useRef<(HTMLSpanElement | null)[]>([]);
+  /* La valeur passe par l'état plutôt que d'être écrite dans le DOM : c'est
+     le roulement qui doit la recevoir, et il a besoin d'être rendu. */
+  const [valeurs, setValeurs] = useState<string[]>(() => compteurs.map(() => ""));
 
   useEffect(() => {
     const doux = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const t0 = debutAnnee();
-    let brut = 0;
     const fmt = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
+    let brut = 0;
 
     const peint = () => {
       const part = (Date.now() - t0) / AN;
-      compteurs.forEach((c, i) => {
-        const el = cases.current[i];
-        if (!el) return;
-        const v = c.parAn * part;
-        el.textContent =
-          v >= 1000 ? `${fmt.format(Math.round(v / 1000))} T€` : `${fmt.format(Math.round(v))} Md€`;
-      });
-      /* Deux images par seconde : au-delà, les derniers chiffres clignotent
-         sans qu'on puisse les lire, et la page paie une boucle pour rien. */
-      if (!doux) brut = window.setTimeout(() => requestAnimationFrame(peint), 500);
+      /* Le montant entier, en euros, pas un arrondi en milliards : c'est en
+         voyant tourner les unités qu'on comprend la vitesse à laquelle ces
+         grandeurs courent. */
+      setValeurs(compteurs.map((c) => fmt.format(Math.round(c.parAn * 1e9 * part))));
+      /* Une mise à jour par seconde. Plus souvent, le roulement n'a jamais le
+         temps de se poser et le nombre reste illisible ; moins souvent, on ne
+         voit plus qu'il court. */
+      if (!doux) brut = window.setTimeout(peint, 1000);
     };
     peint();
     return () => clearTimeout(brut);
@@ -57,23 +58,18 @@ export function CompteursEco({ compteurs, annee }: { compteurs: Compteur[]; anne
         <div className="cg-cpt-l">
           {compteurs.map((c, i) => (
             <div key={c.id} className="cg-cpt">
-              <span className="cg-cpt-l2">{c.label}</span>
-              <span
-                className="cg-cpt-v"
-                ref={(el) => {
-                  cases.current[i] = el;
-                }}
-              >
-                —
+              <span className="cg-cpt-t">
+                <span className="cg-cpt-l2">{c.label}</span>
+                <span className="cg-cpt-n">{c.note}</span>
               </span>
-              <span className="cg-cpt-n">{c.note}</span>
+              <Roulement texte={valeurs[i] ?? ""} className="cg-cpt-v" />
             </div>
           ))}
         </div>
         <p className="cg-frise-n">
-          Ces compteurs ne mesurent pas en direct : ils étalent sur l&apos;année une grandeur
-          annuelle du millésime {annee}. Ils disent un ordre de grandeur et un rythme, pas un relevé
-          à la seconde.
+          En euros, depuis le 1<sup>er</sup> janvier. Ces compteurs ne mesurent pas en direct : ils
+          étalent sur l&apos;année une grandeur annuelle du millésime {annee}. Ils disent un ordre de
+          grandeur et un rythme, pas un relevé à la seconde.
         </p>
       </div>
     </section>
