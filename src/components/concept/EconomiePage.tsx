@@ -121,6 +121,52 @@ function val(v: number | null, unite: Unite) {
    frise : le tableau ne dépend pas de l'année visée, seulement de l'année
    posée, et il n'a donc aucune raison de repasser par React entre-temps.
    C'est ce qui rendait la frise poisseuse. */
+/* L'ouverture de la bande au défilement.
+
+   whileInView de framer n'a jamais répondu ici, et un IntersectionObserver
+   posé au montage restait muet alors qu'un observateur créé après coup sur le
+   même nœud, lui, se déclenchait. Plutôt que de dépendre d'un mécanisme qui
+   se comporte différemment selon le moment où on l'installe, on lit la
+   position réelle à chaque défilement : c'est une lecture par image, sur un
+   seul nœud, et la mesure est relue à chaque fois donc jamais périmée. Une
+   fois la bande vue, on décroche tout et on n'y revient pas. */
+function useVu(marge = 120) {
+  const ref = useRef<HTMLElement | null>(null);
+  const [vu, setVu] = useState(false);
+  useEffect(() => {
+    let vivant = true;
+    let prevu = false;
+    const regarde = () => {
+      const n = ref.current;
+      if (!n) return;
+      const r = n.getBoundingClientRect();
+      const h = window.innerHeight || 0;
+      if (r.top < h - marge && r.bottom > marge) {
+        setVu(true);
+        decroche();
+      }
+    };
+    const planifie = () => {
+      if (prevu || !vivant) return;
+      prevu = true;
+      requestAnimationFrame(() => {
+        prevu = false;
+        regarde();
+      });
+    };
+    const decroche = () => {
+      vivant = false;
+      window.removeEventListener("scroll", planifie);
+      window.removeEventListener("resize", planifie);
+    };
+    window.addEventListener("scroll", planifie, { passive: true });
+    window.addEventListener("resize", planifie);
+    planifie();
+    return decroche;
+  }, [marge]);
+  return { ref, vu };
+}
+
 const Tableau = memo(function Tableau({
   lignes,
   colonnes,
@@ -210,6 +256,7 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
   const [metrique, setMetrique] = useState<EconomyMetricId>("gdp");
   const [sens, setSens] = useState<1 | -1>(-1);
   const [filtre, setFiltre] = useState("");
+  const bande = useVu();
   const [qArticle, setQArticle] = useState("");
   const [choisi, setChoisi] = useState<string | null>("France");
   const [ouvert, setOuvert] = useState<number | null>(0);
@@ -517,68 +564,89 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
       </div>
 
       {/* ── Le classement ────────────────────────────────────────────────── */}
-      {/* Un panneau clair, qui se lève au défilement : après trois sections
-          sombres, c'est la rupture qui signale « ici on compare », et un
-          tableau se lit mieux sur du clair que sur du noir. */}
+      {/* Une bande claire, de bord à bord, qui s'ouvre au défilement. Après
+          trois sections de nuit, c'est la rupture franche qui dit « ici on
+          compare » — et un tableau de chiffres se lit mieux sur du clair.
+          Le titre et son sélecteur sont centrés ; le tableau vient dessous,
+          dans un bloc arrondi posé au milieu de la bande. */}
       <motion.section
-        className="cg-section cg-eco-rang"
-        initial={{ opacity: 0, y: 46 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-90px" }}
-        transition={{ duration: 0.85, ease: LENT }}
+        ref={bande.ref as React.RefObject<HTMLElement>}
+        className="cg-bande"
+        initial={false}
+        animate={{ clipPath: bande.vu ? "inset(0 0 0% 0)" : "inset(0 0 100% 0)" }}
+        transition={{ duration: 1.05, ease: LENT }}
       >
-        <div className="cg-wrap">
-          <motion.div
-            className="cg-clair"
-            initial={{ clipPath: "inset(8% 6% 8% 6% round 18px)" }}
-            whileInView={{ clipPath: "inset(0% 0% 0% 0% round 18px)" }}
-            viewport={{ once: true, margin: "-90px" }}
-            transition={{ duration: 1, ease: LENT }}
+        <div className="cg-bande-h">
+          <motion.h2
+            className="cg-bande-t"
+            initial={false}
+            animate={bande.vu ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
+            transition={{ duration: 0.8, delay: bande.vu ? 0.25 : 0, ease: LENT }}
           >
-            <div className="cg-clair-h">
-              <div>
-                <h2 className="cg-clair-t">Le classement</h2>
-                <label className="cg-an-choix">
-                  <span className="cg-an-choix-l">Millésime</span>
-                  <select
-                    value={annee}
-                    onChange={(e) => viseAnnee(Number(e.target.value), true)}
-                    aria-label="Millésime du classement"
-                  >
-                    {[...socle.annees].reverse().map((a) => (
-                      <option key={a} value={a}>
-                        {a}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-              <input
-                className="cg-filtre cg-filtre-clair"
-                type="search"
-                placeholder="Filtrer un pays"
-                value={filtre}
-                onChange={(e) => setFiltre(e.target.value)}
-                aria-label="Filtrer un pays"
-              />
-            </div>
+            Le classement
+          </motion.h2>
+          <motion.p
+            className="cg-bande-c"
+            initial={false}
+            animate={bande.vu ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+            transition={{ duration: 0.8, delay: bande.vu ? 0.38 : 0, ease: LENT }}
+          >
+            {socle.pays.length} pays, {socle.annees.length} millésimes, dix indicateurs. Choisissez
+            une année, triez la colonne qui vous intéresse.
+          </motion.p>
 
-            <Tableau
-              lignes={tries}
-              colonnes={colonnes}
-              col={col}
-              sens={sens}
-              choisi={choisi}
-              onChoisi={setChoisi}
-              onTrier={trier}
+          <motion.div
+            className="cg-bande-ctrl"
+            initial={false}
+            animate={bande.vu ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
+            transition={{ duration: 0.8, delay: bande.vu ? 0.5 : 0, ease: LENT }}
+          >
+            <label className="cg-an-choix">
+              <span className="cg-an-choix-l">Millésime</span>
+              <select
+                value={annee}
+                onChange={(e) => viseAnnee(Number(e.target.value), true)}
+                aria-label="Millésime du classement"
+              >
+                {[...socle.annees].reverse().map((a) => (
+                  <option key={a} value={a}>
+                    {a}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <input
+              className="cg-filtre cg-filtre-clair"
+              type="search"
+              placeholder="Filtrer un pays"
+              value={filtre}
+              onChange={(e) => setFiltre(e.target.value)}
+              aria-label="Filtrer un pays"
             />
-            <p className="cg-clair-n">
-              {tries.length} pays affichés · un tiret signale une valeur que la source ne publie pas
-              pour ce pays cette année-là ; ces pays passent en fin de tri, ils ne sont pas classés
-              derniers. Cliquez une ligne pour la retrouver sur le globe.
-            </p>
           </motion.div>
         </div>
+
+        <motion.div
+          className="cg-bande-bloc"
+          initial={false}
+          animate={bande.vu ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+          transition={{ duration: 0.9, delay: bande.vu ? 0.55 : 0, ease: LENT }}
+        >
+          <Tableau
+            lignes={tries}
+            colonnes={colonnes}
+            col={col}
+            sens={sens}
+            choisi={choisi}
+            onChoisi={setChoisi}
+            onTrier={trier}
+          />
+          <p className="cg-bande-n">
+            {tries.length} pays affichés · un tiret signale une valeur que la source ne publie pas
+            pour ce pays cette année-là ; ces pays passent en fin de tri, ils ne sont pas classés
+            derniers. Cliquez une ligne pour la retrouver sur le globe.
+          </p>
+        </motion.div>
       </motion.section>
 
       {/* ── Les recommandations, puis la lecture ─────────────────────────── */}
