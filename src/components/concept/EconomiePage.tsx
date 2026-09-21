@@ -135,24 +135,23 @@ function useVu(marge = 120) {
   const [vu, setVu] = useState(false);
   useEffect(() => {
     let vivant = true;
-    let prevu = false;
     const regarde = () => {
       const n = ref.current;
       if (!n) return;
       const r = n.getBoundingClientRect();
       const h = window.innerHeight || 0;
-      if (r.top < h - marge && r.bottom > marge) {
-        setVu(true);
-        decroche();
-      }
+      /* Le rectangle doit réapparaître à chaque fois qu'on revient dessus,
+         pas seulement la première : on suit l'état au lieu de le figer. */
+      setVu(r.top < h - marge && r.bottom > marge);
     };
+    /* On mesure dans l'écouteur, pas dans une image d'animation. Attendre
+       requestAnimationFrame liait l'ouverture au rythme de rendu : sur une
+       page où le globe tire la cadence vers le bas, la bande s'ouvrait avec
+       un défilement de retard. Lire la position d'un seul élément ne coûte
+       rien, et le résultat est juste au moment où on le lit. */
     const planifie = () => {
-      if (prevu || !vivant) return;
-      prevu = true;
-      requestAnimationFrame(() => {
-        prevu = false;
-        regarde();
-      });
+      if (!vivant) return;
+      regarde();
     };
     const decroche = () => {
       vivant = false;
@@ -166,6 +165,15 @@ function useVu(marge = 120) {
   }, [marge]);
   return { ref, vu };
 }
+
+/* Le classement ne dessine que ce qui est à l'écran.
+
+   Deux cents lignes de cinq cellules, c'est mille nœuds que React devait
+   rapprocher à chaque changement d'année — pendant que le globe repeignait
+   sa texture. Le cadre n'en montre qu'une douzaine : on ne rend que celles-là
+   plus une marge, et deux cales tiennent la hauteur pour que la barre de
+   défilement reste juste. */
+const MARGE = 8;
 
 const Tableau = memo(function Tableau({
   lignes,
@@ -184,8 +192,46 @@ const Tableau = memo(function Tableau({
   onChoisi: (n: string) => void;
   onTrier: (c: Col) => void;
 }) {
+  const cadre = useRef<HTMLDivElement>(null);
+  const [haut, setHaut] = useState(44);
+  const [fen, setFen] = useState({ a: 0, b: 30 });
+
+  const mesure = useCallback(() => {
+    const el = cadre.current;
+    if (!el) return;
+    const tr = el.querySelector("tbody tr[data-pays]") as HTMLElement | null;
+    const h = tr?.offsetHeight || haut;
+    if (h && Math.abs(h - haut) > 0.5) setHaut(h);
+    const a = Math.max(0, Math.floor(el.scrollTop / h) - MARGE);
+    const b = Math.min(lignes.length, Math.ceil((el.scrollTop + el.clientHeight) / h) + MARGE);
+    setFen((p) => (p.a === a && p.b === b ? p : { a, b }));
+  }, [haut, lignes.length]);
+
+  useEffect(() => {
+    mesure();
+    const el = cadre.current;
+    if (!el) return;
+    const suit = () => mesure();
+    el.addEventListener("scroll", suit, { passive: true });
+    window.addEventListener("resize", suit);
+    return () => {
+      el.removeEventListener("scroll", suit);
+      window.removeEventListener("resize", suit);
+    };
+  }, [mesure]);
+
+  /* Trier ou changer d'année remet la lecture en haut : rester au millieu
+     d'un classement qu'on vient de retourner n'a pas de sens. */
+  useEffect(() => {
+    cadre.current?.scrollTo({ top: 0 });
+  }, [col, sens, lignes]);
+
+  const a = Math.min(fen.a, Math.max(0, lignes.length - 1));
+  const b = Math.min(fen.b, lignes.length);
+  const nCol = colonnes.length + 2;
+
   return (
-    <div className="cg-tab-cadre">
+    <div className="cg-tab-cadre" ref={cadre}>
       <table className="cg-tab">
         <thead>
           <tr>
@@ -207,14 +253,19 @@ const Tableau = memo(function Tableau({
           </tr>
         </thead>
         <tbody>
-          {lignes.map((r, i) => (
+          {a > 0 && (
+            <tr className="cg-tab-cale" aria-hidden="true">
+              <td colSpan={nCol} style={{ height: a * haut }} />
+            </tr>
+          )}
+          {lignes.slice(a, b).map((r, i) => (
             <tr
               key={r.nom}
               data-pays={r.nom}
               className={choisi === r.nom ? "cg-tab-on" : undefined}
               onClick={() => onChoisi(r.nom)}
             >
-              <td className="cg-tab-r">{String(i + 1).padStart(2, "0")}</td>
+              <td className="cg-tab-r">{String(a + i + 1).padStart(2, "0")}</td>
               <td className="cg-tab-p">{r.fr}</td>
               {colonnes.map((c) => (
                 <td key={c.id} className={r[c.id] === null ? "cg-tab-vide" : undefined}>
@@ -223,6 +274,11 @@ const Tableau = memo(function Tableau({
               ))}
             </tr>
           ))}
+          {b < lignes.length && (
+            <tr className="cg-tab-cale" aria-hidden="true">
+              <td colSpan={nCol} style={{ height: (lignes.length - b) * haut }} />
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
@@ -421,24 +477,37 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
         {/* Une lueur derrière le titre : sur une page entièrement noire, une
             ouverture sans relief se confond avec la section suivante. */}
         <div className="cg-eco-lueur" aria-hidden="true" />
-        <div className="cg-wrap cg-eco-ouv">
+        <div className="cg-wrap">
+          {/* L'ouverture tient sur une ligne de lecture : le titre à gauche,
+              ce qu'on peut en faire à droite. Un grand titre centré au-dessus
+              d'un chapô centré répétait deux fois la même chose et repoussait
+              les chiffres sous la ligne de flottaison. */}
           <Monte>
-            <p className="cg-eyebrow">Économie · millésime {annee}</p>
-            <h1 className="cg-h1 cg-eco-h1">
-              Le monde,
-              <br />
-              <span className="cg-h2-doux">en milliards.</span>
-            </h1>
-            <p className="cg-chapo">
-              Dix indicateurs, {socle.pays.length} pays, {socle.annees.length} millésimes — de{" "}
-              {socle.annees[0]} à {socle.annees[socle.annees.length - 1]}. Choisissez une année :
-              tout suit.
-            </p>
+            <div className="cg-eco-ouv">
+              <div className="cg-eco-ouv-g">
+                <p className="cg-eyebrow">Économie</p>
+                <h1 className="cg-h1 cg-eco-h1">
+                  Le socle économique,
+                  <br />
+                  <span className="cg-h2-doux">millésime par millésime.</span>
+                </h1>
+              </div>
+              <div className="cg-eco-ouv-d">
+                <p className="cg-chapo">
+                  Dix indicateurs, {socle.pays.length} pays, {socle.annees.length} millésimes — de{" "}
+                  {socle.annees[0]} à {socle.annees[socle.annees.length - 1]}. Choisissez une
+                  année : le globe, les fiches et le classement suivent ensemble.
+                </p>
+                <p className="cg-eco-ouv-s">
+                  Banque mondiale (WDI) · FMI · millésime affiché : {annee}
+                </p>
+              </div>
+            </div>
           </Monte>
 
-          <Monte delay={0.12}>
-            <CompteursEco compteurs={compteurs} annee={socle.annees[socle.annees.length - 1]} />
-          </Monte>
+          {/* Les compteurs en rangée, juste sous l'ouverture : c'est la
+              première chose qui bouge, elle n'a pas à attendre. */}
+          <CompteursEco compteurs={compteurs} annee={socle.annees[socle.annees.length - 1]} />
         </div>
       </section>
 
@@ -569,38 +638,25 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
           compare » — et un tableau de chiffres se lit mieux sur du clair.
           Le titre et son sélecteur sont centrés ; le tableau vient dessous,
           dans un bloc arrondi posé au milieu de la bande. */}
-      <motion.section
+      {/* L'ouverture est une transition CSS pilotée par un attribut, pas une
+          animation JavaScript : elle ne dépend d'aucune boucle de rendu, elle
+          rejoue dans les deux sens à chaque passage, et elle ne coûte rien
+          pendant que le globe occupe le processeur. */}
+      <section
         ref={bande.ref as React.RefObject<HTMLElement>}
         className="cg-bande"
-        initial={false}
-        animate={{ clipPath: bande.vu ? "inset(0 0 0% 0)" : "inset(0 0 100% 0)" }}
-        transition={{ duration: 1.05, ease: LENT }}
+        data-vu={bande.vu ? "1" : "0"}
       >
         <div className="cg-bande-h">
-          <motion.h2
-            className="cg-bande-t"
-            initial={false}
-            animate={bande.vu ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
-            transition={{ duration: 0.8, delay: bande.vu ? 0.25 : 0, ease: LENT }}
-          >
+          <h2 className="cg-bande-t">
             Le classement
-          </motion.h2>
-          <motion.p
-            className="cg-bande-c"
-            initial={false}
-            animate={bande.vu ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-            transition={{ duration: 0.8, delay: bande.vu ? 0.38 : 0, ease: LENT }}
-          >
+          </h2>
+          <p className="cg-bande-c">
             {socle.pays.length} pays, {socle.annees.length} millésimes, dix indicateurs. Choisissez
             une année, triez la colonne qui vous intéresse.
-          </motion.p>
+          </p>
 
-          <motion.div
-            className="cg-bande-ctrl"
-            initial={false}
-            animate={bande.vu ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
-            transition={{ duration: 0.8, delay: bande.vu ? 0.5 : 0, ease: LENT }}
-          >
+          <div className="cg-bande-ctrl">
             <label className="cg-an-choix">
               <span className="cg-an-choix-l">Millésime</span>
               <select
@@ -623,15 +679,10 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
               onChange={(e) => setFiltre(e.target.value)}
               aria-label="Filtrer un pays"
             />
-          </motion.div>
+          </div>
         </div>
 
-        <motion.div
-          className="cg-bande-bloc"
-          initial={false}
-          animate={bande.vu ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-          transition={{ duration: 0.9, delay: bande.vu ? 0.55 : 0, ease: LENT }}
-        >
+        <div className="cg-bande-bloc">
           <Tableau
             lignes={tries}
             colonnes={colonnes}
@@ -646,8 +697,8 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
             pour ce pays cette année-là ; ces pays passent en fin de tri, ils ne sont pas classés
             derniers. Cliquez une ligne pour la retrouver sur le globe.
           </p>
-        </motion.div>
-      </motion.section>
+        </div>
+      </section>
 
       {/* ── Les recommandations, puis la lecture ─────────────────────────── */}
       <section className="cg-section cg-lectures">

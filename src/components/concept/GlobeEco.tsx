@@ -1,13 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useCallback, useMemo, useRef, useState } from "react";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import type { PaletteGlobe } from "@/components/map/EconomyGlobe";
 import { getValueIntensity } from "@/lib/economyColors";
-import { LENT } from "./pieces";
-import { Roulement } from "./Roulement";
+import { Odometre } from "./Roulement";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE GLOBE ÉCONOMIE DU PROTOTYPE
@@ -116,6 +114,23 @@ export function fmtEco(v: number | null | undefined, unite: MetriqueEco["unite"]
     : `${Math.round(v).toLocaleString("fr-FR")} Md€`;
 }
 
+/** La même mise en forme, mais découpée pour l'odomètre : un nombre, ses
+    décimales et son unité, au lieu d'une chaîne déjà composée. */
+export function pieceEco(
+  v: number | null | undefined,
+  unite: MetriqueEco["unite"],
+): { v: number | null; dec: number; unite: string } {
+  if (v === null || v === undefined || !Number.isFinite(v)) return { v: null, dec: 0, unite: "" };
+  if (unite === "ans") return { v, dec: 0, unite: "\u00a0ans" };
+  if (unite === "k") return { v, dec: 0, unite: "\u00a0k" };
+  if (unite === "hab") return { v, dec: 1, unite: "\u00a0M" };
+  if (unite === "pct") return { v, dec: 1, unite: "\u00a0%" };
+  if (unite === "eur") return { v, dec: 0, unite: "\u00a0€" };
+  return Math.abs(v) >= 1000
+    ? { v: v / 1000, dec: 1, unite: "\u00a0T€" }
+    : { v, dec: 0, unite: "\u00a0Md€" };
+}
+
 interface Props {
   annee: EconomyYear;
   metrique: MetriqueEco;
@@ -173,15 +188,45 @@ export function GlobeEco({
       return (i / Math.max(1, serie.length - 1)) * 100;
     };
     const y = (v: number) => 30 - ((v - bas) / ampl) * 26;
-    const d = pts.map((p, k) => `${k === 0 ? "M" : "L"} ${x(p.annee).toFixed(2)} ${y(p.v).toFixed(2)}`).join(" ");
-    const a = pts[0];
-    const b = pts[pts.length - 1];
+    const marques = pts.map((p) => ({ ...p, x: x(p.annee), y: y(p.v) }));
+    const d = marques
+      .map((p, k) => `${k === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
+      .join(" ");
     /* Les deux bouts de la série, avec leur année : une courbe sans repère
        dit une forme, pas une histoire. On donne le départ et l'arrivée
        plutôt que le minimum et le maximum — ce qu'on veut lire, c'est le
        chemin parcouru. */
-    return { d, debut: a, fin: b, xDebut: x(a.annee), xFin: x(b.annee), yDebut: y(a.v), yFin: y(b.v) };
+    return { d, marques, debut: marques[0], fin: marques[marques.length - 1] };
   }, [serie]);
+
+  /* Le survol de la courbe. On ne cherche pas le point le plus proche en
+     distance : on prend celui dont l'abscisse est la plus proche du doigt,
+     sinon un creux profond attire le curseur alors qu'on vise une année. */
+  const [survol, setSurvol] = useState<number | null>(null);
+  const cadre = useRef<HTMLDivElement>(null);
+  const vise = useCallback(
+    (clientX: number) => {
+      const el = cadre.current;
+      if (!el || !courbe) return;
+      const r = el.getBoundingClientRect();
+      const t = Math.max(0, Math.min(100, ((clientX - r.left) / (r.width || 1)) * 100));
+      let best = 0;
+      let d = Infinity;
+      courbe.marques.forEach((p, i) => {
+        const e = Math.abs(p.x - t);
+        if (e < d) {
+          d = e;
+          best = i;
+        }
+      });
+      setSurvol(best);
+    },
+    [courbe],
+  );
+  const lu = survol !== null && courbe ? courbe.marques[survol] : null;
+
+  /* La vedette et ses voisines, découpées pour l'odomètre. */
+  const vedette = pieceEco(fiche?.[metrique.id] as number | undefined, metrique.unite);
 
   return (
     <div className="ge">
@@ -235,90 +280,164 @@ export function GlobeEco({
 
         {/* ── La fiche pays ──────────────────────────────────────────────── */}
         <aside className="ge-panneau">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={choisi ?? "vide"}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3, ease: LENT }}
-            >
-              {fiche && choisi ? (
-                <>
-                  <h3 className="ge-nom">{nomFr(choisi)}</h3>
+          {/* Aucune apparition, aucun envol : quand on change de pays, le
+              cadre ne bouge pas et ce sont les nombres qui tournent jusqu'à
+              leur nouvelle valeur. C'est le mouvement qui dit le changement,
+              pas le déplacement du bloc. */}
+          <div className="ge-fiche">
+            {fiche && choisi ? (
+              <>
+                <h3 className="ge-nom">{nomFr(choisi)}</h3>
 
-                  <div className="ge-vedette">
-                    <span className="ge-vedette-l">{metrique.label}</span>
-                    <Roulement
-                      className="ge-vedette-v"
-                      texte={fmtEco(fiche[metrique.id] as number | undefined, metrique.unite)}
-                    />
-                    {rang && (
-                      <span className="ge-vedette-r">
-                        {rang.rang}
-                        <sup>e</sup> sur {rang.total}
-                      </span>
-                    )}
-                  </div>
-
-                  {famille.id === "dette" && creancier && (
-                    <p className="ge-note">Créancier principal · {creancier}</p>
+                <div className="ge-vedette">
+                  <span className="ge-vedette-l">{metrique.label}</span>
+                  <Odometre
+                    className="ge-vedette-v"
+                    valeur={vedette.v}
+                    dec={vedette.dec}
+                    unite={vedette.unite}
+                    duree={950}
+                    tours={1}
+                    couleur
+                  />
+                  {rang && (
+                    <span className="ge-vedette-r">
+                      {rang.rang}
+                      <sup>e</sup> sur {rang.total}
+                    </span>
                   )}
+                </div>
 
-                  <div className="ge-autres">
-                    {famille.membres
-                      .filter((m) => m.id !== metrique.id)
-                      .map((m) => (
-                        <button key={m.id} type="button" className="ge-autre" onClick={() => onMetrique(m.id)}>
+                {famille.id === "dette" && creancier && (
+                  <p className="ge-note">Créancier principal · {creancier}</p>
+                )}
+
+                <div className="ge-autres">
+                  {famille.membres
+                    .filter((m) => m.id !== metrique.id)
+                    .map((m) => {
+                      const p = pieceEco(fiche[m.id] as number | undefined, m.unite);
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          className="ge-autre"
+                          onClick={() => onMetrique(m.id)}
+                        >
                           <span className="ge-autre-l">{m.label}</span>
-                          <Roulement
+                          <Odometre
                             className="ge-autre-v"
-                            texte={fmtEco(fiche[m.id] as number | undefined, m.unite)}
+                            valeur={p.v}
+                            dec={p.dec}
+                            unite={p.unite}
+                            duree={950}
+                            tours={1}
+                            couleur
                           />
                         </button>
-                      ))}
-                  </div>
+                      );
+                    })}
+                </div>
 
-                  <div className="ge-evo">
-                    <p className="ge-evo-t">Évolution · {metrique.label}</p>
-                    {courbe ? (
-                      <>
-                        {/* Les montants au-dessus de la courbe, à ses deux
-                            bouts : c'est là qu'on les cherche, pas sous
-                            l'axe. */}
-                        <div className="ge-evo-h">
-                          <span className="ge-evo-bout">
-                            <b>{fmtEco(courbe.debut.v, metrique.unite)}</b>
-                            {courbe.debut.annee}
+                <div className="ge-evo">
+                  <p className="ge-evo-t">Évolution · {metrique.label}</p>
+                  {courbe ? (
+                    <>
+                      {/* Le bandeau dit les deux bouts au repos, et l'année
+                          survolée dès qu'on pose le doigt sur la courbe. */}
+                      <div className="ge-evo-h">
+                        {lu ? (
+                          <span className="ge-evo-lu">
+                            <b>{fmtEco(lu.v, metrique.unite)}</b>
+                            {lu.annee}
                           </span>
-                          <span className="ge-evo-bout ge-evo-bout-d">
-                            <b>{fmtEco(courbe.fin.v, metrique.unite)}</b>
-                            {courbe.fin.annee}
-                          </span>
-                        </div>
+                        ) : (
+                          <>
+                            <span className="ge-evo-bout">
+                              <b>{fmtEco(courbe.debut.v, metrique.unite)}</b>
+                              {courbe.debut.annee}
+                            </span>
+                            <span className="ge-evo-bout ge-evo-bout-d">
+                              <b>{fmtEco(courbe.fin.v, metrique.unite)}</b>
+                              {courbe.fin.annee}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      <div
+                        ref={cadre}
+                        className="ge-evo-c"
+                        onPointerMove={(e) => vise(e.clientX)}
+                        onPointerDown={(e) => {
+                          e.currentTarget.setPointerCapture(e.pointerId);
+                          vise(e.clientX);
+                        }}
+                        onPointerLeave={() => setSurvol(null)}
+                        onPointerCancel={() => setSurvol(null)}
+                      >
                         <svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">
-                          <path d={courbe.d} fill="none" stroke="var(--froid)" strokeWidth="1.4"
-                            vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
-                          <circle cx={courbe.xDebut} cy={courbe.yDebut} r="0.9" fill="var(--encre-3)"
-                            vectorEffect="non-scaling-stroke" />
-                          <circle cx={courbe.xFin} cy={courbe.yFin} r="1.3" fill="var(--froid)"
-                            vectorEffect="non-scaling-stroke" />
+                          <path
+                            d={courbe.d}
+                            fill="none"
+                            stroke="var(--froid)"
+                            strokeWidth="1.4"
+                            vectorEffect="non-scaling-stroke"
+                            strokeLinejoin="round"
+                            strokeLinecap="round"
+                          />
+                          <circle
+                            cx={courbe.debut.x}
+                            cy={courbe.debut.y}
+                            r="0.9"
+                            fill="var(--encre-3)"
+                            vectorEffect="non-scaling-stroke"
+                          />
+                          <circle
+                            cx={courbe.fin.x}
+                            cy={courbe.fin.y}
+                            r="1.3"
+                            fill="var(--froid)"
+                            vectorEffect="non-scaling-stroke"
+                          />
+                          {lu && (
+                            <>
+                              <line
+                                x1={lu.x}
+                                y1="0"
+                                x2={lu.x}
+                                y2="30"
+                                stroke="var(--bord)"
+                                strokeWidth="1"
+                                vectorEffect="non-scaling-stroke"
+                              />
+                              <circle
+                                cx={lu.x}
+                                cy={lu.y}
+                                r="1.8"
+                                fill="var(--encre)"
+                                vectorEffect="non-scaling-stroke"
+                              />
+                            </>
+                          )}
                         </svg>
-                      </>
-                    ) : (
-                      <p className="ge-evo-vide">
-                        Moins de deux millésimes publiés pour ce pays sur cet indicateur.
+                      </div>
+                      <p className="ge-evo-n">
+                        Passez le doigt ou le curseur sur la courbe pour lire une année.
                       </p>
-                    )}
-                  </div>
+                    </>
+                  ) : (
+                    <p className="ge-evo-vide">
+                      Moins de deux millésimes publiés pour ce pays sur cet indicateur.
+                    </p>
+                  )}
+                </div>
 
-                  <p className="ge-source">Banque mondiale (WDI) · FMI · {annee.year}</p>
-                </>
-              ) : (
-                <p className="ge-vide">Cliquez un pays sur le globe pour ouvrir sa fiche.</p>
-              )}
-            </motion.div>
-          </AnimatePresence>
+                <p className="ge-source">Banque mondiale (WDI) · FMI · {annee.year}</p>
+              </>
+            ) : (
+              <p className="ge-vide">Cliquez un pays sur le globe pour ouvrir sa fiche.</p>
+            )}
+          </div>
         </aside>
       </div>
     </div>

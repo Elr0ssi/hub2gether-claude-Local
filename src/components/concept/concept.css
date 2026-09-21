@@ -1326,8 +1326,8 @@ body:has(.cg) { background: #05080c; }
   background: linear-gradient(90deg, var(--froid), transparent);
 }
 
-.cg-eco-haut { padding-top: clamp(130px, 17vh, 210px); }
-.cg-eco-h1 { margin-top: 20px; max-width: 16ch; }
+.cg-eco-haut { padding-top: clamp(130px, 17vh, 210px); padding-bottom: clamp(34px, 4.5vh, 62px); }
+.cg-eco-h1 { margin-top: 16px; max-width: 18ch; }
 
 .cg-eco-cles {
   display: grid;
@@ -1686,6 +1686,13 @@ body:has(.cg) { background: #05080c; }
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .cg-eco-haut { overflow: hidden; }
+.ge-evo-c { touch-action: pan-y; cursor: crosshair; }
+.ge-evo-lu { display: flex; flex-direction: column; gap: 2px; font-size: 10.5px; color: var(--encre-3); }
+.ge-evo-lu b { font-size: 13px; font-weight: 400; color: var(--encre); }
+.ge-evo-n { margin-top: 8px; font-size: 10.5px; color: var(--encre-3); }
+/* Les cales qui tiennent la hauteur du classement pendant qu'on n'en dessine
+   qu'une fenêtre : elles ne portent rien et ne doivent rien peindre. */
+.cg-tab-cale td { padding: 0; border: 0; background: none; }
 /* Une lueur derrière l'ouverture : sur une page entièrement noire, un titre
    sans relief se confond avec la section suivante. */
 .cg-eco-lueur {
@@ -1697,7 +1704,23 @@ body:has(.cg) { background: #05080c; }
     radial-gradient(ellipse 42% 58% at 22% 34%, rgba(60, 130, 220, 0.2), transparent 66%),
     radial-gradient(ellipse 46% 50% at 82% 20%, rgba(214, 167, 122, 0.12), transparent 68%);
 }
-.cg-eco-ouv { position: relative; }
+.cg-eco-ouv {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 72px);
+  align-items: end;
+}
+.cg-eco-ouv-d { padding-bottom: 6px; }
+.cg-eco-ouv-s {
+  margin-top: 14px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--encre-3);
+}
+@media (max-width: 900px) {
+  .cg-eco-ouv { grid-template-columns: 1fr; gap: 22px; align-items: start; }
+}
 
 .cg-eco-cles > div {
   padding: 15px 17px;
@@ -1708,33 +1731,55 @@ body:has(.cg) { background: #05080c; }
 
 /* ── Les compteurs ───────────────────────────────────────────────────────── */
 
-.cg-cpt-s { padding-top: clamp(30px, 4vh, 54px); }
-/* Un compteur par ligne : le montant est donné en euros, entier, et quinze
-   chiffres ne tiennent pas à cinq de front. C'est aussi ce qui laisse voir
-   les unités tourner. */
-.cg-cpt-l { display: flex; flex-direction: column; gap: 8px; }
+/* Les compteurs en rangée : cinq grandeurs empilées se lisaient comme une
+   liste. Côte à côte, on les voit courir ensemble, et c'est la course qui
+   est le sujet. Le montant est donné en euros entiers : quinze chiffres à
+   cinq de front, cela impose une petite chasse — c'est le prix de la rangée,
+   et l'ordre de grandeur reste lisible. */
+.cg-cpt-l {
+  margin-top: clamp(30px, 4.5vh, 56px);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
 .cg-cpt {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 14px 18px;
+  flex-direction: column;
+  gap: 7px;
+  padding: 14px 15px;
   border: 1px solid var(--bord-fin);
   border-radius: 11px;
-  background: linear-gradient(90deg, rgba(158, 199, 216, 0.09), rgba(255, 255, 255, 0.025));
+  background: linear-gradient(160deg, rgba(158, 199, 216, 0.09), rgba(255, 255, 255, 0.02));
+  min-width: 0;
 }
-.cg-cpt-t { display: flex; flex-direction: column; gap: 3px; }
-.cg-cpt-l2 { font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--encre-2); }
+.cg-cpt-l2 {
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--encre-2);
+}
 .cg-cpt-v {
-  font-size: clamp(20px, 2.4vw, 32px);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  font-size: clamp(11px, 0.92vw, 15px);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
   color: var(--encre);
+  white-space: nowrap;
 }
-.cg-cpt-v::after { content: " €"; color: var(--encre-3); font-size: 0.6em; }
-.cg-cpt-n { font-size: 11px; color: var(--encre-3); }
+.cg-cpt-n { font-size: 10.5px; color: var(--encre-3); }
+.cg-cpt-p {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  max-width: 86ch;
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--encre-3);
+}
+@media (max-width: 1180px) {
+  .cg-cpt-l { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 @media (max-width: 720px) {
-  .cg-cpt { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .cg-cpt-l { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cg-cpt-v { font-size: 12px; }
 }
 
 /* ── Les lectures ────────────────────────────────────────────────────────── */
@@ -1830,7 +1875,11 @@ body:has(.cg) { background: #05080c; }
      largeur et le nombre respirerait à chaque roulement. */
   font-variant-numeric: tabular-nums;
   line-height: 1.25;
+  transition: color 0.45s ease;
 }
+/* Le sens du mouvement se lit à la couleur, le temps qu'il dure. */
+.rl-hausse { color: #5fe0a2; }
+.rl-baisse { color: #ff8b8b; }
 .rl-fixe { display: inline-block; }
 .rl-fente {
   display: inline-block;
@@ -1841,10 +1890,15 @@ body:has(.cg) { background: #05080c; }
   overflow: hidden;
   width: 1ch;
 }
+/* Un rouleau qui tourne plus vite que l'œil ne se lit plus : on le laisse
+   tourner en retrait, il dit « ça défile » au lieu de brouiller le nombre. */
+.rl-vite { opacity: 0.5; }
 .rl-colonne {
   display: flex;
   flex-direction: column;
-  transition: transform 0.42s cubic-bezier(0.25, 1, 0.4, 1);
+  /* Aucune transition : la position est réécrite à chaque image par la
+     boucle d'animation. Une transition par-dessus ferait courir le navigateur
+     après une cible qui a déjà bougé, et le mouvement redeviendrait saccadé. */
   will-change: transform;
 }
 .rl-colonne > span {
@@ -1854,11 +1908,57 @@ body:has(.cg) { background: #05080c; }
   height: 1.25em;
   line-height: 1.25;
 }
-@media (prefers-reduced-motion: reduce) { .rl-colonne { transition: none; } }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA BANDE CLAIRE DU CLASSEMENT
    ═══════════════════════════════════════════════════════════════════════════ */
+
+/* L'ouverture : une transition CSS, déclenchée par un attribut que le
+   défilement met à jour. Elle rejoue dans les deux sens, à chaque passage.
+   Le faire en CSS plutôt qu'en JavaScript a une raison de fond : sur cette
+   page, le globe prend le processeur, et une animation pilotée image par
+   image arrivait avec un défilement de retard. */
+.cg-bande {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1.05s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-bande[data-vu="1"] { clip-path: inset(0 0 0% 0); }
+.cg-bande-t,
+.cg-bande-c,
+.cg-bande-ctrl,
+.cg-bande-bloc {
+  opacity: 0;
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-bande-t { transform: translateY(22px); }
+.cg-bande-c { transform: translateY(16px); }
+.cg-bande-ctrl { transform: translateY(14px); }
+.cg-bande-bloc { transform: translateY(40px); }
+.cg-bande[data-vu="1"] .cg-bande-t,
+.cg-bande[data-vu="1"] .cg-bande-c,
+.cg-bande[data-vu="1"] .cg-bande-ctrl,
+.cg-bande[data-vu="1"] .cg-bande-bloc {
+  opacity: 1;
+  transform: none;
+}
+.cg-bande[data-vu="1"] .cg-bande-t { transition-delay: 0.25s; }
+.cg-bande[data-vu="1"] .cg-bande-c { transition-delay: 0.38s; }
+.cg-bande[data-vu="1"] .cg-bande-ctrl { transition-delay: 0.5s; }
+.cg-bande[data-vu="1"] .cg-bande-bloc { transition-delay: 0.55s; }
+@media (prefers-reduced-motion: reduce) {
+  .cg-bande,
+  .cg-bande-t,
+  .cg-bande-c,
+  .cg-bande-ctrl,
+  .cg-bande-bloc {
+    transition: none;
+    clip-path: none;
+    opacity: 1;
+    transform: none;
+  }
+}
 
 .cg-bande {
   position: relative;
