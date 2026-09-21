@@ -135,7 +135,12 @@ export default function Page() {
         {nb(ratioDernier.valeur)}{" "}
         % du PIB, selon l&apos;INSEE. Au 31 mars 2026, les non-résidents
         détenaient {nb(nonResidents.valeur)} % des titres de dette de long terme émis par les
-        administrations publiques françaises, selon la Banque de France.
+        administrations publiques françaises, selon la Banque de France. Sur le périmètre de la
+        dette négociable de l&apos;État, en valeur de marché, cette part atteint 57,5 % au premier
+        trimestre 2026 selon l&apos;Agence France Trésor. En 2025, les administrations publiques
+        françaises ont dépensé environ 1 714 milliards d&apos;euros pour environ 1 562 milliards
+        de recettes, soit un déficit public de 152,5 milliards d&apos;euros ; le budget général de
+        l&apos;État a enregistré de son côté 441,2 milliards d&apos;euros de dépenses nettes.
       </p>
 
       <DettePage />

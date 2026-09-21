@@ -242,11 +242,35 @@ export const dureeVieMoyenne = {
 
 export const FAQ: { q: string; r: string }[] = [
   {
+    q: "Combien la France dépense-t-elle par an ?",
+    r: "En 2025, les administrations publiques françaises ont dépensé environ 1 714 milliards d'euros, soit 57,3 % du PIB. Ce chiffre couvre l'État, les administrations locales, les organismes publics centraux et les administrations de sécurité sociale.",
+  },
+  {
+    q: "Combien l'État français dépense-t-il ?",
+    r: "Le budget général de l'État a enregistré 441,2 milliards d'euros de dépenses nettes en 2025. Ce chiffre ne doit pas être confondu avec les 1 714 milliards d'euros de dépenses de l'ensemble des administrations publiques : le périmètre et la comptabilité sont différents.",
+  },
+  {
+    q: "Quelles sont les principales recettes publiques françaises ?",
+    r: "En 2025, les recettes publiques atteignent environ 1 562 milliards d'euros. Elles comprennent notamment 882 milliards d'euros d'impôts et 446,3 milliards d'euros de cotisations sociales effectives.",
+  },
+  {
+    q: "Où va l'argent public en France ?",
+    r: "La dernière ventilation fonctionnelle détaillée disponible indique qu'en 2024 la protection sociale représentait 693 milliards d'euros de dépenses publiques, devant la santé à 261 milliards, les services publics généraux à 181 milliards, les affaires économiques à 166 milliards et l'enseignement à 149 milliards.",
+  },
+  {
+    q: "Quelle part de la dette française est détenue par l'étranger ?",
+    r: "Au premier trimestre 2026, les non-résidents détenaient 57,5 % des titres de la dette négociable de l'État français en valeur de marché. Ce pourcentage ne correspond pas à 57,5 % de l'ensemble de la dette publique française au sens de Maastricht.",
+  },
+  {
+    q: "Qui détient la dette française ?",
+    r: "Au premier trimestre 2026, la dette négociable de l'État était détenue à 57,5 % par des non-résidents, 20,6 % par d'autres détenteurs français, 10,5 % par des établissements de crédit français, 9,6 % par des compagnies d'assurance françaises et 1,8 % par des OPCVM français.",
+  },
+  {
     q: "Quel est le montant de la dette publique française ?",
     r: `À la fin du premier trimestre 2026, la dette publique française au sens de Maastricht s'élève à ${detteDerniere.valeur.toLocaleString("fr-FR", { minimumFractionDigits: 1 })} milliards d'euros, soit ${ratioDernier.valeur.toLocaleString("fr-FR", { minimumFractionDigits: 1 })} % du PIB, selon l'INSEE.`,
   },
   {
-    q: "Qui détient la dette française ?",
+    q: "Qui détient les titres de dette de long terme des administrations publiques ?",
     r: `La dette française est détenue par de nombreux investisseurs français et étrangers. Au 31 mars 2026, les non-résidents détenaient ${nonResidents.valeur.toLocaleString("fr-FR", { minimumFractionDigits: 1 })} % des titres de dette de long terme émis par les administrations publiques françaises, selon la Banque de France. Ce périmètre ne correspond pas exactement à l'ensemble de la dette publique de Maastricht.`,
   },
   {

@@ -3,7 +3,6 @@
 import {
   deficit2025,
   detteDerniere,
-  dureeVieMoyenne,
   eurosysteme,
   FAQ,
   nonResidents,
@@ -11,6 +10,21 @@ import {
   variationTrimestre,
 } from "@/data/articles/detteFrancaise";
 import { Compteur, Leve, Precision, Progression, Source } from "./pieces";
+import { Etiquette } from "./finances";
+import {
+  AnneeReelle,
+  BruteNette,
+  CompositionDette,
+  DeuxMesures,
+  OuVaLArgent,
+  Porteurs,
+  Prelevements,
+  Recettes,
+  TvaDeuxMesures,
+  Waterfall,
+  ZoomEtat,
+  ZoomSecu,
+} from "./finances";
 import {
   Administrations,
   Balance,
@@ -190,6 +204,46 @@ export function DettePage() {
             <Cascade />
           </div>
 
+          {/* La France réelle derrière l'équation : les mêmes barres, mais
+              avec les montants de 2025. */}
+          <h3 className="dp-h3">Avant la dette, il y a un déséquilibre annuel.</h3>
+          <p className="dp-reponse">
+            La dette de {nb(detteDerniere.valeur, 1)} milliards d&apos;euros est un stock accumulé
+            dans le temps. Pour comprendre pourquoi ce stock évolue, il faut d&apos;abord regarder
+            ce qui se passe chaque année dans les finances publiques.
+          </p>
+          <AnneeReelle />
+          <p className="dp-texte">
+            En 2025, l&apos;ensemble des administrations publiques françaises a donc dépensé environ
+            152,5 milliards d&apos;euros de plus qu&apos;il n&apos;a reçu de recettes. Cet écart
+            constitue le déficit public de l&apos;année.
+          </p>
+          <p className="dp-garde">
+            Le déficit annuel et l&apos;augmentation de la dette ne sont pas exactement la même
+            chose. La variation de la dette dépend également des mouvements de trésorerie, des
+            acquisitions ou cessions d&apos;actifs financiers et d&apos;autres opérations qui
+            n&apos;entrent pas directement dans le déficit de Maastricht. On ne peut donc pas
+            déduire l&apos;un de l&apos;autre.
+          </p>
+
+          <Recettes />
+          <Prelevements />
+
+          <h3 className="dp-h3">Où va l&apos;argent public ?</h3>
+          <OuVaLArgent />
+          <DeuxMesures />
+          <ZoomEtat />
+          <TvaDeuxMesures />
+          <ZoomSecu />
+
+          <h3 className="dp-h3">Qui crée le déficit ?</h3>
+          <Waterfall />
+          <p className="dp-texte">
+            C&apos;est ce besoin de financement, répété dans le temps et combiné aux opérations de
+            financement, qui nous ramène à la dette. Une année ne suffit pas à l&apos;expliquer :
+            le stock actuel est le produit de décennies de besoins de financement.
+          </p>
+
           <Courbe />
 
           <Leve tag="p" className="dp-texte">
@@ -254,6 +308,8 @@ export function DettePage() {
             sens de Maastricht : celle de l&apos;ensemble des administrations publiques françaises,
             après consolidation des dettes qu&apos;elles peuvent avoir entre elles.
           </p>
+          <CompositionDette />
+          <BruteNette />
           <Administrations />
 
           <div className="dp-duo">
@@ -339,6 +395,9 @@ export function DettePage() {
             appliqué mécaniquement à la dette de Maastricht.
           </p>
 
+          <Porteurs />
+
+          <h3 className="dp-h3">Les grandes catégories d&apos;investisseurs</h3>
           <Detenteurs />
 
           <Leve className="dp-encart">
@@ -420,16 +479,56 @@ export function DettePage() {
           </div>
 
           <Leve className="dp-encart">
-            <p className="dp-encart-v">{dureeVieMoyenne.ordre}</p>
+            <p className="dp-encart-v">8 ans et 142 jours</p>
             <p>
-              C&apos;est l&apos;ordre de grandeur de la {dureeVieMoyenne.perimetre} en{" "}
-              {dureeVieMoyenne.periode}. Plus des taux élevés persistent, plus ils peuvent
-              progressivement se diffuser dans le coût moyen de financement : chaque année, une
-              partie seulement du stock est refinancée.
+              C&apos;est la durée de vie moyenne de la dette négociable de l&apos;État au 31 août
+              2026. Plus des taux élevés persistent, plus ils peuvent progressivement se diffuser
+              dans le coût moyen de financement : chaque année, une partie seulement du stock est
+              refinancée.
             </p>
-            <p className="dp-note">{dureeVieMoyenne.reserve}</p>
-            <Source c={dureeVieMoyenne} />
+            <ul className="dp-chiffres">
+              <li>
+                <b>2 903,8 Md€</b>encours de dette négociable de l&apos;État
+              </li>
+              <li>
+                <b>3,50 %</b>taux moyen pondéré des OAT émises en 2026
+              </li>
+            </ul>
+            <Etiquette perimetre="STATE_NEGOTIABLE_DEBT" base="NATIONAL_FINANCIAL_STATISTICS" periode="au 31 août 2026" />
+            <a className="dp-src" href="https://www.aft.gouv.fr/fr/publications-chiffres-cles" target="_blank" rel="noopener noreferrer">
+              Source : Agence France Trésor · bulletin mensuel ↗
+            </a>
           </Leve>
+
+          {/* Quatre mesures du coût, qui ne disent pas la même chose. */}
+          <div className="dp-couts">
+            <div>
+              <b>64,7 Md€</b>
+              <span>intérêts payés par l&apos;ensemble des administrations publiques en 2025</span>
+              <Etiquette perimetre="GENERAL_GOVERNMENT" base="NATIONAL_ACCOUNTS" periode="2025" />
+            </div>
+            <div>
+              <b>52,4 Md€</b>
+              <span>dont l&apos;État, en comptabilité nationale</span>
+              <Etiquette perimetre="STATE" base="NATIONAL_ACCOUNTS" periode="2025" />
+            </div>
+            <div>
+              <b>50,9 Md€</b>
+              <span>programme « Charge de la dette et trésorerie de l&apos;État »</span>
+              <Etiquette perimetre="STATE" base="BUDGETARY_ACCOUNTING" periode="2025" />
+            </div>
+            <div>
+              <b>53,2 Md€</b>
+              <span>mission « Engagements financiers de l&apos;État », plus large</span>
+              <Etiquette perimetre="STATE" base="BUDGETARY_ACCOUNTING" periode="2025" />
+            </div>
+          </div>
+          <p className="dp-garde">
+            Ces quatre montants sont exacts en même temps. Ils ne mesurent ni le même périmètre, ni
+            la même comptabilité : le programme « Charge de la dette » n&apos;est pas la mission
+            « Engagements financiers », et l&apos;État n&apos;est pas l&apos;ensemble des
+            administrations publiques.
+          </p>
 
           <div className="dp-split">
             <div className="dp-split-c">
@@ -449,9 +548,9 @@ export function DettePage() {
           </div>
 
           <p className="dp-manque">
-            La série de la charge de la dette de l&apos;État n&apos;est pas encore dans notre base :
-            elle n&apos;est donc pas représentée ici plutôt que d&apos;être approchée. Elle se lit
-            dans les documents budgétaires et chez l&apos;Agence France Trésor.
+            La série historique de la charge de la dette n&apos;est pas encore dans notre base :
+            seuls les montants 2025 sont donnés ci-dessus, et aucune courbe n&apos;est approchée à
+            leur place.
           </p>
 
           <p className="dp-vers-t">
