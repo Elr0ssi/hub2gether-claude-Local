@@ -543,7 +543,10 @@ body:has(.cg) { background: #05080c; }
   align-items: center;
 }
 .cg-une-img { border-radius: 12px; }
-.cg-rubrique { font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--chaud); }
+/* Les rubriques passent au froid. L'ambre était la couleur d'accent de la
+   page d'accueil ; sur une page de données bleues, elle tirait l'œil vers un
+   registre qui n'est plus celui du site. */
+.cg-rubrique { font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--froid); }
 .cg-une-t {
   margin-top: 18px;
   font-size: clamp(30px, 3.3vw, 54px);
@@ -1327,7 +1330,7 @@ body:has(.cg) { background: #05080c; }
 }
 
 .cg-eco-haut { padding-top: clamp(120px, 15vh, 180px); padding-bottom: clamp(26px, 3.5vh, 48px); }
-.cg-eco-h1 { margin-top: 14px; max-width: none; font-size: clamp(38px, 5.2vw, 72px); }
+.cg-eco-h1 { margin-top: 14px; max-width: none; font-size: clamp(34px, 4.6vw, 64px); text-wrap: balance; }
 
 .cg-eco-cles {
   display: grid;
@@ -1555,8 +1558,11 @@ body:has(.cg) { background: #05080c; }
 
 .ge-corps {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 300px);
-  gap: 20px;
+  /* La colonne du globe se resserre et sa scène s'allonge : la sphère est
+     inscrite dans le plus petit côté du cadre, donc un cadre large et bas la
+     rend petite. Moins large, plus haut, elle grandit sans rien déplacer. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 336px);
+  gap: 22px;
   align-items: start;
 }
 @media (max-width: 1080px) { .ge-corps { grid-template-columns: minmax(0, 1fr); } }
@@ -1564,11 +1570,58 @@ body:has(.cg) { background: #05080c; }
 
 .ge-scene {
   position: relative;
-  height: clamp(360px, 46vh, 480px);
+  height: clamp(440px, 64vh, 680px);
   border: 1px solid var(--bord-fin);
-  border-radius: 12px;
-  background: radial-gradient(ellipse 62% 62% at 50% 46%, #0a1524, #05090f 72%);
+  border-radius: 14px;
+  /* Un éclat froid derrière la sphère, et un halo chaud très bas : la scène
+     n'est plus un trou noir dans la page, elle a une profondeur. */
+  background:
+    radial-gradient(ellipse 46% 46% at 50% 44%, rgba(90, 165, 235, 0.16), transparent 68%),
+    radial-gradient(ellipse 70% 40% at 50% 104%, rgba(214, 167, 122, 0.08), transparent 70%),
+    radial-gradient(ellipse 62% 62% at 50% 46%, #0a1524, #05090f 72%);
   overflow: hidden;
+}
+
+/* L'anneau qui tourne au bord de la scène, comme sur la page d'accueil du
+   concept : un filet d'un pixel, jamais un aplat. */
+.ge-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--cg-tour),
+    transparent 0deg 190deg,
+    rgba(158, 199, 216, 0.85) 244deg,
+    rgba(120, 220, 255, 0.95) 262deg,
+    rgba(214, 167, 122, 0.7) 280deg,
+    transparent 330deg 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: cg-tourne 11s linear infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+/* Deux éclats aux angles, qui respirent en décalé. */
+.ge-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 34% 40% at 0% 0%, rgba(120, 200, 255, 0.16), transparent 70%),
+    radial-gradient(ellipse 34% 40% at 100% 100%, rgba(214, 167, 122, 0.13), transparent 70%);
+  animation: cg-respire 6.5s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ge-scene::before,
+  .ge-scene::after { animation: none; }
 }
 .ge-attente { position: absolute; inset: 0; }
 
@@ -1706,7 +1759,7 @@ body:has(.cg) { background: #05080c; }
 }
 .cg-eco-ouv {
   position: relative;
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
   text-align: center;
 }
@@ -1779,7 +1832,7 @@ body:has(.cg) { background: #05080c; }
 /* ── Les lectures ────────────────────────────────────────────────────────── */
 
 .cg-recos { margin-bottom: 30px; }
-.cg-recos-t { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--chaud); }
+.cg-recos-t { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--froid); }
 .cg-recos-l {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2114,4 +2167,355 @@ body:has(.cg) { background: #05080c; }
   background: rgba(255, 255, 255, 0.04);
   font-size: 11.5px;
   color: var(--encre-2);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA COULEUR ET LE MOUVEMENT DE LA PAGE ÉCONOMIE
+
+   Même principe que la page d'accueil du concept : la couleur n'arrive pas
+   par des aplats, elle arrive par des traits. Un filet qui court sous un
+   titre, un bord qui s'allume au passage du curseur, une ligne de tableau qui
+   prend une lueur sous le doigt. Assez pour que la page respire, jamais assez
+   pour passer devant les chiffres.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Le titre d'ouverture ──────────────────────────────────────────────── */
+
+/* Les mots montent l'un après l'autre derrière un masque : ils ne surgissent
+   pas, ils se lèvent. Une animation au chargement plutôt qu'au défilement —
+   le titre est au-dessus de la ligne de flottaison, il n'a personne à
+   attendre. */
+/* Plus spécifique que `.cg-h1 span { display: block }`, qui fait tenir les
+   titres sur plusieurs lignes ailleurs sur le site : ici les mots doivent
+   rester côte à côte. */
+.cg-h1 .cg-mot:last-child,
+.cg-h1 .cg-mot,
+.cg-mot {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  color: var(--encre);
+}
+.cg-h1 .cg-mot > span,
+.cg-mot > span {
+  display: inline-block;
+  color: inherit;
+}
+.cg-mot > span {
+  display: inline-block;
+  transform: translateY(105%);
+  animation: cg-leve 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 90ms + 120ms);
+}
+@keyframes cg-leve {
+  to { transform: translateY(0); }
+}
+
+/* Pas de dégradé découpé sur les lettres du titre : les mots se translatent
+   pour se lever, et un fond découpé sur du texte ne suit pas un glyphe
+   transformé — le titre devenait invisible. La couleur passe donc derrière,
+   par la lueur, qui elle n'a rien à découper. */
+.cg-eco-lueur {
+  animation: cg-lueur-eco 9s ease-in-out infinite alternate;
+}
+@keyframes cg-lueur-eco {
+  from { opacity: 0.55; transform: translate3d(-2%, 0, 0) scale(1); }
+  to { opacity: 1; transform: translate3d(2%, 0, 0) scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cg-eco-lueur { animation: none; }
+}
+
+/* Un trait qui s'allume sous l'ouverture. */
+.cg-eco-ouv::after {
+  content: "";
+  display: block;
+  width: min(280px, 46%);
+  height: 1px;
+  margin: 30px auto 0;
+  background: linear-gradient(90deg, transparent, rgba(158, 199, 216, 0.75), rgba(214, 167, 122, 0.5), transparent);
+  transform: scaleX(0);
+  animation: cg-trait 1.3s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
+}
+@keyframes cg-trait {
+  to { transform: scaleX(1); }
+}
+
+/* ── Ce qui s'allume au passage ────────────────────────────────────────── */
+
+/* Les boutons d'indicateur prennent un filet froid quand on les survole, et
+   le gardent quand ils sont actifs. */
+.ge-metrique {
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+.ge-metrique::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--froid), transparent);
+  transform: scaleX(0);
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ge-metrique:hover::after,
+.ge-metrique-on::after { transform: scaleX(1); }
+
+/* Les rectangles voisins de la fiche pays. */
+.ge-autre {
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+.ge-autre::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(150deg, rgba(158, 199, 216, 0.14), transparent 62%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.ge-autre:hover::before { opacity: 1; }
+
+/* La fiche article : un filet froid en haut, qui se tire au survol. */
+.cg-art { position: relative; }
+.cg-art::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--froid), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 2;
+}
+.cg-art:hover::before { transform: scaleX(1); }
+
+/* ── Les recommandations ───────────────────────────────────────────────── */
+
+/* Trois lectures proposées, en ligne, chacune sous un trait qui s'allume.
+   L'ancienne version les posait dans des rectangles gris qui ressemblaient à
+   des cartes sans en être : on garde le trait, on retire le cadre. */
+.cg-recos {
+  margin: 0 0 34px;
+  padding: 22px 0 0;
+  border-top: 1px solid var(--bord-fin);
+}
+.cg-recos-t {
+  margin: 0 0 16px;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--froid);
+}
+.cg-recos-l {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+}
+.cg-reco {
+  position: relative;
+  padding: 18px 26px 18px 0;
+  background: none;
+  border: 0;
+  border-left: 1px solid var(--bord-fin);
+  padding-left: 22px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.35s ease;
+}
+.cg-reco:first-child { border-left: 0; padding-left: 0; }
+.cg-reco::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--froid), rgba(214, 167, 122, 0.6), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-reco:hover::after { transform: scaleX(1); }
+.cg-reco-n {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--encre-3);
+}
+.cg-reco-t {
+  margin: 9px 0 0;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.34;
+  color: var(--encre);
+  transition: color 0.3s ease;
+}
+.cg-reco:hover .cg-reco-t { color: #d7ecff; }
+.cg-reco-m {
+  display: inline-block;
+  margin-top: 11px;
+  font-size: 11px;
+  color: var(--froid);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.cg-reco:hover .cg-reco-m { opacity: 1; transform: none; }
+@media (max-width: 880px) {
+  .cg-recos-l { grid-template-columns: 1fr; }
+  .cg-reco { border-left: 0; padding-left: 0; }
+}
+
+/* ── La ligne de tableau qui s'éclaire sous le curseur ─────────────────── */
+
+/* La lueur suit le pointeur : deux variables posées sur la ligne survolée,
+   et un dégradé radial centré dessus. Une écriture de deux propriétés sur un
+   seul nœud — c'est ce que coûte l'effet, et il s'arrête dès que le curseur
+   sort du tableau. */
+.cg-bande-bloc tbody tr { position: relative; }
+.cg-bande-bloc tbody tr td:first-child::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, var(--froid), transparent);
+  transform: scaleY(0);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-bande-bloc tbody tr:hover td:first-child::before { transform: scaleY(1); }
+.cg-tab-suivi {
+  background-image: radial-gradient(
+    220px circle at var(--x, 50%) 50%,
+    rgba(80, 150, 220, 0.11),
+    transparent 70%
+  );
+}
+
+/* ── L'arrivée du classement : un panneau qui se déplie ────────────────── */
+
+/* Le rectangle ne se contente plus d'apparaître : il arrive petit, arrondi,
+   un peu plus bas, et se déplie jusqu'à sa taille — largeur, hauteur, rayon
+   et position bougent ensemble. C'est le geste de la page de garde de la
+   première version, ramené à une transition. */
+.cg-bande-bloc {
+  transform: translateY(44px) scale(0.9);
+  border-radius: 44px;
+  transition:
+    opacity 0.9s ease,
+    transform 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 1.15s ease;
+  box-shadow: 0 10px 30px rgba(12, 13, 15, 0.06);
+}
+.cg-bande[data-vu="1"] .cg-bande-bloc {
+  transform: none;
+  border-radius: 20px;
+  box-shadow: 0 24px 70px rgba(12, 13, 15, 0.16);
+}
+
+/* ── Le bloc méthode ───────────────────────────────────────────────────── */
+
+.cg-methode2 { position: relative; }
+.cg-methode2::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 54% 46% at 18% 24%, rgba(60, 130, 220, 0.1), transparent 68%);
+}
+.cg-meth-l {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 26px;
+}
+.cg-meth {
+  padding: 26px 30px 26px 24px;
+  border-left: 1px solid var(--bord-fin);
+  position: relative;
+}
+.cg-meth:first-child { border-left: 0; padding-left: 0; }
+.cg-meth::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--froid), transparent);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-meth:hover::after { transform: scaleY(1); }
+.cg-meth-n {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--froid);
+}
+.cg-meth-t {
+  margin: 12px 0 0;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--encre);
+}
+.cg-meth-c {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  line-height: 1.66;
+  color: var(--encre-2);
+}
+.cg-sources {
+  position: relative;
+  margin-top: 34px;
+  padding-top: 22px;
+  border-top: 1px solid var(--bord-fin);
+}
+.cg-sources-t {
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+.cg-sources-l {
+  margin: 14px 0 0;
+  /* Deux colonnes au plus : à quatre, « Inflation (prix à la consommation) »
+     tombait sur trois lignes et la source se lisait en colonne de six mots.
+     Une source doit se lire d'un trait, sinon autant ne pas la donner. */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(460px, 100%), 1fr));
+  gap: 1px;
+  background: var(--bord-fin);
+  border: 1px solid var(--bord-fin);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.cg-source {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px 18px;
+  background: var(--fond-2);
+  transition: background 0.3s ease;
+}
+.cg-source:hover { background: var(--surface); }
+.cg-source-l { font-size: 13px; line-height: 1.35; color: var(--encre); }
+.cg-source-s { font-size: 11px; line-height: 1.5; color: var(--encre-3); }
+.cg-source-c { font-size: 11px; color: var(--froid); }
+@media (max-width: 880px) {
+  .cg-meth-l { grid-template-columns: 1fr; }
+  .cg-meth { border-left: 0; padding-left: 0; }
 }

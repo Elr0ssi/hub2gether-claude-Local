@@ -1,9 +1,9 @@
 "use client";
 
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
-import { COLONNE, type SocleEco } from "@/data/concept/conceptEconomie";
+import { COLONNE, type LigneSource, type SocleEco } from "@/data/concept/conceptEconomie";
 import { Annonce } from "./Annonce";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
@@ -26,6 +26,7 @@ export interface EcoProps {
   /* Les compteurs qui couraient en ouverture sont sortis de la page. Le
      composant reste dans le dépôt : les remettre tient en une ligne, ailleurs
      et plus discrets si on le souhaite. */
+  sources: LigneSource[];
   articles: FicheArticle[];
   faq: { question: string; answer: string }[];
 }
@@ -181,6 +182,24 @@ function useVu(marge = 120) {
    qui passe, ils projettent une grandeur annuelle : les arrêter une seconde
    ne fausse rien, et cela rend au glissement les images qu'ils prenaient.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* Un titre qui se lève, mot par mot, derrière un masque. Chaque mot porte son
+   rang : c'est le CSS qui décale les départs, rien ne tourne en JavaScript. */
+function Titre({ texte }: { texte: string }) {
+  const mots = texte.split(" ");
+  return (
+    <>
+      {mots.map((m, i) => (
+        <Fragment key={`${m}-${i}`}>
+          <span className="cg-mot" style={{ "--i": i } as React.CSSProperties}>
+            <span>{m}</span>
+          </span>
+          {i < mots.length - 1 ? " " : null}
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
 const Frise = memo(function Frise({
   annees,
   valeur,
@@ -363,6 +382,7 @@ const Tableau = memo(function Tableau({
   onTrier: (c: Col) => void;
 }) {
   const cadre = useRef<HTMLDivElement>(null);
+  const allumee = useRef<HTMLElement | null>(null);
   const [haut, setHaut] = useState(44);
   const [fen, setFen] = useState({ a: 0, b: 30 });
 
@@ -400,6 +420,23 @@ const Tableau = memo(function Tableau({
   const b = Math.min(fen.b, lignes.length);
   const nCol = colonnes.length + 2;
 
+  /* La lueur suit le pointeur : deux propriétés écrites sur la ligne
+     survolée, rien de plus. On nettoie en sortant pour qu'aucune ligne ne
+     reste allumée derrière le curseur. */
+  const suitLePointeur = useCallback((e: React.PointerEvent<HTMLTableSectionElement>) => {
+    const tr = (e.target as HTMLElement).closest("tr") as HTMLElement | null;
+    if (!tr || !tr.dataset.pays) return;
+    const r = tr.getBoundingClientRect();
+    if (allumee.current && allumee.current !== tr) allumee.current.classList.remove("cg-tab-suivi");
+    tr.classList.add("cg-tab-suivi");
+    tr.style.setProperty("--x", `${e.clientX - r.left}px`);
+    allumee.current = tr;
+  }, []);
+  const eteint = useCallback(() => {
+    allumee.current?.classList.remove("cg-tab-suivi");
+    allumee.current = null;
+  }, []);
+
   return (
     <div className="cg-tab-cadre" ref={cadre}>
       <table className="cg-tab">
@@ -422,7 +459,7 @@ const Tableau = memo(function Tableau({
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody onPointerMove={suitLePointeur} onPointerLeave={eteint}>
           {a > 0 && (
             <tr className="cg-tab-cale" aria-hidden="true">
               <td colSpan={nCol} style={{ height: a * haut }} />
@@ -455,7 +492,7 @@ const Tableau = memo(function Tableau({
   );
 });
 
-export function EconomiePage({ socle, articles, faq }: EcoProps) {
+export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
   /* La page ne connaît qu'une année : celle qu'elle affiche. L'année visée
      pendant qu'on glisse appartient à la frise, et n'en sort qu'une fois le
      geste posé — c'est ce qui l'empêche de redessiner le globe à chaque
@@ -627,7 +664,9 @@ export function EconomiePage({ socle, articles, faq }: EcoProps) {
           <Monte>
             <div className="cg-eco-ouv">
               <p className="cg-eyebrow">Économie</p>
-              <h1 className="cg-h1 cg-eco-h1">Le socle économique</h1>
+              <h1 className="cg-h1 cg-eco-h1">
+                <Titre texte="Le socle économique" />
+              </h1>
               <p className="cg-chapo cg-eco-ouv-c">
                 {socle.pays.length} pays, {socle.annees[0]}–
                 {socle.annees[socle.annees.length - 1]}, dix indicateurs.
@@ -751,14 +790,17 @@ export function EconomiePage({ socle, articles, faq }: EcoProps) {
           {recos.length > 0 && !qArticle.trim() && (
             <div className="cg-recos">
               <p className="cg-recos-t">
-                Parce que vous regardez « {TOUTES.find((m) => m.id === metrique)?.label} »
+                À lire aussi · {TOUTES.find((m) => m.id === metrique)?.label}
               </p>
               <div className="cg-recos-l">
                 {recos.map((a) => (
-                  <article key={a.slug} className="cg-reco">
-                    <span className="cg-rubrique">{a.rubrique} · {a.duree}</span>
-                    <h4 className="cg-reco-t">{a.titre}</h4>
-                  </article>
+                  <button key={a.slug} type="button" className="cg-reco">
+                    <span className="cg-reco-n">
+                      {a.rubrique.toUpperCase()} · {a.duree}
+                    </span>
+                    <span className="cg-reco-t">{a.titre}</span>
+                    <span className="cg-reco-m">Lire →</span>
+                  </button>
                 ))}
               </div>
             </div>
@@ -798,6 +840,60 @@ export function EconomiePage({ socle, articles, faq }: EcoProps) {
             {articlesVus.length === 0 && (
               <p className="cg-frise-n">Aucun article ne correspond à cette recherche.</p>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* ── La méthode et les sources ────────────────────────────────────── */}
+      <section className="cg-section cg-methode2">
+        <div className="cg-wrap">
+          <Enseigne droite={<span className="cg-demo-mini">{sources.length} indicateurs</span>}>
+            D&apos;où viennent ces chiffres
+          </Enseigne>
+
+          <div className="cg-meth-l">
+            <article className="cg-meth">
+              <span className="cg-meth-n">01</span>
+              <h3 className="cg-meth-t">Une seule base</h3>
+              <p className="cg-meth-c">
+                Chaque indicateur est rangé par pays et par date, sous son code ISO3, avec sa
+                source. Rien n&apos;est saisi deux fois : le chiffre que vous lisez sur le globe est
+                le même objet que celui du classement et celui de la courbe.
+              </p>
+            </article>
+            <article className="cg-meth">
+              <span className="cg-meth-n">02</span>
+              <h3 className="cg-meth-t">Une absence reste une absence</h3>
+              <p className="cg-meth-c">
+                Une année qu&apos;une source ne publie pas n&apos;est pas ramenée à zéro et
+                n&apos;est pas devinée d&apos;après ses voisines. Le pays sort en gris sur le globe
+                et porte un tiret au classement : il n&apos;est pas dernier, il n&apos;est pas
+                classé.
+              </p>
+            </article>
+            <article className="cg-meth">
+              <span className="cg-meth-n">03</span>
+              <h3 className="cg-meth-t">Ce qui est calculé le dit</h3>
+              <p className="cg-meth-c">
+                Le montant de la dette affiché ici est déduit du PIB et du ratio de dette, faute
+                d&apos;une série annuelle mesurée. La couverture de chaque indicateur est donnée
+                ci-dessous, telle qu&apos;elle est — sept dates ne se présentent pas comme
+                soixante-six.
+              </p>
+            </article>
+          </div>
+
+          <div className="cg-sources">
+            <p className="cg-sources-t">Les sources, indicateur par indicateur</p>
+            <div className="cg-sources-l">
+              {sources.map((s) => (
+                <div key={s.libelle} className="cg-source">
+                  <span className="cg-source-l">{s.libelle}</span>
+                  <span className="cg-source-c">{s.couverture}</span>
+                  <span className="cg-source-s">{s.source}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

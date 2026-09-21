@@ -16,7 +16,7 @@
       ],
       "pays": 99,
       "sources": [
-        "ONU · Banque mondiale — estimations sur 7 millésimes repères"
+        "ONU · Banque mondiale — estimations sur 7 dates repères"
       ]
     },
     "dette-montant": {
@@ -48,7 +48,7 @@
       ],
       "pays": 99,
       "sources": [
-        "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères"
+        "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 dates repères"
       ]
     },
     "inflation": {
@@ -167,7 +167,7 @@
       ],
       "pays": 99,
       "sources": [
-        "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères"
+        "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 dates repères"
       ]
     },
     "nombre-entreprises": {
@@ -185,7 +185,7 @@
       ],
       "pays": 99,
       "sources": [
-        "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères"
+        "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 dates repères"
       ]
     },
     "balance-commerciale": {

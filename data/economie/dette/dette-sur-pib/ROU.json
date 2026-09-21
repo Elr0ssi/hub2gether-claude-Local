@@ -2,7 +2,7 @@
   "country": "ROU",
   "indicator": "DEBT_TO_GDP",
   "unit": "PCT",
-  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 dates repères",
   "name": "Roumanie",
   "iso2": "RO",
   "data": {

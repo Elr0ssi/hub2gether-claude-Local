@@ -180,3 +180,63 @@ export function compteursEco(): { annee: number; liste: Compteur[] } {
   }
   return { annee: y.year, liste };
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA MÉTHODE ET LES SOURCES
+
+   Les libellés et les sources ne sont pas recopiés ici : ils sont lus dans la
+   base, dans la fiche que chaque indicateur porte à côté de ses fichiers
+   pays. Une source qui change dans la base change sur la page, sans que
+   personne ait à y penser.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+import pibTotal from "@/../data/economie/pib/pib-total/_indicateur.json";
+import pibHab from "@/../data/economie/pib/pib-par-habitant/_indicateur.json";
+import balance from "@/../data/economie/pib/balance-commerciale/_indicateur.json";
+import detteRatio from "@/../data/economie/dette/dette-sur-pib/_indicateur.json";
+import detteMontant from "@/../data/economie/dette/dette-montant/_indicateur.json";
+import inflation from "@/../data/economie/dette/inflation/_indicateur.json";
+import chomage from "@/../data/economie/emploi/taux-chomage/_indicateur.json";
+import actifs from "@/../data/economie/emploi/population-active/_indicateur.json";
+import retraite from "@/../data/economie/emploi/age-retraite/_indicateur.json";
+import entreprises from "@/../data/economie/entreprises/nombre-entreprises/_indicateur.json";
+
+interface FicheIndicateur {
+  libelle: string;
+  sources: string[];
+  annees: number[];
+  paysCouverts: number;
+}
+
+export interface LigneSource {
+  libelle: string;
+  source: string;
+  couverture: string;
+}
+
+const FICHES: FicheIndicateur[] = [
+  pibTotal, pibHab, balance, detteRatio, detteMontant,
+  inflation, chomage, actifs, retraite, entreprises,
+];
+
+export function sourcesEco(): LigneSource[] {
+  return FICHES.map((f) => {
+    const a = f.annees;
+    /* On annonce la couverture réelle, pas la plage rêvée : un indicateur qui
+       n'existe qu'à sept dates doit le dire, sinon la page laisse croire à un
+       historique complet. */
+    const etendue =
+      a.length === 0
+        ? "aucune date"
+        : a.length === 1
+          ? String(a[0])
+          : a.length === a[a.length - 1] - a[0] + 1
+            ? `${a[0]}–${a[a.length - 1]}`
+            : `${a.length} dates, de ${a[0]} à ${a[a.length - 1]}`;
+    return {
+      libelle: f.libelle,
+      source: f.sources.join(" · ") || "source non renseignée",
+      couverture: `${etendue} · ${f.paysCouverts} pays`,
+    };
+  });
+}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { EconomiePage } from "@/components/concept/EconomiePage";
-import { articlesEco, faqEco, socleEco } from "@/data/concept/conceptEconomie";
+import { articlesEco, faqEco, socleEco, sourcesEco } from "@/data/concept/conceptEconomie";
 
 export const metadata: Metadata = {
   title: "Concept · Économie · The Essential Data",
@@ -19,6 +19,7 @@ export default function ConceptEconomiePage() {
   return (
     <EconomiePage
       socle={socleEco()}
+      sources={sourcesEco()}
       articles={articlesEco(9)}
       faq={faqEco()}
     />

@@ -5,7 +5,7 @@
   "categorie": "demographie/population",
   "chemin": "data/demographie/population/nombre-habitants",
   "sources": [
-    "ONU · Banque mondiale — estimations sur 7 millésimes repères"
+    "ONU · Banque mondiale — estimations sur 7 dates repères"
   ],
   "annees": [
     2000,

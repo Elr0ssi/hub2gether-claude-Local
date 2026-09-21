@@ -69,7 +69,7 @@
   },
   "autres_sources": [
     {
-      "source": "FMI · OMC · Banque mondiale — estimations sur 7 millésimes repères",
+      "source": "FMI · OMC · Banque mondiale — estimations sur 7 dates repères",
       "unit": "MD_USD",
       "data": {
         "2000": 5,
@@ -87,7 +87,7 @@
       "data": {
         "2024": 35
       },
-      "note": "La source date ces valeurs « 2024/2025 » sans trancher. Elles sont rangées sous 2024, millésime le plus récent que la source nomme explicitement."
+      "note": "La source date ces valeurs « 2024/2025 » sans trancher. Elles sont rangées sous 2024, date la plus récente que la source nomme explicitement."
     }
   ]
 }

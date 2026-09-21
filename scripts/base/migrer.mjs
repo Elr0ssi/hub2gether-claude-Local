@@ -126,7 +126,7 @@ for (const f of fs.readdirSync(`${RACINE}/data/countries`).sort()) {
         — et le PIB qu'elle porte aussi, gardé comme seconde source ═════ */
 
 const SAISIE = litteral("src/data/economy/economy.ts", "SAISIE_MANUELLE");
-const SRC_SAISIE = "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 millésimes repères";
+const SRC_SAISIE = "Saisie manuelle du site (Banque mondiale, FMI, OIT) — 7 dates repères";
 for (const an of SAISIE) {
   for (const [nom, d] of Object.entries(an.countries)) {
     const c = code(nom, "economy.ts/SAISIE_MANUELLE");
@@ -178,7 +178,7 @@ for (const d of DETTE) {
 
 const ANNEES_REPERE = litteral("src/data/economy/populationData.ts", "ECONOMY_YEARS_LIST");
 const BALANCE = litteral("src/data/economy/tradeBalanceHistory.ts", "TRADE_BALANCE_BY_COUNTRY");
-const SRC_BALANCE = "FMI · OMC · Banque mondiale — estimations sur 7 millésimes repères";
+const SRC_BALANCE = "FMI · OMC · Banque mondiale — estimations sur 7 dates repères";
 for (const [nom, serie] of Object.entries(BALANCE)) {
   const c = code(nom, "tradeBalanceHistory.ts");
   if (!c) continue;
@@ -189,7 +189,7 @@ const TRADE = litteral("src/data/economy/tradeData.ts", "TRADE_DATA");
 const SRC_TRADE = "OMC · FMI (WEO) · Banque mondiale (BOP)";
 const NOTE_TRADE =
   "La source date ces valeurs « 2024/2025 » sans trancher. Elles sont rangées " +
-  "sous 2024, millésime le plus récent que la source nomme explicitement.";
+  "sous 2024, date la plus récente que la source nomme explicitement.";
 for (const t of TRADE) {
   const c = code(t.name, "tradeData.ts");
   if (!c) continue;
@@ -203,7 +203,7 @@ for (const t of TRADE) {
 /* ═══ 6. populationData.ts → démographie ════════════════════════════════ */
 
 const POP = litteral("src/data/economy/populationData.ts", "POPULATION_BY_COUNTRY");
-const SRC_POP = "ONU · Banque mondiale — estimations sur 7 millésimes repères";
+const SRC_POP = "ONU · Banque mondiale — estimations sur 7 dates repères";
 for (const [nom, serie] of Object.entries(POP)) {
   const c = code(nom, "populationData.ts");
   if (!c) continue;
