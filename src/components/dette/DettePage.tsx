@@ -50,6 +50,18 @@ export function DettePage() {
     <div className="dp">
       <Progression />
 
+      {/* Une barre minimale, propre à l'article : le nom ramène au prototype.
+          On ne reprend pas l'en-tête du concept ici — il tient ses couleurs
+          d'un conteneur que cette page n'a pas, et l'importer pour un lien
+          coûterait une feuille de styles entière. */}
+      <div className="dp-barre-h">
+        <a href="/concept-globe" className="dp-retour">
+          <span className="dp-retour-m" aria-hidden="true" />
+          Visualize
+        </a>
+        <span className="dp-barre-h-r">Mode Lecture</span>
+      </div>
+
       {/* ── Ouverture ───────────────────────────────────────────────────── */}
       <header className="dp-ouv">
         <div className="dp-wrap">

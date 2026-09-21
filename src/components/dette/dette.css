@@ -862,3 +862,58 @@ body:has(.dp) { background: #04070d; }
   white-space: nowrap;
   border: 0;
 }
+
+/* ── La barre de l'article ─────────────────────────────────────────────── */
+
+.dp-barre-h {
+  position: sticky;
+  top: 0;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px clamp(20px, 5vw, 64px);
+  background: rgba(4, 7, 13, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--bord-fin);
+}
+.dp-retour {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--encre);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.dp-retour:hover { color: var(--vif-clair); }
+.dp-retour-m {
+  position: relative;
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--vif);
+  border-radius: 50%;
+  flex: none;
+}
+.dp-retour-m::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: var(--tiede);
+}
+.dp-barre-h-r {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+/* La barre de progression passe au-dessus de l'en-tête collant. */
+.dp-barre { z-index: 50; }

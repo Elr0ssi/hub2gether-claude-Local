@@ -161,6 +161,9 @@ const NAV: { label: string; href: string }[] = [
   { label: "Sociétés", href: "/concept-globe#societes" },
   { label: "Ressources", href: "/concept-globe#ressources" },
   { label: "Analyses", href: "/concept-globe#analyses" },
+  /* Le mode Lecture. Il ne vit pas sous /concept-globe : c'est une page à
+     part entière, avec sa propre URL et son propre référencement. */
+  { label: "Dette publique", href: "/france/economie/dette-publique" },
 ];
 
 export function EnTete({ actif }: { actif?: string }) {
