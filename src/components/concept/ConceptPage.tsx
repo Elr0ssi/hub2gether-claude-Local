@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionTemplate, useScroll, useTransform } from "framer-motion";
 import { BarChart3, CloudSun, Flag, Layers, TrendingUp, Users } from "lucide-react";
+import { Loupe } from "./Loupe";
 import { EnTete, LENT } from "./pieces";
 import {
   Classements,
@@ -126,6 +127,7 @@ export function ConceptPage({ articles, reperes, donnees, annee, regions, vues }
   return (
     <div className="cg">
       <EnTete actif="Monde" />
+      <Loupe />
 
       {/* ── Le globe de fond, sur toute la traversée ─────────────────────── */}
       <motion.div

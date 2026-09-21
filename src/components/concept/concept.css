@@ -89,90 +89,156 @@ body:has(.cg) { background: #05080c; }
   gap: clamp(24px, 4vw, 64px);
 }
 
-/* ── Le menu replié ──────────────────────────────────────────────────────── */
+/* ── Le menu centré ──────────────────────────────────────────────────────
 
-/* Replié, la barre ne doit plus rien intercepter : elle couvre toute la
-   largeur et bloquerait un clic sur la page en dessous. Seul le nom reste
-   saisissable, et c'est lui qui rouvre le reste. */
-.cg-header-replie { background: none; backdrop-filter: none; pointer-events: none; }
-.cg-header-replie .cg-logo { pointer-events: auto; }
-/* Le nom garde sa place quoi qu'il arrive : la gouttière du menu ne se
-   referme pas, elle se vide. Sinon le titre glissait vers la gauche à
-   chaque repli et revenait à chaque survol. */
-.cg-header-replie .cg-header-l { gap: clamp(24px, 4vw, 64px); }
+   Au repos, la barre ne porte que le nom, au milieu, et n'intercepte rien :
+   elle couvre toute la largeur et bloquerait un clic sur la page. Ouverte,
+   le nom glisse à gauche et le reste se déplie derrière un verre.
 
-/* Le nom devient un jeton flou posé sur la page : sans fond, il se perdrait
-   sur un globe clair. */
-/* Le jeton est dessiné derrière le nom, pas autour : une marge négative pour
-   compenser une rustine le décalait de quinze pixels au moment du repli, et
-   le nom doit rester strictement où il est. */
-.cg-logo { position: relative; }
-.cg-logo::before {
-  content: "";
+   Le glissement combine `left` et `transform` : une position en pourcentage
+   du parent pour aller du milieu au bord, une translation en pourcentage de
+   soi pour se recentrer. Les deux s'interpolent, et comme le nom est
+   détaché du flux, rien d'autre n'est remis en page.
+   ──────────────────────────────────────────────────────────────────────── */
+
+.cg-header { pointer-events: none; background: none; backdrop-filter: none; }
+.cg-header .cg-logo,
+.cg-header-ouvert { pointer-events: auto; }
+.cg-header-l { position: relative; min-height: 44px; }
+
+/* Le verre, seulement quand le menu est ouvert. */
+.cg-header-verre {
   position: absolute;
-  inset: -9px -15px;
-  z-index: -1;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  background: rgba(8, 13, 20, 0);
-  backdrop-filter: blur(0px);
-  transition: background 0.4s, border-color 0.4s, backdrop-filter 0.4s;
-}
-.cg-header-replie .cg-logo::before {
-  background: rgba(8, 13, 20, 0.55);
-  backdrop-filter: blur(10px);
-}
-.cg-header-replie:hover .cg-logo::before {
-  background: rgba(8, 13, 20, 0);
-  border-color: transparent;
-  backdrop-filter: blur(0px);
-}
-
-/* Le menu s'ouvre comme un rideau, de la gauche vers la droite : il est
-   masqué par sa propre largeur, et c'est ce masque qui se retire. Un simple
-   fondu ne dit pas d'où le menu vient. */
-.cg-nav,
-.cg-header-d {
-  transition:
-    clip-path 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-  clip-path: inset(0 0 0 0);
-}
-.cg-header-replie .cg-nav,
-.cg-header-replie .cg-header-d {
+  inset: 0;
   opacity: 0;
   pointer-events: none;
-  clip-path: inset(0 100% 0 0);
+  background: linear-gradient(180deg, rgba(8, 13, 20, 0.66), rgba(8, 13, 20, 0.22));
+  backdrop-filter: blur(16px) saturate(1.25);
+  -webkit-backdrop-filter: blur(16px) saturate(1.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  transition: opacity 0.5s ease;
 }
-/* Les liens eux-mêmes arrivent en léger décalé, l'un après l'autre. */
-.cg-nav a { transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s; }
-.cg-header-replie .cg-nav a { transform: translateX(-14px); }
-.cg-header-replie:hover .cg-nav a { transform: none; }
-.cg-header-replie:hover {
-  background: linear-gradient(180deg, rgba(5, 8, 12, 0.82), transparent);
-  backdrop-filter: blur(6px);
-  pointer-events: auto;
-}
-.cg-header-replie:hover .cg-nav,
-.cg-header-replie:hover .cg-header-d {
-  opacity: 1;
-  pointer-events: auto;
-  clip-path: inset(0 0 0 0);
-}
+.cg-header-ouvert .cg-header-verre { opacity: 1; }
 
-@media (prefers-reduced-motion: reduce) {
-  .cg-nav, .cg-header-d { transition: none; }
-}
+/* Le nom : au milieu au repos, au bord une fois ouvert.
 
+   Il reste dans le flux — c'est lui qui pose la gouttière du menu, et le
+   déplacement se fait par décalage : `left` à la moitié du parent pour aller
+   au centre, `translateX` à la moitié de soi pour s'y recentrer. Les deux
+   reviennent à zéro à l'ouverture, et comme le décalage d'un élément
+   positionné ne remet rien d'autre en page, le reste ne bouge pas. */
 .cg-logo {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-size: 14px;
-  font-weight: 500;
+  z-index: 2;
+  pointer-events: auto;
+  transition:
+    left 0.66s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.66s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-header-ouvert .cg-logo { left: 0; transform: translateX(0); }
+
+/* Le jeton de verre sous le nom : il disparaît quand le verre du menu prend
+   le relais, sinon on lirait deux fonds l'un sur l'autre. */
+.cg-logo::before {
+  content: "";
+  position: absolute;
+  inset: -10px -18px;
+  z-index: -1;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(8, 13, 20, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: opacity 0.45s ease;
+}
+.cg-header-ouvert .cg-logo::before { opacity: 0; }
+
+/* La marque : un anneau et un point, dessinés, jamais une image. */
+.cg-logo-m {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--froid);
+  position: relative;
+  flex: none;
+  transition: transform 0.66s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s;
+}
+.cg-logo-m::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: var(--chaud);
+}
+.cg-header-ouvert .cg-logo-m { transform: rotate(-120deg) scale(1.06); }
+.cg-logo-t {
+  font-size: 15.5px;
   letter-spacing: -0.01em;
   color: var(--encre);
   white-space: nowrap;
+}
+
+/* Le menu et les actions : décalés à gauche et effacés au repos, ils
+   arrivent l'un après l'autre derrière le nom qui s'écarte. */
+.cg-nav,
+.cg-header-d {
+  opacity: 0;
+  transform: translateX(-14px);
+  pointer-events: none;
+  transition:
+    opacity 0.45s ease,
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-nav { margin-left: 148px; }
+.cg-header-d { margin-left: auto; }
+.cg-header-ouvert .cg-nav,
+.cg-header-ouvert .cg-header-d {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition-delay: 0.16s;
+}
+/* Chaque onglet monte à son tour. */
+.cg-nav a {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.4s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.3s ease;
+}
+.cg-header-ouvert .cg-nav a {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(0.22s + var(--i, 0) * 45ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cg-logo,
+  .cg-nav,
+  .cg-nav a,
+  .cg-header-d,
+  .cg-header-verre { transition: none; }
+}
+@media (max-width: 960px) {
+  .cg-nav { margin-left: 130px; }
+  .cg-header-d .cg-demo-mini { display: none; }
+}
+
+.cg-logo {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--encre);
+  white-space: nowrap;
+  text-decoration: none;
 }
 .cg-logo-m {
   width: 9px;
@@ -2757,4 +2823,79 @@ body:has(.cg) { background: #05080c; }
 @media (prefers-reduced-motion: reduce) {
   .cg-art:hover,
   .cg-reco:hover { transform: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA LOUPE ET LE SURLIGNAGE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Deux disques fixes, posés sur la page, que seule une transformation déplace.
+   Ils ne reçoivent aucun clic et ne floutent rien derrière eux : un
+   backdrop-filter qui se déplace obligerait le navigateur à recomposer la
+   zone à chaque image. Ici il n'y a que deux couches à faire glisser, ce que
+   la carte graphique fait sans y penser. */
+.cg-loupe,
+.cg-loupe-a {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  will-change: transform;
+}
+.a-loupe .cg-loupe,
+.a-loupe .cg-loupe-a { opacity: 1; }
+
+/* La nappe : la lumière large, qui colle au curseur. */
+.cg-loupe {
+  width: 460px;
+  height: 460px;
+  margin: -230px 0 0 -230px;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(120, 190, 255, 0.1),
+    rgba(120, 190, 255, 0.045) 38%,
+    rgba(214, 167, 122, 0.022) 58%,
+    transparent 72%
+  );
+}
+
+/* L'anneau : plus net, plus petit, et toujours un peu en retard. */
+.cg-loupe-a {
+  width: 120px;
+  height: 120px;
+  margin: -60px 0 0 -60px;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 44%,
+    rgba(158, 199, 216, 0.3) 49%,
+    rgba(158, 199, 216, 0.06) 54%,
+    transparent 66%
+  );
+  filter: blur(1.5px);
+}
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .cg-loupe,
+  .cg-loupe-a { display: none; }
+}
+
+/* Le surlignage. Le bleu du navigateur est celui du système : sur une page de
+   nuit il tombe comme une tache, et il ne connaît pas nos encres. On le
+   remplace par le froid de la page, assez transparent pour que le texte
+   reste lisible dessous. */
+.cg ::selection,
+.cg::selection {
+  background: rgba(158, 199, 216, 0.3);
+  color: #ffffff;
+}
+/* Sur la bande claire du classement, le même principe à l'envers. */
+.cg-bande ::selection {
+  background: rgba(20, 70, 120, 0.18);
+  color: #0a0b0d;
 }

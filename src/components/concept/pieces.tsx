@@ -164,32 +164,75 @@ const NAV: { label: string; href: string }[] = [
 ];
 
 export function EnTete({ actif }: { actif?: string }) {
-  /* En haut de page le menu est là, entier. Dès qu'on descend il se replie
-     dans le nom : tout part vers la gauche et s'efface, et il ne reste qu'un
-     jeton posé sur la page. On le rouvre en passant dessus. C'est la seule
-     façon de garder une barre fixe sans lui donner une bande de l'écran. */
-  const [replie, setReplie] = useState(false);
+  /* Le menu tient tout entier dans son nom.
+
+     Au repos, « Visualize » est seul, au milieu de la page. On s'en approche
+     et il glisse vers la gauche pendant que le reste se déplie derrière lui,
+     sur un panneau de verre qui laisse voir la page en dessous.
+
+     L'ouverture se fait au survol et à la prise de focus : un menu qui ne
+     répond qu'à la souris est un menu fermé pour qui navigue au clavier.
+     Elle tient aussi au clic, sinon un écran tactile n'y accède jamais. */
+  const [ouvert, setOuvert] = useState(false);
+  const barre = useRef<HTMLElement>(null);
+
+  /* Échap referme, et un clic ailleurs aussi : une barre ouverte qui couvre
+     le haut de la page doit pouvoir se refermer sans viser. */
   useEffect(() => {
-    const lis = () => setReplie(window.scrollY > 64);
-    lis();
-    window.addEventListener("scroll", lis, { passive: true });
-    return () => window.removeEventListener("scroll", lis);
-  }, []);
+    if (!ouvert) return;
+    const touche = (e: KeyboardEvent) => e.key === "Escape" && setOuvert(false);
+    const ailleurs = (e: PointerEvent) => {
+      if (!barre.current?.contains(e.target as Node)) setOuvert(false);
+    };
+    window.addEventListener("keydown", touche);
+    window.addEventListener("pointerdown", ailleurs);
+    return () => {
+      window.removeEventListener("keydown", touche);
+      window.removeEventListener("pointerdown", ailleurs);
+    };
+  }, [ouvert]);
 
   return (
-    <header className={`cg-header${replie ? " cg-header-replie" : ""}`}>
+    <header
+      ref={barre}
+      className={`cg-header${ouvert ? " cg-header-ouvert" : ""}`}
+      onPointerEnter={(e) => e.pointerType === "mouse" && setOuvert(true)}
+      onPointerLeave={(e) => e.pointerType === "mouse" && setOuvert(false)}
+      onFocus={() => setOuvert(true)}
+    >
+      {/* Le verre : il n'existe qu'ouvert, et il ne floute que ce qui est
+          derrière lui. Une couche immobile — le navigateur la compose une
+          fois, pas à chaque image. */}
+      <span className="cg-header-verre" aria-hidden="true" />
+
       <div className="cg-header-l">
-        <a href="/concept-globe" className="cg-logo">
+        <a
+          href="/concept-globe"
+          className="cg-logo"
+          onClick={(e) => {
+            if (!ouvert) {
+              e.preventDefault();
+              setOuvert(true);
+            }
+          }}
+        >
           <span className="cg-logo-m" aria-hidden="true" />
-          The Essential Data
+          <span className="cg-logo-t">Visualize</span>
         </a>
+
         <nav className="cg-nav">
-          {NAV.map((n) => (
-            <a key={n.label} href={n.href} className={actif === n.label ? "cg-nav-on" : undefined}>
+          {NAV.map((n, i) => (
+            <a
+              key={n.label}
+              href={n.href}
+              className={actif === n.label ? "cg-nav-on" : undefined}
+              style={{ "--i": i } as React.CSSProperties}
+            >
               {n.label}
             </a>
           ))}
         </nav>
+
         <div className="cg-header-d">
           <span className="cg-demo-mini" title="Les valeurs de cette maquette ne sont pas mesurées">
             prototype · démonstration
@@ -213,7 +256,7 @@ export function Pied() {
   return (
     <footer className="cg-pied">
       <div className="cg-wrap cg-pied-l">
-        <span>The Essential Data</span>
+        <span>Visualize</span>
         <nav>
           {NAV.slice(0, 4).map((n) => (
             <a key={n.label} href={n.href}>

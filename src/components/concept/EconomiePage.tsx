@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
 import { COLONNE, type LigneSource, type SocleEco } from "@/data/concept/conceptEconomie";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
+import { Loupe } from "./Loupe";
 import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
 import { gelerOdometres } from "./Roulement";
 import { GlobeEco, familleDe, TOUTES } from "./GlobeEco";
@@ -672,6 +673,7 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
   return (
     <div className="cg cg-eco">
       <EnTete actif="Économie" />
+      <Loupe />
 
       {/* ── L'ouverture ──────────────────────────────────────────────────── */}
       {/* L'ouverture occupe la page. Rien d'autre que le titre, et en bas un
