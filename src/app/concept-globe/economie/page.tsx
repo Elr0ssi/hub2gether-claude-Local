@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { EconomiePage } from "@/components/concept/EconomiePage";
-import { REGIONS, VUES } from "@/data/concept/conceptGeo";
-import { articlesEco, faqEco, socleEco } from "@/data/concept/conceptEconomie";
+import { articlesEco, compteursEco, faqEco, socleEco } from "@/data/concept/conceptEconomie";
 
 export const metadata: Metadata = {
   title: "Concept · Économie · The Essential Data",
@@ -20,10 +19,9 @@ export default function ConceptEconomiePage() {
   return (
     <EconomiePage
       socle={socleEco()}
-      articles={articlesEco(4)}
+      compteurs={compteursEco().liste}
+      articles={articlesEco(9)}
       faq={faqEco()}
-      regions={REGIONS}
-      vues={VUES}
     />
   );
 }

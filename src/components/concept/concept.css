@@ -2,9 +2,17 @@
    PROTOTYPE — FEUILLE DE STYLE ISOLÉE
 
    Elle n'est importée que par `ConceptPage`. Rien n'est ajouté à
-   `globals.css`, et tout est porté par `.cg` : aucune règle d'ici ne peut
-   atteindre une page existante.
+   `globals.css`, et tout est porté par `.cg` — une seule règle vise `body`,
+   et seulement s'il contient un `.cg`. Aucune page existante n'est touchée.
    ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Le fond doit couvrir ce qui dépasse du conteneur : rebond de défilement,
+   bande sous le pied, barre d'adresse qui se rétracte. Sans cela on voyait
+   du blanc en bout de course. La couleur est écrite en clair — les jetons
+   sont déclarés sur `.cg`, ils n'existent pas encore sur `body`. Et la règle
+   ne s'applique qu'aux pages qui portent un `.cg` : aucune page existante
+   n'est touchée. */
+body:has(.cg) { background: #05080c; }
 
 .cg {
   --fond: #05080c;
@@ -1661,3 +1669,141 @@
 
 .ge-source { margin-top: 18px; font-size: 10.5px; letter-spacing: 0.05em; color: var(--encre-3); }
 .ge-vide { font-size: 13px; line-height: 1.6; color: var(--encre-2); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE ÉCONOMIE — OUVERTURE, COMPTEURS, LECTURES, ANNONCE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cg-eco-haut { overflow: hidden; }
+/* Une lueur derrière l'ouverture : sur une page entièrement noire, un titre
+   sans relief se confond avec la section suivante. */
+.cg-eco-lueur {
+  position: absolute;
+  inset: -20% -10% auto -10%;
+  height: 130%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 42% 58% at 22% 34%, rgba(60, 130, 220, 0.2), transparent 66%),
+    radial-gradient(ellipse 46% 50% at 82% 20%, rgba(214, 167, 122, 0.12), transparent 68%);
+}
+.cg-eco-ouv { position: relative; }
+
+.cg-eco-cles > div {
+  padding: 15px 17px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 11px;
+  background: var(--surface);
+}
+
+/* ── Les compteurs ───────────────────────────────────────────────────────── */
+
+.cg-cpt-s { padding-top: clamp(30px, 4vh, 54px); }
+.cg-cpt-l {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 1080px) { .cg-cpt-l { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .cg-cpt-l { grid-template-columns: minmax(0, 1fr); } }
+.cg-cpt {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 16px 17px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 11px;
+  background: linear-gradient(180deg, rgba(158, 199, 216, 0.08), rgba(255, 255, 255, 0.03));
+}
+.cg-cpt-l2 { font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--encre-3); }
+.cg-cpt-v {
+  font-size: clamp(21px, 2.2vw, 28px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--encre);
+  font-variant-numeric: tabular-nums;
+}
+.cg-cpt-n { font-size: 11px; color: var(--encre-2); }
+
+/* ── Les lectures ────────────────────────────────────────────────────────── */
+
+.cg-recos { margin-bottom: 30px; }
+.cg-recos-t { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--chaud); }
+.cg-recos-l {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 13px;
+}
+@media (max-width: 860px) { .cg-recos-l { grid-template-columns: minmax(0, 1fr); } }
+.cg-reco {
+  padding: 14px 16px;
+  border: 1px solid rgba(214, 167, 122, 0.3);
+  border-radius: 11px;
+  background: rgba(214, 167, 122, 0.07);
+}
+.cg-reco-t { margin: 7px 0 0; font-size: 14px; font-weight: 400; line-height: 1.35; color: var(--encre); }
+
+.cg-arts {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  mask-image: linear-gradient(90deg, #000 0 93%, transparent);
+}
+.cg-arts::-webkit-scrollbar { display: none; }
+.cg-arts:active { cursor: grabbing; }
+.cg-art {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: clamp(232px, 24vw, 290px);
+  padding: 15px 17px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 11px;
+  background: var(--surface);
+  transition: border-color 0.3s;
+}
+.cg-art:hover { border-color: var(--bord); }
+/* Titres et chapôs resserrés : c'est une section de lecture secondaire, elle
+   ne doit pas peser autant que le classement. */
+.cg-art-t { margin: 8px 0 0; font-size: 14px; font-weight: 400; line-height: 1.35; color: var(--encre); }
+.cg-art-c {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--encre-2);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── L'annonce ───────────────────────────────────────────────────────────── */
+
+.cg-pub-s { padding-top: clamp(20px, 3vh, 40px); padding-bottom: clamp(20px, 3vh, 40px); }
+.cg-pub-l { font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--encre-3); margin-bottom: 9px; }
+.cg-pub { border: 1px dashed var(--bord); border-radius: 11px; overflow: hidden; }
+
+/* ── Le classement, moins sombre ─────────────────────────────────────────── */
+
+.cg-tab-cadre { background: var(--surface); }
+.cg-tab thead th { background: #1b2530; }
+.cg-tab tbody tr:nth-child(2n) { background: rgba(255, 255, 255, 0.022); }
+.cg-tab tbody tr:hover { background: rgba(255, 255, 255, 0.075); }
+
+/* ── La fiche pays ───────────────────────────────────────────────────────
+   Elle prend la hauteur de son contenu : étirée sur celle du globe, elle
+   ouvrait un trou au milieu quand la famille n'a que deux membres. Ce qu'on
+   voulait, c'est qu'elle ne coupe plus rien — pas qu'elle remplisse. */
+.ge-panneau { align-self: start; }
+.ge-metrique-sous {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--froid);
+}

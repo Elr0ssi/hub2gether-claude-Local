@@ -75,6 +75,8 @@ export interface FicheArticle {
   chapo: string;
   rubrique: string;
   duree: string;
+  /** Tags et titre concaténés, pour rapprocher un article d'un indicateur. */
+  mots?: string;
 }
 
 const RUBRIQUES: Record<string, string> = {

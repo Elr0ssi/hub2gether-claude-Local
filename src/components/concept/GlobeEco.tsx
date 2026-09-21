@@ -49,11 +49,64 @@ const PALETTE: PaletteGlobe = {
 export interface MetriqueEco {
   id: EconomyMetricId;
   label: string;
-  unite: "md" | "eur" | "pct" | "hab";
+  unite: "md" | "eur" | "pct" | "hab" | "ans" | "k";
+}
+
+/* Les familles du site, telles quelles. En haut, quatre têtes de famille ;
+   dans la fiche du pays, les membres de la famille en cours — et rien
+   d'autre. Tout étaler faisait dix boutons qui ne disaient plus de quoi on
+   parlait. */
+export interface FamilleEco {
+  id: string;
+  label: string;
+  membres: MetriqueEco[];
+}
+
+export const FAMILLES: FamilleEco[] = [
+  {
+    id: "pib",
+    label: "PIB",
+    membres: [
+      { id: "gdp", label: "PIB", unite: "md" },
+      { id: "gdp_per_capita", label: "PIB par habitant", unite: "eur" },
+      { id: "trade_balance", label: "Balance commerciale", unite: "md" },
+    ],
+  },
+  {
+    id: "dette",
+    label: "Dette",
+    membres: [
+      { id: "debt_ratio", label: "Dette / PIB", unite: "pct" },
+      { id: "debt_amount", label: "Montant de la dette", unite: "md" },
+      { id: "inflation", label: "Inflation", unite: "pct" },
+    ],
+  },
+  {
+    id: "chomage",
+    label: "Chômage",
+    membres: [
+      { id: "unemployment", label: "Chômage", unite: "pct" },
+      { id: "active_population", label: "Population active", unite: "hab" },
+      { id: "retirement_age", label: "Âge de la retraite", unite: "ans" },
+    ],
+  },
+  {
+    id: "entreprises",
+    label: "Entreprises",
+    membres: [{ id: "companies", label: "Entreprises", unite: "k" }],
+  },
+];
+
+export const TOUTES = FAMILLES.flatMap((f) => f.membres);
+
+export function familleDe(id: EconomyMetricId): FamilleEco {
+  return FAMILLES.find((f) => f.membres.some((m) => m.id === id)) ?? FAMILLES[0];
 }
 
 export function fmtEco(v: number | null | undefined, unite: MetriqueEco["unite"]): string {
   if (v === null || v === undefined || !Number.isFinite(v)) return "—";
+  if (unite === "ans") return `${Math.round(v)} ans`;
+  if (unite === "k") return `${Math.round(v).toLocaleString("fr-FR")} k`;
   if (unite === "hab") return `${v.toFixed(1).replace(".", ",")} M`;
   if (unite === "pct") return `${v.toFixed(1).replace(".", ",")} %`;
   if (unite === "eur") return `${Math.round(v).toLocaleString("fr-FR")} €`;
@@ -65,7 +118,6 @@ export function fmtEco(v: number | null | undefined, unite: MetriqueEco["unite"]
 interface Props {
   annee: EconomyYear;
   metrique: MetriqueEco;
-  metriques: MetriqueEco[];
   onMetrique: (id: EconomyMetricId) => void;
   choisi: string | null;
   onChoisi: (nom: string | null) => void;
@@ -78,7 +130,6 @@ interface Props {
 export function GlobeEco({
   annee,
   metrique,
-  metriques,
   onMetrique,
   choisi,
   onChoisi,
@@ -87,6 +138,7 @@ export function GlobeEco({
   sousLeGlobe,
 }: Props) {
   const fiche: CountryEconomyData | undefined = choisi ? annee.countries[choisi] : undefined;
+  const famille = familleDe(metrique.id);
 
   /* Le rang se lit sur la métrique affichée. Les pays sans valeur ne comptent
      pas : ils ne sont pas derniers, ils ne sont pas classés. */
@@ -126,18 +178,26 @@ export function GlobeEco({
     <div className="ge">
       {/* ── Les métriques ────────────────────────────────────────────────── */}
       <div className="ge-metriques" role="tablist" aria-label="Indicateur affiché">
-        {metriques.map((m) => (
-          <button
-            key={m.id}
-            type="button"
-            role="tab"
-            aria-selected={m.id === metrique.id}
-            className={`ge-metrique${m.id === metrique.id ? " ge-metrique-on" : ""}`}
-            onClick={() => onMetrique(m.id)}
-          >
-            {m.label}
-          </button>
-        ))}
+        {FAMILLES.map((f) => {
+          const active = f.id === famille.id;
+          /* La tête de famille reste allumée quand on regarde l'un de ses
+             membres, et dit lequel : sinon, choisir « Inflation » dans la
+             fiche éteignait « Dette » et l'on ne savait plus où l'on était. */
+          const sous = active && metrique.id !== f.membres[0].id ? metrique.label : null;
+          return (
+            <button
+              key={f.id}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              className={`ge-metrique${active ? " ge-metrique-on" : ""}`}
+              onClick={() => onMetrique(f.membres[0].id)}
+            >
+              {f.label}
+              {sous && <span className="ge-metrique-sous">{sous}</span>}
+            </button>
+          );
+        })}
       </div>
 
       <div className="ge-corps">
@@ -176,7 +236,6 @@ export function GlobeEco({
             >
               {fiche && choisi ? (
                 <>
-                  <p className="ge-sur">{annee.year}</p>
                   <h3 className="ge-nom">{nomFr(choisi)}</h3>
 
                   <div className="ge-vedette">
@@ -193,7 +252,7 @@ export function GlobeEco({
                   </div>
 
                   <div className="ge-autres">
-                    {metriques
+                    {famille.membres
                       .filter((m) => m.id !== metrique.id)
                       .map((m) => (
                         <button key={m.id} type="button" className="ge-autre" onClick={() => onMetrique(m.id)}>

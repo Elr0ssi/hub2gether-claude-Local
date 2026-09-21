@@ -3,10 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
-import type { SocleEco } from "@/data/concept/conceptEconomie";
+import { COLONNE, type Compteur as CompteurEco, type SocleEco } from "@/data/concept/conceptEconomie";
+import { CompteursEco } from "./CompteursEco";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
-import { GlobeEco, type MetriqueEco } from "./GlobeEco";
+import { GlobeEco, familleDe, TOUTES } from "./GlobeEco";
 import "./concept.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -21,58 +22,92 @@ import "./concept.css";
 
 export interface EcoProps {
   socle: SocleEco;
+  compteurs: CompteurEco[];
   articles: FicheArticle[];
   faq: { question: string; answer: string }[];
-  regions: readonly { id: string; label: string; pays: readonly string[] }[];
-  vues: Record<string, { lat: number; lon: number }>;
 }
 
-interface Rang {
-  nom: string;
-  fr: string;
-  pib: number | null;
-  pibHab: number | null;
-  inflation: number | null;
-  balance: number | null;
-  dette: number | null;
-  chomage: number | null;
-  population: number | null;
-}
+type Col =
+  | "pib"
+  | "pibHab"
+  | "balance"
+  | "dette"
+  | "detteMontant"
+  | "inflation"
+  | "chomage"
+  | "actifs"
+  | "retraite"
+  | "entreprises";
 
-type Col = "pib" | "pibHab" | "inflation" | "balance" | "dette" | "chomage";
+type Rang = { nom: string; fr: string } & Record<Col, number | null>;
 
-/* Les identifiants du site, pour que le globe et le classement parlent de la
-   même chose. Ce sont ceux de la base, pas des noms réinventés ici. */
-const METRIQUES: MetriqueEco[] = [
-  { id: "gdp", label: "PIB", unite: "md" },
-  { id: "debt_ratio", label: "Dette / PIB", unite: "pct" },
-  { id: "unemployment", label: "Chômage", unite: "pct" },
-  { id: "inflation", label: "Inflation", unite: "pct" },
-  { id: "gdp_per_capita", label: "PIB / habitant", unite: "eur" },
-  { id: "trade_balance", label: "Balance", unite: "md" },
-];
-
-/** La colonne du classement qui correspond à chaque métrique. */
-const COL_DE: Record<string, Col> = {
-  gdp: "pib",
-  debt_ratio: "dette",
-  unemployment: "chomage",
+/* La colonne du classement correspondant à chaque métrique du site. Le
+   classement et le globe parlent ainsi de la même chose. */
+/* Le champ de la base derrière chaque métrique, pour lire une série. */
+const CHAMP_DE: Partial<Record<EconomyMetricId, string>> = {
+  gdp: "gdp",
+  gdp_per_capita: "gdp_per_capita",
+  trade_balance: "trade_balance",
+  debt_ratio: "debt_ratio",
+  debt_amount: "debt_amount",
   inflation: "inflation",
-  gdp_per_capita: "pibHab",
-  trade_balance: "balance",
+  unemployment: "unemployment",
+  active_population: "active_population",
+  retirement_age: "retirement_age",
+  companies: "companies",
 };
 
-const COLONNES: { id: Col; label: string; unite: "md" | "eur" | "pct" }[] = [
-  { id: "pib", label: "PIB", unite: "md" },
-  { id: "pibHab", label: "PIB / hab.", unite: "eur" },
-  { id: "inflation", label: "Inflation", unite: "pct" },
-  { id: "balance", label: "Balance", unite: "md" },
-  { id: "dette", label: "Dette / PIB", unite: "pct" },
-  { id: "chomage", label: "Chômage", unite: "pct" },
+/* Les mots qui rapprochent un article d'un indicateur. Écrits, pas déduits :
+   les libellés du site sont des étiquettes de colonne, pas du vocabulaire
+   d'article. */
+const MOTS_DE: Partial<Record<EconomyMetricId, string[]>> = {
+  gdp: ["pib", "croissance", "économie mondiale"],
+  gdp_per_capita: ["pib par habitant", "habitant", "niveau de vie", "pib"],
+  trade_balance: ["balance", "commerce", "échange", "exportation", "importation"],
+  debt_ratio: ["dette", "emprunt", "déficit"],
+  debt_amount: ["dette", "emprunt", "déficit"],
+  inflation: ["inflation", "prix", "pouvoir d'achat"],
+  unemployment: ["chômage", "emploi", "travail"],
+  active_population: ["population", "emploi", "actif", "démographie"],
+  retirement_age: ["retraite", "pension"],
+  companies: ["entreprise", "industrie", "marché"],
+};
+
+const COL_DE: Partial<Record<EconomyMetricId, Col>> = {
+  gdp: "pib",
+  gdp_per_capita: "pibHab",
+  trade_balance: "balance",
+  debt_ratio: "dette",
+  debt_amount: "detteMontant",
+  inflation: "inflation",
+  unemployment: "chomage",
+  active_population: "actifs",
+  retirement_age: "retraite",
+  companies: "entreprises",
+};
+
+type Unite = "md" | "eur" | "pct" | "hab" | "ans" | "k";
+
+/* Le classement montre les colonnes de la famille regardée, pas les dix à la
+   fois : dix colonnes de chiffres ne se comparent pas, elles se subissent. */
+const COLONNES: { id: Col; label: string; unite: Unite; famille: string }[] = [
+  { id: "pib", label: "PIB", unite: "md", famille: "pib" },
+  { id: "pibHab", label: "PIB / hab.", unite: "eur", famille: "pib" },
+  { id: "balance", label: "Balance", unite: "md", famille: "pib" },
+  { id: "dette", label: "Dette / PIB", unite: "pct", famille: "dette" },
+  { id: "detteMontant", label: "Montant dette", unite: "md", famille: "dette" },
+  { id: "inflation", label: "Inflation", unite: "pct", famille: "dette" },
+  { id: "chomage", label: "Chômage", unite: "pct", famille: "chomage" },
+  { id: "actifs", label: "Population active", unite: "hab", famille: "chomage" },
+  { id: "retraite", label: "Retraite", unite: "ans", famille: "chomage" },
+  { id: "entreprises", label: "Entreprises", unite: "k", famille: "entreprises" },
 ];
 
-function val(v: number | null, unite: "md" | "eur" | "pct") {
+function val(v: number | null, unite: Unite) {
   if (v === null) return "—";
+  if (unite === "ans") return `${Math.round(v)} ans`;
+  if (unite === "k") return `${Math.round(v).toLocaleString("fr-FR")} k`;
+  if (unite === "hab") return `${v.toFixed(1).replace(".", ",")} M`;
   if (unite === "pct") return `${v.toFixed(1).replace(".", ",")} %`;
   if (unite === "eur") return `${Math.round(v).toLocaleString("fr-FR")} €`;
   return Math.abs(v) >= 1000
@@ -80,7 +115,7 @@ function val(v: number | null, unite: "md" | "eur" | "pct") {
     : `${Math.round(v).toLocaleString("fr-FR")} Md€`;
 }
 
-export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) {
+export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
   const [annee, setAnnee] = useState(socle.annees[socle.annees.length - 1]);
   const [col, setCol] = useState<Col>("pib");
   /* La métrique du globe et la colonne triée sont liées : cliquer « Dette »
@@ -90,9 +125,12 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
   const [metrique, setMetrique] = useState<EconomyMetricId>("gdp");
   const [sens, setSens] = useState<1 | -1>(-1);
   const [filtre, setFiltre] = useState("");
+  const [qArticle, setQArticle] = useState("");
   const [choisi, setChoisi] = useState<string | null>("France");
   const [ouvert, setOuvert] = useState<number | null>(0);
   const rail = useRef<HTMLDivElement>(null);
+  const rail2 = useRef<HTMLDivElement>(null);
+  const prise2 = useRef<{ x: number; g: number } | null>(null);
   const tire = useRef(false);
 
   /* La position d'un millésime sur la ligne, en pourcentage : les jalons ne
@@ -113,9 +151,26 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
   /* Les lignes de l'année, reconstituées depuis le format compact. */
   const rangs = useMemo<Rang[]>(() => {
     const l = socle.lignes[annee] ?? [];
-    return l.map(([id, pib, pibHab, inflation, balance, dette, chomage, population]) => {
-      const p = socle.pays[id as number];
-      return { nom: p.nom, fr: p.fr, pib, pibHab, inflation, balance, dette, chomage, population };
+    return l.map((ligne) => {
+      const p = socle.pays[ligne[0] as number];
+      const v = (c: string) => {
+        const x = ligne[COLONNE[c]];
+        return typeof x === "number" && Number.isFinite(x) ? x : null;
+      };
+      return {
+        nom: p.nom,
+        fr: p.fr,
+        pib: v("gdp"),
+        pibHab: v("gdp_per_capita"),
+        balance: v("trade_balance"),
+        dette: v("debt_ratio"),
+        detteMontant: v("debt_amount"),
+        inflation: v("inflation"),
+        chomage: v("unemployment"),
+        actifs: v("active_population"),
+        retraite: v("retirement_age"),
+        entreprises: v("companies"),
+      };
     });
   }, [socle, annee]);
 
@@ -145,10 +200,14 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
       countries[r.nom] = {
         gdp: r.pib ?? undefined,
         gdp_per_capita: r.pibHab ?? undefined,
-        inflation: r.inflation ?? undefined,
         trade_balance: r.balance ?? undefined,
         debt_ratio: r.dette ?? undefined,
+        debt_amount: r.detteMontant ?? undefined,
+        inflation: r.inflation ?? undefined,
         unemployment: r.chomage ?? undefined,
+        active_population: r.actifs ?? undefined,
+        retirement_age: r.retraite ?? undefined,
+        companies: r.entreprises ?? undefined,
       };
     }
     return { year: annee, label: String(annee), dataNote: "", countries };
@@ -159,34 +218,14 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
      à zéro. */
   const serie = useMemo(() => {
     const idx = choisi ? socle.pays.findIndex((p) => p.nom === choisi) : -1;
-    const colonne = ["pib", "pibHab", "inflation", "balance", "dette", "chomage", "population"].indexOf(
-      COL_DE[metrique] ?? "pib",
-    );
+    const c = CHAMP_DE[metrique];
     return socle.annees.map((a) => {
-      if (idx < 0 || colonne < 0) return { annee: a, v: null };
+      if (idx < 0 || !c) return { annee: a, v: null };
       const l = (socle.lignes[a] ?? []).find((x) => x[0] === idx);
-      const v = l ? l[colonne + 1] : null;
+      const v = l ? l[COLONNE[c]] : null;
       return { annee: a, v: typeof v === "number" && Number.isFinite(v) ? v : null };
     });
   }, [socle, choisi, metrique]);
-
-  /* Ce que lit le globe : la même année, la même base. */
-  const donnees = useMemo<Record<string, FichePays>>(() => {
-    const o: Record<string, FichePays> = {};
-    for (const r of rangs) {
-      o[r.nom] = {
-        fr: r.fr,
-        pib: r.pib,
-        pibHab: r.pibHab,
-        inflation: r.inflation,
-        balance: r.balance,
-        dette: r.dette,
-        chomage: r.chomage,
-        population: r.population,
-      };
-    }
-    return o;
-  }, [rangs]);
 
   const cles = useMemo(() => {
     let pib = 0;
@@ -209,12 +248,42 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
     return { pib, n, med, tete };
   }, [rangs]);
 
+  /* Les colonnes de la famille en cours, plus le PIB qui sert de repère
+     commun — on compare toujours quelque chose au poids de l'économie. */
+  const colonnes = useMemo(() => {
+    const f = familleDe(metrique).id;
+    const l = COLONNES.filter((c) => c.famille === f);
+    return f === "pib" ? l : [COLONNES[0], ...l];
+  }, [metrique]);
+
+  /* Les trois articles les plus proches de l'indicateur regardé. Le
+     rapprochement se fait sur des mots, pas sur le libellé découpé : « PIB »
+     fait trois lettres et ne ressortait d'aucune découpe. Sans
+     correspondance, on ne recommande rien plutôt que les trois premiers de
+     la liste, qui n'auraient aucun rapport. */
+  const recos = useMemo(() => {
+    const cles = MOTS_DE[metrique] ?? [];
+    if (!cles.length) return [];
+    return articles
+      .map((a) => ({ a, score: cles.filter((c) => (a.mots ?? "").includes(c)).length }))
+      .filter((o) => o.score > 0)
+      .sort((x, y) => y.score - x.score)
+      .slice(0, 3)
+      .map((o) => o.a);
+  }, [articles, metrique]);
+
+  const articlesVus = useMemo(() => {
+    const q = qArticle.trim().toLowerCase();
+    if (!q) return articles;
+    return articles.filter((a) => `${a.titre} ${a.chapo} ${a.mots ?? ""}`.toLowerCase().includes(q));
+  }, [articles, qArticle]);
+
   const trier = (c: Col) => {
     if (c === col) setSens((s) => (s === 1 ? -1 : 1));
     else {
       setCol(c);
       setSens(-1);
-      const m = METRIQUES.find((x) => COL_DE[x.id] === c);
+      const m = TOUTES.find((x) => COL_DE[x.id] === c);
       if (m) setMetrique(m.id);
     }
   };
@@ -234,21 +303,25 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
 
       {/* ── L'ouverture ──────────────────────────────────────────────────── */}
       <section className="cg-section cg-eco-haut">
-        <div className="cg-wrap">
+        {/* Une lueur derrière le titre : sur une page entièrement noire, une
+            ouverture sans relief se confond avec la section suivante. */}
+        <div className="cg-eco-lueur" aria-hidden="true" />
+        <div className="cg-wrap cg-eco-ouv">
           <Monte>
-            <p className="cg-eyebrow">Économie</p>
+            <p className="cg-eyebrow">Économie · millésime {annee}</p>
             <h1 className="cg-h1 cg-eco-h1">
               Le monde,
               <br />
               <span className="cg-h2-doux">en milliards.</span>
             </h1>
             <p className="cg-chapo">
-              Six indicateurs, {socle.pays.length} pays, {socle.annees.length} millésimes. Choisissez
-              une année : tout suit — le globe, le classement, les chiffres.
+              Dix indicateurs, {socle.pays.length} pays, {socle.annees.length} millésimes — de{" "}
+              {socle.annees[0]} à {socle.annees[socle.annees.length - 1]}. Choisissez une année :
+              tout suit.
             </p>
           </Monte>
 
-          <Monte delay={0.15}>
+          <Monte delay={0.12}>
             <dl className="cg-eco-cles">
               <div>
                 <dt>PIB cumulé</dt>
@@ -275,6 +348,8 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
         </div>
       </section>
 
+      <CompteursEco compteurs={compteurs} annee={socle.annees[socle.annees.length - 1]} />
+
       {/* ── Le globe, sa frise et ses raccourcis ─────────────────────────── */}
       <section className="cg-section cg-eco-globe">
         <div className="cg-wrap">
@@ -284,8 +359,7 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
 
           <GlobeEco
             annee={anneeEco}
-            metrique={METRIQUES.find((m) => m.id === metrique) ?? METRIQUES[0]}
-            metriques={METRIQUES}
+            metrique={TOUTES.find((m) => m.id === metrique) ?? TOUTES[0]}
             onMetrique={changeMetrique}
             choisi={choisi}
             onChoisi={setChoisi}
@@ -346,30 +420,38 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
                 >
                   <span className="cg-frise2-ligne" aria-hidden="true" />
                   <span className="cg-frise2-faite" aria-hidden="true" style={{ width: `${pct(annee)}%` }} />
-                  {socle.annees.map((a) => (
-                    <span
-                      key={a}
-                      className={`cg-frise2-jalon${a === annee ? " cg-frise2-jalon-on" : ""}`}
-                      style={{ left: `${pct(a)}%` }}
-                      aria-hidden="true"
-                    />
-                  ))}
+                  {socle.annees
+                    .filter((a) => a % 10 === 0 || (a >= 2000 && a % 5 === 0))
+                    .map((a) => (
+                      <span
+                        key={a}
+                        className="cg-frise2-jalon"
+                        style={{ left: `${pct(a)}%` }}
+                        aria-hidden="true"
+                      />
+                    ))}
                   <span className="cg-frise2-point" aria-hidden="true" style={{ left: `${pct(annee)}%` }} />
                 </div>
 
                 <div className="cg-frise2-bornes" aria-hidden="true">
-                  {socle.annees.map((a) => (
-                    <button
-                      key={a}
-                      type="button"
-                      className={`cg-frise2-b${a === annee ? " cg-frise2-b-on" : ""}`}
-                      style={{ left: `${pct(a)}%` }}
-                      onClick={() => setAnnee(a)}
-                      tabIndex={-1}
-                    >
-                      {a}
-                    </button>
-                  ))}
+                  {/* Toutes les années sont atteignables sur la ligne ; seules
+                      les décennies portent un libellé, et les demi-décennies à
+                      partir de 2000 où la matière se resserre. Soixante-six
+                      étiquettes côte à côte ne se lisent pas. */}
+                  {socle.annees
+                    .filter((a) => a % 10 === 0 || (a >= 2000 && a % 5 === 0) || a === annee || a === socle.annees[socle.annees.length - 1])
+                    .map((a) => (
+                      <button
+                        key={a}
+                        type="button"
+                        className={`cg-frise2-b${a === annee ? " cg-frise2-b-on" : ""}`}
+                        style={{ left: `${pct(a)}%` }}
+                        onClick={() => setAnnee(a)}
+                        tabIndex={-1}
+                      >
+                        {a}
+                      </button>
+                    ))}
                 </div>
 
                 <p className="cg-frise-n">
@@ -406,7 +488,7 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
                 <tr>
                   <th className="cg-tab-r">#</th>
                   <th className="cg-tab-p">Pays</th>
-                  {COLONNES.map((c) => (
+                  {colonnes.map((c) => (
                     <th key={c.id}>
                       <button
                         type="button"
@@ -431,7 +513,7 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
                   >
                     <td className="cg-tab-r">{String(i + 1).padStart(2, "0")}</td>
                     <td className="cg-tab-p">{r.fr}</td>
-                    {COLONNES.map((c) => (
+                    {colonnes.map((c) => (
                       <td key={c.id} className={r[c.id] === null ? "cg-tab-vide" : undefined}>
                         {val(r[c.id], c.unite)}
                       </td>
@@ -449,23 +531,80 @@ export function EconomiePage({ socle, articles, faq, regions, vues }: EcoProps) 
         </div>
       </section>
 
-      {/* ── Les articles ─────────────────────────────────────────────────── */}
-      <section className="cg-section">
+      {/* ── Les recommandations, puis la lecture ─────────────────────────── */}
+      <section className="cg-section cg-lectures">
         <div className="cg-wrap">
-          <Enseigne>À lire sur l&apos;économie</Enseigne>
-          <div className="cg-secondaires cg-eco-arts">
-            {articles.map((a, k) => (
-              <Monte key={a.slug} delay={k * 0.08} y={30}>
-                <article className="cg-second">
-                  <ImagePlaceholder nom={`IMAGE_PNG_ECO_0${k + 1}`} ratio="4 / 3" />
-                  <span className="cg-rubrique">
-                    {a.rubrique} · {a.duree}
-                  </span>
-                  <h4 className="cg-second-t">{a.titre}</h4>
-                  <p className="cg-second-c">{a.chapo}</p>
-                </article>
-              </Monte>
+          <Enseigne
+            droite={
+              <input
+                className="cg-filtre"
+                type="search"
+                placeholder="Chercher un article"
+                value={qArticle}
+                onChange={(e) => setQArticle(e.target.value)}
+                aria-label="Chercher un article"
+              />
+            }
+          >
+            À lire sur l&apos;économie
+          </Enseigne>
+
+          {recos.length > 0 && !qArticle.trim() && (
+            <div className="cg-recos">
+              <p className="cg-recos-t">
+                Parce que vous regardez « {TOUTES.find((m) => m.id === metrique)?.label} »
+              </p>
+              <div className="cg-recos-l">
+                {recos.map((a) => (
+                  <article key={a.slug} className="cg-reco">
+                    <span className="cg-rubrique">{a.rubrique} · {a.duree}</span>
+                    <h4 className="cg-reco-t">{a.titre}</h4>
+                  </article>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Un carrousel : neuf articles posés à plat prendraient trois
+              écrans pour une section de lecture secondaire. */}
+          <div
+            ref={rail2}
+            className="cg-arts"
+            onPointerDown={(e) => {
+              prise2.current = { x: e.clientX, g: e.currentTarget.scrollLeft };
+              e.currentTarget.setPointerCapture(e.pointerId);
+            }}
+            onPointerMove={(e) => {
+              if (!prise2.current || !rail2.current) return;
+              rail2.current.scrollLeft = prise2.current.g - (e.clientX - prise2.current.x);
+            }}
+            onPointerUp={() => {
+              prise2.current = null;
+            }}
+            onPointerCancel={() => {
+              prise2.current = null;
+            }}
+          >
+            {articlesVus.map((a) => (
+              <article key={a.slug} className="cg-art">
+                <span className="cg-rubrique">{a.rubrique} · {a.duree}</span>
+                <h4 className="cg-art-t">{a.titre}</h4>
+                <p className="cg-art-c">{a.chapo}</p>
+              </article>
             ))}
+            {articlesVus.length === 0 && (
+              <p className="cg-frise-n">Aucun article ne correspond à cette recherche.</p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Un emplacement d'annonce ─────────────────────────────────────── */}
+      <section className="cg-section cg-pub-s">
+        <div className="cg-wrap">
+          <p className="cg-pub-l">Publicité</p>
+          <div className="cg-pub">
+            <ImagePlaceholder nom="IMAGE_PNG_PUB_ECO_01" ratio="8 / 1" />
           </div>
         </div>
       </section>
