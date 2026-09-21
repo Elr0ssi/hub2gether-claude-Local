@@ -3,7 +3,7 @@
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
-import { COLONNE, type LigneSource, type SocleEco } from "@/data/concept/conceptEconomie";
+import { COLONNE, type FicheDebat, type LigneSource, type SocleEco } from "@/data/concept/conceptEconomie";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import { Loupe } from "./Loupe";
 import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
@@ -27,6 +27,7 @@ export interface EcoProps {
      composant reste dans le dépôt : les remettre tient en une ligne, ailleurs
      et plus discrets si on le souhaite. */
   sources: LigneSource[];
+  debats: FicheDebat[];
   articles: FicheArticle[];
   faq: { question: string; answer: string }[];
 }
@@ -492,7 +493,7 @@ const Tableau = memo(function Tableau({
   );
 });
 
-export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
+export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps) {
   /* La page ne connaît qu'une année : celle qu'elle affiche. L'année visée
      pendant qu'on glisse appartient à la frise, et n'en sort qu'une fois le
      geste posé — c'est ce qui l'empêche de redessiner le globe à chaque
@@ -514,7 +515,9 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
   const [ouvert, setOuvert] = useState<number | null>(0);
   const rail = useRef<HTMLDivElement>(null);
   const rail2 = useRef<HTMLDivElement>(null);
+  const rail3 = useRef<HTMLDivElement>(null);
   const prise2 = useRef<{ x: number; g: number } | null>(null);
+  const prise3 = useRef<{ x: number; g: number } | null>(null);
   const tire = useRef(false);
 
   /* Les lignes de l'année, reconstituées depuis le format compact. */
@@ -629,7 +632,7 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
   /* « D'où viennent ces chiffres » n'était pas une section : c'est une
      question, et elle se range avec les autres. Les trois principes la
      suivent, et les sources ferment la page. */
-  const questions = useMemo(
+  const questions = useMemo<{ question: string; answer: string; tableau?: boolean }[]>(
     () => [
       ...faq,
       {
@@ -645,11 +648,35 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
       {
         question: "Tous les chiffres sont-ils mesurés ?",
         answer:
-          "Non, et ceux qui ne le sont pas le disent. Le montant de la dette affiché ici est déduit du PIB et du ratio de dette, faute d'une série annuelle mesurée. La couverture de chaque indicateur est donnée telle qu'elle est, au bas de cette page : sept dates ne s'y présentent pas comme soixante-six.",
+          "Non, et ceux qui ne le sont pas le disent. Le montant de la dette affiché ici est déduit du PIB et du ratio de dette, faute d'une série annuelle mesurée. La couverture de chaque indicateur est donnée telle qu'elle est dans la question suivante : sept dates ne s'y présentent pas comme soixante-six.",
       },
     ],
     [faq],
   );
+
+  /* La FAQ posait déjà la question des sources : le tableau se range dans sa
+     réponse plutôt que d'ouvrir une seconde question qui dirait la même
+     chose. S'il n'y en avait pas, on en ajouterait une. */
+  const questionsVues = useMemo(() => {
+    const i = questions.findIndex((q) => /sources/i.test(q.question));
+    if (i >= 0) {
+      const l = [...questions];
+      l[i] = { ...l[i], tableau: true };
+      /* Elle ferme la page : c'est là qu'on vient vérifier. */
+      const [src] = l.splice(i, 1);
+      l.push(src);
+      return l;
+    }
+    return [
+      ...questions,
+      {
+        question: "Quelles sont nos sources ?",
+        answer:
+          "Indicateur par indicateur, l'institution qui publie la donnée, la référence exacte de la série, les dates couvertes et le nombre de pays renseignés.",
+        tableau: true,
+      },
+    ];
+  }, [questions]);
 
   const trier = useCallback((c: Col) => {
     if (c === col) setSens((s) => (s === 1 ? -1 : 1));
@@ -809,40 +836,55 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
             />
           </div>
 
-          {recos.length > 0 && !qArticle.trim() && (
-            <div className="cg-recos">
-              <p className="cg-recos-t">
-                À lire aussi · {TOUTES.find((m) => m.id === metrique)?.label}
-              </p>
-              <div className="cg-recos-l">
-                {recos.map((a) => (
-                  <button key={a.slug} type="button" className="cg-reco">
-                    <span className="cg-reco-n">
-                      {a.rubrique.toUpperCase()} · {a.duree}
-                    </span>
-                    <span className="cg-reco-t">{a.titre}</span>
-                    <span className="cg-reco-m">Lire →</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
           {articlesVus.length === 0 ? (
             <p className="cg-frise-n">Aucun article ne correspond à cette recherche.</p>
           ) : (
-            /* Un article en grand à gauche, le reste en carrousel à droite :
-               la première lecture se présente comme une lecture, pas comme la
-               première vignette d'une file. */
+            /* Une lecture en grand à gauche, et à droite deux étages : les
+               débats en cours au-dessus, la file des autres lectures en
+               dessous. Le grand article tient la hauteur des deux. */
             <div className="cg-arts-l">
               <article className="cg-art cg-art-une">
-                <ImagePlaceholder nom="IMAGE_PNG_ECO_01" ratio="4 / 3" />
+                <ImagePlaceholder nom="IMAGE_PNG_ECO_01" ratio="16 / 10" />
                 <span className="cg-rubrique">
                   {articlesVus[0].rubrique} · {articlesVus[0].duree}
                 </span>
                 <h3 className="cg-art-t">{articlesVus[0].titre}</h3>
                 <p className="cg-art-c">{articlesVus[0].chapo}</p>
               </article>
+
+              {debats.length > 0 && (
+                <div className="cg-debats">
+                  <div className="cg-debats-t">
+                    <span>Nos plus gros débats</span>
+                    <span className="cg-debats-n">{debats.length} en cours</span>
+                  </div>
+                  <div
+                    ref={rail3}
+                    className="cg-debats-l"
+                    onPointerDown={(e) => {
+                      prise3.current = { x: e.clientX, g: e.currentTarget.scrollLeft };
+                      e.currentTarget.setPointerCapture(e.pointerId);
+                    }}
+                    onPointerMove={(e) => {
+                      if (!prise3.current || !rail3.current) return;
+                      rail3.current.scrollLeft = prise3.current.g - (e.clientX - prise3.current.x);
+                    }}
+                    onPointerUp={() => {
+                      prise3.current = null;
+                    }}
+                    onPointerCancel={() => {
+                      prise3.current = null;
+                    }}
+                  >
+                    {debats.map((d) => (
+                      <button key={d.id} type="button" className="cg-debat">
+                        <span className="cg-debat-q">{d.question}</span>
+                        <span className="cg-debat-a">{d.ancre}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="cg-arts-c">
                 <div
@@ -865,12 +907,11 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
                 >
                   {articlesVus.slice(1).map((a, k) => (
                     <article key={a.slug} className="cg-art">
-                      <ImagePlaceholder nom={`IMAGE_PNG_ECO_0${((k + 1) % 9) + 1}`} ratio="16 / 10" />
+                      <ImagePlaceholder nom={`IMAGE_PNG_ECO_0${((k + 1) % 9) + 1}`} ratio="16 / 9" />
                       <span className="cg-rubrique">
                         {a.rubrique} · {a.duree}
                       </span>
                       <h4 className="cg-art-t">{a.titre}</h4>
-                      <p className="cg-art-c">{a.chapo}</p>
                     </article>
                   ))}
                 </div>
@@ -885,8 +926,28 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
       <section className="cg-section cg-questions">
         <div className="cg-wrap">
           <Enseigne>Les questions d&apos;économie</Enseigne>
+
+          {/* Le balisage que les moteurs lisent. Il décrit les questions et
+              leurs réponses telles qu'elles sont affichées — jamais autre
+              chose, sous peine d'être traité comme une tromperie. Cette page
+              du prototype n'est pas indexée ; le balisage est là pour que la
+              page définitive n'ait rien à rattraper. */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                mainEntity: questionsVues.map((q) => ({
+                  "@type": "Question",
+                  name: q.question,
+                  acceptedAnswer: { "@type": "Answer", text: q.answer },
+                })),
+              }),
+            }}
+          />
           <div className="cg-q-liste">
-            {questions.map((q, k) => {
+            {questionsVues.map((q, k) => {
               const on = ouvert === k;
               return (
                 <div key={q.question} className={`cg-q${on ? " cg-q-on" : ""}`}>
@@ -909,6 +970,30 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
                         transition={{ duration: 0.36, ease: LENT }}
                       >
                         <p>{q.answer}</p>
+                        {"tableau" in q && q.tableau && (
+                          <table className="cg-src-t">
+                            <caption className="cg-src-c">
+                              Sources des indicateurs économiques, telles que la base les
+                              enregistre
+                            </caption>
+                            <thead>
+                              <tr>
+                                <th scope="col">Indicateur</th>
+                                <th scope="col">Source</th>
+                                <th scope="col">Couverture</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {sources.map((o) => (
+                                <tr key={o.libelle}>
+                                  <th scope="row">{o.libelle}</th>
+                                  <td>{o.source}</td>
+                                  <td className="cg-src-n">{o.couverture}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -917,20 +1002,6 @@ export function EconomiePage({ socle, sources, articles, faq }: EcoProps) {
             })}
           </div>
 
-          {/* Les sources, au pied des questions : c'est là qu'on vient
-              vérifier, une fois qu'on s'est demandé d'où sort un chiffre. */}
-          <div className="cg-sources">
-            <p className="cg-sources-t">Nos sources, indicateur par indicateur</p>
-            <div className="cg-sources-l">
-              {sources.map((o) => (
-                <div key={o.libelle} className="cg-source">
-                  <span className="cg-source-l">{o.libelle}</span>
-                  <span className="cg-source-c">{o.couverture}</span>
-                  <span className="cg-source-s">{o.source}</span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 

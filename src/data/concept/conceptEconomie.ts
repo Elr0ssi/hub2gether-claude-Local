@@ -1,6 +1,7 @@
 import { ECONOMY_YEARS } from "@/data/economy/economy";
 import { countryFr } from "@/data/countryNamesFr";
 import { DEBT_DATA } from "@/data/economy/debtData";
+import { DEBATS } from "@/data/community/debates";
 import { ECONOMY_ARTICLES } from "@/data/economy/articles";
 import { FAQS_ECONOMY } from "@/data/economy/faqs";
 import type { FicheArticle } from "./conceptGeo";
@@ -239,4 +240,30 @@ export function sourcesEco(): LigneSource[] {
       couverture: `${etendue} · ${f.paysCouverts} pays`,
     };
   });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DÉBATS D'ÉCONOMIE
+
+   Ils viennent du module de la communauté, filtrés sur le thème. Rien n'est
+   réécrit : la question et son chiffre d'ancrage sont ceux qui existent déjà,
+   et le prototype se contente de les présenter.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export interface FicheDebat {
+  id: string;
+  question: string;
+  ancre: string;
+  tags: string[];
+}
+
+export function debatsEco(n = 8): FicheDebat[] {
+  return DEBATS.filter((d) => d.theme === "economy")
+    .slice(0, n)
+    .map((d) => ({
+      id: d.id,
+      question: d.question,
+      ancre: `${d.ancre.valeur} · ${d.ancre.libelle}`,
+      tags: d.tags,
+    }));
 }

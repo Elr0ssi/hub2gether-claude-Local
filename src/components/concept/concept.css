@@ -1698,47 +1698,48 @@ body:has(.cg) { background: #05080c; }
 
 /* L'éclat de la sphère.
 
-   Deux couches posées sur le bord du globe, en fusion d'écran : un anneau
-   serré qui souligne le limbe, et une nappe plus large qui déborde de part et
-   d'autre. Elles ne tournent pas avec le globe — c'est une lumière, pas une
-   matière — et elles respirent en décalé pour que le bord ne soit jamais tout
-   à fait figé. */
+   La lumière doit épouser le limbe, pas flotter au milieu du globe. C'était
+   le défaut de la première version : le disque était dimensionné sur la
+   hauteur du cadre, et les pourcentages d'un dégradé radial se mesurent sur
+   le coin le plus éloigné — l'anneau tombait donc très en deçà du bord de la
+   sphère.
+
+   On calcule ici le diamètre réel à l'écran. Le globe est cadré sur son axe
+   le plus contraint et la caméra recule de la marge passée au composant : le
+   diamètre apparent vaut donc le plus petit côté du cadre divisé par cette
+   marge. La lumière est ensuite portée par des ombres portées, qui partent du
+   contour exact du disque et rayonnent vers l'extérieur — jamais vers le
+   centre. */
+.ge-scene { --ge-marge: 1.06; --ge-d: calc(min(100%, var(--ge-h)) / var(--ge-marge)); }
 .ge-eclat {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: min(96%, calc(var(--ge-h) * 1.04));
-  aspect-ratio: 1;
+  width: var(--ge-d);
+  height: var(--ge-d);
   transform: translate(-50%, -50%);
   border-radius: 50%;
   pointer-events: none;
-  mix-blend-mode: screen;
   z-index: 2;
-  background: radial-gradient(
-    circle at 50% 50%,
-    transparent 0 44%,
-    rgba(120, 190, 255, 0.34) 48.5%,
-    rgba(120, 190, 255, 0.1) 53%,
-    transparent 60%
-  );
+  /* Le disque lui-même reste vide : seules ses ombres éclairent. */
+  box-shadow:
+    0 0 0 1px rgba(150, 210, 255, 0.45),
+    0 0 18px 2px rgba(120, 190, 255, 0.4),
+    0 0 52px 8px rgba(100, 170, 245, 0.26);
   animation: cg-limbe 7s ease-in-out infinite alternate;
 }
+/* La seconde couche porte le rayonnement large, celui qui déborde loin du
+   bord et fait l'éclat. */
 .ge-eclat-2 {
-  width: min(122%, calc(var(--ge-h) * 1.34));
-  background: radial-gradient(
-    circle at 50% 50%,
-    transparent 0 36%,
-    rgba(90, 160, 240, 0.16) 41%,
-    rgba(150, 205, 255, 0.07) 48%,
-    transparent 64%
-  );
-  filter: blur(14px);
+  box-shadow:
+    0 0 90px 18px rgba(90, 165, 240, 0.22),
+    0 0 190px 60px rgba(70, 140, 220, 0.14);
   animation: cg-limbe 9.5s ease-in-out 0.8s infinite alternate-reverse;
   z-index: 0;
 }
 @keyframes cg-limbe {
-  from { opacity: 0.55; transform: translate(-50%, -50%) scale(0.985); }
-  to { opacity: 1; transform: translate(-50%, -50%) scale(1.015); }
+  from { opacity: 0.6; }
+  to { opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ge-eclat { animation: none; }
@@ -2291,7 +2292,7 @@ body:has(.cg) { background: #05080c; }
 /* ── Les fiches de lecture retrouvent leur visuel ────────────────────────── */
 
 .cg-arts { scroll-snap-type: none; }
-.cg-art { width: clamp(250px, 25vw, 310px); padding: 0 0 16px; overflow: hidden; }
+.cg-art { width: clamp(212px, 19vw, 262px); padding: 0 0 14px; overflow: hidden; }
 .cg-art .cg-rubrique { display: block; margin: 13px 16px 0; }
 .cg-art-t { margin: 8px 16px 0; }
 .cg-art-c { margin: 8px 16px 0; }
@@ -2758,12 +2759,18 @@ body:has(.cg) { background: #05080c; }
   font-size: 13.5px;
 }
 
+/* Le grand article tient la hauteur de deux étages : les débats en haut à
+   droite, la file des lectures en dessous, alignée sur sa partie basse. */
 .cg-arts-l {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  gap: clamp(18px, 2vw, 32px);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.35fr);
+  grid-template-rows: auto auto;
+  gap: clamp(18px, 2vw, 30px);
   align-items: start;
 }
+.cg-art-une { grid-column: 1; grid-row: 1 / 3; }
+.cg-debats { grid-column: 2; grid-row: 1; min-width: 0; }
+.cg-arts-c { grid-column: 2; grid-row: 2; }
 .cg-arts-c { position: relative; min-width: 0; }
 /* Un fondu au bord droit : la file continue, et on le voit. */
 .cg-arts-f {
@@ -2775,8 +2782,11 @@ body:has(.cg) { background: #05080c; }
   pointer-events: none;
   background: linear-gradient(90deg, transparent, var(--fond));
 }
-@media (max-width: 960px) {
-  .cg-arts-l { grid-template-columns: 1fr; }
+@media (max-width: 1080px) {
+  .cg-arts-l { grid-template-columns: 1fr; grid-template-rows: auto; }
+  .cg-art-une,
+  .cg-debats,
+  .cg-arts-c { grid-column: 1; grid-row: auto; }
 }
 
 /* La fiche qui se soulève. */
@@ -2810,16 +2820,18 @@ body:has(.cg) { background: #05080c; }
 }
 .cg-art-une .cg-rubrique { display: block; margin: 16px 18px 0; }
 .cg-art-une .cg-art-t {
-  margin: 10px 18px 0;
-  font-size: clamp(18px, 1.7vw, 23px);
-  line-height: 1.26;
+  margin: 12px 20px 0;
+  font-size: clamp(20px, 1.95vw, 27px);
+  line-height: 1.22;
 }
 .cg-art-une .cg-art-c {
-  margin: 12px 18px 0;
-  font-size: 13px;
-  -webkit-line-clamp: 6;
-  line-clamp: 6;
+  margin: 12px 20px 0;
+  font-size: 13.5px;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
 }
+/* Dans la file, plus de chapô du tout : ce sont des titres qu'on parcourt. */
+.cg-arts .cg-art .cg-art-c { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .cg-art:hover,
   .cg-reco:hover { transform: none; }
@@ -2898,4 +2910,119 @@ body:has(.cg) { background: #05080c; }
 .cg-bande ::selection {
   background: rgba(20, 70, 120, 0.18);
   color: #0a0b0d;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DÉBATS ET LE TABLEAU DES SOURCES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Les débats se parcourent comme des titres, pas comme des articles : un
+   rectangle, une question, le chiffre qui la déclenche. Rien d'autre tant que
+   la partie communauté n'existe pas. */
+.cg-debats-t {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--froid);
+}
+.cg-debats-n { color: var(--encre-3); letter-spacing: 0.1em; }
+.cg-debats-l {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  cursor: grab;
+  padding-bottom: 2px;
+}
+.cg-debats-l::-webkit-scrollbar { display: none; }
+.cg-debats-l:active { cursor: grabbing; }
+.cg-debat {
+  position: relative;
+  flex: none;
+  width: clamp(190px, 17vw, 236px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 108px;
+  padding: 13px 15px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 11px;
+  background: linear-gradient(155deg, rgba(158, 199, 216, 0.08), rgba(255, 255, 255, 0.015));
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.3s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s ease;
+}
+.cg-debat:hover {
+  border-color: rgba(158, 199, 216, 0.5);
+  transform: translateY(-5px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.38);
+}
+.cg-debat-q {
+  font-size: 13.5px;
+  line-height: 1.34;
+  color: var(--encre);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cg-debat-a { font-size: 10.5px; color: var(--froid); }
+@media (prefers-reduced-motion: reduce) {
+  .cg-debat:hover { transform: none; }
+}
+
+/* Le tableau des sources, dans la réponse de la FAQ. Un vrai tableau, avec
+   ses en-têtes de ligne et de colonne : c'est ce qu'un moteur sait lire, et
+   c'est aussi ce qu'un lecteur d'écran sait annoncer. */
+.cg-src-t {
+  width: 100%;
+  margin-top: 16px;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.cg-src-c {
+  caption-side: top;
+  text-align: left;
+  padding-bottom: 10px;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+.cg-src-t th,
+.cg-src-t td {
+  padding: 10px 14px 10px 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--bord-fin);
+}
+.cg-src-t thead th {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+.cg-src-t tbody th {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--encre);
+  white-space: nowrap;
+}
+.cg-src-t tbody td { font-size: 12px; line-height: 1.5; color: var(--encre-2); }
+.cg-src-n { color: var(--froid) !important; white-space: nowrap; }
+@media (max-width: 720px) {
+  .cg-src-t tbody th { white-space: normal; }
+  .cg-src-n { white-space: normal; }
 }
