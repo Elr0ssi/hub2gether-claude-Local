@@ -181,7 +181,7 @@ export const ETAPES = [
   {
     n: "05",
     titre: "Relecture et publication",
-    ligne: "Une relecture humaine avant la mise en ligne. Chaque chiffre conserve sa source et son millésime.",
+    ligne: "Une relecture humaine avant la mise en ligne. Chaque chiffre conserve sa source et sa date.",
   },
 ];
 

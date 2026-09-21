@@ -1326,8 +1326,8 @@ body:has(.cg) { background: #05080c; }
   background: linear-gradient(90deg, var(--froid), transparent);
 }
 
-.cg-eco-haut { padding-top: clamp(130px, 17vh, 210px); padding-bottom: clamp(34px, 4.5vh, 62px); }
-.cg-eco-h1 { margin-top: 16px; max-width: 18ch; }
+.cg-eco-haut { padding-top: clamp(120px, 15vh, 180px); padding-bottom: clamp(26px, 3.5vh, 48px); }
+.cg-eco-h1 { margin-top: 14px; max-width: none; font-size: clamp(38px, 5.2vw, 72px); }
 
 .cg-eco-cles {
   display: grid;
@@ -1706,20 +1706,14 @@ body:has(.cg) { background: #05080c; }
 }
 .cg-eco-ouv {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-  gap: clamp(28px, 4vw, 72px);
-  align-items: end;
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
 }
-.cg-eco-ouv-d { padding-bottom: 6px; }
-.cg-eco-ouv-s {
-  margin-top: 14px;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: var(--encre-3);
-}
-@media (max-width: 900px) {
-  .cg-eco-ouv { grid-template-columns: 1fr; gap: 22px; align-items: start; }
+.cg-eco-ouv .cg-eyebrow { justify-content: center; }
+.cg-eco-ouv-c {
+  margin: 16px auto 0;
+  max-width: 44ch;
 }
 
 .cg-eco-cles > div {

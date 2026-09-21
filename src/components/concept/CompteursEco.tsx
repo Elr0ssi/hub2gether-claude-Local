@@ -51,7 +51,7 @@ export function CompteursEco({ compteurs, annee }: { compteurs: Compteur[]; anne
       })}
       <p className="cg-cpt-p">
         En euros, depuis le 1<sup>er</sup> janvier. Ces compteurs ne mesurent pas en direct : ils
-        étalent sur l&apos;année une grandeur annuelle du millésime {annee}. Ils disent un ordre de
+        étalent sur l&apos;année une grandeur annuelle de {annee}. Ils disent un ordre de
         grandeur et un rythme, pas un relevé à la seconde.
       </p>
     </div>

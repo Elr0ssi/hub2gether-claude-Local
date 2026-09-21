@@ -470,7 +470,7 @@ export function Classements({
           <h2 className="cg-h2">
             Ce que dit le socle<span className="cg-pt">.</span>
             <br />
-            <span className="cg-h2-doux">Millésime {annee}.</span>
+            <span className="cg-h2-doux">{annee}.</span>
           </h2>
         </Monte>
 

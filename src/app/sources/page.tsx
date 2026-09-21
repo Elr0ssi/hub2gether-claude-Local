@@ -35,7 +35,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
         name: "FMI · WEO",
         fullName: "Fonds Monétaire International · World Economic Outlook",
         url: "https://www.imf.org/en/Publications/WEO",
-        usage: "PIB nominal par pays, dette/PIB, taux de chômage. Millésime 2024.",
+        usage: "PIB nominal par pays, dette/PIB, taux de chômage. Données 2024.",
         license: "Données librement consultables",
       },
       {

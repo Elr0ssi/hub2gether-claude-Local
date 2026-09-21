@@ -3,11 +3,11 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
-import { COLONNE, type Compteur as CompteurEco, type SocleEco } from "@/data/concept/conceptEconomie";
-import { CompteursEco } from "./CompteursEco";
+import { COLONNE, type SocleEco } from "@/data/concept/conceptEconomie";
 import { Annonce } from "./Annonce";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
+import { gelerOdometres } from "./Roulement";
 import { GlobeEco, familleDe, TOUTES } from "./GlobeEco";
 import "./concept.css";
 
@@ -15,7 +15,7 @@ import "./concept.css";
    LA PAGE ÉCONOMIE DU PROTOTYPE
 
    Même langage que la page Monde, mais une seule matière : le socle
-   économique, millésime par millésime. Tout ce qui s'affiche ici vient de la
+   économique, date par date. Tout ce qui s'affiche ici vient de la
    base du site. Une année qu'une source ne publie pas pour un pays reste
    absente — le pays sort du classement de cette année-là, il n'y figure pas
    avec un zéro.
@@ -23,7 +23,9 @@ import "./concept.css";
 
 export interface EcoProps {
   socle: SocleEco;
-  compteurs: CompteurEco[];
+  /* Les compteurs qui couraient en ouverture sont sortis de la page. Le
+     composant reste dans le dépôt : les remettre tient en une ligne, ailleurs
+     et plus discrets si on le souhaite. */
   articles: FicheArticle[];
   faq: { question: string; answer: string }[];
 }
@@ -111,9 +113,9 @@ function val(v: number | null, unite: Unite) {
   if (unite === "hab") return `${v.toFixed(1).replace(".", ",")} M`;
   if (unite === "pct") return `${v.toFixed(1).replace(".", ",")} %`;
   if (unite === "eur") return `${Math.round(v).toLocaleString("fr-FR")} €`;
-  return Math.abs(v) >= 1000
-    ? `${(v / 1000).toFixed(1).replace(".", ",")} T€`
-    : `${Math.round(v).toLocaleString("fr-FR")} Md€`;
+  /* Une seule échelle pour les montants : des milliards, toujours. Un PIB en
+     T€ face à une dette en Md€ oblige à diviser de tête avant de comparer. */
+  return `${Math.round(v).toLocaleString("fr-FR")} Md€`;
 }
 
 
@@ -165,6 +167,174 @@ function useVu(marge = 120) {
   }, [marge]);
   return { ref, vu };
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA FRISE
+
+   Elle porte son année elle-même. C'est tout l'enjeu : tant qu'elle vivait
+   dans l'état de la page, chaque pixel de glissement redessinait le globe, la
+   fiche pays et le classement — soixante fois par seconde, pour un point qui
+   bouge de trois pixels. Ici, glisser ne redessine que la frise ; la page
+   n'apprend l'année qu'une fois le geste posé, ou après une courte attente.
+
+   Les compteurs sont gelés le temps du geste. Ils ne mesurent pas une seconde
+   qui passe, ils projettent une grandeur annuelle : les arrêter une seconde
+   ne fausse rien, et cela rend au glissement les images qu'ils prenaient.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const Frise = memo(function Frise({
+  annees,
+  valeur,
+  onAnnee,
+}: {
+  annees: number[];
+  valeur: number;
+  onAnnee: (a: number) => void;
+}) {
+  const [vue, setVue] = useState(valeur);
+  /* L'année sous le doigt est aussi tenue dans une référence. Relâcher lit
+     celle-ci et non celle du dernier rendu : un geste rapide envoie ses
+     déplacements plus vite que React ne redessine, et la valider depuis l'état
+     ramenait à l'année d'avant le geste. */
+  const vueRef = useRef(valeur);
+  const rail = useRef<HTMLDivElement>(null);
+  const tire = useRef(false);
+  const attente = useRef<number | null>(null);
+
+  /* Un changement venu d'ailleurs — le menu du classement, par exemple —
+     ramène le point où il doit être. */
+  useEffect(() => {
+    setVue(valeur);
+    vueRef.current = valeur;
+  }, [valeur]);
+  useEffect(
+    () => () => {
+      if (attente.current) clearTimeout(attente.current);
+      gelerOdometres(false);
+    },
+    [],
+  );
+
+  const vise = useCallback(
+    (a: number, tout_de_suite = false) => {
+      vueRef.current = a;
+      setVue(a);
+      if (attente.current) clearTimeout(attente.current);
+      if (tout_de_suite) onAnnee(a);
+      else attente.current = window.setTimeout(() => onAnnee(a), 110);
+    },
+    [onAnnee],
+  );
+
+  const viseX = (x: number) => {
+    const el = rail.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const t = Math.max(0, Math.min(1, (x - r.left) / (r.width || 1)));
+    vise(annees[Math.round(t * (annees.length - 1))]);
+  };
+
+  const pct = (a: number) => {
+    const i = annees.indexOf(a);
+    return annees.length < 2 ? 0 : (i / (annees.length - 1)) * 100;
+  };
+
+  const jalons = annees.filter((a) => a % 10 === 0 || (a >= 2000 && a % 5 === 0));
+
+  return (
+    <div className="cg-frise2">
+      <div className="cg-frise2-tete">
+        <span className="cg-frise2-an">{vue}</span>
+        <span className="cg-frise2-l">date affichée</span>
+      </div>
+
+      {/* Une ligne, un point. On vise un repère, on glisse le point, ou on
+          pousse aux flèches — un curseur qui ne répond qu'à la souris exclut
+          ceux qui n'en tiennent pas. */}
+      <div
+        ref={rail}
+        className="cg-frise2-rail"
+        role="slider"
+        tabIndex={0}
+        aria-label="Date affichée"
+        aria-valuemin={annees[0]}
+        aria-valuemax={annees[annees.length - 1]}
+        aria-valuenow={vue}
+        aria-valuetext={String(vue)}
+        onPointerDown={(e) => {
+          e.currentTarget.setPointerCapture(e.pointerId);
+          tire.current = true;
+          gelerOdometres(true);
+          viseX(e.clientX);
+        }}
+        onPointerMove={(e) => tire.current && viseX(e.clientX)}
+        onPointerUp={() => {
+          tire.current = false;
+          gelerOdometres(false);
+          vise(vueRef.current, true);
+        }}
+        onPointerCancel={() => {
+          tire.current = false;
+          gelerOdometres(false);
+        }}
+        onKeyDown={(e) => {
+          const i = annees.indexOf(vueRef.current);
+          if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+            e.preventDefault();
+            vise(annees[Math.max(0, i - 1)], true);
+          } else if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+            e.preventDefault();
+            vise(annees[Math.min(annees.length - 1, i + 1)], true);
+          } else if (e.key === "Home") {
+            e.preventDefault();
+            vise(annees[0], true);
+          } else if (e.key === "End") {
+            e.preventDefault();
+            vise(annees[annees.length - 1], true);
+          }
+        }}
+      >
+        <span className="cg-frise2-ligne" aria-hidden="true" />
+        <span className="cg-frise2-faite" aria-hidden="true" style={{ width: `${pct(vue)}%` }} />
+        {jalons.map((a) => (
+          <span key={a} className="cg-frise2-jalon" style={{ left: `${pct(a)}%` }} aria-hidden="true" />
+        ))}
+        <span className="cg-frise2-point" aria-hidden="true" style={{ left: `${pct(vue)}%` }} />
+      </div>
+
+      <div className="cg-frise2-bornes" aria-hidden="true">
+        {/* Toutes les années sont atteignables sur la ligne ; seules les
+            décennies portent un libellé, et les demi-décennies à partir de
+            2000 où la matière se resserre. Soixante-six étiquettes côte à côte
+            ne se lisent pas. */}
+        {annees
+          .filter(
+            (a) =>
+              a % 10 === 0 ||
+              (a >= 2000 && a % 5 === 0) ||
+              a === vue ||
+              a === annees[annees.length - 1],
+          )
+          .map((a) => (
+            <button
+              key={a}
+              type="button"
+              className={`cg-frise2-b${a === vue ? " cg-frise2-b-on" : ""}`}
+              style={{ left: `${pct(a)}%` }}
+              onClick={() => vise(a, true)}
+              tabIndex={-1}
+            >
+              {a}
+            </button>
+          ))}
+      </div>
+
+      <p className="cg-frise-n">
+        Les dates affichées sont celles publiées par la source. Rien n&apos;est interpolé entre deux
+        repères : une année absente reste absente.
+      </p>
+    </div>
+  );
+});
 
 /* Le classement ne dessine que ce qui est à l'écran.
 
@@ -285,25 +455,13 @@ const Tableau = memo(function Tableau({
   );
 });
 
-export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
-  /* Deux années : celle qu'on vise et celle qu'on affiche.
-     Repeindre la texture du globe et recalculer deux cents lignes à chaque
-     pixel de glissement rendait la frise poisseuse. Le point et le libellé
-     suivent le doigt immédiatement ; le reste de la page attend que le geste
-     se pose. */
-  const [anneeVue, setAnneeVue] = useState(socle.annees[socle.annees.length - 1]);
+export function EconomiePage({ socle, articles, faq }: EcoProps) {
+  /* La page ne connaît qu'une année : celle qu'elle affiche. L'année visée
+     pendant qu'on glisse appartient à la frise, et n'en sort qu'une fois le
+     geste posé — c'est ce qui l'empêche de redessiner le globe à chaque
+     pixel. */
   const [annee, setAnnee] = useState(socle.annees[socle.annees.length - 1]);
-  const attente = useRef<number | null>(null);
 
-  const viseAnnee = useCallback((a: number, tout_de_suite = false) => {
-    setAnneeVue(a);
-    if (attente.current) clearTimeout(attente.current);
-    if (tout_de_suite) setAnnee(a);
-    else attente.current = window.setTimeout(() => setAnnee(a), 110);
-  }, []);
-  useEffect(() => () => {
-    if (attente.current) clearTimeout(attente.current);
-  }, []);
   const [col, setCol] = useState<Col>("pib");
   /* La métrique du globe et la colonne triée sont liées : cliquer « Dette »
      sur le globe trie le classement sur la dette, et l'inverse aussi. C'est
@@ -320,21 +478,6 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
   const rail2 = useRef<HTMLDivElement>(null);
   const prise2 = useRef<{ x: number; g: number } | null>(null);
   const tire = useRef(false);
-
-  /* La position d'un millésime sur la ligne, en pourcentage : les jalons ne
-     sont pas régulièrement espacés dans le temps, mais ils le sont sur la
-     ligne — c'est une suite de repères, pas un axe. */
-  const pct = (a: number) => {
-    const i = socle.annees.indexOf(a);
-    return socle.annees.length < 2 ? 0 : (i / (socle.annees.length - 1)) * 100;
-  };
-  const viseX = (x: number) => {
-    const el = rail.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const t = Math.max(0, Math.min(1, (x - r.left) / (r.width || 1)));
-    viseAnnee(socle.annees[Math.round(t * (socle.annees.length - 1))]);
-  };
 
   /* Les lignes de l'année, reconstituées depuis le format compact. */
   const rangs = useMemo<Rang[]>(() => {
@@ -381,7 +524,7 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
 
   /* L'année remise au format de la base : le globe du site lit un EconomyYear,
      et on le reconstruit depuis le format compact plutôt que d'expédier au
-     navigateur seize millésimes entiers. */
+     navigateur seize dates entiers. */
   const anneeEco = useMemo<EconomyYear>(() => {
     const countries: Record<string, CountryEconomyData> = {};
     for (const r of rangs) {
@@ -401,7 +544,7 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
     return { year: annee, label: String(annee), dataNote: "", countries };
   }, [rangs, annee]);
 
-  /* La série du pays choisi, millésime par millésime, pour la courbe. Une
+  /* La série du pays choisi, date par date, pour la courbe. Une
      année sans valeur reste nulle : la courbe se coupe, elle ne descend pas
      à zéro. */
   const serie = useMemo(() => {
@@ -474,40 +617,23 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
 
       {/* ── L'ouverture ──────────────────────────────────────────────────── */}
       <section className="cg-section cg-eco-haut">
-        {/* Une lueur derrière le titre : sur une page entièrement noire, une
-            ouverture sans relief se confond avec la section suivante. */}
+        {/* Une ouverture courte et centrée. Un titre sur deux lignes, une
+            phrase, et l'on est dans la matière. Le grand bloc de texte et la
+            rangée de compteurs qui occupaient cet espace disaient beaucoup
+            avant d'avoir rien montré — et les compteurs prenaient des images
+            au glissement de la frise, juste en dessous. */}
         <div className="cg-eco-lueur" aria-hidden="true" />
         <div className="cg-wrap">
-          {/* L'ouverture tient sur une ligne de lecture : le titre à gauche,
-              ce qu'on peut en faire à droite. Un grand titre centré au-dessus
-              d'un chapô centré répétait deux fois la même chose et repoussait
-              les chiffres sous la ligne de flottaison. */}
           <Monte>
             <div className="cg-eco-ouv">
-              <div className="cg-eco-ouv-g">
-                <p className="cg-eyebrow">Économie</p>
-                <h1 className="cg-h1 cg-eco-h1">
-                  Le socle économique,
-                  <br />
-                  <span className="cg-h2-doux">millésime par millésime.</span>
-                </h1>
-              </div>
-              <div className="cg-eco-ouv-d">
-                <p className="cg-chapo">
-                  Dix indicateurs, {socle.pays.length} pays, {socle.annees.length} millésimes — de{" "}
-                  {socle.annees[0]} à {socle.annees[socle.annees.length - 1]}. Choisissez une
-                  année : le globe, les fiches et le classement suivent ensemble.
-                </p>
-                <p className="cg-eco-ouv-s">
-                  Banque mondiale (WDI) · FMI · millésime affiché : {annee}
-                </p>
-              </div>
+              <p className="cg-eyebrow">Économie</p>
+              <h1 className="cg-h1 cg-eco-h1">Le socle économique</h1>
+              <p className="cg-chapo cg-eco-ouv-c">
+                {socle.pays.length} pays, {socle.annees[0]}–
+                {socle.annees[socle.annees.length - 1]}, dix indicateurs.
+              </p>
             </div>
           </Monte>
-
-          {/* Les compteurs en rangée, juste sous l'ouverture : c'est la
-              première chose qui bouge, elle n'a pas à attendre. */}
-          <CompteursEco compteurs={compteurs} annee={socle.annees[socle.annees.length - 1]} />
         </div>
       </section>
 
@@ -515,7 +641,7 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
       <section className="cg-section cg-eco-globe">
         <div className="cg-wrap">
           <Enseigne droite={<span className="cg-demo-mini">Banque mondiale (WDI) · FMI</span>}>
-            Le globe, millésime {annee}
+            Le globe, {annee}
           </Enseigne>
 
           <GlobeEco
@@ -527,103 +653,7 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
             nomFr={(n) => socle.pays.find((p) => p.nom === n)?.fr ?? n}
             creancier={choisi ? socle.pays.find((p) => p.nom === choisi)?.creancier : undefined}
             serie={serie}
-            sousLeGlobe={
-
-              /* La frise est collée au globe : changer d'année et regarder le
-                 résultat est un seul geste, et l'envoyer dans une section
-                 au-dessus obligeait à remonter pour chaque millésime. */
-              <div className="cg-frise2">
-                <div className="cg-frise2-tete">
-                  <span className="cg-frise2-an">{anneeVue}</span>
-                  <span className="cg-frise2-l">millésime affiché</span>
-                </div>
-
-                {/* Une ligne, un point. On vise un jalon, on glisse le point,
-                    ou on pousse aux flèches — un curseur qui ne répond qu'à la
-                    souris exclut ceux qui n'en tiennent pas. */}
-                <div
-                  ref={rail}
-                  className="cg-frise2-rail"
-                  role="slider"
-                  tabIndex={0}
-                  aria-label="Millésime affiché"
-                  aria-valuemin={socle.annees[0]}
-                  aria-valuemax={socle.annees[socle.annees.length - 1]}
-                  aria-valuenow={anneeVue}
-                  aria-valuetext={String(anneeVue)}
-                  onPointerDown={(e) => {
-                    e.currentTarget.setPointerCapture(e.pointerId);
-                    tire.current = true;
-                    viseX(e.clientX);
-                  }}
-                  onPointerMove={(e) => tire.current && viseX(e.clientX)}
-                  onPointerUp={() => {
-                    tire.current = false;
-                    /* Le geste est fini : on n'attend plus. */
-                    viseAnnee(anneeVue, true);
-                  }}
-                  onPointerCancel={() => {
-                    tire.current = false;
-                  }}
-                  onKeyDown={(e) => {
-                    const i = socle.annees.indexOf(anneeVue);
-                    if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
-                      e.preventDefault();
-                      viseAnnee(socle.annees[Math.max(0, i - 1)], true);
-                    } else if (e.key === "ArrowRight" || e.key === "ArrowUp") {
-                      e.preventDefault();
-                      viseAnnee(socle.annees[Math.min(socle.annees.length - 1, i + 1)], true);
-                    } else if (e.key === "Home") {
-                      e.preventDefault();
-                      viseAnnee(socle.annees[0], true);
-                    } else if (e.key === "End") {
-                      e.preventDefault();
-                      viseAnnee(socle.annees[socle.annees.length - 1], true);
-                    }
-                  }}
-                >
-                  <span className="cg-frise2-ligne" aria-hidden="true" />
-                  <span className="cg-frise2-faite" aria-hidden="true" style={{ width: `${pct(anneeVue)}%` }} />
-                  {socle.annees
-                    .filter((a) => a % 10 === 0 || (a >= 2000 && a % 5 === 0))
-                    .map((a) => (
-                      <span
-                        key={a}
-                        className="cg-frise2-jalon"
-                        style={{ left: `${pct(a)}%` }}
-                        aria-hidden="true"
-                      />
-                    ))}
-                  <span className="cg-frise2-point" aria-hidden="true" style={{ left: `${pct(anneeVue)}%` }} />
-                </div>
-
-                <div className="cg-frise2-bornes" aria-hidden="true">
-                  {/* Toutes les années sont atteignables sur la ligne ; seules
-                      les décennies portent un libellé, et les demi-décennies à
-                      partir de 2000 où la matière se resserre. Soixante-six
-                      étiquettes côte à côte ne se lisent pas. */}
-                  {socle.annees
-                    .filter((a) => a % 10 === 0 || (a >= 2000 && a % 5 === 0) || a === anneeVue || a === socle.annees[socle.annees.length - 1])
-                    .map((a) => (
-                      <button
-                        key={a}
-                        type="button"
-                        className={`cg-frise2-b${a === anneeVue ? " cg-frise2-b-on" : ""}`}
-                        style={{ left: `${pct(a)}%` }}
-                        onClick={() => viseAnnee(a, true)}
-                        tabIndex={-1}
-                      >
-                        {a}
-                      </button>
-                    ))}
-                </div>
-
-                <p className="cg-frise-n">
-                  Les millésimes affichés sont ceux publiés par la source. Rien n&apos;est interpolé
-                  entre deux jalons : une année absente reste absente.
-                </p>
-              </div>
-            }
+            sousLeGlobe={<Frise annees={socle.annees} valeur={annee} onAnnee={setAnnee} />}
           />
         </div>
       </section>
@@ -652,17 +682,17 @@ export function EconomiePage({ socle, compteurs, articles, faq }: EcoProps) {
             Le classement
           </h2>
           <p className="cg-bande-c">
-            {socle.pays.length} pays, {socle.annees.length} millésimes, dix indicateurs. Choisissez
+            {socle.pays.length} pays, {socle.annees.length} dates, dix indicateurs. Choisissez
             une année, triez la colonne qui vous intéresse.
           </p>
 
           <div className="cg-bande-ctrl">
             <label className="cg-an-choix">
-              <span className="cg-an-choix-l">Millésime</span>
+              <span className="cg-an-choix-l">Date</span>
               <select
                 value={annee}
-                onChange={(e) => viseAnnee(Number(e.target.value), true)}
-                aria-label="Millésime du classement"
+                onChange={(e) => setAnnee(Number(e.target.value))}
+                aria-label="Date du classement"
               >
                 {[...socle.annees].reverse().map((a) => (
                   <option key={a} value={a}>

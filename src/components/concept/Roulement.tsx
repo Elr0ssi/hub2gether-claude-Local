@@ -22,9 +22,19 @@ import { useEffect, useMemo, useRef, useState } from "react";
 type Tic = (t: number) => void;
 const ABONNES = new Set<Tic>();
 let BOUCLE = 0;
+let GELE = false;
+
+/* Pendant qu'on tient la frise, rien d'autre n'a le droit de peindre. Les
+   compteurs ne mesurent pas une seconde qui passe, ils projettent une
+   grandeur annuelle : les geler le temps d'un geste ne fausse rien, ils
+   reprennent à l'heure qu'il est. Le glissement, lui, redevient franc. */
+export function gelerOdometres(gele: boolean) {
+  GELE = gele;
+}
 
 function tourne(t: number) {
   BOUCLE = requestAnimationFrame(tourne);
+  if (GELE || document.hidden) return;
   for (const f of ABONNES) f(t);
 }
 
@@ -92,8 +102,10 @@ export interface OdometreProps {
   /** Tours supplémentaires à chaque changement, pour que même un écart d'un
       se voie tourner. */
   tours?: number;
-  /** Vert à la hausse, rouge à la baisse, le temps du mouvement. */
-  couleur?: boolean;
+  /** Le sens favorable de la variation : 1 si monter est une bonne nouvelle,
+      −1 si c'est l'inverse (une dette, une inflation, un chômage). 0 ou
+      absent : aucune couleur. */
+  couleur?: 1 | -1 | 0 | false;
   /** L'ordre de grandeur qui fixe le nombre de rouleaux. */
   reference?: number;
   className?: string;
@@ -107,7 +119,7 @@ export function Odometre({
   unite = "",
   duree = 900,
   tours = 0,
-  couleur = false,
+  couleur = 0,
   reference,
   className,
 }: OdometreProps) {
@@ -154,7 +166,12 @@ export function Odometre({
   const derniere = useRef(cible);
   if (!continu && cible !== derniere.current) {
     depart.current = peinte.current;
-    sens.current = cible > peinte.current ? 1 : cible < peinte.current ? -1 : 0;
+    /* Le signe retenu n'est pas celui de la variation : c'est celui de son
+       sens. Une dette qui baisse est une bonne nouvelle, et c'est le vert
+       qu'il faut. */
+    const bon = couleur === false ? 0 : Number(couleur);
+    const monte = cible > peinte.current ? 1 : cible < peinte.current ? -1 : 0;
+    sens.current = (monte * bon) as 1 | -1 | 0;
     derniere.current = cible;
     t0.current = 0; // sera posé à la première image
   }
@@ -232,7 +249,7 @@ export function Odometre({
         }
         return false;
       }
-      if (!continu && u < 1 && couleur && sens.current && racine.current) {
+      if (!continu && u < 1 && sens.current && racine.current) {
         racine.current.classList.add(sens.current > 0 ? "rl-hausse" : "rl-baisse");
       }
       return true;

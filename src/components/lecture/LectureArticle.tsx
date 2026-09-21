@@ -409,7 +409,7 @@ export function LectureArticle({
             <ul>
               <li>
                 Les montants économiques viennent des <strong>Indicateurs du développement dans le
-                monde</strong> de la Banque mondiale, à leur dernier millésime publié.
+                monde</strong> de la Banque mondiale, à leur dernière date publiée.
               </li>
               <li>
                 Une année qu&apos;une source ne publie pas reste <strong>absente</strong> : elle

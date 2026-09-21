@@ -98,6 +98,29 @@ export const FAMILLES: FamilleEco[] = [
 
 export const TOUTES = FAMILLES.flatMap((f) => f.membres);
 
+/* Le sens d'une variation.
+
+   Un nombre qui monte n'est pas une bonne nouvelle par nature : un PIB qui
+   croît et une dette qui croît ne se lisent pas de la même façon. La couleur
+   dit le sens, pas la direction — vert quand la variation va dans le sens
+   favorable, rouge quand elle va contre. La dette, son ratio, l'inflation, le
+   chômage et l'âge de la retraite sont donc à l'envers des autres.
+
+   C'est un jugement, et il s'assume : il vaut pour la lecture courante de ces
+   indicateurs, pas pour tous les cas. */
+export const SENS: Record<EconomyMetricId, 1 | -1> = {
+  gdp: 1,
+  gdp_per_capita: 1,
+  trade_balance: 1,
+  companies: 1,
+  active_population: 1,
+  debt_amount: -1,
+  debt_ratio: -1,
+  inflation: -1,
+  unemployment: -1,
+  retirement_age: -1,
+};
+
 export function familleDe(id: EconomyMetricId): FamilleEco {
   return FAMILLES.find((f) => f.membres.some((m) => m.id === id)) ?? FAMILLES[0];
 }
@@ -109,9 +132,10 @@ export function fmtEco(v: number | null | undefined, unite: MetriqueEco["unite"]
   if (unite === "hab") return `${v.toFixed(1).replace(".", ",")} M`;
   if (unite === "pct") return `${v.toFixed(1).replace(".", ",")} %`;
   if (unite === "eur") return `${Math.round(v).toLocaleString("fr-FR")} €`;
-  return Math.abs(v) >= 1000
-    ? `${(v / 1000).toFixed(1).replace(".", ",")} T€`
-    : `${Math.round(v).toLocaleString("fr-FR")} Md€`;
+  /* Toujours des milliards, jamais de trillions. Un PIB en T€ et une dette en
+     Md€ ne se comparent pas d'un coup d'œil : il faut diviser de tête avant
+     de pouvoir lire. Une seule échelle, et les deux nombres se répondent. */
+  return `${Math.round(v).toLocaleString("fr-FR")} Md€`;
 }
 
 /** La même mise en forme, mais découpée pour l'odomètre : un nombre, ses
@@ -126,9 +150,7 @@ export function pieceEco(
   if (unite === "hab") return { v, dec: 1, unite: "\u00a0M" };
   if (unite === "pct") return { v, dec: 1, unite: "\u00a0%" };
   if (unite === "eur") return { v, dec: 0, unite: "\u00a0€" };
-  return Math.abs(v) >= 1000
-    ? { v: v / 1000, dec: 1, unite: "\u00a0T€" }
-    : { v, dec: 0, unite: "\u00a0Md€" };
+  return { v, dec: 0, unite: "\u00a0Md€" };
 }
 
 interface Props {
@@ -298,7 +320,7 @@ export function GlobeEco({
                     unite={vedette.unite}
                     duree={950}
                     tours={1}
-                    couleur
+                    couleur={SENS[metrique.id]}
                   />
                   {rang && (
                     <span className="ge-vedette-r">
@@ -332,7 +354,7 @@ export function GlobeEco({
                             unite={p.unite}
                             duree={950}
                             tours={1}
-                            couleur
+                            couleur={SENS[m.id]}
                           />
                         </button>
                       );
@@ -421,13 +443,10 @@ export function GlobeEco({
                           )}
                         </svg>
                       </div>
-                      <p className="ge-evo-n">
-                        Passez le doigt ou le curseur sur la courbe pour lire une année.
-                      </p>
                     </>
                   ) : (
                     <p className="ge-evo-vide">
-                      Moins de deux millésimes publiés pour ce pays sur cet indicateur.
+                      Moins de deux dates publiés pour ce pays sur cet indicateur.
                     </p>
                   )}
                 </div>

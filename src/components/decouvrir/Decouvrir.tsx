@@ -389,7 +389,7 @@ export function Decouvrir({ chiffres, tete, articles, fils, serie }: DecouvrirPr
             {
               n: "03",
               t: "Traçabilité",
-              c: "Source, millésime, méthode de calcul. Le lecteur peut refaire le chemin, et le contester.",
+              c: "Source, date, méthode de calcul. Le lecteur peut refaire le chemin, et le contester.",
             },
           ].map((r, k) => (
             <motion.div
