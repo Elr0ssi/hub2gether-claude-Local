@@ -21,7 +21,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
+  /* L'article « dette publique française » : une page à part entière, donc
+     une entrée à part entière. */
+  const dette = {
+    url: `${siteUrl}/france/economie/dette-publique`,
+    lastModified: new Date("2026-09-21"),
+    changeFrequency: "monthly" as const,
+    priority: 0.9,
+  };
+
   return [
+    dette,
     {
       url: siteUrl,
       lastModified: LAST_MODIFIED_STATIC,
