@@ -1984,7 +1984,12 @@ body:has(.cg) { background: #05080c; }
 }
 .cg-reco-t { margin: 7px 0 0; font-size: 14px; font-weight: 400; line-height: 1.35; color: var(--encre); }
 
+/* Une carte qui se soulève sort de sa file : sans marge, le conteneur qui
+   défile la rogne par le haut et lui coupe son ombre. On lui ménage la place
+   à l'intérieur, et on la reprend en dehors pour que rien ne se déplace. */
 .cg-arts {
+  padding: 14px 0 26px;
+  margin: -14px 0 -26px;
   display: flex;
   gap: 12px;
   overflow-x: auto;
@@ -2805,7 +2810,7 @@ body:has(.cg) { background: #05080c; }
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.35fr);
   grid-template-rows: auto auto;
   gap: clamp(18px, 2vw, 30px);
-  align-items: start;
+  align-items: stretch;
 }
 .cg-art-une { grid-column: 1; grid-row: 1 / 3; }
 .cg-debats { grid-column: 2; grid-row: 1; min-width: 0; }
@@ -2849,13 +2854,27 @@ body:has(.cg) { background: #05080c; }
 .cg-reco:hover { transform: translateY(-4px); }
 
 /* La lecture en grand. */
+/* La lecture en grand s'aligne sur la colonne de droite plutôt que de la
+   dépasser. Elle s'étire sur les deux rangées, et c'est son image qui prend
+   la place restante : en lui donnant une hauteur souple au lieu d'un rapport
+   fixe, la carte ne réclame plus que la hauteur de son texte, ce sont donc
+   les débats et la file qui fixent la rangée, et elle vient s'y couler. */
 .cg-art-une {
   width: auto;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   padding: 0 0 20px;
   border: 1px solid var(--bord-fin);
   border-radius: 12px;
   overflow: hidden;
   background: var(--fond-2);
+}
+.cg-art-une .image-placeholder {
+  aspect-ratio: auto !important;
+  flex: 1 1 0;
+  min-height: 150px;
 }
 .cg-art-une .cg-rubrique { display: block; margin: 16px 18px 0; }
 .cg-art-une .cg-art-t {
@@ -2977,7 +2996,10 @@ body:has(.cg) { background: #05080c; }
   overflow-x: auto;
   scrollbar-width: none;
   cursor: grab;
-  padding-bottom: 2px;
+  /* Même raison que la file d'articles : le relief du survol a besoin de
+     place, et elle est reprise en marge négative. */
+  padding: 12px 0 22px;
+  margin: -12px 0 -22px;
 }
 .cg-debats-l::-webkit-scrollbar { display: none; }
 .cg-debats-l:active { cursor: grabbing; }
