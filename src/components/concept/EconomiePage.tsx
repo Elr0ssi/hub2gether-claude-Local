@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
 import { COLONNE, type FicheDebat, type LigneSource, type SocleEco } from "@/data/concept/conceptEconomie";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
+import { Jetons } from "./Jetons";
 import { Loupe } from "./Loupe";
 import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
 import { gelerOdometres } from "./Roulement";
@@ -439,7 +440,11 @@ const Tableau = memo(function Tableau({
   }, []);
 
   return (
-    <div className="cg-tab-cadre" ref={cadre}>
+    <div
+      className="cg-tab-cadre"
+      ref={cadre}
+      style={{ "--cg-tab-h": `${haut}px` } as React.CSSProperties}
+    >
       <table className="cg-tab">
         <thead>
           <tr>
@@ -709,6 +714,7 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
           globe. */}
       <section className="cg-section cg-eco-haut" data-vu={haut.vu ? "1" : "0"}>
         <div className="cg-eco-lueur" aria-hidden="true" />
+        <Jetons rassembles={haut.vu} />
         <div className="cg-wrap">
           <div className="cg-eco-ouv">
             <p className="cg-eyebrow">Économie</p>

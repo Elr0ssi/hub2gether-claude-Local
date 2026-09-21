@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import type { PaletteGlobe } from "@/components/map/EconomyGlobe";
 import { getValueIntensity } from "@/lib/economyColors";
@@ -247,6 +247,42 @@ export function GlobeEco({
   );
   const lu = survol !== null && courbe ? courbe.marques[survol] : null;
 
+  /* Deux repères posés sur la courbe donnent l'évolution entre eux. Un clic
+     pose le premier, un second le referme, un troisième repart de zéro. Le
+     multiple est dit plutôt que le pourcentage : « ×8,4 » se saisit d'un coup
+     d'œil là où « +740 % » demande un calcul. En dessous de deux, c'est le
+     pourcentage qui parle mieux, et on le donne à la place. */
+  const [bornes, setBornes] = useState<number[]>([]);
+  const pose = useCallback(
+    (i: number) => {
+      setBornes((b) => (b.length >= 2 ? [i] : b.length === 1 && b[0] === i ? [] : [...b, i].sort((x, y) => x - y)));
+    },
+    [],
+  );
+  useEffect(() => setBornes([]), [choisi, metrique.id]);
+
+  const ecart = useMemo(() => {
+    if (!courbe || bornes.length < 2) return null;
+    const a = courbe.marques[bornes[0]];
+    const b = courbe.marques[bornes[1]];
+    if (!a || !b || a.v === 0) return null;
+    const r = b.v / a.v;
+    /* Un rapport n'a de sens que si les deux valeurs sont du même signe :
+       passer d'un déficit à un excédent ne se multiplie pas. */
+    const memeSigne = a.v > 0 === b.v > 0;
+    const pct = ((b.v - a.v) / Math.abs(a.v)) * 100;
+    return {
+      a,
+      b,
+      texte: !memeSigne
+        ? `${pct > 0 ? "+" : "−"}${Math.abs(pct).toFixed(0)} %, en changeant de signe`
+        : Math.abs(r) >= 2
+          ? `×${r.toFixed(1).replace(".", ",")}`
+          : `${pct >= 0 ? "+" : "−"}${Math.abs(pct).toFixed(pct < 10 && pct > -10 ? 1 : 0).replace(".", ",")} %`,
+      sens: b.v > a.v ? 1 : b.v < a.v ? -1 : 0,
+    };
+  }, [courbe, bornes]);
+
   /* La vedette et ses voisines, découpées pour l'odomètre. */
   const vedette = pieceEco(fiche?.[metrique.id] as number | undefined, metrique.unite);
 
@@ -376,7 +412,14 @@ export function GlobeEco({
                       {/* Le bandeau dit les deux bouts au repos, et l'année
                           survolée dès qu'on pose le doigt sur la courbe. */}
                       <div className="ge-evo-h">
-                        {lu ? (
+                        {ecart ? (
+                          <span
+                            className={`ge-evo-ec${ecart.sens > 0 ? " ge-evo-ec-h" : ecart.sens < 0 ? " ge-evo-ec-b" : ""}`}
+                          >
+                            <b>{ecart.texte}</b>
+                            {ecart.a.annee} → {ecart.b.annee}
+                          </span>
+                        ) : lu ? (
                           <span className="ge-evo-lu">
                             <b>{fmtEco(lu.v, metrique.unite)}</b>
                             {lu.annee}
@@ -402,6 +445,7 @@ export function GlobeEco({
                           e.currentTarget.setPointerCapture(e.pointerId);
                           vise(e.clientX);
                         }}
+                        onClick={() => survol !== null && pose(survol)}
                         onPointerLeave={() => setSurvol(null)}
                         onPointerCancel={() => setSurvol(null)}
                       >
@@ -429,6 +473,37 @@ export function GlobeEco({
                             fill="var(--froid)"
                             vectorEffect="non-scaling-stroke"
                           />
+                          {ecart && (
+                            <>
+                              <rect
+                                x={Math.min(ecart.a.x, ecart.b.x)}
+                                y="0"
+                                width={Math.abs(ecart.b.x - ecart.a.x)}
+                                height="30"
+                                fill="rgba(158,199,216,0.1)"
+                              />
+                              {[ecart.a, ecart.b].map((m) => (
+                                <g key={m.annee}>
+                                  <line
+                                    x1={m.x}
+                                    y1="0"
+                                    x2={m.x}
+                                    y2="30"
+                                    stroke="var(--froid)"
+                                    strokeWidth="1"
+                                    vectorEffect="non-scaling-stroke"
+                                  />
+                                  <circle
+                                    cx={m.x}
+                                    cy={m.y}
+                                    r="1.7"
+                                    fill="var(--froid)"
+                                    vectorEffect="non-scaling-stroke"
+                                  />
+                                </g>
+                              ))}
+                            </>
+                          )}
                           {lu && (
                             <>
                               <line
@@ -451,6 +526,13 @@ export function GlobeEco({
                           )}
                         </svg>
                       </div>
+                      <p className="ge-evo-aide">
+                        {bornes.length === 0
+                          ? "Cliquez deux dates pour mesurer l'écart."
+                          : bornes.length === 1
+                            ? `${courbe.marques[bornes[0]].annee} posée. Cliquez la seconde date.`
+                            : "Cliquez ailleurs pour repartir."}
+                      </p>
                     </>
                   ) : (
                     <p className="ge-evo-vide">

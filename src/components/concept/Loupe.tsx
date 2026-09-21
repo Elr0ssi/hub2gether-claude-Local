@@ -33,9 +33,9 @@ export function Loupe() {
 
     let x = innerWidth / 2;
     let y = innerHeight / 2;
-    /* L'anneau ne colle pas au curseur : il le rattrape. Une poursuite d'un
-       dixième par image suffit à donner de la matière au geste sans qu'on
-       ait l'impression d'un décalage. */
+    /* Le point ne colle pas tout à fait au curseur : il le rattrape. À un
+       dixième par image la traîne se voyait comme un retard ; à un tiers elle
+       ne se lit plus que comme de la matière. */
     let ax = x;
     let ay = y;
     let bouge = false;
@@ -62,8 +62,8 @@ export function Loupe() {
       boucle = requestAnimationFrame(peint);
       if (!bouge && Math.abs(ax - x) < 0.1 && Math.abs(ay - y) < 0.1) return;
       bouge = false;
-      ax += (x - ax) * 0.14;
-      ay += (y - ay) * 0.14;
+      ax += (x - ax) * 0.34;
+      ay += (y - ay) * 0.34;
       if (nappe.current) nappe.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       if (anneau.current) anneau.current.style.transform = `translate3d(${ax}px, ${ay}px, 0)`;
     };
