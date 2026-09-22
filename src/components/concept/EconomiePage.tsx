@@ -864,7 +864,6 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
         <Jetons />
         <div className="cg-wrap">
           <div className="cg-eco-ouv">
-            <p className="cg-eyebrow">Économie</p>
             {/* Le sceau : la tuile du milieu, plus grande que les autres et
                 seule à porter un cerne. C'est le point de fuite du champ —
                 tout s'écarte de lui quand on descend, tout y revient quand
@@ -874,8 +873,13 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
                 <Dessin f="courbe" />
               </span>
             </span>
-            <h1 className="cg-h1 cg-eco-h1">
-              <Titre texte="Le socle économique" />
+            {/* Le mot seul tient le titre. « Le socle économique » disait au
+                lecteur comment on appelle la page en interne, pas ce qu'elle
+                traite ; le sur-titre, lui, portait déjà le sujet, en petit et
+                sans être un titre. Ils échangent leurs rôles, et le mot que
+                les moteurs cherchent devient le titre de premier niveau. */}
+            <h1 className="cg-eco-titre">
+              <Titre texte="Économie" />
             </h1>
             <p className="cg-chapo cg-eco-ouv-c">
               {socle.pays.length} pays, {socle.annees[0]}&ndash;

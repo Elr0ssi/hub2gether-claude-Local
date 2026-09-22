@@ -19,27 +19,50 @@ export type Theme = "nuit" | "clair";
 
 const CLE = "visualize-theme";
 
-/** Le thème courant, lu sur la racine, et de quoi en changer. */
+/* Les abonnés au thème.
+
+   Deux composants appelaient ce crochet — le bouton et le globe — et chacun
+   tenait son propre état. Le bouton changeait le sien, le globe ne
+   l'apprenait jamais : il gardait sa palette de nuit sur une page devenue
+   claire. Le thème est donc tenu une seule fois, ici, et tout le monde y est
+   abonné. */
+let COURANT: Theme = "nuit";
+const ABONNES = new Set<(t: Theme) => void>();
+
+function diffuse(t: Theme) {
+  COURANT = t;
+  for (const f of ABONNES) f(t);
+}
+
+/** Le thème courant, et de quoi en changer. */
 export function useTheme(): [Theme, (t: Theme) => void] {
-  const [theme, poser] = useState<Theme>("nuit");
+  const [theme, poser] = useState<Theme>(COURANT);
 
   useEffect(() => {
-    const lu = document.documentElement.dataset.concept === "clair" ? "clair" : "nuit";
-    poser(lu);
+    /* Le premier crochet monté relit la racine : c'est le script du gabarit
+       qui y a posé le choix, avant tout rendu. */
+    const lu: Theme = document.documentElement.dataset.concept === "clair" ? "clair" : "nuit";
+    if (lu !== COURANT) diffuse(lu);
+    poser(COURANT);
+
+    ABONNES.add(poser);
     /* Deux onglets ouverts restent d'accord entre eux. */
     const sync = (e: StorageEvent) => {
       if (e.key !== CLE) return;
       const t: Theme = e.newValue === "clair" ? "clair" : "nuit";
       appliquer(t);
-      poser(t);
+      diffuse(t);
     };
     window.addEventListener("storage", sync);
-    return () => window.removeEventListener("storage", sync);
+    return () => {
+      ABONNES.delete(poser);
+      window.removeEventListener("storage", sync);
+    };
   }, []);
 
   const change = (t: Theme) => {
     appliquer(t);
-    poser(t);
+    diffuse(t);
     try {
       window.localStorage.setItem(CLE, t);
     } catch {

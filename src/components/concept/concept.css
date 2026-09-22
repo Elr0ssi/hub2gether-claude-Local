@@ -3731,3 +3731,63 @@ body:has(.cg) { background: #05080c; }
     var(--surface)
   );
 }
+
+/* ── Le titre de l'ouverture ─────────────────────────────────────────────
+   Un seul mot, sous le sceau, très espacé : une enseigne plutôt qu'une
+   phrase. Il reprend la lettre du sur-titre qu'il remplace, en grand, parce
+   que c'est ce mot-là qu'on cherche et qu'on doit reconnaître de loin.
+
+   L'alinéa rattrape la chasse ajoutée après la dernière lettre, sans quoi le
+   mot penche à gauche de son axe. */
+.cg-eco-titre {
+  margin: 4px 0 0;
+  font-size: clamp(30px, 5.4vw, 74px);
+  font-weight: 300;
+  line-height: 1.04;
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+  text-transform: uppercase;
+  color: var(--encre);
+}
+.cg-eco-titre .cg-mot { display: inline-block; }
+.cg-eco-ouv .cg-eco-ouv-c { margin-top: 18px; }
+
+/* ── L'éclat du limbe, de jour ───────────────────────────────────────────
+   L'ocre marchait de nuit, où il lisait comme un lever de soleil. De jour il
+   ne lit plus comme de la lumière, seulement comme un trait beige. Le même
+   éclat passe donc au bleu, qui se détache d'une page blanche là où le chaud
+   s'y noie. */
+:root[data-concept="clair"] .cg-arc-trait {
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 calc(50% - 1.75px),
+    rgba(31, 95, 168, 0.78) calc(50% - 1.15px) calc(50% - 0.4px),
+    transparent calc(50% + 0.2px)
+  );
+}
+:root[data-concept="clair"] .cg-arc-nappe {
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 48.7%,
+    rgba(70, 140, 215, 0.42) 49.7%,
+    rgba(40, 105, 180, 0.3) 50.3%,
+    transparent 51.8%
+  );
+}
+:root[data-concept="clair"] .cg-arc-corps {
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 45%,
+    rgba(70, 140, 215, 0.14) 49.2%,
+    rgba(110, 170, 230, 0.2) 50%,
+    rgba(70, 140, 215, 0.1) 50.8%,
+    transparent 56%
+  );
+}
+:root[data-concept="clair"] .cg-arc-point::before {
+  background: #2f6f8a;
+  box-shadow:
+    0 0 12px 3px rgba(60, 130, 200, 0.6),
+    0 0 46px 14px rgba(50, 115, 185, 0.28),
+    0 0 150px 60px rgba(45, 105, 175, 0.12);
+}
