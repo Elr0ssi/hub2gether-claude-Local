@@ -787,6 +787,7 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
           </div>
         </div>
         <div className="cg-arc" aria-hidden="true">
+          <span className="cg-arc-corps" />
           <span className="cg-arc-trait" />
           <span className="cg-arc-nappe" />
           {/* Le point du jour, posé sur le limbe : c'est lui qui donne

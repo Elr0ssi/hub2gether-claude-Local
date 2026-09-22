@@ -12,10 +12,11 @@
    dont la page parle et ce qu'elle mesure ; un logo d'entreprise, c'est une
    marque qui ne nous appartient pas et qui ne dirait rien de plus.
 
-   Trois couches, et chacune tient une seule chose : la place, la dérive
-   continue, puis le relief au survol. La quatrième — l'écart au défilement —
-   est écrite en CSS depuis une seule variable, `--p`, que l'ouverture met à
-   jour. Rien n'est calculé image par image.
+   Cinq couches, et chacune tient une seule chose : la place, l'écart au
+   défilement, l'arrivée, la dérive continue, le relief au survol. Les
+   empiler évite que deux mouvements se disputent la même propriété. Rien
+   n'est calculé image par image : l'écart vient d'une seule variable CSS,
+   le reste est en animations et en transitions.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 type Forme =
@@ -50,6 +51,11 @@ interface Tuile {
   z: number;
   /** Gardée sur une colonne étroite. */
   petit?: boolean;
+  /** Le rang d'apparition. Volontairement dispersé : dans l'ordre de la
+      liste, les tuiles arriveraient de gauche à droite comme un balayage. */
+  o: number;
+  /** Une tuile allumée : elle porte un halo de sa teinte, les autres non. */
+  vif?: boolean;
 }
 
 const OR = "#e8b774";
@@ -64,29 +70,29 @@ const VIOLET = "#b79cff";
    fait des grappes et des trous. */
 const TUILES: Tuile[] = [
   /* ── Le bord gauche ─────────────────────────────────────────────────── */
-  { t: "€", c: OR, x: 8, y: 22, k: 46, d: 11, z: 1.1, petit: true },
-  { f: "barres", c: BLEU, x: 17, y: 12, k: 40, d: 14, z: 0.8 },
-  { t: "CAC 40", c: PALE, x: 5, y: 44, k: 52, d: 13, z: 1.2 },
-  { f: "usine", c: PALE, x: 21, y: 33, k: 42, d: 9, z: 0.9, petit: true },
-  { f: "goutte", c: OR, x: 12, y: 58, k: 38, d: 16, z: 1 },
-  { f: "banque", c: BLEU, x: 26, y: 54, k: 44, d: 12, z: 1.15, petit: true },
-  { t: "$", c: OR, x: 30, y: 20, k: 38, d: 10, z: 0.75 },
-  { f: "panier", c: BLEU, x: 24, y: 71, k: 36, d: 15, z: 1.25 },
-  { f: "chandelier", c: VERT, x: 34, y: 38, k: 34, d: 13, z: 0.7 },
-  { f: "ble", c: OR, x: 33, y: 63, k: 34, d: 11, z: 0.85 },
+  { t: "€", c: OR, x: 8, y: 22, k: 46, d: 11, z: 1.1, petit: true, o: 3, vif: true },
+  { f: "barres", c: BLEU, x: 17, y: 12, k: 40, d: 14, z: 0.8, o: 11 },
+  { t: "CAC 40", c: PALE, x: 5, y: 44, k: 52, d: 13, z: 1.2, o: 7 },
+  { f: "usine", c: PALE, x: 21, y: 33, k: 42, d: 9, z: 0.9, petit: true, o: 16 },
+  { f: "goutte", c: OR, x: 12, y: 58, k: 38, d: 16, z: 1, o: 1 },
+  { f: "banque", c: BLEU, x: 26, y: 54, k: 44, d: 12, z: 1.15, petit: true, o: 13 },
+  { t: "$", c: OR, x: 30, y: 20, k: 38, d: 10, z: 0.75, o: 19 },
+  { f: "panier", c: BLEU, x: 24, y: 71, k: 36, d: 15, z: 1.25, o: 5 },
+  { f: "chandelier", c: VERT, x: 34, y: 38, k: 34, d: 13, z: 0.7, o: 9 },
+  { f: "ble", c: OR, x: 33, y: 63, k: 34, d: 11, z: 0.85, o: 17 },
 
   /* ── Le bord droit ──────────────────────────────────────────────────── */
-  { t: "₿", c: OR, x: 63, y: 30, k: 44, d: 12, z: 1.05, petit: true },
-  { f: "pourcent", c: CORAIL, x: 70, y: 16, k: 36, d: 10, z: 0.8 },
-  { t: "S&P 500", c: PALE, x: 88, y: 28, k: 52, d: 14, z: 1.2 },
-  { f: "banque", c: BLEU, x: 76, y: 44, k: 42, d: 9, z: 0.95, petit: true },
-  { f: "lingots", c: OR, x: 69, y: 58, k: 40, d: 15, z: 1.1 },
-  { t: "¥", c: OR, x: 94, y: 52, k: 38, d: 11, z: 0.9 },
-  { f: "curseurs", c: VIOLET, x: 82, y: 66, k: 36, d: 13, z: 1.3, petit: true },
-  { f: "caisse", c: PALE, x: 92, y: 70, k: 38, d: 10, z: 1.15 },
-  { f: "chandelier", c: VERT, x: 66, y: 74, k: 34, d: 16, z: 1.25 },
-  { t: "£", c: OR, x: 79, y: 12, k: 34, d: 12, z: 0.7 },
-  { f: "barres", c: BLEU, x: 96, y: 14, k: 36, d: 14, z: 0.75 },
+  { t: "₿", c: OR, x: 63, y: 30, k: 44, d: 12, z: 1.05, petit: true, o: 0, vif: true },
+  { f: "pourcent", c: CORAIL, x: 70, y: 16, k: 36, d: 10, z: 0.8, o: 12 },
+  { t: "S&P 500", c: PALE, x: 88, y: 28, k: 52, d: 14, z: 1.2, o: 6 },
+  { f: "banque", c: BLEU, x: 76, y: 44, k: 42, d: 9, z: 0.95, petit: true, o: 15 },
+  { f: "lingots", c: OR, x: 69, y: 58, k: 40, d: 15, z: 1.1, o: 2, vif: true },
+  { t: "¥", c: OR, x: 94, y: 52, k: 38, d: 11, z: 0.9, o: 18 },
+  { f: "curseurs", c: VIOLET, x: 82, y: 66, k: 36, d: 13, z: 1.3, petit: true, o: 8 },
+  { f: "caisse", c: PALE, x: 92, y: 70, k: 38, d: 10, z: 1.15, o: 14 },
+  { f: "chandelier", c: VERT, x: 66, y: 74, k: 34, d: 16, z: 1.25, o: 4 },
+  { t: "£", c: OR, x: 79, y: 12, k: 34, d: 12, z: 0.7, o: 20 },
+  { f: "barres", c: BLEU, x: 96, y: 14, k: 36, d: 14, z: 0.75, o: 10 },
 ];
 
 const TRAIT = {
@@ -100,10 +106,12 @@ const TRAIT = {
 export function Dessin({ f }: { f: Forme }) {
   switch (f) {
     case "courbe":
+      /* Deux montées, un creux entre les deux, et rien d'autre. Pas de
+         flèche : le sens de lecture suffit à dire que ça monte, et une
+         pointe ajoutée ferait un pictogramme de plus au lieu d'un signe. */
       return (
         <svg viewBox="0 0 24 24">
-          <path d="M3 17 L9 11 L13 14 L21 6" {...TRAIT} />
-          <path d="M16 6 H21 V11" {...TRAIT} />
+          <path d="M3.5 18 L9.5 10.5 L13 14 L20.5 5" {...TRAIT} strokeWidth={2.1} />
         </svg>
       );
     case "barres":
@@ -198,7 +206,7 @@ export function Jetons() {
       {TUILES.map((j, i) => (
         <span
           key={`${j.f ?? j.t}-${i}`}
-          className={`cg-tuile${j.petit ? " cg-tuile-p" : ""}`}
+          className={`cg-tuile${j.petit ? " cg-tuile-p" : ""}${j.vif ? " cg-tuile-vif" : ""}`}
           style={
             {
               "--x": j.x,
@@ -211,13 +219,16 @@ export function Jetons() {
               "--dx": (j.x - 50) * 1.6,
               "--c": j.c,
               "--i": i,
+              "--o": j.o,
             } as React.CSSProperties
           }
         >
           <span className="cg-tuile-p2">
-            <span className="cg-tuile-d">
-              <span className="cg-tuile-i">
-                {j.f ? <Dessin f={j.f} /> : <em className={(j.t ?? "").length > 2 ? "cg-tuile-long" : undefined}>{j.t}</em>}
+            <span className="cg-tuile-a">
+              <span className="cg-tuile-d">
+                <span className="cg-tuile-i">
+                  {j.f ? <Dessin f={j.f} /> : <em className={(j.t ?? "").length > 2 ? "cg-tuile-long" : undefined}>{j.t}</em>}
+                </span>
               </span>
             </span>
           </span>
