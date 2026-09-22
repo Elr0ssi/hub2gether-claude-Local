@@ -117,8 +117,8 @@ function val(v: number | null, unite: Unite) {
   if (unite === "pct") return `${v.toFixed(1).replace(".", ",")} %`;
   if (unite === "eur") return `${Math.round(v).toLocaleString("fr-FR")} €`;
   /* Une seule échelle pour les montants : des milliards, toujours. Un PIB en
-     T€ face à une dette en Md€ oblige à diviser de tête avant de comparer. */
-  return `${Math.round(v).toLocaleString("fr-FR")} Md€`;
+     T$ face à une dette en Md $ oblige à diviser de tête avant de comparer. */
+  return `${Math.round(v).toLocaleString("fr-FR")} Md $`;
 }
 
 

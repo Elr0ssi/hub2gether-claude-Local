@@ -170,7 +170,7 @@ export function reperes(): { annee: number; liste: Repere[] } {
     liste.push({ nom: "Balances excédentaires", valeur: `${excedent} / ${nBal}`, note: "pays" });
   }
   if (nPib) {
-    liste.push({ nom: "PIB moyen par pays", valeur: `${fr(pib / nPib)} Md€`, note: `${nPib} pays` });
+    liste.push({ nom: "PIB moyen par pays", valeur: `${fr(pib / nPib)} Md $`, note: `${nPib} pays` });
   }
   if (pibHabHaut) {
     liste.push({ nom: "PIB / habitant le plus haut", valeur: `${fr(pibHabHaut.v)} €`, note: pibHabHaut.nom });

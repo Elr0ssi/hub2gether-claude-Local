@@ -437,7 +437,7 @@ function valeurFr(v: number, unite: "md" | "eur" | "pct" | "hab") {
   if (unite === "eur") return `${Math.round(v).toLocaleString("fr-FR")} €`;
   return Math.abs(v) >= 1000
     ? `${(v / 1000).toFixed(1).replace(".", ",")} T€`
-    : `${Math.round(v).toLocaleString("fr-FR")} Md€`;
+    : `${Math.round(v).toLocaleString("fr-FR")} Md $`;
 }
 
 export function Classements({

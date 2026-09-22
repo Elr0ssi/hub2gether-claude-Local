@@ -7,8 +7,13 @@ export const ECONOMY_METRICS: EconomyMetric[] = [
     id: "gdp",
     label: "PIB",
     shortLabel: "PIB",
-    unit: "Mds €",
-    description: "Produit Intérieur Brut nominal en milliards d'euros (équivalent USD courants).",
+    /* La série vient de la Banque mondiale, indicateur NY.GDP.MKTP.CD, qui
+       est publié en dollars américains courants. Elle était étiquetée en
+       euros, avec la mention « équivalent USD courants » : les deux ne sont
+       pas équivalents, le taux euro-dollar ayant varié d'environ 0,85 à 1,15
+       sur la période couverte. On dit donc ce que la donnée est. */
+    unit: "Mds $",
+    description: "Produit intérieur brut nominal, en milliards de dollars américains courants.",
   },
   {
     id: "debt_ratio",
@@ -35,21 +40,21 @@ export const ECONOMY_METRICS: EconomyMetric[] = [
     id: "gdp_per_capita",
     label: "PIB par habitant",
     shortLabel: "PIB/hab.",
-    unit: "€",
-    description: "Produit Intérieur Brut par habitant, en euros (équivalent USD courants, PIB total ÷ population).",
+    unit: "$",
+    description: "Produit intérieur brut par habitant, en dollars américains courants (PIB total divisé par la population).",
   },
   {
     id: "trade_balance",
     label: "Balance commerciale",
     shortLabel: "Balance",
-    unit: "Mds €",
-    description: "Balance extérieure de biens et services : exportations moins importations, en milliards d'euros (équivalent USD courants). Positif = excédent, négatif = déficit.",
+    unit: "Mds $",
+    description: "Balance extérieure de biens et services : exportations moins importations, en milliards de dollars américains courants. Positif = excédent, négatif = déficit.",
   },
   {
     id: "debt_amount",
     label: "Montant de la dette",
     shortLabel: "Dette (Mds)",
-    unit: "Mds €",
+    unit: "Mds $",
     description: "Dette publique brute en valeur absolue, en milliards d'euros (équivalent USD courants, PIB × ratio de dette).",
   },
   {
@@ -86,7 +91,7 @@ const SAISIE_MANUELLE: EconomyYear[] = [
   {
     year: 2000,
     label: "2000",
-    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards € (équivalent USD courants).",
+    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards de dollars américains courants.",
     countries: {
       "United States of America": { gdp: 10_300, debt_ratio: 54,  unemployment: 4.0,  companies: 27_000 },
       China:                       { gdp: 1_210,  debt_ratio: 23,  unemployment: 3.1,  companies: 8_000  },
@@ -198,7 +203,7 @@ const SAISIE_MANUELLE: EconomyYear[] = [
   {
     year: 2005,
     label: "2005",
-    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards € (équivalent USD courants).",
+    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards de dollars américains courants.",
     countries: {
       "United States of America": { gdp: 13_090, debt_ratio: 62,  unemployment: 5.1,  companies: 29_000 },
       China:                       { gdp: 2_290,  debt_ratio: 26,  unemployment: 4.2,  companies: 12_000 },
@@ -306,7 +311,7 @@ const SAISIE_MANUELLE: EconomyYear[] = [
   {
     year: 2010,
     label: "2010",
-    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards € (équivalent USD courants).",
+    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards de dollars américains courants.",
     countries: {
       "United States of America": { gdp: 15_050, debt_ratio: 95,  unemployment: 9.6,  companies: 30_000 },
       China:                       { gdp: 6_090,  debt_ratio: 34,  unemployment: 4.1,  companies: 20_000 },
@@ -414,7 +419,7 @@ const SAISIE_MANUELLE: EconomyYear[] = [
   {
     year: 2015,
     label: "2015",
-    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards € (équivalent USD courants).",
+    dataNote: "Source : Banque mondiale, FMI, OIT. PIB en milliards de dollars américains courants.",
     countries: {
       "United States of America": { gdp: 18_210, debt_ratio: 105, unemployment: 5.3,  companies: 31_000 },
       China:                       { gdp: 11_060, debt_ratio: 41,  unemployment: 4.1,  companies: 32_000 },

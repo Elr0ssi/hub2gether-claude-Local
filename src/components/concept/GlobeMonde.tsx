@@ -75,7 +75,7 @@ function fmt(v: number | null | undefined, genre: "md" | "eur" | "pct" | "hab"):
   if (genre === "eur") return `${Math.round(v).toLocaleString("fr-FR")} €`;
   const a = Math.abs(v);
   if (a >= 1000) return `${(v / 1000).toFixed(1).replace(".", ",")} T€`;
-  return `${Math.round(v).toLocaleString("fr-FR")} Md€`;
+  return `${Math.round(v).toLocaleString("fr-FR")} Md $`;
 }
 
 type Indic = "pib" | "pibHab" | "inflation" | "balance" | "dette" | "chomage" | "population";
