@@ -70,7 +70,7 @@ export function DettePage() {
           couleurs du conteneur `.cg` : on le lui donne ici, en neutralisant le
           voile que ce conteneur pose d'ordinaire sur la page. */}
       <div className="cg dp-menu">
-        <EnTete />
+        <EnTete actif="Dette" />
       </div>
 
       {/* ── Ouverture ───────────────────────────────────────────────────── */}

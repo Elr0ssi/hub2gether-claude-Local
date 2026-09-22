@@ -91,20 +91,30 @@ body:has(.cg) { background: #05080c; }
 
 /* ── Le menu centré ──────────────────────────────────────────────────────
 
-   Au repos, la barre ne porte que le nom, au milieu, et n'intercepte rien :
-   elle couvre toute la largeur et bloquerait un clic sur la page. Ouverte,
-   le nom glisse à gauche et le reste se déplie derrière un verre.
+   Le nom ne bouge plus. Il tient le milieu de la barre, et les onglets se
+   rangent de part et d'autre : deux à gauche, deux à droite.
 
-   Le glissement combine `left` et `transform` : une position en pourcentage
-   du parent pour aller du milieu au bord, une translation en pourcentage de
-   soi pour se recentrer. Les deux s'interpolent, et comme le nom est
-   détaché du flux, rien d'autre n'est remis en page.
+   Trois colonnes, « 1fr auto 1fr » : les deux gouttières sont égales par
+   construction, donc le nom tombe au centre exact de la barre quelle que
+   soit la largeur des deux groupes d'onglets. Aucune mesure, aucun calcul.
+
+   Au repos, la barre n'intercepte rien : elle couvre toute la largeur et
+   bloquerait un clic sur la page. Seuls le nom et l'entrée de compte
+   restent saisissables.
    ──────────────────────────────────────────────────────────────────────── */
 
 .cg-header { pointer-events: none; background: none; backdrop-filter: none; }
 .cg-header .cg-logo,
+.cg-header .cg-cnx,
 .cg-header-ouvert { pointer-events: auto; }
-.cg-header-l { position: relative; min-height: 44px; }
+.cg-header-l {
+  position: relative;
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: clamp(18px, 2.6vw, 40px);
+}
 
 /* Le verre, seulement quand le menu est ouvert. */
 .cg-header-verre {
@@ -120,27 +130,21 @@ body:has(.cg) { background: #05080c; }
 }
 .cg-header-ouvert .cg-header-verre { opacity: 1; }
 
-/* Le nom : au milieu au repos, au bord une fois ouvert.
+/* Le nom, au centre de la colonne du milieu, et immobile.
 
-   Il reste dans le flux — c'est lui qui pose la gouttière du menu, et le
-   déplacement se fait par décalage : `left` à la moitié du parent pour aller
-   au centre, `translateX` à la moitié de soi pour s'y recentrer. Les deux
-   reviennent à zéro à l'ouverture, et comme le décalage d'un élément
-   positionné ne remet rien d'autre en page, le reste ne bouge pas. */
+   La colonne est nommée explicitement : sur mobile les onglets passent en
+   `display: none`, ils cessent d'occuper une cellule, et un placement
+   automatique ferait glisser le nom dans la première colonne. */
 .cg-logo {
   position: relative;
-  left: 50%;
-  transform: translateX(-50%);
+  grid-column: 2;
+  justify-self: center;
   display: inline-flex;
   align-items: center;
   gap: 10px;
   z-index: 2;
   pointer-events: auto;
-  transition:
-    left 0.66s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.66s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.cg-header-ouvert .cg-logo { left: 0; transform: translateX(0); }
 
 /* Le jeton de verre sous le nom : il disparaît quand le verre du menu prend
    le relais, sinon on lirait deux fonds l'un sur l'autre. */
@@ -187,28 +191,28 @@ body:has(.cg) { background: #05080c; }
   white-space: nowrap;
 }
 
-/* Le menu et les actions : décalés à gauche et effacés au repos, ils
-   arrivent l'un après l'autre derrière le nom qui s'écarte. */
-.cg-nav,
-.cg-header-d {
+/* Les onglets : tassés contre le nom et effacés au repos, ils s'écartent
+   vers leur bord quand la barre s'ouvre. Chacun part du bon côté. */
+.cg-nav {
   opacity: 0;
-  transform: translateX(-14px);
   pointer-events: none;
   transition:
     opacity 0.45s ease,
     transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.cg-nav { margin-left: 148px; }
-.cg-header-d { margin-left: auto; }
-.cg-header-ouvert .cg-nav,
-.cg-header-ouvert .cg-header-d {
+.cg-nav-g { grid-column: 1; justify-self: end; transform: translateX(18px); }
+/* Les onglets de droite se serrent contre le nom : la fin de leur colonne
+   reste libre, et c'est là que se pose l'entrée de compte. */
+.cg-nav-d { grid-column: 3; justify-self: start; transform: translateX(-18px); }
+.cg-header-ouvert .cg-nav {
   opacity: 1;
   transform: none;
   pointer-events: auto;
-  transition-delay: 0.16s;
+  transition-delay: 0.14s;
 }
 /* Chaque onglet monte à son tour. */
-.cg-nav a {
+.cg-nav a,
+.cg-nav-bientot {
   opacity: 0;
   transform: translateY(-6px);
   transition:
@@ -216,7 +220,8 @@ body:has(.cg) { background: #05080c; }
     transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
     color 0.3s ease;
 }
-.cg-header-ouvert .cg-nav a {
+.cg-header-ouvert .cg-nav a,
+.cg-header-ouvert .cg-nav-bientot {
   opacity: 1;
   transform: none;
   transition-delay: calc(0.22s + var(--i, 0) * 45ms);
@@ -225,12 +230,9 @@ body:has(.cg) { background: #05080c; }
   .cg-logo,
   .cg-nav,
   .cg-nav a,
-  .cg-header-d,
+  .cg-nav-bientot,
+  .cg-cnx,
   .cg-header-verre { transition: none; }
-}
-@media (max-width: 960px) {
-  .cg-nav { margin-left: 130px; }
-  .cg-header-d .cg-demo-mini { display: none; }
 }
 
 .cg-logo {
@@ -257,25 +259,52 @@ body:has(.cg) { background: #05080c; }
 }
 .cg-nav a:hover { color: var(--encre); }
 
-.cg-header-d { margin-left: auto; display: flex; align-items: center; gap: 14px; }
-.cg-header-b {
-  border: 0;
-  background: none;
-  font: inherit;
-  font-size: 13px;
-  color: var(--encre-2);
-  cursor: pointer;
-  transition: color 0.3s;
-  padding: 0;
-}
-.cg-header-b:hover { color: var(--encre); }
-.cg-header-b-vif {
+/* L'entrée de compte, au bout de la barre et hors du flux : elle ne pèse
+   pas sur les trois colonnes, donc elle ne décale pas le nom. */
+.cg-cnx {
+  position: absolute;
+  /* Le décalage d'un élément hors flux se mesure sur la boîte de padding :
+     il faut donc reprendre la gouttière à la main pour que le bouton
+     s'aligne sur le reste du contenu, et non sur le bord du conteneur. */
+  right: clamp(28px, 4.4vw, 76px);
+  top: 50%;
+  transform: translateY(-50%);
   padding: 8px 16px;
   border: 1px solid var(--bord);
-  border-radius: 8px;
+  border-radius: 999px;
+  background: rgba(8, 13, 20, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 13px;
   color: var(--encre);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.3s, background 0.3s;
 }
-.cg-header-b-vif:hover { border-color: rgba(214, 167, 122, 0.55); background: rgba(214, 167, 122, 0.07); }
+.cg-cnx:hover { border-color: rgba(214, 167, 122, 0.55); background: rgba(214, 167, 122, 0.1); }
+/* Ouverte, la barre porte déjà son verre : le jeton sous le bouton ferait
+   un second fond. */
+.cg-header-ouvert .cg-cnx { background: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.cg-header-ouvert .cg-cnx:hover { background: rgba(214, 167, 122, 0.1); }
+
+/* Les rubriques annoncées : lisibles, pas cliquables. */
+.cg-nav-bientot {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 13.5px;
+  color: var(--encre-3, rgba(226, 232, 240, 0.42));
+  cursor: default;
+  white-space: nowrap;
+}
+.cg-nav-bientot em {
+  font-style: normal;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--chaud);
+  opacity: 0.7;
+}
 
 .cg-demo-mini {
   font-size: 10px;
@@ -761,6 +790,9 @@ body:has(.cg) { background: #05080c; }
   .cg-panneaux { height: auto; flex-direction: column; }
   .cg-panneau { height: 190px; flex-grow: 0 !important; }
   .cg-nav { display: none; }
+  /* Sans onglets, la barre n'a plus que son nom au centre et son entrée de
+     compte au bout. Le bouton se resserre pour ne pas mordre sur le nom. */
+  .cg-cnx { padding: 7px 12px; font-size: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

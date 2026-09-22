@@ -126,7 +126,7 @@ export function ConceptPage({ articles, reperes, donnees, annee, regions, vues }
 
   return (
     <div className="cg">
-      <EnTete actif="Monde" />
+      <EnTete />
       <Loupe />
 
       {/* ── Le globe de fond, sur toute la traversée ─────────────────────── */}

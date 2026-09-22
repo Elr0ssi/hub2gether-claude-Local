@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
+import { LienCompte } from "@/components/compte/LienCompte";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LES PETITES PIÈCES DU PROTOTYPE
@@ -154,17 +155,41 @@ export function Enseigne({ children, droite }: { children: React.ReactNode; droi
 
 /* ── L'en-tête et le pied, partagés par les pages du prototype ──────────── */
 
-const NAV: { label: string; href: string }[] = [
-  { label: "Monde", href: "/concept-globe" },
+interface Onglet {
+  label: string;
+  /** Absent : la rubrique est annoncée, mais elle n'a pas encore de page. */
+  href?: string;
+}
+
+/* Les onglets se répartissent de part et d'autre du nom. L'ordre de gauche
+   se lit du bord vers le centre, comme à l'écran. */
+const NAV_GAUCHE: Onglet[] = [
   { label: "Économie", href: "/concept-globe/economie" },
-  { label: "Géopolitique", href: "/concept-globe#geopolitique" },
-  { label: "Sociétés", href: "/concept-globe#societes" },
-  { label: "Ressources", href: "/concept-globe#ressources" },
-  { label: "Analyses", href: "/concept-globe#analyses" },
-  /* Le mode Lecture. Il ne vit pas sous /concept-globe : c'est une page à
-     part entière, avec sa propre URL et son propre référencement. */
-  { label: "Dette publique", href: "/france/economie/dette-publique" },
+  { label: "Démographie" },
 ];
+const NAV_DROITE: Onglet[] = [
+  { label: "Analyses", href: "/concept-globe#analyses" },
+  { label: "Dette", href: "/france/economie/dette-publique" },
+];
+const NAV: Onglet[] = [...NAV_GAUCHE, ...NAV_DROITE];
+
+/** Un onglet. Sans adresse, il se montre sans se laisser cliquer. */
+function Lien({ n, actif, rang }: { n: Onglet; actif?: string; rang: number }) {
+  const style = { "--i": rang } as React.CSSProperties;
+  if (!n.href) {
+    return (
+      <span className="cg-nav-bientot" style={style}>
+        {n.label}
+        <em>bientôt</em>
+      </span>
+    );
+  }
+  return (
+    <a href={n.href} className={actif === n.label ? "cg-nav-on" : undefined} style={style}>
+      {n.label}
+    </a>
+  );
+}
 
 export function EnTete({ actif }: { actif?: string }) {
   /* Le menu tient tout entier dans son nom.
@@ -209,6 +234,14 @@ export function EnTete({ actif }: { actif?: string }) {
       <span className="cg-header-verre" aria-hidden="true" />
 
       <div className="cg-header-l">
+        <nav className="cg-nav cg-nav-g">
+          {NAV_GAUCHE.map((n, i) => (
+            /* Le rang compte depuis le centre : les onglets s'écartent du nom
+               vers les bords, et non de la gauche vers la droite. */
+            <Lien key={n.label} n={n} actif={actif} rang={NAV_GAUCHE.length - 1 - i} />
+          ))}
+        </nav>
+
         <a
           href="/concept-globe"
           className="cg-logo"
@@ -223,33 +256,15 @@ export function EnTete({ actif }: { actif?: string }) {
           <span className="cg-logo-t">Visualize</span>
         </a>
 
-        <nav className="cg-nav">
-          {NAV.map((n, i) => (
-            <a
-              key={n.label}
-              href={n.href}
-              className={actif === n.label ? "cg-nav-on" : undefined}
-              style={{ "--i": i } as React.CSSProperties}
-            >
-              {n.label}
-            </a>
+        <nav className="cg-nav cg-nav-d">
+          {NAV_DROITE.map((n, i) => (
+            <Lien key={n.label} n={n} actif={actif} rang={i} />
           ))}
         </nav>
 
-        <div className="cg-header-d">
-          <span className="cg-demo-mini" title="Les valeurs de cette maquette ne sont pas mesurées">
-            prototype · démonstration
-          </span>
-          <button type="button" className="cg-header-b" aria-label="Recherche">
-            Recherche
-          </button>
-          <button type="button" className="cg-header-b">
-            FR
-          </button>
-          <button type="button" className="cg-header-b cg-header-b-vif">
-            Se connecter
-          </button>
-        </div>
+        {/* Au bout de la barre, et toujours visible : une entrée de compte
+            qu'il faut survoler pour trouver n'est pas une entrée. */}
+        <LienCompte className="cg-cnx" />
       </div>
     </header>
   );
@@ -261,7 +276,7 @@ export function Pied() {
       <div className="cg-wrap cg-pied-l">
         <span>Visualize</span>
         <nav>
-          {NAV.slice(0, 4).map((n) => (
+          {NAV.filter((n) => n.href).map((n) => (
             <a key={n.label} href={n.href}>
               {n.label}
             </a>
