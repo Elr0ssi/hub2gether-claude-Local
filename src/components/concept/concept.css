@@ -812,6 +812,11 @@ body:has(.cg) { background: #05080c; }
   .cg-bout { gap: 9px; }
   .cg-bout-l { font-size: 12px; }
   .cg-cnx { padding: 6px 11px; font-size: 12px; }
+  /* Le jeton de verre sous le nom déborde de trente-six pixels : sur une
+     barre de trois cent quatre-vingt-dix, c'est ce qui le faisait mordre sur
+     « Forum ». Le nom se lit très bien sans lui sur un fond sombre. */
+  .cg-logo::before { display: none; }
+  .cg-logo-t { font-size: 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2783,7 +2788,8 @@ body:has(.cg) { background: #05080c; }
   bottom: 0;
   width: 190vw;
   aspect-ratio: 1;
-  transform: translate(-50%, 78%);
+  /* Le limbe remonte un peu à mesure qu'on descend : la planète approche. */
+  transform: translate(-50%, calc(78% - var(--p, 0) * 4%));
   pointer-events: none;
 }
 .cg-arc-trait,
@@ -2801,7 +2807,7 @@ body:has(.cg) { background: #05080c; }
   background: radial-gradient(
     circle at 50% 50%,
     transparent 0 calc(50% - 1.2px),
-    rgba(158, 199, 216, 0.85) calc(50% - 1.2px) 50%,
+    rgba(255, 233, 204, 0.88) calc(50% - 1.2px) 50%,
     transparent 50%
   );
   opacity: 0.35;
@@ -2812,13 +2818,47 @@ body:has(.cg) { background: #05080c; }
   background: radial-gradient(
     circle at 50% 50%,
     transparent 0 46%,
-    rgba(90, 165, 235, 0.16) 49.4%,
-    rgba(214, 167, 122, 0.06) 50%,
+    rgba(232, 183, 116, 0.2) 49.4%,
+    rgba(255, 226, 190, 0.12) 50%,
     transparent 56%
   );
   filter: blur(22px);
   opacity: 0.3;
   transform: scale(0.99);
+}
+
+/* ── Le point du jour ────────────────────────────────────────────────────
+   Un point posé sur le limbe, pas à côté. On tourne depuis le centre du
+   cercle puis on s'éloigne de son rayon : la position reste juste quelle que
+   soit la largeur de la fenêtre, sans un seul calcul en JavaScript.
+   Attention au rayon : il ne vaut pas la moitié de la boîte. Les
+   pourcentages d'un dégradé radial se mesurent, par défaut, sur le coin le
+   plus éloigné. Pour une boîte carrée de demi-côté R, ce coin est à R√2, et
+   l'anneau posé à cinquante pour cent tombe donc à R/√2, soit un peu plus de
+   soixante-sept pour cent de la largeur de la fenêtre. C'est exactement le
+   piège qui avait mis la lumière du globe au milieu de la sphère. */
+.cg-arc-point {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: rotate(-13deg) translateY(-67.18vw);
+  opacity: calc(0.6 + var(--p, 0) * 0.4);
+}
+.cg-arc-point::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff8ec;
+  box-shadow:
+    0 0 12px 3px rgba(255, 240, 214, 0.9),
+    0 0 46px 14px rgba(232, 183, 116, 0.42),
+    0 0 150px 60px rgba(214, 167, 122, 0.16);
 }
 .cg-eco-haut[data-vu="1"] .cg-arc-trait { opacity: 1; transform: scale(1); }
 .cg-eco-haut[data-vu="1"] .cg-arc-nappe { opacity: 1; transform: scale(1.01); }
@@ -3155,10 +3195,25 @@ body:has(.cg) { background: #05080c; }
 .ge-evo-aide { margin-top: 8px; font-size: 10.5px; color: var(--encre-3); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LES JETONS DE L'OUVERTURE
+   LES TUILES DE L'OUVERTURE
+
+   Un champ de tuiles au-dessus de l'horizon, et un sceau au milieu.
+
+   Tout le mouvement de défilement tient dans une seule variable, `--p`, que
+   l'ouverture met à jour : zéro quand elle tient l'écran, un quand elle en
+   est sortie. Le reste est de l'interpolation CSS. Descendre et remonter
+   sont donc exactement le même geste joué dans les deux sens — il n'y a pas
+   d'animation d'arrivée à rejouer, donc rien qui sursaute quand on revient
+   par le bas.
+
+   Quatre couches, chacune pour une seule chose : la place, l'écart au
+   défilement, la dérive continue, le relief au survol. Les empiler évite que
+   deux mouvements se disputent la même propriété.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.cg-jetons {
+.cg-eco-haut { --p: 0; }
+
+.cg-tuiles {
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -3166,22 +3221,36 @@ body:has(.cg) { background: #05080c; }
   z-index: 1;
 }
 
-/* Le jeton est posé à sa place, en pourcentage de l'ouverture. Celle-ci fait
-   une largeur et une hauteur d'écran : le vecteur qui le ramène au point de
-   rassemblement — le bas, au centre — s'écrit donc en vw et en vh. */
-.cg-jeton {
+/* 1. La place, en pourcentage de l'ouverture. */
+.cg-tuile {
   position: absolute;
   left: calc(var(--x) * 1%);
   top: calc(var(--y) * 1%);
-  width: var(--t);
-  height: var(--t);
-  margin: calc(var(--t) / -2) 0 0 calc(var(--t) / -2);
+  width: var(--k);
+  height: var(--k);
+  margin: calc(var(--k) / -2) 0 0 calc(var(--k) / -2);
   pointer-events: auto;
 }
 
-/* La dérive, sur une couche à part : elle tourne en boucle sans jamais
-   discuter avec la transition du rassemblement. */
-.cg-jeton-d {
+/* 2. L'écart au défilement. Chaque tuile fuit vers son bord — c'est le signe
+      de `--dx` qui le dit — et d'autant plus vite qu'elle est au premier
+      plan. Le champ s'ouvre au lieu de glisser en bloc. */
+.cg-tuile-p2 {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform:
+    translate3d(
+      calc(var(--dx) * var(--p) * var(--z) * 1px),
+      calc(var(--p) * var(--z) * -76px),
+      0
+    )
+    scale(calc(1 - var(--p) * 0.22));
+  opacity: calc(1 - var(--p) * 1.05);
+}
+
+/* 3. La dérive, qui ne s'arrête jamais et ne discute avec personne. */
+.cg-tuile-d {
   display: block;
   width: 100%;
   height: 100%;
@@ -3189,49 +3258,101 @@ body:has(.cg) { background: #05080c; }
   animation-delay: calc(var(--i) * -1.3s);
 }
 @keyframes cg-derive {
-  from { transform: translate3d(-7px, -9px, 0) rotate(-5deg); }
-  to { transform: translate3d(7px, 9px, 0) rotate(5deg); }
+  from { transform: translate3d(-6px, -8px, 0) rotate(-3deg); }
+  to { transform: translate3d(6px, 8px, 0) rotate(3deg); }
 }
 
-/* Le survol, sur une troisième couche, pour la même raison. */
-.cg-jeton-i {
+/* 4. La tuile elle-même, et son relief au survol. */
+.cg-tuile-i {
   display: grid;
   place-items: center;
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-  /* Chaque jeton porte sa teinte : le trait, le halo et le cerne en sont
-     tirés, pour qu'une seule variable suffise à le recolorer. */
+  /* Un carré aux angles très arrondis, comme une icône posée : c'est ce qui
+     distingue un signe rangé d'une pastille qui flotte. */
+  border-radius: 27%;
   color: var(--c, #9ec7d8);
-  border: 1px solid color-mix(in srgb, var(--c, #9ec7d8) 34%, transparent);
-  background:
-    radial-gradient(circle at 34% 28%, color-mix(in srgb, var(--c, #9ec7d8) 24%, transparent), rgba(8, 14, 24, 0.62));
-  box-shadow: 0 0 16px color-mix(in srgb, var(--c, #9ec7d8) 14%, transparent);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  border: 1px solid color-mix(in srgb, var(--c, #9ec7d8) 26%, transparent);
+  background: linear-gradient(158deg, rgba(22, 28, 38, 0.92), rgba(9, 13, 20, 0.88));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 6px 18px rgba(0, 0, 0, 0.45),
+    0 0 18px color-mix(in srgb, var(--c, #9ec7d8) 10%, transparent);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   transition:
     transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
     color 0.35s ease,
     border-color 0.35s ease,
     box-shadow 0.45s ease;
 }
-.cg-jeton-i svg { width: 58%; height: 58%; display: block; }
-.cg-jeton:hover .cg-jeton-i {
-  transform: translateY(-9px) scale(1.18);
+.cg-tuile-i svg { width: 52%; height: 52%; display: block; }
+.cg-tuile-i em {
+  font-style: normal;
+  font-weight: 600;
+  font-size: calc(var(--k) * 0.36);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+/* Un nom d'indice tient en toutes lettres : il lui faut une autre échelle
+   qu'un signe de monnaie. */
+.cg-tuile-i em.cg-tuile-long {
+  font-size: calc(var(--k) * 0.17);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding: 0 5px;
+}
+.cg-tuile:hover .cg-tuile-i {
+  transform: translateY(-8px) scale(1.16);
   color: #fff;
   border-color: var(--c, #9ec7d8);
   box-shadow:
-    0 14px 30px rgba(0, 0, 0, 0.45),
-    0 0 30px color-mix(in srgb, var(--c, #9ec7d8) 45%, transparent);
+    0 16px 34px rgba(0, 0, 0, 0.5),
+    0 0 30px color-mix(in srgb, var(--c, #9ec7d8) 42%, transparent);
+}
+
+/* ── Le sceau ────────────────────────────────────────────────────────────
+   La tuile du milieu : plus grande, seule à porter un cerne chaud, et seule
+   à se tenir dans le flux du texte. Le champ s'écarte d'elle. */
+.cg-sceau {
+  display: grid;
+  place-items: center;
+  width: clamp(74px, 7vw, 94px);
+  height: clamp(74px, 7vw, 94px);
+  margin: 16px auto 24px;
+  border-radius: 26%;
+  color: var(--chaud);
+  border: 1px solid color-mix(in srgb, var(--chaud) 58%, transparent);
+  background: linear-gradient(158deg, rgba(32, 25, 18, 0.92), rgba(12, 13, 18, 0.9));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 30px color-mix(in srgb, var(--chaud) 20%, transparent),
+    0 16px 44px rgba(0, 0, 0, 0.5);
+  transform:
+    translateY(calc(var(--p) * -30px))
+    scale(calc(1 - var(--p) * 0.16));
+  opacity: calc(1 - var(--p) * 1);
+}
+.cg-sceau-i { display: grid; place-items: center; width: 100%; height: 100%; }
+.cg-sceau svg { width: 44%; height: 44%; display: block; }
+
+/* Le bloc de texte suit le même mouvement, en plus retenu : c'est le fond
+   qui s'écarte, pas le titre qui s'enfuit. */
+.cg-eco-ouv {
+  transform: translateY(calc(var(--p) * -16px));
+  opacity: calc(1 - var(--p) * 1.05);
 }
 
 @media (max-width: 900px) {
-  /* Sur une colonne étroite il n'y a pas de marges où les poser : ils
-     passeraient derrière le titre. */
-  .cg-jetons { display: none; }
+  /* Sur une colonne étroite, seules les tuiles marquées restent, et le champ
+     se range au-dessus du texte au lieu de passer derrière. */
+  .cg-tuile { display: none; }
+  .cg-tuile-p { display: block; }
+  .cg-tuiles { bottom: 48%; }
+  .cg-sceau { width: 66px; height: 66px; margin: 12px auto 18px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cg-jeton,
-  .cg-jeton-d,
-  .cg-jeton-i { animation: none; transition: none; }
+  .cg-tuile-d { animation: none; }
+  .cg-tuile-i { transition: none; }
 }

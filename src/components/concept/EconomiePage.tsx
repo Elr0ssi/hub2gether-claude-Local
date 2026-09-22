@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
 import { type FicheDebat, type LigneSource, type SocleEco } from "@/data/concept/conceptEconomie";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
-import { Jetons } from "./Jetons";
+import { Dessin, Jetons } from "./Jetons";
 import { Loupe } from "./Loupe";
 import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
 import { gelerOdometres } from "./Roulement";
@@ -169,6 +169,46 @@ function useVu(marge = 120) {
     return decroche;
   }, [marge]);
   return { ref, vu };
+}
+
+/**
+ * La progression de l'ouverture : zéro quand elle tient l'écran, un quand
+ * elle l'a quitté par le haut.
+ *
+ * Elle s'écrit directement dans le style de la section, sans passer par un
+ * rendu React : le navigateur interpole tout le reste en CSS, à partir de
+ * cette seule variable. Descendre et remonter sont donc le même mouvement,
+ * joué dans un sens puis dans l'autre, et rien ne se rejoue d'un coup en
+ * arrivant par le bas.
+ *
+ * La mesure se fait dans l'écouteur, comme pour `useVu` et pour la même
+ * raison : une image d'animation de retard se voit sur cette page.
+ */
+function useProgression() {
+  const ref = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    let vivant = true;
+    const regarde = () => {
+      const n = ref.current;
+      if (!n || !vivant) return;
+      const r = n.getBoundingClientRect();
+      /* La course : la hauteur de l'ouverture. Une course plus courte
+         faisait disparaître les tuiles alors que l'ouverture tenait encore
+         l'écran — le mouvement prenait de l'avance sur la lecture. */
+      const course = Math.max(1, r.height);
+      const p = Math.min(1, Math.max(0, -r.top / course));
+      n.style.setProperty("--p", p.toFixed(3));
+    };
+    window.addEventListener("scroll", regarde, { passive: true });
+    window.addEventListener("resize", regarde);
+    regarde();
+    return () => {
+      vivant = false;
+      window.removeEventListener("scroll", regarde);
+      window.removeEventListener("resize", regarde);
+    };
+  }, []);
+  return ref;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -515,6 +555,7 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
   const [filtre, setFiltre] = useState("");
   const bande = useVu();
   const haut = useVu(260);
+  const ouverture = useProgression();
   const [qArticle, setQArticle] = useState("");
   const [choisi, setChoisi] = useState<string | null>("France");
   const [ouvert, setOuvert] = useState<number | null>(0);
@@ -717,12 +758,25 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
           arc de cercle qui ferme l'écran comme un horizon : c'est lui qui dit
           que la page continue, et il s'allume quand on descend vers le
           globe. */}
-      <section className="cg-section cg-eco-haut" data-vu={haut.vu ? "1" : "0"}>
+      <section
+        ref={ouverture as React.RefObject<HTMLElement>}
+        className="cg-section cg-eco-haut"
+        data-vu={haut.vu ? "1" : "0"}
+      >
         <div className="cg-eco-lueur" aria-hidden="true" />
         <Jetons />
         <div className="cg-wrap">
           <div className="cg-eco-ouv">
             <p className="cg-eyebrow">Économie</p>
+            {/* Le sceau : la tuile du milieu, plus grande que les autres et
+                seule à porter un cerne. C'est le point de fuite du champ —
+                tout s'écarte de lui quand on descend, tout y revient quand
+                on remonte. */}
+            <span className="cg-sceau" aria-hidden="true">
+              <span className="cg-sceau-i">
+                <Dessin f="courbe" />
+              </span>
+            </span>
             <h1 className="cg-h1 cg-eco-h1">
               <Titre texte="Le socle économique" />
             </h1>
@@ -735,6 +789,9 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
         <div className="cg-arc" aria-hidden="true">
           <span className="cg-arc-trait" />
           <span className="cg-arc-nappe" />
+          {/* Le point du jour, posé sur le limbe : c'est lui qui donne
+              l'échelle et qui dit d'où vient la lumière. */}
+          <span className="cg-arc-point" />
         </div>
       </section>
 
