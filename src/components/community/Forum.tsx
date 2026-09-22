@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { FILS, TAGS, type Fil } from "@/data/community/fils";
-import { ilYA, scoreFil, useForum, type Message } from "./store";
+import { ilYA, scoreFil, useForum, type Compte, type Message } from "./store";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE FORUM
@@ -58,32 +58,61 @@ function Votes({
 /* ── Le champ de réponse ─────────────────────────────────────────────────── */
 
 function Repondre({
-  pseudo,
-  onPseudo,
+  compte,
   onEnvoyer,
   onAnnuler,
   placeholder,
   auto,
 }: {
-  pseudo: string;
-  onPseudo: (p: string) => void;
-  onEnvoyer: (texte: string, auteur: string) => void;
+  compte: Compte | null;
+  onEnvoyer: (texte: string, source: string) => Promise<string | null>;
   onAnnuler?: () => void;
   placeholder: string;
   auto?: boolean;
 }) {
   const [texte, setTexte] = useState("");
-  const [nom, setNom] = useState(pseudo);
+  const [source, setSource] = useState("");
+  const [envoi, setEnvoi] = useState(false);
+  const [erreur, setErreur] = useState<string | null>(null);
+
+  /* Sans compte, on ne montre pas un champ qui refusera : on montre la
+     porte d'entrée. */
+  if (!compte) {
+    return (
+      <div className="fo-invite">
+        <p className="fo-invite-t">Pour écrire ici, il faut un compte.</p>
+        <p className="fo-invite-p">
+          Un pseudo, une adresse, et c&apos;est tout. Vos messages restent attachés à ce pseudo,
+          pas à votre nom.
+        </p>
+        <div className="fo-invite-actions">
+          <Link href="/compte/connexion" className="fo-btn fo-btn-plein">
+            Se connecter
+          </Link>
+          <Link href="/compte/connexion?mode=inscription" className="fo-btn fo-btn-fantome">
+            Créer un compte
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form
       className="fo-repondre"
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
-        if (!texte.trim()) return;
-        onPseudo(nom);
-        onEnvoyer(texte, nom);
+        if (!texte.trim() || envoi) return;
+        setEnvoi(true);
+        setErreur(null);
+        const souci = await onEnvoyer(texte, source);
+        setEnvoi(false);
+        if (souci) {
+          setErreur(souci);
+          return;
+        }
         setTexte("");
+        setSource("");
         onAnnuler?.();
       }}
     >
@@ -93,28 +122,96 @@ function Repondre({
         placeholder={placeholder}
         rows={3}
         autoFocus={auto}
+        maxLength={4000}
         onKeyDown={(e) => {
           if ((e.metaKey || e.ctrlKey) && e.key === "Enter") e.currentTarget.form?.requestSubmit();
         }}
       />
+      <input
+        type="url"
+        className="fo-source"
+        value={source}
+        onChange={(e) => setSource(e.target.value)}
+        placeholder="Une source à l'appui (facultatif) : insee.fr, banque-france.fr…"
+        aria-label="Une source à l'appui"
+      />
+      {erreur && <p className="fo-erreur">{erreur}</p>}
       <div className="fo-repondre-pied">
-        <input
-          type="text"
-          value={nom}
-          onChange={(e) => setNom(e.target.value)}
-          placeholder="Votre nom (facultatif)"
-          aria-label="Votre nom"
-        />
+        <span className="fo-signe">
+          Vous publiez en tant que <strong>{compte.pseudo}</strong>
+        </span>
         <span className="fo-astuce">⌘ + entrée</span>
         {onAnnuler && (
           <button type="button" className="fo-btn fo-btn-fantome" onClick={onAnnuler}>
             Annuler
           </button>
         )}
-        <button type="submit" className="fo-btn fo-btn-plein" disabled={!texte.trim()}>
-          Publier
+        <button type="submit" className="fo-btn fo-btn-plein" disabled={!texte.trim() || envoi}>
+          {envoi ? "Envoi…" : "Publier"}
         </button>
       </div>
+    </form>
+  );
+}
+
+/* ── Le signalement ──────────────────────────────────────────────────────
+   Un message publié doit pouvoir être contesté sans passer par nous : c'est
+   ce que demande la loi à tout hébergeur de propos, et c'est de toute façon
+   la seule façon de tenir un fil. */
+
+function Signaler({
+  onSignaler,
+  onFermer,
+}: {
+  onSignaler: (motif: string, detail: string) => Promise<string | null>;
+  onFermer: () => void;
+}) {
+  const [motif, setMotif] = useState("illicite");
+  const [detail, setDetail] = useState("");
+  const [etat, setEtat] = useState<"saisie" | "envoi" | "fait">("saisie");
+  const [erreur, setErreur] = useState<string | null>(null);
+
+  if (etat === "fait") {
+    return <p className="fo-signal-fait">Signalement transmis. Merci.</p>;
+  }
+
+  return (
+    <form
+      className="fo-signal"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setEtat("envoi");
+        const souci = await onSignaler(motif, detail);
+        if (souci) {
+          setErreur(souci);
+          setEtat("saisie");
+          return;
+        }
+        setEtat("fait");
+      }}
+    >
+      <select value={motif} onChange={(e) => setMotif(e.target.value)} aria-label="Motif">
+        <option value="illicite">Contenu illicite</option>
+        <option value="haine">Propos haineux</option>
+        <option value="spam">Spam ou publicité</option>
+        <option value="faux">Chiffre faux ou trompeur</option>
+        <option value="autre">Autre</option>
+      </select>
+      <input
+        type="text"
+        value={detail}
+        onChange={(e) => setDetail(e.target.value)}
+        placeholder="Précisez (facultatif)"
+        maxLength={500}
+        aria-label="Précision"
+      />
+      {erreur && <span className="fo-erreur">{erreur}</span>}
+      <button type="submit" className="fo-btn fo-btn-plein" disabled={etat === "envoi"}>
+        Envoyer
+      </button>
+      <button type="button" className="fo-btn fo-btn-fantome" onClick={onFermer}>
+        Annuler
+      </button>
     </form>
   );
 }
@@ -125,32 +222,35 @@ function Fil1Message({
   m,
   enfants,
   niveau,
-  mien,
+  votes,
   onVote,
   onRepondre,
   onSupprimer,
+  onSignaler,
   repondA,
   setRepondA,
-  pseudo,
-  setPseudo,
+  compte,
   poster,
   filId,
 }: {
   m: Message;
   enfants: Map<string | null, Message[]>;
   niveau: number;
-  mien?: 1 | -1;
-  onVote: (id: string, s: 1 | -1) => void;
+  votes: Record<string, 1 | -1>;
+  onVote: (cible: string, s: 1 | -1) => void;
   onRepondre: (id: string) => void;
   onSupprimer: (id: string) => void;
+  onSignaler: (id: string, motif: string, detail: string) => Promise<string | null>;
   repondA: string | null;
   setRepondA: (id: string | null) => void;
-  pseudo: string;
-  setPseudo: (p: string) => void;
-  poster: (fil: string, texte: string, parent: string | null, auteur: string) => void;
+  compte: Compte | null;
+  poster: (fil: string, texte: string, parent: string | null, source: string) => Promise<string | null>;
   filId: string;
 }) {
   const fils = enfants.get(m.id) ?? [];
+  const [signale, setSignale] = useState(false);
+  const mien = compte?.id === m.auteurId;
+
   return (
     <motion.div
       layout
@@ -161,22 +261,54 @@ function Fil1Message({
       style={{ marginLeft: niveau ? 22 : 0 }}
     >
       <div className="fo-msg-corps">
-        <Votes score={m.votes} mien={mien} onVote={(s) => onVote(m.id, s)} compact />
+        <Votes
+          score={m.votes}
+          mien={votes[`msg:${m.id}`]}
+          onVote={(s) => onVote(`msg:${m.id}`, s)}
+          compact
+        />
         <div style={{ minWidth: 0, flex: 1 }}>
           <p className="fo-msg-tete">
             <strong>{m.auteur}</strong>
+            {mien && <span className="fo-moi">vous</span>}
             <span>·</span>
             <span>{ilYA(m.cree)}</span>
           </p>
           <p className="fo-msg-texte">{m.texte}</p>
+          {m.source && (
+            <p className="fo-msg-source">
+              <a href={m.source} target="_blank" rel="ugc nofollow noopener noreferrer">
+                {(() => {
+                  try {
+                    return new URL(m.source).hostname.replace(/^www\./, "");
+                  } catch {
+                    return m.source;
+                  }
+                })()}
+              </a>
+            </p>
+          )}
           <div className="fo-msg-actions">
             <button type="button" onClick={() => onRepondre(m.id)}>
               Répondre
             </button>
-            <button type="button" onClick={() => onSupprimer(m.id)}>
-              Supprimer
-            </button>
+            {mien && (
+              <button type="button" onClick={() => onSupprimer(m.id)}>
+                Supprimer
+              </button>
+            )}
+            {compte && !mien && (
+              <button type="button" onClick={() => setSignale((v) => !v)}>
+                Signaler
+              </button>
+            )}
           </div>
+          {signale && (
+            <Signaler
+              onSignaler={(motif, detail) => onSignaler(m.id, motif, detail)}
+              onFermer={() => setSignale(false)}
+            />
+          )}
         </div>
       </div>
 
@@ -185,10 +317,9 @@ function Fil1Message({
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
             <Repondre
               auto
-              pseudo={pseudo}
-              onPseudo={setPseudo}
+              compte={compte}
               placeholder={`Répondre à ${m.auteur}…`}
-              onEnvoyer={(t, a) => poster(filId, t, m.id, a)}
+              onEnvoyer={(t, src) => poster(filId, t, m.id, src)}
               onAnnuler={() => setRepondA(null)}
             />
           </motion.div>
@@ -204,14 +335,14 @@ function Fil1Message({
           m={f}
           enfants={enfants}
           niveau={Math.min(niveau + 1, 2)}
-          mien={mien}
+          votes={votes}
           onVote={onVote}
           onRepondre={onRepondre}
           onSupprimer={onSupprimer}
+          onSignaler={onSignaler}
           repondA={repondA}
           setRepondA={setRepondA}
-          pseudo={pseudo}
-          setPseudo={setPseudo}
+          compte={compte}
           poster={poster}
           filId={filId}
         />
@@ -225,13 +356,13 @@ function Fil1Message({
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export function Forum() {
-  const { etat, pret, poster, supprimer, voter, setPseudo } = useForum();
+  const { etat, pret, erreur, actif, compte, poster, supprimer, voter, signaler } = useForum();
   const [ouvert, setOuvert] = useState<string>(FILS[0].id);
   const [tri, setTri] = useState<"actifs" | "recents">("actifs");
   const [tag, setTag] = useState<string | null>(null);
   const [repondA, setRepondA] = useState<string | null>(null);
 
-  const compte = useMemo(() => {
+  const nbMessages = useMemo(() => {
     const c = new Map<string, number>();
     for (const m of etat.messages) c.set(m.fil, (c.get(m.fil) ?? 0) + 1);
     return c;
@@ -242,12 +373,12 @@ export function Forum() {
     const trie = [...base].sort((a, b) => {
       if (a.epingle !== b.epingle) return a.epingle ? -1 : 1;
       if (tri === "recents") return b.ouvertLe.localeCompare(a.ouvertLe);
-      const da = (compte.get(a.id) ?? 0) * 3 + scoreFil(etat, a.id);
-      const db = (compte.get(b.id) ?? 0) * 3 + scoreFil(etat, b.id);
+      const da = (nbMessages.get(a.id) ?? 0) * 3 + scoreFil(etat, a.id);
+      const db = (nbMessages.get(b.id) ?? 0) * 3 + scoreFil(etat, b.id);
       return db - da;
     });
     return trie;
-  }, [tag, tri, compte, etat]);
+  }, [tag, tri, nbMessages, etat]);
 
   const fil: Fil = FILS.find((f) => f.id === ouvert) ?? FILS[0];
 
@@ -283,6 +414,18 @@ export function Forum() {
             Des fils ouverts sur des chiffres publiés. On discute, on conteste, on apporte une
             source — et on peut aller vérifier sur la carte dans la seconde.
           </p>
+          <p className="fo-compte">
+            {compte ? (
+              <>
+                Connecté comme <strong>{compte.pseudo}</strong>.{" "}
+                <Link href="/compte">Mon espace</Link>
+              </>
+            ) : (
+              <>
+                <Link href="/compte/connexion">Se connecter</Link> pour écrire et voter.
+              </>
+            )}
+          </p>
           <div className="fo-stats">
             <span>
               <strong>{FILS.length}</strong> fils
@@ -296,6 +439,20 @@ export function Forum() {
           </div>
         </div>
       </header>
+
+      {!actif && (
+        <div className="fo-wrap">
+          <p className="fo-alerte">
+            Les comptes ne sont pas branchés sur cette copie du site : le forum est en lecture
+            seule.
+          </p>
+        </div>
+      )}
+      {erreur && (
+        <div className="fo-wrap">
+          <p className="fo-alerte">{erreur}</p>
+        </div>
+      )}
 
       <div className="fo-wrap fo-corps">
         {/* ── La colonne des fils ─────────────────────────────────────────── */}
@@ -340,7 +497,7 @@ export function Forum() {
                   </span>
                   <span className="fo-fil-titre">{f.titre}</span>
                   <span className="fo-fil-pied">
-                    {compte.get(f.id) ?? 0} message{(compte.get(f.id) ?? 0) > 1 ? "s" : ""}
+                    {nbMessages.get(f.id) ?? 0} message{(nbMessages.get(f.id) ?? 0) > 1 ? "s" : ""}
                     <span> · {f.tags[0]}</span>
                   </span>
                 </button>
@@ -364,7 +521,7 @@ export function Forum() {
                   <Votes
                     score={scoreFil(etat, fil.id)}
                     mien={etat.votes[`fil:${fil.id}`]}
-                    onVote={(s) => voter(`fil:${fil.id}`, s)}
+                    onVote={(s) => void voter(`fil:${fil.id}`, s)}
                   />
                   <div style={{ minWidth: 0 }}>
                     <p className="fo-meta">
@@ -411,10 +568,9 @@ export function Forum() {
               </article>
 
               <Repondre
-                pseudo={etat.pseudo}
-                onPseudo={setPseudo}
+                compte={compte}
                 placeholder="Votre message. Une source, un contre-exemple, une objection…"
-                onEnvoyer={(t, a) => poster(fil.id, t, null, a)}
+                onEnvoyer={(t, src) => poster(fil.id, t, null, src)}
               />
 
               <div className="fo-messages">
@@ -429,14 +585,14 @@ export function Forum() {
                     m={m}
                     enfants={enfants}
                     niveau={0}
-                    mien={etat.votes[m.id]}
-                    onVote={voter}
+                    votes={etat.votes}
+                    onVote={(cible, sens) => void voter(cible, sens)}
                     onRepondre={(id) => setRepondA(repondA === id ? null : id)}
-                    onSupprimer={supprimer}
+                    onSupprimer={(id) => void supprimer(id)}
+                    onSignaler={signaler}
                     repondA={repondA}
                     setRepondA={setRepondA}
-                    pseudo={etat.pseudo}
-                    setPseudo={setPseudo}
+                    compte={compte}
                     poster={poster}
                     filId={fil.id}
                   />
@@ -444,9 +600,9 @@ export function Forum() {
               </div>
 
               <p className="fo-note">
-                Il n&apos;y a pas encore de comptes : vos messages et vos votes restent dans ce
-                navigateur, et personne d&apos;autre ne les voit. Aucun compteur de participation
-                n&apos;est affiché tant qu&apos;il n&apos;y a rien de réel à compter.
+                Les messages sont publics et rattachés à un pseudo. Vous pouvez effacer les vôtres
+                à tout moment, et signaler ceux des autres. Les fils ne sont pas relus avant
+                publication : ils le sont après, sur signalement.
               </p>
             </motion.div>
           </AnimatePresence>

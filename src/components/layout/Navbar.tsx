@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Globe, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { THEMES } from "@/data/themes";
+import { LienCompte } from "@/components/compte/LienCompte";
 
 /** Grisees dans le menu, mais toujours en ligne : leurs pages repondent. */
 const NAV_A_VENIR = new Set(["empires", "politics", "military", "epidemics"]);
@@ -236,6 +237,8 @@ export function Navbar() {
           >
             <Maximize2 size={14} />
           </button>
+
+          <LienCompte className="hidden sm:inline-flex items-center px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)] transition-all duration-150" />
 
           <Link href="/comparaison" className="btn-primary text-sm hidden sm:inline-flex">
             Comparer
