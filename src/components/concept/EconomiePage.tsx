@@ -171,6 +171,19 @@ function useVu(marge = 120) {
   return { ref, vu };
 }
 
+/* ── L'année en cours ────────────────────────────────────────────────────
+   Le produit intérieur brut est un flux : il se renouvelle chaque année, et
+   ce qu'un pays a produit depuis le premier janvier se déduit de sa dernière
+   valeur publiée. Un compteur a donc un sens.
+
+   Aucun autre indicateur ne s'y prête. Une dette est un stock qui
+   s'accumule, un PIB par habitant et une balance commerciale ne se cumulent
+   pas davantage. Le pas « en cours » n'apparaît donc sur la frise que
+   lorsqu'on regarde le PIB — la frise suit ce que l'indicateur permet, comme
+   elle suit déjà ce que les sources publient. */
+const ANNEE_EN_COURS = 2026;
+const SECONDES_PAR_AN = 365 * 24 * 3600;
+
 /** Un nom de pays réduit à ce qui sert à le reconnaître dans une adresse. */
 function cle(n: string) {
   return n
@@ -418,7 +431,14 @@ const Frise = memo(function Frise({
 
       <p className="cg-frise-n">
         Les dates affichées sont celles publiées par la source. Rien n&apos;est interpolé entre deux
-        repères : une année absente reste absente.
+        repères : une année absente reste absente.{" "}
+        {annees[annees.length - 1] === ANNEE_EN_COURS && (
+          <>
+            Sur le pas {ANNEE_EN_COURS}, les teintes du globe et les rangs restent ceux de{" "}
+            {annees[annees.length - 2]}, dernière année publiée ; seul le compteur avance, à partir
+            de cette valeur ramenée à la seconde.
+          </>
+        )}
       </p>
     </div>
   );
@@ -613,6 +633,15 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
   const [choisi, setChoisi] = useState<string | null>("France");
   const [ouvert, setOuvert] = useState<number | null>(0);
 
+  /* La dernière année réellement publiée, et l'état « on regarde l'année en
+     cours ». Le classement, les teintes du globe et les rangs continuent de
+     se lire sur la dernière année publiée : il n'existe pas de classement
+     mondial de l'année en cours, et en fabriquer un serait inventer. */
+  const derniereReelle = socle.annees[socle.annees.length - 1];
+  const compteurPossible = metrique === "gdp";
+  const enCours = annee === ANNEE_EN_COURS && compteurPossible;
+  const anneeSocle = enCours ? derniereReelle : annee;
+
   /* ── L'adresse, lue une fois puis tenue à jour ───────────────────────── */
   useEffect(() => {
     if (arrivee.current) return;
@@ -633,8 +662,10 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
       setCol((COLONNES.find((c) => c.id === (CHAMP_DE[m] as Col))?.id ?? "pib") as Col);
     }
 
+    /* L'année en cours ne fait pas partie du socle — aucune source ne l'a
+       publiée — mais c'est une adresse légitime : elle ouvre le compteur. */
     const a = Number(q.get("annee"));
-    if (Number.isFinite(a) && socle.annees.includes(a)) setAnnee(a);
+    if (Number.isFinite(a) && (socle.annees.includes(a) || a === ANNEE_EN_COURS)) setAnnee(a);
 
     /* On ne descend que si l'adresse demandait quelque chose : sans cela une
        visite ordinaire sauterait par-dessus l'ouverture. */
@@ -666,8 +697,8 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
      colonnes dépendent de la date : une date qui ne publie pas un indicateur
      ne lui réserve pas de place. */
   const rangs = useMemo<Rang[]>(() => {
-    const l = socle.lignes[annee] ?? [];
-    const place = socle.cols[annee] ?? {};
+    const l = socle.lignes[anneeSocle] ?? [];
+    const place = socle.cols[anneeSocle] ?? {};
     return l.map((ligne) => {
       const p = socle.pays[ligne[0] as number];
       const v = (c: string) => {
@@ -690,7 +721,7 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
         entreprises: v("companies"),
       };
     });
-  }, [socle, annee]);
+  }, [socle, anneeSocle]);
 
   /* Un pays sans valeur pour la colonne triée passe à la fin, jamais au
      rang le plus bas : ne pas savoir n'est pas être dernier. */
@@ -836,6 +867,10 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
   }, [col]);
 
   const changeMetrique = (id: EconomyMetricId) => {
+    /* Quitter le PIB alors qu'on regardait l'année en cours : ce pas
+       n'existe pas pour les autres indicateurs, on redescend sur la dernière
+       année publiée plutôt que de rester sur une date vide. */
+    if (id !== "gdp" && annee === ANNEE_EN_COURS) setAnnee(derniereReelle);
     setMetrique(id);
     const c = COL_DE[id];
     if (c) {
@@ -910,6 +945,21 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
 
           <GlobeEco
             annee={anneeEco}
+            /* Le compteur : la valeur annuelle publiée, ramenée à la seconde,
+               comptée depuis le premier janvier. Rien n'est mesuré en
+               direct — aucune institution ne publie un produit intérieur brut
+               à la seconde — et c'est dit sous le globe. */
+            compteur={
+              enCours && choisi
+                ? {
+                    base: rangs.find((r) => r.nom === choisi)?.pib ?? null,
+                    baseAnnee: derniereReelle,
+                    parSeconde:
+                      (rangs.find((r) => r.nom === choisi)?.pib ?? 0) / SECONDES_PAR_AN,
+                    depuisMs: Date.UTC(ANNEE_EN_COURS, 0, 1),
+                  }
+                : undefined
+            }
             metrique={TOUTES.find((m) => m.id === metrique) ?? TOUTES[0]}
             onMetrique={changeMetrique}
             choisi={choisi}
@@ -917,7 +967,13 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
             nomFr={(n) => socle.pays.find((p) => p.nom === n)?.fr ?? n}
             creancier={choisi ? socle.pays.find((p) => p.nom === choisi)?.creancier : undefined}
             serie={serie}
-            sousLeGlobe={<Frise annees={socle.annees} valeur={annee} onAnnee={setAnnee} />}
+            sousLeGlobe={
+              <Frise
+                annees={compteurPossible ? [...socle.annees, ANNEE_EN_COURS] : socle.annees}
+                valeur={annee}
+                onAnnee={setAnnee}
+              />
+            }
           />
         </div>
       </section>

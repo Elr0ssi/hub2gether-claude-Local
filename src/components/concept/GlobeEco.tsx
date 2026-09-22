@@ -192,6 +192,31 @@ interface Props {
   /** La valeur de la métrique, année par année, pour la courbe d'évolution. */
   serie: { annee: number; v: number | null }[];
   sousLeGlobe?: React.ReactNode;
+  /**
+   * Le compteur de l'année en cours, quand l'indicateur s'y prête.
+   *
+   * Ce n'est pas une mesure : c'est la dernière valeur annuelle publiée,
+   * ramenée à la seconde et cumulée depuis le premier janvier. Le globe, lui,
+   * garde les teintes de l'année publiée — il n'existe pas de classement
+   * mondial de l'année en cours.
+   */
+  compteur?: {
+    base: number | null;
+    baseAnnee: number;
+    parSeconde: number;
+    /** L'origine du cumul, en temps universel. */
+    depuisMs: number;
+  };
+}
+
+/** Le temps écoulé depuis une date, ramené sur l'horloge des animations. */
+function origine(depuisMs: number) {
+  return performance.now() - (Date.now() - depuisMs);
+}
+
+/** Un nombre, en français, sans décimale superflue. */
+function nb(v: number, d = 0) {
+  return v.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d });
 }
 
 export function GlobeEco({
@@ -204,6 +229,7 @@ export function GlobeEco({
   creancier,
   serie,
   sousLeGlobe,
+  compteur,
 }: Props) {
   const fiche: CountryEconomyData | undefined = choisi ? annee.countries[choisi] : undefined;
   const famille = familleDe(metrique.id);
@@ -420,21 +446,49 @@ export function GlobeEco({
                 <h3 className="ge-nom">{nomFr(choisi)}</h3>
 
                 <div className="ge-vedette">
-                  <span className="ge-vedette-l">{metrique.label}</span>
-                  <Odometre
-                    className="ge-vedette-v"
-                    valeur={vedette.v}
-                    dec={vedette.dec}
-                    unite={vedette.unite}
-                    duree={950}
-                    tours={1}
-                    couleur={SENS[metrique.id]}
-                  />
-                  {rang && (
-                    <span className="ge-vedette-r">
-                      {rang.rang}
-                      <sup>e</sup> sur {rang.total}
-                    </span>
+                  <span className="ge-vedette-l">
+                    {compteur ? `${metrique.label} produit depuis le 1er janvier` : metrique.label}
+                  </span>
+                  {compteur && compteur.base !== null ? (
+                    <>
+                      <Odometre
+                        className="ge-vedette-v"
+                        valeur={0}
+                        parSeconde={compteur.parSeconde}
+                        depuis={origine(compteur.depuisMs)}
+                        /* Quatre décimales, et c'est un choix, pas un excès
+                           de précision : en milliards entiers le dernier
+                           chiffre ne bougerait que toutes les trois heures,
+                           et le compteur paraîtrait arrêté. À cette échelle
+                           le dernier rouleau tourne de manière continue,
+                           c'est-à-dire qu'il se voit avancer. */
+                        dec={4}
+                        unite={vedette.unite}
+                        couleur={1}
+                      />
+                      <span className="ge-vedette-r">
+                        sur {nb(compteur.base, 0)}
+                        {vedette.unite} en {compteur.baseAnnee}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Odometre
+                        className="ge-vedette-v"
+                        valeur={vedette.v}
+                        dec={vedette.dec}
+                        unite={vedette.unite}
+                        duree={950}
+                        tours={1}
+                        couleur={SENS[metrique.id]}
+                      />
+                      {rang && (
+                        <span className="ge-vedette-r">
+                          {rang.rang}
+                          <sup>e</sup> sur {rang.total}
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
 
