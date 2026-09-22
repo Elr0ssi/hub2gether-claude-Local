@@ -171,6 +171,33 @@ function useVu(marge = 120) {
   return { ref, vu };
 }
 
+/** Un nom de pays réduit à ce qui sert à le reconnaître dans une adresse. */
+function cle(n: string) {
+  return n
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+/** Les indicateurs, sous le nom qu'on tape dans une adresse. */
+const PAR_NOM: Record<string, EconomyMetricId> = {
+  pib: "gdp",
+  "pib-par-habitant": "gdp_per_capita",
+  "balance-commerciale": "trade_balance",
+  dette: "debt_ratio",
+  "dette-montant": "debt_amount",
+  inflation: "inflation",
+  chomage: "unemployment",
+  "population-active": "active_population",
+  "age-retraite": "retirement_age",
+  entreprises: "companies",
+};
+const VERS_NOM: Record<string, string> = Object.fromEntries(
+  Object.entries(PAR_NOM).map(([n, id]) => [id, n]),
+);
+
 /**
  * La progression de l'ouverture : zéro quand elle tient l'écran, un quand
  * elle l'a quitté par le haut.
@@ -560,7 +587,19 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
      pendant que le globe monte sa scène, c'est les faire sauter : le fil
      d'exécution est pris ailleurs, et une animation qui démarre dans une
      image à deux cents millisecondes se voit par à-coups. */
+  /* L'adresse pilote la première vue.
+   *
+   * « /economie?pays=france&indicateur=pib&annee=2025 » ouvre la page sur la
+   * France, le produit intérieur brut et 2025, et descend jusqu'au globe.
+   * C'est ce qui permet à un moteur d'envoyer quelqu'un sur la réponse qu'il
+   * cherchait plutôt qu'en haut d'une page longue.
+   *
+   * La lecture se fait au montage, dans le navigateur, et non par les
+   * paramètres de rendu : la page reste entièrement statique, donc servie
+   * depuis le cache pour tout le monde, quelle que soit l'adresse demandée.
+   */
   const [pret, setPret] = useState(false);
+  const arrivee = useRef(false);
   useEffect(() => {
     const lance = () => requestAnimationFrame(() => setPret(true));
     if (document.readyState === "complete") {
@@ -573,6 +612,49 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
   const [qArticle, setQArticle] = useState("");
   const [choisi, setChoisi] = useState<string | null>("France");
   const [ouvert, setOuvert] = useState<number | null>(0);
+
+  /* ── L'adresse, lue une fois puis tenue à jour ───────────────────────── */
+  useEffect(() => {
+    if (arrivee.current) return;
+    arrivee.current = true;
+    const q = new URLSearchParams(window.location.search);
+
+    const p = q.get("pays");
+    if (p) {
+      const k = cle(p);
+      const t = socle.pays.find((x) => cle(x.nom) === k || cle(x.fr) === k);
+      if (t) setChoisi(t.nom);
+    }
+
+    const i = q.get("indicateur");
+    if (i && PAR_NOM[cle(i)]) {
+      const m = PAR_NOM[cle(i)];
+      setMetrique(m);
+      setCol((COLONNES.find((c) => c.id === (CHAMP_DE[m] as Col))?.id ?? "pib") as Col);
+    }
+
+    const a = Number(q.get("annee"));
+    if (Number.isFinite(a) && socle.annees.includes(a)) setAnnee(a);
+
+    /* On ne descend que si l'adresse demandait quelque chose : sans cela une
+       visite ordinaire sauterait par-dessus l'ouverture. */
+    if (p || i || q.get("annee")) {
+      window.requestAnimationFrame(() =>
+        document.getElementById("globe")?.scrollIntoView({ block: "start" }),
+      );
+    }
+  }, [socle]);
+
+  /* Le lien reste partageable : ce qu'on regarde est dans l'adresse, sans
+     jamais empiler d'entrées dans l'historique. */
+  useEffect(() => {
+    if (!arrivee.current) return;
+    const q = new URLSearchParams();
+    if (choisi) q.set("pays", cle(socle.pays.find((x) => x.nom === choisi)?.fr ?? choisi));
+    if (VERS_NOM[metrique]) q.set("indicateur", VERS_NOM[metrique]);
+    q.set("annee", String(annee));
+    window.history.replaceState(null, "", `${window.location.pathname}?${q}`);
+  }, [choisi, metrique, annee, socle]);
   const rail = useRef<HTMLDivElement>(null);
   const rail2 = useRef<HTMLDivElement>(null);
   const rail3 = useRef<HTMLDivElement>(null);
@@ -816,7 +898,7 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
       <div ref={haut.ref as React.RefObject<HTMLDivElement>} className="cg-temoin" aria-hidden="true" />
 
       {/* ── Le globe, sa frise et ses raccourcis ─────────────────────────── */}
-      <section className="cg-section cg-eco-globe">
+      <section id="globe" className="cg-section cg-eco-globe">
         <div className="cg-wrap">
           <Enseigne droite={<span className="cg-demo-mini">Banque mondiale (WDI) · FMI</span>}>
             Le globe, {annee}

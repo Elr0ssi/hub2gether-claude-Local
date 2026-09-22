@@ -42,6 +42,9 @@ body:has(.cg) { background: #05080c; }
      assombrit. Un seul jeton, et les trente-trois voiles de cette feuille
      basculent ensemble. */
   --voile: #ffffff;
+  /* L'ombre portée des fiches. De nuit elle est franche ; de jour, une ombre
+     aussi noire salit la page au lieu de soulever la carte. */
+  --ombre-portee: rgba(0, 0, 0, 0.42);
 
   position: relative;
   background: var(--fond);
@@ -91,6 +94,7 @@ body:has(.cg) { background: #05080c; }
   --vert: #0d7a52;
   --rouge: #c12b3c;
   --voile: #0b0f14;
+  --ombre-portee: rgba(14, 17, 22, 0.14);
 }
 /* De jour, la lumière vient du haut. */
 :root[data-concept="clair"] .cg::before {
@@ -2107,8 +2111,11 @@ body:has(.cg) { background: #05080c; }
    défile la rogne par le haut et lui coupe son ombre. On lui ménage la place
    à l'intérieur, et on la reprend en dehors pour que rien ne se déplace. */
 .cg-arts {
-  padding: 14px 0 26px;
-  margin: -14px 0 -26px;
+  /* La place du relief, sur les quatre côtés. Elle manquait à gauche et à
+     droite : l'ombre de la première et de la dernière fiche était tranchée
+     net par le bord du rail. */
+  padding: 14px 20px 26px;
+  margin: -14px -20px -26px;
   display: flex;
   gap: 12px;
   overflow-x: auto;
@@ -3082,7 +3089,7 @@ body:has(.cg) { background: #05080c; }
 .cg-art:hover {
   border-color: var(--bord);
   transform: translateY(-7px);
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.42);
+  box-shadow: 0 18px 38px var(--ombre-portee);
 }
 .cg-reco {
   transition:
@@ -3236,8 +3243,8 @@ body:has(.cg) { background: #05080c; }
   cursor: grab;
   /* Même raison que la file d'articles : le relief du survol a besoin de
      place, et elle est reprise en marge négative. */
-  padding: 12px 0 22px;
-  margin: -12px 0 -22px;
+  padding: 12px 18px 22px;
+  margin: -12px -18px -22px;
 }
 .cg-debats-l::-webkit-scrollbar { display: none; }
 .cg-debats-l:active { cursor: grabbing; }
@@ -3711,3 +3718,16 @@ body:has(.cg) { background: #05080c; }
 /* Le témoin « sans donnée » de la légende reprend la teinte que le globe
    emploie vraiment, laquelle change avec le thème. */
 :root[data-concept="clair"] .ge-echelle-sans { background: #d9d6cf; }
+
+/* ── Fiches d'article et fiches de débat, même matière ───────────────────
+   La fiche de débat portait un voile froid par-dessus le fond, la fiche
+   d'article prenait la surface telle quelle. De nuit l'écart passait
+   inaperçu, de jour l'une était blanche et l'autre bleutée, côte à côte
+   dans la même colonne. Elles partagent maintenant le même fond. */
+.cg-art {
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--froid) 8%, var(--surface)),
+    var(--surface)
+  );
+}
