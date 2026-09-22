@@ -2,19 +2,22 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { COMPTES_ACTIFS } from "@/lib/supabase/config";
 import { clientNavigateur } from "@/lib/supabase/navigateur";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   L'ENTRÉE DU COMPTE DANS LE MENU
+   L'ENTRÉE DU COMPTE
 
    On ne lit que la présence d'une session, pas le profil : le nom ne vaut
    pas une requête sur chaque page du site. « Mon espace » suffit, et
    l'espace, lui, sait qui vous êtes.
+
+   Elle s'affiche même quand les comptes ne sont pas branchés. Une entrée
+   qui disparaît sans rien dire laisse chercher une porte qui n'existe
+   plus ; la page de connexion, elle, explique ce qui manque.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export function LienCompte({ className }: { className?: string }) {
-  const [connecte, setConnecte] = useState<boolean | null>(null);
+  const [connecte, setConnecte] = useState(false);
 
   useEffect(() => {
     const sb = clientNavigateur();
@@ -29,13 +32,12 @@ export function LienCompte({ className }: { className?: string }) {
     return () => ecoute.subscription.unsubscribe();
   }, []);
 
-  if (!COMPTES_ACTIFS) return null;
-
   return (
     <Link href={connecte ? "/compte" : "/compte/connexion"} className={className}>
-      {/* Avant de savoir, on affiche la formule neutre : les deux mènent au
-          bon endroit, et rien ne saute au chargement. */}
-      {connecte ? "Mon espace" : "Se connecter"}
+      {/* Deux libellés, un seul affiché : les barres étroites n'ont pas la
+          place de « Se connecter ». */}
+      <span className="lc-long">{connecte ? "Mon espace" : "Se connecter"}</span>
+      <span className="lc-court">{connecte ? "Espace" : "Compte"}</span>
     </Link>
   );
 }

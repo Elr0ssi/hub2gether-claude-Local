@@ -2361,3 +2361,10 @@ body {
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
 .cp-msg-date { font-size: 11.5px; color: var(--ink-5); }
+
+/* L'entrée de compte porte deux libellés ; la barre choisit selon sa place. */
+.lc-court { display: none; }
+@media (max-width: 700px) {
+  .lc-long { display: none; }
+  .lc-court { display: inline; }
+}

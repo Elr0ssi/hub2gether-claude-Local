@@ -262,9 +262,15 @@ export function EnTete({ actif }: { actif?: string }) {
           ))}
         </nav>
 
-        {/* Au bout de la barre, et toujours visible : une entrée de compte
-            qu'il faut survoler pour trouver n'est pas une entrée. */}
-        <LienCompte className="cg-cnx" />
+        {/* Au bout de la barre, et toujours visibles : le forum et l'entrée
+            de compte. Une porte qu'il faut survoler pour trouver n'est pas
+            une porte. */}
+        <div className="cg-bout">
+          <a href="/community" className="cg-bout-l">
+            Forum
+          </a>
+          <LienCompte className="cg-cnx" />
+        </div>
       </div>
     </header>
   );
@@ -281,6 +287,8 @@ export function Pied() {
               {n.label}
             </a>
           ))}
+          <a href="/community">Forum</a>
+          <a href="/compte/connexion">Mon compte</a>
         </nav>
         <span className="cg-pied-note">Prototype de direction artistique · non indexé</span>
       </div>

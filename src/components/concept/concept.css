@@ -105,7 +105,7 @@ body:has(.cg) { background: #05080c; }
 
 .cg-header { pointer-events: none; background: none; backdrop-filter: none; }
 .cg-header .cg-logo,
-.cg-header .cg-cnx,
+.cg-header .cg-bout,
 .cg-header-ouvert { pointer-events: auto; }
 .cg-header-l {
   position: relative;
@@ -232,6 +232,7 @@ body:has(.cg) { background: #05080c; }
   .cg-nav a,
   .cg-nav-bientot,
   .cg-cnx,
+  .cg-bout-l,
   .cg-header-verre { transition: none; }
 }
 
@@ -259,16 +260,31 @@ body:has(.cg) { background: #05080c; }
 }
 .cg-nav a:hover { color: var(--encre); }
 
-/* L'entrée de compte, au bout de la barre et hors du flux : elle ne pèse
-   pas sur les trois colonnes, donc elle ne décale pas le nom. */
-.cg-cnx {
+/* Le forum et l'entrée de compte, au bout de la barre et hors du flux :
+   ils ne pèsent pas sur les trois colonnes, donc ils ne décalent pas le
+   nom. */
+.cg-bout {
   position: absolute;
   /* Le décalage d'un élément hors flux se mesure sur la boîte de padding :
-     il faut donc reprendre la gouttière à la main pour que le bouton
-     s'aligne sur le reste du contenu, et non sur le bord du conteneur. */
+     il faut donc reprendre la gouttière à la main pour s'aligner sur le
+     reste du contenu, et non sur le bord du conteneur. */
   right: clamp(28px, 4.4vw, 76px);
   top: 50%;
   transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  pointer-events: auto;
+}
+.cg-bout-l {
+  font-size: 13.5px;
+  color: var(--encre-2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+.cg-bout-l:hover { color: var(--encre); }
+.cg-cnx {
   padding: 8px 16px;
   border: 1px solid var(--bord);
   border-radius: 999px;
@@ -790,9 +806,12 @@ body:has(.cg) { background: #05080c; }
   .cg-panneaux { height: auto; flex-direction: column; }
   .cg-panneau { height: 190px; flex-grow: 0 !important; }
   .cg-nav { display: none; }
-  /* Sans onglets, la barre n'a plus que son nom au centre et son entrée de
-     compte au bout. Le bouton se resserre pour ne pas mordre sur le nom. */
-  .cg-cnx { padding: 7px 12px; font-size: 12px; }
+  /* Sans onglets, la barre n'a plus que son nom au centre, et au bout le
+     forum et le compte. Les deux se resserrent, et le libellé du compte
+     passe à sa forme courte, pour ne pas mordre sur le nom. */
+  .cg-bout { gap: 9px; }
+  .cg-bout-l { font-size: 12px; }
+  .cg-cnx { padding: 6px 11px; font-size: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
