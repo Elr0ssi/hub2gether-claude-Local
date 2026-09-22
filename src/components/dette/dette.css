@@ -21,15 +21,20 @@
   --vif: #5aa5ff;
   --vif-clair: #9ccbff;
   --tiede: #d6a77a;
-  --bord: rgba(255, 255, 255, 0.14);
-  --bord-fin: rgba(255, 255, 255, 0.08);
+  --bord: color-mix(in srgb, var(--voile) 14%, transparent);
+  --bord-fin: color-mix(in srgb, var(--voile) 8%, transparent);
+  /* Même jeton que la feuille du concept, même raison : un voile blanc ne se
+     voit pas sur une page blanche. */
+  --voile: #ffffff;
+  --corail: #ff8b8b;
+  --pousse: #5fe0a2;
 
   position: relative;
   background: var(--nuit);
   color: var(--encre);
   font-variant-numeric: tabular-nums;
 }
-body:has(.dp) { background: #04070d; }
+body:has(.dp) { background: var(--nuit); }
 
 .dp-wrap {
   max-width: 1180px;
@@ -55,7 +60,7 @@ body:has(.dp) { background: #04070d; }
   right: 0;
   height: 2px;
   z-index: 50;
-  background: rgba(255, 255, 255, 0.06);
+  background: color-mix(in srgb, var(--voile) 6%, transparent);
 }
 .dp-barre span {
   display: block;
@@ -323,7 +328,7 @@ body:has(.dp) { background: #04070d; }
   padding: 20px;
   border: 1px solid var(--bord-fin);
   border-radius: 14px;
-  background: linear-gradient(160deg, rgba(90, 165, 255, 0.08), rgba(255, 255, 255, 0.015));
+  background: linear-gradient(160deg, rgba(90, 165, 255, 0.08), color-mix(in srgb, var(--voile) 1.5%, transparent));
   transition: border-color 0.35s, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .dp-carte:hover { border-color: rgba(90, 165, 255, 0.45); transform: translateY(-5px); }
@@ -534,8 +539,8 @@ body:has(.dp) { background: #04070d; }
 .dp-ratios-c p { display: flex; justify-content: space-between; gap: 18px; margin: 0 0 6px; font-size: 13px; color: var(--encre-2); }
 .dp-ratios-c b { font-weight: 400; color: var(--encre-3); letter-spacing: 0.1em; }
 .dp-plus { color: var(--vif-clair) !important; }
-.dp-ratios-r { margin-top: 12px !important; padding-top: 12px; border-top: 1px solid var(--bord-fin); color: #5fe0a2 !important; justify-content: flex-start !important; }
-.dp-ratios-h { color: #ff8b8b !important; }
+.dp-ratios-r { margin-top: 12px !important; padding-top: 12px; border-top: 1px solid var(--bord-fin); color: var(--pousse) !important; justify-content: flex-start !important; }
+.dp-ratios-h { color: var(--corail) !important; }
 
 .dp-flux { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .dp-flux li {
@@ -656,7 +661,7 @@ body:has(.dp) { background: #04070d; }
   padding: 18px 20px;
   border: 1px solid var(--bord-fin);
   border-radius: 13px;
-  background: linear-gradient(155deg, rgba(90, 165, 255, 0.07), rgba(255, 255, 255, 0.015));
+  background: linear-gradient(155deg, rgba(90, 165, 255, 0.07), color-mix(in srgb, var(--voile) 1.5%, transparent));
   transition: border-color 0.3s, transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .dp-det:hover { border-color: rgba(90, 165, 255, 0.45); transform: translateY(-6px); }
@@ -799,13 +804,13 @@ body:has(.dp) { background: #04070d; }
 .dp-comp-fr .dp-comp-n { color: var(--encre); }
 .dp-comp-fr .dp-comp-b { background: linear-gradient(90deg, var(--vif), #a8d4ff); box-shadow: 0 0 18px rgba(90, 165, 255, 0.45); }
 .dp-comp-fr .dp-comp-v { color: var(--vif-clair); }
-.dp-comp-ag .dp-comp-b { background: repeating-linear-gradient(135deg, rgba(255,255,255,0.18) 0 5px, rgba(255,255,255,0.06) 5px 10px); }
+.dp-comp-ag .dp-comp-b { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--voile) 18%, transparent) 0 5px, color-mix(in srgb, var(--voile) 6%, transparent) 5px 10px); }
 .dp-comp-ag .dp-comp-n { color: var(--encre-3); font-style: italic; }
 @media (max-width: 620px) { .dp-comp-l { grid-template-columns: 110px minmax(0, 1fr) 60px; gap: 10px; } }
 
 /* ── Conclusion ────────────────────────────────────────────────────────── */
 
-.dp-fin { background: linear-gradient(180deg, var(--nuit), #060c16); }
+.dp-fin { background: linear-gradient(180deg, var(--nuit), var(--nuit-2)); }
 .dp-chaine { list-style: none; margin: 0 auto; padding: 0; max-width: 560px; display: grid; gap: 0; }
 .dp-chaine li {
   position: relative;
@@ -849,8 +854,8 @@ body:has(.dp) { background: #04070d; }
   transition: border-color 0.3s, background 0.3s, color 0.3s;
 }
 .dp-quiz-b button:hover { border-color: var(--bord); }
-.dp-quiz-b .dp-juste { border-color: #5fe0a2; background: rgba(95, 224, 162, 0.12); color: #5fe0a2; }
-.dp-quiz-b .dp-faux { border-color: #ff8b8b; background: rgba(255, 139, 139, 0.1); color: #ff8b8b; }
+.dp-quiz-b .dp-juste { border-color: var(--pousse); background: rgba(95, 224, 162, 0.12); color: var(--pousse); }
+.dp-quiz-b .dp-faux { border-color: var(--corail); background: rgba(255, 139, 139, 0.1); color: var(--corail); }
 .dp-quiz-e { margin: 12px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--encre-2); }
 .dp-quiz-r { margin: 18px 0 0; font-size: 15px; color: var(--vif-clair); }
 
@@ -1016,7 +1021,7 @@ body:has(.dp) { background: #04070d; }
   transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .dp-annee[data-vu="1"] .dp-annee-b { transform: scaleX(1); }
-.dp-annee-r { background: linear-gradient(90deg, rgba(95, 224, 162, 0.5), #5fe0a2); }
+.dp-annee-r { background: linear-gradient(90deg, rgba(95, 224, 162, 0.5), var(--pousse)); }
 .dp-annee-d { background: linear-gradient(90deg, rgba(90, 165, 255, 0.5), var(--vif)); transition-delay: 0.18s; }
 .dp-annee-e {
   display: grid;
@@ -1027,7 +1032,7 @@ body:has(.dp) { background: #04070d; }
   border-radius: 12px;
   background: rgba(255, 139, 139, 0.07);
 }
-.dp-annee-ev { font-size: clamp(22px, 2.6vw, 32px); letter-spacing: -0.03em; color: #ff8b8b; }
+.dp-annee-ev { font-size: clamp(22px, 2.6vw, 32px); letter-spacing: -0.03em; color: var(--corail); }
 .dp-annee-et { font-size: 11.5px; color: var(--encre-2); }
 
 /* ── Les blocs qui s'ouvrent ───────────────────────────────────────────── */
@@ -1041,7 +1046,7 @@ body:has(.dp) { background: #04070d; }
   padding: 20px 24px;
   border: 1px solid var(--bord-fin);
   border-radius: 14px;
-  background: linear-gradient(140deg, rgba(90, 165, 255, 0.09), rgba(255, 255, 255, 0.015));
+  background: linear-gradient(140deg, rgba(90, 165, 255, 0.09), color-mix(in srgb, var(--voile) 1.5%, transparent));
   font: inherit;
   text-align: left;
   color: var(--encre);
@@ -1300,7 +1305,7 @@ body:has(.dp) { background: #04070d; }
 .dp-acteur-c { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--encre-3); }
 .dp-acteur-c b { font-weight: 400; color: var(--encre); }
 .dp-acteur-c i { font-style: normal; }
-.dp-acteur-s { font-size: 12.5px; color: #ff8b8b; }
+.dp-acteur-s { font-size: 12.5px; color: var(--corail); }
 @media (max-width: 860px) { .dp-acteurs { grid-template-columns: 1fr; } }
 
 /* ── La chaîne du budget de l'État ─────────────────────────────────────── */
@@ -1320,13 +1325,13 @@ body:has(.dp) { background: #04070d; }
 }
 .dp-chaine-b b { font-size: 17px; font-weight: 400; letter-spacing: -0.02em; color: var(--encre); }
 .dp-chaine-m { border-color: rgba(255, 139, 139, 0.3) !important; }
-.dp-chaine-m b { color: #ff8b8b; }
+.dp-chaine-m b { color: var(--corail); }
 .dp-chaine-s { border-color: rgba(90, 165, 255, 0.45) !important; background: rgba(90, 165, 255, 0.08) !important; }
 .dp-chaine-s b { color: var(--vif-clair); }
 .dp-solde { margin-top: 20px; padding: 18px 20px; border: 1px solid var(--bord-fin); border-radius: 12px; background: var(--surface); }
 .dp-solde p { margin: 0; font-size: 13.5px; line-height: 1.66; color: var(--encre-2); }
 .dp-solde b { font-weight: 400; color: var(--encre); }
-.dp-solde-v { margin-top: 12px !important; font-size: clamp(20px, 2.4vw, 28px) !important; color: #ff8b8b !important; letter-spacing: -0.03em; }
+.dp-solde-v { margin-top: 12px !important; font-size: clamp(20px, 2.4vw, 28px) !important; color: var(--corail) !important; letter-spacing: -0.03em; }
 
 /* ── Le waterfall du déficit ───────────────────────────────────────────── */
 
@@ -1344,7 +1349,7 @@ body:has(.dp) { background: #04070d; }
   transition-delay: calc(var(--i) * 110ms);
 }
 .dp-water[data-vu="1"] .dp-water-b { transform: scaleX(1); }
-.dp-water-v { font-size: 13px; text-align: right; color: #ff8b8b; }
+.dp-water-v { font-size: 13px; text-align: right; color: var(--corail); }
 .dp-water-t {
   display: flex;
   justify-content: space-between;
@@ -1357,7 +1362,7 @@ body:has(.dp) { background: #04070d; }
   text-transform: uppercase;
   color: var(--encre-3);
 }
-.dp-water-t b { font-size: clamp(20px, 2.4vw, 28px); font-weight: 400; letter-spacing: -0.03em; color: #ff8b8b; text-transform: none; }
+.dp-water-t b { font-size: clamp(20px, 2.4vw, 28px); font-weight: 400; letter-spacing: -0.03em; color: var(--corail); text-transform: none; }
 @media (max-width: 760px) { .dp-water-l { grid-template-columns: 130px minmax(0, 1fr) 84px; gap: 10px; } }
 
 /* ── La composition de la dette ────────────────────────────────────────── */
@@ -1483,3 +1488,28 @@ body:has(.dp) { background: #04070d; }
 .dp-chiffres li { display: grid; gap: 3px; font-size: 12px; color: var(--encre-3); }
 .dp-chiffres b { font-size: 18px; font-weight: 400; letter-spacing: -0.02em; color: var(--encre); }
 @media (max-width: 720px) { .dp-couts { grid-template-columns: 1fr; } }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ARTICLE, DE JOUR
+
+   Même bascule que la feuille du concept : seuls les jetons changent. Les
+   accents sont assombris, parce qu'un corail et un vert d'eau qui se lisent
+   sur une page noire passent sous le seuil de contraste sur une page
+   blanche.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root[data-concept="clair"] .dp {
+  --nuit: #f6f5f2;
+  --nuit-2: #eeece7;
+  --surface: #ffffff;
+  --surface-2: #f2f0eb;
+  --encre: #0e1116;
+  --encre-2: #3f474f;
+  --encre-3: #6b737b;
+  --vif: #1f5fa8;
+  --vif-clair: #2f6f8a;
+  --tiede: #9a6532;
+  --corail: #c1354a;
+  --pousse: #0d7a52;
+  --voile: #0b0f14;
+}

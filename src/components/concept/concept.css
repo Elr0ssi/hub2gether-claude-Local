@@ -13,10 +13,13 @@
    ne s'applique qu'aux pages qui portent un `.cg` : aucune page existante
    n'est touchée. */
 body:has(.cg) { background: #05080c; }
+:root[data-concept="clair"] body:has(.cg) { background: #f6f5f2; }
 
 .cg {
   --fond: #05080c;
   --fond-2: #081018;
+  /* Le ton intermédiaire du dégradé de fond. */
+  --fond-3: #071018;
   /* Les surfaces étaient à quelques points du fond : deux cartes côte à côte
      ne se distinguaient pas, et un rectangle n'avait pas de bord visible. On
      les remonte franchement — sur une page noire, c'est l'écart entre les
@@ -32,8 +35,13 @@ body:has(.cg) { background: #05080c; }
   --froid: #9ec7d8;
   --vert: #41c7a5;
   --rouge: #ff6474;
-  --bord: rgba(255, 255, 255, 0.17);
-  --bord-fin: rgba(255, 255, 255, 0.1);
+  --bord: color-mix(in srgb, var(--voile) 17%, transparent);
+  --bord-fin: color-mix(in srgb, var(--voile) 10%, transparent);
+  /* La teinte des voiles. Sur fond de nuit c'est du blanc qui éclaircit ;
+     sur fond de jour, un voile blanc ne se voit pas, il faut de l'encre qui
+     assombrit. Un seul jeton, et les trente-trois voiles de cette feuille
+     basculent ensemble. */
+  --voile: #ffffff;
 
   position: relative;
   background: var(--fond);
@@ -55,7 +63,41 @@ body:has(.cg) { background: #05080c; }
   background:
     radial-gradient(ellipse 70% 50% at 62% 18%, rgba(158, 199, 216, 0.06), transparent 62%),
     radial-gradient(ellipse 50% 40% at 20% 80%, rgba(214, 167, 122, 0.045), transparent 66%),
-    linear-gradient(180deg, #05080c 0%, #071018 46%, #05080c 100%);
+    linear-gradient(180deg, var(--fond) 0%, var(--fond-3) 46%, var(--fond) 100%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE THÈME CLAIR
+
+   Le même site, de jour. Rien n'est redessiné : seuls les jetons changent, et
+   tout ce qui en dépend suit. C'est la raison d'être des voiles tokenisés
+   plus haut — sans eux, il aurait fallu réécrire trente-trois règles.
+
+   Les accents sont assombris. Un ocre et un bleu pâle lisibles sur une page
+   noire tombent sous le seuil de contraste sur une page blanche : ce sont
+   les mêmes teintes, pas les mêmes valeurs.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root[data-concept="clair"] .cg {
+  --fond: #f6f5f2;
+  --fond-2: #eeece7;
+  --fond-3: #f1efeb;
+  --surface: #ffffff;
+  --surface-2: #f2f0eb;
+  --encre: #0e1116;
+  --encre-2: #3f474f;
+  --encre-3: #6b737b;
+  --chaud: #9a6532;
+  --froid: #2f6f8a;
+  --vert: #0d7a52;
+  --rouge: #c12b3c;
+  --voile: #0b0f14;
+}
+/* De jour, la lumière vient du haut. */
+:root[data-concept="clair"] .cg::before {
+  background:
+    radial-gradient(ellipse 70% 50% at 62% 18%, rgba(47, 111, 138, 0.07), transparent 62%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(154, 101, 50, 0.05), transparent 66%),
+    linear-gradient(180deg, #faf9f7 0%, #f2f0ec 46%, #f6f5f2 100%);
 }
 
 .cg-wrap {
@@ -125,7 +167,7 @@ body:has(.cg) { background: #05080c; }
   background: linear-gradient(180deg, rgba(8, 13, 20, 0.66), rgba(8, 13, 20, 0.22));
   backdrop-filter: blur(16px) saturate(1.25);
   -webkit-backdrop-filter: blur(16px) saturate(1.25);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid color-mix(in srgb, var(--voile) 7%, transparent);
   transition: opacity 0.5s ease;
 }
 .cg-header-ouvert .cg-header-verre { opacity: 1; }
@@ -154,7 +196,7 @@ body:has(.cg) { background: #05080c; }
   inset: -10px -18px;
   z-index: -1;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid color-mix(in srgb, var(--voile) 8%, transparent);
   background: rgba(8, 13, 20, 0.5);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -520,7 +562,7 @@ body:has(.cg) { background: #05080c; }
 .image-placeholder-lueur {
   position: absolute;
   inset: -40%;
-  background: radial-gradient(ellipse 42% 46% at 30% 26%, rgba(255, 255, 255, 0.16), transparent 62%);
+  background: radial-gradient(ellipse 42% 46% at 30% 26%, color-mix(in srgb, var(--voile) 16%, transparent), transparent 62%);
   animation: ph-derive 11s ease-in-out infinite alternate;
 }
 @keyframes ph-derive {
@@ -531,7 +573,7 @@ body:has(.cg) { background: #05080c; }
   position: absolute;
   inset: 0;
   background-image:
-    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 13px);
+    repeating-linear-gradient(115deg, color-mix(in srgb, var(--voile) 5%, transparent) 0 1px, transparent 1px 13px);
   mix-blend-mode: overlay;
 }
 .image-placeholder-etiquette {
@@ -542,7 +584,7 @@ body:has(.cg) { background: #05080c; }
   letter-spacing: 0.16em;
   color: rgba(244, 242, 238, 0.4);
   background: rgba(5, 8, 12, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid color-mix(in srgb, var(--voile) 8%, transparent);
   border-radius: 4px;
   padding: 3px 7px;
   backdrop-filter: blur(3px);
@@ -598,7 +640,7 @@ body:has(.cg) { background: #05080c; }
   min-height: 380px;
   border: 1px solid var(--bord-fin);
   border-radius: 12px;
-  background: #081018;
+  background: var(--fond-2);
   overflow: hidden;
 }
 .cg-carte-fond { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -844,7 +886,7 @@ body:has(.cg) { background: #05080c; }
   transition: color 0.35s, background 0.35s, border-color 0.35s;
 }
 .gm-region:hover { color: var(--encre); }
-.gm-region-on { background: rgba(255, 255, 255, 0.07); border-color: var(--bord); color: var(--encre); }
+.gm-region-on { background: color-mix(in srgb, var(--voile) 7%, transparent); border-color: var(--bord); color: var(--encre); }
 
 .gm-corps {
   display: grid;
@@ -913,7 +955,7 @@ body:has(.cg) { background: #05080c; }
   width: 150px;
   height: 7px;
   border-radius: 2px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid color-mix(in srgb, var(--voile) 12%, transparent);
 }
 .gm-echelle-p {
   font-size: 10px;
@@ -928,7 +970,7 @@ body:has(.cg) { background: #05080c; }
   width: 9px;
   height: 9px;
   border-radius: 2px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid color-mix(in srgb, var(--voile) 16%, transparent);
   /* La même hachure que sur le globe : le repère doit être reconnaissable. */
   background: repeating-linear-gradient(
     45deg,
@@ -975,10 +1017,10 @@ body:has(.cg) { background: #05080c; }
   padding: 9px 11px;
   border: 1px solid var(--bord-fin);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.045);
+  background: color-mix(in srgb, var(--voile) 4.5%, transparent);
   transition: border-color 0.3s, background 0.3s;
 }
-.gm-mesures > div:hover { border-color: var(--bord); background: rgba(255, 255, 255, 0.085); }
+.gm-mesures > div:hover { border-color: var(--bord); background: color-mix(in srgb, var(--voile) 8.5%, transparent); }
 .gm-mesures dt { font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--encre-3); }
 .gm-mesures dd { margin: 0; font-size: 13px; color: var(--encre); font-variant-numeric: tabular-nums; }
 
@@ -1095,7 +1137,7 @@ body:has(.cg) { background: #05080c; }
   cursor: pointer;
   transition: color 0.3s, border-color 0.3s, background 0.3s;
 }
-.cg-cl-fleches button:hover { color: var(--encre); border-color: var(--bord); background: rgba(255, 255, 255, 0.085); }
+.cg-cl-fleches button:hover { color: var(--encre); border-color: var(--bord); background: color-mix(in srgb, var(--voile) 8.5%, transparent); }
 
 .cg-cl-grille {
   display: grid;
@@ -1131,7 +1173,7 @@ body:has(.cg) { background: #05080c; }
   padding: 18px 20px 20px;
   border: 1px solid var(--bord-fin);
   border-radius: 12px;
-  background: linear-gradient(180deg, rgba(158, 199, 216, 0.09), rgba(255, 255, 255, 0.035));
+  background: linear-gradient(180deg, rgba(158, 199, 216, 0.09), color-mix(in srgb, var(--voile) 3.5%, transparent));
   transition: border-color 0.35s, background 0.35s;
 }
 .cg-fiche:hover { border-color: rgba(158, 199, 216, 0.35); }
@@ -1485,7 +1527,7 @@ body:has(.cg) { background: #05080c; }
   padding: 8px 13px;
   border: 1px solid var(--bord-fin);
   border-radius: 7px;
-  background: rgba(255, 255, 255, 0.055);
+  background: color-mix(in srgb, var(--voile) 5.5%, transparent);
   font: inherit;
   font-size: 12.5px;
   color: var(--encre);
@@ -1531,7 +1573,7 @@ body:has(.cg) { background: #05080c; }
 .cg-tri:hover { color: var(--encre-2); }
 .cg-tri-on { color: var(--froid); }
 .cg-tab tbody tr { cursor: pointer; transition: background 0.2s; }
-.cg-tab tbody tr:hover { background: rgba(255, 255, 255, 0.06); }
+.cg-tab tbody tr:hover { background: color-mix(in srgb, var(--voile) 6%, transparent); }
 .cg-tab-on { background: rgba(158, 199, 216, 0.12) !important; }
 .cg-tab td {
   padding: 11px 14px;
@@ -1643,13 +1685,13 @@ body:has(.cg) { background: #05080c; }
   padding: 11px 14px;
   border: 1px solid var(--bord-fin);
   border-radius: 9px;
-  background: rgba(255, 255, 255, 0.045);
+  background: color-mix(in srgb, var(--voile) 4.5%, transparent);
   font: inherit;
   text-align: left;
   cursor: pointer;
   transition: border-color 0.3s, background 0.3s;
 }
-.cg-racc:hover { border-color: var(--bord); background: rgba(255, 255, 255, 0.085); }
+.cg-racc:hover { border-color: var(--bord); background: color-mix(in srgb, var(--voile) 8.5%, transparent); }
 .cg-racc-on { border-color: rgba(158, 199, 216, 0.5); background: rgba(158, 199, 216, 0.1); }
 .cg-racc-r { font-size: 9.5px; letter-spacing: 0.1em; color: var(--encre-3); }
 .cg-racc-n { font-size: 13px; color: var(--encre); white-space: nowrap; }
@@ -1667,7 +1709,7 @@ body:has(.cg) { background: #05080c; }
   padding: 8px 15px;
   border: 1px solid var(--bord-fin);
   border-radius: 7px;
-  background: rgba(255, 255, 255, 0.03);
+  background: color-mix(in srgb, var(--voile) 3%, transparent);
   font: inherit;
   font-size: 12.5px;
   color: var(--encre-2);
@@ -1823,7 +1865,7 @@ body:has(.cg) { background: #05080c; }
   width: 156px;
   height: 7px;
   border-radius: 2px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid color-mix(in srgb, var(--voile) 20%, transparent);
 }
 .ge-echelle-l {
   display: flex;
@@ -1840,7 +1882,7 @@ body:has(.cg) { background: #05080c; }
   margin-left: 6px;
   border-radius: 2px;
   background: #1d2531;
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  border: 1px solid color-mix(in srgb, var(--voile) 24%, transparent);
 }
 
 .ge-sous { margin-top: 22px; }
@@ -1897,7 +1939,7 @@ body:has(.cg) { background: #05080c; }
   cursor: pointer;
   transition: border-color 0.28s, background 0.28s;
 }
-.ge-autre:hover { border-color: var(--bord); background: rgba(255, 255, 255, 0.075); }
+.ge-autre:hover { border-color: var(--bord); background: color-mix(in srgb, var(--voile) 7.5%, transparent); }
 /* Le libellé tient sur une ligne : c'est pour cela que la colonne de droite
    a gagné en largeur. Un intitulé qui se casse en deux déséquilibre les deux
    rectangles voisins et rend la fiche bancale. */
@@ -2009,7 +2051,7 @@ body:has(.cg) { background: #05080c; }
   padding: 14px 15px;
   border: 1px solid var(--bord-fin);
   border-radius: 11px;
-  background: linear-gradient(160deg, rgba(158, 199, 216, 0.09), rgba(255, 255, 255, 0.02));
+  background: linear-gradient(160deg, rgba(158, 199, 216, 0.09), color-mix(in srgb, var(--voile) 2%, transparent));
   min-width: 0;
 }
 .cg-cpt-l2 {
@@ -2115,8 +2157,8 @@ body:has(.cg) { background: #05080c; }
 
 .cg-tab-cadre { background: var(--surface); }
 .cg-tab thead th { background: #1b2530; }
-.cg-tab tbody tr:nth-child(2n) { background: rgba(255, 255, 255, 0.022); }
-.cg-tab tbody tr:hover { background: rgba(255, 255, 255, 0.075); }
+.cg-tab tbody tr:nth-child(2n) { background: color-mix(in srgb, var(--voile) 2.2%, transparent); }
+.cg-tab tbody tr:hover { background: color-mix(in srgb, var(--voile) 7.5%, transparent); }
 
 /* ── La fiche pays ───────────────────────────────────────────────────────
    Elle prend la hauteur de son contenu : étirée sur celle du globe, elle
@@ -2375,7 +2417,7 @@ body:has(.cg) { background: #05080c; }
   border: 1px dashed var(--bord);
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.022);
+  background: color-mix(in srgb, var(--voile) 2.2%, transparent);
 }
 .an-l {
   position: relative;
@@ -2424,7 +2466,7 @@ body:has(.cg) { background: #05080c; }
   margin-top: 10px;
   padding: 8px 11px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
+  background: color-mix(in srgb, var(--voile) 4%, transparent);
   font-size: 11.5px;
   color: var(--encre-2);
 }
@@ -3211,7 +3253,7 @@ body:has(.cg) { background: #05080c; }
   padding: 13px 15px;
   border: 1px solid var(--bord-fin);
   border-radius: 11px;
-  background: linear-gradient(155deg, rgba(158, 199, 216, 0.08), rgba(255, 255, 255, 0.015));
+  background: linear-gradient(155deg, rgba(158, 199, 216, 0.08), color-mix(in srgb, var(--voile) 1.5%, transparent));
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -3340,7 +3382,7 @@ body:has(.cg) { background: #05080c; }
 .cg-tuile-tenue .cg-tuile-i {
   transform: scale(1.14);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 1px 0 color-mix(in srgb, var(--voile) 16%, transparent),
     0 24px 46px rgba(0, 0, 0, 0.7),
     0 0 36px color-mix(in srgb, var(--c, #9ec7d8) 40%, transparent);
 }
@@ -3419,7 +3461,7 @@ body:has(.cg) { background: #05080c; }
   color: var(--c, #9ec7d8);
   background: linear-gradient(168deg, rgba(41, 43, 49, 0.96), rgba(15, 16, 20, 0.98));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    inset 0 1px 0 color-mix(in srgb, var(--voile) 11%, transparent),
     inset 0 -1px 0 rgba(0, 0, 0, 0.6),
     0 10px 24px rgba(0, 0, 0, 0.62),
     0 2px 6px rgba(0, 0, 0, 0.5);
@@ -3439,7 +3481,7 @@ body:has(.cg) { background: #05080c; }
 .cg-tuile-vif .cg-tuile-i {
   background: linear-gradient(168deg, rgba(48, 40, 31, 0.96), rgba(19, 16, 14, 0.98));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.13),
+    inset 0 1px 0 color-mix(in srgb, var(--voile) 13%, transparent),
     inset 0 -1px 0 rgba(0, 0, 0, 0.6),
     inset 0 0 0 1px color-mix(in srgb, var(--c, #9ec7d8) 30%, transparent),
     0 10px 24px rgba(0, 0, 0, 0.62),
@@ -3465,7 +3507,7 @@ body:has(.cg) { background: #05080c; }
 .cg-tuile:hover .cg-tuile-i {
   transform: translateY(-8px) scale(1.16);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 1px 0 color-mix(in srgb, var(--voile) 16%, transparent),
     inset 0 -1px 0 rgba(0, 0, 0, 0.6),
     0 20px 40px rgba(0, 0, 0, 0.66),
     0 0 34px color-mix(in srgb, var(--c, #9ec7d8) 38%, transparent);
@@ -3487,7 +3529,7 @@ body:has(.cg) { background: #05080c; }
   border: 0;
   background: linear-gradient(168deg, rgba(44, 34, 24, 0.96), rgba(16, 14, 13, 0.98));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 1px 0 color-mix(in srgb, var(--voile) 14%, transparent),
     inset 0 -1px 0 rgba(0, 0, 0, 0.6),
     inset 0 0 0 1px color-mix(in srgb, var(--chaud) 42%, transparent),
     0 0 44px color-mix(in srgb, var(--chaud) 26%, transparent),
@@ -3536,3 +3578,136 @@ body:has(.cg) { background: #05080c; }
   .cg-sceau { animation: none; }
   .cg-tuile-i { transition: none; }
 }
+
+/* ── Le bouton jour/nuit ─────────────────────────────────────────────────
+   Au bout de la barre, avec le forum et le compte. Il porte un dessin et
+   aucun mot : c'est le seul endroit de cette barre où un libellé serait
+   redondant avec ce qu'il montre. */
+.cg-jour {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--bord);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fond) 55%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--encre-2);
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s, background 0.3s;
+}
+.cg-jour:hover { color: var(--encre); border-color: color-mix(in srgb, var(--chaud) 55%, transparent); }
+.cg-header-ouvert .cg-jour { background: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+@media (max-width: 700px) { .cg-jour { width: 28px; height: 28px; } }
+
+/* ── La scène du globe, de jour ──────────────────────────────────────────
+   Le cadre du globe porte ses couleurs en clair, pas en jetons : c'est une
+   scène, pas une surface. Elle a donc sa propre version diurne, et l'éclat
+   du limbe passe du bleu froid à une lumière chaude qui se voit sur blanc. */
+:root[data-concept="clair"] .ge-scene {
+  background:
+    radial-gradient(ellipse 46% 46% at 50% 44%, rgba(47, 111, 138, 0.1), transparent 68%),
+    radial-gradient(ellipse 70% 40% at 50% 104%, rgba(154, 101, 50, 0.07), transparent 70%),
+    radial-gradient(ellipse 62% 62% at 50% 46%, #ffffff, #eef1f5 72%);
+}
+:root[data-concept="clair"] .ge-eclat {
+  box-shadow:
+    0 0 0 1px rgba(40, 90, 130, 0.3),
+    0 0 18px 2px rgba(60, 120, 170, 0.22),
+    0 0 52px 8px rgba(80, 140, 190, 0.14);
+}
+:root[data-concept="clair"] .ge-eclat-2 {
+  box-shadow:
+    0 0 90px 18px rgba(70, 125, 175, 0.12),
+    0 0 190px 60px rgba(90, 140, 185, 0.08);
+}
+
+/* ── L'ouverture, de jour ────────────────────────────────────────────────
+   Les tuiles sont des boutons sombres : sur une page blanche, ce sont des
+   boutons clairs, avec la même arête haute et la même ombre portée. Le
+   limbe, lui, garde sa lumière chaude — c'est un lever de soleil, il n'a
+   pas de version diurne. */
+:root[data-concept="clair"] .cg-tuile-i {
+  background: linear-gradient(168deg, #ffffff, #eceae5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(12, 16, 22, 0.1),
+    0 8px 20px rgba(12, 16, 22, 0.13),
+    0 2px 5px rgba(12, 16, 22, 0.1);
+}
+:root[data-concept="clair"] .cg-tuile-vif .cg-tuile-i {
+  background: linear-gradient(168deg, #fffaf2, #f4ece0);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 0 1px color-mix(in srgb, var(--c, #9ec7d8) 40%, transparent),
+    0 8px 20px rgba(12, 16, 22, 0.13),
+    0 0 22px color-mix(in srgb, var(--c, #9ec7d8) 22%, transparent);
+}
+:root[data-concept="clair"] .cg-sceau {
+  background: linear-gradient(168deg, #fffaf3, #f2e9dc);
+  color: #8a5a28;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 0 1px color-mix(in srgb, var(--chaud) 48%, transparent),
+    0 0 36px color-mix(in srgb, var(--chaud) 18%, transparent),
+    0 14px 36px rgba(12, 16, 22, 0.16);
+}
+:root[data-concept="clair"] .cg-sceau svg { filter: drop-shadow(0 0 8px rgba(154, 101, 50, 0.3)); }
+:root[data-concept="clair"] .cg-eco-ouv .cg-eyebrow { color: #8a5a28; opacity: 1; }
+
+/* ── La barre et le limbe, de jour ───────────────────────────────────────
+   Deux surfaces qui portaient leurs couleurs en clair et se retrouvaient
+   noires sur une page blanche : le verre de la barre, et le trait du limbe,
+   qui était presque blanc et disparaissait. */
+:root[data-concept="clair"] .cg-header-verre {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.4));
+  border-bottom-color: rgba(12, 16, 22, 0.09);
+}
+:root[data-concept="clair"] .cg-logo::before {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(12, 16, 22, 0.1);
+}
+:root[data-concept="clair"] .cg-cnx {
+  background: rgba(255, 255, 255, 0.72);
+}
+:root[data-concept="clair"] .cg-arc-trait {
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 calc(50% - 1.75px),
+    rgba(150, 96, 40, 0.75) calc(50% - 1.15px) calc(50% - 0.4px),
+    transparent calc(50% + 0.2px)
+  );
+}
+:root[data-concept="clair"] .cg-arc-nappe {
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 48.7%,
+    rgba(200, 140, 70, 0.4) 49.7%,
+    rgba(170, 110, 50, 0.28) 50.3%,
+    transparent 51.8%
+  );
+}
+:root[data-concept="clair"] .cg-arc-corps {
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 45%,
+    rgba(190, 140, 80, 0.14) 49.2%,
+    rgba(210, 160, 100, 0.18) 50%,
+    rgba(190, 140, 80, 0.1) 50.8%,
+    transparent 56%
+  );
+}
+:root[data-concept="clair"] .cg-arc-point::before {
+  background: #b8762c;
+  box-shadow:
+    0 0 12px 3px rgba(200, 140, 70, 0.6),
+    0 0 46px 14px rgba(190, 130, 60, 0.26),
+    0 0 150px 60px rgba(180, 120, 55, 0.1);
+}
+
+/* Le témoin « sans donnée » de la légende reprend la teinte que le globe
+   emploie vraiment, laquelle change avec le thème. */
+:root[data-concept="clair"] .ge-echelle-sans { background: #d9d6cf; }

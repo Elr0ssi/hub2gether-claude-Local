@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTheme } from "./Theme";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import type { PaletteGlobe } from "@/components/map/EconomyGlobe";
 import { getValueIntensity } from "@/lib/economyColors";
@@ -30,6 +31,15 @@ const BLEUS = [
 ];
 const SANS = "#1d2531";
 
+/* La même rampe, de jour : elle démarre plus clair et monte moins haut,
+   sinon les pays les plus foncés font des trous noirs sur une page blanche
+   et les plus clairs disparaissent dans le fond. */
+const BLEUS_JOUR = [
+  "#dbe9fa", "#bcd7f4", "#9cc3ec", "#7cade3", "#5e96d6",
+  "#437cc4", "#2f63ad", "#204c92", "#153873",
+];
+const SANS_JOUR = "#d9d6cf";
+
 const PALETTE: PaletteGlobe = {
   oceanProfond: "#050b16",
   oceanMoyen: "#081426",
@@ -42,6 +52,23 @@ const PALETTE: PaletteGlobe = {
     const t = getValueIntensity(nom, countries, max, metric);
     if (t === null) return SANS;
     return BLEUS[Math.round(Math.max(0, Math.min(1, t)) * (BLEUS.length - 1))];
+  },
+};
+
+/* L'océan de jour reste un océan : il pâlit, il ne devient pas blanc. Un
+   globe entièrement clair sur un fond clair n'a plus de silhouette. */
+const PALETTE_JOUR: PaletteGlobe = {
+  oceanProfond: "#cfdced",
+  oceanMoyen: "#dce7f3",
+  oceanPlateau: "#e6eef7",
+  terreSansDonnee: SANS_JOUR,
+  frontiere: "rgba(30,60,100,0.3)",
+  graticule: "rgba(40,80,130,0.1)",
+  accent: "#2f6f8a",
+  remplissage: (nom, countries, max, metric) => {
+    const t = getValueIntensity(nom, countries, max, metric);
+    if (t === null) return SANS_JOUR;
+    return BLEUS_JOUR[Math.round(Math.max(0, Math.min(1, t)) * (BLEUS_JOUR.length - 1))];
   },
 };
 
@@ -225,6 +252,9 @@ export function GlobeEco({
      distance : on prend celui dont l'abscisse est la plus proche du doigt,
      sinon un creux profond attire le curseur alors qu'on vise une année. */
   const [survol, setSurvol] = useState<number | null>(null);
+  const [theme] = useTheme();
+  const jour = theme === "clair";
+
   const cadre = useRef<HTMLDivElement>(null);
 
   /* La lumière du limbe suit la caméra.
@@ -341,7 +371,13 @@ export function GlobeEco({
               metric={metrique.id}
               selectedCountry={choisi}
               onCountryClick={(n) => onChoisi(n)}
-              palette={PALETTE}
+              /* Le globe peint ses fonds de carte une fois, au montage : un
+                 changement de palette après coup ne repeindrait que les
+                 remplissages, pas l'océan ni le graticule. On le remonte
+                 donc, ce qui ne se produit qu'au clic sur le bouton du
+                 thème. */
+              key={theme}
+              palette={jour ? PALETTE_JOUR : PALETTE}
               /* La sphère occupe davantage son cadre : la valeur d'origine
                  laissait près d'un cinquième de vide autour d'elle. */
               marge={1.06}
@@ -361,7 +397,7 @@ export function GlobeEco({
             <div className="ge-echelle" aria-hidden="true">
               <span
                 className="ge-echelle-barre"
-                style={{ background: `linear-gradient(90deg, ${BLEUS.join(", ")})` }}
+                style={{ background: `linear-gradient(90deg, ${(jour ? BLEUS_JOUR : BLEUS).join(", ")})` }}
               />
               <span className="ge-echelle-l">
                 {metrique.label} · faible à élevé

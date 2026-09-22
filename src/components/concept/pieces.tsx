@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { LienCompte } from "@/components/compte/LienCompte";
+import { BoutonTheme } from "./Theme";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LES PETITES PIÈCES DU PROTOTYPE
@@ -266,6 +267,7 @@ export function EnTete({ actif }: { actif?: string }) {
             de compte. Une porte qu'il faut survoler pour trouver n'est pas
             une porte. */}
         <div className="cg-bout">
+          <BoutonTheme className="cg-jour" />
           <a href="/community" className="cg-bout-l">
             Forum
           </a>

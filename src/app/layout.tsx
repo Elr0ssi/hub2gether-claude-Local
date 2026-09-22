@@ -106,6 +106,17 @@ export default function RootLayout({
     <html lang="fr" suppressHydrationWarning className={inter.variable}>
       <head>
         <meta name="theme-color" content="#FAFAFA" />
+        {/* Le thème des pages Visualize, posé avant le premier rendu. Sans
+            ce passage, une page choisie en clair apparaîtrait noire le temps
+            d'une image, puis basculerait : c'est le défaut que tout le monde
+            connaît et que personne ne pardonne. Il ne fait rien d'autre que
+            relire un choix déjà pris, et se tait si le stockage est fermé. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{if(localStorage.getItem("visualize-theme")==="clair")document.documentElement.dataset.concept="clair"}catch(e){}',
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdString(websiteSchema) }}
