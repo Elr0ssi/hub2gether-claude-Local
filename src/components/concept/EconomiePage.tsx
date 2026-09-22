@@ -556,6 +556,20 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
   const bande = useVu();
   const haut = useVu(260);
   const ouverture = useProgression();
+  /* Les tuiles n'arrivent qu'une fois la page chargée. Les faire partir
+     pendant que le globe monte sa scène, c'est les faire sauter : le fil
+     d'exécution est pris ailleurs, et une animation qui démarre dans une
+     image à deux cents millisecondes se voit par à-coups. */
+  const [pret, setPret] = useState(false);
+  useEffect(() => {
+    const lance = () => requestAnimationFrame(() => setPret(true));
+    if (document.readyState === "complete") {
+      lance();
+      return;
+    }
+    window.addEventListener("load", lance);
+    return () => window.removeEventListener("load", lance);
+  }, []);
   const [qArticle, setQArticle] = useState("");
   const [choisi, setChoisi] = useState<string | null>("France");
   const [ouvert, setOuvert] = useState<number | null>(0);
@@ -762,6 +776,7 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
         ref={ouverture as React.RefObject<HTMLElement>}
         className="cg-section cg-eco-haut"
         data-vu={haut.vu ? "1" : "0"}
+        data-pret={pret ? "1" : "0"}
       >
         <div className="cg-eco-lueur" aria-hidden="true" />
         <Jetons />

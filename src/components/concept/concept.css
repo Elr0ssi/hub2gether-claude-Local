@@ -2821,31 +2821,24 @@ body:has(.cg) { background: #05080c; }
     transform 1.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Le corps de la planète, sous le limbe.
+/* Le rayonnement large, et rien d'autre.
 
-   Il ne doit pas être noir : un disque noir sur un fond noir n'existe pas,
-   et la ligne flotte alors dans le vide. Deux nappes suffisent — une lueur
-   rasante du côté du soleil, un fond terreux qui s'éteint vers le bas — et
-   le sol se devine sans jamais se montrer.
-
-   Les arrêts restent sous cinquante pour cent, comme l'anneau : les
-   pourcentages d'un dégradé radial se mesurent sur le coin le plus éloigné,
-   donc cinquante pour cent tombe exactement sur le limbe. */
+   Il n'y a pas de planète à remplir. Un disque terreux occupait toute la
+   calotte et écrasait le trait ; ce qu'on veut, c'est que la ligne rayonne.
+   Les arrêts se serrent donc autour de cinquante pour cent — la position
+   exacte du limbe, puisque les pourcentages d'un dégradé radial se mesurent
+   sur le coin le plus éloigné — et rien n'est peint ailleurs. */
 .cg-arc-corps {
-  background:
-    /* La lueur rasante reste à l'intérieur du limbe. Depuis un point décalé,
-       le coin le plus éloigné est plus loin que depuis le centre : un arrêt
-       à quarante-huit pour cent débordait de la sphère et faisait une brume
-       brune au-dessus de la ligne. */
-    radial-gradient(circle at 42% 42%, rgba(126, 96, 66, 0.32) 0 18%, transparent 28%),
-    radial-gradient(
-      circle at 50% 50%,
-      rgba(34, 29, 26, 0.9) 0 40%,
-      rgba(44, 36, 30, 0.95) 47%,
-      rgba(64, 50, 38, 0.9) 49.6%,
-      transparent 50%
-    );
-  opacity: 0.85;
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 45%,
+    rgba(232, 183, 116, 0.16) 49.2%,
+    rgba(255, 226, 190, 0.2) 50%,
+    rgba(232, 183, 116, 0.12) 50.8%,
+    transparent 56%
+  );
+  filter: blur(38px);
+  opacity: calc(0.25 + (1 - var(--p, 0)) * 0.75);
 }
 /* Le trait : un anneau d'un peu plus d'un pixel, découpé dans un dégradé
    radial. Une bordure ne sait pas prendre un dégradé, un anneau si. */
@@ -2876,33 +2869,40 @@ body:has(.cg) { background: #05080c; }
   --a: 0deg;
   -webkit-mask: conic-gradient(from 268deg, #000 0deg, #000 var(--a), transparent var(--a));
   mask: conic-gradient(from 268deg, #000 0deg, #000 var(--a), transparent var(--a));
-  animation: cg-trace 2.4s cubic-bezier(0.32, 0.72, 0.3, 1) 0.5s backwards;
-  animation-fill-mode: both;
+}
+.cg-eco-haut[data-pret="1"] .cg-arc-trait {
+  animation: cg-trace 2.6s cubic-bezier(0.32, 0.72, 0.3, 1) 0.5s both;
 }
 @keyframes cg-trace {
   from { --a: 0deg; }
   to { --a: 360deg; }
 }
 /* La nappe : la lumière qui déborde au-dessus du trait. */
+/* L'éclat serré, posé sur le trait. C'est lui qui fait la lumière : une
+   bande étroite centrée sur le limbe, pas une calotte. */
 .cg-arc-nappe {
   background: radial-gradient(
     circle at 50% 50%,
-    transparent 0 46%,
-    rgba(232, 183, 116, 0.2) 49.4%,
-    rgba(255, 226, 190, 0.12) 50%,
-    transparent 56%
+    transparent 0 48.7%,
+    rgba(255, 240, 216, 0.6) 49.7%,
+    rgba(232, 183, 116, 0.42) 50.3%,
+    transparent 51.8%
   );
-  filter: blur(22px);
-  opacity: 0.3;
+  filter: blur(13px);
+  opacity: calc(0.2 + (1 - var(--p, 0)) * 0.8);
   transform: scale(0.99);
   /* La nappe n'arrive qu'une fois le trait bouclé : le limbe s'embrase
      d'un coup, au lieu d'accompagner le tracé. */
-  animation: cg-embrase 1.5s cubic-bezier(0.16, 1, 0.3, 1) 2.7s backwards;
 }
+.cg-eco-haut[data-pret="1"] .cg-arc-nappe {
+  animation: cg-embrase 1.6s cubic-bezier(0.16, 1, 0.3, 1) 2.9s backwards;
+}
+/* L'opacité de fin n'est pas écrite : elle revient à la valeur calculée,
+   celle qui suit le défilement. L'embrasement ne fait que la traverser. */
 @keyframes cg-embrase {
-  from { opacity: 0; filter: blur(34px) brightness(0.6); }
-  55% { opacity: 1; filter: blur(16px) brightness(2.1); }
-  to { opacity: 0.3; filter: blur(22px) brightness(1); }
+  from { opacity: 0; filter: blur(30px) brightness(0.5); }
+  55% { filter: blur(9px) brightness(2.4); }
+  to { filter: blur(13px) brightness(1); }
 }
 
 /* ── Le point du jour ────────────────────────────────────────────────────
@@ -2925,7 +2925,9 @@ body:has(.cg) { background: #05080c; }
   opacity: calc(0.6 + var(--p, 0) * 0.4);
   /* Le point est la pointe du crayon : il part du bord gauche et s'arrête
      où le trait l'abandonne. */
-  animation: cg-pointe 2.4s cubic-bezier(0.32, 0.72, 0.3, 1) 0.5s backwards;
+}
+.cg-eco-haut[data-pret="1"] .cg-arc-point {
+  animation: cg-pointe 2.6s cubic-bezier(0.32, 0.72, 0.3, 1) 0.5s backwards;
 }
 @keyframes cg-pointe {
   from { transform: rotate(-86deg) translateY(-67.18vw); opacity: 0; }
@@ -2946,8 +2948,13 @@ body:has(.cg) { background: #05080c; }
     0 0 46px 14px rgba(232, 183, 116, 0.42),
     0 0 150px 60px rgba(214, 167, 122, 0.16);
 }
-.cg-eco-haut[data-vu="1"] .cg-arc-trait { opacity: 1; transform: scale(1); }
-.cg-eco-haut[data-vu="1"] .cg-arc-nappe { opacity: 1; transform: scale(1.01); }
+/* L'éclat se fait et se défait au défilement, dans les deux sens : plein
+   quand l'ouverture tient l'écran, éteint quand elle l'a quittée. C'est la
+   même variable que les tuiles, donc revenir par le bas le rallume sans
+   rien rejouer. */
+.cg-arc-trait { opacity: calc(0.3 + (1 - var(--p, 0)) * 0.7); }
+.cg-eco-haut[data-vu="1"] .cg-arc-trait { transform: scale(1); }
+.cg-eco-haut[data-vu="1"] .cg-arc-nappe { transform: scale(1.01); }
 @media (prefers-reduced-motion: reduce) {
   .cg-arc-trait,
   .cg-arc-nappe { transition: none; animation: none; }
@@ -3345,8 +3352,14 @@ body:has(.cg) { background: #05080c; }
   display: block;
   width: 100%;
   height: 100%;
-  animation: cg-pose 0.72s cubic-bezier(0.22, 1.3, 0.36, 1) backwards;
-  animation-delay: calc(0.25s + var(--o) * 78ms);
+  /* Rien ne bouge tant que la page n'a pas fini de charger : une arrivée
+     lancée pendant que le globe monte sa scène saute au lieu de glisser. */
+  opacity: 0;
+}
+.cg-eco-haut[data-pret="1"] .cg-tuile-a {
+  animation: cg-pose 1.15s cubic-bezier(0.22, 1.2, 0.36, 1) backwards;
+  animation-delay: calc(0.45s + var(--o) * 135ms);
+  opacity: 1;
 }
 @keyframes cg-pose {
   from { opacity: 0; transform: scale(0.35); }
@@ -3440,6 +3453,7 @@ body:has(.cg) { background: #05080c; }
    La tuile du milieu : plus grande, seule à porter un cerne chaud, et seule
    à se tenir dans le flux du texte. Le champ s'écarte d'elle. */
 .cg-sceau {
+  opacity: 0;
   display: grid;
   place-items: center;
   width: clamp(84px, 8vw, 112px);
@@ -3455,12 +3469,13 @@ body:has(.cg) { background: #05080c; }
     inset 0 0 0 1px color-mix(in srgb, var(--chaud) 42%, transparent),
     0 0 44px color-mix(in srgb, var(--chaud) 26%, transparent),
     0 18px 48px rgba(0, 0, 0, 0.6);
-  animation: cg-pose 0.8s cubic-bezier(0.22, 1.3, 0.36, 1) backwards;
+  animation: cg-pose 1.2s cubic-bezier(0.22, 1.2, 0.36, 1) 0.35s backwards;
   transform:
     translateY(calc(var(--p) * -30px))
     scale(calc(1 - var(--p) * 0.16));
   opacity: calc(1 - var(--p) * 1);
 }
+.cg-eco-haut[data-pret="1"] .cg-sceau { opacity: 1; }
 .cg-sceau-i { display: grid; place-items: center; width: 100%; height: 100%; }
 .cg-sceau svg {
   width: 48%;
@@ -3480,8 +3495,16 @@ body:has(.cg) { background: #05080c; }
   /* Sur une colonne étroite, seules les tuiles marquées restent, et le champ
      se range au-dessus du texte au lieu de passer derrière. */
   .cg-tuile { display: none; }
-  .cg-tuile-p { display: block; }
-  .cg-tuiles { bottom: 48%; }
+  /* Les tuiles gardées occupent toute la hauteur au lieu de se tasser en
+     haut : sur un téléphone il n'y a pas de marges, le champ passe donc
+     derrière le texte, un peu effacé pour le laisser lire. */
+  .cg-tuile-p {
+    display: block;
+    width: calc(var(--k) * 0.74);
+    height: calc(var(--k) * 0.74);
+    margin: calc(var(--k) * -0.37) 0 0 calc(var(--k) * -0.37);
+    opacity: 0.72;
+  }
   .cg-sceau { width: 66px; height: 66px; margin: 12px auto 18px; }
 }
 @media (prefers-reduced-motion: reduce) {

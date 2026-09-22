@@ -67,31 +67,36 @@ const VIOLET = "#b79cff";
 
 /* Les tuiles laissent libre le couloir central, où se lisent le sceau et le
    titre. Les positions sont posées à la main : une dispersion tirée au sort
-   fait des grappes et des trous. */
+   fait des grappes et des trous.
+
+   Celles marquées `petit` restent sur une colonne étroite. Elles sont
+   choisies pour couvrir toute la hauteur, des deux côtés : sur un téléphone
+   il n'y a pas de marges, le champ passe donc derrière le texte, et neuf
+   tuiles réparties valent mieux que six tassées en haut. */
 const TUILES: Tuile[] = [
   /* ── Le bord gauche ─────────────────────────────────────────────────── */
   { t: "€", c: OR, x: 8, y: 22, k: 46, d: 11, z: 1.1, petit: true, o: 3, vif: true },
-  { f: "barres", c: BLEU, x: 17, y: 12, k: 40, d: 14, z: 0.8, o: 11 },
+  { f: "barres", c: BLEU, x: 17, y: 12, k: 40, d: 14, z: 0.8, petit: true, o: 11 },
   { t: "CAC 40", c: PALE, x: 5, y: 44, k: 52, d: 13, z: 1.2, o: 7 },
   { f: "usine", c: PALE, x: 21, y: 33, k: 42, d: 9, z: 0.9, petit: true, o: 16 },
   { f: "goutte", c: OR, x: 12, y: 58, k: 38, d: 16, z: 1, o: 1 },
-  { f: "banque", c: BLEU, x: 26, y: 54, k: 44, d: 12, z: 1.15, petit: true, o: 13 },
+  { f: "banque", c: BLEU, x: 26, y: 54, k: 44, d: 12, z: 1.15, o: 13 },
   { t: "$", c: OR, x: 30, y: 20, k: 38, d: 10, z: 0.75, o: 19 },
-  { f: "panier", c: BLEU, x: 24, y: 71, k: 36, d: 15, z: 1.25, o: 5 },
+  { f: "panier", c: BLEU, x: 24, y: 71, k: 36, d: 15, z: 1.25, petit: true, o: 5 },
   { f: "chandelier", c: VERT, x: 34, y: 38, k: 34, d: 13, z: 0.7, o: 9 },
-  { f: "ble", c: OR, x: 33, y: 63, k: 34, d: 11, z: 0.85, o: 17 },
+  { f: "ble", c: OR, x: 33, y: 63, k: 34, d: 11, z: 0.85, petit: true, o: 17 },
 
   /* ── Le bord droit ──────────────────────────────────────────────────── */
   { t: "₿", c: OR, x: 63, y: 30, k: 44, d: 12, z: 1.05, petit: true, o: 0, vif: true },
   { f: "pourcent", c: CORAIL, x: 70, y: 16, k: 36, d: 10, z: 0.8, o: 12 },
   { t: "S&P 500", c: PALE, x: 88, y: 28, k: 52, d: 14, z: 1.2, o: 6 },
   { f: "banque", c: BLEU, x: 76, y: 44, k: 42, d: 9, z: 0.95, petit: true, o: 15 },
-  { f: "lingots", c: OR, x: 69, y: 58, k: 40, d: 15, z: 1.1, o: 2, vif: true },
+  { f: "lingots", c: OR, x: 74, y: 24, k: 40, d: 15, z: 1.1, petit: true, o: 2, vif: true },
   { t: "¥", c: OR, x: 94, y: 52, k: 38, d: 11, z: 0.9, o: 18 },
   { f: "curseurs", c: VIOLET, x: 82, y: 66, k: 36, d: 13, z: 1.3, petit: true, o: 8 },
-  { f: "caisse", c: PALE, x: 92, y: 70, k: 38, d: 10, z: 1.15, o: 14 },
+  { f: "caisse", c: PALE, x: 92, y: 70, k: 38, d: 10, z: 1.15, petit: true, o: 14 },
   { f: "chandelier", c: VERT, x: 66, y: 74, k: 34, d: 16, z: 1.25, o: 4 },
-  { t: "£", c: OR, x: 79, y: 12, k: 34, d: 12, z: 0.7, o: 20 },
+  { t: "£", c: OR, x: 79, y: 12, k: 34, d: 12, z: 0.7, petit: true, o: 20 },
   { f: "barres", c: BLEU, x: 96, y: 14, k: 36, d: 14, z: 0.75, o: 10 },
 ];
 
