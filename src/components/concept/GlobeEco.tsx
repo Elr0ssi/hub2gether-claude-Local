@@ -346,6 +346,12 @@ export function GlobeEco({
                  laissait près d'un cinquième de vide autour d'elle. */
               marge={1.06}
               onCadrage={mesureLimbe}
+              /* Ce globe tient dans une colonne de six cents pixels. Les
+                 toiles de huit mille texels du fond de carte du site n'y
+                 montrent rien de plus : quatre toiles de cette taille pèsent
+                 cinq cents méga-octets et leur peinture tient la main du
+                 navigateur plusieurs secondes à l'ouverture. */
+              texelsMax={4096}
             />
             {/* L'éclat qui sort de la sphère : un anneau de lumière posé sur
                 son bord, en fusion d'écran, qui respire. Il ne tourne pas avec

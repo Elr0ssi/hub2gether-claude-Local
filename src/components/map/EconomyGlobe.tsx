@@ -35,17 +35,22 @@ let ZOOM_CEILING = 2.6;
 /** Field of view at rest. Zooming past the dolly limit narrows it. */
 const BASE_FOV = 34;
 
-function chooseTextureSize(renderer: THREE.WebGLRenderer) {
+function chooseTextureSize(renderer: THREE.WebGLRenderer, plafond?: number) {
   const maxTex = renderer.capabilities.maxTextureSize;
   const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4;
   const coarse = window.matchMedia("(pointer: coarse)").matches;
   const roomy = maxTex >= 8192 && memory >= 8 && !coarse;
 
   TEXTURE_W = roomy ? 8192 : 4096;
+  /* Un plafond demandé par la page. Quatre toiles pleines sont peintes au
+     montage ; à 8192 sur 4096, chacune pèse cent trente méga-octets et sa
+     peinture tient la main du navigateur plusieurs secondes. Un globe qui
+     occupe six cents pixels n'a pas de quoi montrer ces texels. */
+  if (plafond && plafond < TEXTURE_W) TEXTURE_W = plafond;
   TEXTURE_H = TEXTURE_W / 2;
   // Capped where the texture still has texels to give: past it the map stops
   // gaining detail and only gains blur.
-  ZOOM_CEILING = roomy ? 5 : 2.6;
+  ZOOM_CEILING = TEXTURE_W >= 8192 ? 5 : TEXTURE_W >= 4096 ? 2.6 : 1.8;
 }
 /** La teinte d'un pays pour la métrique affichée. */
 type Remplissage = (
@@ -709,6 +714,11 @@ interface Props {
    * épouse le limbe et qui suit le zoom.
    */
   onCadrage?: (diametre: number) => void;
+  /**
+   * La largeur maximale des toiles peintes. Absente, la machine décide comme
+   * avant. Une page qui montre un petit globe a tout intérêt à la brider.
+   */
+  texelsMax?: number;
 }
 
 export function EconomyGlobe({
@@ -721,6 +731,7 @@ export function EconomyGlobe({
   palette,
   marge = 1.18,
   onCadrage,
+  texelsMax,
 }: Props) {
   /* Posée pendant le rendu, donc avant tout effet : la carte de base est
      peinte au montage, et une palette appliquée après serait arrivée trop
@@ -737,8 +748,16 @@ export function EconomyGlobe({
   const onCadrageRef = useRef(onCadrage);
   onCadrageRef.current = onCadrage;
 
+  /* Lu au montage, une seule fois : changer de plafond en cours de route
+     voudrait dire tout repeindre, ce qu'aucune page ne demande. */
+  const texelsRef = useRef(texelsMax);
+
   const mountRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
+  /* La photographie n'arrive qu'en dernier : l'effet de redessin doit le
+     savoir, sinon un globe passé en satellite avant elle garderait ses
+     terres grises. */
+  const [photoPrete, setPhotoPrete] = useState(false);
 
   const byNameRef = useRef<Map<string, GeoJSON.Feature>>(new Map());
   const baseMapRef = useRef<HTMLCanvasElement | null>(null);
@@ -835,7 +854,7 @@ export function EconomyGlobe({
       texture.needsUpdate = true;
     });
     return () => cancelAnimationFrame(handle);
-  }, [economyYear, metric, ready, satellite]);
+  }, [economyYear, metric, ready, satellite, photoPrete]);
 
   /* ── Selection: an outline in 3D, so picking never repaints the map ───── */
   useEffect(() => {
@@ -876,7 +895,7 @@ export function EconomyGlobe({
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    chooseTextureSize(renderer);
+    chooseTextureSize(renderer, texelsRef.current);
     mount.appendChild(renderer.domElement);
     renderer.domElement.style.display = "block";
     renderer.domElement.style.cursor = "grab";
@@ -1072,64 +1091,105 @@ export function EconomyGlobe({
         img.src = src;
       });
 
-    Promise.all([
-      fetch("/geo/ne_50m_countries.geojson").then((r) => r.json()),
-      loadImage(TOPOLOGY),
-      loadImage(IMAGERY),
-    ])
-      .then(([geojson, topo, imagery]: [GeoJSON.FeatureCollection, HTMLImageElement | null, HTMLImageElement | null]) => {
-        if (cancelled) return;
+    /* ── L'arrivée, par paliers ──────────────────────────────────────────
+       Tout partait ensemble et rien n'apparaissait avant que tout soit là :
+       le tracé des côtes, le relief, et une photographie d'un méga-trois
+       cent. Le globe attendait donc la plus lente des trois, puis peignait
+       quatre toiles pleines d'affilée, ce qui tenait la main du navigateur
+       plusieurs secondes.
 
-        const byName = new Map<string, GeoJSON.Feature>();
-        for (const feat of geojson.features) {
-          const name = feat.properties?.name as string | undefined;
-          if (name) byName.set(name, feat);
-        }
-        byNameRef.current = byName;
+       Il arrive maintenant par paliers. Le tracé suffit à montrer un globe
+       complet et juste : c'est lui qui porte la couleur. Le survol, le
+       relief et la photographie se posent ensuite, chacun après un souffle,
+       et le rendu final est le même. */
+    const souffle = () =>
+      new Promise<void>((r) => {
+        const libre = (window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => void })
+          .requestIdleCallback;
+        if (libre) libre(() => r(), { timeout: 260 });
+        else setTimeout(r, 0);
+      });
 
-        baseMapRef.current = buildBaseMap(geojson);
-        pickRef.current = buildPickMap(geojson);
-        // The satellite base is a second full-size canvas with every border
-        // stroked onto it. Built the first time it is asked for rather than on
-        // every mount, so the editorial globe pays nothing for a mode it does
-        // not use.
-        geojsonRef.current = geojson;
-        imageryRef.current = imagery;
+    /* Le tracé fin, et lui seul. Le fichier allégé de Natural Earth pèse
+       quatre fois moins, mais il ne connaît que cent soixante-dix-sept
+       entités contre deux cent trente et une : Singapour, Hong Kong, Malte,
+       Bahreïn et cinquante autres en sont absents. Sur un globe économique,
+       ce serait troquer des secondes contre des pays. */
+    const pTrace = fetch("/geo/ne_50m_countries.geojson").then((r) => r.json());
+    const pTopo = loadImage(TOPOLOGY);
+    const pPhoto = loadImage(IMAGERY);
 
-        // The same height field drives the geometry and its shading: the land
-        // is pushed out along the normal, and the wall it now stands on is lit
-        // from the field's own slope.
-        const relief = new THREE.CanvasTexture(buildReliefMap(geojson, topo));
-        relief.colorSpace = THREE.NoColorSpace;
-        relief.anisotropy = renderer.capabilities.getMaxAnisotropy();
-        material.displacementMap = relief;
-        material.displacementScale = RELIEF_SCALE;
+    void (async () => {
+      const geojson: GeoJSON.FeatureCollection = await pTrace;
+      if (cancelled) return;
 
-        // The light is shaded from its own surface, not from the field that
-        // lifts the land: the sea can have a floor and a swell without the
-        // ocean itself rising off sea level.
-        const shading = new THREE.CanvasTexture(buildShadingMap(geojson, topo));
-        shading.colorSpace = THREE.NoColorSpace;
-        shading.anisotropy = renderer.capabilities.getMaxAnisotropy();
-        material.bumpMap = shading;
-        material.bumpScale = BUMP_SCALE;
+      const byName = new Map<string, GeoJSON.Feature>();
+      for (const feat of geojson.features) {
+        const name = feat.properties?.name as string | undefined;
+        if (name) byName.set(name, feat);
+      }
+      byNameRef.current = byName;
+      geojsonRef.current = geojson;
 
-        if (imagery) {
-          const terrain = new THREE.Texture(imagery);
-          terrain.colorSpace = THREE.SRGBColorSpace;
-          terrain.anisotropy = renderer.capabilities.getMaxAnisotropy();
-          terrain.needsUpdate = true;
-          terrainUniforms.uTerrain.value = terrain;
-          terrainUniforms.uTerrainMask.value = relief;
-          terrainUniforms.uTerrainAmount.value = TERRAIN_AMOUNT;
-        }
-        terrainAmountRef.current = terrainUniforms.uTerrainAmount;
-        material.needsUpdate = true;
+      // Premier palier : le globe, en aplat de couleur. Complet, lisible,
+      // et sans rien devoir à la photographie.
+      baseMapRef.current = buildBaseMap(geojson);
+      fillCanvas.getContext("2d")!.drawImage(baseMapRef.current, 0, 0);
+      texture.needsUpdate = true;
+      setReady(true);
 
-        fillCanvas.getContext("2d")!.drawImage(baseMapRef.current, 0, 0);
-        texture.needsUpdate = true;
-        setReady(true);
-      })
+      // Deuxième palier : la carte de visée, qui n'est lue qu'au survol.
+      await souffle();
+      if (cancelled) return;
+      pickRef.current = buildPickMap(geojson);
+
+      const topo = await pTopo;
+      if (cancelled) return;
+
+      // The same height field drives the geometry and its shading: the land
+      // is pushed out along the normal, and the wall it now stands on is lit
+      // from the field's own slope.
+      await souffle();
+      if (cancelled) return;
+      const relief = new THREE.CanvasTexture(buildReliefMap(geojson, topo));
+      relief.colorSpace = THREE.NoColorSpace;
+      relief.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      material.displacementMap = relief;
+      material.displacementScale = RELIEF_SCALE;
+      material.needsUpdate = true;
+
+      // The light is shaded from its own surface, not from the field that
+      // lifts the land: the sea can have a floor and a swell without the
+      // ocean itself rising off sea level.
+      await souffle();
+      if (cancelled) return;
+      const shading = new THREE.CanvasTexture(buildShadingMap(geojson, topo));
+      shading.colorSpace = THREE.NoColorSpace;
+      shading.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      material.bumpMap = shading;
+      material.bumpScale = BUMP_SCALE;
+      material.needsUpdate = true;
+
+      // Dernier palier : la photographie, qui ne fait que teinter les terres.
+      const imagery = await pPhoto;
+      if (cancelled) return;
+      imageryRef.current = imagery;
+      if (imagery) {
+        const terrain = new THREE.Texture(imagery);
+        terrain.colorSpace = THREE.SRGBColorSpace;
+        terrain.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        terrain.needsUpdate = true;
+        terrainUniforms.uTerrain.value = terrain;
+        terrainUniforms.uTerrainMask.value = relief;
+        terrainUniforms.uTerrainAmount.value = TERRAIN_AMOUNT;
+        // La base satellite, si elle avait été construite sans la photo,
+        // est à refaire : l'effet de redessin s'en charge.
+        satelliteMapRef.current = null;
+      }
+      terrainAmountRef.current = terrainUniforms.uTerrainAmount;
+      material.needsUpdate = true;
+      setPhotoPrete(true);
+    })()
       .catch(() => {
         /* The globe stays empty; the flat map is one click away. */
       });

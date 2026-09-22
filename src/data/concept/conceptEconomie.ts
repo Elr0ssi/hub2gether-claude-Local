@@ -29,6 +29,17 @@ export interface SocleEco {
      annuel : c'est une information de contexte, la même que celle affichée
      sur la carte économie. */
   pays: { nom: string; fr: string; creancier?: string }[];
+  /**
+   * Pour chaque date, la position de chaque indicateur dans ses lignes.
+   *
+   * Les colonnes changent d'une date à l'autre, et c'est tout l'intérêt : la
+   * couverture des sources est très inégale. Le PIB remonte à soixante-six
+   * dates, l'âge de départ à la retraite à une seule. Une grille fixe de dix
+   * colonnes obligeait à écrire « null » neuf fois par pays et par date, ce
+   * qui faisait à soi seul près de la moitié du poids de la page. Une date
+   * ne transporte plus que les indicateurs qu'elle publie.
+   */
+  cols: Record<number, Record<string, number>>;
   lignes: Record<number, Ligne[]>;
 }
 
@@ -48,11 +59,6 @@ const CHAMPS: [string, number][] = [
   ["companies", 0],
 ];
 
-/** L'ordre des colonnes dans une ligne, décalé de 1 (l'identifiant du pays). */
-export const COLONNE: Record<string, number> = Object.fromEntries(
-  CHAMPS.map(([c], i) => [c, i + 1]),
-);
-
 /**
  * Le socle économique du prototype.
  *
@@ -71,30 +77,47 @@ export function socleEco(): SocleEco {
   const index = new Map<string, number>();
   const pays: SocleEco["pays"] = [];
   const lignes: Record<number, Ligne[]> = {};
+  const cols: Record<number, Record<string, number>> = {};
 
   for (const y of ECONOMY_YEARS) {
+    const fiches = Object.entries(y.countries);
+
+    /* Premier passage : ce que cette date publie réellement. Un indicateur
+       qu'aucun pays ne renseigne cette année-là n'aura pas de colonne. */
+    const publies = CHAMPS.filter(([c]) =>
+      fiches.some(([, d]) => {
+        const v = (d as Record<string, number | undefined>)[c];
+        return v !== undefined && Number.isFinite(v);
+      }),
+    );
+    const place: Record<string, number> = {};
+    publies.forEach(([c], i) => {
+      place[c] = i + 1;
+    });
+
     const l: Ligne[] = [];
-    for (const [nom, d] of Object.entries(y.countries)) {
+    for (const [nom, d] of fiches) {
       let id = index.get(nom);
       if (id === undefined) {
         id = pays.length;
         index.set(nom, id);
         pays.push({ nom, fr: countryFr(nom), creancier: CREANCIER.get(nom) });
       }
-      const vals = CHAMPS.map(([c, dec]) => {
+      const vals = publies.map(([c, dec]) => {
         const v = (d as Record<string, number | undefined>)[c];
         if (v === undefined || !Number.isFinite(v)) return null;
         const p = Math.pow(10, dec);
         return Math.round(v * p) / p;
       });
-      /* Une fiche vide sur les dix indicateurs n'a rien à dire. */
+      /* Une fiche vide sur tous les indicateurs de la date n'a rien à dire. */
       if (vals.every((v) => v === null)) continue;
       l.push([id, ...vals]);
     }
     lignes[y.year] = l;
+    cols[y.year] = place;
   }
 
-  return { annees: ECONOMY_YEARS.map((y) => y.year), pays, lignes };
+  return { annees: ECONOMY_YEARS.map((y) => y.year), pays, cols, lignes };
 }
 
 export function articlesEco(n = 9): FicheArticle[] {

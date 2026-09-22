@@ -3,7 +3,7 @@
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
-import { COLONNE, type FicheDebat, type LigneSource, type SocleEco } from "@/data/concept/conceptEconomie";
+import { type FicheDebat, type LigneSource, type SocleEco } from "@/data/concept/conceptEconomie";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import { Jetons } from "./Jetons";
 import { Loupe } from "./Loupe";
@@ -525,13 +525,17 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
   const prise3 = useRef<{ x: number; g: number } | null>(null);
   const tire = useRef(false);
 
-  /* Les lignes de l'année, reconstituées depuis le format compact. */
+  /* Les lignes de l'année, reconstituées depuis le format compact. Les
+     colonnes dépendent de la date : une date qui ne publie pas un indicateur
+     ne lui réserve pas de place. */
   const rangs = useMemo<Rang[]>(() => {
     const l = socle.lignes[annee] ?? [];
+    const place = socle.cols[annee] ?? {};
     return l.map((ligne) => {
       const p = socle.pays[ligne[0] as number];
       const v = (c: string) => {
-        const x = ligne[COLONNE[c]];
+        const i = place[c];
+        const x = i === undefined ? null : ligne[i];
         return typeof x === "number" && Number.isFinite(x) ? x : null;
       };
       return {
@@ -598,8 +602,9 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
     const c = CHAMP_DE[metrique];
     return socle.annees.map((a) => {
       if (idx < 0 || !c) return { annee: a, v: null };
-      const l = (socle.lignes[a] ?? []).find((x) => x[0] === idx);
-      const v = l ? l[COLONNE[c]] : null;
+      const i = (socle.cols[a] ?? {})[c];
+      const l = i === undefined ? undefined : (socle.lignes[a] ?? []).find((x) => x[0] === idx);
+      const v = l ? l[i] : null;
       return { annee: a, v: typeof v === "number" && Number.isFinite(v) ? v : null };
     });
   }, [socle, choisi, metrique]);
