@@ -1710,7 +1710,10 @@ body:has(.cg) { background: #05080c; }
    marge. La lumière est ensuite portée par des ombres portées, qui partent du
    contour exact du disque et rayonnent vers l'extérieur — jamais vers le
    centre. */
-.ge-scene { --ge-marge: 1.06; --ge-d: calc(min(100%, var(--ge-h)) / var(--ge-marge)); }
+/* Valeurs de repli, le temps que la scène trois dimensions se monte et
+   annonce son cadrage : le diamètre au repos, marge comprise. Ensuite, c'est
+   le globe lui-même qui écrit --ge-d et --ge-eclat-o à chaque zoom. */
+.ge-scene { --ge-marge: 1.06; --ge-d: calc(min(100%, var(--ge-h)) / var(--ge-marge)); --ge-eclat-o: 1; }
 .ge-eclat {
   position: absolute;
   top: 50%;
@@ -1721,6 +1724,9 @@ body:has(.cg) { background: #05080c; }
   border-radius: 50%;
   pointer-events: none;
   z-index: 2;
+  /* L'extinction hors champ passe par un filtre, pas par `opacity` : celle-ci
+     porte déjà la respiration, et les deux se multiplient proprement. */
+  filter: opacity(var(--ge-eclat-o, 1));
   /* Le disque lui-même reste vide : seules ses ombres éclairent. */
   box-shadow:
     0 0 0 1px rgba(150, 210, 255, 0.45),

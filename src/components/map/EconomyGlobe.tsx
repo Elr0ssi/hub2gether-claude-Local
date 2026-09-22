@@ -701,6 +701,14 @@ interface Props {
    * et la sphère occupe davantage son cadre.
    */
   marge?: number;
+  /**
+   * Prévenue chaque fois que le cadrage change — zoom, pincement,
+   * redimensionnement — avec le diamètre apparent de la sphère à l'écran, en
+   * pixels. Absente, rien n'est mesuré ni appelé : la page économie du site
+   * est rendue exactement comme avant. Elle sert à poser une lumière qui
+   * épouse le limbe et qui suit le zoom.
+   */
+  onCadrage?: (diametre: number) => void;
 }
 
 export function EconomyGlobe({
@@ -712,6 +720,7 @@ export function EconomyGlobe({
   satellite = false,
   palette,
   marge = 1.18,
+  onCadrage,
 }: Props) {
   /* Posée pendant le rendu, donc avant tout effet : la carte de base est
      peinte au montage, et une palette appliquée après serait arrivée trop
@@ -722,6 +731,11 @@ export function EconomyGlobe({
      pas quand elle change, et la caméra la relit à chaque cadrage. */
   const margeRef = useRef(marge);
   margeRef.current = marge;
+
+  /* Même raison pour la mesure : la référence suit les rendus, la scène n'est
+     jamais remontée parce que la fonction a changé d'identité. */
+  const onCadrageRef = useRef(onCadrage);
+  onCadrageRef.current = onCadrage;
 
   const mountRef = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
@@ -986,6 +1000,10 @@ export function EconomyGlobe({
      */
     const DOLLY_MAX = 2.2;
 
+    /* Hauteur du canvas, relevée au dernier cadrage : la mesure du limbe s'y
+       rapporte. */
+    let hauteurCanvas = 0;
+
     const applyCamera = () => {
       const dolly = Math.min(zoom, DOLLY_MAX);
       camera.position.z = (baseDistance * margeRef.current) / dolly;
@@ -994,6 +1012,21 @@ export function EconomyGlobe({
       camera.fov =
         (2 * Math.atan(Math.tan((BASE_FOV * Math.PI) / 360) * (dolly / zoom)) * 180) / Math.PI;
       camera.updateProjectionMatrix();
+
+      /* Le diamètre réellement dessiné.
+
+         Le bord d'une sphère n'est pas son équateur : la silhouette est le
+         cercle de tangence, vu sous l'angle asin(R / d). Ce demi-angle,
+         rapporté à la demi-ouverture de la caméra, donne la moitié du disque
+         en fraction de la hauteur du canvas. La formule se vérifie au repos :
+         à distance R / sin(champ / 2) et sans marge, elle rend exactement la
+         hauteur du cadre. */
+      const mesure = onCadrageRef.current;
+      if (mesure && hauteurCanvas) {
+        const theta = Math.asin(Math.min(1, RADIUS / camera.position.z));
+        const demiChamp = Math.tan((camera.fov * Math.PI) / 360);
+        mesure((hauteurCanvas * Math.tan(theta)) / demiChamp);
+      }
     };
 
     const resize = () => {
@@ -1011,6 +1044,7 @@ export function EconomyGlobe({
       const height = mount.clientHeight;
       if (!width || !height) return;
       renderer.setSize(width, height);
+      hauteurCanvas = height;
       camera.aspect = width / height;
       resolutionRef.current.set(width, height);
       for (const mat of lineMatsRef.current) mat.resolution.copy(resolutionRef.current);

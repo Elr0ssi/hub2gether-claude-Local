@@ -226,6 +226,27 @@ export function GlobeEco({
      sinon un creux profond attire le curseur alors qu'on vise une année. */
   const [survol, setSurvol] = useState<number | null>(null);
   const cadre = useRef<HTMLDivElement>(null);
+
+  /* La lumière du limbe suit la caméra.
+
+     Le diamètre apparent de la sphère change à chaque zoom ; l'anneau était
+     lui dimensionné une fois pour toutes sur le cadre, et se retrouvait donc
+     dessiné à l'intérieur du globe dès qu'on s'approchait. Le globe mesure
+     désormais son limbe et le dépose ici, en pixels, directement dans le
+     style de la scène : aucun rendu React par image.
+
+     Passé le bord du cadre, le limbe n'est plus visible — il est hors champ.
+     La lumière s'éteint alors progressivement plutôt que de venir baver sur
+     les bords de la scène. */
+  const scene = useRef<HTMLDivElement>(null);
+  const mesureLimbe = useCallback((diametre: number) => {
+    const el = scene.current;
+    if (!el) return;
+    el.style.setProperty("--ge-d", `${Math.round(diametre)}px`);
+    const cote = Math.min(el.clientWidth, el.clientHeight);
+    const sortie = cote ? (diametre - cote) / (cote * 0.35) : 0;
+    el.style.setProperty("--ge-eclat-o", String(Math.max(0, Math.min(1, 1 - sortie))));
+  }, []);
   const vise = useCallback(
     (clientX: number) => {
       const el = cadre.current;
@@ -314,7 +335,7 @@ export function GlobeEco({
 
       <div className="ge-corps">
         <div className="ge-colonne">
-          <div className="ge-scene">
+          <div className="ge-scene" ref={scene}>
             <EconomyGlobe
               economyYear={annee}
               metric={metrique.id}
@@ -324,6 +345,7 @@ export function GlobeEco({
               /* La sphère occupe davantage son cadre : la valeur d'origine
                  laissait près d'un cinquième de vide autour d'elle. */
               marge={1.06}
+              onCadrage={mesureLimbe}
             />
             {/* L'éclat qui sort de la sphère : un anneau de lumière posé sur
                 son bord, en fusion d'écran, qui respire. Il ne tourne pas avec
