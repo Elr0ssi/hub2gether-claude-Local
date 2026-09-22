@@ -58,9 +58,15 @@ export async function inscrire(_precedent: Retour, donnees: FormData): Promise<R
   });
   if (error) return { erreur: lisible(error.message) };
 
-  /* Session absente : le projet demande une confirmation par courriel. */
+  /* Session absente : le projet est réglé pour demander une confirmation
+     par courriel. L'adresse étant tenue pour confirmée dès l'inscription,
+     la connexion passe quand même : on la fait ici plutôt que de renvoyer
+     l'arrivant vers un courriel qui ne partira pas. */
   if (!data.session) {
-    return { message: "Compte créé. Confirmez votre adresse par le lien reçu, puis connectez-vous." };
+    const { error: souci } = await sb.auth.signInWithPassword({ email, password: motDePasse });
+    if (souci) {
+      return { message: "Compte créé. Connectez-vous avec votre adresse et votre mot de passe." };
+    }
   }
   redirect("/compte");
 }

@@ -78,6 +78,9 @@ function enMessage(l: Ligne, scores: Record<string, number>): Message {
 
 function messageDErreur(brut: string): string {
   const m = brut.toLowerCase();
+  if (m.includes("failed to fetch") || m.includes("networkerror") || m.includes("load failed")) {
+    return "Le forum est injoignable. Vérifiez votre connexion, puis réessayez.";
+  }
   if (m.includes("trop de messages")) return "Trop de messages en peu de temps. Réessayez dans une minute.";
   if (m.includes("limite horaire")) return "Limite horaire atteinte. Réessayez plus tard.";
   if (m.includes("row-level security") || m.includes("violates row-level")) {
@@ -112,7 +115,6 @@ export function useForum() {
       sb.auth.getUser(),
     ]);
 
-    if (error) setErreur(messageDErreur(error.message));
 
     const scores: Record<string, number> = {};
     for (const s of (scoresBruts ?? []) as { cible: string; score: number }[]) {
@@ -137,7 +139,9 @@ export function useForum() {
       compte,
     });
     setPret(true);
-    setErreur(null);
+    /* Posée en dernier, jamais avant : un `setErreur` en tête de fonction
+       serait effacé par celui-ci quelques lignes plus bas. */
+    setErreur(error ? messageDErreur(error.message) : null);
   }, [sb]);
 
   const charger = useCallback(async () => {
