@@ -164,7 +164,7 @@ interface Onglet {
 /* Les onglets se répartissent de part et d'autre du nom. L'ordre de gauche
    se lit du bord vers le centre, comme à l'écran. */
 const NAV_GAUCHE: Onglet[] = [
-  { label: "Économie", href: "/concept-globe/economie" },
+  { label: "Économie", href: "/economie" },
   { label: "Démographie" },
 ];
 const NAV_DROITE: Onglet[] = [

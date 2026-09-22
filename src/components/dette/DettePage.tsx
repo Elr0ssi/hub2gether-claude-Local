@@ -103,7 +103,7 @@ export function DettePage() {
       {/* ── 01 · Trente secondes ────────────────────────────────────────── */}
       <section id="trente-secondes" className="dp-sect dp-sect-vide">
         <div className="dp-wrap">
-          <p className="dp-num"><span>01</span>La dette française en 30 secondes</p>
+          <h2 className="dp-num"><span>01</span>La dette publique française en 30 secondes</h2>
 
           <Leve className="dp-geant">
             <p className="dp-geant-v">
@@ -181,8 +181,8 @@ export function DettePage() {
       {/* ── 02 · Origine ────────────────────────────────────────────────── */}
       <section id="origine" className="dp-sect">
         <div className="dp-wrap">
-          <p className="dp-num"><span>02</span>Comment se crée la dette</p>
-          <h2 className="dp-h2">Tout commence par une différence.</h2>
+          <h2 className="dp-num"><span>02</span>Comment se crée la dette publique : déficit, emprunt, intérêts</h2>
+          <h3 className="dp-h2">Tout commence par une différence.</h3>
           <p className="dp-reponse">
             Lorsqu&apos;au cours d&apos;une année les administrations publiques dépensent davantage
             qu&apos;elles ne perçoivent de recettes, elles enregistrent un déficit. Ce déficit crée
@@ -288,8 +288,8 @@ export function DettePage() {
       {/* ── 03 · Qui doit ───────────────────────────────────────────────── */}
       <section id="qui-doit" className="dp-sect">
         <div className="dp-wrap">
-          <p className="dp-num"><span>03</span>Qui doit cet argent</p>
-          <h2 className="dp-h2">Ce n&apos;est pas seulement la dette du gouvernement.</h2>
+          <h2 className="dp-num"><span>03</span>Qui doit cet argent : État, Sécurité sociale, collectivités</h2>
+          <h3 className="dp-h2">Ce n&apos;est pas seulement la dette du gouvernement.</h3>
           <p className="dp-reponse">
             Le chiffre correspond à la dette publique au sens de Maastricht : celle de
             l&apos;ensemble des administrations publiques françaises, après consolidation des
@@ -318,8 +318,8 @@ export function DettePage() {
       {/* ── 04 · Détenteurs ─────────────────────────────────────────────── */}
       <section id="detenteurs" className="dp-sect dp-sect-nuit">
         <div className="dp-wrap">
-          <p className="dp-num"><span>04</span>Qui possède la dette</p>
-          <h2 className="dp-h2">Qui a réellement prêté cet argent à la France ?</h2>
+          <h2 className="dp-num"><span>04</span>Qui détient la dette française : résidents et non-résidents</h2>
+          <h3 className="dp-h2">Qui a réellement prêté cet argent à la France ?</h3>
           <ul className="dp-mots">
             {["Banques", "Assurances", "Épargnants", "Fonds", "Banque centrale", "Investisseurs étrangers"].map(
               (m, i) => (
@@ -415,7 +415,7 @@ export function DettePage() {
       {/* ── 05 · Coût ───────────────────────────────────────────────────── */}
       <section id="cout" className="dp-sect">
         <div className="dp-wrap">
-          <p className="dp-num"><span>05</span>Ce que la dette coûte</p>
+          <h2 className="dp-num"><span>05</span>Ce que la dette coûte : la charge d'intérêts</h2>
           <Leve className="dp-egal">
             <p className="dp-egal-a">
               Dette
@@ -545,8 +545,8 @@ export function DettePage() {
       {/* ── 06 · Remboursement ──────────────────────────────────────────── */}
       <section id="remboursement" className="dp-sect dp-sect-nuit">
         <div className="dp-wrap">
-          <p className="dp-num"><span>06</span>Comment elle se rembourse</p>
-          <h2 className="dp-h2">Non. Pas en une seule fois.</h2>
+          <h2 className="dp-num"><span>06</span>Comment la dette se rembourse : maturité et refinancement</h2>
+          <h3 className="dp-h2">Non. Pas en une seule fois.</h3>
           <p className="dp-reponse">
             La dette publique n&apos;est pas un prêt géant possédant une date unique de
             remboursement. Lorsqu&apos;une obligation arrive à échéance, son capital doit être
@@ -586,10 +586,10 @@ export function DettePage() {
       {/* ── 07 · Avenir ─────────────────────────────────────────────────── */}
       <section id="avenir" className="dp-sect">
         <div className="dp-wrap">
-          <p className="dp-num"><span>07</span>Ce que le niveau change</p>
-          <h2 className="dp-h2">
+          <h2 className="dp-num"><span>07</span>Dette sur PIB : ce que le niveau change vraiment</h2>
+          <h3 className="dp-h2">
             Une dette publique n&apos;est ni gratuite, ni automatiquement catastrophique.
-          </h2>
+          </h3>
           <p className="dp-reponse">
             Le chiffre brut ne suffit pas à déterminer si une dette est soutenable. Ce qui compte
             est la capacité d&apos;un État à continuer de financer ses dépenses, payer ses intérêts
@@ -657,7 +657,7 @@ export function DettePage() {
       {/* ── Comparaison européenne ──────────────────────────────────────── */}
       <section className="dp-sect dp-sect-nuit">
         <div className="dp-wrap">
-          <h2 className="dp-h2">{nb(ratioDernier.valeur, 1)} %. Est-ce beaucoup ?</h2>
+          <h2 className="dp-h2">Dette publique française et comparaison européenne : {nb(ratioDernier.valeur, 1)} %, est-ce beaucoup ?</h2>
           <p className="dp-reponse">
             Un ratio n&apos;a de sens que lorsqu&apos;on possède un point de comparaison. Fin 2025,
             la France faisait partie des cinq pays de l&apos;Union européenne dont la dette publique
@@ -709,7 +709,7 @@ export function DettePage() {
       {/* ── Est-ce que j'ai compris ? ───────────────────────────────────── */}
       <section className="dp-sect">
         <div className="dp-wrap">
-          <h2 className="dp-h2">Est-ce que j&apos;ai compris ?</h2>
+          <h2 className="dp-h2">Testez votre compréhension de la dette publique</h2>
           <Quiz />
         </div>
       </section>
@@ -717,7 +717,7 @@ export function DettePage() {
       {/* ── FAQ ─────────────────────────────────────────────────────────── */}
       <section id="questions" className="dp-sect dp-sect-nuit">
         <div className="dp-wrap">
-          <h2 className="dp-h2">Questions fréquentes</h2>
+          <h2 className="dp-h2">Questions fréquentes sur la dette publique française</h2>
           <dl className="dp-faq">
             {FAQ.map((f) => (
               <div key={f.q}>

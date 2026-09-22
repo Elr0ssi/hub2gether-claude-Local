@@ -30,8 +30,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   };
 
+  /* Les pages de rubrique et les pages de confiance. Elles n'étaient pas
+     déclarées : deux d'entre elles n'existaient même pas, alors que le fil
+     d'Ariane de l'article dette les annonçait. */
+  const rubriques = [
+    { url: `${siteUrl}/economie`, priority: 0.95, changeFrequency: "weekly" as const },
+    { url: `${siteUrl}/france`, priority: 0.8, changeFrequency: "monthly" as const },
+    { url: `${siteUrl}/france/economie`, priority: 0.85, changeFrequency: "monthly" as const },
+    { url: `${siteUrl}/methodologie-donnees`, priority: 0.6, changeFrequency: "monthly" as const },
+    { url: `${siteUrl}/a-propos`, priority: 0.6, changeFrequency: "monthly" as const },
+  ].map((r) => ({ ...r, lastModified: new Date("2026-09-22") }));
+
   return [
     dette,
+    ...rubriques,
     {
       url: siteUrl,
       lastModified: LAST_MODIFIED_STATIC,

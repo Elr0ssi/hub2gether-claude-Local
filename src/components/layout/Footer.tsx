@@ -61,10 +61,26 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
+                  href="/a-propos"
+                  className="text-small hover:text-[var(--ink)] transition-colors"
+                >
+                  Qui nous sommes
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/methodologie-donnees"
+                  className="text-small hover:text-[var(--ink)] transition-colors"
+                >
+                  Méthodologie de la base
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/methodology"
                   className="text-small hover:text-[var(--ink)] transition-colors"
                 >
-                  Méthodologie
+                  Méthodologie éditoriale
                 </Link>
               </li>
               <li>
