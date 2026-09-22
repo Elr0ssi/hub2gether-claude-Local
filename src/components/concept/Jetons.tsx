@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 /* ═══════════════════════════════════════════════════════════════════════════
    LES TUILES DE L'OUVERTURE
 
@@ -205,9 +207,192 @@ export function Dessin({ f }: { f: Forme }) {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE LANCER
+
+   On attrape une tuile, on la traîne, on la lâche : elle part avec la
+   vitesse qu'on lui a donnée et s'arrête d'elle-même. Elle rebondit sur les
+   bords de l'ouverture plutôt que d'en sortir.
+
+   La boucle ne tourne que tant que quelque chose bouge. Au repos elle
+   s'arrête, et la page ne paie rien — ce qui compte sur celle-ci, où le
+   globe prend déjà le processeur.
+
+   Les positions de repos sont mesurées une fois, au montage et à chaque
+   redimensionnement : lire la boîte d'une tuile à chaque image obligerait
+   le navigateur à recalculer la mise en page vingt et une fois par image.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** Ce qu'il reste de vitesse d'une image à la suivante. */
+const FROTTEMENT = 0.94;
+/** En deçà, on considère que c'est arrêté. */
+const REPOS = 0.06;
+/** Ce que rend un bord quand on tape dedans. */
+const REBOND = 0.55;
+
+function useLancer(champ: React.RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    const zone = champ.current;
+    if (!zone) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const tuiles = Array.from(zone.querySelectorAll<HTMLElement>(".cg-tuile"));
+    const etats = tuiles.map(() => ({ x: 0, y: 0, vx: 0, vy: 0, cx: 0, cy: 0, r: 0 }));
+    let boucle = 0;
+    let largeur = 0;
+    let hauteur = 0;
+
+    /* Le centre de repos et le rayon, relus seulement quand la fenêtre
+       change de taille. */
+    const mesure = () => {
+      const b = zone.getBoundingClientRect();
+      largeur = b.width;
+      hauteur = b.height;
+      tuiles.forEach((t, i) => {
+        const st = getComputedStyle(t);
+        const k = parseFloat(st.getPropertyValue("--k")) || 40;
+        etats[i].cx = (parseFloat(st.getPropertyValue("--x")) / 100) * largeur;
+        etats[i].cy = (parseFloat(st.getPropertyValue("--y")) / 100) * hauteur;
+        etats[i].r = k / 2;
+      });
+    };
+
+    const pose = (i: number) => {
+      tuiles[i].style.setProperty("--fx", `${etats[i].x.toFixed(1)}px`);
+      tuiles[i].style.setProperty("--fy", `${etats[i].y.toFixed(1)}px`);
+    };
+
+    let tenue: { i: number; dx: number; dy: number; px: number; py: number; t: number } | null = null;
+
+    const tourne = () => {
+      let vivant = false;
+      for (let i = 0; i < etats.length; i++) {
+        if (tenue?.i === i) {
+          vivant = true;
+          continue;
+        }
+        const e = etats[i];
+        if (Math.abs(e.vx) < REPOS && Math.abs(e.vy) < REPOS) {
+          e.vx = 0;
+          e.vy = 0;
+          continue;
+        }
+        e.x += e.vx;
+        e.y += e.vy;
+        e.vx *= FROTTEMENT;
+        e.vy *= FROTTEMENT;
+
+        /* Les bords. On raisonne sur le centre de la tuile, jamais sur sa
+           boîte : celle-ci porte aussi la dérive et l'écart au défilement,
+           qui ne regardent pas le lancer. */
+        const gauche = -e.cx + e.r;
+        const droite = largeur - e.cx - e.r;
+        const haut = -e.cy + e.r;
+        const bas = hauteur - e.cy - e.r;
+        if (e.x < gauche) {
+          e.x = gauche;
+          e.vx = Math.abs(e.vx) * REBOND;
+        } else if (e.x > droite) {
+          e.x = droite;
+          e.vx = -Math.abs(e.vx) * REBOND;
+        }
+        if (e.y < haut) {
+          e.y = haut;
+          e.vy = Math.abs(e.vy) * REBOND;
+        } else if (e.y > bas) {
+          e.y = bas;
+          e.vy = -Math.abs(e.vy) * REBOND;
+        }
+
+        pose(i);
+        vivant = true;
+      }
+      boucle = vivant ? requestAnimationFrame(tourne) : 0;
+    };
+    const relance = () => {
+      if (!boucle) boucle = requestAnimationFrame(tourne);
+    };
+
+    const prend = (ev: PointerEvent) => {
+      const t = (ev.target as HTMLElement).closest<HTMLElement>(".cg-tuile");
+      if (!t) return;
+      const i = tuiles.indexOf(t);
+      if (i < 0) return;
+      ev.preventDefault();
+      /* La capture peut être refusée — un pointeur déjà relâché, un événement
+         qui ne vient pas d'un vrai périphérique. Ce n'est pas une raison de
+         renoncer au glissement. */
+      try {
+        t.setPointerCapture(ev.pointerId);
+      } catch {
+        /* On suivra le pointeur sans capture. */
+      }
+      t.classList.add("cg-tuile-tenue");
+      etats[i].vx = 0;
+      etats[i].vy = 0;
+      tenue = { i, dx: ev.clientX - etats[i].x, dy: ev.clientY - etats[i].y, px: ev.clientX, py: ev.clientY, t: ev.timeStamp };
+      relance();
+    };
+
+    const bouge = (ev: PointerEvent) => {
+      if (!tenue) return;
+      const e = etats[tenue.i];
+      e.x = ev.clientX - tenue.dx;
+      e.y = ev.clientY - tenue.dy;
+      /* La vitesse au moment du lâcher, ramenée à une image de seize
+         millisecondes : sans cela un geste lent sur un écran rapide
+         paraîtrait aussi vif qu'un geste sec. */
+      const dt = Math.max(1, ev.timeStamp - tenue.t);
+      const g = 1.4;
+      e.vx = Math.max(-48, Math.min(48, ((ev.clientX - tenue.px) / dt) * 16.7 * g));
+      e.vy = Math.max(-48, Math.min(48, ((ev.clientY - tenue.py) / dt) * 16.7 * g));
+      tenue.px = ev.clientX;
+      tenue.py = ev.clientY;
+      tenue.t = ev.timeStamp;
+      pose(tenue.i);
+    };
+
+    const lache = (ev: PointerEvent) => {
+      if (!tenue) return;
+      const t = tuiles[tenue.i];
+      t.classList.remove("cg-tuile-tenue");
+      try {
+        if (t.hasPointerCapture(ev.pointerId)) t.releasePointerCapture(ev.pointerId);
+      } catch {
+        /* Rien à relâcher. */
+      }
+      /* Un doigt posé puis relevé sans bouger ne lance rien : la dernière
+         vitesse vue peut dater, on l'efface si le geste s'est arrêté. */
+      if (ev.timeStamp - tenue.t > 160) {
+        etats[tenue.i].vx = 0;
+        etats[tenue.i].vy = 0;
+      }
+      tenue = null;
+      relance();
+    };
+
+    mesure();
+    window.addEventListener("resize", mesure);
+    zone.addEventListener("pointerdown", prend);
+    zone.addEventListener("pointermove", bouge);
+    zone.addEventListener("pointerup", lache);
+    zone.addEventListener("pointercancel", lache);
+    return () => {
+      if (boucle) cancelAnimationFrame(boucle);
+      window.removeEventListener("resize", mesure);
+      zone.removeEventListener("pointerdown", prend);
+      zone.removeEventListener("pointermove", bouge);
+      zone.removeEventListener("pointerup", lache);
+      zone.removeEventListener("pointercancel", lache);
+    };
+  }, [champ]);
+}
+
 export function Jetons() {
+  const champ = useRef<HTMLDivElement>(null);
+  useLancer(champ);
   return (
-    <div className="cg-tuiles" aria-hidden="true">
+    <div className="cg-tuiles" ref={champ} aria-hidden="true">
       {TUILES.map((j, i) => (
         <span
           key={`${j.f ?? j.t}-${i}`}

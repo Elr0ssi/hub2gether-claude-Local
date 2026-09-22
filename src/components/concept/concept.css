@@ -2857,15 +2857,19 @@ body:has(.cg) { background: #05080c; }
   inherits: false;
   initial-value: 0deg;
 }
+/* Les arrêts nets d'un dégradé ne sont pas adoucis : le navigateur prend
+   une couleur par pixel, et sur un cercle de deux mille huit cents pixels
+   de large cela donne un escalier. On laisse donc un demi-pixel de rampe de
+   chaque côté du trait, ce qui rend le lissage que le dégradé ne fait pas,
+   et un voile de flou rattrape le reste. */
 .cg-arc-trait {
   background: radial-gradient(
     circle at 50% 50%,
-    transparent 0 calc(50% - 1.2px),
-    rgba(255, 233, 204, 0.88) calc(50% - 1.2px) 50%,
-    transparent 50%
+    transparent 0 calc(50% - 1.75px),
+    rgba(255, 233, 204, 0.88) calc(50% - 1.15px) calc(50% - 0.4px),
+    transparent calc(50% + 0.2px)
   );
-  opacity: 0.35;
-  transform: scale(0.985);
+  filter: blur(0.4px);
   --a: 0deg;
   -webkit-mask: conic-gradient(from 268deg, #000 0deg, #000 var(--a), transparent var(--a));
   mask: conic-gradient(from 268deg, #000 0deg, #000 var(--a), transparent var(--a));
@@ -2890,7 +2894,6 @@ body:has(.cg) { background: #05080c; }
   );
   filter: blur(13px);
   opacity: calc(0.2 + (1 - var(--p, 0)) * 0.8);
-  transform: scale(0.99);
   /* La nappe n'arrive qu'une fois le trait bouclé : le limbe s'embrase
      d'un coup, au lieu d'accompagner le tracé. */
 }
@@ -2953,8 +2956,9 @@ body:has(.cg) { background: #05080c; }
    même variable que les tuiles, donc revenir par le bas le rallume sans
    rien rejouer. */
 .cg-arc-trait { opacity: calc(0.3 + (1 - var(--p, 0)) * 0.7); }
-.cg-eco-haut[data-vu="1"] .cg-arc-trait { transform: scale(1); }
-.cg-eco-haut[data-vu="1"] .cg-arc-nappe { transform: scale(1.01); }
+/* Aucune mise à l'échelle sur le trait ni sur l'éclat : elle décalait le
+   cercle de quinze pixels, et le point du jour, lui posé au rayon nominal,
+   se retrouvait à flotter au-dessus de la ligne. */
 @media (prefers-reduced-motion: reduce) {
   .cg-arc-trait,
   .cg-arc-nappe { transition: none; animation: none; }
@@ -3325,23 +3329,42 @@ body:has(.cg) { background: #05080c; }
   height: var(--k);
   margin: calc(var(--k) / -2) 0 0 calc(var(--k) / -2);
   pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  /* Le lancer vit dans `translate`, pas dans `transform` : les quatre autres
+     mouvements se partagent déjà celui-ci, et une propriété séparée évite
+     une sixième couche. */
+  translate: var(--fx, 0) var(--fy, 0);
+}
+.cg-tuile-tenue { cursor: grabbing; z-index: 3; }
+.cg-tuile-tenue .cg-tuile-i {
+  transform: scale(1.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 24px 46px rgba(0, 0, 0, 0.7),
+    0 0 36px color-mix(in srgb, var(--c, #9ec7d8) 40%, transparent);
 }
 
 /* 2. L'écart au défilement. Chaque tuile fuit vers son bord — c'est le signe
       de `--dx` qui le dit — et d'autant plus vite qu'elle est au premier
       plan. Le champ s'ouvre au lieu de glisser en bloc. */
+/* Le départ suit le même ordre que l'arrivée : chaque tuile a sa propre
+   course, décalée par son rang. Une progression locale, taillée dans la
+   progression d'ensemble, suffit — le champ se vide alors petit à petit au
+   lieu de s'effacer d'un bloc, et se remplit de même en remontant. */
 .cg-tuile-p2 {
   display: block;
   width: 100%;
   height: 100%;
+  --pl: clamp(0, calc((var(--p) - var(--o) * 0.021) * 1.9), 1);
   transform:
     translate3d(
-      calc(var(--dx) * var(--p) * var(--z) * 1px),
-      calc(var(--p) * var(--z) * -76px),
+      calc(var(--dx) * var(--pl) * var(--z) * 1px),
+      calc(var(--pl) * var(--z) * -76px),
       0
     )
-    scale(calc(1 - var(--p) * 0.22));
-  opacity: calc(1 - var(--p) * 1.05);
+    scale(calc(1 - var(--pl) * 0.22));
+  opacity: calc(1 - var(--pl) * 1.05);
 }
 
 /* 3. L'arrivée. Chaque tuile se pose à son tour, dans un ordre dispersé :
