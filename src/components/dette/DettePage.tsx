@@ -11,6 +11,8 @@ import {
 } from "@/data/articles/detteFrancaise";
 import { Compteur, Leve, Precision, Progression, Source } from "./pieces";
 import { Etiquette } from "./finances";
+import { EnTete } from "@/components/concept/pieces";
+import "@/components/concept/concept.css";
 import {
   AnneeReelle,
   BruteNette,
@@ -64,29 +66,26 @@ export function DettePage() {
     <div className="dp">
       <Progression />
 
-      {/* Une barre minimale, propre à l'article : le nom ramène au prototype.
-          On ne reprend pas l'en-tête du concept ici — il tient ses couleurs
-          d'un conteneur que cette page n'a pas, et l'importer pour un lien
-          coûterait une feuille de styles entière. */}
-      <div className="dp-barre-h">
-        <a href="/concept-globe" className="dp-retour">
-          <span className="dp-retour-m" aria-hidden="true" />
-          Visualize
-        </a>
-        <span className="dp-barre-h-r">Mode Lecture</span>
+      {/* Le menu du site, celui de toutes les autres pages. Il tient ses
+          couleurs du conteneur `.cg` : on le lui donne ici, en neutralisant le
+          voile que ce conteneur pose d'ordinaire sur la page. */}
+      <div className="cg dp-menu">
+        <EnTete />
       </div>
 
       {/* ── Ouverture ───────────────────────────────────────────────────── */}
       <header className="dp-ouv">
         <div className="dp-wrap">
           <p className="dp-label">Économie · France</p>
+          {/* Un seul titre. Le sous-titre descriptif et la phrase d'accroche
+              faisaient deux fois la même annonce, l'une petite au-dessus de
+              l'autre : ils tiennent maintenant dans le même h1, le premier
+              comme surtitre. */}
           <h1 className="dp-h1">
-            Dette publique française : comprendre les {nb(detteDerniere.valeur, 1)}{" "}milliards d&apos;euros de dette
+            <span className="dp-h1-s">Dette publique française</span>
+            La France doit {nb(detteDerniere.valeur, 1)}{" "}milliards d&apos;euros.
+            <span className="dp-h1-q"> Mais qu&apos;est-ce que cela veut vraiment dire ?</span>
           </h1>
-          <p className="dp-accroche">
-            La France doit {nb(detteDerniere.valeur, 1)}{" "}milliards d&apos;euros. Mais
-            qu&apos;est-ce que cela veut vraiment dire ?
-          </p>
           <p className="dp-chapo">
             La dette publique française représente aujourd&apos;hui {nb(ratioDernier.valeur, 1)} %
             du PIB. Derrière ce chiffre se cachent des déficits accumulés, des millions de titres
@@ -104,7 +103,7 @@ export function DettePage() {
       {/* ── 01 · Trente secondes ────────────────────────────────────────── */}
       <section id="trente-secondes" className="dp-sect dp-sect-vide">
         <div className="dp-wrap">
-          <p className="dp-num">01 — La dette française en 30 secondes</p>
+          <p className="dp-num"><span>01</span>La dette française en 30 secondes</p>
 
           <Leve className="dp-geant">
             <p className="dp-geant-v">
@@ -175,14 +174,14 @@ export function DettePage() {
             </p>
           </Leve>
 
-          <p className="dp-vers-t">↓ Maintenant, décortiquons ces {nb(detteDerniere.valeur, 1)}{" "}milliards.</p>
+          <p className="dp-vers-t">↓ Décortiquons-les.</p>
         </div>
       </section>
 
       {/* ── 02 · Origine ────────────────────────────────────────────────── */}
       <section id="origine" className="dp-sect">
         <div className="dp-wrap">
-          <p className="dp-num">02 — Comment a-t-on créé {nb(detteDerniere.valeur, 1)}{" "}milliards de dette ?</p>
+          <p className="dp-num"><span>02</span>Comment se crée la dette</p>
           <h2 className="dp-h2">Tout commence par une différence.</h2>
           <p className="dp-reponse">
             Lorsqu&apos;au cours d&apos;une année les administrations publiques dépensent davantage
@@ -197,7 +196,7 @@ export function DettePage() {
               <h3>Un exemple volontairement simple</h3>
               <p>
                 Recettes : 100. Dépenses : 105. Déficit : 5. Les cinq manquants doivent être
-                financés — et c&apos;est ce financement qui devient de la dette.
+                financés, et c&apos;est ce financement qui devient de la dette.
               </p>
               <p className="dp-note">Exemple pédagogique simplifié.</p>
             </div>
@@ -206,18 +205,8 @@ export function DettePage() {
 
           {/* La France réelle derrière l'équation : les mêmes barres, mais
               avec les montants de 2025. */}
-          <h3 className="dp-h3">Avant la dette, il y a un déséquilibre annuel.</h3>
-          <p className="dp-reponse">
-            La dette de {nb(detteDerniere.valeur, 1)} milliards d&apos;euros est un stock accumulé
-            dans le temps. Pour comprendre pourquoi ce stock évolue, il faut d&apos;abord regarder
-            ce qui se passe chaque année dans les finances publiques.
-          </p>
+          <h3 className="dp-h3">La même équation, en vrai</h3>
           <AnneeReelle />
-          <p className="dp-texte">
-            En 2025, l&apos;ensemble des administrations publiques françaises a donc dépensé environ
-            152,5 milliards d&apos;euros de plus qu&apos;il n&apos;a reçu de recettes. Cet écart
-            constitue le déficit public de l&apos;année.
-          </p>
           <p className="dp-garde">
             Le déficit annuel et l&apos;augmentation de la dette ne sont pas exactement la même
             chose. La variation de la dette dépend également des mouvements de trésorerie, des
@@ -292,21 +281,19 @@ export function DettePage() {
             pourcentage du PIB si l&apos;économie nominale progresse plus rapidement.
           </Leve>
 
-          <p className="dp-vers-t">
-            ↓ Mais quand on dit « la France est endettée », qui est réellement endetté ?
-          </p>
+
         </div>
       </section>
 
       {/* ── 03 · Qui doit ───────────────────────────────────────────────── */}
       <section id="qui-doit" className="dp-sect">
         <div className="dp-wrap">
-          <p className="dp-num">03 — Qui doit les {nb(detteDerniere.valeur, 1)}{" "}milliards ?</p>
+          <p className="dp-num"><span>03</span>Qui doit cet argent</p>
           <h2 className="dp-h2">Ce n&apos;est pas seulement la dette du gouvernement.</h2>
           <p className="dp-reponse">
-            Le chiffre de {nb(detteDerniere.valeur, 1)}{" "}milliards correspond à la dette publique au
-            sens de Maastricht : celle de l&apos;ensemble des administrations publiques françaises,
-            après consolidation des dettes qu&apos;elles peuvent avoir entre elles.
+            Le chiffre correspond à la dette publique au sens de Maastricht : celle de
+            l&apos;ensemble des administrations publiques françaises, après consolidation des
+            dettes qu&apos;elles peuvent avoir entre elles.
           </p>
           <CompositionDette />
           <BruteNette />
@@ -324,17 +311,15 @@ export function DettePage() {
             <Consolidation />
           </div>
 
-          <p className="dp-vers-t">↓ D&apos;accord. Mais à qui doivent-ils cet argent ?</p>
+
         </div>
       </section>
 
       {/* ── 04 · Détenteurs ─────────────────────────────────────────────── */}
       <section id="detenteurs" className="dp-sect dp-sect-nuit">
         <div className="dp-wrap">
-          <p className="dp-num">04 — Qui possède la dette française ?</p>
-          <h2 className="dp-h2">
-            Qui a réellement prêté {nb(detteDerniere.valeur, 1)}{" "}milliards à la France ?
-          </h2>
+          <p className="dp-num"><span>04</span>Qui possède la dette</p>
+          <h2 className="dp-h2">Qui a réellement prêté cet argent à la France ?</h2>
           <ul className="dp-mots">
             {["Banques", "Assurances", "Épargnants", "Fonds", "Banque centrale", "Investisseurs étrangers"].map(
               (m, i) => (
@@ -348,7 +333,7 @@ export function DettePage() {
 
           <p className="dp-reponse">
             Pour financer ses besoins, l&apos;État français émet principalement des titres
-            financiers. Les plus connus sont les OAT — obligations assimilables du Trésor — pour le
+            financiers. Les plus connus sont les OAT, obligations assimilables du Trésor, pour le
             moyen et le long terme, et les BTF pour le court terme.
           </p>
 
@@ -430,7 +415,7 @@ export function DettePage() {
       {/* ── 05 · Coût ───────────────────────────────────────────────────── */}
       <section id="cout" className="dp-sect">
         <div className="dp-wrap">
-          <p className="dp-num">05 — Combien la dette coûte-t-elle ?</p>
+          <p className="dp-num"><span>05</span>Ce que la dette coûte</p>
           <Leve className="dp-egal">
             <p className="dp-egal-a">
               Dette
@@ -553,16 +538,14 @@ export function DettePage() {
             leur place.
           </p>
 
-          <p className="dp-vers-t">
-            ↓ Alors comment rembourse-t-on {nb(detteDerniere.valeur, 1)}{" "}milliards ?
-          </p>
+          <p className="dp-vers-t">↓ Alors comment rembourse-t-on tout cela ?</p>
         </div>
       </section>
 
       {/* ── 06 · Remboursement ──────────────────────────────────────────── */}
       <section id="remboursement" className="dp-sect dp-sect-nuit">
         <div className="dp-wrap">
-          <p className="dp-num">06 — La France va-t-elle devoir rembourser {nb(detteDerniere.valeur, 1)}{" "}milliards ?</p>
+          <p className="dp-num"><span>06</span>Comment elle se rembourse</p>
           <h2 className="dp-h2">Non. Pas en une seule fois.</h2>
           <p className="dp-reponse">
             La dette publique n&apos;est pas un prêt géant possédant une date unique de
@@ -596,16 +579,14 @@ export function DettePage() {
 
           <Tuyaux />
 
-          <p className="dp-vers-t">
-            ↓ Si la dette peut être refinancée, pourquoi son niveau est-il important ?
-          </p>
+          <p className="dp-vers-t">↓ Si elle se refinance, pourquoi son niveau compte-t-il ?</p>
         </div>
       </section>
 
       {/* ── 07 · Avenir ─────────────────────────────────────────────────── */}
       <section id="avenir" className="dp-sect">
         <div className="dp-wrap">
-          <p className="dp-num">07 — Ce que {nb(detteDerniere.valeur, 1)}{" "}milliards changent réellement</p>
+          <p className="dp-num"><span>07</span>Ce que le niveau change</p>
           <h2 className="dp-h2">
             Une dette publique n&apos;est ni gratuite, ni automatiquement catastrophique.
           </h2>
@@ -683,7 +664,7 @@ export function DettePage() {
             dépassait 100 % du PIB.
           </p>
           <p className="dp-garde">
-            La comparaison porte sur une même période pour tout le monde — fin 2025 — afin de ne pas
+            La comparaison porte sur une même période pour tout le monde, fin 2025, afin de ne pas
             mêler le premier trimestre 2026 français aux données 2025 des autres pays.
           </p>
           <Comparaison />

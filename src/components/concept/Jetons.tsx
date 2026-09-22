@@ -1,28 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 /* ═══════════════════════════════════════════════════════════════════════════
    LES JETONS DE L'OUVERTURE
 
    Des pièces, des chandeliers, un billet, un jeton de chaîne : les signes de
    l'économie, dessinés au trait, jamais des images rapportées.
 
-   Leur trajet tient en un seul état. Au chargement ils sont rassemblés en bas
-   au centre et se déploient ; quand le globe approche ils s'y rassemblent de
-   nouveau, et ils se redéploient si l'on remonte. Entre les deux ils
-   dérivent, chacun à son rythme.
+   Ils sont là, et ils dérivent. Pas d'arrivée, pas de départ : les faire
+   converger au défilement attirait l'œil vers le bas au moment précis où l'on
+   commence à lire, et le mouvement ne servait plus le titre, il lui prenait
+   l'attention. Reste la dérive, continue, chacun à son rythme, et le relief
+   au survol.
 
-   Rien de tout cela n'est calculé image par image. Chaque jeton porte sa
-   position en pourcentage de l'ouverture, qui fait exactement une largeur et
-   une hauteur d'écran : le vecteur qui le ramène au point de rassemblement
-   s'écrit donc en vw et en vh, et c'est une transition CSS qui l'y emmène.
+   Rien n'est calculé image par image : la dérive est une animation CSS, le
+   survol une transition.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 type Forme = "piece" | "chandelier" | "billet" | "chaine" | "part" | "taux";
 
 interface Jeton {
   f: Forme;
+  /** La teinte du jeton. Chaque famille de signe a la sienne. */
+  c: string;
   /** Position dans l'ouverture, en pourcentage de sa largeur et de sa hauteur. */
   x: number;
   y: number;
@@ -36,20 +35,20 @@ interface Jeton {
 
 /* Les jetons évitent le couloir central, où se lit le titre. */
 const JETONS: Jeton[] = [
-  { f: "piece", x: 9, y: 26, t: 54, d: 11, s: "€" },
-  { f: "chandelier", x: 17, y: 58, t: 46, d: 14 },
-  { f: "piece", x: 6, y: 72, t: 38, d: 9, s: "$" },
-  { f: "billet", x: 22, y: 33, t: 50, d: 13 },
-  { f: "chaine", x: 13, y: 45, t: 42, d: 16 },
-  { f: "taux", x: 27, y: 74, t: 36, d: 10 },
-  { f: "part", x: 31, y: 18, t: 40, d: 15 },
-  { f: "piece", x: 90, y: 30, t: 52, d: 12, s: "¥" },
-  { f: "chandelier", x: 83, y: 64, t: 44, d: 10 },
-  { f: "piece", x: 94, y: 70, t: 36, d: 15, s: "£" },
-  { f: "billet", x: 77, y: 24, t: 46, d: 13 },
-  { f: "chaine", x: 87, y: 47, t: 40, d: 9 },
-  { f: "part", x: 70, y: 76, t: 38, d: 14 },
-  { f: "taux", x: 69, y: 15, t: 34, d: 11 },
+  { f: "piece", c: "#e8b774", x: 9, y: 26, t: 54, d: 11, s: "€" },
+  { f: "chandelier", c: "#5fe0a2", x: 17, y: 58, t: 46, d: 14 },
+  { f: "piece", c: "#e8b774", x: 6, y: 72, t: 38, d: 9, s: "$" },
+  { f: "billet", c: "#7cc0ff", x: 22, y: 33, t: 50, d: 13 },
+  { f: "chaine", c: "#b79cff", x: 13, y: 45, t: 42, d: 16 },
+  { f: "taux", c: "#ff9e8a", x: 27, y: 74, t: 36, d: 10 },
+  { f: "part", c: "#9ccbff", x: 31, y: 18, t: 40, d: 15 },
+  { f: "piece", c: "#e8b774", x: 90, y: 30, t: 52, d: 12, s: "¥" },
+  { f: "chandelier", c: "#5fe0a2", x: 83, y: 64, t: 44, d: 10 },
+  { f: "piece", c: "#e8b774", x: 94, y: 70, t: 36, d: 15, s: "£" },
+  { f: "billet", c: "#7cc0ff", x: 77, y: 24, t: 46, d: 13 },
+  { f: "chaine", c: "#b79cff", x: 87, y: 47, t: 40, d: 9 },
+  { f: "part", c: "#9ccbff", x: 70, y: 76, t: 38, d: 14 },
+  { f: "taux", c: "#ff9e8a", x: 69, y: 15, t: 34, d: 11 },
 ];
 
 function Dessin({ f, s }: { f: Forme; s?: string }) {
@@ -113,17 +112,9 @@ function Dessin({ f, s }: { f: Forme; s?: string }) {
   }
 }
 
-export function Jetons({ rassembles }: { rassembles: boolean }) {
-  /* Au premier rendu ils sont rassemblés : le déploiement est alors une
-     transition et non une animation de plus à écrire. */
-  const [pose, setPose] = useState(false);
-  useEffect(() => {
-    const t = requestAnimationFrame(() => setPose(true));
-    return () => cancelAnimationFrame(t);
-  }, []);
-
+export function Jetons() {
   return (
-    <div className="cg-jetons" data-groupes={!pose || rassembles ? "1" : "0"} aria-hidden="true">
+    <div className="cg-jetons" aria-hidden="true">
       {JETONS.map((j, i) => (
         <span
           key={`${j.f}-${i}`}
@@ -135,6 +126,7 @@ export function Jetons({ rassembles }: { rassembles: boolean }) {
               "--t": `${j.t}px`,
               "--d": `${j.d}s`,
               "--i": i,
+              "--c": j.c,
             } as React.CSSProperties
           }
         >

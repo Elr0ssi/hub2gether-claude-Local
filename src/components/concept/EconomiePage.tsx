@@ -714,7 +714,7 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
           globe. */}
       <section className="cg-section cg-eco-haut" data-vu={haut.vu ? "1" : "0"}>
         <div className="cg-eco-lueur" aria-hidden="true" />
-        <Jetons rassembles={haut.vu} />
+        <Jetons />
         <div className="cg-wrap">
           <div className="cg-eco-ouv">
             <p className="cg-eyebrow">Économie</p>

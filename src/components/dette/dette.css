@@ -64,11 +64,14 @@ body:has(.dp) { background: #04070d; }
   background: linear-gradient(90deg, var(--vif), var(--vif-clair));
 }
 
+/* Le sommaire est posé par rapport à la colonne de lecture, pas par rapport
+   à l'écran : il se tient toujours à vingt-huit pixels de son bord gauche, et
+   ne peut donc jamais passer par-dessus le texte. */
 .dp-sommaire {
   position: fixed;
-  left: clamp(12px, 2vw, 28px);
+  left: calc(50% - 590px - 28px);
   top: 50%;
-  transform: translateY(-50%);
+  transform: translate(-100%, -50%);
   z-index: 40;
 }
 .dp-sommaire ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
@@ -92,15 +95,16 @@ body:has(.dp) { background: #04070d; }
 .dp-sommaire a:hover { color: var(--encre-2); }
 .dp-sommaire a.dp-sommaire-on { color: var(--vif-clair); }
 .dp-sommaire a.dp-sommaire-on .dp-sommaire-p { width: 30px; background: var(--vif); }
-/* Sous 1180 px la colonne n'a plus de marge où loger le sommaire : seule la
-   barre de progression reste. */
-@media (max-width: 1180px) { .dp-sommaire { display: none; } }
+/* Il faut 1 180 px de colonne plus deux fois la largeur du sommaire et sa
+   gouttière : en deçà, il n'y a pas la place, et seule la barre de
+   progression reste. */
+@media (max-width: 1500px) { .dp-sommaire { display: none; } }
 
 /* ── Ouverture ─────────────────────────────────────────────────────────── */
 
 .dp-ouv {
   position: relative;
-  padding: clamp(110px, 16vh, 190px) 0 clamp(70px, 10vh, 120px);
+  padding: clamp(130px, 18vh, 210px) 0 clamp(80px, 11vh, 130px);
   overflow: hidden;
 }
 .dp-ouv::before {
@@ -121,24 +125,25 @@ body:has(.dp) { background: #04070d; }
   text-transform: uppercase;
   color: var(--vif-clair);
 }
-/* Le H1 porte la réponse pour un moteur ; l'accroche porte la phrase pour le
-   lecteur. Les deux existent, et aucune n'est cachée. */
+/* Un seul titre : le surtitre nomme le sujet pour un moteur, la suite pose la
+   question au lecteur. */
 .dp-h1 {
-  margin: 18px 0 0;
-  font-size: clamp(15px, 1.5vw, 17px);
+  margin: 20px 0 0;
+  font-size: clamp(32px, 4.8vw, 66px);
   font-weight: 400;
-  line-height: 1.5;
-  color: var(--encre-2);
-  max-width: 62ch;
-}
-.dp-accroche {
-  margin: 14px 0 0;
-  font-size: clamp(34px, 5.4vw, 74px);
-  font-weight: 400;
-  line-height: 1.04;
+  line-height: 1.06;
   letter-spacing: -0.04em;
-  max-width: 19ch;
+  max-width: 17ch;
 }
+.dp-h1-s {
+  display: block;
+  margin-bottom: 18px;
+  font-size: clamp(11px, 1.05vw, 13px);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+.dp-h1-q { color: var(--encre-2); }
 .dp-chapo {
   margin: 26px 0 0;
   max-width: 58ch;
@@ -147,8 +152,9 @@ body:has(.dp) { background: #04070d; }
   color: var(--encre-2);
 }
 /* La source sur sa ligne, le bouton sur la sienne : côte à côte, le lien
-   discret se lisait comme une étiquette du bouton. */
-.dp-src-ouv { display: block; margin-top: 22px; }
+   discret se lisait comme une étiquette du bouton. Le sélecteur est plus
+   spécifique que `.dp-src`, qui est déclarée plus bas en inline-block. */
+.dp-ouv .dp-src-ouv { display: block; margin-top: 26px; }
 .dp-vers {
   display: inline-flex;
   align-items: center;
@@ -171,13 +177,39 @@ body:has(.dp) { background: #04070d; }
 .dp-sect { position: relative; padding: clamp(70px, 11vh, 140px) 0; }
 .dp-sect-nuit { background: var(--nuit-2); }
 .dp-sect-vide { text-align: center; }
+/* Le titre de partie reprend l'enseigne du site : un numéro en pastille, le
+   libellé en petites capitales, un filet qui court jusqu'au bord. Plus de
+   tiret cadratin, plus de numérotation collée au texte. */
 .dp-num {
-  margin: 0 0 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 26px;
   font-size: 10.5px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
+  color: var(--encre-2);
+}
+.dp-num > span {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(90, 165, 255, 0.4);
+  border-radius: 50%;
+  font-size: 10px;
+  letter-spacing: 0;
   color: var(--vif-clair);
 }
+.dp-num::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--bord-fin), transparent);
+}
+.dp-sect-vide .dp-num { justify-content: center; }
+.dp-sect-vide .dp-num::after { display: none; }
 .dp-h2 {
   margin: 0;
   font-size: clamp(25px, 3.2vw, 44px);
@@ -863,9 +895,25 @@ body:has(.dp) { background: #04070d; }
   border: 0;
 }
 
-/* ── La barre de l'article ─────────────────────────────────────────────── */
+/* ── Le menu du site ───────────────────────────────────────────────────── */
 
-.dp-barre-h {
+/* Le conteneur `.cg` apporte les couleurs dont l'en-tête a besoin, mais il
+   pose aussi un voile fixe sur toute la page : on le neutralise, on ne garde
+   que les variables. */
+.dp-menu {
+  position: relative;
+  z-index: 46;
+  /* Le conteneur du prototype réserve un écran entier de hauteur : ici il ne
+     sert qu'à porter les couleurs de l'en-tête, qui est lui-même fixe. On le
+     ramène donc à rien. */
+  min-height: 0 !important;
+  height: 0;
+}
+.dp-menu::before { display: none !important; }
+
+/* ── L'ancienne barre de l'article, conservée pour mémoire ─────────────── */
+
+.dp-barre-h-inutilisee {
   position: sticky;
   top: 0;
   z-index: 45;
