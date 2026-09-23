@@ -6,6 +6,7 @@ import { motion, useMotionTemplate, useScroll, useTransform } from "framer-motio
 import { BarChart3, CloudSun, Flag, Layers, TrendingUp, Users } from "lucide-react";
 import { Loupe } from "./Loupe";
 import { EnTete, LENT } from "./pieces";
+import { TempsReel } from "./TempsReel";
 import {
   Classements,
   FeaturedStories,
@@ -234,6 +235,7 @@ export function ConceptPage({ articles, reperes, donnees, annee, regions, vues }
         </svg>
 
         <LiveTicker reperes={reperes} annee={annee} />
+        <TempsReel donnees={donnees} annee={annee} />
         <div ref={relais}>
           <InteractiveMapPreview donnees={donnees} annee={annee} regions={regions} vues={vues} />
         </div>
