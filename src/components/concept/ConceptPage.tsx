@@ -12,7 +12,6 @@ import {
   FeaturedStories,
   FluxSources,
   InteractiveMapPreview,
-  LiveTicker,
   Methode,
   NewsletterSection,
   NumbersSection,
@@ -53,13 +52,15 @@ const MARQUEURS = [
 export interface ConceptProps {
   articles: FicheArticle[];
   reperes: Repere[];
+  /** Les comptages du hero : globes thématiques, articles publiés. */
+  comptes: { globes: number; articles: number };
   donnees: Record<string, FichePays>;
   annee: number;
   regions: readonly { id: string; label: string; pays: readonly string[] }[];
   vues: Record<string, { lat: number; lon: number }>;
 }
 
-export function ConceptPage({ articles, reperes, donnees, annee, regions, vues }: ConceptProps) {
+export function ConceptPage({ articles, comptes, donnees, annee, regions, vues }: ConceptProps) {
   const [pret, setPret] = useState(false);
 
   const scene = useRef<HTMLDivElement>(null);
@@ -202,6 +203,34 @@ export function ConceptPage({ articles, reperes, donnees, annee, regions, vues }
               </span>
             </motion.div>
 
+            {/* Les quatre repères du cahier. Trois sont des comptages, lus dans
+                la base ; le quatrième est une porte, pas un chiffre. */}
+            <motion.ul
+              className="cg-reperes"
+              initial={{ opacity: 0, y: 14 }}
+              animate={pret ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 1.2, delay: 1.15, ease: LENT }}
+            >
+              <li>
+                <strong>{comptes.globes}</strong>
+                globes thématiques
+              </li>
+              <li>
+                <strong>{comptes.articles}</strong>
+                articles décortiqués
+              </li>
+              <li>
+                <strong>{Object.keys(donnees).length}</strong>
+                pays au socle
+              </li>
+              <li>
+                <a href="/community">
+                  <strong>Forum</strong>
+                  espace de débat
+                </a>
+              </li>
+            </motion.ul>
+
           </motion.div>
           </div>
 
@@ -234,18 +263,17 @@ export function ConceptPage({ articles, reperes, donnees, annee, regions, vues }
           />
         </svg>
 
-        <LiveTicker reperes={reperes} annee={annee} />
         <TempsReel donnees={donnees} annee={annee} />
         <div ref={relais}>
           <InteractiveMapPreview donnees={donnees} annee={annee} regions={regions} vues={vues} />
         </div>
         <Classements donnees={donnees} annee={annee} />
         <FluxSources />
-        <Methode />
         <FeaturedStories articles={articles} />
         <TopicExplorer />
-        <Questions />
         <NumbersSection />
+        <Methode />
+        <Questions />
         <NewsletterSection />
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { ECONOMY_YEARS } from "@/data/economy/economy";
 import { countryFr } from "@/data/countryNamesFr";
 import { ARTICLES } from "@/data/articles";
+import { THEMES } from "@/data/themes";
 import { getPopulationMillions } from "@/data/economy/populationData";
 
 /**
@@ -178,4 +179,13 @@ export function reperes(): { annee: number; liste: Repere[] } {
   liste.push({ nom: "Pays au socle", valeur: String(pays.length), note: "fiches" });
 
   return { annee: y.year, liste };
+}
+
+/* ── Ce que la maison contient ───────────────────────────────────────────────
+   Les quatre repères du hero. Ce sont des comptages, pas des arguments : on
+   lit la base d'articles et la liste des thèmes, et on affiche ce qu'on
+   trouve. Le jour où un article s'ajoute, le chiffre suit tout seul. */
+
+export function comptes(): { globes: number; articles: number } {
+  return { globes: THEMES.length, articles: ARTICLES.length };
 }

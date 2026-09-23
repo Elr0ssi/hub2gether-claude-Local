@@ -151,7 +151,6 @@ body:has(.cg) { background: #05080c; }
 
 .cg-header { pointer-events: none; background: none; backdrop-filter: none; }
 .cg-header .cg-logo,
-.cg-header .cg-bout,
 .cg-header-ouvert { pointer-events: auto; }
 .cg-header-l {
   position: relative;
@@ -278,6 +277,7 @@ body:has(.cg) { background: #05080c; }
   .cg-nav a,
   .cg-nav-bientot,
   .cg-cnx,
+  .cg-bout,
   .cg-bout-l,
   .cg-header-verre { transition: none; }
 }
@@ -309,18 +309,32 @@ body:has(.cg) { background: #05080c; }
 /* Le forum et l'entrée de compte, au bout de la barre et hors du flux :
    ils ne pèsent pas sur les trois colonnes, donc ils ne décalent pas le
    nom. */
+/* Le bout de barre suit la même règle que les onglets : au repos il n'est
+   pas là, il arrive quand le nom s'ouvre. Tout le menu tient donc dans un
+   seul geste, au lieu d'avoir deux moitiés qui n'obéissent pas au même
+   principe. */
 .cg-bout {
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.45s ease,
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   position: absolute;
   /* Le décalage d'un élément hors flux se mesure sur la boîte de padding :
      il faut donc reprendre la gouttière à la main pour s'aligner sur le
      reste du contenu, et non sur le bord du conteneur. */
   right: clamp(28px, 4.4vw, 76px);
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-50%) translateX(16px);
   display: flex;
   align-items: center;
   gap: 14px;
+}
+.cg-header-ouvert .cg-bout {
+  opacity: 1;
   pointer-events: auto;
+  transform: translateY(-50%);
+  transition-delay: 0.18s;
 }
 .cg-bout-l {
   font-size: 13.5px;
@@ -474,6 +488,42 @@ body:has(.cg) { background: #05080c; }
 
 .cg-lecteurs { display: flex; flex-direction: column; font-size: 12px; color: var(--encre-3); }
 .cg-lecteurs strong { font-size: 22px; font-weight: 400; color: var(--encre); letter-spacing: -0.02em; }
+
+/* Les repères du hero : quatre entrées sur une ligne, séparées par un filet.
+   Des comptages, donc une chasse tabulaire et pas d'emphase. */
+.cg-reperes {
+  margin-top: clamp(22px, 3vh, 38px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0;
+  list-style: none;
+  padding: 0;
+}
+.cg-reperes li { padding: 0 clamp(14px, 1.6vw, 24px); border-left: 1px solid var(--bord-fin); }
+.cg-reperes li:first-child { padding-left: 0; border-left: 0; }
+.cg-reperes li,
+.cg-reperes a {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--encre-3);
+  text-decoration: none;
+}
+.cg-reperes strong {
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--encre);
+  font-variant-numeric: tabular-nums;
+}
+.cg-reperes a:hover strong { color: var(--chaud); }
+@media (max-width: 700px) {
+  .cg-reperes li { padding: 0 12px 0 0; border-left: 0; }
+  .cg-reperes { gap: 14px 0; }
+}
 
 .cg-murmure {
   margin-top: 52px;
@@ -1086,6 +1136,48 @@ body:has(.cg) { background: #05080c; }
 .cg-flux-t { font-size: 15.5px; font-weight: 400; }
 .cg-flux-d { font-size: 12px; color: var(--encre-3); }
 
+/* Les vingt-cinq titres, au survol de l'entrée presse. Le panneau sort du
+   flux : il se déplie par-dessus la scène au lieu de pousser les trois autres
+   entrées vers le bas. Il répond aussi au focus, sinon il n'existe pas pour
+   qui navigue au clavier. */
+.cg-flux-entree { position: relative; }
+.cg-flux-entree:focus-visible { outline: none; }
+.cg-flux-pop {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 10px);
+  z-index: 6;
+  width: min(360px, 78vw);
+  padding: 14px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--fond) 92%, transparent);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.3s;
+}
+.cg-flux-entree:hover .cg-flux-pop,
+.cg-flux-entree:focus-within .cg-flux-pop {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.cg-flux-pop-l {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 11px;
+  color: var(--encre-2);
+}
+
 .cg-flux-toile { width: 100%; height: 340px; }
 
 .cg-flux-sortie {
@@ -1105,6 +1197,17 @@ body:has(.cg) { background: #05080c; }
 }
 .cg-flux-sortie-t { font-size: 17px; font-weight: 400; letter-spacing: -0.02em; }
 .cg-flux-sortie-d { font-size: 12px; color: var(--encre-2); }
+.cg-flux-gratuit {
+  margin-top: 4px;
+  align-self: flex-start;
+  padding: 4px 11px;
+  border: 1px solid color-mix(in srgb, var(--froid) 45%, transparent);
+  border-radius: 999px;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--froid);
+}
 
 .cg-gratuit {
   display: flex;
@@ -3877,56 +3980,82 @@ body:has(.cg) { background: #05080c; }
 
 /* ── Données temps réelles ───────────────────────────────────────────────── */
 
-/* Quatre compteurs de front : c'est la course commune qui est le sujet, pas
-   chaque grandeur prise à part. Les cartes portent la même facture que celles
-   du panneau économie — même bord, même voile — pour que le bandeau appartienne
-   à la page plutôt que d'y être posé. */
-.cg-tr-l {
-  margin-top: clamp(26px, 3.6vh, 44px);
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+/* Le bandeau remplace le fil d'agrégats : mêmes mécanique et mêmes bords qui
+   s'effacent, mais des vignettes qu'on peut viser. Chacune ne porte que son
+   intitulé et son nombre ; le reste attend le clic, dans la ligne de dessous.
+
+   La piste s'arrête dès qu'une vignette est ouverte : lire une provenance
+   pendant que la vignette s'en va est impossible. */
+.cg-tr-piste {
+  display: flex;
+  align-items: stretch;
   gap: 12px;
+  width: max-content;
+  padding: 2px 0 6px;
+  will-change: transform;
 }
-.cg-tr-c {
+.cg-tr-i {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 18px 19px;
+  gap: 5px;
+  min-width: 178px;
+  padding: 13px 17px;
   border: 1px solid var(--bord-fin);
-  border-radius: 13px;
-  /* Le globe du hero finit sa sortie derrière cette rangée. En sombre il n'est
-     qu'une ombre et la carte peut rester translucide ; en clair c'est un disque
-     gris qui passe sous le texte. D'où la couche de fond : assez pour que les
-     chiffres se lisent, assez peu pour que le globe continue de se deviner. */
+  border-radius: 12px;
+  /* Le globe du hero finit sa sortie derrière ce bandeau. En sombre il n'est
+     qu'une ombre ; en clair c'est un disque gris qui passerait sous les
+     chiffres. D'où la couche de fond, assez légère pour le laisser deviner. */
   background:
-    linear-gradient(160deg, rgba(158, 199, 216, 0.09), color-mix(in srgb, var(--voile) 2%, transparent)),
-    color-mix(in srgb, var(--fond) 76%, transparent);
+    linear-gradient(160deg, rgba(158, 199, 216, 0.08), color-mix(in srgb, var(--voile) 2%, transparent)),
+    color-mix(in srgb, var(--fond) 74%, transparent);
   backdrop-filter: blur(7px);
-  min-width: 0;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-tr-i:hover { border-color: color-mix(in srgb, var(--froid) 45%, transparent); }
+.cg-tr-i-on {
+  border-color: color-mix(in srgb, var(--chaud) 65%, transparent);
+  transform: translateY(-2px);
 }
 .cg-tr-lab {
-  font-size: 10px;
-  letter-spacing: 0.13em;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--encre-2);
+  color: var(--encre-3);
 }
 .cg-tr-v {
-  font-size: clamp(13px, 1.15vw, 19px);
+  font-size: 16px;
   line-height: 1.2;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   color: var(--encre);
-  white-space: nowrap;
 }
-.cg-tr-vide { color: var(--encre-3); font-size: 12px; white-space: normal; }
-.cg-tr-n { font-size: 11px; line-height: 1.5; color: var(--encre-3); }
+
+/* La ligne de détail : une hauteur tenue, sinon la page saute d'un cran à
+   chaque ouverture. */
+.cg-tr-d {
+  margin-top: 16px;
+  min-height: 42px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  max-width: 92ch;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--encre-3);
+  transition: color 0.3s ease;
+}
+.cg-tr-d strong { font-weight: 500; color: var(--encre); }
+.cg-tr-d-on { color: var(--encre-2); }
+.cg-tr-d-v { opacity: 0.72; }
 
 /* La pastille d'exemple. Elle n'est pas discrète : un compteur sans source
    doit se voir comme tel, sinon il se lit comme une mesure. */
 .cg-tr-ex {
-  align-self: flex-start;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   padding: 3px 9px;
   border: 1px dashed color-mix(in srgb, var(--chaud) 55%, transparent);
   border-radius: 999px;
@@ -3934,16 +4063,7 @@ body:has(.cg) { background: #05080c; }
   letter-spacing: 0.04em;
   color: var(--chaud);
 }
-.cg-tr-p {
-  margin-top: 16px;
-  max-width: 82ch;
-  font-size: 12px;
-  line-height: 1.7;
-  color: var(--encre-3);
-}
-@media (max-width: 1080px) {
-  .cg-tr-l { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
 @media (max-width: 620px) {
-  .cg-tr-l { grid-template-columns: minmax(0, 1fr); }
+  .cg-tr-i { min-width: 150px; padding: 11px 14px; }
+  .cg-tr-v { font-size: 14px; }
 }

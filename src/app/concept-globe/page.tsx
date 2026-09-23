@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ConceptPage } from "@/components/concept/ConceptPage";
-import { articlesEnUne, donneesPays, reperes, REGIONS, VUES } from "@/data/concept/conceptGeo";
+import { articlesEnUne, comptes, donneesPays, reperes, REGIONS, VUES } from "@/data/concept/conceptGeo";
 
 export const metadata: Metadata = {
   title: "Concept · The Essential Data",
@@ -30,6 +30,7 @@ export default function ConceptGlobePage() {
     <ConceptPage
       articles={articlesEnUne(4)}
       reperes={bandeau}
+      comptes={comptes()}
       donnees={pays}
       annee={annee}
       regions={REGIONS}

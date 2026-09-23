@@ -264,9 +264,10 @@ export function EnTete({ actif }: { actif?: string }) {
           ))}
         </nav>
 
-        {/* Au bout de la barre, et toujours visibles : le forum et l'entrée
-            de compte. Une porte qu'il faut survoler pour trouver n'est pas
-            une porte. */}
+        {/* Au bout de la barre : la monnaie, le thème, le forum et l'entrée de
+            compte. Ils apparaissent avec les onglets, au survol du nom et à la
+            prise de focus, et pas avant : le menu tient tout entier dans un
+            seul geste. */}
         <div className="cg-bout">
           <ChoixMonnaie />
           <BoutonTheme className="cg-jour" />

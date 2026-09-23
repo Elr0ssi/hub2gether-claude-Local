@@ -34,12 +34,12 @@ export interface Cadence {
   exemple?: string;
 }
 
-/** Les deux grandeurs en attente de formule. Chiffres d'exemple. */
+/** Les grandeurs en attente de formule. Chiffres d'exemple, tous marqués. */
 export const CADENCES_EXEMPLE: Cadence[] = [
   {
     id: "foret",
     label: "Forêt brûlée",
-    unite: " ha",
+    unite: "\u00a0ha",
     dec: 0,
     parAn: 30_000_000,
     note: "Surface partie en fumée depuis le 1er janvier.",
@@ -48,10 +48,64 @@ export const CADENCES_EXEMPLE: Cadence[] = [
   {
     id: "eau",
     label: "Eau douce prélevée",
-    unite: " km³",
+    unite: "\u00a0km³",
     dec: 4,
     parAn: 4_000,
     note: "Prélèvements cumulés depuis le 1er janvier.",
+    exemple: "Cadence d'exemple, en attente de la source.",
+  },
+  {
+    id: "co2",
+    label: "CO₂ émis",
+    unite: "\u00a0Mt",
+    dec: 3,
+    parAn: 37_000,
+    note: "Émissions liées à l'énergie, cumulées depuis le 1er janvier.",
+    exemple: "Cadence d'exemple, en attente de la source.",
+  },
+  {
+    id: "plastique",
+    label: "Plastique produit",
+    unite: "\u00a0t",
+    dec: 0,
+    parAn: 400_000_000,
+    note: "Production mondiale cumulée depuis le 1er janvier.",
+    exemple: "Cadence d'exemple, en attente de la source.",
+  },
+  {
+    id: "solaire",
+    label: "Électricité solaire",
+    unite: "\u00a0TWh",
+    dec: 4,
+    parAn: 2_000,
+    note: "Production photovoltaïque cumulée depuis le 1er janvier.",
+    exemple: "Cadence d'exemple, en attente de la source.",
+  },
+  {
+    id: "naissances",
+    label: "Naissances",
+    unite: "",
+    dec: 0,
+    parAn: 134_000_000,
+    note: "Naissances cumulées depuis le 1er janvier.",
+    exemple: "Cadence d'exemple, en attente de la source.",
+  },
+  {
+    id: "terres",
+    label: "Terres arables perdues",
+    unite: "\u00a0ha",
+    dec: 1,
+    parAn: 10_000_000,
+    note: "Surfaces cultivables perdues depuis le 1er janvier.",
+    exemple: "Cadence d'exemple, en attente de la source.",
+  },
+  {
+    id: "vols",
+    label: "Vols commerciaux",
+    unite: "",
+    dec: 0,
+    parAn: 38_000_000,
+    note: "Décollages cumulés depuis le 1er janvier.",
     exemple: "Cadence d'exemple, en attente de la source.",
   },
 ];

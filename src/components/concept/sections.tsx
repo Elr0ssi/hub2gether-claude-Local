@@ -113,8 +113,9 @@ export function InteractiveMapPreview({
   vues: Record<string, { lat: number; lon: number }>;
 }) {
   return (
-    <section className="cg-section">
+    <section className="cg-section" id="nos-globes">
       <div className="cg-wrap">
+        <Enseigne>Nos globes</Enseigne>
         <Monte>
           <h2 className="cg-h2">
             Explorez le monde<span className="cg-pt">.</span>
@@ -147,8 +148,30 @@ export function InteractiveMapPreview({
 
 /* ── Les flux : d'où viennent les données ────────────────────────────────── */
 
-const SOURCES = [
-  { id: "presse", label: "Presse internationale", detail: "25 titres, 9 langues" },
+/* Les vingt-cinq titres de presse se déplient au survol de la première
+   entrée. La liste réelle n'est pas encore arrêtée : ce sont des
+   emplacements, et le panneau le dit plutôt que d'avancer des noms de
+   journaux que nous ne citons pas encore. Le jour où la liste arrive, on
+   remplace ce tableau et la mention d'exemple s'en va. */
+const PRESSE_EXEMPLE = Array.from({ length: 25 }, (_, k) => `Titre ${String(k + 1).padStart(2, "0")}`);
+
+interface Source {
+  id: string;
+  label: string;
+  detail: string;
+  /** Déplié au survol et à la prise de focus. */
+  liste?: string[];
+  exemple?: string;
+}
+
+const SOURCES: Source[] = [
+  {
+    id: "presse",
+    label: "Presse internationale",
+    detail: "25 titres, 9 langues",
+    liste: PRESSE_EXEMPLE,
+    exemple: "Emplacements : la liste des titres n'est pas encore arrêtée.",
+  },
   { id: "institutions", label: "Institutions", detail: "Banque mondiale, FMI, OMS" },
   { id: "ouvertes", label: "Données ouvertes", detail: "INSEE, Eurostat, OCDE" },
   { id: "terrain", label: "Terrain", detail: "Rapports, registres, archives" },
@@ -158,7 +181,7 @@ export function FluxSources() {
   return (
     <section className="cg-section cg-flux">
       <div className="cg-wrap">
-        <Enseigne>La fabrique</Enseigne>
+        <Enseigne>Notre fonctionnement</Enseigne>
         <Monte>
           <h2 className="cg-h2">
             Quatre flux<span className="cg-pt">.</span>
@@ -176,10 +199,20 @@ export function FluxSources() {
           <div className="cg-flux-entrees">
             {SOURCES.map((s, k) => (
               <Monte key={s.id} delay={k * 0.1} y={18}>
-                <div className="cg-flux-entree">
+                <div className="cg-flux-entree" tabIndex={s.liste ? 0 : undefined}>
                   <span className="cg-flux-n">{String(k + 1).padStart(2, "0")}</span>
                   <span className="cg-flux-t">{s.label}</span>
                   <span className="cg-flux-d">{s.detail}</span>
+                  {s.liste ? (
+                    <div className="cg-flux-pop">
+                      <ul className="cg-flux-pop-l">
+                        {s.liste.map((t) => (
+                          <li key={t}>{t}</li>
+                        ))}
+                      </ul>
+                      {s.exemple ? <span className="cg-tr-ex">{s.exemple}</span> : null}
+                    </div>
+                  ) : null}
                 </div>
               </Monte>
             ))}
@@ -220,6 +253,7 @@ export function FluxSources() {
               <span className="cg-flux-sortie-m" aria-hidden="true" />
               <span className="cg-flux-sortie-t">The Essential Data</span>
               <span className="cg-flux-sortie-d">Recoupé, daté, sourcé</span>
+              <span className="cg-flux-gratuit">100 % gratuit pour nos lecteurs</span>
             </div>
           </Monte>
         </div>
@@ -241,7 +275,7 @@ export function FeaturedStories({ articles }: { articles: FicheArticle[] }) {
   return (
     <section className="cg-section">
       <div className="cg-wrap">
-        <Enseigne>À la une</Enseigne>
+        <Enseigne>Sujets à la une</Enseigne>
 
         <motion.article
           className="cg-une"
@@ -338,6 +372,7 @@ export function NumbersSection() {
   return (
     <section className="cg-section cg-preuves">
       <div className="cg-wrap">
+        <Enseigne>Notre couverture</Enseigne>
         <Monte>
           <p className="cg-preuves-t">
             Le monde change<span className="cg-pt">.</span>
@@ -465,7 +500,7 @@ export function Classements({
   return (
     <section className="cg-section cg-classements">
       <div className="cg-wrap">
-        <Enseigne>Le monde en chiffres</Enseigne>
+        <Enseigne>Nos classements</Enseigne>
         <Monte>
           <h2 className="cg-h2">
             Ce que dit le socle<span className="cg-pt">.</span>
@@ -518,7 +553,7 @@ export function Methode() {
   return (
     <section className="cg-section cg-methode">
       <div className="cg-wrap">
-        <Enseigne>La méthode</Enseigne>
+        <Enseigne>Notre méthode</Enseigne>
         <Monte>
           <h2 className="cg-h2">
             D&apos;une source<span className="cg-pt">.</span>
