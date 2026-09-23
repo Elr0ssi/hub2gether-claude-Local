@@ -3,6 +3,8 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "./Theme";
+import { monnaieCourante } from "./Monnaie";
+import { fiche } from "@/data/finance/tauxChange";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import type { PaletteGlobe } from "@/components/map/EconomyGlobe";
 import { getValueIntensity } from "@/lib/economyColors";
@@ -158,11 +160,11 @@ export function fmtEco(v: number | null | undefined, unite: MetriqueEco["unite"]
   if (unite === "k") return `${Math.round(v).toLocaleString("fr-FR")} k`;
   if (unite === "hab") return `${v.toFixed(1).replace(".", ",")} M`;
   if (unite === "pct") return `${v.toFixed(1).replace(".", ",")} %`;
-  if (unite === "eur") return `${Math.round(v).toLocaleString("fr-FR")} €`;
+  if (unite === "eur") return `${Math.round(v).toLocaleString("fr-FR")} ${fiche(monnaieCourante()).unitaire}`;
   /* Toujours des milliards, jamais de trillions. Un PIB en T€ et une dette en
      Md $ ne se comparent pas d'un coup d'œil : il faut diviser de tête avant
      de pouvoir lire. Une seule échelle, et les deux nombres se répondent. */
-  return `${Math.round(v).toLocaleString("fr-FR")} Md $`;
+  return `${Math.round(v).toLocaleString("fr-FR")} ${fiche(monnaieCourante()).suffixe}`;
 }
 
 /** La même mise en forme, mais découpée pour l'odomètre : un nombre, ses
@@ -176,8 +178,8 @@ export function pieceEco(
   if (unite === "k") return { v, dec: 0, unite: "\u00a0k" };
   if (unite === "hab") return { v, dec: 1, unite: "\u00a0M" };
   if (unite === "pct") return { v, dec: 1, unite: "\u00a0%" };
-  if (unite === "eur") return { v, dec: 0, unite: "\u00a0$" };
-  return { v, dec: 0, unite: "\u00a0Md $" };
+  if (unite === "eur") return { v, dec: 0, unite: `\u00a0${fiche(monnaieCourante()).unitaire}` };
+  return { v, dec: 0, unite: `\u00a0${fiche(monnaieCourante()).suffixe}` };
 }
 
 interface Props {

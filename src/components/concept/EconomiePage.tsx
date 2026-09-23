@@ -6,6 +6,8 @@ import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
 import { type FicheDebat, type LigneSource, type SocleEco } from "@/data/concept/conceptEconomie";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import { Dessin, Jetons } from "./Jetons";
+import { monnaieCourante, useMonnaie } from "./Monnaie";
+import { convertir, fiche } from "@/data/finance/tauxChange";
 import { Loupe } from "./Loupe";
 import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
 import { gelerOdometres } from "./Roulement";
@@ -115,10 +117,10 @@ function val(v: number | null, unite: Unite) {
   if (unite === "k") return `${Math.round(v).toLocaleString("fr-FR")} k`;
   if (unite === "hab") return `${v.toFixed(1).replace(".", ",")} M`;
   if (unite === "pct") return `${v.toFixed(1).replace(".", ",")} %`;
-  if (unite === "eur") return `${Math.round(v).toLocaleString("fr-FR")} €`;
+  if (unite === "eur") return `${Math.round(v).toLocaleString("fr-FR")} ${fiche(monnaieCourante()).unitaire}`;
   /* Une seule échelle pour les montants : des milliards, toujours. Un PIB en
      T$ face à une dette en Md $ oblige à diviser de tête avant de comparer. */
-  return `${Math.round(v).toLocaleString("fr-FR")} Md $`;
+  return `${Math.round(v).toLocaleString("fr-FR")} ${fiche(monnaieCourante()).suffixe}`;
 }
 
 
@@ -182,6 +184,13 @@ function useVu(marge = 120) {
    lorsqu'on regarde le PIB — la frise suit ce que l'indicateur permet, comme
    elle suit déjà ce que les sources publient. */
 const ANNEE_EN_COURS = 2026;
+/** Les indicateurs exprimés en monnaie, donc convertibles. */
+const MONETAIRE = new Set<EconomyMetricId>([
+  "gdp",
+  "gdp_per_capita",
+  "trade_balance",
+  "debt_amount",
+]);
 const SECONDES_PAR_AN = 365 * 24 * 3600;
 
 /** Un nom de pays réduit à ce qui sert à le reconnaître dans une adresse. */
@@ -286,10 +295,15 @@ const Frise = memo(function Frise({
   annees,
   valeur,
   onAnnee,
+  sansTaux,
+  piece,
 }: {
   annees: number[];
   valeur: number;
   onAnnee: (a: number) => void;
+  /** Vrai quand la monnaie choisie n'a pas de taux pour la date affichée. */
+  sansTaux?: boolean;
+  piece: { libelle: string };
 }) {
   const [vue, setVue] = useState(valeur);
   /* L'année sous le doigt est aussi tenue dans une référence. Relâcher lit
@@ -432,6 +446,16 @@ const Frise = memo(function Frise({
       <p className="cg-frise-n">
         Les dates affichées sont celles publiées par la source. Rien n&apos;est interpolé entre deux
         repères : une année absente reste absente.{" "}
+        {sansTaux && (
+          <>
+            {" "}
+            <b>
+              Aucun taux de change {piece.libelle.toLowerCase()} n&apos;existe pour {valeur} : les
+              montants de cette date ne sont pas convertibles et les pays sortent du classement.
+              Revenez au dollar, l&apos;unité d&apos;origine de la base, pour les lire.
+            </b>
+          </>
+        )}
         {annees[annees.length - 1] === ANNEE_EN_COURS && (
           <>
             Sur le pas {ANNEE_EN_COURS}, les teintes du globe et les rangs restent ceux de{" "}
@@ -637,6 +661,9 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
      cours ». Le classement, les teintes du globe et les rangs continuent de
      se lire sur la dernière année publiée : il n'existe pas de classement
      mondial de l'année en cours, et en fabriquer un serait inventer. */
+  const [monnaie] = useMonnaie();
+  const piece = fiche(monnaie);
+
   const derniereReelle = socle.annees[socle.annees.length - 1];
   const compteurPossible = metrique === "gdp";
   const enCours = annee === ANNEE_EN_COURS && compteurPossible;
@@ -709,11 +736,18 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
       return {
         nom: p.nom,
         fr: p.fr,
-        pib: v("gdp"),
-        pibHab: v("gdp_per_capita"),
-        balance: v("trade_balance"),
+        /* Les quatre grandeurs en monnaie sont converties ici, une fois, au
+           taux de l'année lue. Tout ce qui les consomme ensuite — le
+           classement, les teintes du globe, le panneau, la courbe, le
+           compteur — les reçoit déjà dans la bonne monnaie. Les teintes ne
+           bougent pas pour autant : l'échelle est relative au maximum, et
+           multiplier toutes les valeurs par le même taux ne change aucun
+           rang. */
+        pib: convertir(v("gdp"), anneeSocle, monnaie),
+        pibHab: convertir(v("gdp_per_capita"), anneeSocle, monnaie),
+        balance: convertir(v("trade_balance"), anneeSocle, monnaie),
         dette: v("debt_ratio"),
-        detteMontant: v("debt_amount"),
+        detteMontant: convertir(v("debt_amount"), anneeSocle, monnaie),
         inflation: v("inflation"),
         chomage: v("unemployment"),
         actifs: v("active_population"),
@@ -721,7 +755,7 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
         entreprises: v("companies"),
       };
     });
-  }, [socle, anneeSocle]);
+  }, [socle, anneeSocle, monnaie]);
 
   /* Un pays sans valeur pour la colonne triée passe à la fin, jamais au
      rang le plus bas : ne pas savoir n'est pas être dernier. */
@@ -773,9 +807,15 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
       const i = (socle.cols[a] ?? {})[c];
       const l = i === undefined ? undefined : (socle.lignes[a] ?? []).find((x) => x[0] === idx);
       const v = l ? l[i] : null;
-      return { annee: a, v: typeof v === "number" && Number.isFinite(v) ? v : null };
+      const brut = typeof v === "number" && Number.isFinite(v) ? v : null;
+      /* Chaque point est converti au taux de sa propre année. C'est là que
+         la courbe change de forme selon la monnaie, et c'est voulu : le
+         produit intérieur brut français a reculé en dollars entre 2008 et
+         2015 alors qu'il montait en euros. Les deux lectures sont justes,
+         elles ne répondent pas à la même question. */
+      return { annee: a, v: MONETAIRE.has(metrique) ? convertir(brut, a, monnaie) : brut };
     });
-  }, [socle, choisi, metrique]);
+  }, [socle, choisi, metrique, monnaie]);
 
   /* Les colonnes de la famille en cours, plus le PIB qui sert de repère
      commun — on compare toujours quelque chose au poids de l'économie. */
@@ -972,6 +1012,10 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
                 annees={compteurPossible ? [...socle.annees, ANNEE_EN_COURS] : socle.annees}
                 valeur={annee}
                 onAnnee={setAnnee}
+                piece={piece}
+                sansTaux={
+                  monnaie !== "usd" && convertir(1, anneeSocle, monnaie) === null
+                }
               />
             }
           />
