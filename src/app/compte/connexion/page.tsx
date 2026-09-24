@@ -17,9 +17,9 @@ export const metadata: Metadata = {
 export default async function ConnexionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ mode?: string }>;
+  searchParams: Promise<{ mode?: string; erreur?: string }>;
 }) {
-  const { mode } = await searchParams;
+  const { mode, erreur } = await searchParams;
   const compte = COMPTES_ACTIFS ? await lireCompte() : null;
   if (compte) redirect("/compte");
 
@@ -33,6 +33,12 @@ export default async function ConnexionPage({
             Un compte sert à une chose : parler sous un nom stable, pour que vos messages puissent
             être suivis, contestés et corrigés. Rien de plus ne vous est demandé.
           </p>
+          {erreur === "google" && (
+            <p className="cp-erreur" style={{ marginBottom: 16 }}>
+              La connexion avec Google n&apos;a pas abouti. Réessayez, ou utilisez votre adresse et
+              votre mot de passe.
+            </p>
+          )}
           {COMPTES_ACTIFS ? (
             <FormConnexion mode={mode === "inscription" ? "inscription" : "connexion"} />
           ) : (

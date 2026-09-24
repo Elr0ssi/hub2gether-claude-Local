@@ -38,6 +38,44 @@ Deux garde-fous complètent ces règles : cinq messages par minute et
 soixante par heure au plus, et une réponse ne peut pas viser une autre
 discussion que son parent.
 
+## La connexion
+
+Deux portes ouvrent le même compte : l'adresse électronique et le mot de
+passe, ou le bouton Google. Les deux mènent au même profil quand elles
+partagent l'adresse, puisque c'est elle que Supabase utilise pour
+identifier un compte.
+
+**Adresse et mot de passe.** Rien de particulier : `signUp` /
+`signInWithPassword` côté serveur, le pseudo part dans les métadonnées de
+l'inscription et le déclencheur `creer_profil()` en fait la ligne dans
+`profils`.
+
+**Google.** Le bouton lance `signInWithOAuth` depuis le navigateur — une
+action serveur ne peut pas rediriger un onglet vers un autre site — puis
+Google renvoie sur `/compte/callback`, qui échange le code contre une
+session et redirige vers `/compte`. Comme Google ne fournit pas de pseudo,
+le déclencheur retombe sur la partie locale de l'adresse Google et lui
+attache un numéro si elle est déjà prise.
+
+Pour activer ce bouton, deux réglages à faire une fois, sur le tableau de
+bord :
+
+1. **Google Cloud Console** : créer un identifiant OAuth 2.0 (type
+   « Application Web »), avec `https://umqksphaqhyairdchcxk.supabase.co/auth/v1/callback`
+   comme URI de redirection autorisée. On en tire un Client ID et un Client
+   Secret.
+2. **Supabase → Authentication → Providers → Google** : coller les deux,
+   activer le fournisseur.
+3. **Supabase → Authentication → URL Configuration → Redirect URLs** :
+   ajouter l'adresse de chaque copie du site suivie de `/compte/callback`
+   (par exemple `https://hub2gether-claude-local.vercel.app/compte/callback`
+   et le domaine définitif une fois posé). Sans cette entrée, Supabase
+   refuse de renvoyer vers une adresse qu'il ne reconnaît pas.
+
+Sans ces trois réglages, le bouton reste affiché mais renvoie une erreur ;
+la page de connexion l'affiche en clair plutôt que de laisser un onglet
+Google en échec sans explication.
+
 ## Les variables d'environnement
 
 Les deux sont publiques, elles partent dans le navigateur. Voir
