@@ -7,6 +7,7 @@ import { FormProfil } from "@/components/compte/FormProfil";
 import { Pastille } from "@/components/compte/Pastille";
 import { deconnecter } from "./actions";
 import { COMPTES_ACTIFS } from "@/lib/supabase/config";
+import { identifiantDe } from "@/lib/supabase/identifiant";
 import { clientServeur, lireCompte } from "@/lib/supabase/serveur";
 import { filParId } from "@/data/community/fils";
 
@@ -46,7 +47,9 @@ export default async function ComptePage() {
             <div>
               <h1 className="cp-h1">{compte.profil.pseudo}</h1>
               <p className="cp-sous">
-                {compte.email} · inscrit le{" "}
+                {/* L'adresse est fabriquée à partir de l'identifiant : c'est
+                    lui qu'il faut lire, pas un courriel qui n'existe pas. */}
+                identifiant {identifiantDe(compte.email)} · inscrit le{" "}
                 {new Date(compte.profil.cree_le).toLocaleDateString("fr-FR", {
                   day: "numeric",
                   month: "long",

@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import Link from "next/link";
 import { connecter, inscrire, type Retour } from "@/app/compte/actions";
+import { IDENTIFIANT_MOTIF } from "@/lib/supabase/identifiant";
 
 const DEPART: Retour = {};
 
@@ -39,26 +40,27 @@ export function FormConnexion({ mode }: { mode: "connexion" | "inscription" }) {
       </div>
 
       <form action={inscription ? actionI : actionC} className="cp-form" key={onglet}>
-        {inscription && (
-          <label className="cp-champ">
-            <span>Pseudo</span>
-            <input
-              name="pseudo"
-              type="text"
-              required
-              minLength={3}
-              maxLength={24}
-              pattern="[A-Za-z0-9_\-]{3,24}"
-              autoComplete="username"
-              placeholder="celui qui s'affichera sur vos messages"
-            />
-            <em>Lettres, chiffres, tiret et souligné. Votre nom réel n&apos;est jamais demandé.</em>
-          </label>
-        )}
-
         <label className="cp-champ">
-          <span>Adresse électronique</span>
-          <input name="email" type="email" required autoComplete="email" placeholder="vous@exemple.fr" />
+          <span>Identifiant</span>
+          <input
+            name="identifiant"
+            type="text"
+            required
+            minLength={3}
+            maxLength={24}
+            pattern={IDENTIFIANT_MOTIF}
+            autoComplete="username"
+            autoCapitalize="none"
+            spellCheck={false}
+            placeholder={inscription ? "celui qui s'affichera sur vos messages" : "votre identifiant"}
+          />
+          {inscription && (
+            <em>
+              Lettres, chiffres, tiret et souligné, de 3 à 24 caractères. Aucune adresse
+              électronique n&apos;est demandée : gardez ce mot-là, il ne pourra pas vous être
+              renvoyé.
+            </em>
+          )}
         </label>
 
         <label className="cp-champ">
