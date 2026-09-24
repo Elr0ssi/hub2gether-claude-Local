@@ -38,40 +38,12 @@ Deux garde-fous complètent ces règles : cinq messages par minute et
 soixante par heure au plus, et une réponse ne peut pas viser une autre
 discussion que son parent.
 
-## La connexion se fait par identifiant
-
-On s'inscrit et on se connecte avec un identifiant et un mot de passe.
-Aucune adresse électronique n'est demandée : personne n'a à donner son
-courriel pour écrire dans un forum, et le forfait gratuit n'envoie de toute
-façon de courriel qu'aux adresses de l'équipe du projet.
-
-Supabase, lui, authentifie par adresse. On lui en fabrique donc une,
-toujours la même pour un identifiant donné : `lea` devient
-`lea@identifiants.essential-data.fr`, à l'inscription comme à la connexion.
-Le domaine ne reçoit rien et n'a pas à exister. La transformation tient en
-dix lignes, dans `src/lib/supabase/identifiant.ts`.
-
-Deux conséquences qu'il faut connaître :
-
-- **Le réglage « Confirm email » doit être coupé** (tableau de bord,
-  Authentication, Sign In / Providers, Email). Sinon le compte est créé mais
-  la connexion reste bloquée sur un courriel qui ne partira nulle part. Le
-  site le dit mot pour mot quand le cas se présente.
-- **Un mot de passe perdu est un compte perdu.** Sans adresse réelle, rien
-  ne peut être renvoyé. Le jour où il faudra la récupération, on demandera
-  une adresse facultative et on la branchera sur le renvoi de Supabase.
-
-L'identifiant est insensible à la casse et aux espaces de bord : `Lea`,
-`lea` et ` Lea ` ouvrent le même compte. Le nom affiché sur les messages,
-lui, se change dans le profil ; l'identifiant de connexion, non.
-
 ## Les variables d'environnement
 
-Les deux premières sont publiques, elles partent dans le navigateur. Voir
+Les deux sont publiques, elles partent dans le navigateur. Voir
 `.env.example`.
 
 ```
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-NEXT_PUBLIC_DOMAINE_COMPTES   (facultatif, défaut identifiants.essential-data.fr)
 ```

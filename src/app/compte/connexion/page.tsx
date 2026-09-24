@@ -31,8 +31,7 @@ export default async function ConnexionPage({
           <h1 className="cp-h1">Votre espace</h1>
           <p className="cp-chapo">
             Un compte sert à une chose : parler sous un nom stable, pour que vos messages puissent
-            être suivis, contestés et corrigés. Un identifiant, un mot de passe, rien d&apos;autre :
-            ni adresse électronique, ni nom réel.
+            être suivis, contestés et corrigés. Rien de plus ne vous est demandé.
           </p>
           {COMPTES_ACTIFS ? (
             <FormConnexion mode={mode === "inscription" ? "inscription" : "connexion"} />

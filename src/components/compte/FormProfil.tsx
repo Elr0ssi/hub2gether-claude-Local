@@ -11,7 +11,7 @@ export function FormProfil({ pseudo, bio }: { pseudo: string; bio: string | null
   return (
     <form action={action} className="cp-form">
       <label className="cp-champ">
-        <span>Nom affiché</span>
+        <span>Pseudo</span>
         <input
           name="pseudo"
           type="text"
@@ -21,9 +21,6 @@ export function FormProfil({ pseudo, bio }: { pseudo: string; bio: string | null
           maxLength={24}
           pattern="[A-Za-z0-9_\-]{3,24}"
         />
-        {/* Le nom affiché et l'identifiant de connexion sont deux choses :
-            changer le premier ne change pas celui qu'on saisit pour entrer. */}
-        <em>C&apos;est le nom sur vos messages. Votre identifiant de connexion ne change pas.</em>
       </label>
 
       <label className="cp-champ">
