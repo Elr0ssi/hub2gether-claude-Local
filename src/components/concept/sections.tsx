@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { AnimatePresence, motion, useScroll } from "framer-motion";
 import {
   FICHE_PAYS,
   PREUVES,
@@ -112,35 +112,71 @@ export function InteractiveMapPreview({
   regions: readonly { id: string; label: string; pays: readonly string[] }[];
   vues: Record<string, { lat: number; lon: number }>;
 }) {
+  /* Le globe change de région au fil du défilement plutôt qu'au clic : la
+     section est haute, et chaque tranche de sa hauteur fait avancer d'une
+     région. Une seule scène WebGL reste montée — cinq en parallèle
+     referaient cinq fois le même coût pour cinq fois la même carte — mais
+     la caméra, la région pilotée et le pays vedette du panneau changent,
+     ce qui se voit et se lit comme un défilement de globes. */
+  const zone = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: zone, offset: ["start start", "end end"] });
+  const [pas, setPas] = useState(0);
+  useEffect(
+    () =>
+      scrollYProgress.on("change", (v) => {
+        const i = Math.min(regions.length - 1, Math.max(0, Math.floor(v * regions.length)));
+        setPas((p) => (p === i ? p : i));
+      }),
+    [scrollYProgress, regions.length],
+  );
+  const region = regions[pas] ?? regions[0];
+
   return (
     <section className="cg-section" id="nos-globes">
       <div className="cg-wrap">
         <Enseigne>Nos globes</Enseigne>
         <Monte>
-          <h2 className="cg-h2">
-            Explorez le monde<span className="cg-pt">.</span>
-            <br />
-            <span className="cg-h2-doux">Autrement.</span>
-          </h2>
-          <p className="cg-chapo">
-            Un globe interactif, des indicateurs clés et des analyses pour chaque pays. Faites-le
-            tourner, choisissez un territoire.
+          <p className="cg-chapo cg-globes-accroche">
+            Le produit intérieur brut, la démographie et le commerce de chaque pays, sur un globe
+            qu&apos;on fait tourner à la souris — cinq régions du monde, une source nommée.
           </p>
         </Monte>
+        {/* Le compte que le globe ne montre plus : utile aux moteurs, pas à
+            l'œil. La liste des sujets couverts se lit déjà dans les plaques
+            du hero et dans les repères du bandeau. */}
+        <p className="sr-only">
+          {FICHE_PAYS.couverture.map((c) => `${c.valeur} ${c.label}`).join(", ")}.
+        </p>
+      </div>
 
-        <Monte delay={0.08}>
-          <GlobeMonde donnees={donnees} annee={annee} regions={regions} vues={vues} />
-        </Monte>
-
-        <Monte delay={0.14}>
-          <div className="cg-couverture">
-            {FICHE_PAYS.couverture.map((c) => (
-              <span key={c.label}>
-                <strong>{c.valeur}</strong> {c.label}
-              </span>
-            ))}
+      <div ref={zone} className="cg-globes-zone" style={{ height: `${regions.length * 68}vh` }}>
+        <div className="cg-globes-colle">
+          <div className="cg-wrap">
+            <Monte>
+              <div className="cg-globes-cadre">
+                <GlobeMonde
+                  donnees={donnees}
+                  annee={annee}
+                  regions={regions}
+                  vues={vues}
+                  montrerRegions={false}
+                  montrerIndicateurs={false}
+                  indicateurs={["pib"]}
+                  regionPilotee={region.id}
+                />
+              </div>
+            </Monte>
+            <div className="cg-globes-puces" role="tablist" aria-label="Région affichée">
+              {regions.map((r, i) => (
+                <span
+                  key={r.id}
+                  className={`cg-globes-puce${i === pas ? " cg-globes-puce-on" : ""}`}
+                  aria-hidden="true"
+                />
+              ))}
+            </div>
           </div>
-        </Monte>
+        </div>
       </div>
     </section>
   );
@@ -183,11 +219,7 @@ export function FluxSources() {
       <div className="cg-wrap">
         <Enseigne>Notre fonctionnement</Enseigne>
         <Monte>
-          <h2 className="cg-h2">
-            Quatre flux<span className="cg-pt">.</span>
-            <br />
-            <span className="cg-h2-doux">Une seule sortie.</span>
-          </h2>
+          <h2 className="cg-h2">Notre fonctionnement</h2>
           <p className="cg-chapo">
             Rien ne sort qui n&apos;ait été vu par plusieurs sources. Les convergences font la
             donnée, les divergences font l&apos;article.
@@ -250,8 +282,7 @@ export function FluxSources() {
           {/* La sortie */}
           <Monte delay={0.28}>
             <div className="cg-flux-sortie">
-              <span className="cg-flux-sortie-m" aria-hidden="true" />
-              <span className="cg-flux-sortie-t">The Essential Data</span>
+              <span className="cg-flux-sortie-t">Visualize</span>
               <span className="cg-flux-sortie-d">Recoupé, daté, sourcé</span>
               <span className="cg-flux-gratuit">100 % gratuit pour nos lecteurs</span>
             </div>
@@ -475,6 +506,13 @@ function valeurFr(v: number, unite: "md" | "eur" | "pct" | "hab") {
     : `${Math.round(v).toLocaleString("fr-FR")} Md $`;
 }
 
+const FICHE_COULEUR: Record<string, string> = {
+  pib: "linear-gradient(90deg, #3987e5, transparent)",
+  dette: "linear-gradient(90deg, #D6A77A, transparent)",
+  inflation: "linear-gradient(90deg, #41C7A5, transparent)",
+  population: "linear-gradient(90deg, #9B8BE0, transparent)",
+};
+
 export function Classements({
   donnees,
   annee,
@@ -497,51 +535,85 @@ export function Classements({
     [donnees],
   );
 
+  /* Les titres tiennent la colonne de gauche, fixes ; à droite, une seule
+     vitrine passe de l'un à l'autre au fil du défilement — de la droite vers
+     la gauche, comme le reste des rubriques qui se remplacent sur cette
+     page. Cliquer un titre saute directement dessus. */
+  const zone = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: zone, offset: ["start start", "end end"] });
+  const [pas, setPas] = useState(0);
+  useEffect(
+    () =>
+      scrollYProgress.on("change", (v) => {
+        const i = Math.min(fiches.length - 1, Math.max(0, Math.floor(v * fiches.length)));
+        setPas((p) => (p === i ? p : i));
+      }),
+    [scrollYProgress, fiches.length],
+  );
+  const actif = fiches[pas];
+
   return (
     <section className="cg-section cg-classements">
       <div className="cg-wrap">
         <Enseigne>Nos classements</Enseigne>
         <Monte>
-          <h2 className="cg-h2">
-            Ce que dit le socle<span className="cg-pt">.</span>
-            <br />
-            <span className="cg-h2-doux">{annee}.</span>
-          </h2>
+          <h2 className="cg-h2">Nos classements</h2>
         </Monte>
+      </div>
 
-        <div className="cg-cl-grille">
-          {fiches.map((f, k) => (
-            <Monte key={`${f.id}-${f.sens}`} delay={Math.min(k, 3) * 0.08} y={22}>
-              <article className="cg-fiche">
-                <header className="cg-fiche-h">
-                  <span className="cg-fiche-i">{f.court}</span>
-                  <h3 className="cg-fiche-t">{f.label}</h3>
-                </header>
-                <ol className="cg-fiche-l">
-                  {f.lignes.map((o, i) => (
-                    <li key={o.fr}>
-                      <span className="cg-fiche-r">{String(i + 1).padStart(2, "0")}</span>
-                      <span className="cg-fiche-n">{o.fr}</span>
-                      <span className="cg-fiche-v">{valeurFr(o.v, f.unite)}</span>
-                      <motion.span
-                        className="cg-fiche-b"
-                        initial={{ scaleX: 0 }}
-                        whileInView={{ scaleX: o.part }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.7, delay: 0.1 + i * 0.05, ease: LENT }}
-                      />
-                    </li>
-                  ))}
-                </ol>
-              </article>
-            </Monte>
-          ))}
+      <div ref={zone} className="cg-cl-zone" style={{ height: `${fiches.length * 56}vh` }}>
+        <div className="cg-cl-colle">
+          <div className="cg-wrap cg-cl-disposition">
+            <nav className="cg-cl-titres" aria-label="Classements">
+              {fiches.map((f, i) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  className={`cg-cl-titre${i === pas ? " cg-cl-titre-on" : ""}`}
+                  onClick={() => setPas(i)}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </nav>
+
+            <div className="cg-cl-vitrine">
+              <AnimatePresence mode="wait">
+                <motion.article
+                  key={actif.id}
+                  className="cg-fiche cg-fiche-vitrine"
+                  style={{ "--fiche-t": FICHE_COULEUR[actif.id] } as CSSProperties}
+                  initial={{ opacity: 0, x: 36 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -36 }}
+                  transition={{ duration: 0.42, ease: LENT }}
+                >
+                  <header className="cg-fiche-h">
+                    <span className="cg-fiche-i">{actif.court}</span>
+                    <h3 className="cg-fiche-t">{actif.label}</h3>
+                  </header>
+                  <ol className="cg-fiche-l">
+                    {actif.lignes.map((o, i) => (
+                      <li key={o.fr}>
+                        <span className="cg-fiche-r">{String(i + 1).padStart(2, "0")}</span>
+                        <span className="cg-fiche-n">{o.fr}</span>
+                        <span className="cg-fiche-v">{valeurFr(o.v, actif.unite)}</span>
+                        <span className="cg-fiche-b" style={{ transform: `scaleX(${o.part})` }} />
+                      </li>
+                    ))}
+                  </ol>
+                </motion.article>
+              </AnimatePresence>
+            </div>
+          </div>
+
+          <div className="cg-wrap">
+            <p className="cg-cl-source">
+              Banque mondiale (WDI) · {annee} · les pays sans valeur publiée pour cet
+              indicateur ne figurent pas au classement.
+            </p>
+          </div>
         </div>
-
-        <p className="cg-cl-source">
-          Banque mondiale (WDI) · {annee} · les pays sans valeur publiée pour cet
-          indicateur ne figurent pas au classement.
-        </p>
       </div>
     </section>
   );
@@ -555,11 +627,7 @@ export function Methode() {
       <div className="cg-wrap">
         <Enseigne>Notre méthode</Enseigne>
         <Monte>
-          <h2 className="cg-h2">
-            D&apos;une source<span className="cg-pt">.</span>
-            <br />
-            <span className="cg-h2-doux">à un article.</span>
-          </h2>
+          <h2 className="cg-h2">Notre méthode</h2>
           <p className="cg-chapo">
             Cinq étapes, toujours les mêmes. C&apos;est la répétition qui rend le
             résultat vérifiable — pas la vitesse.

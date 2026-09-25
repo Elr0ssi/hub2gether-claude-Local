@@ -429,6 +429,55 @@ body:has(.cg) { background: #05080c; }
 }
 .cg-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
+/* Les plaques posées sur le globe : ce que la maison couvre, lisible sans
+   suivre la rotation. Un empilement à droite, dans la même colonne que le
+   globe, en verre dépoli comme le reste de la barre — la même matière que
+   `.cg-header-verre`, pour que la scène reste cohérente. */
+.cg-hero-plaques {
+  position: absolute;
+  top: 50%;
+  right: clamp(24px, 4.4vw, 72px);
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: clamp(168px, 15vw, 208px);
+  pointer-events: auto;
+}
+.cg-plaque {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--voile) 12%, transparent);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--fond) 38%, transparent);
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+  text-decoration: none;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.cg-plaque strong { font-size: 21px; font-weight: 400; letter-spacing: -0.01em; color: var(--encre); }
+.cg-plaque span { font-size: 11px; letter-spacing: 0.03em; color: var(--encre-3); }
+.cg-plaque-lien:hover { border-color: color-mix(in srgb, var(--chaud) 55%, transparent); transform: translateX(-2px); }
+.cg-plaque-lien strong { color: var(--chaud); }
+@media (max-width: 900px) {
+  .cg-hero-plaques {
+    top: auto;
+    bottom: 12vh;
+    right: 50%;
+    transform: translateX(50%);
+    flex-direction: row;
+    width: auto;
+  }
+  .cg-plaque { padding: 10px 12px; }
+  .cg-plaque strong { font-size: 17px; }
+  .cg-plaque span { font-size: 9.5px; }
+}
+
+
 
 /* ── Le bloc éditorial ───────────────────────────────────────────────────── */
 
@@ -442,88 +491,29 @@ body:has(.cg) { background: #05080c; }
 }
 .cg-hero-texte { will-change: transform, opacity; }
 
-.cg-eyebrow {
-  font-size: 10.5px;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--encre-3);
-}
-
-.cg-h1 {
-  margin-top: 26px;
-  font-size: clamp(42px, 4.6vw, 76px);
+/* Le nom seul, en enseigne : la même facture que le mot-titre de la page
+   économie (lettres très espacées, poids léger), parce que c'est la
+   promesse tenue par les deux pages — un mot qu'on reconnaît de loin. */
+.cg-hero-titre {
+  font-size: clamp(40px, 5.6vw, 78px);
+  font-weight: 300;
   line-height: 1.04;
-  letter-spacing: -0.035em;
-  /* Poids 400 : la force vient de la taille et du blanc, pas de la graisse. */
-  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-indent: 0.14em;
+  text-transform: uppercase;
+  color: var(--encre);
 }
-.cg-h1 span { display: block; }
-.cg-h1 span:last-child { color: var(--encre-2); }
 
 .cg-hero-c {
-  margin-top: 28px;
+  margin-top: 24px;
   font-size: 15.5px;
   line-height: 1.68;
   color: var(--encre-2);
   max-width: 440px;
 }
 
-.cg-hero-bas { margin-top: 40px; display: flex; align-items: center; gap: 32px; flex-wrap: wrap; }
-
-.cg-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 11px;
-  padding: 14px 26px;
-  border: 1px solid rgba(214, 167, 122, 0.45);
-  border-radius: 10px;
-  background: rgba(214, 167, 122, 0.06);
-  color: var(--encre);
-  font: inherit;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.4s, border-color 0.4s, gap 0.4s;
-}
-.cg-cta:hover { background: rgba(214, 167, 122, 0.13); border-color: rgba(214, 167, 122, 0.8); gap: 16px; }
-
-.cg-lecteurs { display: flex; flex-direction: column; font-size: 12px; color: var(--encre-3); }
-.cg-lecteurs strong { font-size: 22px; font-weight: 400; color: var(--encre); letter-spacing: -0.02em; }
-
-/* Les repères du hero : quatre entrées sur une ligne, séparées par un filet.
-   Des comptages, donc une chasse tabulaire et pas d'emphase. */
-.cg-reperes {
-  margin-top: clamp(22px, 3vh, 38px);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  gap: 0;
-  list-style: none;
-  padding: 0;
-}
-.cg-reperes li { padding: 0 clamp(14px, 1.6vw, 24px); border-left: 1px solid var(--bord-fin); }
-.cg-reperes li:first-child { padding-left: 0; border-left: 0; }
-.cg-reperes li,
-.cg-reperes a {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: 11.5px;
-  line-height: 1.35;
-  color: var(--encre-3);
-  text-decoration: none;
-}
-.cg-reperes strong {
-  font-size: 19px;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  color: var(--encre);
-  font-variant-numeric: tabular-nums;
-}
-.cg-reperes a:hover strong { color: var(--chaud); }
-@media (max-width: 700px) {
-  .cg-reperes li { padding: 0 12px 0 0; border-left: 0; }
-  .cg-reperes { gap: 14px 0; }
-}
+.cg-lecteurs { display: block; margin-top: 32px; font-size: 12px; color: var(--encre-3); }
+.cg-lecteurs strong { display: block; font-size: 22px; font-weight: 400; color: var(--encre); letter-spacing: -0.02em; }
 
 .cg-murmure {
   margin-top: 52px;
@@ -733,13 +723,44 @@ body:has(.cg) { background: #05080c; }
   font: inherit;
   font-size: 13.5px;
   color: var(--chaud);
+  text-decoration: none;
   cursor: pointer;
   transition: gap 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .cg-lien-fleche:hover { gap: 15px; }
 
-.cg-couverture { display: flex; gap: 40px; flex-wrap: wrap; margin-top: 28px; font-size: 12.5px; color: var(--encre-3); }
-.cg-couverture strong { font-size: 19px; font-weight: 400; color: var(--encre); margin-right: 7px; letter-spacing: -0.02em; }
+/* ── Le carrousel de globes ──────────────────────────────────────────────
+   Une scène tenue en position fixe (sticky) pendant que sa section, plus
+   haute qu'un écran, défile derrière elle : chaque tranche de hauteur
+   franchie fait avancer d'une région, comme des cartes qu'on tournerait. */
+.cg-globes-accroche { margin-top: 18px; max-width: 62ch; }
+.cg-globes-zone { position: relative; }
+.cg-globes-colle {
+  position: sticky;
+  top: 8vh;
+  padding-top: 6vh;
+}
+.cg-globes-cadre {
+  border: 1px solid var(--bord-fin);
+  border-radius: 20px;
+  padding: clamp(10px, 1.6vw, 22px);
+  background: linear-gradient(160deg, rgba(158, 199, 216, 0.05), color-mix(in srgb, var(--voile) 1.5%, transparent));
+  overflow: hidden;
+}
+.cg-globes-puces {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+.cg-globes-puce {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bord);
+  transition: background 0.35s ease, transform 0.35s ease;
+}
+.cg-globes-puce-on { background: var(--chaud); transform: scale(1.4); }
 
 /* ── À la une ────────────────────────────────────────────────────────────── */
 
@@ -1185,15 +1206,10 @@ body:has(.cg) { background: #05080c; }
   display: flex;
   flex-direction: column;
   gap: 7px;
-  padding: 24px 22px;
+  padding: 26px 24px;
   border: 1px solid rgba(158, 199, 216, 0.34);
-  border-radius: 12px;
+  border-radius: 20px;
   background: linear-gradient(150deg, rgba(158, 199, 216, 0.09), rgba(12, 19, 26, 0.5));
-}
-.cg-flux-sortie-m {
-  width: 9px; height: 9px; border-radius: 9px;
-  border: 1px solid var(--froid);
-  box-shadow: inset 0 0 0 2px rgba(158, 199, 216, 0.25);
 }
 .cg-flux-sortie-t { font-size: 17px; font-weight: 400; letter-spacing: -0.02em; }
 .cg-flux-sortie-d { font-size: 12px; color: var(--encre-2); }
@@ -1255,6 +1271,44 @@ body:has(.cg) { background: #05080c; }
 @media (max-width: 1080px) { .cg-cl-grille { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .cg-cl-grille { grid-template-columns: minmax(0, 1fr); } }
 .cg-cl-grille .cg-fiche { width: auto; height: 100%; }
+
+/* ── Titres à gauche, vitrine à droite ────────────────────────────────────
+   Même mécanique de défilement tenu (sticky) que le carrousel de globes :
+   la section est plus haute qu'un écran, et chaque tranche franchie fait
+   passer la vitrine au classement suivant. */
+.cg-cl-zone { position: relative; }
+.cg-cl-colle { position: sticky; top: 10vh; padding-top: 4vh; }
+.cg-cl-disposition {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: clamp(24px, 4vw, 64px);
+}
+.cg-cl-titres { display: flex; flex-direction: column; gap: 6px; }
+.cg-cl-titre {
+  padding: 10px 4px;
+  border: 0;
+  border-top: 1px solid var(--bord-fin);
+  background: none;
+  text-align: left;
+  font: inherit;
+  font-size: clamp(19px, 2vw, 27px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--encre-3);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+.cg-cl-titres > *:last-child { border-bottom: 1px solid var(--bord-fin); }
+.cg-cl-titre:hover { color: var(--encre-2); }
+.cg-cl-titre-on { color: var(--encre); }
+
+.cg-cl-vitrine { position: relative; width: clamp(260px, 27vw, 320px); }
+.cg-fiche-vitrine { width: 100%; }
+@media (max-width: 780px) {
+  .cg-cl-disposition { grid-template-columns: minmax(0, 1fr); }
+  .cg-cl-vitrine { width: 100%; }
+}
 
 .cg-cl-piste {
   display: flex;
@@ -1758,35 +1812,36 @@ body:has(.cg) { background: #05080c; }
 }
 .cg-frise2-rail:active .cg-frise2-point { transition: none; }
 
-/* Le pas en cours, à part : un repère flottant au-dessus du rail, à son
-   bord droit, plutôt qu'un chiffre de plus collé au dernier publié. Le
-   point vert dit ce que la date « en cours » n'est pas : un millésime de la
-   source. */
+/* Le pas en cours continue la rangée des dates, juste après la dernière
+   publiée, au lieu de flotter au-dessus du rail : c'était bien vu, mais mal
+   lu — on ne comprenait pas ce que ce repère voulait dire de si loin. Le
+   point vert et la couleur le distinguent d'une date parmi les autres, sans
+   le sortir de la ligne. */
 .cg-frise2-direct {
   position: absolute;
-  right: 0;
-  bottom: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 14px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px 4px 8px;
-  border: 1px solid var(--bord-fin);
+  padding: 3px 9px 3px 7px;
+  border: 1px solid color-mix(in srgb, var(--froid) 40%, transparent);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--fond) 70%, transparent);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: color-mix(in srgb, var(--froid) 10%, transparent);
   font: inherit;
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  color: var(--encre-2);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--froid);
   cursor: pointer;
-  transition: color 0.25s, border-color 0.25s;
+  transition: color 0.25s, border-color 0.25s, background 0.25s;
 }
-.cg-frise2-direct:hover { color: var(--encre); }
-.cg-frise2-direct-on { color: var(--froid); border-color: color-mix(in srgb, var(--froid) 55%, transparent); }
+.cg-frise2-direct:hover { background: color-mix(in srgb, var(--froid) 18%, transparent); }
+.cg-frise2-direct-on { color: var(--encre); border-color: var(--froid); background: color-mix(in srgb, var(--froid) 22%, transparent); }
 .cg-frise2-direct-p {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: var(--vert);
   animation: cg-bat 2.4s ease-out infinite;
@@ -4000,16 +4055,16 @@ body:has(.cg) { background: #05080c; }
 
 /* ── Données temps réelles ───────────────────────────────────────────────── */
 
-/* Le bandeau remplace le fil d'agrégats : mêmes mécanique et mêmes bords qui
-   s'effacent, mais des vignettes qu'on peut viser. Chacune ne porte que son
-   intitulé et son nombre ; le reste attend le clic, dans la ligne de dessous.
+.cg-tr-titre { margin-bottom: clamp(20px, 3vh, 34px); }
 
-   La piste s'arrête dès qu'une vignette est ouverte : lire une provenance
-   pendant que la vignette s'en va est impossible. */
+/* Le bandeau reprend la mécanique de l'ancien fil d'agrégats — mêmes bords
+   qui s'effacent, la piste s'attrape à la main — mais les vignettes sont
+   plus grandes, et rien ne s'y ouvre plus au clic : le montant écrit en
+   toutes lettres tient déjà lieu d'explication. */
 .cg-tr-piste {
   display: flex;
   align-items: stretch;
-  gap: 12px;
+  gap: 14px;
   width: max-content;
   padding: 2px 0 6px;
   will-change: transform;
@@ -4017,11 +4072,11 @@ body:has(.cg) { background: #05080c; }
 .cg-tr-i {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  min-width: 178px;
-  padding: 13px 17px;
+  gap: 7px;
+  min-width: 224px;
+  padding: 20px 24px;
   border: 1px solid var(--bord-fin);
-  border-radius: 12px;
+  border-radius: 14px;
   /* Le globe du hero finit sa sortie derrière ce bandeau. En sombre il n'est
      qu'une ombre ; en clair c'est un disque gris qui passerait sous les
      chiffres. D'où la couche de fond, assez légère pour le laisser deviner. */
@@ -4030,60 +4085,41 @@ body:has(.cg) { background: #05080c; }
     color-mix(in srgb, var(--fond) 74%, transparent);
   backdrop-filter: blur(7px);
   text-align: left;
-  cursor: pointer;
   white-space: nowrap;
-  transition: border-color 0.3s ease, background 0.3s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.cg-tr-i:hover { border-color: color-mix(in srgb, var(--froid) 45%, transparent); }
-.cg-tr-i-on {
-  border-color: color-mix(in srgb, var(--chaud) 65%, transparent);
-  transform: translateY(-2px);
 }
 .cg-tr-lab {
-  font-size: 9.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10.5px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--encre-3);
 }
 .cg-tr-v {
-  font-size: 16px;
+  font-size: 22px;
   line-height: 1.2;
   letter-spacing: -0.02em;
   color: var(--encre);
 }
-
-/* La ligne de détail : une hauteur tenue, sinon la page saute d'un cran à
-   chaque ouverture. */
-.cg-tr-d {
-  margin-top: 16px;
-  min-height: 42px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  max-width: 92ch;
-  font-size: 12px;
-  line-height: 1.6;
-  color: var(--encre-3);
-  transition: color 0.3s ease;
+.cg-tr-lettres {
+  font-size: 12.5px;
+  color: var(--encre-2);
+  white-space: normal;
 }
-.cg-tr-d strong { font-weight: 500; color: var(--encre); }
-.cg-tr-d-on { color: var(--encre-2); }
-.cg-tr-d-v { opacity: 0.72; }
 
-/* La pastille d'exemple. Elle n'est pas discrète : un compteur sans source
-   doit se voir comme tel, sinon il se lit comme une mesure. */
+/* La pastille d'exemple, à même le libellé plutôt que dans un panneau à
+   part. Elle n'est pas discrète : un compteur sans source doit se voir
+   comme tel, sinon il se lit comme une mesure. */
 .cg-tr-ex {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 9px;
+  padding: 2px 7px;
   border: 1px dashed color-mix(in srgb, var(--chaud) 55%, transparent);
   border-radius: 999px;
-  font-size: 10px;
-  letter-spacing: 0.04em;
+  font-size: 8.5px;
+  letter-spacing: 0.06em;
   color: var(--chaud);
 }
 @media (max-width: 620px) {
-  .cg-tr-i { min-width: 150px; padding: 11px 14px; }
-  .cg-tr-v { font-size: 14px; }
+  .cg-tr-i { min-width: 188px; padding: 16px 18px; }
+  .cg-tr-v { font-size: 18px; }
 }

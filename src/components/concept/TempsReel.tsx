@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Enseigne } from "./pieces";
+import { useEffect, useMemo, useRef } from "react";
 import { Odometre } from "./Roulement";
 import { useMonnaie } from "./Monnaie";
 import { convertir, fiche } from "@/data/finance/tauxChange";
@@ -12,26 +11,25 @@ import type { FichePays } from "@/data/concept/conceptGeo";
    DONNÉES TEMPS RÉELLES
 
    Le bandeau défile : les compteurs passent, on n'en lit pas dix d'un coup.
-   Chaque vignette ne montre que son intitulé et son nombre — le détail, la
-   provenance et la mention d'exemple n'apparaissent qu'au clic, dans le
-   bandeau de dessous. Une rangée qui porterait tout en même temps se lirait
-   comme un tableau, et ce n'est pas ce qu'on veut voir courir.
+   Chaque vignette porte son intitulé, son nombre, et le même montant écrit
+   en toutes lettres — « 8,5 milliards d'habitants » — pour qu'il se lise
+   d'un regard sans compter les chiffres.
 
    Aucun de ces compteurs ne mesure quoi que ce soit à la seconde : ils
-   étalent une grandeur annuelle sur l'année en cours.
-
-   Deux d'entre eux viennent du socle : le produit intérieur brut, qui est un
-   flux et se cumule depuis le 1er janvier, et la population, qui est un stock
-   et part de la somme publiée. Les autres attendent leur source ; ils le
-   disent dès qu'on les ouvre.
+   étalent une grandeur annuelle sur l'année en cours. Deux viennent du
+   socle — le produit intérieur brut, qui est un flux et se cumule depuis le
+   1er janvier, et la population, qui est un stock et part de la somme
+   publiée. Les autres attendent leur source ; une pastille le dit.
 
    Le défilement est écrit dans le DOM par une boucle plutôt que par une
-   animation CSS : sans cela, on ne peut ni l'attraper pour le faire glisser,
-   ni l'arrêter net quand on vise une vignette.
+   animation CSS : sans cela, on ne peut pas l'attraper pour le faire
+   glisser à la main.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const AN = 365.2425 * 24 * 3600;
 const COPIES = 2;
+
+const MOT_MONNAIE: Record<string, string> = { usd: "dollars", eur: "euros", cny: "renminbis" };
 
 interface Vignette {
   id: string;
@@ -41,7 +39,8 @@ interface Vignette {
   parSeconde: number;
   dec: number;
   unite: string;
-  note: string;
+  /** Le mot au pluriel qui suit le montant écrit en toutes lettres. */
+  mot: string;
   exemple?: string;
 }
 
@@ -58,6 +57,44 @@ function somme(donnees: Record<string, FichePays>, champ: "pib" | "population") 
   return { total, pays };
 }
 
+/* Le montant en toutes lettres, à l'échelle qui lui va : au-delà du
+   milliard on ne lit plus neuf chiffres, on lit « 8,5 milliards ». L'échelle
+   se choisit seule, sur la valeur du moment — ce texte n'est donc pas figé,
+   il change avec le compteur, mais à son rythme à lui : la puce ne se
+   redessine qu'une fois par seconde, pas à chaque image. */
+const ECHELLES: [number, string][] = [
+  [1e9, "milliards"],
+  [1e6, "millions"],
+  [1e3, "mille"],
+];
+function enLettres(valeur: number, mot: string): string {
+  const dit = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1, minimumFractionDigits: 0 });
+  for (const [seuil, echelle] of ECHELLES) {
+    if (Math.abs(valeur) >= seuil) return `${dit.format(valeur / seuil)} ${echelle} ${mot}`;
+  }
+  return `${dit.format(valeur)} ${mot}`;
+}
+
+/* Le texte en lettres suit le compteur sans repasser par React à chaque
+   image : une seconde puce, à son propre rythme, plutôt qu'un second état
+   React qui redessinerait la page soixante fois par seconde pour rien. */
+function Lettres({ base, parSeconde, depuis, mot }: { base: number; parSeconde: number; depuis: number; mot: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let brut = 0;
+    const tic = () => {
+      const v = base + parSeconde * ((performance.now() - depuis) / 1000);
+      el.textContent = enLettres(v, mot);
+      brut = window.setTimeout(tic, 1000);
+    };
+    tic();
+    return () => window.clearTimeout(brut);
+  }, [base, parSeconde, depuis, mot]);
+  return <span className="cg-tr-lettres" ref={ref} />;
+}
+
 export function TempsReel({
   donnees,
   annee,
@@ -67,10 +104,9 @@ export function TempsReel({
 }) {
   const [monnaie] = useMonnaie();
   const f = fiche(monnaie);
-  const [ouvert, setOuvert] = useState<string | null>(null);
 
   /* L'origine est fixée une fois : l'odomètre lit l'heure lui-même à chaque
-     image, ce composant ne se rend qu'au clic ou au changement de monnaie. */
+     image, ce composant ne se rend qu'au changement de monnaie. */
   const depart = useMemo(() => {
     const t = new Date(new Date().getFullYear(), 0, 1).getTime();
     return performance.now() - (Date.now() - t);
@@ -91,20 +127,20 @@ export function TempsReel({
         base: 0,
         parSeconde: pibMonnaie / AN,
         dec: 3,
-        unite: ` ${f.suffixe}`,
-        note: `Produit depuis le 1er janvier, au rythme de ${annee}. Somme des ${pib.pays} pays du socle, convertie au taux de ${annee}.`,
+        unite: ` ${f.suffixe}`,
+        mot: MOT_MONNAIE[monnaie] ?? "dollars",
       });
     }
     l.push({
       id: "population",
-      label: "Population couverte",
+      label: "Population",
       /* Le socle compte en millions ; le compteur compte des personnes, seule
          unité où le dernier rouleau tourne à une vitesse qui se regarde. */
       base: pop.total * 1e6,
       parSeconde: POPULATION_PAR_AN / AN,
       dec: 0,
       unite: "",
-      note: `Départ : les ${pop.pays} pays dont le socle publie la population en ${annee}. Ce n'est pas la population mondiale.`,
+      mot: "habitants",
       exemple: "Accroissement d'exemple, en attente de la source.",
     });
     for (const c of CADENCES_EXEMPLE) {
@@ -115,7 +151,7 @@ export function TempsReel({
         parSeconde: c.parAn / AN,
         dec: c.dec,
         unite: c.unite,
-        note: c.note,
+        mot: c.mot,
         exemple: c.exemple,
       });
     }
@@ -126,9 +162,7 @@ export function TempsReel({
 
   const piste = useRef<HTMLDivElement>(null);
   const pos = useRef(0);
-  const prise = useRef<{ x: number; pos: number; bouge: boolean } | null>(null);
-  const arret = useRef(false);
-  arret.current = ouvert !== null;
+  const prise = useRef<{ x: number; pos: number } | null>(null);
 
   useEffect(() => {
     const el = piste.current;
@@ -142,7 +176,7 @@ export function TempsReel({
       /* La largeur d'un exemplaire : au-delà, le suivant a pris exactement sa
          place et l'on reboucle sans saut visible. */
       const pas = el.scrollWidth / COPIES || 1;
-      if (!prise.current && !arret.current && !doux) pos.current += (dt / 1000) * 34;
+      if (!prise.current && !doux) pos.current += (dt / 1000) * 30;
       pos.current = ((pos.current % pas) + pas) % pas;
       el.style.transform = `translate3d(${-pos.current}px, 0, 0)`;
       brut = requestAnimationFrame(boucle);
@@ -151,29 +185,21 @@ export function TempsReel({
     return () => cancelAnimationFrame(brut);
   }, []);
 
-  const detail = ouvert ? vignettes.find((v) => v.id === ouvert) : null;
-
   return (
     <section className="cg-section cg-direct" id="temps-reel">
       <div className="cg-wrap">
-        <Enseigne droite={<span className="cg-demo-mini">Depuis le 1<sup>er</sup> janvier</span>}>
-          <span className="cg-point-vif" aria-hidden="true" /> Données temps réelles
-        </Enseigne>
+        <h2 className="cg-h2 cg-tr-titre">Données en temps réel</h2>
       </div>
 
       <div
         className="cg-fil"
         onPointerDown={(e) => {
-          prise.current = { x: e.clientX, pos: pos.current, bouge: false };
+          prise.current = { x: e.clientX, pos: pos.current };
           (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
         }}
         onPointerMove={(e) => {
           if (!prise.current) return;
-          const d = e.clientX - prise.current.x;
-          /* Au-delà de quatre pixels, c'est un glissement : le clic qui suit
-             ne doit pas ouvrir la vignette qu'on vient de traîner. */
-          if (Math.abs(d) > 4) prise.current.bouge = true;
-          pos.current = prise.current.pos - d;
+          pos.current = prise.current.pos - (e.clientX - prise.current.x);
         }}
         onPointerUp={() => {
           prise.current = null;
@@ -185,17 +211,11 @@ export function TempsReel({
         <div ref={piste} className="cg-tr-piste">
           {Array.from({ length: COPIES }, (_, c) =>
             vignettes.map((v) => (
-              <button
-                type="button"
-                key={`${v.id}-${c}`}
-                className={`cg-tr-i${ouvert === v.id ? " cg-tr-i-on" : ""}`}
-                aria-expanded={ouvert === v.id}
-                onClick={() => {
-                  if (prise.current?.bouge) return;
-                  setOuvert((o) => (o === v.id ? null : v.id));
-                }}
-              >
-                <span className="cg-tr-lab">{v.label}</span>
+              <div className="cg-tr-i" key={`${v.id}-${c}`}>
+                <span className="cg-tr-lab">
+                  {v.label}
+                  {v.exemple ? <span className="cg-tr-ex">exemple</span> : null}
+                </span>
                 <Odometre
                   className="cg-tr-v"
                   valeur={v.base}
@@ -204,26 +224,9 @@ export function TempsReel({
                   dec={v.dec}
                   unite={v.unite}
                 />
-              </button>
+                <Lettres base={v.base} parSeconde={v.parSeconde} depuis={depart} mot={v.mot} />
+              </div>
             )),
-          )}
-        </div>
-      </div>
-
-      <div className="cg-wrap">
-        <div className={`cg-tr-d${detail ? " cg-tr-d-on" : ""}`} aria-live="polite">
-          {detail ? (
-            <>
-              <strong>{detail.label}</strong>
-              <span>{detail.note}</span>
-              {detail.exemple ? <span className="cg-tr-ex">{detail.exemple}</span> : null}
-            </>
-          ) : (
-            <span className="cg-tr-d-v">
-              Touchez un compteur pour savoir d&apos;où il vient. Aucun ne relève à la seconde :
-              ils étalent sur l&apos;année une grandeur annuelle, et certains attendent encore leur
-              source.
-            </span>
           )}
         </div>
       </div>

@@ -12,6 +12,7 @@ import { Loupe } from "./Loupe";
 import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
 import { gelerOdometres } from "./Roulement";
 import { GlobeEco, familleDe, TOUTES } from "./GlobeEco";
+import { cle } from "@/data/concept/cle";
 import "./concept.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -193,15 +194,7 @@ const MONETAIRE = new Set<EconomyMetricId>([
 ]);
 const SECONDES_PAR_AN = 365 * 24 * 3600;
 
-/** Un nom de pays réduit à ce qui sert à le reconnaître dans une adresse. */
-function cle(n: string) {
-  return n
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
+
 
 /** Les indicateurs, sous le nom qu'on tape dans une adresse. */
 const PAR_NOM: Record<string, EconomyMetricId> = {
@@ -414,23 +407,7 @@ const Frise = memo(function Frise({
         <span className="cg-frise2-point" aria-hidden="true" style={{ left: `${pct(vue)}%` }} />
       </div>
 
-      {/* Le pas en cours ne prend pas place sur la ligne : sa position, tout
-          au bout, tombait à quelques pixels de la dernière année publiée et
-          les deux libellés se recouvraient. Il devient un repère à part,
-          posé au-dessus du rail plutôt que dessus : « en direct », pas une
-          date parmi les autres. */}
-      {annees[annees.length - 1] === ANNEE_EN_COURS && (
-        <button
-          type="button"
-          className={`cg-frise2-direct${vue === ANNEE_EN_COURS ? " cg-frise2-direct-on" : ""}`}
-          onClick={() => vise(ANNEE_EN_COURS, true)}
-        >
-          <span className="cg-frise2-direct-p" aria-hidden="true" />
-          {ANNEE_EN_COURS}
-        </button>
-      )}
-
-      <div className="cg-frise2-bornes" aria-hidden="true">
+      <div className="cg-frise2-bornes">
         {/* Toutes les années sont atteignables sur la ligne ; seules les
             décennies portent un libellé, et les demi-décennies à partir de
             2000 où la matière se resserre. Soixante-six étiquettes côte à côte
@@ -456,6 +433,23 @@ const Frise = memo(function Frise({
               {a}
             </button>
           ))}
+
+        {/* Le pas en cours ne prend pas place sur la ligne : au bout du rail,
+            sa position tombait à quelques pixels de la dernière année
+            publiée et les deux libellés se recouvraient. Il continue la
+            rangée plutôt que de flotter au-dessus : « en temps réel »,
+            cliquable, juste après 2025. */}
+        {annees[annees.length - 1] === ANNEE_EN_COURS && (
+          <button
+            type="button"
+            className={`cg-frise2-direct${vue === ANNEE_EN_COURS ? " cg-frise2-direct-on" : ""}`}
+            style={{ left: "100%" }}
+            onClick={() => vise(ANNEE_EN_COURS, true)}
+          >
+            <span className="cg-frise2-direct-p" aria-hidden="true" />
+            en temps réel
+          </button>
+        )}
       </div>
 
       </div>
@@ -641,7 +635,12 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
   const [metrique, setMetrique] = useState<EconomyMetricId>("gdp");
   const [sens, setSens] = useState<1 | -1>(-1);
   const [filtre, setFiltre] = useState("");
-  const bande = useVu();
+  /* La marge par défaut faisait sortir la bande alors qu'il restait encore
+     six fois sa hauteur de marge en bas d'écran : elle se refermait pendant
+     qu'on la voyait encore, et le défilement naturel la coupait avant que le
+     fondu n'ait fini. Une marge resserrée retarde la sortie jusqu'à ce que
+     la bande ait presque entièrement quitté l'écran par le haut. */
+  const bande = useVu(20);
   const haut = useVu(260);
   const ouverture = useProgression();
   /* Les tuiles n'arrivent qu'une fois la page chargée. Les faire partir

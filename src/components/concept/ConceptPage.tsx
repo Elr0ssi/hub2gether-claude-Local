@@ -154,85 +154,66 @@ export function ConceptPage({ articles, comptes, donnees, annee, regions, vues }
       {/* ── La scène : le texte passe devant le globe ─────────────────────── */}
       <div ref={scene} className="cg-scene">
         <div className="cg-scene-colle">
-          {/* ── Le bloc éditorial, à gauche ──────────────────────────────── */}
+          {/* ── Le bloc éditorial, à gauche : le nom, une accroche, le lectorat.
+              Tout le reste — ce que le site couvre — s'est déplacé sur le
+              globe, à droite, plutôt que de s'empiler ici. */}
           <div className="cg-hero-ancre">
           <motion.div className="cg-hero-texte" style={{ y: texteY, opacity: texteO }}>
-            <motion.p
-              className="cg-eyebrow"
-              initial={{ opacity: 0, y: 10 }}
+            <motion.h1 className="cg-hero-titre" style={{ margin: 0 }}
+              initial={{ opacity: 0, y: 22 }}
               animate={pret ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 1.1, delay: 0.35, ease: LENT }}
+              transition={{ duration: 1.3, delay: 0.4, ease: LENT }}
             >
-              Des données pour comprendre le monde
-            </motion.p>
-
-            <h1 className="cg-h1">
-              {["Comprendre", "ce qui façonne", "le monde."].map((l, k) => (
-                <motion.span
-                  key={l}
-                  initial={{ opacity: 0, y: 28 }}
-                  animate={pret ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 1.3, delay: 0.5 + k * 0.1, ease: LENT }}
-                >
-                  {l}
-                </motion.span>
-              ))}
-            </h1>
+              Visualize
+            </motion.h1>
 
             <motion.p
               className="cg-hero-c"
               initial={{ opacity: 0, y: 16 }}
               animate={pret ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 1.2, delay: 0.85, ease: LENT }}
+              transition={{ duration: 1.2, delay: 0.7, ease: LENT }}
             >
-              Des données fiables, des sources nommées, une méthode constante.
+              Analyser et comprendre le monde en 30 secondes : des cartes qui se lisent d&apos;un
+              coup d&apos;œil, des chiffres sourcés, une méthode qu&apos;on montre.
             </motion.p>
 
-            <motion.div
-              className="cg-hero-bas"
-              initial={{ opacity: 0, y: 16 }}
-              animate={pret ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 1.2, delay: 1.0, ease: LENT }}
-            >
-              <button type="button" className="cg-cta">
-                Explorer l&apos;univers <span aria-hidden="true">→</span>
-              </button>
-              <span className="cg-lecteurs">
-                <strong>+50 000</strong>
-                lecteurs chaque mois
-              </span>
-            </motion.div>
-
-            {/* Les quatre repères du cahier. Trois sont des comptages, lus dans
-                la base ; le quatrième est une porte, pas un chiffre. */}
-            <motion.ul
-              className="cg-reperes"
+            <motion.span
+              className="cg-lecteurs"
               initial={{ opacity: 0, y: 14 }}
               animate={pret ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 1.2, delay: 1.15, ease: LENT }}
+              transition={{ duration: 1.2, delay: 0.95, ease: LENT }}
             >
-              <li>
-                <strong>{comptes.globes}</strong>
-                globes thématiques
-              </li>
-              <li>
-                <strong>{comptes.articles}</strong>
-                articles décortiqués
-              </li>
-              <li>
-                <strong>{Object.keys(donnees).length}</strong>
-                pays au socle
-              </li>
-              <li>
-                <a href="/community">
-                  <strong>Forum</strong>
-                  espace de débat
-                </a>
-              </li>
-            </motion.ul>
-
+              <strong>+50 000</strong>
+              lecteurs chaque mois
+            </motion.span>
           </motion.div>
           </div>
+
+          {/* ── Ce que la maison couvre, en verre sur le globe ─────────────
+              Trois plaques dépoli, posées sur la scène plutôt que sur la
+              sphère elle-même : le globe tourne sous la souris, des
+              étiquettes qui tourneraient avec lui deviendraient illisibles à
+              mi-course. Elles restent donc fixes à l'écran, comme un
+              tableau de bord au-dessus de l'instrument. */}
+          <motion.div
+            className="cg-hero-plaques"
+            initial={{ opacity: 0 }}
+            animate={pret ? { opacity: 1 } : {}}
+            transition={{ duration: 1.2, delay: 1.1 }}
+          >
+            <div className="cg-plaque">
+              <strong>{comptes.globes}</strong>
+              <span>globes thématiques</span>
+            </div>
+            <div className="cg-plaque">
+              <strong>{comptes.articles}</strong>
+              <span>articles décortiqués</span>
+            </div>
+            <a className="cg-plaque cg-plaque-lien" href="/community">
+              <strong>Forum</strong>
+              <span>espace de débat</span>
+            </a>
+          </motion.div>
 
           <motion.span
             className="cg-defiler"

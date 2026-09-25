@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { FichePays } from "@/data/concept/conceptGeo";
+import { cle } from "@/data/concept/cle";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE GLOBE DU MONDE
@@ -61,6 +62,14 @@ interface Props {
   indicateurs?: Indic[];
   /** Les onglets de région : utiles sur une page d'accueil, encombrants ailleurs. */
   montrerRegions?: boolean;
+  /** L'onglet de l'indicateur affiché : à cacher quand un seul indicateur
+      est proposé, sinon il montre un onglet qui ne fait rien d'autre que se
+      nommer lui-même. */
+  montrerIndicateurs?: boolean;
+  /** Pilote la région depuis l'extérieur — un carrousel qui défile au
+      scroll, par exemple — sans passer par les onglets internes. Absente,
+      la région reste tenue par le globe comme avant. */
+  regionPilotee?: string;
   /** Ce qui vient se glisser sous le globe — une frise, par exemple. */
   sousLeGlobe?: React.ReactNode;
   annee: number;
@@ -103,6 +112,23 @@ const CATALOGUE: Record<Indic, SpecIndic> = {
 /** Ce que la page Monde propose depuis toujours : on ne change rien pour elle. */
 const DEFAUT: Indic[] = ["pib", "pibHab", "inflation", "balance"];
 
+/* L'indicateur, sous le nom qu'on tape dans l'adresse de la page économie.
+   Elle ne connaît pas la population brute comme indicateur sélectionnable :
+   le lien retombe alors sur le PIB plutôt que de pointer une adresse qui
+   n'existe pas. */
+const INDIC_VERS_ADRESSE: Record<Indic, string> = {
+  pib: "pib",
+  pibHab: "pib-par-habitant",
+  balance: "balance-commerciale",
+  dette: "dette",
+  chomage: "chomage",
+  inflation: "inflation",
+  population: "pib",
+};
+function cleIndic(id: Indic): string {
+  return INDIC_VERS_ADRESSE[id];
+}
+
 /* Rampe séquentielle d'une seule teinte, du sombre au clair : sur un fond de
    nuit, c'est la clarté qui porte la magnitude. On s'arrête avant les pas les
    plus sombres, qui se confondraient avec l'océan. */
@@ -137,11 +163,23 @@ export function GlobeMonde({
   onChoisi,
   indicateurs = DEFAUT,
   montrerRegions = true,
+  montrerIndicateurs = true,
+  regionPilotee,
   sousLeGlobe,
 }: Props) {
   const cv = useRef<HTMLCanvasElement>(null);
   const [pays, setPays] = useState<Pays[]>([]);
-  const [choisiLocal, setChoisiLocal] = useState<string | null>("France");
+  /* Une région pilotée dès le montage doit se lire dès la première image :
+     sans cela, le panneau ouvrirait sur le repli « France » pendant qu'un
+     autre onglet du carrousel affiche déjà sa région. */
+  const [choisiLocal, setChoisiLocal] = useState<string | null>(() => {
+    if (regionPilotee) {
+      const r = regions.find((x) => x.id === regionPilotee);
+      const premier = r?.pays.find((n) => donnees[n]);
+      if (premier) return premier;
+    }
+    return "France";
+  });
   const choisi = choisiPilote !== undefined ? choisiPilote : choisiLocal;
   const setChoisi = useCallback(
     (n: string | null) => {
@@ -151,13 +189,25 @@ export function GlobeMonde({
     [onChoisi],
   );
   const [survol, setSurvol] = useState<string | null>(null);
-  const [region, setRegion] = useState("monde");
+  const [region, setRegion] = useState(regionPilotee ?? "monde");
   const [indic, setIndic] = useState<Indic>(indicateurs[0] ?? "pib");
+
+  useEffect(() => {
+    if (regionPilotee === undefined || regionPilotee === region) return;
+    setRegion(regionPilotee);
+    const r = regions.find((x) => x.id === regionPilotee);
+    const premier = r?.pays.find((n) => donnees[n]);
+    if (premier) setChoisi(premier);
+    const v = vues[regionPilotee];
+    if (v) cible.current = { lon: v.lon, lat: v.lat };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [regionPilotee]);
 
   /* La caméra : deux angles, tirés vers une cible. Le rendu lit ces refs
      soixante fois par seconde sans repasser par React. */
-  const cam = useRef({ lon: -30, lat: 14 });
-  const cible = useRef({ lon: -30, lat: 14 });
+  const vueDepart = (regionPilotee && vues[regionPilotee]) || { lat: 14, lon: -30 };
+  const cam = useRef({ lon: vueDepart.lon, lat: vueDepart.lat });
+  const cible = useRef({ lon: vueDepart.lon, lat: vueDepart.lat });
   const glisse = useRef<{ x: number; y: number; a: number; b: number; lon: number; lat: number } | null>(null);
   const aBouge = useRef(false);
   /* Dès la première interaction, le globe cesse de dériver : sinon le pays
@@ -782,6 +832,7 @@ export function GlobeMonde({
       )}
 
       {/* ── L'indicateur qui colore le globe ──────────────────────────────── */}
+      {montrerIndicateurs && (
       <div className="gm-indics" role="tablist" aria-label="Indicateur affiché">
         {indicateurs.map((k) => CATALOGUE[k]).map((i) => (
           <button
@@ -796,6 +847,7 @@ export function GlobeMonde({
           </button>
         ))}
       </div>
+      )}
 
       <div className="gm-corps">
         {/* ── Le globe, et ce qu'on glisse dessous ───────────────────────── */}
@@ -953,9 +1005,12 @@ export function GlobeMonde({
                     ))}
                   </dl>
 
-                  <button type="button" className="cg-lien-fleche">
+                  <a
+                    className="cg-lien-fleche"
+                    href={`/economie?pays=${cle(fiche.fr)}&indicateur=${cleIndic(echelle.spec.id)}&annee=${annee}`}
+                  >
                     Voir la fiche pays <span aria-hidden="true">→</span>
-                  </button>
+                  </a>
                   <p className="gm-source">Banque mondiale (WDI) · {annee}</p>
                 </>
               ) : (

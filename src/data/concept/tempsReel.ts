@@ -27,10 +27,14 @@ export interface Cadence {
   dec: number;
   /** Ce qui s'accumule en une année, dans l'unité affichée. */
   parAn: number;
-  /** La ligne sous le nombre : ce que la grandeur est, et d'où elle vient. */
+  /** Le mot qui suit le nombre écrit en toutes lettres, au pluriel
+      (« hectares », « habitants »…) : « 8,5 milliards d'habitants ». */
+  mot: string;
+  /** La ligne sous le nombre : ce que la grandeur est, et d'où elle vient.
+      Conservée pour documenter la donnée même si l'écran ne l'affiche plus. */
   note: string;
   /** Renseigné tant que le chiffre n'est pas sourcé. Le texte dit ce qui est
-      inventé ; l'affichage porte alors une pastille. */
+      inventé ; l'affichage porte alors une pastille, toujours visible. */
   exemple?: string;
 }
 
@@ -43,6 +47,7 @@ export const CADENCES_EXEMPLE: Cadence[] = [
     dec: 0,
     parAn: 30_000_000,
     note: "Surface partie en fumée depuis le 1er janvier.",
+    mot: "hectares brûlés",
     exemple: "Cadence d'exemple, en attente de la source.",
   },
   {
@@ -52,6 +57,7 @@ export const CADENCES_EXEMPLE: Cadence[] = [
     dec: 4,
     parAn: 4_000,
     note: "Prélèvements cumulés depuis le 1er janvier.",
+    mot: "kilomètres cubes d'eau",
     exemple: "Cadence d'exemple, en attente de la source.",
   },
   {
@@ -61,6 +67,7 @@ export const CADENCES_EXEMPLE: Cadence[] = [
     dec: 3,
     parAn: 37_000,
     note: "Émissions liées à l'énergie, cumulées depuis le 1er janvier.",
+    mot: "mégatonnes de CO₂",
     exemple: "Cadence d'exemple, en attente de la source.",
   },
   {
@@ -70,6 +77,7 @@ export const CADENCES_EXEMPLE: Cadence[] = [
     dec: 0,
     parAn: 400_000_000,
     note: "Production mondiale cumulée depuis le 1er janvier.",
+    mot: "tonnes de plastique",
     exemple: "Cadence d'exemple, en attente de la source.",
   },
   {
@@ -79,6 +87,7 @@ export const CADENCES_EXEMPLE: Cadence[] = [
     dec: 4,
     parAn: 2_000,
     note: "Production photovoltaïque cumulée depuis le 1er janvier.",
+    mot: "térawattheures",
     exemple: "Cadence d'exemple, en attente de la source.",
   },
   {
@@ -88,6 +97,7 @@ export const CADENCES_EXEMPLE: Cadence[] = [
     dec: 0,
     parAn: 134_000_000,
     note: "Naissances cumulées depuis le 1er janvier.",
+    mot: "naissances",
     exemple: "Cadence d'exemple, en attente de la source.",
   },
   {
@@ -97,6 +107,7 @@ export const CADENCES_EXEMPLE: Cadence[] = [
     dec: 1,
     parAn: 10_000_000,
     note: "Surfaces cultivables perdues depuis le 1er janvier.",
+    mot: "hectares de terres perdus",
     exemple: "Cadence d'exemple, en attente de la source.",
   },
   {
@@ -106,6 +117,7 @@ export const CADENCES_EXEMPLE: Cadence[] = [
     dec: 0,
     parAn: 38_000_000,
     note: "Décollages cumulés depuis le 1er janvier.",
+    mot: "vols commerciaux",
     exemple: "Cadence d'exemple, en attente de la source.",
   },
 ];

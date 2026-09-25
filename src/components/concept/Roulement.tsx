@@ -220,13 +220,14 @@ export function Odometre({
         const d = Math.floor(x);
         const f = x - d;
         /* Seul le dernier rouleau affiché d'un compteur qui court tourne en
-           continu. Partout ailleurs, il ne bascule que sur la fin de sa
-           course : « 19,5 » a une partie décimale, et un rouleau des unités
-           laissé continu se serait posé entre le 9 et le 0 — le nombre
-           devenait illisible à l'arrêt. Et une fois le mouvement fini, plus
-           aucune fenêtre : un compteur posé montre ses chiffres pile, pas la
-           retenue du suivant. */
-        const fen = continu && c.k === -dec ? 1 : continu || u < 1 ? 0.14 : 0;
+           continu. Partout ailleurs il reste posé, pile sur son chiffre : un
+           rouleau qui court a longtemps gardé une fenêtre de retenue avant
+           chaque report, pour lisser le passage au chiffre suivant — un
+           « 5 » qui penchait déjà vers le « 6 » avant d'y arriver. Vu de
+           près, ça se lisait comme deux rouleaux qui bougent au lieu d'un
+           seul : ce n'est jamais qu'un, le dernier, qui doit courir. Le
+           report des autres reste immédiat, comme à l'arrêt. */
+        const fen = continu ? (c.k === -dec ? 1 : 0) : u < 1 ? 0.14 : 0;
         const roule = fen > 0 && f > 1 - fen ? (f - (1 - fen)) / fen : 0;
         let pos = (d % 10) + roule;
         if (tours && !continu && u < 1) {
