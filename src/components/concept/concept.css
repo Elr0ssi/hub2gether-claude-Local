@@ -1706,7 +1706,7 @@ body:has(.cg) { background: #05080c; }
 /* La date à gauche, la ligne à sa droite : le nombre sert de repère fixe, et
    la piste gagne toute la largeur restante au lieu d'être repoussée sous lui. */
 .cg-frise2 { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: clamp(16px, 2vw, 30px); align-items: center; }
-.cg-frise2-piste { min-width: 0; }
+.cg-frise2-piste { min-width: 0; position: relative; }
 .cg-frise2-an {
   font-size: clamp(30px, 3.4vw, 46px);
   line-height: 1;
@@ -1757,6 +1757,40 @@ body:has(.cg) { background: #05080c; }
   transition: left 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .cg-frise2-rail:active .cg-frise2-point { transition: none; }
+
+/* Le pas en cours, à part : un repère flottant au-dessus du rail, à son
+   bord droit, plutôt qu'un chiffre de plus collé au dernier publié. Le
+   point vert dit ce que la date « en cours » n'est pas : un millésime de la
+   source. */
+.cg-frise2-direct {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fond) 70%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font: inherit;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--encre-2);
+  cursor: pointer;
+  transition: color 0.25s, border-color 0.25s;
+}
+.cg-frise2-direct:hover { color: var(--encre); }
+.cg-frise2-direct-on { color: var(--froid); border-color: color-mix(in srgb, var(--froid) 55%, transparent); }
+.cg-frise2-direct-p {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--vert);
+  animation: cg-bat 2.4s ease-out infinite;
+}
 
 .cg-frise2-bornes { position: relative; height: 22px; margin-top: 4px; }
 .cg-frise2-b {
@@ -3018,7 +3052,7 @@ body:has(.cg) { background: #05080c; }
   background: radial-gradient(
     circle at 50% 50%,
     transparent 0 calc(50% - 1.75px),
-    rgba(255, 233, 204, 0.88) calc(50% - 1.15px) calc(50% - 0.4px),
+    rgba(255, 233, 204, 0.62) calc(50% - 1.15px) calc(50% - 0.4px),
     transparent calc(50% + 0.2px)
   );
   filter: blur(0.4px);
@@ -3033,9 +3067,21 @@ body:has(.cg) { background: #05080c; }
   from { --a: 0deg; }
   to { --a: 360deg; }
 }
-/* La nappe : la lumière qui déborde au-dessus du trait. */
-/* L'éclat serré, posé sur le trait. C'est lui qui fait la lumière : une
-   bande étroite centrée sur le limbe, pas une calotte. */
+/* La nappe : la lumière qui accompagne le trait, pas qui le suit.
+
+   Elle portait sa propre apparition, plus tard et pour elle seule : le
+   trait se dessinait d'abord, seul et net, puis toute la nappe s'allumait
+   d'un coup sur le tracé déjà fini, avec un pic de clarté avant de se
+   poser. Deux mouvements se voyaient, l'un après l'autre — la ligne, puis
+   l'éclat — ce qui se lit comme deux lumières différentes.
+
+   La nappe porte donc le même masque conique que le trait, à sa propre
+   vitesse : elle s'ouvre avec lui, sur le tracé déjà écrit et nulle part
+   ailleurs. Son intensité grandit dans la même fenêtre de temps, sans
+   dépasser sa valeur d'arrivée : au bout du geste, le trait est complet et
+   la nappe est à sa pleine clarté au même instant — un seul mouvement,
+   continu, qui finit par le plein éclat plutôt que de s'y jeter après
+   coup. */
 .cg-arc-nappe {
   background: radial-gradient(
     circle at 50% 50%,
@@ -3046,17 +3092,20 @@ body:has(.cg) { background: #05080c; }
   );
   filter: blur(13px);
   opacity: calc(0.2 + (1 - var(--p, 0)) * 0.8);
-  /* La nappe n'arrive qu'une fois le trait bouclé : le limbe s'embrase
-     d'un coup, au lieu d'accompagner le tracé. */
+  --a: 0deg;
+  -webkit-mask: conic-gradient(from 268deg, #000 0deg, #000 var(--a), transparent var(--a));
+  mask: conic-gradient(from 268deg, #000 0deg, #000 var(--a), transparent var(--a));
 }
 .cg-eco-haut[data-pret="1"] .cg-arc-nappe {
-  animation: cg-embrase 1.6s cubic-bezier(0.16, 1, 0.3, 1) 2.9s backwards;
+  animation:
+    cg-trace 2.6s cubic-bezier(0.32, 0.72, 0.3, 1) 0.5s both,
+    cg-embrase 2.6s cubic-bezier(0.32, 0.72, 0.3, 1) 0.5s both;
 }
 /* L'opacité de fin n'est pas écrite : elle revient à la valeur calculée,
-   celle qui suit le défilement. L'embrasement ne fait que la traverser. */
+   celle qui suit le défilement. Aucun dépassement au passage : le flou et
+   la clarté montent sans jamais franchir leur valeur de repos. */
 @keyframes cg-embrase {
-  from { opacity: 0; filter: blur(30px) brightness(0.5); }
-  55% { filter: blur(9px) brightness(2.4); }
+  from { opacity: 0; filter: blur(19px) brightness(0.7); }
   to { filter: blur(13px) brightness(1); }
 }
 
@@ -3768,10 +3817,10 @@ body:has(.cg) { background: #05080c; }
 :root[data-concept="clair"] .cg-sceau svg { filter: drop-shadow(0 0 8px rgba(154, 101, 50, 0.3)); }
 :root[data-concept="clair"] .cg-eco-ouv .cg-eyebrow { color: #8a5a28; opacity: 1; }
 
-/* ── La barre et le limbe, de jour ───────────────────────────────────────
-   Deux surfaces qui portaient leurs couleurs en clair et se retrouvaient
-   noires sur une page blanche : le verre de la barre, et le trait du limbe,
-   qui était presque blanc et disparaissait. */
+/* ── La barre, de jour ────────────────────────────────────────────────────
+   Une surface qui portait ses couleurs en clair et se retrouvait noire sur
+   une page blanche : le verre de la barre. Le limbe a sa propre teinte de
+   jour plus bas, où il passe du chaud au bleu froid. */
 :root[data-concept="clair"] .cg-header-verre {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.4));
   border-bottom-color: rgba(12, 16, 22, 0.09);
@@ -3782,40 +3831,6 @@ body:has(.cg) { background: #05080c; }
 }
 :root[data-concept="clair"] .cg-cnx {
   background: rgba(255, 255, 255, 0.72);
-}
-:root[data-concept="clair"] .cg-arc-trait {
-  background: radial-gradient(
-    circle at 50% 50%,
-    transparent 0 calc(50% - 1.75px),
-    rgba(150, 96, 40, 0.75) calc(50% - 1.15px) calc(50% - 0.4px),
-    transparent calc(50% + 0.2px)
-  );
-}
-:root[data-concept="clair"] .cg-arc-nappe {
-  background: radial-gradient(
-    circle at 50% 50%,
-    transparent 0 48.7%,
-    rgba(200, 140, 70, 0.4) 49.7%,
-    rgba(170, 110, 50, 0.28) 50.3%,
-    transparent 51.8%
-  );
-}
-:root[data-concept="clair"] .cg-arc-corps {
-  background: radial-gradient(
-    circle at 50% 50%,
-    transparent 0 45%,
-    rgba(190, 140, 80, 0.14) 49.2%,
-    rgba(210, 160, 100, 0.18) 50%,
-    rgba(190, 140, 80, 0.1) 50.8%,
-    transparent 56%
-  );
-}
-:root[data-concept="clair"] .cg-arc-point::before {
-  background: #b8762c;
-  box-shadow:
-    0 0 12px 3px rgba(200, 140, 70, 0.6),
-    0 0 46px 14px rgba(190, 130, 60, 0.26),
-    0 0 150px 60px rgba(180, 120, 55, 0.1);
 }
 
 /* Le témoin « sans donnée » de la légende reprend la teinte que le globe
@@ -3859,22 +3874,27 @@ body:has(.cg) { background: #05080c; }
    L'ocre marchait de nuit, où il lisait comme un lever de soleil. De jour il
    ne lit plus comme de la lumière, seulement comme un trait beige. Le même
    éclat passe donc au bleu, qui se détache d'une page blanche là où le chaud
-   s'y noie. */
+   s'y noie.
+
+   Le bleu, plus froid, se lit comme un trait dès qu'il est net : le garder
+   aussi marqué que le chaud faisait une ligne, pas une lumière. Le trait
+   s'efface donc davantage ici, et c'est la nappe — l'éclat lui-même — qui
+   porte la couleur. */
 :root[data-concept="clair"] .cg-arc-trait {
   background: radial-gradient(
     circle at 50% 50%,
     transparent 0 calc(50% - 1.75px),
-    rgba(31, 95, 168, 0.78) calc(50% - 1.15px) calc(50% - 0.4px),
+    rgba(31, 95, 168, 0.4) calc(50% - 1.15px) calc(50% - 0.4px),
     transparent calc(50% + 0.2px)
   );
 }
 :root[data-concept="clair"] .cg-arc-nappe {
   background: radial-gradient(
     circle at 50% 50%,
-    transparent 0 48.7%,
-    rgba(70, 140, 215, 0.42) 49.7%,
-    rgba(40, 105, 180, 0.3) 50.3%,
-    transparent 51.8%
+    transparent 0 48.5%,
+    rgba(90, 160, 235, 0.52) 49.7%,
+    rgba(50, 115, 190, 0.38) 50.5%,
+    transparent 52.2%
   );
 }
 :root[data-concept="clair"] .cg-arc-corps {

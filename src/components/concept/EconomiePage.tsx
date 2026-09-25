@@ -414,6 +414,22 @@ const Frise = memo(function Frise({
         <span className="cg-frise2-point" aria-hidden="true" style={{ left: `${pct(vue)}%` }} />
       </div>
 
+      {/* Le pas en cours ne prend pas place sur la ligne : sa position, tout
+          au bout, tombait à quelques pixels de la dernière année publiée et
+          les deux libellés se recouvraient. Il devient un repère à part,
+          posé au-dessus du rail plutôt que dessus : « en direct », pas une
+          date parmi les autres. */}
+      {annees[annees.length - 1] === ANNEE_EN_COURS && (
+        <button
+          type="button"
+          className={`cg-frise2-direct${vue === ANNEE_EN_COURS ? " cg-frise2-direct-on" : ""}`}
+          onClick={() => vise(ANNEE_EN_COURS, true)}
+        >
+          <span className="cg-frise2-direct-p" aria-hidden="true" />
+          {ANNEE_EN_COURS}
+        </button>
+      )}
+
       <div className="cg-frise2-bornes" aria-hidden="true">
         {/* Toutes les années sont atteignables sur la ligne ; seules les
             décennies portent un libellé, et les demi-décennies à partir de
@@ -422,10 +438,11 @@ const Frise = memo(function Frise({
         {annees
           .filter(
             (a) =>
-              a % 10 === 0 ||
-              (a >= 2000 && a % 5 === 0) ||
-              a === vue ||
-              a === annees[annees.length - 1],
+              a !== ANNEE_EN_COURS &&
+              (a % 10 === 0 ||
+                (a >= 2000 && a % 5 === 0) ||
+                a === vue ||
+                a === annees[annees.length - 1]),
           )
           .map((a) => (
             <button
