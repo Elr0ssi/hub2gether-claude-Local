@@ -18,7 +18,16 @@ export interface GlobeMarker {
   id: string;
   lat: number;
   lon: number;
+  /* Un marqueur porte soit une icône (le badge rond par défaut), soit un
+     texte (un rectangle dépoli) — jamais les deux. `icon` reste obligatoire
+     pour ne rien changer aux appels existants ; un marqueur textuel lui
+     passe une icône neutre qui ne sert à rien puisqu'elle n'est pas
+     dessinée. */
   icon: LucideIcon;
+  /** Présent : le marqueur se dessine en rectangle dépoli, pas en rond. Le
+      contenu suit le globe exactement comme une icône — même projection,
+      même rotation — mais rien ne s'y clique. */
+  texte?: { chiffre: string; label: string };
 }
 
 // Country-anchored icon badges, positioned by real lat/lon so they travel with globe rotation.
@@ -492,6 +501,39 @@ export default function InteractiveGlobeIcons({
     >
       {markers.map((marker, i) => {
         const Icon = marker.icon;
+        if (marker.texte) {
+          return (
+            <div
+              key={marker.id}
+              ref={(el) => {
+                markerElsRef.current[i] = el;
+              }}
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: "clamp(112px, 13vw, 152px)",
+                padding: "12px 15px",
+                borderRadius: 13,
+                border: "1px solid rgba(255,255,255,0.14)",
+                background: "rgba(10,16,24,0.42)",
+                backdropFilter: "blur(9px)",
+                WebkitBackdropFilter: "blur(9px)",
+                boxShadow: "0 12px 28px rgba(0,0,0,0.3)",
+                pointerEvents: "none",
+                opacity: 0,
+                willChange: "transform, opacity",
+              }}
+            >
+              <div style={{ fontSize: 19, fontWeight: 400, color: "#fff", letterSpacing: "-0.01em" }}>
+                {marker.texte.chiffre}
+              </div>
+              <div style={{ fontSize: 10.5, color: "rgba(255,255,255,0.62)", marginTop: 2 }}>
+                {marker.texte.label}
+              </div>
+            </div>
+          );
+        }
         return (
           <div
             key={marker.id}

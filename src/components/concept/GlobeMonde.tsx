@@ -70,6 +70,12 @@ interface Props {
       scroll, par exemple — sans passer par les onglets internes. Absente,
       la région reste tenue par le globe comme avant. */
   regionPilotee?: string;
+  /** Même principe pour l'indicateur affiché. */
+  indicateurPilote?: Indic;
+  /** Faux : le clic sur un pays ne choisit plus rien, seule la rotation
+      reste possible. Une vitrine qui montre des exemples n'a pas à laisser
+      composer les siens. */
+  explorable?: boolean;
   /** Ce qui vient se glisser sous le globe — une frise, par exemple. */
   sousLeGlobe?: React.ReactNode;
   annee: number;
@@ -87,7 +93,7 @@ function fmt(v: number | null | undefined, genre: "md" | "eur" | "pct" | "hab"):
   return `${Math.round(v).toLocaleString("fr-FR")} Md $`;
 }
 
-type Indic = "pib" | "pibHab" | "inflation" | "balance" | "dette" | "chomage" | "population";
+export type Indic = "pib" | "pibHab" | "inflation" | "balance" | "dette" | "chomage" | "population";
 
 interface SpecIndic {
   id: Indic;
@@ -165,6 +171,8 @@ export function GlobeMonde({
   montrerRegions = true,
   montrerIndicateurs = true,
   regionPilotee,
+  indicateurPilote,
+  explorable = true,
   sousLeGlobe,
 }: Props) {
   const cv = useRef<HTMLCanvasElement>(null);
@@ -190,7 +198,7 @@ export function GlobeMonde({
   );
   const [survol, setSurvol] = useState<string | null>(null);
   const [region, setRegion] = useState(regionPilotee ?? "monde");
-  const [indic, setIndic] = useState<Indic>(indicateurs[0] ?? "pib");
+  const [indic, setIndic] = useState<Indic>(indicateurPilote ?? (indicateurs[0] ?? "pib"));
 
   useEffect(() => {
     if (regionPilotee === undefined || regionPilotee === region) return;
@@ -202,6 +210,11 @@ export function GlobeMonde({
     if (v) cible.current = { lon: v.lon, lat: v.lat };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [regionPilotee]);
+
+  useEffect(() => {
+    if (indicateurPilote === undefined) return;
+    setIndic(indicateurPilote);
+  }, [indicateurPilote]);
 
   /* La caméra : deux angles, tirés vers une cible. Le rendu lit ces refs
      soixante fois par seconde sans repasser par React. */
@@ -902,6 +915,7 @@ export function GlobeMonde({
                 }
                 return;
               }
+              if (!explorable) return;
               const g = versLonLat(e);
               const p = g ? paysSous(g.lon, g.lat) : null;
               setSurvol(p?.nom ?? null);
@@ -909,7 +923,7 @@ export function GlobeMonde({
             onPointerUp={(e) => {
               const bougeait = aBouge.current;
               glisse.current = null;
-              if (bougeait) return;
+              if (bougeait || !explorable) return;
               const g = versLonLat(e);
               const p = g ? paysSous(g.lon, g.lat) : null;
               if (p) {
@@ -949,7 +963,7 @@ export function GlobeMonde({
           </div>
 
           <p className="gm-aide">
-            Faites tourner le globe · cliquez un pays
+            {explorable ? "Faites tourner le globe · cliquez un pays" : "Faites tourner le globe"}
             {survol && <span className="gm-aide-survol"> — {donnees[survol]?.fr ?? survol}</span>}
           </p>
         </div>
@@ -1007,9 +1021,14 @@ export function GlobeMonde({
 
                   <a
                     className="cg-lien-fleche"
-                    href={`/economie?pays=${cle(fiche.fr)}&indicateur=${cleIndic(echelle.spec.id)}&annee=${annee}`}
+                    href={
+                      explorable
+                        ? `/economie?pays=${cle(fiche.fr)}&indicateur=${cleIndic(echelle.spec.id)}&annee=${annee}`
+                        : `/economie?indicateur=${cleIndic(echelle.spec.id)}&annee=${annee}`
+                    }
                   >
-                    Voir la fiche pays <span aria-hidden="true">→</span>
+                    {explorable ? "Voir la fiche pays" : "Voir le globe interactif complet"}{" "}
+                    <span aria-hidden="true">→</span>
                   </a>
                   <p className="gm-source">Banque mondiale (WDI) · {annee}</p>
                 </>

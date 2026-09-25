@@ -1660,12 +1660,14 @@ body {
 
 .lx-outils { display: flex; flex-direction: column; gap: 7px; margin-top: 22px; }
 .lx-outil {
-  display: block; text-align: center;
+  display: block; width: 100%; text-align: center;
   padding: 9px 12px; border-radius: 999px;
   border: 1px solid var(--border); background: var(--surface);
-  font-size: 12.5px; font-weight: 700; color: var(--ink-2);
+  font: inherit; font-size: 12.5px; font-weight: 700; color: var(--ink-2);
+  cursor: pointer; appearance: none;
   transition: all 0.16s;
 }
+.lx-outil:disabled { opacity: 0.6; cursor: default; }
 .lx-outil:hover { border-color: var(--accent-border); background: var(--accent-dim); color: #0d7a40; }
 
 .lx-colonne { max-width: 68ch; }
@@ -2376,6 +2378,21 @@ body {
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
 .cp-msg-date { font-size: 11.5px; color: var(--ink-5); }
+
+/* ── Le tableau de bord ────────────────────────────────────────────────── */
+.cp-tdb { display: flex; flex-direction: column; gap: 18px; }
+.cp-tdb-live { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.cp-tdb-carte {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2);
+}
+.cp-tdb-lab { display: flex; align-items: center; gap: 6px; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); }
+.cp-tdb-ex { padding: 1px 6px; border: 1px dashed var(--ink-4); border-radius: 999px; font-size: 9px; color: var(--ink-4); }
+.cp-tdb-v { font-size: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.cp-tdb-choix-t { font-size: 12.5px; color: var(--ink-3); }
+.cp-tdb-choix { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 8px; }
+.cp-tdb-case { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); }
+.cp-tdb-case input { accent-color: var(--ink); }
 
 /* L'entrée de compte porte deux libellés ; la barre choisit selon sa place. */
 .lc-court { display: none; }

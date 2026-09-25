@@ -126,3 +126,11 @@ export const CADENCES_EXEMPLE: Cadence[] = [
     socle pour le mesurer. C'est la seule part inventée du compteur de
     population : son point de départ, lui, est la somme du socle. */
 export const POPULATION_PAR_AN = 70_000_000;
+
+/** Les identifiants qu'on peut épingler à un tableau de bord personnel :
+    les deux grandeurs réelles, puis les cadences d'exemple ci-dessus. */
+export const WIDGETS_POSSIBLES = [
+  "pib",
+  "population",
+  ...CADENCES_EXEMPLE.map((c) => c.id),
+] as const;

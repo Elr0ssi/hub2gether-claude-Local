@@ -429,53 +429,6 @@ body:has(.cg) { background: #05080c; }
 }
 .cg-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-/* Les plaques posées sur le globe : ce que la maison couvre, lisible sans
-   suivre la rotation. Un empilement à droite, dans la même colonne que le
-   globe, en verre dépoli comme le reste de la barre — la même matière que
-   `.cg-header-verre`, pour que la scène reste cohérente. */
-.cg-hero-plaques {
-  position: absolute;
-  top: 50%;
-  right: clamp(24px, 4.4vw, 72px);
-  transform: translateY(-50%);
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: clamp(168px, 15vw, 208px);
-  pointer-events: auto;
-}
-.cg-plaque {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 14px 16px;
-  border: 1px solid color-mix(in srgb, var(--voile) 12%, transparent);
-  border-radius: 13px;
-  background: color-mix(in srgb, var(--fond) 38%, transparent);
-  backdrop-filter: blur(14px) saturate(1.15);
-  -webkit-backdrop-filter: blur(14px) saturate(1.15);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
-  text-decoration: none;
-  transition: border-color 0.3s, transform 0.3s;
-}
-.cg-plaque strong { font-size: 21px; font-weight: 400; letter-spacing: -0.01em; color: var(--encre); }
-.cg-plaque span { font-size: 11px; letter-spacing: 0.03em; color: var(--encre-3); }
-.cg-plaque-lien:hover { border-color: color-mix(in srgb, var(--chaud) 55%, transparent); transform: translateX(-2px); }
-.cg-plaque-lien strong { color: var(--chaud); }
-@media (max-width: 900px) {
-  .cg-hero-plaques {
-    top: auto;
-    bottom: 12vh;
-    right: 50%;
-    transform: translateX(50%);
-    flex-direction: row;
-    width: auto;
-  }
-  .cg-plaque { padding: 10px 12px; }
-  .cg-plaque strong { font-size: 17px; }
-  .cg-plaque span { font-size: 9.5px; }
-}
 
 
 
@@ -1277,7 +1230,11 @@ body:has(.cg) { background: #05080c; }
    la section est plus haute qu'un écran, et chaque tranche franchie fait
    passer la vitrine au classement suivant. */
 .cg-cl-zone { position: relative; }
-.cg-cl-colle { position: sticky; top: 10vh; padding-top: 4vh; }
+/* Elle se bloquait trop bas : dix pour cent de la hauteur d'écran, plus une
+   marge intérieure, retardaient l'apparition du classement de presque un
+   tiers d'écran. Elle se pose maintenant tout près du haut, et le
+   classement se lit dès l'entrée dans la section. */
+.cg-cl-colle { position: sticky; top: 2vh; padding-top: 1vh; }
 .cg-cl-disposition {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

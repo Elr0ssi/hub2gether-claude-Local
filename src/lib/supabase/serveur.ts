@@ -33,6 +33,8 @@ export interface Profil {
   bio: string | null;
   role: string;
   cree_le: string;
+  /** Les compteurs choisis pour le tableau de bord personnel. */
+  widgets: string[];
 }
 
 /** Le compte connecté, avec son profil, ou null. */
@@ -43,7 +45,7 @@ export async function lireCompte(): Promise<{ email: string; profil: Profil } | 
   if (!data.user) return null;
   const { data: profil } = await sb
     .from("profils")
-    .select("id, pseudo, bio, role, cree_le")
+    .select("id, pseudo, bio, role, cree_le, widgets")
     .eq("id", data.user.id)
     .single();
   if (!profil) return null;

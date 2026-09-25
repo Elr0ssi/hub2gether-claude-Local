@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useScroll, useSpring } from "framer-motion";
 import type { Article, ArticleSection } from "@/types";
+import { BoutonFavori } from "@/components/compte/BoutonFavori";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE FORMAT DE LECTURE
@@ -284,10 +285,16 @@ export function LectureArticle({
   article,
   themeLabel,
   suite,
+  connecte = false,
+  enregistre = false,
 }: {
   article: Article;
   themeLabel: string;
   suite: { slug: string; titre: string; minutes: number }[];
+  /** Une session existe : sans elle, le bouton d'enregistrement renvoie
+      simplement vers la connexion plutôt que de disparaître sans un mot. */
+  connecte?: boolean;
+  enregistre?: boolean;
 }) {
   const corps = article.body ?? [];
   const zone = useRef<HTMLDivElement>(null);
@@ -369,6 +376,7 @@ export function LectureArticle({
           </ol>
 
           <div className="lx-outils">
+            <BoutonFavori slug={article.slug} connecte={connecte} enregistreInitial={enregistre} />
             <Link href="/comparer" className="lx-outil">
               Comparer les pays
             </Link>

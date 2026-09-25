@@ -12,11 +12,12 @@ tableau de bord, et le rejouer sur un autre projet si besoin.
 
 | Table | Ce qu'elle porte |
 |---|---|
-| `profils` | un pseudo par compte, une présentation, un rôle |
+| `profils` | un pseudo par compte, une présentation, un rôle, les compteurs choisis pour le tableau de bord |
 | `messages` | le texte, sa cible (`fil` ou `article`), son parent, sa source |
 | `votes` | une voix par personne et par cible, nominative et privée |
 | `scores` | le total des voix, tenu par déclencheur, public |
 | `signalements` | ce qu'un lecteur conteste, et où en est le traitement |
+| `favoris` | les articles qu'un compte a enregistrés, privé à ce compte |
 
 La cible d'un message est un couple `(cible_type, cible_id)`. Le forum
 écrit `('fil', 'dette-france')`. Les réponses sous un article écriront
@@ -32,7 +33,8 @@ s'appliquent donc aussi à quelqu'un qui appellerait l'API directement :
 - il faut un compte pour écrire, voter ou signaler ;
 - personne n'écrit, ne vote ni n'efface au nom d'un autre ;
 - qui a voté quoi n'est visible que de l'intéressé ;
-- un modérateur peut retirer un message et traiter un signalement.
+- un modérateur peut retirer un message et traiter un signalement ;
+- les articles enregistrés ne sont visibles, ajoutés et retirés que par le compte qui les a enregistrés.
 
 Deux garde-fous complètent ces règles : cinq messages par minute et
 soixante par heure au plus, et une réponse ne peut pas viser une autre

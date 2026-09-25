@@ -1,9 +1,9 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useMotionTemplate, useScroll, useTransform } from "framer-motion";
-import { BarChart3, CloudSun, Flag, Layers, TrendingUp, Users } from "lucide-react";
+import { Layers } from "lucide-react";
 import { Loupe } from "./Loupe";
 import { EnTete, LENT } from "./pieces";
 import { TempsReel } from "./TempsReel";
@@ -29,16 +29,16 @@ const GlobePoints = dynamic(() => import("@/components/globe/InteractiveGlobeIco
   loading: () => null,
 });
 
-/* Les rubriques, posées sur de vraies coordonnées : elles tournent donc avec
-   le globe au lieu de flotter à côté. */
-const MARQUEURS = [
-  { id: "economie", lat: 50, lon: 12, icon: TrendingUp },
-  { id: "geopolitique", lat: 39, lon: -98, icon: Flag },
-  { id: "societes", lat: 22, lon: 79, icon: Users },
-  { id: "ressources", lat: -25, lon: 133, icon: Layers },
-  { id: "climat", lat: -12, lon: -55, icon: CloudSun },
-  { id: "analyses", lat: 36, lon: 138, icon: BarChart3 },
-];
+/* Les trois repères tenaient une place à part dans la colonne de texte ; ils
+   vivent maintenant sur le globe, comme les icônes qu'ils remplacent — des
+   rectangles dépolis, posés sur de vraies coordonnées pour tourner avec la
+   sphère plutôt que de flotter par-dessus. `icon` n'est là que parce que le
+   type des marqueurs l'exige ; un marqueur textuel ne la dessine pas. */
+const COORDONNEES = [
+  { id: "globes", lat: 50, lon: 12 },
+  { id: "articles", lat: 39, lon: -98 },
+  { id: "forum", lat: -12, lon: -55 },
+] as const;
 
 /* ═══════════════════════════════════════════════════════════════════════════
    PROTOTYPE — LA PAGE
@@ -62,6 +62,15 @@ export interface ConceptProps {
 
 export function ConceptPage({ articles, comptes, donnees, annee, regions, vues }: ConceptProps) {
   const [pret, setPret] = useState(false);
+
+  const marqueurs = useMemo(
+    () => [
+      { id: COORDONNEES[0].id, lat: COORDONNEES[0].lat, lon: COORDONNEES[0].lon, icon: Layers, texte: { chiffre: String(comptes.globes), label: "globes thématiques" } },
+      { id: COORDONNEES[1].id, lat: COORDONNEES[1].lat, lon: COORDONNEES[1].lon, icon: Layers, texte: { chiffre: String(comptes.articles), label: "articles décortiqués" } },
+      { id: COORDONNEES[2].id, lat: COORDONNEES[2].lat, lon: COORDONNEES[2].lon, icon: Layers, texte: { chiffre: "Forum", label: "espace de débat" } },
+    ],
+    [comptes],
+  );
 
   const scene = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: scene, offset: ["start start", "end start"] });
@@ -139,7 +148,7 @@ export function ConceptPage({ articles, comptes, donnees, annee, regions, vues }
       >
         <div className="cg-fond-globe-i" style={{ pointerEvents: fondPrise ? "auto" : "none" }}>
           <GlobePoints
-            markers={MARQUEURS}
+            markers={marqueurs}
             accent="#9EC7D8"
             sphereColor="#070E16"
             badgeBackground="rgba(10,16,24,0.88)"
@@ -188,32 +197,6 @@ export function ConceptPage({ articles, comptes, donnees, annee, regions, vues }
             </motion.span>
           </motion.div>
           </div>
-
-          {/* ── Ce que la maison couvre, en verre sur le globe ─────────────
-              Trois plaques dépoli, posées sur la scène plutôt que sur la
-              sphère elle-même : le globe tourne sous la souris, des
-              étiquettes qui tourneraient avec lui deviendraient illisibles à
-              mi-course. Elles restent donc fixes à l'écran, comme un
-              tableau de bord au-dessus de l'instrument. */}
-          <motion.div
-            className="cg-hero-plaques"
-            initial={{ opacity: 0 }}
-            animate={pret ? { opacity: 1 } : {}}
-            transition={{ duration: 1.2, delay: 1.1 }}
-          >
-            <div className="cg-plaque">
-              <strong>{comptes.globes}</strong>
-              <span>globes thématiques</span>
-            </div>
-            <div className="cg-plaque">
-              <strong>{comptes.articles}</strong>
-              <span>articles décortiqués</span>
-            </div>
-            <a className="cg-plaque cg-plaque-lien" href="/community">
-              <strong>Forum</strong>
-              <span>espace de débat</span>
-            </a>
-          </motion.div>
 
           <motion.span
             className="cg-defiler"

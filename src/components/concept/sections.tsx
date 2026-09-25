@@ -11,7 +11,7 @@ import {
   QUESTIONS,
 } from "@/data/concept/conceptData";
 import { Compteur, Enseigne, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
-import { GlobeMonde } from "./GlobeMonde";
+import { GlobeMonde, type Indic } from "./GlobeMonde";
 import { HorizonTerre } from "./HorizonTerre";
 import type { FicheArticle, FichePays, Repere } from "@/data/concept/conceptGeo";
 
@@ -101,6 +101,30 @@ export function LiveTicker({ reperes, annee }: { reperes: Repere[]; annee: numbe
 
 /* ── La carte ────────────────────────────────────────────────────────────── */
 
+/* Le pays vedette de chaque pas : celui qui porte la plus forte valeur pour
+   l'indicateur du moment, calculé sur le socle plutôt qu'écrit à la main —
+   ce sont des exemples, mais aucun n'est inventé. */
+function meilleurPays(donnees: Record<string, FichePays>, id: Indic, sens: 1 | -1): string | null {
+  let meilleur: string | null = null;
+  let record = -Infinity;
+  for (const [nom, f] of Object.entries(donnees)) {
+    const v = f[id as keyof FichePays];
+    if (typeof v !== "number" || !Number.isFinite(v)) continue;
+    if (v * sens > record) {
+      record = v * sens;
+      meilleur = nom;
+    }
+  }
+  return meilleur;
+}
+
+const PAS_GLOBES: { indic: Indic; sens: 1 | -1; label: string }[] = [
+  { indic: "pib", sens: 1, label: "Produit intérieur brut" },
+  { indic: "dette", sens: 1, label: "Dette publique" },
+  { indic: "chomage", sens: 1, label: "Chômage" },
+  { indic: "population", sens: 1, label: "Démographie" },
+];
+
 export function InteractiveMapPreview({
   donnees,
   annee,
@@ -112,24 +136,30 @@ export function InteractiveMapPreview({
   regions: readonly { id: string; label: string; pays: readonly string[] }[];
   vues: Record<string, { lat: number; lon: number }>;
 }) {
-  /* Le globe change de région au fil du défilement plutôt qu'au clic : la
-     section est haute, et chaque tranche de sa hauteur fait avancer d'une
-     région. Une seule scène WebGL reste montée — cinq en parallèle
-     referaient cinq fois le même coût pour cinq fois la même carte — mais
-     la caméra, la région pilotée et le pays vedette du panneau changent,
-     ce qui se voit et se lit comme un défilement de globes. */
+  /* Le globe change d'indicateur au fil du défilement plutôt qu'au clic : la
+     section est haute, et chaque tranche de sa hauteur fait avancer d'un
+     pas. Une seule scène WebGL reste montée — quatre en parallèle
+     referaient quatre fois le même coût pour quatre fois la même carte —
+     mais la teinte, l'indicateur piloté et le pays vedette du panneau
+     changent, ce qui se voit et se lit comme un défilement de globes. Ce
+     sont des exemples : on ne peut pas viser un autre pays soi-même, seule
+     la rotation reste libre. */
   const zone = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: zone, offset: ["start start", "end end"] });
   const [pas, setPas] = useState(0);
   useEffect(
     () =>
       scrollYProgress.on("change", (v) => {
-        const i = Math.min(regions.length - 1, Math.max(0, Math.floor(v * regions.length)));
+        const i = Math.min(PAS_GLOBES.length - 1, Math.max(0, Math.floor(v * PAS_GLOBES.length)));
         setPas((p) => (p === i ? p : i));
       }),
-    [scrollYProgress, regions.length],
+    [scrollYProgress],
   );
-  const region = regions[pas] ?? regions[0];
+  const etape = PAS_GLOBES[pas];
+  const vedette = useMemo(
+    () => meilleurPays(donnees, etape.indic, etape.sens),
+    [donnees, etape.indic, etape.sens],
+  );
 
   return (
     <section className="cg-section" id="nos-globes">
@@ -137,19 +167,19 @@ export function InteractiveMapPreview({
         <Enseigne>Nos globes</Enseigne>
         <Monte>
           <p className="cg-chapo cg-globes-accroche">
-            Le produit intérieur brut, la démographie et le commerce de chaque pays, sur un globe
-            qu&apos;on fait tourner à la souris — cinq régions du monde, une source nommée.
+            Le produit intérieur brut, la dette, le chômage et la démographie de chaque pays, sur
+            un globe qu&apos;on fait tourner à la souris — un indicateur par pas de défilement.
           </p>
         </Monte>
         {/* Le compte que le globe ne montre plus : utile aux moteurs, pas à
-            l'œil. La liste des sujets couverts se lit déjà dans les plaques
-            du hero et dans les repères du bandeau. */}
+            l'œil. La liste des sujets couverts se lit déjà sur le globe du
+            hero et dans les repères du bandeau. */}
         <p className="sr-only">
           {FICHE_PAYS.couverture.map((c) => `${c.valeur} ${c.label}`).join(", ")}.
         </p>
       </div>
 
-      <div ref={zone} className="cg-globes-zone" style={{ height: `${regions.length * 68}vh` }}>
+      <div ref={zone} className="cg-globes-zone" style={{ height: `${PAS_GLOBES.length * 68}vh` }}>
         <div className="cg-globes-colle">
           <div className="cg-wrap">
             <Monte>
@@ -161,15 +191,18 @@ export function InteractiveMapPreview({
                   vues={vues}
                   montrerRegions={false}
                   montrerIndicateurs={false}
-                  indicateurs={["pib"]}
-                  regionPilotee={region.id}
+                  explorable={false}
+                  indicateurs={[etape.indic]}
+                  indicateurPilote={etape.indic}
+                  choisi={vedette}
+                  onChoisi={() => {}}
                 />
               </div>
             </Monte>
-            <div className="cg-globes-puces" role="tablist" aria-label="Région affichée">
-              {regions.map((r, i) => (
+            <div className="cg-globes-puces" role="tablist" aria-label="Indicateur affiché">
+              {PAS_GLOBES.map((e, i) => (
                 <span
-                  key={r.id}
+                  key={e.indic}
                   className={`cg-globes-puce${i === pas ? " cg-globes-puce-on" : ""}`}
                   aria-hidden="true"
                 />
@@ -555,7 +588,6 @@ export function Classements({
   return (
     <section className="cg-section cg-classements">
       <div className="cg-wrap">
-        <Enseigne>Nos classements</Enseigne>
         <Monte>
           <h2 className="cg-h2">Nos classements</h2>
         </Monte>
@@ -625,7 +657,6 @@ export function Methode() {
   return (
     <section className="cg-section cg-methode">
       <div className="cg-wrap">
-        <Enseigne>Notre méthode</Enseigne>
         <Monte>
           <h2 className="cg-h2">Notre méthode</h2>
           <p className="cg-chapo">

@@ -5,6 +5,8 @@ import { Footer } from "@/components/layout/Footer";
 import { LectureArticle } from "@/components/lecture/LectureArticle";
 import { ARTICLES, getArticleBySlug, getArticlesByTheme } from "@/data/articles";
 import { THEMES } from "@/data/themes";
+import { COMPTES_ACTIFS } from "@/lib/supabase/config";
+import { clientServeur, lireCompte } from "@/lib/supabase/serveur";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -47,11 +49,32 @@ export default async function LecturePage({ params }: Props) {
     .slice(0, 3)
     .map((a) => ({ slug: a.slug, titre: a.title, minutes: a.readingTime }));
 
+  /* L'état d'enregistrement se lit sur le serveur, une fois, plutôt que de
+     partir d'un bouton muet le temps d'un aller-retour côté client. */
+  const compte = COMPTES_ACTIFS ? await lireCompte() : null;
+  let enregistre = false;
+  if (compte) {
+    const sb = await clientServeur();
+    const { data } = (await sb
+      ?.from("favoris")
+      .select("id")
+      .eq("profil_id", compte.profil.id)
+      .eq("article", slug)
+      .maybeSingle()) ?? { data: null };
+    enregistre = Boolean(data);
+  }
+
   return (
     <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
       <Navbar />
       <main style={{ paddingTop: "var(--navbar-height)" }}>
-        <LectureArticle article={article} themeLabel={themeLabel} suite={suite} />
+        <LectureArticle
+          article={article}
+          themeLabel={themeLabel}
+          suite={suite}
+          connecte={Boolean(compte)}
+          enregistre={enregistre}
+        />
       </main>
       <Footer />
     </div>
