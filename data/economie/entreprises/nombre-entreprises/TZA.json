@@ -1,0 +1,17 @@
+{
+  "country": "TZA",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Tanzanie",
+  "iso2": "TZ",
+  "data": {
+    "2000": 300,
+    "2005": 400,
+    "2010": 540,
+    "2015": 680,
+    "2020": 810,
+    "2023": 900,
+    "2025": 490
+  }
+}

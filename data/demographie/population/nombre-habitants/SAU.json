@@ -1,0 +1,17 @@
+{
+  "country": "SAU",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Arabie saoudite",
+  "iso2": "SA",
+  "data": {
+    "2000": 20.7,
+    "2005": 24.6,
+    "2010": 28.2,
+    "2015": 31.4,
+    "2020": 35,
+    "2023": 36.9,
+    "2025": 37.5
+  }
+}

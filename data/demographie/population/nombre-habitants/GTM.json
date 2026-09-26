@@ -1,0 +1,17 @@
+{
+  "country": "GTM",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Guatemala",
+  "iso2": "GT",
+  "data": {
+    "2000": 11.2,
+    "2005": 12.7,
+    "2010": 14.3,
+    "2015": 16,
+    "2020": 17.1,
+    "2023": 17.6,
+    "2025": 18.1
+  }
+}

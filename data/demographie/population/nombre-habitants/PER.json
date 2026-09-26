@@ -1,0 +1,17 @@
+{
+  "country": "PER",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Pérou",
+  "iso2": "PE",
+  "data": {
+    "2000": 26,
+    "2005": 27.6,
+    "2010": 29.2,
+    "2015": 31.4,
+    "2020": 33.3,
+    "2023": 34.4,
+    "2025": 34.9
+  }
+}

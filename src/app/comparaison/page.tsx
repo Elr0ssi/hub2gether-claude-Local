@@ -3,7 +3,7 @@ import { Layout } from "@/components/layout/Layout";
 import { ComparisonView } from "@/components/comparison/ComparisonView";
 
 export const metadata: Metadata = {
-  title: "Comparaison de pays 2025 — PIB, Dette, Population, Militaire",
+  title: "Comparaison de pays 2025 · PIB, Dette, Population, Militaire",
   description:
     "Comparez deux pays sur 15+ indicateurs : PIB 2025, dette publique, superficie, population, ressources naturelles et budget militaire. Ratio automatique et visualisation côte à côte. Données FMI et Banque mondiale.",
   keywords: [
@@ -20,14 +20,14 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "/comparaison" },
   openGraph: {
-    title: "Comparaison de pays 2025 — PIB, Dette, Population | The Essential Data",
+    title: "Comparaison de pays 2025 · PIB, Dette, Population | The Essential Data",
     description:
       "Confrontez deux pays sur 15+ indicateurs : PIB 2025 (FMI), dette publique, chômage, superficie, population, ressources et militaire. Ratio automatique.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Comparaison de pays 2025 — The Essential Data",
+    title: "Comparaison de pays 2025 · The Essential Data",
     description: "Comparez deux pays sur PIB, dette, population, militaire et ressources.",
   },
 };
@@ -44,7 +44,7 @@ export default function ComparaisonPage() {
           Comparaison de pays
         </h1>
         <p className="text-body" style={{ maxWidth: "540px" }}>
-          Sélectionnez deux pays et comparez-les sur des dizaines d'indicateurs — PIB, dette, superficie, population, ressources naturelles et budget militaire. Le ratio est calculé automatiquement.
+          Sélectionnez deux pays et comparez-les sur des dizaines d'indicateurs, PIB, dette, superficie, population, ressources naturelles et budget militaire. Le ratio est calculé automatiquement.
         </p>
       </div>
 

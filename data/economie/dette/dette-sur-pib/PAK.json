@@ -1,0 +1,28 @@
+{
+  "country": "PAK",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Pakistan",
+  "iso2": "PK",
+  "data": {
+    "2000": 93,
+    "2005": 63,
+    "2010": 63,
+    "2015": 63,
+    "2020": 76,
+    "2023": 77,
+    "2025": 73
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 54.2,
+        "2014": 64.7,
+        "2024": 95.2
+      }
+    }
+  ]
+}

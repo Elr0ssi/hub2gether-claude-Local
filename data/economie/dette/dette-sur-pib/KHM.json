@@ -1,0 +1,16 @@
+{
+  "country": "KHM",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Cambodge",
+  "iso2": "KH",
+  "data": {
+    "2000": 69,
+    "2005": 57,
+    "2010": 29,
+    "2015": 26,
+    "2020": 39,
+    "2023": 33
+  }
+}

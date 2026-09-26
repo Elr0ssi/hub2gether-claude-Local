@@ -1,0 +1,17 @@
+{
+  "country": "PAK",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Pakistan",
+  "iso2": "PK",
+  "data": {
+    "2000": 7.8,
+    "2005": 7.7,
+    "2010": 5.6,
+    "2015": 5.9,
+    "2020": 4.5,
+    "2023": 6.3,
+    "2025": 8
+  }
+}

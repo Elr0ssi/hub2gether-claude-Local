@@ -1,0 +1,17 @@
+{
+  "country": "TUR",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Turquie",
+  "iso2": "TR",
+  "data": {
+    "2000": 2100,
+    "2005": 2400,
+    "2010": 2700,
+    "2015": 2900,
+    "2020": 3100,
+    "2023": 3200,
+    "2025": 5100
+  }
+}

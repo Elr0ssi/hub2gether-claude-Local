@@ -1,0 +1,17 @@
+{
+  "country": "RUS",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Russie",
+  "iso2": "RU",
+  "data": {
+    "2000": 2800,
+    "2005": 3200,
+    "2010": 4000,
+    "2015": 4400,
+    "2020": 4700,
+    "2023": 4800,
+    "2025": 5100
+  }
+}

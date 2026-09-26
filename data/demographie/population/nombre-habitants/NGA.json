@@ -1,0 +1,17 @@
+{
+  "country": "NGA",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Nigeria",
+  "iso2": "NG",
+  "data": {
+    "2000": 122.3,
+    "2005": 138.9,
+    "2010": 158.5,
+    "2015": 181.1,
+    "2020": 206.1,
+    "2023": 223.8,
+    "2025": 232.7
+  }
+}

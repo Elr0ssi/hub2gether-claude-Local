@@ -1,0 +1,17 @@
+{
+  "country": "FRA",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "France",
+  "iso2": "FR",
+  "data": {
+    "2000": 9,
+    "2005": 8.9,
+    "2010": 9.3,
+    "2015": 10.4,
+    "2020": 8,
+    "2023": 7.3,
+    "2025": 7.4
+  }
+}

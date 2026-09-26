@@ -1,0 +1,17 @@
+{
+  "country": "IRN",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Iran",
+  "iso2": "IR",
+  "data": {
+    "2000": 13.2,
+    "2005": 12.3,
+    "2010": 13.5,
+    "2015": 11,
+    "2020": 10.4,
+    "2023": 9,
+    "2025": 9.5
+  }
+}

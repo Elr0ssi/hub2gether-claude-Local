@@ -1,0 +1,16 @@
+{
+  "country": "BOL",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Bolivie",
+  "iso2": "BO",
+  "data": {
+    "2000": 7.5,
+    "2005": 8.2,
+    "2010": 4,
+    "2015": 3.5,
+    "2020": 5.8,
+    "2023": 3.6
+  }
+}

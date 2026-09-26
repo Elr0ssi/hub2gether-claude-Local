@@ -43,7 +43,9 @@ export function getValueIntensity(
   if (metric === "gdp" || metric === "companies" || metric === "debt_amount") {
     return Math.log10(v + 1) / Math.log10(maxValue + 1);
   }
-  return Math.min(v / maxValue, 1);
+  // Une valeur négative — une déflation, par exemple — se lit au bas de
+  // l'échelle, pas hors d'elle.
+  return Math.max(0, Math.min(v / maxValue, 1));
 }
 
 export function getCountryFillColorEconomy(

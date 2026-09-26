@@ -384,7 +384,7 @@ export function MunicipalElectionsSection() {
             {/* Results label */}
             {hasCities && (
               <p className="text-xs font-semibold" style={{ color: "var(--ink-3)" }}>
-                Maires élus — {finalCities.length} ville{finalCities.length > 1 ? "s" : ""}
+                Maires élus, {finalCities.length} ville{finalCities.length > 1 ? "s" : ""}
               </p>
             )}
 
@@ -446,7 +446,7 @@ export function MunicipalElectionsSection() {
         style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
       >
         <p style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>
-          Sources : Ministère de l'Intérieur (France), Bundeswahlleiterin (Allemagne) — données à titre informatif
+          Sources : Ministère de l'Intérieur (France), Bundeswahlleiterin (Allemagne) · données à titre informatif
         </p>
       </div>
     </div>

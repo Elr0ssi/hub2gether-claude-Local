@@ -1,0 +1,27 @@
+{
+  "country": "BOL",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Bolivie",
+  "iso2": "BO",
+  "data": {
+    "2000": 65,
+    "2005": 64,
+    "2010": 39,
+    "2015": 34,
+    "2020": 77,
+    "2023": 82
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 76,
+        "2014": 37,
+        "2024": 67
+      }
+    }
+  ]
+}

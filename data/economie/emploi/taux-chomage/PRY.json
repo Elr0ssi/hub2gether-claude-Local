@@ -1,0 +1,16 @@
+{
+  "country": "PRY",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Paraguay",
+  "iso2": "PY",
+  "data": {
+    "2000": 10.7,
+    "2005": 7.6,
+    "2010": 6.1,
+    "2015": 5.4,
+    "2020": 8.5,
+    "2023": 6.1
+  }
+}

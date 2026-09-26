@@ -1,0 +1,17 @@
+{
+  "country": "NZL",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Nouvelle-Zélande",
+  "iso2": "NZ",
+  "data": {
+    "2000": 3.9,
+    "2005": 4.1,
+    "2010": 4.4,
+    "2015": 4.6,
+    "2020": 5,
+    "2023": 5.2,
+    "2025": 5.3
+  }
+}

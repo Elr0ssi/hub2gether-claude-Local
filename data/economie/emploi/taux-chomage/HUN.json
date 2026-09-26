@@ -1,0 +1,17 @@
+{
+  "country": "HUN",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Hongrie",
+  "iso2": "HU",
+  "data": {
+    "2000": 6.4,
+    "2005": 7.2,
+    "2010": 11.2,
+    "2015": 6.8,
+    "2020": 4.1,
+    "2023": 4.1,
+    "2025": 4.3
+  }
+}

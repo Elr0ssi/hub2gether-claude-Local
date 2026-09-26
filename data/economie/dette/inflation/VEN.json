@@ -1,0 +1,27 @@
+{
+  "country": "VEN",
+  "indicator": "INFLATION",
+  "unit": "PCT",
+  "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+  "name": "Venezuela",
+  "iso2": "VE",
+  "data": {
+    "2009": 27.080941446613,
+    "2010": 28.1874647092039,
+    "2011": 26.0902123160959,
+    "2012": 21.0689956331876,
+    "2013": 40.6394275161589,
+    "2014": 62.1686499794829,
+    "2015": 121.738085297503,
+    "2016": 254.948534781816
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2024": 350
+      }
+    }
+  ]
+}

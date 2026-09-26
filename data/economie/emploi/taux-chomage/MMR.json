@@ -1,0 +1,16 @@
+{
+  "country": "MMR",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Birmanie",
+  "iso2": "MM",
+  "data": {
+    "2000": 4,
+    "2005": 4.2,
+    "2010": 3.5,
+    "2015": 2,
+    "2020": 2,
+    "2023": 2.8
+  }
+}

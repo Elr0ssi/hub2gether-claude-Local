@@ -1,0 +1,4082 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   PROTOTYPE — FEUILLE DE STYLE ISOLÉE
+
+   Elle n'est importée que par `ConceptPage`. Rien n'est ajouté à
+   `globals.css`, et tout est porté par `.cg` — une seule règle vise `body`,
+   et seulement s'il contient un `.cg`. Aucune page existante n'est touchée.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Le fond doit couvrir ce qui dépasse du conteneur : rebond de défilement,
+   bande sous le pied, barre d'adresse qui se rétracte. Sans cela on voyait
+   du blanc en bout de course. La couleur est écrite en clair — les jetons
+   sont déclarés sur `.cg`, ils n'existent pas encore sur `body`. Et la règle
+   ne s'applique qu'aux pages qui portent un `.cg` : aucune page existante
+   n'est touchée. */
+body:has(.cg) { background: #05080c; }
+:root[data-concept="clair"] body:has(.cg) { background: #f6f5f2; }
+
+.cg {
+  --fond: #05080c;
+  --fond-2: #081018;
+  /* Le ton intermédiaire du dégradé de fond. */
+  --fond-3: #071018;
+  /* Les surfaces étaient à quelques points du fond : deux cartes côte à côte
+     ne se distinguaient pas, et un rectangle n'avait pas de bord visible. On
+     les remonte franchement — sur une page noire, c'est l'écart entre les
+     niveaux qui fait lire la structure, pas leur noirceur. */
+  --surface: #121a24;
+  --surface-2: #19222d;
+  --encre: #f4f2ee;
+  /* #9da4aa donnait 4,4:1 sur le fond et #626a71 tombait à 3,7:1 — sous le
+     seuil lisible, pour du texte qu'on met justement en petit. */
+  --encre-2: #b3bcc4;
+  --encre-3: #8a949d;
+  --chaud: #d6a77a;
+  --froid: #9ec7d8;
+  --vert: #41c7a5;
+  --rouge: #ff6474;
+  --bord: color-mix(in srgb, var(--voile) 17%, transparent);
+  --bord-fin: color-mix(in srgb, var(--voile) 10%, transparent);
+  /* La teinte des voiles. Sur fond de nuit c'est du blanc qui éclaircit ;
+     sur fond de jour, un voile blanc ne se voit pas, il faut de l'encre qui
+     assombrit. Un seul jeton, et les trente-trois voiles de cette feuille
+     basculent ensemble. */
+  --voile: #ffffff;
+  /* L'ombre portée des fiches. De nuit elle est franche ; de jour, une ombre
+     aussi noire salit la page au lieu de soulever la carte. */
+  --ombre-portee: rgba(0, 0, 0, 0.42);
+
+  position: relative;
+  background: var(--fond);
+  color: var(--encre);
+  min-height: 100vh;
+  overflow-x: clip;
+  font-feature-settings: "cv05" 1, "ss01" 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Le dégradé de fond ne bouge jamais : c'est lui qui tient la continuité
+   d'un bout à l'autre de la page. */
+.cg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 62% 18%, rgba(158, 199, 216, 0.06), transparent 62%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(214, 167, 122, 0.045), transparent 66%),
+    linear-gradient(180deg, var(--fond) 0%, var(--fond-3) 46%, var(--fond) 100%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE THÈME CLAIR
+
+   Le même site, de jour. Rien n'est redessiné : seuls les jetons changent, et
+   tout ce qui en dépend suit. C'est la raison d'être des voiles tokenisés
+   plus haut — sans eux, il aurait fallu réécrire trente-trois règles.
+
+   Les accents sont assombris. Un ocre et un bleu pâle lisibles sur une page
+   noire tombent sous le seuil de contraste sur une page blanche : ce sont
+   les mêmes teintes, pas les mêmes valeurs.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root[data-concept="clair"] .cg {
+  --fond: #f6f5f2;
+  --fond-2: #eeece7;
+  --fond-3: #f1efeb;
+  --surface: #ffffff;
+  --surface-2: #f2f0eb;
+  --encre: #0e1116;
+  --encre-2: #3f474f;
+  --encre-3: #6b737b;
+  --chaud: #9a6532;
+  --froid: #2f6f8a;
+  --vert: #0d7a52;
+  --rouge: #c12b3c;
+  --voile: #0b0f14;
+  --ombre-portee: rgba(14, 17, 22, 0.14);
+}
+/* De jour, la lumière vient du haut. */
+:root[data-concept="clair"] .cg::before {
+  background:
+    radial-gradient(ellipse 70% 50% at 62% 18%, rgba(47, 111, 138, 0.07), transparent 62%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(154, 101, 50, 0.05), transparent 66%),
+    linear-gradient(180deg, #faf9f7 0%, #f2f0ec 46%, #f6f5f2 100%);
+}
+
+.cg-wrap {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 clamp(28px, 4.4vw, 76px);
+}
+
+.cg-tabulaire { font-variant-numeric: tabular-nums; }
+.cg-pt { color: var(--chaud); }
+
+/* ── L'en-tête ───────────────────────────────────────────────────────────── */
+
+.cg-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  padding: 22px 0;
+  /* Pas de fond, pas d'ombre : seul un voile qui naît au défilement. */
+  background: linear-gradient(180deg, rgba(5, 8, 12, 0.72), transparent);
+  backdrop-filter: blur(3px);
+}
+.cg-header-l {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 clamp(28px, 4.4vw, 76px);
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 4vw, 64px);
+}
+
+/* ── Le menu centré ──────────────────────────────────────────────────────
+
+   Le nom ne bouge plus. Il tient le milieu de la barre, et les onglets se
+   rangent de part et d'autre : deux à gauche, deux à droite.
+
+   Trois colonnes, « 1fr auto 1fr » : les deux gouttières sont égales par
+   construction, donc le nom tombe au centre exact de la barre quelle que
+   soit la largeur des deux groupes d'onglets. Aucune mesure, aucun calcul.
+
+   Au repos, la barre n'intercepte rien : elle couvre toute la largeur et
+   bloquerait un clic sur la page. Seuls le nom et l'entrée de compte
+   restent saisissables.
+   ──────────────────────────────────────────────────────────────────────── */
+
+.cg-header { pointer-events: none; background: none; backdrop-filter: none; }
+.cg-header .cg-logo,
+.cg-header-ouvert { pointer-events: auto; }
+.cg-header-l {
+  position: relative;
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: clamp(18px, 2.6vw, 40px);
+}
+
+/* Le verre, seulement quand le menu est ouvert. */
+.cg-header-verre {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(8, 13, 20, 0.66), rgba(8, 13, 20, 0.22));
+  backdrop-filter: blur(16px) saturate(1.25);
+  -webkit-backdrop-filter: blur(16px) saturate(1.25);
+  border-bottom: 1px solid color-mix(in srgb, var(--voile) 7%, transparent);
+  transition: opacity 0.5s ease;
+}
+.cg-header-ouvert .cg-header-verre { opacity: 1; }
+
+/* Le nom, au centre de la colonne du milieu, et immobile.
+
+   La colonne est nommée explicitement : sur mobile les onglets passent en
+   `display: none`, ils cessent d'occuper une cellule, et un placement
+   automatique ferait glisser le nom dans la première colonne. */
+.cg-logo {
+  position: relative;
+  grid-column: 2;
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+/* Le jeton de verre sous le nom : il disparaît quand le verre du menu prend
+   le relais, sinon on lirait deux fonds l'un sur l'autre. */
+.cg-logo::before {
+  content: "";
+  position: absolute;
+  inset: -10px -18px;
+  z-index: -1;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--voile) 8%, transparent);
+  background: rgba(8, 13, 20, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: opacity 0.45s ease;
+}
+.cg-header-ouvert .cg-logo::before { opacity: 0; }
+
+/* La marque : un anneau et un point, dessinés, jamais une image. */
+.cg-logo-m {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--froid);
+  position: relative;
+  flex: none;
+  transition: transform 0.66s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s;
+}
+.cg-logo-m::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: var(--chaud);
+}
+.cg-header-ouvert .cg-logo-m { transform: rotate(-120deg) scale(1.06); }
+.cg-logo-t {
+  font-size: 15.5px;
+  letter-spacing: -0.01em;
+  color: var(--encre);
+  white-space: nowrap;
+}
+
+/* Les onglets : tassés contre le nom et effacés au repos, ils s'écartent
+   vers leur bord quand la barre s'ouvre. Chacun part du bon côté. */
+.cg-nav {
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.45s ease,
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-nav-g { grid-column: 1; justify-self: end; transform: translateX(18px); }
+/* Les onglets de droite se serrent contre le nom : la fin de leur colonne
+   reste libre, et c'est là que se pose l'entrée de compte. */
+.cg-nav-d { grid-column: 3; justify-self: start; transform: translateX(-18px); }
+.cg-header-ouvert .cg-nav {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition-delay: 0.14s;
+}
+/* Chaque onglet monte à son tour. */
+.cg-nav a,
+.cg-nav-bientot {
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.4s ease,
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.3s ease;
+}
+.cg-header-ouvert .cg-nav a,
+.cg-header-ouvert .cg-nav-bientot {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(0.22s + var(--i, 0) * 45ms);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cg-logo,
+  .cg-nav,
+  .cg-nav a,
+  .cg-nav-bientot,
+  .cg-cnx,
+  .cg-bout,
+  .cg-bout-l,
+  .cg-header-verre { transition: none; }
+}
+
+.cg-logo {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--encre);
+  white-space: nowrap;
+  text-decoration: none;
+}
+.cg-logo-m {
+  width: 9px;
+  height: 9px;
+  border-radius: 9px;
+  border: 1px solid var(--chaud);
+  box-shadow: inset 0 0 0 2px rgba(214, 167, 122, 0.22);
+}
+
+.cg-nav { display: flex; gap: clamp(16px, 1.8vw, 30px); }
+.cg-nav a {
+  font-size: 13.5px;
+  font-weight: 400;
+  color: var(--encre-2);
+  transition: color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-nav a:hover { color: var(--encre); }
+
+/* Le forum et l'entrée de compte, au bout de la barre et hors du flux :
+   ils ne pèsent pas sur les trois colonnes, donc ils ne décalent pas le
+   nom. */
+/* Le bout de barre suit la même règle que les onglets : au repos il n'est
+   pas là, il arrive quand le nom s'ouvre. Tout le menu tient donc dans un
+   seul geste, au lieu d'avoir deux moitiés qui n'obéissent pas au même
+   principe. */
+.cg-bout {
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.45s ease,
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  position: absolute;
+  /* Le décalage d'un élément hors flux se mesure sur la boîte de padding :
+     il faut donc reprendre la gouttière à la main pour s'aligner sur le
+     reste du contenu, et non sur le bord du conteneur. */
+  right: clamp(28px, 4.4vw, 76px);
+  top: 50%;
+  transform: translateY(-50%) translateX(16px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.cg-header-ouvert .cg-bout {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%);
+  transition-delay: 0.18s;
+}
+.cg-bout-l {
+  font-size: 13.5px;
+  color: var(--encre-2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+.cg-bout-l:hover { color: var(--encre); }
+.cg-cnx {
+  padding: 8px 16px;
+  border: 1px solid var(--bord);
+  border-radius: 999px;
+  background: rgba(8, 13, 20, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 13px;
+  color: var(--encre);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.3s, background 0.3s;
+}
+.cg-cnx:hover { border-color: rgba(214, 167, 122, 0.55); background: rgba(214, 167, 122, 0.1); }
+/* Ouverte, la barre porte déjà son verre : le jeton sous le bouton ferait
+   un second fond. */
+.cg-header-ouvert .cg-cnx { background: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.cg-header-ouvert .cg-cnx:hover { background: rgba(214, 167, 122, 0.1); }
+
+/* Les rubriques annoncées : lisibles, pas cliquables. */
+.cg-nav-bientot {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 13.5px;
+  color: var(--encre-3, rgba(226, 232, 240, 0.42));
+  cursor: default;
+  white-space: nowrap;
+}
+.cg-nav-bientot em {
+  font-style: normal;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--chaud);
+  opacity: 0.7;
+}
+
+.cg-demo-mini {
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+  border: 1px solid var(--bord-fin);
+  border-radius: 6px;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+.cg-demo-bloc { display: inline-block; margin-top: 30px; }
+
+/* ── La scène ────────────────────────────────────────────────────────────── */
+
+.cg-scene { position: relative; z-index: 1; height: 108vh; }
+.cg-scene-colle {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  /* Transparente au pointeur : c'est ce qui laisse attraper le globe de
+     fond, qui est en dessous. Le bloc de texte, lui, se réactive. */
+  pointer-events: none;
+}
+.cg-hero-ancre, .cg-defiler { pointer-events: auto; }
+
+/* Le globe de fond traverse tout le haut de la page : il est fixe, et c'est
+   le défilement qui le fait reculer. L'ancrage et l'animation sont séparés —
+   framer-motion écrit sa propre propriété `transform` sur l'élément qu'il
+   anime et effacerait un `translate(-50%, -50%)` posé au même endroit. */
+.cg-fond-globe {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  will-change: transform, opacity, filter;
+}
+.cg-fond-globe-i {
+  position: absolute;
+  top: 50%;
+  left: 71%;
+  width: min(46vw, 720px);
+  height: min(74vh, 720px);
+  transform: translate(-50%, -50%);
+}
+.cg-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+
+
+
+/* ── Le bloc éditorial ───────────────────────────────────────────────────── */
+
+.cg-hero-ancre {
+  position: absolute;
+  top: 50%;
+  left: clamp(28px, 4.4vw, 76px);
+  transform: translateY(-50%);
+  max-width: 460px;
+  z-index: 3;
+}
+.cg-hero-texte { will-change: transform, opacity; }
+
+/* Le nom seul, en enseigne : la même facture que le mot-titre de la page
+   économie (lettres très espacées, poids léger), parce que c'est la
+   promesse tenue par les deux pages — un mot qu'on reconnaît de loin. */
+.cg-hero-titre {
+  font-size: clamp(40px, 5.6vw, 78px);
+  font-weight: 300;
+  line-height: 1.04;
+  letter-spacing: 0.14em;
+  text-indent: 0.14em;
+  text-transform: uppercase;
+  color: var(--encre);
+}
+
+.cg-hero-c {
+  margin-top: 24px;
+  font-size: 15.5px;
+  line-height: 1.68;
+  color: var(--encre-2);
+  max-width: 440px;
+}
+
+.cg-lecteurs { display: block; margin-top: 32px; font-size: 12px; color: var(--encre-3); }
+.cg-lecteurs strong { display: block; font-size: 22px; font-weight: 400; color: var(--encre); letter-spacing: -0.02em; }
+
+.cg-murmure {
+  margin-top: 52px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--encre-3);
+  font-style: italic;
+}
+
+.cg-defiler {
+  position: absolute;
+  left: clamp(28px, 4.4vw, 76px);
+  bottom: 30px;
+  font-size: 9.5px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+  z-index: 3;
+  animation: cg-respire 3.2s ease-in-out infinite;
+}
+@keyframes cg-respire { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.9; } }
+
+/* ── La suite ────────────────────────────────────────────────────────────── */
+
+.cg-suite { position: relative; z-index: 1; }
+.cg-fil-orbital {
+  position: absolute;
+  top: -180px;
+  left: 0;
+  width: 100%;
+  height: 3200px;
+  pointer-events: none;
+}
+
+/* Des sections plus serrées : à treize pour cent de la hauteur de l'écran
+   de marge en haut et en bas, deux sections voisines mangeaient un écran
+   entier de vide. */
+.cg-section { position: relative; padding: clamp(64px, 8vh, 118px) 0; }
+
+.cg-enseigne { display: flex; align-items: center; gap: 18px; margin-bottom: 40px; }
+.cg-enseigne-t {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 10.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--encre-2);
+  white-space: nowrap;
+}
+.cg-enseigne-r { flex: 1; height: 1px; background: var(--bord-fin); }
+.cg-point-vif {
+  width: 5px; height: 5px; border-radius: 5px; background: var(--vert);
+  animation: cg-bat 2.4s ease-out infinite;
+}
+@keyframes cg-bat {
+  0% { box-shadow: 0 0 0 0 rgba(65, 199, 165, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(65, 199, 165, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(65, 199, 165, 0); }
+}
+
+.cg-h2 {
+  font-size: clamp(32px, 3.6vw, 60px);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  font-weight: 400;
+}
+.cg-h2-doux { color: var(--encre-2); }
+.cg-h2-centre { text-align: center; }
+.cg-chapo { margin-top: 22px; font-size: 15.5px; line-height: 1.66; color: var(--encre-2); max-width: 46ch; }
+.cg-chapo-centre { margin-left: auto; margin-right: auto; text-align: center; }
+
+/* ── Les emplacements d'images ───────────────────────────────────────────── */
+
+.image-placeholder {
+  position: relative;
+  width: 100%;
+  background: #11161c;
+  border: 1px solid var(--bord-fin);
+  border-radius: 8px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.image-placeholder {
+  background: linear-gradient(152deg, var(--ph-a, #1a2029) 0%, var(--ph-b, #0b1016) 72%);
+}
+/* Une lueur qui balaie lentement : le cadre vide a une vie, et l'on voit le
+   rythme que donnera l'image. */
+.image-placeholder-lueur {
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(ellipse 42% 46% at 30% 26%, color-mix(in srgb, var(--voile) 16%, transparent), transparent 62%);
+  animation: ph-derive 11s ease-in-out infinite alternate;
+}
+@keyframes ph-derive {
+  from { transform: translate(-4%, -3%) scale(1); }
+  to   { transform: translate(8%, 6%) scale(1.14); }
+}
+.image-placeholder-trame {
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(115deg, color-mix(in srgb, var(--voile) 5%, transparent) 0 1px, transparent 1px 13px);
+  mix-blend-mode: overlay;
+}
+.image-placeholder-etiquette {
+  position: absolute;
+  left: 10px;
+  bottom: 9px;
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  color: rgba(244, 242, 238, 0.4);
+  background: rgba(5, 8, 12, 0.5);
+  border: 1px solid color-mix(in srgb, var(--voile) 8%, transparent);
+  border-radius: 4px;
+  padding: 3px 7px;
+  backdrop-filter: blur(3px);
+}
+
+/* ── En direct ───────────────────────────────────────────────────────────── */
+
+.cg-direct { padding-top: clamp(28px, 4vh, 58px); padding-bottom: clamp(70px, 9vh, 130px); }
+.cg-fil {
+  overflow: hidden;
+  cursor: grab;
+  touch-action: pan-y;
+  /* Tirer une piste ne doit pas sélectionner son texte : le surlignage bleu
+     par-dessus le fil est le premier signe qu'on a attrapé la mauvaise chose. */
+  user-select: none;
+  -webkit-user-select: none;
+  /* Les deux bords s'effacent : le fil sort du cadre au lieu d'y être coupé. */
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+.cg-fil:active { cursor: grabbing; }
+.cg-fil-piste {
+  display: flex;
+  align-items: center;
+  gap: 42px;
+  width: max-content;
+  will-change: transform;
+}
+.cg-cours {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  white-space: nowrap;
+}
+.cg-cours-n { font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--encre-3); }
+.cg-cours-v { font-size: 17px; font-weight: 400; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.cg-micro { opacity: 0.9; }
+.cg-cours-note { font-size: 10.5px; padding-left: 2px; border-left: 1px solid var(--bord-fin); padding-left: 12px; letter-spacing: 0.06em; color: var(--encre-3); }
+.cg-cours-d { font-size: 12px; font-variant-numeric: tabular-nums; }
+.cg-cours-d.up { color: var(--vert); }
+.cg-cours-d.down { color: var(--rouge); }
+
+/* ── La carte ────────────────────────────────────────────────────────────── */
+
+.cg-carte-grille {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 300px);
+  gap: 22px;
+  margin-top: 54px;
+  align-items: stretch;
+}
+.cg-carte-zone {
+  position: relative;
+  min-height: 380px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 12px;
+  background: var(--fond-2);
+  overflow: hidden;
+}
+.cg-carte-fond { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cg-carte-mention {
+  position: absolute;
+  left: 16px;
+  top: 14px;
+  z-index: 2;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: var(--encre-3);
+}
+
+.cg-fiche {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border: 1px solid var(--bord);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.cg-fiche-pays { font-size: 19px; font-weight: 400; letter-spacing: -0.02em; }
+.cg-fiche-l { margin-top: 20px; display: flex; flex-direction: column; gap: 15px; }
+.cg-fiche-l > div { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding-bottom: 13px; border-bottom: 1px solid var(--bord-fin); }
+.cg-fiche-l dt { font-size: 12px; color: var(--encre-3); }
+.cg-fiche-l dd { font-size: 15px; font-variant-numeric: tabular-nums; }
+
+.cg-lien-fleche {
+  margin-top: auto;
+  padding-top: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--chaud);
+  text-decoration: none;
+  cursor: pointer;
+  transition: gap 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-lien-fleche:hover { gap: 15px; }
+
+/* ── Le carrousel de globes ──────────────────────────────────────────────
+   Une scène tenue en position fixe (sticky) pendant que sa section, plus
+   haute qu'un écran, défile derrière elle : chaque tranche de hauteur
+   franchie fait avancer d'une région, comme des cartes qu'on tournerait. */
+.cg-globes-accroche { margin-top: 18px; max-width: 62ch; }
+.cg-globes-zone { position: relative; }
+.cg-globes-colle {
+  position: sticky;
+  top: 8vh;
+  padding-top: 6vh;
+}
+.cg-globes-cadre {
+  border: 1px solid var(--bord-fin);
+  border-radius: 20px;
+  padding: clamp(10px, 1.6vw, 22px);
+  background: linear-gradient(160deg, rgba(158, 199, 216, 0.05), color-mix(in srgb, var(--voile) 1.5%, transparent));
+  overflow: hidden;
+}
+.cg-globes-puces {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+.cg-globes-puce {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bord);
+  transition: background 0.35s ease, transform 0.35s ease;
+}
+.cg-globes-puce-on { background: var(--chaud); transform: scale(1.4); }
+
+/* ── À la une ────────────────────────────────────────────────────────────── */
+
+.cg-une {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: center;
+}
+.cg-une-img { border-radius: 12px; }
+/* Les rubriques passent au froid. L'ambre était la couleur d'accent de la
+   page d'accueil ; sur une page de données bleues, elle tirait l'œil vers un
+   registre qui n'est plus celui du site. */
+.cg-rubrique { font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--froid); }
+.cg-une-t {
+  margin-top: 18px;
+  font-size: clamp(30px, 3.3vw, 54px);
+  line-height: 1.06;
+  letter-spacing: -0.038em;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+.cg-une-c { margin-top: 22px; font-size: 15.5px; line-height: 1.66; color: var(--encre-2); max-width: 44ch; }
+.cg-une .cg-lien-fleche { margin-top: 26px; padding-top: 0; }
+
+.cg-secondaires { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin-top: clamp(56px, 7vw, 100px); }
+.cg-second { display: flex; flex-direction: column; gap: 14px; cursor: pointer; }
+.cg-second .image-placeholder { transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
+.cg-second:hover .image-placeholder { transform: translateY(-6px); }
+.cg-second-t { font-size: 19px; font-weight: 400; line-height: 1.24; letter-spacing: -0.026em; text-transform: uppercase; }
+
+/* ── Les panneaux thématiques ────────────────────────────────────────────── */
+
+.cg-panneaux {
+  display: flex;
+  gap: 10px;
+  margin-top: 56px;
+  padding: 0 clamp(28px, 4.4vw, 76px);
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  height: clamp(340px, 46vh, 460px);
+}
+.cg-panneau {
+  position: relative;
+  flex-basis: 0;
+  min-width: 0;
+  border: 1px solid var(--bord-fin);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: flex-grow 0.85s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.6s;
+}
+.cg-panneau-on { border-color: rgba(214, 167, 122, 0.45); }
+.cg-panneau-img { position: absolute; inset: 0; height: 100%; border: 0; border-radius: 0; aspect-ratio: auto !important; }
+.cg-panneau-corps {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 22px;
+  background: linear-gradient(0deg, rgba(5, 8, 12, 0.94) 22%, transparent);
+}
+.cg-panneau-n { font-size: 10px; letter-spacing: 0.2em; color: var(--chaud); }
+.cg-panneau-t { font-size: 19px; font-weight: 400; letter-spacing: -0.024em; white-space: nowrap; }
+.cg-panneau-l {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--encre-2);
+  opacity: 0;
+  max-height: 0;
+  transition: opacity 0.6s ease, max-height 0.6s ease;
+}
+.cg-panneau-on .cg-panneau-l { opacity: 1; max-height: 60px; }
+
+/* ── Les chiffres ────────────────────────────────────────────────────────── */
+
+.cg-preuves-t { font-size: clamp(26px, 2.8vw, 44px); line-height: 1.1; letter-spacing: -0.032em; font-weight: 400; }
+.cg-preuves-l {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: clamp(50px, 6vw, 86px);
+}
+.cg-preuve { display: flex; flex-direction: column; gap: 12px; padding-top: 22px; border-top: 1px solid var(--bord-fin); }
+.cg-preuve-v { font-size: clamp(34px, 3.8vw, 62px); font-weight: 400; letter-spacing: -0.045em; line-height: 1; }
+.cg-preuve-l { font-size: 12.5px; color: var(--encre-3); }
+
+/* ── La sortie ───────────────────────────────────────────────────────────── */
+
+.cg-sortie { position: relative; overflow: hidden; padding-bottom: 0; }
+/* La planète de fin de page : elle occupe toute la largeur et déborde par
+   le bas, de sorte qu'on n'en voit que la courbe. Le dernier bloc se pose
+   dessus. */
+.cg-horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: clamp(320px, 40vh, 470px);
+  pointer-events: none;
+  z-index: 0;
+}
+.cg-terre { display: block; width: 100%; height: 100%; }
+.cg-sortie { overflow: hidden; }
+.cg-sortie-corps { position: relative; z-index: 1; text-align: center; padding-bottom: clamp(80px, 10vh, 140px); }
+
+.cg-inscription { display: flex; gap: 10px; justify-content: center; margin-top: 38px; flex-wrap: wrap; }
+.cg-inscription input {
+  width: min(360px, 76vw);
+  padding: 14px 18px;
+  border: 1px solid var(--bord);
+  border-radius: 10px;
+  background: rgba(12, 19, 26, 0.7);
+  font: inherit;
+  font-size: 14px;
+  color: var(--encre);
+  outline: none;
+  transition: border-color 0.4s;
+}
+.cg-inscription input::placeholder { color: var(--encre-3); }
+.cg-inscription input:focus { border-color: rgba(214, 167, 122, 0.6); }
+.cg-inscription button {
+  padding: 14px 28px;
+  border: 1px solid rgba(214, 167, 122, 0.5);
+  border-radius: 10px;
+  background: rgba(214, 167, 122, 0.1);
+  font: inherit;
+  font-size: 14px;
+  color: var(--encre);
+  cursor: pointer;
+  transition: background 0.4s, border-color 0.4s;
+}
+.cg-inscription button:hover { background: rgba(214, 167, 122, 0.2); border-color: rgba(214, 167, 122, 0.85); }
+
+.cg-citation { margin-top: clamp(56px, 7vw, 96px); font-size: clamp(15px, 1.4vw, 19px); line-height: 1.6; color: var(--encre-3); font-style: italic; }
+
+.cg-pied { position: relative; border-top: 1px solid var(--bord-fin); padding: 26px 0 34px; }
+.cg-pied-l { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; font-size: 12px; color: var(--encre-3); }
+.cg-pied-l nav { display: flex; gap: 20px; }
+.cg-pied-l a { color: var(--encre-3); transition: color 0.3s; }
+.cg-pied-l a:hover { color: var(--encre); }
+.cg-pied-note { margin-left: auto; }
+
+/* ── En dessous du desktop ───────────────────────────────────────────────── */
+
+@media (max-width: 1080px) {
+  .cg-fond-globe-i { left: 50%; width: 92vw; height: 92vw; opacity: 0.4; }
+  .cg-hero-texte { left: clamp(20px, 5vw, 48px); right: clamp(20px, 5vw, 48px); max-width: none; }
+  .cg-carte-grille,
+  .cg-une { grid-template-columns: minmax(0, 1fr); }
+  .cg-secondaires { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cg-preuves-l { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cg-panneaux { height: auto; flex-direction: column; }
+  .cg-panneau { height: 190px; flex-grow: 0 !important; }
+  .cg-nav { display: none; }
+  /* Sans onglets, la barre n'a plus que son nom au centre, et au bout le
+     forum et le compte. Les deux se resserrent, et le libellé du compte
+     passe à sa forme courte, pour ne pas mordre sur le nom. */
+  .cg-bout { gap: 9px; }
+  .cg-bout-l { font-size: 12px; }
+  .cg-cnx { padding: 6px 11px; font-size: 12px; }
+  /* Le jeton de verre sous le nom déborde de trente-six pixels : sur une
+     barre de trois cent quatre-vingt-dix, c'est ce qui le faisait mordre sur
+     « Forum ». Le nom se lit très bien sans lui sur un fond sombre. */
+  .cg-logo::before { display: none; }
+  .cg-logo-t { font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  
+  .cg-defiler { animation: none; }
+  .cg-point-vif { animation: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE GLOBE DU MONDE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.gm { margin-top: 44px; }
+
+.gm-regions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.gm-region {
+  padding: 9px 20px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--encre-2);
+  cursor: pointer;
+  transition: color 0.35s, background 0.35s, border-color 0.35s;
+}
+.gm-region:hover { color: var(--encre); }
+.gm-region-on { background: color-mix(in srgb, var(--voile) 7%, transparent); border-color: var(--bord); color: var(--encre); }
+
+.gm-corps {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 300px);
+  gap: 22px;
+  align-items: stretch;
+}
+@media (max-width: 1080px) { .gm-corps { grid-template-columns: minmax(0, 1fr); } }
+
+.gm-scene {
+  position: relative;
+  min-height: 430px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 12px;
+  /* Translucide : le globe de fond, arrivé derrière, doit encore se
+     deviner à travers — c'est là que le relais se lit. */
+  background: radial-gradient(ellipse 60% 60% at 50% 45%, rgba(7, 16, 31, 0.82), rgba(4, 7, 14, 0.92) 70%);
+  overflow: hidden;
+}
+.gm-colonne { display: flex; flex-direction: column; min-width: 0; }
+.gm-sous { margin-top: 22px; }
+.gm-sous .cg-frise2 { margin-top: 0; }
+.gm-sous .cg-frise2-tete { margin-bottom: 16px; }
+.gm-sous .cg-frise2-an { font-size: clamp(26px, 2.6vw, 34px); }
+.gm-sous .cg-frise-n { margin-top: 14px; }
+
+.gm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+.gm-canvas:active { cursor: grabbing; }
+
+/* ── Les indicateurs et l'échelle de couleurs ────────────────────────────── */
+
+.gm-indics { display: flex; gap: 4px; flex-wrap: wrap; margin: -8px 0 18px; }
+.gm-indic {
+  padding: 6px 13px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 6px;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  color: var(--encre-3);
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s, background 0.3s;
+}
+.gm-indic:hover { color: var(--encre-2); border-color: var(--bord); }
+.gm-indic-on { color: var(--encre); border-color: rgba(158, 199, 216, 0.45); background: rgba(158, 199, 216, 0.08); }
+
+.gm-echelle {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  pointer-events: none;
+}
+.gm-echelle-ligne { display: flex; align-items: center; gap: 8px; }
+.gm-echelle-b {
+  font-size: 10.5px;
+  color: var(--encre-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.gm-echelle-barre {
+  display: block;
+  width: 150px;
+  height: 7px;
+  border-radius: 2px;
+  border: 1px solid color-mix(in srgb, var(--voile) 12%, transparent);
+}
+.gm-echelle-p {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--encre-3);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.gm-echelle-sans {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  border: 1px solid color-mix(in srgb, var(--voile) 16%, transparent);
+  /* La même hachure que sur le globe : le repère doit être reconnaissable. */
+  background: repeating-linear-gradient(
+    45deg,
+    #1b212b 0 2px,
+    rgba(150, 170, 200, 0.28) 2px 3px
+  );
+}
+@media (max-width: 720px) {
+  .gm-echelle { position: static; align-items: flex-start; padding: 12px 16px 0; }
+}
+
+.gm-aide {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: var(--encre-3);
+}
+.gm-aide-survol { color: var(--froid); }
+
+.gm-vedette {
+  margin: 14px 0 2px;
+  font-size: clamp(30px, 3.2vw, 42px);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: var(--froid);
+  font-variant-numeric: tabular-nums;
+}
+.gm-vedette-l { font-size: 11.5px; letter-spacing: 0.04em; color: var(--encre-2); }
+/* Les autres indicateurs, dans la fiche du pays : de petits rectangles
+   posés côte à côte plutôt qu'une liste. On les vise, on clique, le globe
+   change de couleur sans quitter le pays. */
+.gm-mesures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin: 22px 0 0;
+}
+.gm-mesures > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 11px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--voile) 4.5%, transparent);
+  transition: border-color 0.3s, background 0.3s;
+}
+.gm-mesures > div:hover { border-color: var(--bord); background: color-mix(in srgb, var(--voile) 8.5%, transparent); }
+.gm-mesures dt { font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--encre-3); }
+.gm-mesures dd { margin: 0; font-size: 13px; color: var(--encre); font-variant-numeric: tabular-nums; }
+
+.gm-mesure-b {
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.25s;
+}
+.gm-mesure-b:hover { color: var(--froid); }
+
+.gm-panneau {
+  display: flex;
+  flex-direction: column;
+  padding: 26px;
+  border: 1px solid var(--bord);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.gm-panneau-sur { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--encre-3); }
+.gm-panneau-t { margin-top: 12px; font-size: 27px; font-weight: 400; letter-spacing: -0.03em; }
+.gm-rang { margin-top: 6px; font-size: 12.5px; color: var(--chaud); }
+.gm-mesures { margin-top: 24px; display: flex; flex-direction: column; gap: 15px; }
+.gm-mesures > div { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding-bottom: 13px; border-bottom: 1px solid var(--bord-fin); }
+.gm-mesures dt { font-size: 12px; color: var(--encre-3); }
+.gm-mesures dd { font-size: 15.5px; font-variant-numeric: tabular-nums; }
+.gm-source { margin-top: 18px; font-size: 10px; color: var(--encre-3); letter-spacing: 0.08em; }
+.gm-vide { font-size: 13px; color: var(--encre-3); margin: auto; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES FLUX
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cg-flux-scene {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 260px) minmax(0, 1fr) minmax(0, 230px);
+  align-items: center;
+  gap: 0;
+  margin-top: 56px;
+  min-height: 340px;
+}
+@media (max-width: 1080px) {
+  .cg-flux-scene { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+  .cg-flux-toile { display: none; }
+}
+
+.cg-flux-entrees { display: flex; flex-direction: column; gap: 22px; }
+.cg-flux-entree { display: flex; flex-direction: column; gap: 3px; padding-left: 14px; border-left: 1px solid var(--bord); }
+.cg-flux-n { font-size: 9.5px; letter-spacing: 0.2em; color: var(--chaud); }
+.cg-flux-t { font-size: 15.5px; font-weight: 400; }
+.cg-flux-d { font-size: 12px; color: var(--encre-3); }
+
+/* Les vingt-cinq titres, au survol de l'entrée presse. Le panneau sort du
+   flux : il se déplie par-dessus la scène au lieu de pousser les trois autres
+   entrées vers le bas. Il répond aussi au focus, sinon il n'existe pas pour
+   qui navigue au clavier. */
+.cg-flux-entree { position: relative; }
+.cg-flux-entree:focus-visible { outline: none; }
+.cg-flux-pop {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 10px);
+  z-index: 6;
+  width: min(360px, 78vw);
+  padding: 14px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--fond) 92%, transparent);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.3s;
+}
+.cg-flux-entree:hover .cg-flux-pop,
+.cg-flux-entree:focus-within .cg-flux-pop {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+.cg-flux-pop-l {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 11px;
+  color: var(--encre-2);
+}
+
+.cg-flux-toile { width: 100%; height: 340px; }
+
+.cg-flux-sortie {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 26px 24px;
+  border: 1px solid rgba(158, 199, 216, 0.34);
+  border-radius: 20px;
+  background: linear-gradient(150deg, rgba(158, 199, 216, 0.09), rgba(12, 19, 26, 0.5));
+}
+.cg-flux-sortie-t { font-size: 17px; font-weight: 400; letter-spacing: -0.02em; }
+.cg-flux-sortie-d { font-size: 12px; color: var(--encre-2); }
+.cg-flux-gratuit {
+  margin-top: 4px;
+  align-self: flex-start;
+  padding: 4px 11px;
+  border: 1px solid color-mix(in srgb, var(--froid) 45%, transparent);
+  border-radius: 999px;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--froid);
+}
+
+.cg-gratuit {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+  margin-top: clamp(50px, 6vw, 84px);
+  padding-top: 32px;
+  border-top: 1px solid var(--bord-fin);
+}
+.cg-gratuit-v { font-size: clamp(50px, 6vw, 96px); font-weight: 400; letter-spacing: -0.05em; line-height: 1; color: var(--froid); }
+.cg-gratuit-l { display: flex; flex-direction: column; gap: 6px; max-width: 46ch; font-size: 14px; line-height: 1.6; color: var(--encre-2); }
+.cg-gratuit-l strong { font-size: 16px; font-weight: 400; color: var(--encre); }
+
+@media (prefers-reduced-motion: reduce) {
+  .image-placeholder-lueur { animation: none; }
+  .cg-flux-bille { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES CLASSEMENTS, LA MÉTHODE, LES QUESTIONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cg-cl-fleches { display: flex; gap: 6px; }
+.cg-cl-fleches button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 50%;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--encre-2);
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s, background 0.3s;
+}
+.cg-cl-fleches button:hover { color: var(--encre); border-color: var(--bord); background: color-mix(in srgb, var(--voile) 8.5%, transparent); }
+
+.cg-cl-grille {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 44px;
+}
+@media (max-width: 1080px) { .cg-cl-grille { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .cg-cl-grille { grid-template-columns: minmax(0, 1fr); } }
+.cg-cl-grille .cg-fiche { width: auto; height: 100%; }
+
+/* ── Titres à gauche, vitrine à droite ────────────────────────────────────
+   Même mécanique de défilement tenu (sticky) que le carrousel de globes :
+   la section est plus haute qu'un écran, et chaque tranche franchie fait
+   passer la vitrine au classement suivant. */
+.cg-cl-zone { position: relative; }
+/* Elle se bloquait trop bas : dix pour cent de la hauteur d'écran, plus une
+   marge intérieure, retardaient l'apparition du classement de presque un
+   tiers d'écran. Elle se pose maintenant tout près du haut, et le
+   classement se lit dès l'entrée dans la section. */
+.cg-cl-colle { position: sticky; top: 2vh; padding-top: 1vh; }
+.cg-cl-disposition {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: clamp(24px, 4vw, 64px);
+}
+.cg-cl-titres { display: flex; flex-direction: column; gap: 6px; }
+.cg-cl-titre {
+  padding: 10px 4px;
+  border: 0;
+  border-top: 1px solid var(--bord-fin);
+  background: none;
+  text-align: left;
+  font: inherit;
+  font-size: clamp(19px, 2vw, 27px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--encre-3);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+.cg-cl-titres > *:last-child { border-bottom: 1px solid var(--bord-fin); }
+.cg-cl-titre:hover { color: var(--encre-2); }
+.cg-cl-titre-on { color: var(--encre); }
+
+.cg-cl-vitrine { position: relative; width: clamp(260px, 27vw, 320px); }
+.cg-fiche-vitrine { width: 100%; }
+@media (max-width: 780px) {
+  .cg-cl-disposition { grid-template-columns: minmax(0, 1fr); }
+  .cg-cl-vitrine { width: 100%; }
+}
+
+.cg-cl-piste {
+  display: flex;
+  user-select: none;
+  -webkit-user-select: none;
+  gap: 16px;
+  margin-top: 44px;
+  padding-bottom: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  cursor: grab;
+  /* Le dernier bord s'efface : la piste doit se lire comme une suite qui
+     continue, pas comme un bloc coupé net. */
+  mask-image: linear-gradient(90deg, #000 0 92%, transparent);
+}
+.cg-cl-piste::-webkit-scrollbar { display: none; }
+.cg-cl-piste:active { cursor: grabbing; }
+.cg-cl-piste > * { scroll-snap-align: start; flex: 0 0 auto; }
+
+.cg-fiche {
+  width: clamp(250px, 26vw, 310px);
+  padding: 18px 20px 20px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(158, 199, 216, 0.09), color-mix(in srgb, var(--voile) 3.5%, transparent));
+  transition: border-color 0.35s, background 0.35s;
+}
+.cg-fiche:hover { border-color: rgba(158, 199, 216, 0.35); }
+/* Un filet de couleur par fiche, dans un ordre fixe : il distingue les
+   classements sans rien encoder — la couleur ne porte aucune valeur ici. */
+.cg-fiche::before {
+  content: "";
+  position: absolute;
+  inset: -1px -1px auto -1px;
+  height: 2px;
+  border-radius: 12px 12px 0 0;
+  background: var(--fiche-t, var(--froid));
+  opacity: 0.85;
+}
+.cg-fiche { position: relative; }
+.cg-cl-grille > *:nth-child(4n + 1) .cg-fiche { --fiche-t: linear-gradient(90deg, #3987e5, transparent); }
+.cg-cl-grille > *:nth-child(4n + 2) .cg-fiche { --fiche-t: linear-gradient(90deg, #D6A77A, transparent); }
+.cg-cl-grille > *:nth-child(4n + 3) .cg-fiche { --fiche-t: linear-gradient(90deg, #41C7A5, transparent); }
+.cg-cl-grille > *:nth-child(4n + 4) .cg-fiche { --fiche-t: linear-gradient(90deg, #9B8BE0, transparent); }
+.cg-fiche-h { margin-bottom: 16px; }
+.cg-fiche-i {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--chaud);
+}
+.cg-fiche-t { margin: 7px 0 0; font-size: 15px; font-weight: 400; line-height: 1.32; color: var(--encre); }
+
+.cg-fiche-l { list-style: none; margin: 0; padding: 0; }
+.cg-fiche-l li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 9px;
+  padding: 9px 0 10px;
+  border-top: 1px solid var(--bord-fin);
+}
+.cg-fiche-r { font-size: 10px; color: var(--encre-3); font-variant-numeric: tabular-nums; }
+.cg-fiche-n {
+  font-size: 13px;
+  color: var(--encre);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cg-fiche-v { font-size: 12.5px; color: var(--froid); font-variant-numeric: tabular-nums; }
+.cg-fiche-b {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, #1c5cab, #6da7ec);
+}
+
+.cg-cl-source { margin-top: 18px; font-size: 11.5px; line-height: 1.6; color: var(--encre-3); }
+
+.cg-etapes {
+  list-style: none;
+  margin: 52px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0;
+}
+@media (max-width: 1080px) { .cg-etapes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 20px; } }
+@media (max-width: 620px) { .cg-etapes { grid-template-columns: minmax(0, 1fr); } }
+.cg-etape { position: relative; padding: 0 20px 0 0; }
+.cg-etape-n {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--chaud);
+}
+.cg-etape-fil {
+  display: block;
+  height: 1px;
+  margin: 14px 0 16px;
+  background: linear-gradient(90deg, var(--bord), transparent);
+}
+.cg-etape-t { margin: 0 0 8px; font-size: 16px; font-weight: 400; color: var(--encre); }
+.cg-etape-l { margin: 0; font-size: 13px; line-height: 1.62; color: var(--encre-2); }
+
+.cg-trace {
+  margin: 58px 0 0;
+  border: 1px solid var(--bord-fin);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.cg-trace-h {
+  display: block;
+  padding: 13px 22px;
+  border-bottom: 1px solid var(--bord-fin);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+.cg-trace-corps { display: flex; flex-wrap: wrap; align-items: center; gap: 34px; padding: 26px 22px; }
+.cg-trace-v { font-size: clamp(38px, 4.4vw, 60px); line-height: 1; letter-spacing: -0.04em; color: var(--froid); }
+.cg-trace-d { display: grid; grid-template-columns: repeat(4, minmax(0, auto)); gap: 22px 38px; margin: 0; }
+@media (max-width: 720px) { .cg-trace-d { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.cg-trace-d dt { font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--encre-3); }
+.cg-trace-d dd { margin: 5px 0 0; font-size: 14px; color: var(--encre); }
+
+.cg-q-liste { display: flex; flex-direction: column; border-top: 1px solid var(--bord-fin); }
+.cg-q { border-bottom: 1px solid var(--bord-fin); }
+.cg-q-t {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: clamp(16px, 1.7vw, 20px);
+  text-align: left;
+  color: var(--encre-2);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.cg-q-t:hover, .cg-q-on .cg-q-t { color: var(--encre); }
+.cg-q-signe {
+  position: relative;
+  flex: none;
+  width: 13px;
+  height: 13px;
+}
+.cg-q-signe::before, .cg-q-signe::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto 0;
+  height: 1px;
+  background: var(--encre-2);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-q-signe::after { transform: rotate(90deg); }
+.cg-q-on .cg-q-signe::after { transform: rotate(0deg); }
+.cg-q-r { overflow: hidden; }
+.cg-q-r p {
+  margin: 0;
+  padding: 0 0 24px;
+  max-width: 68ch;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--encre-2);
+}
+
+/* ── Les six rubriques ───────────────────────────────────────────────────── */
+
+.cg-rub-l {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0 24px;
+}
+@media (max-width: 1080px) { .cg-rub-l { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px 24px; } }
+@media (max-width: 620px) { .cg-rub-l { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.cg-rub { display: flex; flex-direction: column; gap: 7px; }
+.cg-rub-tige { display: block; width: 22px; height: 1px; margin-bottom: 9px; }
+.cg-rub-t { margin: 0; font-size: 12px; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; }
+.cg-rub-v {
+  font-size: clamp(22px, 2.3vw, 30px);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: var(--encre);
+  /* Deux lignes réservées : un libellé qui passe à la ligne ne doit pas
+     décaler la légende de sa colonne par rapport aux cinq autres. */
+  min-height: 2.24em;
+}
+.cg-rub-l2 { font-size: 12.5px; line-height: 1.55; color: var(--encre-2); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA COULEUR
+
+   Le fond reste une nuit. La couleur n'arrive donc pas par des aplats — elle
+   arrive par des traits : filets qui parcourent les règles de section, bord
+   du globe qui s'allume par intermittence, halos très bas sous quelques
+   blocs. Assez pour que la page ne soit pas grise, jamais assez pour passer
+   devant le texte.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@property --cg-tour {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* ── Le filet des règles de section ──────────────────────────────────────── */
+
+.cg-enseigne-r {
+  position: relative;
+  overflow: hidden;
+  background: var(--bord-fin);
+}
+.cg-enseigne-r::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(158, 199, 216, 0) 30%,
+    rgba(158, 199, 216, 0.9) 45%,
+    rgba(214, 167, 122, 0.85) 55%,
+    rgba(214, 167, 122, 0) 70%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: cg-filet 7.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+@keyframes cg-filet {
+  0% { transform: translateX(-100%); }
+  55%, 100% { transform: translateX(100%); }
+}
+
+/* ── Le bord du globe interactif ─────────────────────────────────────────── */
+
+.gm-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--cg-tour),
+    transparent 0deg 190deg,
+    rgba(158, 199, 216, 0.85) 244deg,
+    rgba(120, 220, 255, 0.95) 262deg,
+    rgba(214, 167, 122, 0.7) 280deg,
+    transparent 330deg 360deg
+  );
+  /* Seul l'anneau d'un pixel garde la couleur : le centre est découpé. */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: cg-tourne 11s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+@keyframes cg-tourne {
+  to { --cg-tour: 360deg; }
+}
+
+/* Deux éclats aux angles : ils respirent, décalés, pour que le cadre ne soit
+   jamais tout à fait immobile. */
+.gm-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 34% 40% at 0% 0%, rgba(120, 200, 255, 0.16), transparent 70%),
+    radial-gradient(ellipse 34% 40% at 100% 100%, rgba(214, 167, 122, 0.13), transparent 70%);
+  animation: cg-respire 6.5s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 1;
+}
+@keyframes cg-respire {
+  from { opacity: 0.45; }
+  to { opacity: 1; }
+}
+
+/* ── Les halos de section ────────────────────────────────────────────────── */
+
+.cg-methode::before,
+.cg-questions::before,
+.cg-classements::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+.cg-classements::before {
+  background: radial-gradient(ellipse 52% 46% at 78% 22%, rgba(60, 130, 220, 0.11), transparent 68%);
+}
+.cg-methode::before {
+  background: radial-gradient(ellipse 60% 44% at 12% 78%, rgba(214, 167, 122, 0.09), transparent 66%);
+}
+.cg-questions::before {
+  background: radial-gradient(ellipse 48% 40% at 88% 60%, rgba(65, 199, 165, 0.08), transparent 66%);
+}
+
+/* ── Les étapes de la méthode ────────────────────────────────────────────── */
+
+.cg-etape-fil {
+  background: linear-gradient(90deg, var(--froid), rgba(214, 167, 122, 0.5) 45%, transparent);
+  opacity: 0.75;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-enseigne-r::after,
+  .gm-scene::before,
+  .gm-scene::after { animation: none; }
+  .cg-enseigne-r::after { opacity: 0.5; transform: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE ÉCONOMIE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cg-nav-on { color: var(--encre) !important; }
+.cg-nav-on::after {
+  content: "";
+  display: block;
+  height: 1px;
+  margin-top: 5px;
+  background: linear-gradient(90deg, var(--froid), transparent);
+}
+
+.cg-eco-haut { padding-top: clamp(120px, 15vh, 180px); padding-bottom: clamp(26px, 3.5vh, 48px); }
+.cg-eco-h1 { margin-top: 14px; max-width: none; font-size: clamp(34px, 4.6vw, 64px); text-wrap: balance; }
+
+.cg-eco-cles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 26px;
+  margin: 60px 0 0;
+  padding-top: 26px;
+  border-top: 1px solid var(--bord-fin);
+}
+@media (max-width: 860px) { .cg-eco-cles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.cg-eco-cles dt { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--encre-3); }
+.cg-eco-cles dd {
+  margin: 9px 0 4px;
+  font-size: clamp(24px, 2.6vw, 34px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--encre);
+}
+.cg-eco-cles span { font-size: 12px; color: var(--encre-2); }
+
+/* ── La frise ────────────────────────────────────────────────────────────── */
+
+.cg-frise-s { padding-top: 0; }
+.cg-frise-n { margin-top: 20px; max-width: 76ch; font-size: 11.5px; line-height: 1.65; color: var(--encre-3); }
+
+/* ── Le classement ───────────────────────────────────────────────────────── */
+
+.cg-filtre {
+  width: min(230px, 42vw);
+  padding: 8px 13px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--voile) 5.5%, transparent);
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--encre);
+}
+.cg-filtre::placeholder { color: var(--encre-3); }
+.cg-filtre:focus { outline: none; border-color: rgba(158, 199, 216, 0.5); }
+
+.cg-tab-cadre {
+  max-height: 560px;
+  overflow: auto;
+  border: 1px solid var(--bord-fin);
+  border-radius: 12px;
+  scrollbar-width: thin;
+}
+.cg-tab { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.cg-tab thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0;
+  text-align: right;
+  font-weight: 400;
+  /* Opaque : les lignes passent dessous au défilement. */
+  background: #0a1017;
+  border-bottom: 1px solid var(--bord);
+}
+.cg-tab thead th.cg-tab-r, .cg-tab thead th.cg-tab-p { text-align: left; padding: 13px 14px; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--encre-3); }
+.cg-tri {
+  width: 100%;
+  padding: 13px 14px;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: right;
+  color: var(--encre-3);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.25s;
+}
+.cg-tri:hover { color: var(--encre-2); }
+.cg-tri-on { color: var(--froid); }
+.cg-tab tbody tr { cursor: pointer; transition: background 0.2s; }
+.cg-tab tbody tr:hover { background: color-mix(in srgb, var(--voile) 6%, transparent); }
+.cg-tab-on { background: rgba(158, 199, 216, 0.12) !important; }
+.cg-tab td {
+  padding: 11px 14px;
+  text-align: right;
+  font-size: 13px;
+  color: var(--encre);
+  border-bottom: 1px solid var(--bord-fin);
+}
+.cg-tab td.cg-tab-r { text-align: left; font-size: 10.5px; color: var(--encre-3); }
+.cg-tab td.cg-tab-p { text-align: left; white-space: nowrap; }
+.cg-tab-vide { color: var(--encre-3) !important; }
+
+.cg-eco-arts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 1080px) { .cg-eco-arts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.cg-second-c { margin-top: 8px; font-size: 12.5px; line-height: 1.6; color: var(--encre-2); }
+/* Deux sections qui se suivent additionnent leurs marges : entre le globe et
+   son classement, cela faisait un écran de vide. */
+.cg-eco-rang { padding-top: clamp(40px, 5vh, 70px); }
+
+/* ── La frise : une ligne, un point ──────────────────────────────────────── */
+
+.cg-frise2 { margin-top: 34px; user-select: none; -webkit-user-select: none; }
+/* La date à gauche, la ligne à sa droite : le nombre sert de repère fixe, et
+   la piste gagne toute la largeur restante au lieu d'être repoussée sous lui. */
+.cg-frise2 { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: clamp(16px, 2vw, 30px); align-items: center; }
+.cg-frise2-piste { min-width: 0; position: relative; }
+.cg-frise2-an {
+  font-size: clamp(30px, 3.4vw, 46px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--encre);
+  font-variant-numeric: tabular-nums;
+}
+.cg-frise2-l { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--encre-3); }
+
+.cg-frise2-rail {
+  position: relative;
+  height: 26px;
+  cursor: pointer;
+  touch-action: none;
+}
+.cg-frise2-rail:focus-visible { outline: 1px solid var(--froid); outline-offset: 6px; border-radius: 4px; }
+.cg-frise2-ligne,
+.cg-frise2-faite {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 1px;
+  transform: translateY(-50%);
+}
+.cg-frise2-ligne { right: 0; background: var(--bord); }
+.cg-frise2-faite { background: linear-gradient(90deg, rgba(158, 199, 216, 0.25), var(--froid)); }
+.cg-frise2-jalon {
+  position: absolute;
+  top: 50%;
+  width: 1px;
+  height: 7px;
+  margin-left: -0.5px;
+  transform: translateY(-50%);
+  background: var(--bord);
+  transition: height 0.3s, background 0.3s;
+}
+.cg-frise2-jalon-on { height: 0; }
+.cg-frise2-point {
+  position: absolute;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  margin-left: -6.5px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: var(--encre);
+  box-shadow: 0 0 0 5px rgba(158, 199, 216, 0.16), 0 2px 10px rgba(0, 0, 0, 0.5);
+  transition: left 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-frise2-rail:active .cg-frise2-point { transition: none; }
+
+/* Le pas en cours continue la rangée des dates, juste après la dernière
+   publiée, au lieu de flotter au-dessus du rail : c'était bien vu, mais mal
+   lu — on ne comprenait pas ce que ce repère voulait dire de si loin. Le
+   point vert et la couleur le distinguent d'une date parmi les autres, sans
+   le sortir de la ligne. */
+.cg-frise2-direct {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px 3px 7px;
+  border: 1px solid color-mix(in srgb, var(--froid) 40%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--froid) 10%, transparent);
+  font: inherit;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--froid);
+  cursor: pointer;
+  transition: color 0.25s, border-color 0.25s, background 0.25s;
+}
+.cg-frise2-direct:hover { background: color-mix(in srgb, var(--froid) 18%, transparent); }
+.cg-frise2-direct-on { color: var(--encre); border-color: var(--froid); background: color-mix(in srgb, var(--froid) 22%, transparent); }
+.cg-frise2-direct-p {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--vert);
+  animation: cg-bat 2.4s ease-out infinite;
+}
+
+.cg-frise2-bornes { position: relative; height: 22px; margin-top: 4px; }
+.cg-frise2-b {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  padding: 2px 4px;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--encre-3);
+  cursor: pointer;
+  transition: color 0.25s;
+}
+.cg-frise2-b:hover { color: var(--encre-2); }
+.cg-frise2-b-on { color: var(--froid); }
+/* Seize libellés sur une ligne se chevauchent : sous cette largeur, on ne
+   garde qu'un jalon sur deux. */
+@media (max-width: 900px) { .cg-frise2-b:nth-child(2n) { display: none; } }
+
+/* ── Les raccourcis ──────────────────────────────────────────────────────── */
+
+.cg-raccourcis { margin-top: 38px; }
+.cg-raccourcis-t { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--encre-3); }
+.cg-raccourcis-l { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.cg-racc {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 128px;
+  padding: 11px 14px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--voile) 4.5%, transparent);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s;
+}
+.cg-racc:hover { border-color: var(--bord); background: color-mix(in srgb, var(--voile) 8.5%, transparent); }
+.cg-racc-on { border-color: rgba(158, 199, 216, 0.5); background: rgba(158, 199, 216, 0.1); }
+.cg-racc-r { font-size: 9.5px; letter-spacing: 0.1em; color: var(--encre-3); }
+.cg-racc-n { font-size: 13px; color: var(--encre); white-space: nowrap; }
+.cg-racc-v { font-size: 12.5px; color: var(--froid); font-variant-numeric: tabular-nums; }
+/* La frise et le globe forment un même geste : on choisit une année, on la
+   regarde. Deux marges pleines entre les deux couperaient ce geste. */
+.cg-frise-s { padding-bottom: clamp(24px, 3vh, 44px); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE GLOBE ÉCONOMIE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ge-metriques { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 18px; }
+.ge-metrique {
+  padding: 8px 15px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--voile) 3%, transparent);
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--encre-2);
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s, background 0.3s;
+}
+.ge-metrique:hover { color: var(--encre); border-color: var(--bord); }
+.ge-metrique-on {
+  color: var(--encre);
+  border-color: rgba(158, 199, 216, 0.55);
+  background: rgba(158, 199, 216, 0.14);
+}
+
+.ge-corps {
+  display: grid;
+  /* La colonne du globe se resserre et sa scène s'allonge : la sphère est
+     inscrite dans le plus petit côté du cadre, donc un cadre large et bas la
+     rend petite. Moins large, plus haut, elle grandit sans rien déplacer. */
+  /* Une seule hauteur pour les deux colonnes : la carte et la fiche pays
+     s'arrêtent au même trait, et le bloc se lit d'un tenant. */
+  --ge-h: clamp(460px, 68vh, 700px);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 384px);
+  gap: 22px;
+  align-items: start;
+}
+@media (max-width: 1080px) { .ge-corps { grid-template-columns: minmax(0, 1fr); } }
+.ge-colonne { display: flex; flex-direction: column; min-width: 0; }
+
+.ge-scene {
+  position: relative;
+  height: var(--ge-h);
+  border: 1px solid var(--bord-fin);
+  border-radius: 14px;
+  /* Un éclat froid derrière la sphère, et un halo chaud très bas : la scène
+     n'est plus un trou noir dans la page, elle a une profondeur. */
+  background:
+    radial-gradient(ellipse 46% 46% at 50% 44%, rgba(90, 165, 235, 0.16), transparent 68%),
+    radial-gradient(ellipse 70% 40% at 50% 104%, rgba(214, 167, 122, 0.08), transparent 70%),
+    radial-gradient(ellipse 62% 62% at 50% 46%, #0a1524, #05090f 72%);
+  overflow: hidden;
+}
+
+/* L'anneau qui tourne au bord de la scène, comme sur la page d'accueil du
+   concept : un filet d'un pixel, jamais un aplat. */
+.ge-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--cg-tour),
+    transparent 0deg 190deg,
+    rgba(158, 199, 216, 0.85) 244deg,
+    rgba(120, 220, 255, 0.95) 262deg,
+    rgba(214, 167, 122, 0.7) 280deg,
+    transparent 330deg 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: cg-tourne 11s linear infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+/* Deux éclats aux angles, qui respirent en décalé. */
+.ge-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 34% 40% at 0% 0%, rgba(120, 200, 255, 0.16), transparent 70%),
+    radial-gradient(ellipse 34% 40% at 100% 100%, rgba(214, 167, 122, 0.13), transparent 70%);
+  animation: cg-respire 6.5s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ge-scene::before,
+  .ge-scene::after { animation: none; }
+}
+
+/* L'éclat de la sphère.
+
+   La lumière doit épouser le limbe, pas flotter au milieu du globe. C'était
+   le défaut de la première version : le disque était dimensionné sur la
+   hauteur du cadre, et les pourcentages d'un dégradé radial se mesurent sur
+   le coin le plus éloigné — l'anneau tombait donc très en deçà du bord de la
+   sphère.
+
+   On calcule ici le diamètre réel à l'écran. Le globe est cadré sur son axe
+   le plus contraint et la caméra recule de la marge passée au composant : le
+   diamètre apparent vaut donc le plus petit côté du cadre divisé par cette
+   marge. La lumière est ensuite portée par des ombres portées, qui partent du
+   contour exact du disque et rayonnent vers l'extérieur — jamais vers le
+   centre. */
+/* Valeurs de repli, le temps que la scène trois dimensions se monte et
+   annonce son cadrage : le diamètre au repos, marge comprise. Ensuite, c'est
+   le globe lui-même qui écrit --ge-d et --ge-eclat-o à chaque zoom. */
+.ge-scene { --ge-marge: 1.06; --ge-d: calc(min(100%, var(--ge-h)) / var(--ge-marge)); --ge-eclat-o: 1; }
+.ge-eclat {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--ge-d);
+  height: var(--ge-d);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+  /* L'extinction hors champ passe par un filtre, pas par `opacity` : celle-ci
+     porte déjà la respiration, et les deux se multiplient proprement. */
+  filter: opacity(var(--ge-eclat-o, 1));
+  /* Le disque lui-même reste vide : seules ses ombres éclairent. */
+  box-shadow:
+    0 0 0 1px rgba(150, 210, 255, 0.45),
+    0 0 18px 2px rgba(120, 190, 255, 0.4),
+    0 0 52px 8px rgba(100, 170, 245, 0.26);
+  animation: cg-limbe 7s ease-in-out infinite alternate;
+}
+/* La seconde couche porte le rayonnement large, celui qui déborde loin du
+   bord et fait l'éclat. */
+.ge-eclat-2 {
+  box-shadow:
+    0 0 90px 18px rgba(90, 165, 240, 0.22),
+    0 0 190px 60px rgba(70, 140, 220, 0.14);
+  animation: cg-limbe 9.5s ease-in-out 0.8s infinite alternate-reverse;
+  z-index: 0;
+}
+@keyframes cg-limbe {
+  from { opacity: 0.6; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ge-eclat { animation: none; }
+}
+.ge-attente { position: absolute; inset: 0; }
+
+.ge-echelle {
+  position: absolute;
+  right: 16px;
+  bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  pointer-events: none;
+}
+.ge-echelle-barre {
+  display: block;
+  width: 156px;
+  height: 7px;
+  border-radius: 2px;
+  border: 1px solid color-mix(in srgb, var(--voile) 20%, transparent);
+}
+.ge-echelle-l {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--encre-2);
+}
+.ge-echelle-sans {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-left: 6px;
+  border-radius: 2px;
+  background: #1d2531;
+  border: 1px solid color-mix(in srgb, var(--voile) 24%, transparent);
+}
+
+.ge-sous { margin-top: 22px; }
+.ge-sous .cg-frise2 { margin-top: 0; }
+.ge-sous .cg-frise2-tete { margin-bottom: 16px; }
+.ge-sous .cg-frise2-an { font-size: clamp(26px, 2.6vw, 34px); }
+
+/* ── La fiche pays ───────────────────────────────────────────────────────── */
+
+.ge-panneau {
+  height: var(--ge-h);
+  overflow-y: auto;
+  padding: 16px 18px 18px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 14px;
+  background: var(--surface);
+  scrollbar-width: thin;
+}
+.ge-sur { font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--encre-3); }
+.ge-nom { margin: 0; font-size: clamp(20px, 2.1vw, 25px); font-weight: 400; line-height: 1.1; color: var(--encre); }
+
+.ge-vedette {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 13px;
+  padding: 13px 15px;
+  border-radius: 10px;
+  border: 1px solid rgba(158, 199, 216, 0.34);
+  background: rgba(158, 199, 216, 0.12);
+}
+.ge-vedette-l { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--froid); }
+.ge-vedette-v {
+  font-size: clamp(25px, 2.6vw, 32px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--encre);
+  font-variant-numeric: tabular-nums;
+}
+.ge-vedette-r { font-size: 11.5px; color: var(--encre-2); }
+
+.ge-autres { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-top: 12px; }
+.ge-autre {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  min-width: 0;
+  border: 1px solid var(--bord-fin);
+  border-radius: 9px;
+  background: var(--surface-2);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.28s, background 0.28s;
+}
+.ge-autre:hover { border-color: var(--bord); background: color-mix(in srgb, var(--voile) 7.5%, transparent); }
+/* Le libellé tient sur une ligne : c'est pour cela que la colonne de droite
+   a gagné en largeur. Un intitulé qui se casse en deux déséquilibre les deux
+   rectangles voisins et rend la fiche bancale. */
+.ge-autre-l {
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ge-autre-v { font-size: 15px; color: var(--encre); font-variant-numeric: tabular-nums; }
+
+.ge-evo { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--bord-fin); }
+.ge-evo-t { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--encre-3); }
+.ge-evo svg { display: block; width: 100%; height: 56px; margin-top: 10px; overflow: visible; }
+.ge-evo-h { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 12px; }
+.ge-evo-bout {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 10px;
+  color: var(--encre-3);
+  font-variant-numeric: tabular-nums;
+}
+.ge-evo-bout-d { text-align: right; }
+.ge-evo-bout b { font-size: 13px; font-weight: 400; color: var(--encre); }
+.ge-evo svg { margin-top: 4px; }
+.ge-evo-vide { margin-top: 10px; font-size: 11.5px; line-height: 1.55; color: var(--encre-3); }
+
+.ge-source { margin-top: 18px; font-size: 10.5px; letter-spacing: 0.05em; color: var(--encre-3); }
+.ge-vide { font-size: 13px; line-height: 1.6; color: var(--encre-2); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE ÉCONOMIE — OUVERTURE, COMPTEURS, LECTURES, ANNONCE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cg-eco-haut { overflow: hidden; }
+.ge-evo-c { touch-action: pan-y; cursor: crosshair; }
+.ge-evo-lu { display: flex; flex-direction: column; gap: 2px; font-size: 10.5px; color: var(--encre-3); }
+.ge-evo-lu b { font-size: 13px; font-weight: 400; color: var(--encre); }
+.ge-evo-n { margin-top: 8px; font-size: 10.5px; color: var(--encre-3); }
+/* Les cales qui tiennent la hauteur du classement pendant qu'on n'en dessine
+   qu'une fenêtre : elles ne portent rien et ne doivent rien peindre. */
+.cg-tab-cale td { padding: 0; border: 0; background: none; }
+/* Une lueur derrière l'ouverture : sur une page entièrement noire, un titre
+   sans relief se confond avec la section suivante. */
+.cg-eco-lueur {
+  position: absolute;
+  inset: -20% -10% auto -10%;
+  height: 130%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 42% 58% at 22% 34%, rgba(60, 130, 220, 0.2), transparent 66%),
+    radial-gradient(ellipse 46% 50% at 82% 20%, rgba(214, 167, 122, 0.12), transparent 68%);
+}
+.cg-eco-ouv {
+  position: relative;
+  max-width: 960px;
+  margin: 0 auto;
+  text-align: center;
+}
+/* Le sur-titre de l'ouverture : très espacé, chaud, et sans la pastille
+   qui précède les autres. Dix lettres qui tiennent la largeur du sceau et
+   qui se lisent comme une enseigne, pas comme une étiquette. L'alinéa
+   rattrape la chasse ajoutée après la dernière lettre, sinon le mot penche
+   à gauche de son axe. */
+.cg-eco-ouv .cg-eyebrow {
+  justify-content: center;
+  font-size: clamp(10px, 0.82vw, 12px);
+  font-weight: 400;
+  letter-spacing: 0.46em;
+  text-indent: 0.46em;
+  color: #e6d3b6;
+  opacity: 0.92;
+}
+.cg-eco-ouv .cg-eyebrow::before,
+.cg-eco-ouv .cg-eyebrow .cg-pulse { display: none; }
+.cg-eco-ouv-c {
+  margin: 16px auto 0;
+  max-width: 44ch;
+}
+
+.cg-eco-cles > div {
+  padding: 15px 17px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 11px;
+  background: var(--surface);
+}
+
+/* ── Les compteurs ───────────────────────────────────────────────────────── */
+
+/* Les compteurs en rangée : cinq grandeurs empilées se lisaient comme une
+   liste. Côte à côte, on les voit courir ensemble, et c'est la course qui
+   est le sujet. Le montant est donné en euros entiers : quinze chiffres à
+   cinq de front, cela impose une petite chasse — c'est le prix de la rangée,
+   et l'ordre de grandeur reste lisible. */
+.cg-cpt-l {
+  margin-top: clamp(30px, 4.5vh, 56px);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.cg-cpt {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 14px 15px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 11px;
+  background: linear-gradient(160deg, rgba(158, 199, 216, 0.09), color-mix(in srgb, var(--voile) 2%, transparent));
+  min-width: 0;
+}
+.cg-cpt-l2 {
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--encre-2);
+}
+.cg-cpt-v {
+  font-size: clamp(11px, 0.92vw, 15px);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--encre);
+  white-space: nowrap;
+}
+.cg-cpt-n { font-size: 10.5px; color: var(--encre-3); }
+.cg-cpt-p {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  max-width: 86ch;
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: var(--encre-3);
+}
+@media (max-width: 1180px) {
+  .cg-cpt-l { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .cg-cpt-l { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cg-cpt-v { font-size: 12px; }
+}
+
+/* ── Les lectures ────────────────────────────────────────────────────────── */
+
+.cg-recos { margin-bottom: 30px; }
+.cg-recos-t { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--froid); }
+.cg-recos-l {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 13px;
+}
+@media (max-width: 860px) { .cg-recos-l { grid-template-columns: minmax(0, 1fr); } }
+.cg-reco {
+  padding: 14px 16px;
+  border: 1px solid rgba(214, 167, 122, 0.3);
+  border-radius: 11px;
+  background: rgba(214, 167, 122, 0.07);
+}
+.cg-reco-t { margin: 7px 0 0; font-size: 14px; font-weight: 400; line-height: 1.35; color: var(--encre); }
+
+/* Une carte qui se soulève sort de sa file : sans marge, le conteneur qui
+   défile la rogne par le haut et lui coupe son ombre. On lui ménage la place
+   à l'intérieur, et on la reprend en dehors pour que rien ne se déplace. */
+.cg-arts {
+  /* La place du relief, sur les quatre côtés. Elle manquait à gauche et à
+     droite : l'ombre de la première et de la dernière fiche était tranchée
+     net par le bord du rail. */
+  padding: 14px 20px 26px;
+  margin: -14px -20px -26px;
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  mask-image: linear-gradient(90deg, #000 0 93%, transparent);
+}
+.cg-arts::-webkit-scrollbar { display: none; }
+.cg-arts:active { cursor: grabbing; }
+.cg-art {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  width: clamp(232px, 24vw, 290px);
+  padding: 15px 17px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 11px;
+  background: var(--surface);
+  transition: border-color 0.3s;
+}
+.cg-art:hover { border-color: var(--bord); }
+/* Titres et chapôs resserrés : c'est une section de lecture secondaire, elle
+   ne doit pas peser autant que le classement. */
+.cg-art-t { margin: 8px 0 0; font-size: 14px; font-weight: 400; line-height: 1.35; color: var(--encre); }
+.cg-art-c {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--encre-2);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── L'annonce ───────────────────────────────────────────────────────────── */
+
+.cg-pub-s { padding-top: clamp(20px, 3vh, 40px); padding-bottom: clamp(20px, 3vh, 40px); }
+.cg-pub-l { font-size: 9.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--encre-3); margin-bottom: 9px; }
+.cg-pub { border: 1px dashed var(--bord); border-radius: 11px; overflow: hidden; }
+
+/* ── Le classement, moins sombre ─────────────────────────────────────────── */
+
+.cg-tab-cadre { background: var(--surface); }
+.cg-tab thead th { background: #1b2530; }
+.cg-tab tbody tr:nth-child(2n) { background: color-mix(in srgb, var(--voile) 2.2%, transparent); }
+.cg-tab tbody tr:hover { background: color-mix(in srgb, var(--voile) 7.5%, transparent); }
+
+/* ── La fiche pays ───────────────────────────────────────────────────────
+   Elle prend la hauteur de son contenu : étirée sur celle du globe, elle
+   ouvrait un trou au milieu quand la famille n'a que deux membres. Ce qu'on
+   voulait, c'est qu'elle ne coupe plus rien — pas qu'elle remplisse. */
+.ge-panneau { align-self: start; }
+.ge-metrique-sous {
+  display: block;
+  margin-top: 2px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--froid);
+}
+
+/* ── Le roulement des chiffres ───────────────────────────────────────────── */
+
+.rl {
+  display: inline-flex;
+  align-items: center;
+  /* Chiffres à chasse fixe : sans cela, chaque colonne aurait sa propre
+     largeur et le nombre respirerait à chaque roulement. */
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+  transition: color 0.45s ease;
+}
+/* Le sens du mouvement se lit à la couleur, le temps qu'il dure. */
+.rl-hausse { color: #5fe0a2; }
+.rl-baisse { color: #ff8b8b; }
+.rl-fixe { display: inline-block; }
+.rl-fente {
+  display: inline-block;
+  /* Une hauteur de ligne entière, pas un cadratin : à 1em la fente coupait
+     le haut et le bas des chiffres, et l'on croyait le roulement bloqué
+     entre deux positions. */
+  height: 1.25em;
+  overflow: hidden;
+  width: 1ch;
+}
+/* Un rouleau qui tourne plus vite que l'œil ne se lit plus : on le laisse
+   tourner en retrait, il dit « ça défile » au lieu de brouiller le nombre. */
+.rl-vite { opacity: 0.5; }
+.rl-colonne {
+  display: flex;
+  flex-direction: column;
+  /* Aucune transition : la position est réécrite à chaque image par la
+     boucle d'animation. Une transition par-dessus ferait courir le navigateur
+     après une cible qui a déjà bougé, et le mouvement redeviendrait saccadé. */
+  will-change: transform;
+}
+.rl-colonne > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.25em;
+  line-height: 1.25;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA BANDE CLAIRE DU CLASSEMENT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* L'ouverture : une transition CSS, déclenchée par un attribut que le
+   défilement met à jour. Elle rejoue dans les deux sens, à chaque passage.
+   Le faire en CSS plutôt qu'en JavaScript a une raison de fond : sur cette
+   page, le globe prend le processeur, et une animation pilotée image par
+   image arrivait avec un défilement de retard. */
+/* Une hauteur de dôme, partagée par la découpe et par les deux courbes de
+   transition. */
+.cg-bande { --dome: clamp(42px, 5vw, 86px); }
+/* Fermée, la découpe se referme sur le milieu de la bande, et non sur son
+   bord haut. Les deux bords font donc le même chemin, et le bas apparaît et
+   disparaît comme le haut au lieu de rester un trait droit qui descend. */
+.cg-bande {
+  clip-path: inset(50% 0 50% 0);
+  transition: clip-path 1.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+/* Ouverte, la découpe déborde de la hauteur des dômes : un `inset` négatif
+   élargit la zone visible au-delà de la boîte. Sans cela la bande se
+   découpait sur son propre bord et rognait les deux courbes, qui sont posées
+   en dehors — c'est ce qui faisait réapparaître un trait droit. */
+.cg-bande[data-vu="1"] {
+  clip-path: inset(calc(var(--dome) * -1) 0 calc(var(--dome) * -1) 0);
+}
+.cg-bande-t,
+.cg-bande-c,
+.cg-bande-ctrl,
+.cg-bande-bloc {
+  opacity: 0;
+  transition:
+    opacity 1s ease,
+    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cg-bande-t { transform: translateY(22px); }
+.cg-bande-c { transform: translateY(16px); }
+.cg-bande-ctrl { transform: translateY(14px); }
+.cg-bande-bloc { transform: translateY(40px); }
+.cg-bande[data-vu="1"] .cg-bande-t,
+.cg-bande[data-vu="1"] .cg-bande-c,
+.cg-bande[data-vu="1"] .cg-bande-ctrl,
+.cg-bande[data-vu="1"] .cg-bande-bloc {
+  opacity: 1;
+  transform: none;
+}
+.cg-bande[data-vu="1"] .cg-bande-t { transition-delay: 0.34s; }
+.cg-bande[data-vu="1"] .cg-bande-c { transition-delay: 0.5s; }
+.cg-bande[data-vu="1"] .cg-bande-ctrl { transition-delay: 0.64s; }
+.cg-bande[data-vu="1"] .cg-bande-bloc { transition-delay: 0.72s; }
+@media (prefers-reduced-motion: reduce) {
+  .cg-bande,
+  .cg-bande-t,
+  .cg-bande-c,
+  .cg-bande-ctrl,
+  .cg-bande-bloc {
+    transition: none;
+    clip-path: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.cg-bande {
+  position: relative;
+  z-index: 1;
+  /* De bord à bord : la rupture doit traverser toute la page, sinon c'est une
+     carte posée sur du noir et non un changement de registre. */
+  margin: clamp(110px, 14vh, 190px) 0;
+  padding: clamp(64px, 9vh, 120px) clamp(20px, 4vw, 70px) clamp(56px, 8vh, 100px);
+  /* Un blanc chaud, pas un blanc d'écran : le second brûle sur une page de
+     nuit et fait mal à la lecture. */
+  background: #edebe7;
+  color: #0c0d0f;
+  will-change: clip-path;
+}
+
+/* La bascule du noir au clair ne se fait pas sur une ligne droite : deux
+   dômes très plats, l'un au-dessus, l'autre retourné en dessous, prolongent
+   la bande dans la nuit. La section se lit alors comme un plateau qui
+   s'élève, et non comme un bandeau collé sur la page.
+
+   Le dôme est de la même matière que la bande, découpé par un rayon en
+   pourcentage : large sur l'horizontale, court sur la verticale, donc très
+   aplati. Il est posé en dehors de la bande et remonte avec elle. */
+.cg-bande::before,
+.cg-bande::after {
+  content: "";
+  position: absolute;
+  left: -2%;
+  width: 104%;
+  height: var(--dome);
+  background: inherit;
+  pointer-events: none;
+}
+.cg-bande::before {
+  top: calc(var(--dome) * -1 + 1px);
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+.cg-bande::after {
+  bottom: calc(var(--dome) * -1 + 1px);
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+}
+.cg-bande-h { max-width: 860px; margin: 0 auto; text-align: center; }
+.cg-bande-t {
+  margin: 0;
+  font-size: clamp(34px, 5vw, 68px);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+  color: #0a0b0d;
+}
+.cg-bande-c {
+  margin: 20px auto 0;
+  max-width: 54ch;
+  font-size: clamp(14px, 1.3vw, 16px);
+  line-height: 1.62;
+  color: #4d555f;
+}
+.cg-bande-ctrl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.cg-an-choix { display: inline-flex; align-items: center; gap: 9px; }
+.cg-an-choix-l { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #6b737d; }
+.cg-an-choix select {
+  padding: 9px 14px;
+  border: 1px solid rgba(12, 13, 15, 0.16);
+  border-radius: 9px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: #0c0d0f;
+  cursor: pointer;
+}
+.cg-an-choix select:focus-visible { outline: 2px solid #1c5cab; outline-offset: 1px; }
+.cg-filtre-clair {
+  background: #fff;
+  border-color: rgba(12, 13, 15, 0.16);
+  color: #0c0d0f;
+}
+.cg-filtre-clair::placeholder { color: #838b95; }
+
+/* Le bloc arrondi, posé au milieu de la bande, comme un média encastré. */
+.cg-bande-bloc {
+  max-width: 1320px;
+  margin: clamp(34px, 5vh, 58px) auto 0;
+  padding: 10px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(12, 13, 15, 0.16);
+}
+/* Dix lignes, puis on défile. L'en-tête plus dix rangées : un classement
+   qu'on embrasse d'un regard, et la suite reste à un geste. Douze demandaient
+   déjà de balayer la page. */
+.cg-bande-bloc .cg-tab-cadre {
+  max-height: calc(var(--cg-tab-h, 43px) * 10 + var(--cg-tab-e, 40px));
+  border: 1px solid rgba(12, 13, 15, 0.1);
+  border-radius: 13px;
+  background: #fff;
+}
+.cg-bande-bloc .cg-tab thead th { background: #f2f1ee; border-bottom: 1px solid rgba(12, 13, 15, 0.13); }
+.cg-bande-bloc .cg-tab thead th.cg-tab-r,
+.cg-bande-bloc .cg-tab thead th.cg-tab-p,
+.cg-bande-bloc .cg-tri { color: #6b737d; }
+.cg-bande-bloc .cg-tri:hover { color: #0c0d0f; }
+.cg-bande-bloc .cg-tri-on { color: #1c5cab; }
+.cg-bande-bloc .cg-tab td { color: #0c0d0f; border-bottom: 1px solid rgba(12, 13, 15, 0.07); }
+.cg-bande-bloc .cg-tab td.cg-tab-r { color: #949ba4; }
+.cg-bande-bloc .cg-tab-vide { color: #aeb5bd !important; }
+.cg-bande-bloc .cg-tab tbody tr:nth-child(2n) { background: rgba(12, 13, 15, 0.02); }
+.cg-bande-bloc .cg-tab tbody tr:hover { background: rgba(28, 92, 171, 0.07); }
+.cg-bande-bloc .cg-tab-on { background: rgba(28, 92, 171, 0.13) !important; }
+.cg-bande-n {
+  margin: 14px 10px 4px;
+  max-width: 92ch;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: #6b737d;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES EMPLACEMENTS D'ANNONCE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.an {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px dashed var(--bord);
+  border-radius: 12px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--voile) 2.2%, transparent);
+}
+.an-l {
+  position: relative;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+.an-trame { position: absolute; inset: 0; color: rgba(158, 199, 216, 0.16); pointer-events: none; }
+.an-trame svg { width: 100%; height: 100%; }
+.an-c { position: relative; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.an-f { font-size: 13px; color: var(--encre-2); font-variant-numeric: tabular-nums; }
+.an-n { font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--encre-3); }
+
+.an-bande { height: 118px; }
+.cg-an-bande { margin-bottom: clamp(30px, 4vh, 56px); }
+.an-encart { flex: 0 0 auto; width: 300px; align-self: stretch; }
+.an-dans-fil { margin-left: 4px; }
+
+/* Le rail : collé à gauche, et seulement là où il reste de la place à côté
+   de la colonne de lecture. Sous cette largeur il n'apparaît pas du tout —
+   un rail qui recouvre le texte n'est pas un emplacement, c'est une gêne. */
+.an-colle {
+  position: fixed;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 160px;
+  height: 600px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.an-colle .an-c { align-items: flex-start; }
+@media (max-width: 1620px) { .an-colle { display: none; } }
+
+/* ── Les fiches de lecture retrouvent leur visuel ────────────────────────── */
+
+.cg-arts { scroll-snap-type: none; }
+.cg-art { width: clamp(212px, 19vw, 262px); padding: 0 0 14px; overflow: hidden; }
+.cg-art .cg-rubrique { display: block; margin: 13px 16px 0; }
+.cg-art-t { margin: 8px 16px 0; }
+.cg-art-c { margin: 8px 16px 0; }
+.ge-note {
+  margin-top: 10px;
+  padding: 8px 11px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--voile) 4%, transparent);
+  font-size: 11.5px;
+  color: var(--encre-2);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA COULEUR ET LE MOUVEMENT DE LA PAGE ÉCONOMIE
+
+   Même principe que la page d'accueil du concept : la couleur n'arrive pas
+   par des aplats, elle arrive par des traits. Un filet qui court sous un
+   titre, un bord qui s'allume au passage du curseur, une ligne de tableau qui
+   prend une lueur sous le doigt. Assez pour que la page respire, jamais assez
+   pour passer devant les chiffres.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Le titre d'ouverture ──────────────────────────────────────────────── */
+
+/* Les mots montent l'un après l'autre derrière un masque : ils ne surgissent
+   pas, ils se lèvent. Une animation au chargement plutôt qu'au défilement —
+   le titre est au-dessus de la ligne de flottaison, il n'a personne à
+   attendre. */
+/* Plus spécifique que `.cg-h1 span { display: block }`, qui fait tenir les
+   titres sur plusieurs lignes ailleurs sur le site : ici les mots doivent
+   rester côte à côte. */
+.cg-h1 .cg-mot:last-child,
+.cg-h1 .cg-mot,
+.cg-mot {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  color: var(--encre);
+}
+.cg-h1 .cg-mot > span,
+.cg-mot > span {
+  display: inline-block;
+  color: inherit;
+}
+.cg-mot > span {
+  display: inline-block;
+  transform: translateY(105%);
+  animation: cg-leve 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 90ms + 120ms);
+}
+@keyframes cg-leve {
+  to { transform: translateY(0); }
+}
+
+/* Pas de dégradé découpé sur les lettres du titre : les mots se translatent
+   pour se lever, et un fond découpé sur du texte ne suit pas un glyphe
+   transformé — le titre devenait invisible. La couleur passe donc derrière,
+   par la lueur, qui elle n'a rien à découper. */
+.cg-eco-lueur {
+  animation: cg-lueur-eco 9s ease-in-out infinite alternate;
+}
+@keyframes cg-lueur-eco {
+  from { opacity: 0.55; transform: translate3d(-2%, 0, 0) scale(1); }
+  to { opacity: 1; transform: translate3d(2%, 0, 0) scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cg-eco-lueur { animation: none; }
+}
+
+/* Un trait qui s'allume sous l'ouverture. */
+.cg-eco-ouv::after {
+  content: "";
+  display: block;
+  width: min(280px, 46%);
+  height: 1px;
+  margin: 30px auto 0;
+  background: linear-gradient(90deg, transparent, rgba(158, 199, 216, 0.75), rgba(214, 167, 122, 0.5), transparent);
+  transform: scaleX(0);
+  animation: cg-trait 1.3s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
+}
+@keyframes cg-trait {
+  to { transform: scaleX(1); }
+}
+
+/* ── Ce qui s'allume au passage ────────────────────────────────────────── */
+
+/* Les boutons d'indicateur prennent un filet froid quand on les survole, et
+   le gardent quand ils sont actifs. */
+.ge-metrique {
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+.ge-metrique::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--froid), transparent);
+  transform: scaleX(0);
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ge-metrique:hover::after,
+.ge-metrique-on::after { transform: scaleX(1); }
+
+/* Les rectangles voisins de la fiche pays. */
+.ge-autre {
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+.ge-autre::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(150deg, rgba(158, 199, 216, 0.14), transparent 62%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.ge-autre:hover::before { opacity: 1; }
+
+/* La fiche article : un filet froid en haut, qui se tire au survol. */
+.cg-art { position: relative; }
+.cg-art::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--froid), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 2;
+}
+.cg-art:hover::before { transform: scaleX(1); }
+
+/* ── Les recommandations ───────────────────────────────────────────────── */
+
+/* Trois lectures proposées, en ligne, chacune sous un trait qui s'allume.
+   L'ancienne version les posait dans des rectangles gris qui ressemblaient à
+   des cartes sans en être : on garde le trait, on retire le cadre. */
+.cg-recos {
+  margin: 0 0 34px;
+  padding: 22px 0 0;
+  border-top: 1px solid var(--bord-fin);
+}
+.cg-recos-t {
+  margin: 0 0 16px;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--froid);
+}
+.cg-recos-l {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+}
+.cg-reco {
+  position: relative;
+  padding: 18px 26px 18px 0;
+  background: none;
+  border: 0;
+  border-left: 1px solid var(--bord-fin);
+  padding-left: 22px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.35s ease;
+}
+.cg-reco:first-child { border-left: 0; padding-left: 0; }
+.cg-reco::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--froid), rgba(214, 167, 122, 0.6), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-reco:hover::after { transform: scaleX(1); }
+.cg-reco-n {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--encre-3);
+}
+.cg-reco-t {
+  margin: 9px 0 0;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.34;
+  color: var(--encre);
+  transition: color 0.3s ease;
+}
+.cg-reco:hover .cg-reco-t { color: #d7ecff; }
+.cg-reco-m {
+  display: inline-block;
+  margin-top: 11px;
+  font-size: 11px;
+  color: var(--froid);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.cg-reco:hover .cg-reco-m { opacity: 1; transform: none; }
+@media (max-width: 880px) {
+  .cg-recos-l { grid-template-columns: 1fr; }
+  .cg-reco { border-left: 0; padding-left: 0; }
+}
+
+/* ── La ligne de tableau qui s'éclaire sous le curseur ─────────────────── */
+
+/* La lueur suit le pointeur : deux variables posées sur la ligne survolée,
+   et un dégradé radial centré dessus. Une écriture de deux propriétés sur un
+   seul nœud — c'est ce que coûte l'effet, et il s'arrête dès que le curseur
+   sort du tableau. */
+.cg-bande-bloc tbody tr { position: relative; }
+.cg-bande-bloc tbody tr td:first-child::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, var(--froid), transparent);
+  transform: scaleY(0);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-bande-bloc tbody tr:hover td:first-child::before { transform: scaleY(1); }
+.cg-tab-suivi {
+  background-image: radial-gradient(
+    220px circle at var(--x, 50%) 50%,
+    rgba(80, 150, 220, 0.11),
+    transparent 70%
+  );
+}
+
+/* ── L'arrivée du classement : un panneau qui se déplie ────────────────── */
+
+/* Le rectangle ne se contente plus d'apparaître : il arrive petit, arrondi,
+   un peu plus bas, et se déplie jusqu'à sa taille — largeur, hauteur, rayon
+   et position bougent ensemble. C'est le geste de la page de garde de la
+   première version, ramené à une transition. */
+.cg-bande-bloc {
+  transform: translateY(44px) scale(0.9);
+  border-radius: 44px;
+  transition:
+    opacity 0.9s ease,
+    transform 1.6s cubic-bezier(0.16, 1, 0.3, 1),
+    border-radius 1.6s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 1.6s ease;
+  box-shadow: 0 10px 30px rgba(12, 13, 15, 0.06);
+}
+.cg-bande[data-vu="1"] .cg-bande-bloc {
+  transform: none;
+  border-radius: 20px;
+  box-shadow: 0 24px 70px rgba(12, 13, 15, 0.16);
+}
+
+/* ── Le bloc méthode ───────────────────────────────────────────────────── */
+
+.cg-methode2 { position: relative; }
+.cg-methode2::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 54% 46% at 18% 24%, rgba(60, 130, 220, 0.1), transparent 68%);
+}
+.cg-meth-l {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 26px;
+}
+.cg-meth {
+  padding: 26px 30px 26px 24px;
+  border-left: 1px solid var(--bord-fin);
+  position: relative;
+}
+.cg-meth:first-child { border-left: 0; padding-left: 0; }
+.cg-meth::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--froid), transparent);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-meth:hover::after { transform: scaleY(1); }
+.cg-meth-n {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--froid);
+}
+.cg-meth-t {
+  margin: 12px 0 0;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--encre);
+}
+.cg-meth-c {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  line-height: 1.66;
+  color: var(--encre-2);
+}
+.cg-sources {
+  position: relative;
+  margin-top: 34px;
+  padding-top: 22px;
+  border-top: 1px solid var(--bord-fin);
+}
+.cg-sources-t {
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+.cg-sources-l {
+  margin: 14px 0 0;
+  /* Deux colonnes au plus : à quatre, « Inflation (prix à la consommation) »
+     tombait sur trois lignes et la source se lisait en colonne de six mots.
+     Une source doit se lire d'un trait, sinon autant ne pas la donner. */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(460px, 100%), 1fr));
+  gap: 1px;
+  background: var(--bord-fin);
+  border: 1px solid var(--bord-fin);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.cg-source {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px 18px;
+  background: var(--fond-2);
+  transition: background 0.3s ease;
+}
+.cg-source:hover { background: var(--surface); }
+.cg-source-l { font-size: 13px; line-height: 1.35; color: var(--encre); }
+.cg-source-s { font-size: 11px; line-height: 1.5; color: var(--encre-3); }
+.cg-source-c { font-size: 11px; color: var(--froid); }
+@media (max-width: 880px) {
+  .cg-meth-l { grid-template-columns: 1fr; }
+  .cg-meth { border-left: 0; padding-left: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'OUVERTURE PLEINE PAGE ET SON ARC
+
+   Le premier écran ne porte que le titre. En bas, un arc de cercle ferme la
+   vue comme un horizon : il dit que la page continue sans avoir à l'écrire.
+   Il s'allume et s'ouvre quand le globe approche — une transition CSS pilotée
+   par un attribut, comme le classement, donc rien à faire tourner.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cg-eco-haut {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding-top: clamp(90px, 12vh, 140px);
+  padding-bottom: clamp(120px, 18vh, 220px);
+}
+.cg-eco-haut .cg-wrap { width: 100%; }
+.cg-temoin { height: 1px; }
+
+.cg-arc {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 190vw;
+  aspect-ratio: 1;
+  /* Le limbe remonte un peu à mesure qu'on descend : la planète approche. */
+  transform: translate(-50%, calc(78% - var(--p, 0) * 4%));
+  pointer-events: none;
+}
+.cg-arc-trait,
+.cg-arc-nappe,
+.cg-arc-corps {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  transition:
+    opacity 1.1s ease,
+    transform 1.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Le rayonnement large, et rien d'autre.
+
+   Il n'y a pas de planète à remplir. Un disque terreux occupait toute la
+   calotte et écrasait le trait ; ce qu'on veut, c'est que la ligne rayonne.
+   Les arrêts se serrent donc autour de cinquante pour cent — la position
+   exacte du limbe, puisque les pourcentages d'un dégradé radial se mesurent
+   sur le coin le plus éloigné — et rien n'est peint ailleurs. */
+.cg-arc-corps {
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 45%,
+    rgba(232, 183, 116, 0.16) 49.2%,
+    rgba(255, 226, 190, 0.2) 50%,
+    rgba(232, 183, 116, 0.12) 50.8%,
+    transparent 56%
+  );
+  filter: blur(38px);
+  opacity: calc(0.25 + (1 - var(--p, 0)) * 0.75);
+}
+/* Le trait : un anneau d'un peu plus d'un pixel, découpé dans un dégradé
+   radial. Une bordure ne sait pas prendre un dégradé, un anneau si. */
+/* Le trait se dessine de la gauche vers la droite.
+
+   Un anneau ne se trace pas en `stroke-dashoffset` : il n'est pas un tracé,
+   c'est un dégradé. On le découpe donc avec un masque conique dont l'angle
+   grandit. Partant de neuf heures et tournant dans le sens des aiguilles, la
+   coupe balaie exactement le limbe visible, de son bord gauche à son bord
+   droit.
+
+   L'angle est déclaré pour pouvoir être interpolé : sans `@property`, une
+   variable personnalisée saute d'une valeur à l'autre au lieu de glisser. */
+@property --a {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+/* Les arrêts nets d'un dégradé ne sont pas adoucis : le navigateur prend
+   une couleur par pixel, et sur un cercle de deux mille huit cents pixels
+   de large cela donne un escalier. On laisse donc un demi-pixel de rampe de
+   chaque côté du trait, ce qui rend le lissage que le dégradé ne fait pas,
+   et un voile de flou rattrape le reste. */
+.cg-arc-trait {
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 calc(50% - 1.75px),
+    rgba(255, 233, 204, 0.62) calc(50% - 1.15px) calc(50% - 0.4px),
+    transparent calc(50% + 0.2px)
+  );
+  filter: blur(0.4px);
+  --a: 0deg;
+  -webkit-mask: conic-gradient(from 268deg, #000 0deg, #000 var(--a), transparent var(--a));
+  mask: conic-gradient(from 268deg, #000 0deg, #000 var(--a), transparent var(--a));
+}
+.cg-eco-haut[data-pret="1"] .cg-arc-trait {
+  animation: cg-trace 2.6s cubic-bezier(0.32, 0.72, 0.3, 1) 0.5s both;
+}
+@keyframes cg-trace {
+  from { --a: 0deg; }
+  to { --a: 360deg; }
+}
+/* La nappe : la lumière qui accompagne le trait, pas qui le suit.
+
+   Elle portait sa propre apparition, plus tard et pour elle seule : le
+   trait se dessinait d'abord, seul et net, puis toute la nappe s'allumait
+   d'un coup sur le tracé déjà fini, avec un pic de clarté avant de se
+   poser. Deux mouvements se voyaient, l'un après l'autre — la ligne, puis
+   l'éclat — ce qui se lit comme deux lumières différentes.
+
+   La nappe porte donc le même masque conique que le trait, à sa propre
+   vitesse : elle s'ouvre avec lui, sur le tracé déjà écrit et nulle part
+   ailleurs. Son intensité grandit dans la même fenêtre de temps, sans
+   dépasser sa valeur d'arrivée : au bout du geste, le trait est complet et
+   la nappe est à sa pleine clarté au même instant — un seul mouvement,
+   continu, qui finit par le plein éclat plutôt que de s'y jeter après
+   coup. */
+.cg-arc-nappe {
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 48.7%,
+    rgba(255, 240, 216, 0.6) 49.7%,
+    rgba(232, 183, 116, 0.42) 50.3%,
+    transparent 51.8%
+  );
+  filter: blur(13px);
+  opacity: calc(0.2 + (1 - var(--p, 0)) * 0.8);
+  --a: 0deg;
+  -webkit-mask: conic-gradient(from 268deg, #000 0deg, #000 var(--a), transparent var(--a));
+  mask: conic-gradient(from 268deg, #000 0deg, #000 var(--a), transparent var(--a));
+}
+.cg-eco-haut[data-pret="1"] .cg-arc-nappe {
+  animation:
+    cg-trace 2.6s cubic-bezier(0.32, 0.72, 0.3, 1) 0.5s both,
+    cg-embrase 2.6s cubic-bezier(0.32, 0.72, 0.3, 1) 0.5s both;
+}
+/* L'opacité de fin n'est pas écrite : elle revient à la valeur calculée,
+   celle qui suit le défilement. Aucun dépassement au passage : le flou et
+   la clarté montent sans jamais franchir leur valeur de repos. */
+@keyframes cg-embrase {
+  from { opacity: 0; filter: blur(19px) brightness(0.7); }
+  to { filter: blur(13px) brightness(1); }
+}
+
+/* ── Le point du jour ────────────────────────────────────────────────────
+   Un point posé sur le limbe, pas à côté. On tourne depuis le centre du
+   cercle puis on s'éloigne de son rayon : la position reste juste quelle que
+   soit la largeur de la fenêtre, sans un seul calcul en JavaScript.
+   Attention au rayon : il ne vaut pas la moitié de la boîte. Les
+   pourcentages d'un dégradé radial se mesurent, par défaut, sur le coin le
+   plus éloigné. Pour une boîte carrée de demi-côté R, ce coin est à R√2, et
+   l'anneau posé à cinquante pour cent tombe donc à R/√2, soit un peu plus de
+   soixante-sept pour cent de la largeur de la fenêtre. C'est exactement le
+   piège qui avait mis la lumière du globe au milieu de la sphère. */
+.cg-arc-point {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: rotate(-13deg) translateY(-67.18vw);
+  opacity: calc(0.6 + var(--p, 0) * 0.4);
+  /* Le point est la pointe du crayon : il part du bord gauche et s'arrête
+     où le trait l'abandonne. */
+}
+.cg-eco-haut[data-pret="1"] .cg-arc-point {
+  animation: cg-pointe 2.6s cubic-bezier(0.32, 0.72, 0.3, 1) 0.5s backwards;
+}
+@keyframes cg-pointe {
+  from { transform: rotate(-86deg) translateY(-67.18vw); opacity: 0; }
+  12% { opacity: 1; }
+  to { transform: rotate(-13deg) translateY(-67.18vw); opacity: 1; }
+}
+.cg-arc-point::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff8ec;
+  box-shadow:
+    0 0 12px 3px rgba(255, 240, 214, 0.9),
+    0 0 46px 14px rgba(232, 183, 116, 0.42),
+    0 0 150px 60px rgba(214, 167, 122, 0.16);
+}
+/* L'éclat se fait et se défait au défilement, dans les deux sens : plein
+   quand l'ouverture tient l'écran, éteint quand elle l'a quittée. C'est la
+   même variable que les tuiles, donc revenir par le bas le rallume sans
+   rien rejouer. */
+.cg-arc-trait { opacity: calc(0.3 + (1 - var(--p, 0)) * 0.7); }
+/* Aucune mise à l'échelle sur le trait ni sur l'éclat : elle décalait le
+   cercle de quinze pixels, et le point du jour, lui posé au rayon nominal,
+   se retrouvait à flotter au-dessus de la ligne. */
+@media (prefers-reduced-motion: reduce) {
+  .cg-arc-trait,
+  .cg-arc-nappe { transition: none; animation: none; }
+  .cg-arc-trait { --a: 360deg; }
+  .cg-arc-point { animation: none; }
+}
+
+/* ── La note de la frise passe sous les deux colonnes ──────────────────── */
+.cg-frise2 .cg-frise-n { grid-column: 1 / -1; margin-top: 18px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES ARTICLES
+
+   Une lecture en grand à gauche, le reste en carrousel à droite. Au survol,
+   la fiche prend sa couleur et se soulève : le relief dit « ceci s'ouvre »
+   mieux qu'un changement de teinte seul.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cg-arts-tete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+.cg-arts-h {
+  margin: 0;
+  font-size: clamp(30px, 3.4vw, 46px);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  color: var(--encre);
+}
+.cg-filtre-gros {
+  min-width: min(340px, 100%);
+  padding: 12px 16px;
+  font-size: 13.5px;
+}
+
+/* Le grand article tient la hauteur de deux étages : les débats en haut à
+   droite, la file des lectures en dessous, alignée sur sa partie basse. */
+.cg-arts-l {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.35fr);
+  grid-template-rows: auto auto;
+  gap: clamp(18px, 2vw, 30px);
+  align-items: stretch;
+}
+.cg-art-une { grid-column: 1; grid-row: 1 / 3; }
+.cg-debats { grid-column: 2; grid-row: 1; min-width: 0; }
+.cg-arts-c { grid-column: 2; grid-row: 2; }
+.cg-arts-c { position: relative; min-width: 0; }
+/* Un fondu au bord droit : la file continue, et on le voit. */
+.cg-arts-f {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 64px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--fond));
+}
+@media (max-width: 1080px) {
+  .cg-arts-l { grid-template-columns: 1fr; grid-template-rows: auto; }
+  .cg-art-une,
+  .cg-debats,
+  .cg-arts-c { grid-column: 1; grid-row: auto; }
+}
+
+/* La fiche qui se soulève. */
+.cg-art {
+  transition:
+    border-color 0.3s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s ease;
+  will-change: transform;
+}
+.cg-art:hover {
+  border-color: var(--bord);
+  transform: translateY(-7px);
+  box-shadow: 0 18px 38px var(--ombre-portee);
+}
+.cg-reco {
+  transition:
+    background 0.35s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-reco:hover { transform: translateY(-4px); }
+
+/* La lecture en grand. */
+/* La lecture en grand s'aligne sur la colonne de droite plutôt que de la
+   dépasser. Elle s'étire sur les deux rangées, et c'est son image qui prend
+   la place restante : en lui donnant une hauteur souple au lieu d'un rapport
+   fixe, la carte ne réclame plus que la hauteur de son texte, ce sont donc
+   les débats et la file qui fixent la rangée, et elle vient s'y couler. */
+.cg-art-une {
+  width: auto;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 20px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--fond-2);
+}
+.cg-art-une .image-placeholder {
+  aspect-ratio: auto !important;
+  flex: 1 1 0;
+  min-height: 150px;
+}
+.cg-art-une .cg-rubrique { display: block; margin: 16px 18px 0; }
+.cg-art-une .cg-art-t {
+  margin: 12px 20px 0;
+  font-size: clamp(20px, 1.95vw, 27px);
+  line-height: 1.22;
+}
+.cg-art-une .cg-art-c {
+  margin: 12px 20px 0;
+  font-size: 13.5px;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+}
+/* Dans la file, plus de chapô du tout : ce sont des titres qu'on parcourt. */
+.cg-arts .cg-art .cg-art-c { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .cg-art:hover,
+  .cg-reco:hover { transform: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA LOUPE ET LE SURLIGNAGE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Deux disques fixes, posés sur la page, que seule une transformation déplace.
+   Ils ne reçoivent aucun clic et ne floutent rien derrière eux : un
+   backdrop-filter qui se déplace obligerait le navigateur à recomposer la
+   zone à chaque image. Ici il n'y a que deux couches à faire glisser, ce que
+   la carte graphique fait sans y penser. */
+.cg-loupe,
+.cg-loupe-a {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 60;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  will-change: transform;
+}
+.a-loupe .cg-loupe,
+.a-loupe .cg-loupe-a { opacity: 1; }
+
+/* La nappe : une lumière douce, de la taille d'une main, collée au curseur.
+   Elle était deux fois plus large et couvrait un quart de l'écran. */
+.cg-loupe {
+  width: 240px;
+  height: 240px;
+  margin: -120px 0 0 -120px;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(140, 200, 255, 0.13),
+    rgba(120, 190, 255, 0.05) 40%,
+    transparent 70%
+  );
+}
+
+/* Le point : à la taille du curseur, pas un anneau. L'anneau brillant faisait
+   un objet de plus à l'écran ; ce qu'on veut, c'est que la souris porte sa
+   lumière, pas qu'elle traîne une cible. */
+.cg-loupe-a {
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(214, 236, 255, 0.55),
+    rgba(158, 199, 216, 0.22) 45%,
+    transparent 72%
+  );
+  filter: blur(0.5px);
+}
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .cg-loupe,
+  .cg-loupe-a { display: none; }
+}
+
+/* Le surlignage. Le bleu du navigateur est celui du système : sur une page de
+   nuit il tombe comme une tache, et il ne connaît pas nos encres. On le
+   remplace par le froid de la page, assez transparent pour que le texte
+   reste lisible dessous. */
+.cg ::selection,
+.cg::selection {
+  background: rgba(158, 199, 216, 0.3);
+  color: #ffffff;
+}
+/* Sur la bande claire du classement, le même principe à l'envers. */
+.cg-bande ::selection {
+  background: rgba(20, 70, 120, 0.18);
+  color: #0a0b0d;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DÉBATS ET LE TABLEAU DES SOURCES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Les débats se parcourent comme des titres, pas comme des articles : un
+   rectangle, une question, le chiffre qui la déclenche. Rien d'autre tant que
+   la partie communauté n'existe pas. */
+.cg-debats-t {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--froid);
+}
+.cg-debats-n { color: var(--encre-3); letter-spacing: 0.1em; }
+.cg-debats-l {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  cursor: grab;
+  /* Même raison que la file d'articles : le relief du survol a besoin de
+     place, et elle est reprise en marge négative. */
+  padding: 12px 18px 22px;
+  margin: -12px -18px -22px;
+}
+.cg-debats-l::-webkit-scrollbar { display: none; }
+.cg-debats-l:active { cursor: grabbing; }
+.cg-debat {
+  position: relative;
+  flex: none;
+  width: clamp(190px, 17vw, 236px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 108px;
+  padding: 13px 15px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 11px;
+  background: linear-gradient(155deg, rgba(158, 199, 216, 0.08), color-mix(in srgb, var(--voile) 1.5%, transparent));
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.3s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s ease;
+}
+.cg-debat:hover {
+  border-color: rgba(158, 199, 216, 0.5);
+  transform: translateY(-5px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.38);
+}
+.cg-debat-q {
+  font-size: 13.5px;
+  line-height: 1.34;
+  color: var(--encre);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cg-debat-a { font-size: 10.5px; color: var(--froid); }
+@media (prefers-reduced-motion: reduce) {
+  .cg-debat:hover { transform: none; }
+}
+
+/* Le tableau des sources, dans la réponse de la FAQ. Un vrai tableau, avec
+   ses en-têtes de ligne et de colonne : c'est ce qu'un moteur sait lire, et
+   c'est aussi ce qu'un lecteur d'écran sait annoncer. */
+.cg-src-t {
+  width: 100%;
+  margin-top: 16px;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.cg-src-c {
+  caption-side: top;
+  text-align: left;
+  padding-bottom: 10px;
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+.cg-src-t th,
+.cg-src-t td {
+  padding: 10px 14px 10px 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--bord-fin);
+}
+.cg-src-t thead th {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+.cg-src-t tbody th {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--encre);
+  white-space: nowrap;
+}
+.cg-src-t tbody td { font-size: 12px; line-height: 1.5; color: var(--encre-2); }
+.cg-src-n { color: var(--froid) !important; white-space: nowrap; }
+@media (max-width: 720px) {
+  .cg-src-t tbody th { white-space: normal; }
+  .cg-src-n { white-space: normal; }
+}
+
+/* ── L'écart mesuré sur la courbe ──────────────────────────────────────── */
+
+.ge-evo-ec { display: flex; flex-direction: column; gap: 2px; font-size: 10.5px; color: var(--encre-3); }
+.ge-evo-ec b { font-size: 17px; font-weight: 400; color: var(--encre); letter-spacing: -0.02em; }
+.ge-evo-ec-h b { color: #5fe0a2; }
+.ge-evo-ec-b b { color: #ff8b8b; }
+.ge-evo-aide { margin-top: 8px; font-size: 10.5px; color: var(--encre-3); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES TUILES DE L'OUVERTURE
+
+   Un champ de tuiles au-dessus de l'horizon, et un sceau au milieu.
+
+   Tout le mouvement de défilement tient dans une seule variable, `--p`, que
+   l'ouverture met à jour : zéro quand elle tient l'écran, un quand elle en
+   est sortie. Le reste est de l'interpolation CSS. Descendre et remonter
+   sont donc exactement le même geste joué dans les deux sens — il n'y a pas
+   d'animation d'arrivée à rejouer, donc rien qui sursaute quand on revient
+   par le bas.
+
+   Quatre couches, chacune pour une seule chose : la place, l'écart au
+   défilement, la dérive continue, le relief au survol. Les empiler évite que
+   deux mouvements se disputent la même propriété.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cg-eco-haut { --p: 0; }
+
+.cg-tuiles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 1. La place, en pourcentage de l'ouverture. */
+.cg-tuile {
+  position: absolute;
+  left: calc(var(--x) * 1%);
+  top: calc(var(--y) * 1%);
+  width: var(--k);
+  height: var(--k);
+  margin: calc(var(--k) / -2) 0 0 calc(var(--k) / -2);
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  /* Le lancer vit dans `translate`, pas dans `transform` : les quatre autres
+     mouvements se partagent déjà celui-ci, et une propriété séparée évite
+     une sixième couche. */
+  translate: var(--fx, 0) var(--fy, 0);
+}
+.cg-tuile-tenue { cursor: grabbing; z-index: 3; }
+.cg-tuile-tenue .cg-tuile-i {
+  transform: scale(1.14);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--voile) 16%, transparent),
+    0 24px 46px rgba(0, 0, 0, 0.7),
+    0 0 36px color-mix(in srgb, var(--c, #9ec7d8) 40%, transparent);
+}
+
+/* 2. L'écart au défilement. Chaque tuile fuit vers son bord — c'est le signe
+      de `--dx` qui le dit — et d'autant plus vite qu'elle est au premier
+      plan. Le champ s'ouvre au lieu de glisser en bloc. */
+/* Le départ suit le même ordre que l'arrivée : chaque tuile a sa propre
+   course, décalée par son rang. Une progression locale, taillée dans la
+   progression d'ensemble, suffit — le champ se vide alors petit à petit au
+   lieu de s'effacer d'un bloc, et se remplit de même en remontant. */
+.cg-tuile-p2 {
+  display: block;
+  width: 100%;
+  height: 100%;
+  --pl: clamp(0, calc((var(--p) - var(--o) * 0.021) * 1.9), 1);
+  transform:
+    translate3d(
+      calc(var(--dx) * var(--pl) * var(--z) * 1px),
+      calc(var(--pl) * var(--z) * -76px),
+      0
+    )
+    scale(calc(1 - var(--pl) * 0.22));
+  opacity: calc(1 - var(--pl) * 1.05);
+}
+
+/* 3. L'arrivée. Chaque tuile se pose à son tour, dans un ordre dispersé :
+      suivre la liste les ferait arriver de gauche à droite, comme un
+      balayage, au lieu de peupler le ciel. Le repli en arrière garde la
+      tuile invisible avant son tour. */
+.cg-tuile-a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Rien ne bouge tant que la page n'a pas fini de charger : une arrivée
+     lancée pendant que le globe monte sa scène saute au lieu de glisser. */
+  opacity: 0;
+}
+.cg-eco-haut[data-pret="1"] .cg-tuile-a {
+  animation: cg-pose 1.15s cubic-bezier(0.22, 1.2, 0.36, 1) backwards;
+  animation-delay: calc(0.45s + var(--o) * 135ms);
+  opacity: 1;
+}
+@keyframes cg-pose {
+  from { opacity: 0; transform: scale(0.35); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* 4. La dérive, qui ne s'arrête jamais et ne discute avec personne. */
+.cg-tuile-d {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: cg-derive var(--d) ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -1.3s);
+}
+@keyframes cg-derive {
+  from { transform: translate3d(-6px, -8px, 0) rotate(-3deg); }
+  to { transform: translate3d(6px, 8px, 0) rotate(3deg); }
+}
+
+/* 5. La tuile elle-même, et son relief au survol. */
+/* Un bouton, pas un cerne.
+
+   Le trait d'un pixel faisait une vignette collée sur le fond. Ce qui donne
+   le relief, c'est l'ombre : une arête claire en haut, une arête sombre en
+   bas, et une ombre portée large en dessous. La tuile se soulève alors
+   d'elle-même, sans qu'on ait à l'entourer. */
+.cg-tuile-i {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 28%;
+  border: 0;
+  color: var(--c, #9ec7d8);
+  background: linear-gradient(168deg, rgba(41, 43, 49, 0.96), rgba(15, 16, 20, 0.98));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--voile) 11%, transparent),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    0 10px 24px rgba(0, 0, 0, 0.62),
+    0 2px 6px rgba(0, 0, 0, 0.5);
+  transition:
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.45s ease,
+    filter 0.35s ease;
+}
+/* Le signe porte sa propre lumière : c'est lui qui est teinté, pas la
+   boîte. */
+.cg-tuile-i svg,
+.cg-tuile-i em {
+  filter: drop-shadow(0 0 7px color-mix(in srgb, var(--c, #9ec7d8) 45%, transparent));
+}
+/* Quelques tuiles sont allumées, et le halo reste sur elles : un champ où
+   tout brille ne dit plus rien. */
+.cg-tuile-vif .cg-tuile-i {
+  background: linear-gradient(168deg, rgba(48, 40, 31, 0.96), rgba(19, 16, 14, 0.98));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--voile) 13%, transparent),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px color-mix(in srgb, var(--c, #9ec7d8) 30%, transparent),
+    0 10px 24px rgba(0, 0, 0, 0.62),
+    0 0 26px color-mix(in srgb, var(--c, #9ec7d8) 26%, transparent);
+}
+.cg-tuile-i svg { width: 52%; height: 52%; display: block; }
+.cg-tuile-i em {
+  font-style: normal;
+  font-weight: 600;
+  font-size: calc(var(--k) * 0.36);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+/* Un nom d'indice tient en toutes lettres : il lui faut une autre échelle
+   qu'un signe de monnaie. */
+.cg-tuile-i em.cg-tuile-long {
+  font-size: calc(var(--k) * 0.17);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding: 0 5px;
+}
+.cg-tuile:hover .cg-tuile-i {
+  transform: translateY(-8px) scale(1.16);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--voile) 16%, transparent),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    0 20px 40px rgba(0, 0, 0, 0.66),
+    0 0 34px color-mix(in srgb, var(--c, #9ec7d8) 38%, transparent);
+  filter: brightness(1.25);
+}
+
+/* ── Le sceau ────────────────────────────────────────────────────────────
+   La tuile du milieu : plus grande, seule à porter un cerne chaud, et seule
+   à se tenir dans le flux du texte. Le champ s'écarte d'elle. */
+.cg-sceau {
+  opacity: 0;
+  display: grid;
+  place-items: center;
+  width: clamp(84px, 8vw, 112px);
+  height: clamp(84px, 8vw, 112px);
+  margin: 16px auto 24px;
+  border-radius: 27%;
+  color: #f0dcc0;
+  border: 0;
+  background: linear-gradient(168deg, rgba(44, 34, 24, 0.96), rgba(16, 14, 13, 0.98));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--voile) 14%, transparent),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px color-mix(in srgb, var(--chaud) 42%, transparent),
+    0 0 44px color-mix(in srgb, var(--chaud) 26%, transparent),
+    0 18px 48px rgba(0, 0, 0, 0.6);
+  animation: cg-pose 1.2s cubic-bezier(0.22, 1.2, 0.36, 1) 0.35s backwards;
+  transform:
+    translateY(calc(var(--p) * -30px))
+    scale(calc(1 - var(--p) * 0.16));
+  opacity: calc(1 - var(--p) * 1);
+}
+.cg-eco-haut[data-pret="1"] .cg-sceau { opacity: 1; }
+.cg-sceau-i { display: grid; place-items: center; width: 100%; height: 100%; }
+.cg-sceau svg {
+  width: 48%;
+  height: 48%;
+  display: block;
+  filter: drop-shadow(0 0 10px rgba(240, 220, 192, 0.45));
+}
+
+/* Le bloc de texte suit le même mouvement, en plus retenu : c'est le fond
+   qui s'écarte, pas le titre qui s'enfuit. */
+.cg-eco-ouv {
+  transform: translateY(calc(var(--p) * -16px));
+  opacity: calc(1 - var(--p) * 1.05);
+}
+
+@media (max-width: 900px) {
+  /* Sur une colonne étroite, seules les tuiles marquées restent, et le champ
+     se range au-dessus du texte au lieu de passer derrière. */
+  .cg-tuile { display: none; }
+  /* Les tuiles gardées occupent toute la hauteur au lieu de se tasser en
+     haut : sur un téléphone il n'y a pas de marges, le champ passe donc
+     derrière le texte, un peu effacé pour le laisser lire. */
+  .cg-tuile-p {
+    display: block;
+    width: calc(var(--k) * 0.74);
+    height: calc(var(--k) * 0.74);
+    margin: calc(var(--k) * -0.37) 0 0 calc(var(--k) * -0.37);
+    opacity: 0.72;
+  }
+  .cg-sceau { width: 66px; height: 66px; margin: 12px auto 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cg-tuile-d,
+  .cg-tuile-a,
+  .cg-sceau { animation: none; }
+  .cg-tuile-i { transition: none; }
+}
+
+/* ── Le bouton jour/nuit ─────────────────────────────────────────────────
+   Au bout de la barre, avec le forum et le compte. Il porte un dessin et
+   aucun mot : c'est le seul endroit de cette barre où un libellé serait
+   redondant avec ce qu'il montre. */
+.cg-jour {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--bord);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fond) 55%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--encre-2);
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s, background 0.3s;
+}
+.cg-jour:hover { color: var(--encre); border-color: color-mix(in srgb, var(--chaud) 55%, transparent); }
+.cg-header-ouvert .cg-jour { background: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+@media (max-width: 700px) { .cg-jour { width: 28px; height: 28px; } }
+
+/* ── La scène du globe, de jour ──────────────────────────────────────────
+   Le cadre du globe porte ses couleurs en clair, pas en jetons : c'est une
+   scène, pas une surface. Elle a donc sa propre version diurne, et l'éclat
+   du limbe passe du bleu froid à une lumière chaude qui se voit sur blanc. */
+:root[data-concept="clair"] .ge-scene {
+  background:
+    radial-gradient(ellipse 46% 46% at 50% 44%, rgba(47, 111, 138, 0.1), transparent 68%),
+    radial-gradient(ellipse 70% 40% at 50% 104%, rgba(154, 101, 50, 0.07), transparent 70%),
+    radial-gradient(ellipse 62% 62% at 50% 46%, #ffffff, #eef1f5 72%);
+}
+:root[data-concept="clair"] .ge-eclat {
+  box-shadow:
+    0 0 0 1px rgba(40, 90, 130, 0.3),
+    0 0 18px 2px rgba(60, 120, 170, 0.22),
+    0 0 52px 8px rgba(80, 140, 190, 0.14);
+}
+:root[data-concept="clair"] .ge-eclat-2 {
+  box-shadow:
+    0 0 90px 18px rgba(70, 125, 175, 0.12),
+    0 0 190px 60px rgba(90, 140, 185, 0.08);
+}
+
+/* ── L'ouverture, de jour ────────────────────────────────────────────────
+   Les tuiles sont des boutons sombres : sur une page blanche, ce sont des
+   boutons clairs, avec la même arête haute et la même ombre portée. Le
+   limbe, lui, garde sa lumière chaude — c'est un lever de soleil, il n'a
+   pas de version diurne. */
+:root[data-concept="clair"] .cg-tuile-i {
+  background: linear-gradient(168deg, #ffffff, #eceae5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(12, 16, 22, 0.1),
+    0 8px 20px rgba(12, 16, 22, 0.13),
+    0 2px 5px rgba(12, 16, 22, 0.1);
+}
+:root[data-concept="clair"] .cg-tuile-vif .cg-tuile-i {
+  background: linear-gradient(168deg, #fffaf2, #f4ece0);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 0 1px color-mix(in srgb, var(--c, #9ec7d8) 40%, transparent),
+    0 8px 20px rgba(12, 16, 22, 0.13),
+    0 0 22px color-mix(in srgb, var(--c, #9ec7d8) 22%, transparent);
+}
+:root[data-concept="clair"] .cg-sceau {
+  background: linear-gradient(168deg, #fffaf3, #f2e9dc);
+  color: #8a5a28;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 0 1px color-mix(in srgb, var(--chaud) 48%, transparent),
+    0 0 36px color-mix(in srgb, var(--chaud) 18%, transparent),
+    0 14px 36px rgba(12, 16, 22, 0.16);
+}
+:root[data-concept="clair"] .cg-sceau svg { filter: drop-shadow(0 0 8px rgba(154, 101, 50, 0.3)); }
+:root[data-concept="clair"] .cg-eco-ouv .cg-eyebrow { color: #8a5a28; opacity: 1; }
+
+/* ── La barre, de jour ────────────────────────────────────────────────────
+   Une surface qui portait ses couleurs en clair et se retrouvait noire sur
+   une page blanche : le verre de la barre. Le limbe a sa propre teinte de
+   jour plus bas, où il passe du chaud au bleu froid. */
+:root[data-concept="clair"] .cg-header-verre {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.4));
+  border-bottom-color: rgba(12, 16, 22, 0.09);
+}
+:root[data-concept="clair"] .cg-logo::before {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(12, 16, 22, 0.1);
+}
+:root[data-concept="clair"] .cg-cnx {
+  background: rgba(255, 255, 255, 0.72);
+}
+
+/* Le témoin « sans donnée » de la légende reprend la teinte que le globe
+   emploie vraiment, laquelle change avec le thème. */
+:root[data-concept="clair"] .ge-echelle-sans { background: #d9d6cf; }
+
+/* ── Fiches d'article et fiches de débat, même matière ───────────────────
+   La fiche de débat portait un voile froid par-dessus le fond, la fiche
+   d'article prenait la surface telle quelle. De nuit l'écart passait
+   inaperçu, de jour l'une était blanche et l'autre bleutée, côte à côte
+   dans la même colonne. Elles partagent maintenant le même fond. */
+.cg-art {
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--froid) 8%, var(--surface)),
+    var(--surface)
+  );
+}
+
+/* ── Le titre de l'ouverture ─────────────────────────────────────────────
+   Un seul mot, sous le sceau, très espacé : une enseigne plutôt qu'une
+   phrase. Il reprend la lettre du sur-titre qu'il remplace, en grand, parce
+   que c'est ce mot-là qu'on cherche et qu'on doit reconnaître de loin.
+
+   L'alinéa rattrape la chasse ajoutée après la dernière lettre, sans quoi le
+   mot penche à gauche de son axe. */
+.cg-eco-titre {
+  margin: 4px 0 0;
+  font-size: clamp(30px, 5.4vw, 74px);
+  font-weight: 300;
+  line-height: 1.04;
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+  text-transform: uppercase;
+  color: var(--encre);
+}
+.cg-eco-titre .cg-mot { display: inline-block; }
+.cg-eco-ouv .cg-eco-ouv-c { margin-top: 18px; }
+
+/* ── L'éclat du limbe, de jour ───────────────────────────────────────────
+   L'ocre marchait de nuit, où il lisait comme un lever de soleil. De jour il
+   ne lit plus comme de la lumière, seulement comme un trait beige. Le même
+   éclat passe donc au bleu, qui se détache d'une page blanche là où le chaud
+   s'y noie.
+
+   Le bleu, plus froid, se lit comme un trait dès qu'il est net : le garder
+   aussi marqué que le chaud faisait une ligne, pas une lumière. Le trait
+   s'efface donc davantage ici, et c'est la nappe — l'éclat lui-même — qui
+   porte la couleur. */
+:root[data-concept="clair"] .cg-arc-trait {
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 calc(50% - 1.75px),
+    rgba(31, 95, 168, 0.4) calc(50% - 1.15px) calc(50% - 0.4px),
+    transparent calc(50% + 0.2px)
+  );
+}
+:root[data-concept="clair"] .cg-arc-nappe {
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 48.5%,
+    rgba(90, 160, 235, 0.52) 49.7%,
+    rgba(50, 115, 190, 0.38) 50.5%,
+    transparent 52.2%
+  );
+}
+:root[data-concept="clair"] .cg-arc-corps {
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 0 45%,
+    rgba(70, 140, 215, 0.14) 49.2%,
+    rgba(110, 170, 230, 0.2) 50%,
+    rgba(70, 140, 215, 0.1) 50.8%,
+    transparent 56%
+  );
+}
+:root[data-concept="clair"] .cg-arc-point::before {
+  background: #2f6f8a;
+  box-shadow:
+    0 0 12px 3px rgba(60, 130, 200, 0.6),
+    0 0 46px 14px rgba(50, 115, 185, 0.28),
+    0 0 150px 60px rgba(45, 105, 175, 0.12);
+}
+
+/* ── Le choix de la monnaie ──────────────────────────────────────────────
+   Le signe en place, les trois monnaies au survol, sous le même verre que
+   le reste de la barre. Le déroulé est en survol et en focus : un menu qui
+   ne répond qu'à la souris est fermé pour qui navigue au clavier. */
+.cg-monnaie { position: relative; display: inline-flex; }
+.cg-monnaie-b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--bord);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fond) 55%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font: inherit;
+  font-size: 14px;
+  color: var(--encre-2);
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s;
+}
+.cg-monnaie:hover .cg-monnaie-b,
+.cg-monnaie:focus-within .cg-monnaie-b {
+  color: var(--encre);
+  border-color: color-mix(in srgb, var(--chaud) 55%, transparent);
+}
+.cg-header-ouvert .cg-monnaie-b { background: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+.cg-monnaie-l {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 210px;
+  padding: 6px;
+  border: 1px solid var(--bord);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--fond) 82%, transparent);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow: 0 18px 40px var(--ombre-portee);
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 5;
+}
+.cg-monnaie:hover .cg-monnaie-l,
+.cg-monnaie:focus-within .cg-monnaie-l {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.cg-monnaie-l button {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--encre-2);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.cg-monnaie-l button:hover { background: color-mix(in srgb, var(--voile) 7%, transparent); color: var(--encre); }
+.cg-monnaie-l button.on { color: var(--encre); }
+.cg-monnaie-l button.on b { color: var(--chaud); }
+.cg-monnaie-l b { width: 30px; font-size: 14px; font-weight: 600; }
+.cg-monnaie-l em {
+  margin-left: auto;
+  font-style: normal;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--encre-3);
+}
+@media (max-width: 700px) { .cg-monnaie-b { width: 28px; height: 28px; font-size: 13px; } }
+
+/* ── Données temps réelles ───────────────────────────────────────────────── */
+
+.cg-tr-titre { margin-bottom: clamp(20px, 3vh, 34px); }
+
+/* Le bandeau reprend la mécanique de l'ancien fil d'agrégats — mêmes bords
+   qui s'effacent, la piste s'attrape à la main — mais les vignettes sont
+   plus grandes, et rien ne s'y ouvre plus au clic : le montant écrit en
+   toutes lettres tient déjà lieu d'explication. */
+.cg-tr-piste {
+  display: flex;
+  align-items: stretch;
+  gap: 14px;
+  width: max-content;
+  padding: 2px 0 6px;
+  will-change: transform;
+}
+.cg-tr-i {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 224px;
+  padding: 20px 24px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 14px;
+  /* Le globe du hero finit sa sortie derrière ce bandeau. En sombre il n'est
+     qu'une ombre ; en clair c'est un disque gris qui passerait sous les
+     chiffres. D'où la couche de fond, assez légère pour le laisser deviner. */
+  background:
+    linear-gradient(160deg, rgba(158, 199, 216, 0.08), color-mix(in srgb, var(--voile) 2%, transparent)),
+    color-mix(in srgb, var(--fond) 74%, transparent);
+  backdrop-filter: blur(7px);
+  text-align: left;
+  white-space: nowrap;
+}
+.cg-tr-lab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+.cg-tr-v {
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--encre);
+}
+.cg-tr-lettres {
+  font-size: 12.5px;
+  color: var(--encre-2);
+  white-space: normal;
+}
+
+/* La pastille d'exemple, à même le libellé plutôt que dans un panneau à
+   part. Elle n'est pas discrète : un compteur sans source doit se voir
+   comme tel, sinon il se lit comme une mesure. */
+.cg-tr-ex {
+  padding: 2px 7px;
+  border: 1px dashed color-mix(in srgb, var(--chaud) 55%, transparent);
+  border-radius: 999px;
+  font-size: 8.5px;
+  letter-spacing: 0.06em;
+  color: var(--chaud);
+}
+@media (max-width: 620px) {
+  .cg-tr-i { min-width: 188px; padding: 16px 18px; }
+  .cg-tr-v { font-size: 18px; }
+}

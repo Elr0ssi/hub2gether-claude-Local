@@ -4,7 +4,7 @@ import { Layout } from "@/components/layout/Layout";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Méthodologie — The Essential Data",
+  title: "Méthodologie · The Essential Data",
   description:
     "Découvrez comment The Essential Data collecte, synthétise et vérifie ses données. Transparence totale sur nos sources, notre approche éditoriale et notre conformité EU AI Act.",
   alternates: {
@@ -51,7 +51,7 @@ const sections = [
       "Les cartes interactives sont alimentées par des données structurées issues des sources suivantes :",
     ],
     list: [
-      "PIB et données économiques : Fonds Monétaire International (FMI), Perspectives de l'économie mondiale (WEO), millésime 2024",
+      "PIB et données économiques : Fonds Monétaire International (FMI), Perspectives de l'économie mondiale (WEO), 2024",
       "Épidémies : Organisation Mondiale de la Santé (OMS/WHO), CDC (Centers for Disease Control and Prevention), ECDC",
       "Données militaires et conflits : SIPRI (Stockholm International Peace Research Institute), IISS",
       "Empires historiques : Ancient World Mapping Center (AWMC, UNC Chapel Hill), Barrington Atlas of the Greek and Roman World",
@@ -63,7 +63,7 @@ const sections = [
     title: "Limites et avertissements",
     content: [
       "Les frontières historiques représentées sur les cartes sont des approximations éditoriales. Les empires et entités politiques historiques n'avaient pas de frontières précises au sens moderne du terme ; les délimitations présentées reflètent les travaux historiographiques les plus récents mais restent sujettes à débat académique.",
-      "Les données économiques et épidémiologiques sont mises à jour périodiquement ; les chiffres affichés correspondent au millésime indiqué sur chaque visualisation. Des révisions ultérieures des données sources peuvent entraîner des écarts.",
+      "Les données économiques et épidémiologiques sont mises à jour périodiquement ; les chiffres affichés correspondent à la date indiquée sur chaque visualisation. Des révisions ultérieures des données sources peuvent entraîner des écarts.",
       "Cet outil est destiné à des fins éducatives et journalistiques. Il ne constitue pas un avis professionnel (médical, financier, juridique ou autre).",
     ],
   },
@@ -101,7 +101,7 @@ export default function MethodologyPage() {
               className="text-xs font-medium px-2.5 py-1 rounded-full"
               style={{ background: "rgba(57,255,136,0.12)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)" }}
             >
-              EU AI Act — Conformité
+              EU AI Act · Conformité
             </span>
           </div>
           <h1

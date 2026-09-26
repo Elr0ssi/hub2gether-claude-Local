@@ -1,5 +1,5 @@
 declare module "react-simple-maps" {
-  import type { ReactNode, SVGAttributes } from "react";
+  import type { ReactNode, SVGAttributes, MouseEvent as ReactMouseEvent } from "react";
 
   interface ProjectionConfig {
     center?: [number, number];
@@ -32,9 +32,10 @@ declare module "react-simple-maps" {
     fill?: string;
     stroke?: string;
     strokeWidth?: number;
-    onClick?: () => void;
-    onMouseEnter?: () => void;
-    onMouseLeave?: () => void;
+    onClick?: (event: ReactMouseEvent<SVGPathElement>) => void;
+    onMouseEnter?: (event: ReactMouseEvent<SVGPathElement>) => void;
+    onMouseLeave?: (event: ReactMouseEvent<SVGPathElement>) => void;
+    onMouseMove?: (event: ReactMouseEvent<SVGPathElement>) => void;
     style?: {
       default?: React.CSSProperties & { outline?: string; cursor?: string; filter?: string };
       hover?: React.CSSProperties & { outline?: string; cursor?: string; filter?: string };

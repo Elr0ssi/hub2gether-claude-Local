@@ -1,0 +1,17 @@
+{
+  "country": "ITA",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Italie",
+  "iso2": "IT",
+  "data": {
+    "2000": 10.1,
+    "2005": 7.7,
+    "2010": 8.4,
+    "2015": 11.9,
+    "2020": 9.3,
+    "2023": 6.7,
+    "2025": 6.5
+  }
+}

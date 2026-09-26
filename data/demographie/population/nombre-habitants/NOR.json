@@ -1,0 +1,17 @@
+{
+  "country": "NOR",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Norvège",
+  "iso2": "NO",
+  "data": {
+    "2000": 4.5,
+    "2005": 4.6,
+    "2010": 4.9,
+    "2015": 5.2,
+    "2020": 5.4,
+    "2023": 5.5,
+    "2025": 5.5
+  }
+}

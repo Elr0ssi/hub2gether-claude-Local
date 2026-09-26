@@ -80,7 +80,7 @@ export default async function EntityPage({ params }: PageProps) {
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: `Empire romain — ${entry.label} (${yearLabel})`,
+    headline: `Empire romain · ${entry.label} (${yearLabel})`,
     description: entry.description.slice(0, 200),
     url: pageUrl,
     datePublished: "2025-01-01",
@@ -88,7 +88,7 @@ export default async function EntityPage({ params }: PageProps) {
     publisher: { "@type": "Organization", name: "The Essential Data", url: siteUrl },
     about: {
       "@type": "Thing",
-      name: `Empire romain — ${entry.label}`,
+      name: `Empire romain · ${entry.label}`,
       description: entry.description,
     },
   };

@@ -1,0 +1,16 @@
+{
+  "country": "OMN",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Oman",
+  "iso2": "OM",
+  "data": {
+    "2000": 80,
+    "2005": 100,
+    "2010": 130,
+    "2015": 150,
+    "2020": 165,
+    "2023": 180
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "ARG",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Argentine",
+  "iso2": "AR",
+  "data": {
+    "2000": 1800,
+    "2005": 1900,
+    "2010": 2100,
+    "2015": 2000,
+    "2020": 2100,
+    "2023": 2200,
+    "2025": 2600
+  }
+}

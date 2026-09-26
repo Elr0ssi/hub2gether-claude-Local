@@ -1,0 +1,34 @@
+{
+  "country": "NGA",
+  "indicator": "TRADE_BALANCE",
+  "unit": "USD",
+  "source": "Banque mondiale · WDI (NE.RSB.GNFS.CD)",
+  "name": "Nigeria",
+  "iso2": "NG",
+  "data": {
+    "1960": -322411051.03558
+  },
+  "autres_sources": [
+    {
+      "source": "FMI · OMC · Banque mondiale · estimations sur 7 dates repères",
+      "unit": "MD_USD",
+      "data": {
+        "2000": 8,
+        "2005": 25,
+        "2010": 30,
+        "2015": -5,
+        "2020": -3,
+        "2023": 20,
+        "2025": 18
+      }
+    },
+    {
+      "source": "OMC · FMI (WEO) · Banque mondiale (BOP)",
+      "unit": "MD_USD",
+      "data": {
+        "2024": 20
+      },
+      "note": "La source date ces valeurs « 2024/2025 » sans trancher. Elles sont rangées sous 2024, date la plus récente que la source nomme explicitement."
+    }
+  ]
+}

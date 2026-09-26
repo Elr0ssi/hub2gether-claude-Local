@@ -1,0 +1,17 @@
+{
+  "country": "UZB",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Ouzbékistan",
+  "iso2": "UZ",
+  "data": {
+    "2000": 24.7,
+    "2005": 26.4,
+    "2010": 28.6,
+    "2015": 31.3,
+    "2020": 34.2,
+    "2023": 35.6,
+    "2025": 36.4
+  }
+}

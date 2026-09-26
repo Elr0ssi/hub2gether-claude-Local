@@ -1,0 +1,13 @@
+{
+  "country": "COL",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Colombie",
+  "iso2": "CO",
+  "data": {
+    "2000": 30,
+    "2014": 250,
+    "2024": 420
+  }
+}

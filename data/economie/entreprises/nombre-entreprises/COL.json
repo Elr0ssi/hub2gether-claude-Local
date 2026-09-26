@@ -1,0 +1,17 @@
+{
+  "country": "COL",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Colombie",
+  "iso2": "CO",
+  "data": {
+    "2000": 800,
+    "2005": 950,
+    "2010": 1200,
+    "2015": 1400,
+    "2020": 1500,
+    "2023": 1600,
+    "2025": 1900
+  }
+}

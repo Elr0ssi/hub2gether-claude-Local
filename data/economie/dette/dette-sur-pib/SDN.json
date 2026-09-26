@@ -1,0 +1,28 @@
+{
+  "country": "SDN",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Soudan",
+  "iso2": "SD",
+  "data": {
+    "2000": 208,
+    "2005": 101,
+    "2010": 75,
+    "2015": 73,
+    "2020": 202,
+    "2023": 266,
+    "2025": 278
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 120,
+        "2014": 68.5,
+        "2024": 265
+      }
+    }
+  ]
+}

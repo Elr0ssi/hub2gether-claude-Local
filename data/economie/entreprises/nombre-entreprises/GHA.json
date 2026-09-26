@@ -1,0 +1,17 @@
+{
+  "country": "GHA",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Ghana",
+  "iso2": "GH",
+  "data": {
+    "2000": 230,
+    "2005": 310,
+    "2010": 430,
+    "2015": 530,
+    "2020": 640,
+    "2023": 710,
+    "2025": 580
+  }
+}

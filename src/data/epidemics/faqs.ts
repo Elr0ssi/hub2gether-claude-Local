@@ -4,25 +4,25 @@ export const FAQS_EPIDEMICS: FAQItem[] = [
   {
     question: "Comment sont calculés les taux de létalité sur cette carte ?",
     answer:
-      "Le taux de létalité (Case Fatality Rate — CFR) est calculé en divisant le nombre de décès confirmés par le nombre de cas confirmés. Ce ratio est une sous-estimation de la létalité réelle, car il dépend fortement des capacités de dépistage de chaque pays. Pour le COVID-19, les pays à faibles revenus ayant peu testé présentent des CFR apparemment élevés, non reflet d'une maladie plus mortelle, mais d'un sous-dénombrement des cas.",
+      "Le taux de létalité (Case Fatality Rate, CFR) est calculé en divisant le nombre de décès confirmés par le nombre de cas confirmés. Ce ratio est une sous-estimation de la létalité réelle, car il dépend fortement des capacités de dépistage de chaque pays. Pour le COVID-19, les pays à faibles revenus ayant peu testé présentent des CFR apparemment élevés, non reflet d'une maladie plus mortelle, mais d'un sous-dénombrement des cas.",
     category: "Méthodologie",
   },
   {
     question: "Pourquoi les données de la Peste Noire sont-elles si imprécises ?",
     answer:
-      "La Peste Noire (1347–1353) précède les recensements modernes de plusieurs siècles. Les estimations reposent sur des registres paroissiaux, des chroniques médiévales, des archives notariales et des fouilles archéologiques. Les fourchettes vont de 30% à 60% de mortalité en Europe occidentale selon les régions. Les données géographiques utilisent les frontières modernes comme approximation, ce qui introduit une distorsion supplémentaire.",
+      "La Peste Noire (1347-1353) précède les recensements modernes de plusieurs siècles. Les estimations reposent sur des registres paroissiaux, des chroniques médiévales, des archives notariales et des fouilles archéologiques. Les fourchettes vont de 30% à 60% de mortalité en Europe occidentale selon les régions. Les données géographiques utilisent les frontières modernes comme approximation, ce qui introduit une distorsion supplémentaire.",
     category: "Méthodologie",
   },
   {
     question: "Quelle est la différence entre FHSR et SPH pour l'hantavirus ?",
     answer:
-      "L'hantavirus provoque deux syndromes distincts selon le variant. La Fièvre Hémorragique avec Syndrome Rénal (FHSR) est dominante en Eurasie — notamment en Chine, Corée et Scandinavie — avec une létalité de 1 à 15%. Le Syndrome Pulmonaire à Hantavirus (SPH) sévit en Amérique du Nord et du Sud, causé par différents variants (Sin Nombre aux USA, Andes en Amérique du Sud), avec une létalité beaucoup plus élevée atteignant 35 à 40%.",
+      "L'hantavirus provoque deux syndromes distincts selon le variant. La Fièvre Hémorragique avec Syndrome Rénal (FHSR) est dominante en Eurasie, notamment en Chine, Corée et Scandinavie, avec une létalité de 1 à 15%. Le Syndrome Pulmonaire à Hantavirus (SPH) sévit en Amérique du Nord et du Sud, causé par différents variants (Sin Nombre aux USA, Andes en Amérique du Sud), avec une létalité beaucoup plus élevée atteignant 35 à 40%.",
     category: "Hantavirus",
   },
   {
     question: "Pourquoi l'Afrique subsaharienne concentre-t-elle autant de cas de VIH ?",
     answer:
-      "La concentration du VIH en Afrique subsaharienne tient à plusieurs facteurs : les réseaux sexuels plus denses dans certaines communautés, l'accès limité aux préservatifs et à l'éducation sexuelle, des systèmes de santé sous-financés, et un accès tardif aux traitements antirétroviraux. Des inégalités structurelles — pauvreté, mobilité des populations, inégalités de genre — amplifient la transmission. Aujourd'hui, l'accès au traitement s'est massivement amélioré, mais l'épidémie reste active.",
+      "La concentration du VIH en Afrique subsaharienne tient à plusieurs facteurs : les réseaux sexuels plus denses dans certaines communautés, l'accès limité aux préservatifs et à l'éducation sexuelle, des systèmes de santé sous-financés, et un accès tardif aux traitements antirétroviraux. Des inégalités structurelles, pauvreté, mobilité des populations, inégalités de genre, amplifient la transmission. Aujourd'hui, l'accès au traitement s'est massivement amélioré, mais l'épidémie reste active.",
     category: "VIH/SIDA",
   },
   {
@@ -34,7 +34,7 @@ export const FAQS_EPIDEMICS: FAQItem[] = [
   {
     question: "Comment les épidémies historiques ont-elles modifié les structures sociales ?",
     answer:
-      "Les grandes épidémies ont systématiquement accéléré des transformations sociales profondes. La Peste Noire a décimé la paysannerie européenne, rendant la main-d'œuvre rare et permettant aux survivants de négocier de meilleures conditions — précipitant la fin du servage. Le COVID-19 a accéléré la numérisation du travail, amplifié les inégalités économiques entre travailleurs qualifiés (télétravail possible) et non qualifiés, et a révélé la fragilité des États-providences.",
+      "Les grandes épidémies ont systématiquement accéléré des transformations sociales profondes. La Peste Noire a décimé la paysannerie européenne, rendant la main-d'œuvre rare et permettant aux survivants de négocier de meilleures conditions, précipitant la fin du servage. Le COVID-19 a accéléré la numérisation du travail, amplifié les inégalités économiques entre travailleurs qualifiés (télétravail possible) et non qualifiés, et a révélé la fragilité des États-providences.",
     category: "Analyse",
   },
   {

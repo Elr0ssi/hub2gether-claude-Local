@@ -1,4 +1,5 @@
-import type { FAQItem } from "@/types";
+import type { EconomyYear, FAQItem } from "@/types";
+import { countryFr } from "@/data/countryNamesFr";
 
 export const FAQS_ECONOMY: FAQItem[] = [
   {
@@ -28,7 +29,7 @@ export const FAQS_ECONOMY: FAQItem[] = [
   {
     question: "Que signifie un ratio dette/PIB élevé ?",
     answer:
-      "Le ratio dette/PIB exprime le montant de la dette publique en pourcentage de la production économique annuelle du pays. Un ratio élevé (au-delà de 100%) ne signifie pas forcément une crise imminente — le Japon dépasse 260% depuis des années sans perdre la confiance des marchés. Ce qui compte davantage : la capacité à refinancer cette dette, la confiance des investisseurs, la devise dans laquelle elle est libellée, et la croissance économique. La zone de vigilance généralement admise se situe autour de 60% (critère de Maastricht).",
+      "Le ratio dette/PIB exprime le montant de la dette publique en pourcentage de la production économique annuelle du pays. Un ratio élevé (au-delà de 100%) ne signifie pas forcément une crise imminente, le Japon dépasse 260% depuis des années sans perdre la confiance des marchés. Ce qui compte davantage : la capacité à refinancer cette dette, la confiance des investisseurs, la devise dans laquelle elle est libellée, et la croissance économique. La zone de vigilance généralement admise se situe autour de 60% (critère de Maastricht).",
     category: "Concepts",
   },
   {
@@ -80,3 +81,83 @@ export const FAQS_ECONOMY: FAQItem[] = [
     category: "Utilisation",
   },
 ];
+
+// ── Données de référence, servies dans la FAQ ────────────────────────────────
+// Les tableaux de référence qui vivaient sous la carte ont été retirés de
+// l'écran : leur contenu est rendu ici, en texte, et repart donc dans le
+// balisage FAQPage (JSON-LD) de la page — un signal SEO plus fort qu'un
+// tableau muet, et une lecture plus naturelle pour un visiteur.
+
+function fmt(n: number | undefined): string {
+  if (n === undefined) return "-";
+  // Les montants viennent de la base au million près : l'arrondi de lecture
+  // suit la taille du chiffre, comme sur la carte et dans le classement.
+  const abs = Math.abs(n);
+  const decimales = abs >= 100 ? 0 : abs >= 10 ? 1 : 2;
+  return n.toLocaleString("fr-FR", { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
+}
+
+/**
+ * Questions dérivées du jeu de données économique lui-même : classements PIB,
+ * dette et chômage de l'année de référence. Régénérées à chaque build, donc
+ * toujours alignées sur les chiffres affichés par la carte.
+ */
+export function buildEconomyDataFaqs(year: EconomyYear | undefined): FAQItem[] {
+  if (!year) return [];
+  const entries = Object.entries(year.countries);
+  if (entries.length === 0) return [];
+
+  const topGdp = entries
+    .filter(([, d]) => d.gdp !== undefined)
+    .sort((a, b) => (b[1].gdp ?? 0) - (a[1].gdp ?? 0))
+    .slice(0, 15);
+  const topDebt = entries
+    .filter(([, d]) => d.debt_ratio != null)
+    .sort((a, b) => (b[1].debt_ratio ?? 0) - (a[1].debt_ratio ?? 0))
+    .slice(0, 15);
+  const topUnemployment = entries
+    .filter(([, d]) => d.unemployment != null)
+    .sort((a, b) => (b[1].unemployment ?? 0) - (a[1].unemployment ?? 0))
+    .slice(0, 8);
+  const lowUnemployment = entries
+    .filter(([, d]) => d.unemployment != null)
+    .sort((a, b) => (a[1].unemployment ?? 0) - (b[1].unemployment ?? 0))
+    .slice(0, 8);
+
+  return [
+    {
+      question: `Quel est le classement des 15 premières économies mondiales en ${year.year} ?`,
+      answer:
+        `Classement par PIB nominal ${year.year} : ` +
+        topGdp
+          .map(([name, d], i) => {
+            const dette = d.debt_ratio === undefined ? "" : `, dette ${d.debt_ratio} % du PIB`;
+            const chomage = d.unemployment === undefined ? "" : `, chômage ${d.unemployment} %`;
+            return `${i + 1}. ${countryFr(name)}, ${fmt(d.gdp)} Mds €${dette}${chomage}`;
+          })
+          .join(" ; ") +
+        `. ${year.dataNote}`,
+      category: "Données de référence",
+    },
+    {
+      question: `Quels pays affichent la dette publique la plus élevée en ${year.year} ?`,
+      answer:
+        `Ratios dette publique / PIB les plus élevés en ${year.year} : ` +
+        topDebt
+          .map(([name, d], i) => `${i + 1}. ${countryFr(name)}, ${d.debt_ratio} % du PIB` + (d.debt_amount ? ` (${fmt(d.debt_amount)} Mds €)` : ""))
+          .join(" ; ") +
+        `. Un ratio élevé ne vaut pas crise : ce qui compte est la capacité de refinancement, la devise d'émission et la croissance. ${year.dataNote}`,
+      category: "Données de référence",
+    },
+    {
+      question: `Quels sont les taux de chômage les plus élevés et les plus faibles en ${year.year} ?`,
+      answer:
+        `Taux de chômage les plus élevés en ${year.year} : ` +
+        topUnemployment.map(([name, d]) => `${countryFr(name)} ${d.unemployment} %`).join(", ") +
+        `. Les plus faibles : ` +
+        lowUnemployment.map(([name, d]) => `${countryFr(name)} ${d.unemployment} %`).join(", ") +
+        `. Les méthodologies nationales diffèrent, la mesure retenue ici suit la définition de l'OIT. ${year.dataNote}`,
+      category: "Données de référence",
+    },
+  ];
+}
