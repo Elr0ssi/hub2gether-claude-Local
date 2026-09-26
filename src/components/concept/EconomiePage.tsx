@@ -139,7 +139,7 @@ function val(v: number | null, unite: Unite) {
    position réelle à chaque défilement : c'est une lecture par image, sur un
    seul nœud, et la mesure est relue à chaque fois donc jamais périmée. Une
    fois la bande vue, on décroche tout et on n'y revient pas. */
-function useVu(marge = 120) {
+export function useVu(marge = 120) {
   const ref = useRef<HTMLElement | null>(null);
   const [vu, setVu] = useState(false);
   useEffect(() => {
@@ -336,7 +336,7 @@ const VERS_NOM: Record<string, string> = Object.fromEntries(
  * La mesure se fait dans l'écouteur, comme pour `useVu` et pour la même
  * raison : une image d'animation de retard se voit sur cette page.
  */
-function useProgression() {
+export function useProgression() {
   const ref = useRef<HTMLElement | null>(null);
   useEffect(() => {
     let vivant = true;
@@ -378,7 +378,7 @@ function useProgression() {
    ═══════════════════════════════════════════════════════════════════════════ */
 /* Un titre qui se lève, mot par mot, derrière un masque. Chaque mot porte son
    rang : c'est le CSS qui décale les départs, rien ne tourne en JavaScript. */
-function Titre({ texte }: { texte: string }) {
+export function Titre({ texte }: { texte: string }) {
   const mots = texte.split(" ");
   return (
     <>

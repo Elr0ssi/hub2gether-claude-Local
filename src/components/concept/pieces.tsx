@@ -167,7 +167,7 @@ interface Onglet {
    se lit du bord vers le centre, comme à l'écran. */
 const NAV_GAUCHE: Onglet[] = [
   { label: "Économie", href: "/economie" },
-  { label: "Démographie" },
+  { label: "Démographie", href: "/demographie" },
 ];
 const NAV_DROITE: Onglet[] = [
   { label: "Analyses", href: "/concept-globe#analyses" },
