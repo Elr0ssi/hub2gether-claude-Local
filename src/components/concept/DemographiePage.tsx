@@ -1,16 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { FichePaysDemo, SocleDemo } from "@/data/concept/conceptDemographie";
+import type { SocleDemo } from "@/data/concept/conceptDemographie";
+import type { DemographyMetricId, DemographyYear } from "@/data/demographie/demographie";
 import { Dessin, Jetons } from "./Jetons";
 import { Enseigne, EnTete, Pied } from "./pieces";
 import { Loupe } from "./Loupe";
 import { Odometre, gelerOdometres } from "./Roulement";
 import { Lettres } from "./Lettres";
-import { GlobeDemo, type Indic } from "./GlobeDemo";
+import { GlobeDemographie, TOUTES } from "./GlobeDemographie";
 import { Titre, useProgression, useVu } from "./EconomiePage";
 import { cle } from "@/data/concept/cle";
-import { REGIONS, VUES } from "@/data/concept/conceptGeo";
 import "./concept.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -38,15 +38,12 @@ export interface CompteurDemoProps {
 export interface DemoProps {
   socle: SocleDemo;
   compteur: CompteurDemoProps;
-  donnees: Record<string, FichePaysDemo>;
-  anneeDonnees: number;
 }
 
-type Col = "population" | "birth_rate" | "death_rate" | "natural_change" | "net_migration";
-type Rang = { nom: string; fr: string } & Record<Col, number | null>;
+type Rang = { nom: string; fr: string } & Record<DemographyMetricId, number | null>;
 type Unite = "hab" | "pour1000";
 
-const COLONNES: { id: Col; label: string; unite: Unite }[] = [
+const COLONNES: { id: DemographyMetricId; label: string; unite: Unite }[] = [
   { id: "population", label: "Population", unite: "hab" },
   { id: "birth_rate", label: "Natalité", unite: "pour1000" },
   { id: "death_rate", label: "Mortalité", unite: "pour1000" },
@@ -62,8 +59,6 @@ function val(v: number | null, unite: Unite): string {
   if (a >= 1e3) return `${(v / 1e3).toFixed(1).replace(".", ",")} k`;
   return Math.round(v).toLocaleString("fr-FR");
 }
-
-const AN_SECONDES = 365.2425 * 24 * 3600;
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE BANDEAU EN TEMPS RÉEL
@@ -308,11 +303,11 @@ function TableauDemo({
   onTrier,
 }: {
   lignes: Rang[];
-  col: Col;
+  col: DemographyMetricId;
   sens: 1 | -1;
   choisi: string | null;
   onChoisi: (n: string) => void;
-  onTrier: (c: Col) => void;
+  onTrier: (c: DemographyMetricId) => void;
 }) {
   const cadre = useRef<HTMLDivElement>(null);
   const [haut, setHaut] = useState(44);
@@ -400,13 +395,12 @@ function TableauDemo({
   );
 }
 
-export function DemographiePage({ socle, compteur, donnees, anneeDonnees }: DemoProps) {
+export function DemographiePage({ socle, compteur }: DemoProps) {
   const [annee, setAnnee] = useState(socle.annees[socle.annees.length - 1]);
-  const [col, setCol] = useState<Col>("population");
+  const [metrique, setMetrique] = useState<DemographyMetricId>("population");
   const [sens, setSens] = useState<1 | -1>(-1);
   const [filtre, setFiltre] = useState("");
   const [choisi, setChoisi] = useState<string | null>("France");
-  const [indic, setIndic] = useState<Indic>("population");
 
   const bande = useVu(20);
   const haut = useVu(260);
@@ -434,7 +428,7 @@ export function DemographiePage({ socle, compteur, donnees, anneeDonnees }: Demo
       if (t) setChoisi(t.nom);
     }
     const i = q.get("indicateur");
-    if (i && ["population", "natalite", "mortalite", "croissance"].includes(i)) setIndic(i as Indic);
+    if (i && TOUTES.some((m) => m.id === i)) setMetrique(i as DemographyMetricId);
     const a = Number(q.get("annee"));
     if (Number.isFinite(a) && socle.annees.includes(a)) setAnnee(a);
     if (p || i || q.get("annee")) {
@@ -468,25 +462,63 @@ export function DemographiePage({ socle, compteur, donnees, anneeDonnees }: Demo
     const q = filtre.trim().toLowerCase();
     const base = q ? rangs.filter((r) => r.fr.toLowerCase().includes(q)) : rangs;
     return [...base].sort((a, b) => {
-      const x = a[col];
-      const y = b[col];
+      const x = a[metrique];
+      const y = b[metrique];
       if (x === null && y === null) return a.fr.localeCompare(b.fr);
       if (x === null) return 1;
       if (y === null) return -1;
       return (x - y) * sens;
     });
-  }, [rangs, col, sens, filtre]);
+  }, [rangs, metrique, sens, filtre]);
 
+  /* Cliquer une colonne du classement trie dessus et affiche cette grandeur
+     sur le globe ; cliquer une famille ou une grandeur voisine sur le globe
+     trie le classement dessus. Les deux widgets parlent de la même chose, ce
+     qui évite qu'ils racontent chacun une histoire différente. */
   const trier = useCallback(
-    (c: Col) => {
-      if (c === col) setSens((s) => (s === 1 ? -1 : 1));
+    (c: DemographyMetricId) => {
+      if (c === metrique) setSens((s) => (s === 1 ? -1 : 1));
       else {
-        setCol(c);
+        setMetrique(c);
         setSens(-1);
       }
     },
-    [col],
+    [metrique],
   );
+  const changeMetrique = useCallback((id: DemographyMetricId) => {
+    setMetrique(id);
+    setSens(-1);
+  }, []);
+
+  /* L'année remise au format complet, pour le globe : le socle compact ne
+     transporte que ce qu'une date publie, le globe veut un objet par pays. */
+  const anneeDemo = useMemo<DemographyYear>(() => {
+    const countries: DemographyYear["countries"] = {};
+    for (const r of rangs) {
+      countries[r.nom] = {
+        population: r.population ?? undefined,
+        birth_rate: r.birth_rate ?? undefined,
+        death_rate: r.death_rate ?? undefined,
+        natural_change: r.natural_change ?? undefined,
+        net_migration: r.net_migration ?? undefined,
+      };
+    }
+    return { year: annee, countries };
+  }, [rangs, annee]);
+
+  /* La série du pays choisi, date par date, pour la courbe d'évolution du
+     globe. Une année sans valeur coupe le trait, elle ne le ramène pas à
+     zéro. */
+  const serie = useMemo(() => {
+    const idx = choisi ? socle.pays.findIndex((p) => p.nom === choisi) : -1;
+    return socle.annees.map((a) => {
+      if (idx < 0) return { annee: a, v: null };
+      const i = (socle.cols[a] ?? {})[metrique];
+      const l = i === undefined ? undefined : (socle.lignes[a] ?? []).find((x) => x[0] === idx);
+      const v = l ? l[i] : null;
+      return { annee: a, v: typeof v === "number" && Number.isFinite(v) ? v : null };
+    });
+  }, [socle, choisi, metrique]);
 
   return (
     <div className="cg cg-eco">
@@ -500,7 +532,7 @@ export function DemographiePage({ socle, compteur, donnees, anneeDonnees }: Demo
         data-pret={pret ? "1" : "0"}
       >
         <div className="cg-eco-lueur" aria-hidden="true" />
-        <Jetons />
+        <Jetons theme="demographie" />
         <div className="cg-wrap">
           <div className="cg-eco-ouv">
             <span className="cg-sceau" aria-hidden="true">
@@ -531,17 +563,16 @@ export function DemographiePage({ socle, compteur, donnees, anneeDonnees }: Demo
 
       <section id="globe" className="cg-section cg-eco-globe">
         <div className="cg-wrap">
-          <Enseigne droite={<span className="cg-demo-mini">Nations Unies · WPP 2024</span>}>Le globe, {anneeDonnees}</Enseigne>
+          <Enseigne droite={<span className="cg-demo-mini">Nations Unies · WPP 2024</span>}>Le globe, {annee}</Enseigne>
 
-          <GlobeDemo
-            donnees={donnees}
-            annee={anneeDonnees}
-            regions={REGIONS}
-            vues={VUES}
+          <GlobeDemographie
+            annee={anneeDemo}
+            metrique={TOUTES.find((m) => m.id === metrique) ?? TOUTES[0]}
+            onMetrique={changeMetrique}
             choisi={choisi}
             onChoisi={setChoisi}
-            indicateurs={["population", "natalite", "mortalite", "croissance"]}
-            indicateurPilote={indic}
+            nomFr={(n) => socle.pays.find((p) => p.nom === n)?.fr ?? n}
+            serie={serie}
             sousLeGlobe={<FriseDemo annees={socle.annees} valeur={annee} onAnnee={setAnnee} />}
           />
         </div>
@@ -578,7 +609,7 @@ export function DemographiePage({ socle, compteur, donnees, anneeDonnees }: Demo
         </div>
 
         <div className="cg-bande-bloc">
-          <TableauDemo lignes={tries} col={col} sens={sens} choisi={choisi} onChoisi={setChoisi} onTrier={trier} />
+          <TableauDemo lignes={tries} col={metrique} sens={sens} choisi={choisi} onChoisi={setChoisi} onTrier={trier} />
           <p className="cg-bande-n">
             {tries.length} pays affichés · « n.d. » signale une valeur que la source ne publie pas pour ce pays cette
             année-là ; ces pays passent en fin de tri, ils ne sont pas classés derniers. Cliquez une ligne pour la

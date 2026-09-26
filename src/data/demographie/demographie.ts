@@ -24,6 +24,11 @@ export interface CountryDemographyData {
   net_migration?: number;
 }
 
+/** Les cinq grandeurs comparables d'un pays à l'autre — celles que le globe
+    peut colorer et que le classement peut trier. Les deux compteurs par
+    seconde n'en font pas partie : ils n'ont de sens qu'agrégés sur le monde. */
+export type DemographyMetricId = "population" | "birth_rate" | "death_rate" | "natural_change" | "net_migration";
+
 export interface DemographyYear {
   year: number;
   countries: Record<string, CountryDemographyData>;

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { DemographiePage } from "@/components/concept/DemographiePage";
-import { compteurDemo, donneesPaysDemo, socleDemo } from "@/data/concept/conceptDemographie";
+import { compteurDemo, socleDemo } from "@/data/concept/conceptDemographie";
 import { jsonLdString } from "@/lib/schema";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -48,7 +48,6 @@ export const metadata: Metadata = {
 export default function Page() {
   const socle = socleDemo();
   const compteur = compteurDemo();
-  const { annee: anneeDonnees, pays: donnees } = donneesPaysDemo();
   const premiere = socle.annees[0];
   const derniere = socle.annees[socle.annees.length - 1];
 
@@ -100,7 +99,7 @@ export default function Page() {
         zéro.
       </p>
 
-      <DemographiePage socle={socle} compteur={compteur} donnees={donnees} anneeDonnees={anneeDonnees} />
+      <DemographiePage socle={socle} compteur={compteur} />
     </>
   );
 }

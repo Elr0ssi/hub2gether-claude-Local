@@ -33,7 +33,13 @@ type Forme =
   | "ble"
   | "curseurs"
   | "caisse"
-  | "pourcent";
+  | "pourcent"
+  | "berceau"
+  | "sablier"
+  | "feuille"
+  | "mains"
+  | "personnes"
+  | "globeTerre";
 
 interface Tuile {
   /** Le dessin, ou rien quand la tuile porte du texte. */
@@ -100,6 +106,37 @@ const TUILES: Tuile[] = [
   { f: "chandelier", c: VERT, x: 66, y: 74, k: 34, d: 16, z: 1.25, o: 4 },
   { t: "£", c: OR, x: 79, y: 12, k: 34, d: 12, z: 0.7, petit: true, o: 20 },
   { f: "barres", c: BLEU, x: 96, y: 14, k: 36, d: 14, z: 0.75, o: 10 },
+];
+
+/* Les mêmes positions, pour la démographie : la naissance, la mort,
+   l'environnement et la diversité plutôt que les monnaies et les indices.
+   Aucun texte cette fois — un taux ou un effectif n'a pas de symbole court
+   comme « € » ou « CAC 40 », les tuiles restent donc toutes des dessins. */
+const TUILES_DEMOGRAPHIE: Tuile[] = [
+  /* ── Le bord gauche ─────────────────────────────────────────────────── */
+  { f: "berceau", c: VERT, x: 8, y: 22, k: 46, d: 11, z: 1.1, petit: true, o: 3, vif: true },
+  { f: "personnes", c: BLEU, x: 17, y: 12, k: 40, d: 14, z: 0.8, petit: true, o: 11 },
+  { f: "globeTerre", c: PALE, x: 5, y: 44, k: 52, d: 13, z: 1.2, o: 7 },
+  { f: "feuille", c: VERT, x: 21, y: 33, k: 42, d: 9, z: 0.9, petit: true, o: 16 },
+  { f: "sablier", c: VIOLET, x: 12, y: 58, k: 38, d: 16, z: 1, o: 1 },
+  { f: "mains", c: CORAIL, x: 26, y: 54, k: 44, d: 12, z: 1.15, o: 13 },
+  { f: "berceau", c: VERT, x: 30, y: 20, k: 38, d: 10, z: 0.75, o: 19 },
+  { f: "feuille", c: VERT, x: 24, y: 71, k: 36, d: 15, z: 1.25, petit: true, o: 5 },
+  { f: "personnes", c: BLEU, x: 34, y: 38, k: 34, d: 13, z: 0.7, o: 9 },
+  { f: "mains", c: CORAIL, x: 33, y: 63, k: 34, d: 11, z: 0.85, petit: true, o: 17 },
+
+  /* ── Le bord droit ──────────────────────────────────────────────────── */
+  { f: "globeTerre", c: PALE, x: 63, y: 30, k: 44, d: 12, z: 1.05, petit: true, o: 0, vif: true },
+  { f: "sablier", c: VIOLET, x: 70, y: 16, k: 36, d: 10, z: 0.8, o: 12 },
+  { f: "personnes", c: BLEU, x: 88, y: 28, k: 52, d: 14, z: 1.2, o: 6 },
+  { f: "mains", c: CORAIL, x: 76, y: 44, k: 42, d: 9, z: 0.95, petit: true, o: 15 },
+  { f: "berceau", c: VERT, x: 74, y: 24, k: 40, d: 15, z: 1.1, petit: true, o: 2, vif: true },
+  { f: "feuille", c: VERT, x: 94, y: 52, k: 38, d: 11, z: 0.9, o: 18 },
+  { f: "globeTerre", c: PALE, x: 82, y: 66, k: 36, d: 13, z: 1.3, petit: true, o: 8 },
+  { f: "sablier", c: VIOLET, x: 92, y: 70, k: 38, d: 10, z: 1.15, petit: true, o: 14 },
+  { f: "mains", c: CORAIL, x: 66, y: 74, k: 34, d: 16, z: 1.25, o: 4 },
+  { f: "personnes", c: BLEU, x: 79, y: 12, k: 34, d: 12, z: 0.7, petit: true, o: 20 },
+  { f: "feuille", c: VERT, x: 96, y: 14, k: 36, d: 14, z: 0.75, o: 10 },
 ];
 
 const TRAIT = {
@@ -202,6 +239,62 @@ export function Dessin({ f }: { f: Forme }) {
           <circle cx="7.5" cy="7.5" r="3" {...TRAIT} />
           <circle cx="16.5" cy="16.5" r="3" {...TRAIT} />
           <path d="M19 5 L5 19" {...TRAIT} />
+        </svg>
+      );
+    case "berceau":
+      /* Un berceau vu de côté : la nacelle en arc, le pied qui berce. */
+      return (
+        <svg viewBox="0 0 24 24">
+          <path d="M4 11 C4 7 7.5 5 12 5 C16.5 5 20 7 20 11" {...TRAIT} />
+          <path d="M3 11 H21" {...TRAIT} />
+          <path d="M5 11 C5 16 8 19 12 19 C16 19 19 16 19 11" {...TRAIT} />
+          <path d="M8 19 L6.5 21.5 M16 19 L17.5 21.5" {...TRAIT} />
+        </svg>
+      );
+    case "sablier":
+      /* Le temps qui passe, sans plus : deux triangles, un col étroit. */
+      return (
+        <svg viewBox="0 0 24 24">
+          <path d="M6 4 H18 M6 20 H18" {...TRAIT} />
+          <path d="M6 4 C6 9 10.5 10.5 10.5 12 C10.5 13.5 6 15 6 20" {...TRAIT} />
+          <path d="M18 4 C18 9 13.5 10.5 13.5 12 C13.5 13.5 18 15 18 20" {...TRAIT} />
+        </svg>
+      );
+    case "feuille":
+      /* Une feuille et sa nervure centrale, rien de plus. */
+      return (
+        <svg viewBox="0 0 24 24">
+          <path d="M4.5 20 C3.5 11 9 4 20 4 C20 14.5 13.5 20.5 4.5 20 Z" {...TRAIT} />
+          <path d="M5 19.5 L18.5 5.5" {...TRAIT} />
+        </svg>
+      );
+    case "mains":
+      /* Trois cercles reliés, comme un cercle de personnes tenu par les mains. */
+      return (
+        <svg viewBox="0 0 24 24">
+          <circle cx="6" cy="15" r="3" {...TRAIT} />
+          <circle cx="12" cy="9.5" r="3.4" {...TRAIT} />
+          <circle cx="18" cy="15" r="3" {...TRAIT} />
+          <path d="M8.6 16.6 C10 18.5 14 18.5 15.4 16.6" {...TRAIT} />
+        </svg>
+      );
+    case "personnes":
+      /* Deux silhouettes, l'une devant l'autre. */
+      return (
+        <svg viewBox="0 0 24 24">
+          <circle cx="9" cy="7" r="3" {...TRAIT} />
+          <path d="M3.5 20.5 C3.5 14.5 6 12 9 12 C12 12 14.5 14.5 14.5 20.5" {...TRAIT} />
+          <circle cx="17.5" cy="9.5" r="2.4" {...TRAIT} />
+          <path d="M13.5 20.5 C13.7 16.3 15.5 14.3 17.5 14.3 C19.8 14.3 21.5 16.5 21.5 20.5" {...TRAIT} />
+        </svg>
+      );
+    case "globeTerre":
+      /* Le globe du monde, réduit à un cercle et ses méridiens. */
+      return (
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" {...TRAIT} />
+          <path d="M3 12 H21" {...TRAIT} />
+          <path d="M12 3 C8 3 6.5 7.5 6.5 12 C6.5 16.5 8 21 12 21 C16 21 17.5 16.5 17.5 12 C17.5 7.5 16 3 12 3 Z" {...TRAIT} />
         </svg>
       );
   }
@@ -388,12 +481,13 @@ function useLancer(champ: React.RefObject<HTMLDivElement | null>) {
   }, [champ]);
 }
 
-export function Jetons() {
+export function Jetons({ theme = "finance" }: { theme?: "finance" | "demographie" }) {
   const champ = useRef<HTMLDivElement>(null);
   useLancer(champ);
+  const tuiles = theme === "demographie" ? TUILES_DEMOGRAPHIE : TUILES;
   return (
     <div className="cg-tuiles" ref={champ} aria-hidden="true">
-      {TUILES.map((j, i) => (
+      {tuiles.map((j, i) => (
         <span
           key={`${j.f ?? j.t}-${i}`}
           className={`cg-tuile${j.petit ? " cg-tuile-p" : ""}${j.vif ? " cg-tuile-vif" : ""}`}

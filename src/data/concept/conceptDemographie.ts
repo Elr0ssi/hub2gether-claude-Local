@@ -73,35 +73,6 @@ export function socleDemo(): SocleDemo {
   return { annees: DEMOGRAPHY_YEARS.map((y) => y.year), pays, cols, lignes };
 }
 
-/* ── Le globe ────────────────────────────────────────────────────────────── */
-
-export interface FichePaysDemo {
-  fr: string;
-  population: number | null;
-  natalite: number | null;
-  mortalite: number | null;
-  /** Naissances moins décès, pour 1000 habitants — comparable quelle que
-      soit la taille du pays, contrairement à l'accroissement en personnes. */
-  croissance: number | null;
-}
-
-export function donneesPaysDemo(): { annee: number; pays: Record<string, FichePaysDemo> } {
-  const y = DEMOGRAPHY_YEARS[DEMOGRAPHY_YEARS.length - 1];
-  const pays: Record<string, FichePaysDemo> = {};
-  for (const [nom, d] of Object.entries(y.countries)) {
-    const natalite = d.birth_rate ?? null;
-    const mortalite = d.death_rate ?? null;
-    pays[nom] = {
-      fr: countryFr(nom),
-      population: d.population ?? null,
-      natalite,
-      mortalite,
-      croissance: natalite !== null && mortalite !== null ? natalite - mortalite : null,
-    };
-  }
-  return { annee: y.year, pays };
-}
-
 /* ── Le bandeau en temps réel ────────────────────────────────────────────── */
 
 export interface CompteurDemo {
