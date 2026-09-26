@@ -2,7 +2,7 @@
 
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import type { FicheArticle, FichePays } from "@/data/concept/conceptGeo";
+import { donneesPays, type FicheArticle, type FichePays } from "@/data/concept/conceptGeo";
 import { type FicheDebat, type LigneSource, type SocleEco } from "@/data/concept/conceptEconomie";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import { Dessin, Jetons } from "./Jetons";
@@ -10,7 +10,7 @@ import { monnaieCourante, useMonnaie } from "./Monnaie";
 import { convertir, fiche } from "@/data/finance/tauxChange";
 import { Loupe } from "./Loupe";
 import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
-import { gelerOdometres } from "./Roulement";
+import { gelerOdometres, Odometre } from "./Roulement";
 import { GlobeEco, familleDe, TOUTES } from "./GlobeEco";
 import { cle } from "@/data/concept/cle";
 import "./concept.css";
@@ -194,7 +194,106 @@ const MONETAIRE = new Set<EconomyMetricId>([
 ]);
 const SECONDES_PAR_AN = 365 * 24 * 3600;
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   DONNÉES EN TEMPS RÉEL, AVANT LE GLOBE
 
+   Le produit intérieur brut vient du socle, comme partout ailleurs sur le
+   site : somme des pays à leur dernier millésime publié, convertie au taux
+   de ce millésime, étalée sur l'année en cours depuis le 1er janvier.
+
+   Les trois dépenses sont d'une autre nature : des débits constants, fixés
+   depuis une date fixe — le 1er janvier 2025 — et non depuis le début de
+   l'année en cours. Les montants et les débits par seconde sont ceux
+   fournis, pas calculés ici ; il faudra leur trouver un nom de source avant
+   de les présenter ailleurs que sur ce prototype. */
+const AN_SECONDES = 365.2425 * 24 * 3600;
+const EPOQUE_DEPENSES = Date.UTC(2025, 0, 1);
+
+const DEPENSES_ECO: { id: string; label: string; parSeconde: number }[] = [
+  { id: "militaires", label: "Dépenses militaires", parSeconde: 55_160 },
+  { id: "medicales", label: "Dépenses médicales", parSeconde: 200_130 },
+  { id: "educatives", label: "Dépenses éducatives", parSeconde: 132_610 },
+];
+
+function TempsReelEco() {
+  const [monnaie] = useMonnaie();
+  const f = fiche(monnaie);
+
+  const departAnnee = useMemo(() => {
+    const t = new Date(new Date().getFullYear(), 0, 1).getTime();
+    return performance.now() - (Date.now() - t);
+  }, []);
+  const depart2025 = useMemo(() => performance.now() - (Date.now() - EPOQUE_DEPENSES), []);
+
+  const pib = useMemo(() => {
+    const { annee, pays } = donneesPays();
+    let total = 0;
+    let n = 0;
+    for (const p of Object.values(pays)) {
+      if (typeof p.pib === "number" && Number.isFinite(p.pib)) {
+        total += p.pib;
+        n++;
+      }
+    }
+    return { total, n, annee };
+  }, []);
+  const pibMonnaie = convertir(pib.total, pib.annee, monnaie);
+
+  return (
+    <section className="cg-section" id="temps-reel-eco">
+      <div className="cg-wrap">
+        <Enseigne droite={<span className="cg-demo-mini">Depuis le 1<sup>er</sup> janvier 2025</span>}>
+          <span className="cg-point-vif" aria-hidden="true" /> Données en temps réel
+        </Enseigne>
+
+        <div className="cg-cpt-l" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
+          <div className="cg-cpt">
+            <span className="cg-cpt-l2">PIB mondial</span>
+            {pibMonnaie === null ? (
+              <span className="cg-cpt-v">non convertible avant {f.depuis}</span>
+            ) : (
+              <Odometre
+                className="cg-cpt-v"
+                valeur={0}
+                parSeconde={pibMonnaie / AN_SECONDES}
+                depuis={departAnnee}
+                dec={3}
+                unite={` ${f.suffixe}`}
+              />
+            )}
+            <span className="cg-cpt-n">
+              Somme des {pib.n} pays du socle, {pib.annee}, au taux de {pib.annee}.
+            </span>
+          </div>
+
+          {DEPENSES_ECO.map((d) => (
+            <div className="cg-cpt" key={d.id}>
+              <span className="cg-cpt-l2">{d.label}</span>
+              <Odometre
+                className="cg-cpt-v"
+                valeur={0}
+                parSeconde={d.parSeconde}
+                depuis={depart2025}
+                dec={0}
+                unite={" $"}
+              />
+              <span className="cg-cpt-n">
+                Depuis le 1<sup>er</sup> janvier 2025.
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <p className="cg-cpt-p">
+          Ces compteurs ne relèvent rien à la seconde : le produit intérieur brut étale sur
+          l&apos;année une grandeur annuelle du socle, sourcée et datée. Les trois dépenses sont un
+          débit constant depuis une date fixe ; leur source reste à nommer avant de quitter ce
+          prototype.
+        </p>
+      </div>
+    </section>
+  );
+}
 
 /** Les indicateurs, sous le nom qu'on tape dans une adresse. */
 const PAR_NOM: Record<string, EconomyMetricId> = {
@@ -987,6 +1086,8 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
           <span className="cg-arc-point" />
         </div>
       </section>
+
+      <TempsReelEco />
 
       {/* Le témoin que l'arc regarde : dès qu'il entre dans l'écran, l'arc
           s'allume et s'ouvre. */}
