@@ -11,6 +11,7 @@ import { convertir, fiche } from "@/data/finance/tauxChange";
 import { Loupe } from "./Loupe";
 import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
 import { gelerOdometres, Odometre } from "./Roulement";
+import { Lettres, MOT_MONNAIE } from "./Lettres";
 import { GlobeEco, familleDe, TOUTES } from "./GlobeEco";
 import { cle } from "@/data/concept/cle";
 import "./concept.css";
@@ -202,12 +203,11 @@ const SECONDES_PAR_AN = 365 * 24 * 3600;
    de ce millésime, étalée sur l'année en cours depuis le 1er janvier.
 
    Les trois dépenses sont d'une autre nature : des débits constants, fixés
-   depuis une date fixe — le 1er janvier 2025 — et non depuis le début de
-   l'année en cours. Les montants et les débits par seconde sont ceux
-   fournis, pas calculés ici ; il faudra leur trouver un nom de source avant
-   de les présenter ailleurs que sur ce prototype. */
+   depuis une date fixe — le 1er janvier 2026. Les montants et les débits
+   par seconde sont ceux fournis, pas calculés ici ; il faudra leur trouver
+   un nom de source avant de les présenter ailleurs que sur ce prototype. */
 const AN_SECONDES = 365.2425 * 24 * 3600;
-const EPOQUE_DEPENSES = Date.UTC(2025, 0, 1);
+const EPOQUE_DEPENSES = Date.UTC(2026, 0, 1);
 
 const DEPENSES_ECO: { id: string; label: string; parSeconde: number }[] = [
   { id: "militaires", label: "Dépenses militaires", parSeconde: 55_160 },
@@ -223,7 +223,7 @@ function TempsReelEco() {
     const t = new Date(new Date().getFullYear(), 0, 1).getTime();
     return performance.now() - (Date.now() - t);
   }, []);
-  const depart2025 = useMemo(() => performance.now() - (Date.now() - EPOQUE_DEPENSES), []);
+  const departDepenses = useMemo(() => performance.now() - (Date.now() - EPOQUE_DEPENSES), []);
 
   const pib = useMemo(() => {
     const { annee, pays } = donneesPays();
@@ -242,7 +242,7 @@ function TempsReelEco() {
   return (
     <section className="cg-section" id="temps-reel-eco">
       <div className="cg-wrap">
-        <Enseigne droite={<span className="cg-demo-mini">Depuis le 1<sup>er</sup> janvier 2025</span>}>
+        <Enseigne droite={<span className="cg-demo-mini">Depuis le 1<sup>er</sup> janvier 2026</span>}>
           <span className="cg-point-vif" aria-hidden="true" /> Données en temps réel
         </Enseigne>
 
@@ -252,18 +252,26 @@ function TempsReelEco() {
             {pibMonnaie === null ? (
               <span className="cg-cpt-v">non convertible avant {f.depuis}</span>
             ) : (
-              <Odometre
-                className="cg-cpt-v"
-                valeur={0}
-                parSeconde={pibMonnaie / AN_SECONDES}
-                depuis={departAnnee}
-                dec={3}
-                unite={` ${f.suffixe}`}
-              />
+              <>
+                <Odometre
+                  className="cg-cpt-v"
+                  valeur={0}
+                  parSeconde={pibMonnaie / AN_SECONDES}
+                  depuis={departAnnee}
+                  dec={3}
+                  unite={` ${f.suffixe}`}
+                />
+                <Lettres
+                  className="cg-cpt-n"
+                  base={0}
+                  /* L'odomètre compte en « Md $ » ; le montant en lettres
+                     compte en dollars bruts, un milliard de fois plus. */
+                  parSeconde={(pibMonnaie / AN_SECONDES) * 1e9}
+                  depuis={departAnnee}
+                  mot={MOT_MONNAIE[monnaie] ?? "dollars"}
+                />
+              </>
             )}
-            <span className="cg-cpt-n">
-              Somme des {pib.n} pays du socle, {pib.annee}, au taux de {pib.annee}.
-            </span>
           </div>
 
           {DEPENSES_ECO.map((d) => (
@@ -273,27 +281,30 @@ function TempsReelEco() {
                 className="cg-cpt-v"
                 valeur={0}
                 parSeconde={d.parSeconde}
-                depuis={depart2025}
+                depuis={departDepenses}
                 dec={0}
-                unite={" $"}
+                unite={" $"}
               />
-              <span className="cg-cpt-n">
-                Depuis le 1<sup>er</sup> janvier 2025.
-              </span>
+              <Lettres className="cg-cpt-n" base={0} parSeconde={d.parSeconde} depuis={departDepenses} mot="dollars" />
             </div>
           ))}
         </div>
 
-        <p className="cg-cpt-p">
-          Ces compteurs ne relèvent rien à la seconde : le produit intérieur brut étale sur
-          l&apos;année une grandeur annuelle du socle, sourcée et datée. Les trois dépenses sont un
-          débit constant depuis une date fixe ; leur source reste à nommer avant de quitter ce
-          prototype.
+        {/* Repris par les moteurs de recherche, pas par l'œil : les mêmes
+            grandeurs, dites avec les mots qu'on tape dans une recherche
+            plutôt qu'avec ceux d'un compteur. */}
+        <p className="sr-only">
+          Produit intérieur brut mondial en temps réel, données récentes {pib.annee} : somme des{" "}
+          {pib.n} pays du socle, convertie au taux de {pib.annee}, Banque mondiale (WDI). Dépenses
+          militaires mondiales en temps réel, dépenses de santé et dépenses d&apos;éducation dans le
+          monde en temps réel : trois compteurs à débit constant depuis le 1<sup>er</sup> janvier
+          2026, pour suivre l&apos;évolution récente de chaque poste seconde après seconde.
         </p>
       </div>
     </section>
   );
 }
+
 
 /** Les indicateurs, sous le nom qu'on tape dans une adresse. */
 const PAR_NOM: Record<string, EconomyMetricId> = {

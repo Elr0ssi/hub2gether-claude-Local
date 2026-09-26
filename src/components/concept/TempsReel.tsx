@@ -29,7 +29,7 @@ import type { FichePays } from "@/data/concept/conceptGeo";
 const AN = 365.2425 * 24 * 3600;
 const COPIES = 2;
 
-const MOT_MONNAIE: Record<string, string> = { usd: "dollars", eur: "euros", cny: "renminbis" };
+import { Lettres, MOT_MONNAIE } from "./Lettres";
 
 interface Vignette {
   id: string;
@@ -41,6 +41,10 @@ interface Vignette {
   unite: string;
   /** Le mot au pluriel qui suit le montant écrit en toutes lettres. */
   mot: string;
+  /** Multiplie `base` et `parSeconde` avant de les écrire en toutes lettres :
+      le PIB s'affiche en milliards (l'odomètre), mais se dit en dollars
+      bruts. Absent, le montant en lettres suit l'unité de l'odomètre. */
+  echelleLettres?: number;
   exemple?: string;
 }
 
@@ -55,44 +59,6 @@ function somme(donnees: Record<string, FichePays>, champ: "pib" | "population") 
     }
   }
   return { total, pays };
-}
-
-/* Le montant en toutes lettres, à l'échelle qui lui va : au-delà du
-   milliard on ne lit plus neuf chiffres, on lit « 8,5 milliards ». L'échelle
-   se choisit seule, sur la valeur du moment — ce texte n'est donc pas figé,
-   il change avec le compteur, mais à son rythme à lui : la puce ne se
-   redessine qu'une fois par seconde, pas à chaque image. */
-const ECHELLES: [number, string][] = [
-  [1e9, "milliards"],
-  [1e6, "millions"],
-  [1e3, "mille"],
-];
-function enLettres(valeur: number, mot: string): string {
-  const dit = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1, minimumFractionDigits: 0 });
-  for (const [seuil, echelle] of ECHELLES) {
-    if (Math.abs(valeur) >= seuil) return `${dit.format(valeur / seuil)} ${echelle} ${mot}`;
-  }
-  return `${dit.format(valeur)} ${mot}`;
-}
-
-/* Le texte en lettres suit le compteur sans repasser par React à chaque
-   image : une seconde puce, à son propre rythme, plutôt qu'un second état
-   React qui redessinerait la page soixante fois par seconde pour rien. */
-function Lettres({ base, parSeconde, depuis, mot }: { base: number; parSeconde: number; depuis: number; mot: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    let brut = 0;
-    const tic = () => {
-      const v = base + parSeconde * ((performance.now() - depuis) / 1000);
-      el.textContent = enLettres(v, mot);
-      brut = window.setTimeout(tic, 1000);
-    };
-    tic();
-    return () => window.clearTimeout(brut);
-  }, [base, parSeconde, depuis, mot]);
-  return <span className="cg-tr-lettres" ref={ref} />;
 }
 
 export function TempsReel({
@@ -129,6 +95,9 @@ export function TempsReel({
         dec: 3,
         unite: ` ${f.suffixe}`,
         mot: MOT_MONNAIE[monnaie] ?? "dollars",
+        /* L'odomètre compte en « Md $ » ; le montant en lettres doit
+           compter en dollars, mille fois... un milliard de fois plus. */
+        echelleLettres: 1e9,
       });
     }
     l.push({
@@ -224,7 +193,12 @@ export function TempsReel({
                   dec={v.dec}
                   unite={v.unite}
                 />
-                <Lettres base={v.base} parSeconde={v.parSeconde} depuis={depart} mot={v.mot} />
+                <Lettres
+                  base={v.base * (v.echelleLettres ?? 1)}
+                  parSeconde={v.parSeconde * (v.echelleLettres ?? 1)}
+                  depuis={depart}
+                  mot={v.mot}
+                />
               </div>
             )),
           )}
