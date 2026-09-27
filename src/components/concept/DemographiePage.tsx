@@ -42,8 +42,6 @@ export interface DemoProps {
 
 type Rang = { nom: string; fr: string } & Record<DemographyMetricId, number | null>;
 
-const AN_SECONDES = 365.2425 * 24 * 3600;
-
 function val(v: number | null, unite: MetriqueDemo["unite"]): string {
   if (v === null) return "n.d.";
   if (unite === "pour1000") return `${v.toFixed(1).replace(".", ",")} ‰`;
@@ -517,22 +515,12 @@ export function DemographiePage({ socle, compteur }: DemoProps) {
      autres familles n'auraient plus rien de lisible. */
   const colonnesActives = useMemo(() => familleDe(metrique).membres, [metrique]);
 
-  /* Un effectif annuel, sur le dernier pas publié, accepte un compteur en
-     direct — pas un taux. Le globe garde les teintes de l'année publiée ;
-     seul le compteur avance, à partir de cette valeur ramenée à la seconde
-     depuis le premier janvier. */
+  /* Sur le dernier pas publié, tout effectif annuel (naissances, décès,
+     chaque cause) accepte un compteur en direct — jamais un taux ni la
+     population. Le globe le décide lui-même, tuile par tuile ; la page n'a
+     qu'à dire si on est sur ce pas. */
   const derniereAnnee = socle.annees[socle.annees.length - 1];
-  const enCours = annee === derniereAnnee && compteurPossibleDemo(metrique);
-  const compteurGlobe = useMemo(() => {
-    if (!enCours || !choisi) return undefined;
-    const base = rangs.find((r) => r.nom === choisi)?.[metrique] ?? null;
-    return {
-      base,
-      baseAnnee: derniereAnnee,
-      parSeconde: (base ?? 0) / AN_SECONDES,
-      depuisMs: Date.UTC(derniereAnnee, 0, 1),
-    };
-  }, [enCours, choisi, rangs, metrique, derniereAnnee]);
+  const enDirect = annee === derniereAnnee;
 
   /* L'année remise au format complet, pour le globe : le socle compact ne
      transporte que ce qu'une date publie, le globe veut un objet par pays. */
@@ -616,7 +604,7 @@ export function DemographiePage({ socle, compteur }: DemoProps) {
             onChoisi={setChoisi}
             nomFr={(n) => socle.pays.find((p) => p.nom === n)?.fr ?? n}
             serie={serie}
-            compteur={compteurGlobe}
+            enDirect={enDirect}
             sousLeGlobe={
               <FriseDemo
                 annees={socle.annees}

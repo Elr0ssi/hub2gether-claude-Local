@@ -6,8 +6,10 @@ import { useTheme } from "./Theme";
 import type { CountryDemographyData, DemographyMetricId, DemographyYear } from "@/data/demographie/demographie";
 import { SOURCES_SOCLE_DEMO } from "@/data/demographie/demographie";
 import type { PaletteGlobe } from "@/components/map/DemographyGlobe";
-import { getValueIntensityDemo } from "@/lib/demographyColors";
+import { getMaxMetricValueDemo, getValueIntensityDemo } from "@/lib/demographyColors";
 import { Odometre } from "./Roulement";
+
+const AN_SECONDES = 365.2425 * 24 * 3600;
 
 /** Le temps écoulé depuis une date, ramené sur l'horloge des animations. */
 function origine(depuisMs: number) {
@@ -47,35 +49,44 @@ const BLEUS_JOUR = [
 ];
 const SANS_JOUR = "#d9d6cf";
 
-const PALETTE: PaletteGlobe = {
-  oceanProfond: "#050b16",
-  oceanMoyen: "#081426",
-  oceanPlateau: "#0b1c33",
-  terreSansDonnee: SANS,
-  frontiere: "rgba(150,190,240,0.34)",
-  graticule: "rgba(140,185,245,0.09)",
-  accent: "#9EC7D8",
-  remplissage: (nom, countries, max, metric) => {
-    const t = getValueIntensityDemo(nom, countries, max, metric);
-    if (t === null) return SANS;
-    return BLEUS[Math.round(Math.max(0, Math.min(1, t)) * (BLEUS.length - 1))];
-  },
-};
-
-const PALETTE_JOUR: PaletteGlobe = {
-  oceanProfond: "#cfdced",
-  oceanMoyen: "#dce7f3",
-  oceanPlateau: "#e6eef7",
-  terreSansDonnee: SANS_JOUR,
-  frontiere: "rgba(30,60,100,0.3)",
-  graticule: "rgba(40,80,130,0.1)",
-  accent: "#2f6f8a",
-  remplissage: (nom, countries, max, metric) => {
-    const t = getValueIntensityDemo(nom, countries, max, metric);
-    if (t === null) return SANS_JOUR;
-    return BLEUS_JOUR[Math.round(Math.max(0, Math.min(1, t)) * (BLEUS_JOUR.length - 1))];
-  },
-};
+/* Le plafond de l'échelle vient du repère « pour 100 000 habitants » quand
+   il est actif, jamais du paramètre `max` que le globe passe lui-même — ce
+   dernier ignore ce repère puisqu'il ne connaît que la grandeur brute. */
+function palette(sombre: boolean, pour100k: boolean): PaletteGlobe {
+  const sans = sombre ? SANS : SANS_JOUR;
+  const rampe = sombre ? BLEUS : BLEUS_JOUR;
+  return sombre
+    ? {
+        oceanProfond: "#050b16",
+        oceanMoyen: "#081426",
+        oceanPlateau: "#0b1c33",
+        terreSansDonnee: sans,
+        frontiere: "rgba(150,190,240,0.34)",
+        graticule: "rgba(140,185,245,0.09)",
+        accent: "#9EC7D8",
+        remplissage: (nom, countries, _max, metric) => {
+          const max = getMaxMetricValueDemo(countries, metric, pour100k);
+          const t = getValueIntensityDemo(nom, countries, max, metric, pour100k);
+          if (t === null) return sans;
+          return rampe[Math.round(Math.max(0, Math.min(1, t)) * (rampe.length - 1))];
+        },
+      }
+    : {
+        oceanProfond: "#cfdced",
+        oceanMoyen: "#dce7f3",
+        oceanPlateau: "#e6eef7",
+        terreSansDonnee: sans,
+        frontiere: "rgba(30,60,100,0.3)",
+        graticule: "rgba(40,80,130,0.1)",
+        accent: "#2f6f8a",
+        remplissage: (nom, countries, _max, metric) => {
+          const max = getMaxMetricValueDemo(countries, metric, pour100k);
+          const t = getValueIntensityDemo(nom, countries, max, metric, pour100k);
+          if (t === null) return sans;
+          return rampe[Math.round(Math.max(0, Math.min(1, t)) * (rampe.length - 1))];
+        },
+      };
+}
 
 export interface MetriqueDemo {
   id: DemographyMetricId;
@@ -111,7 +122,6 @@ export const FAMILLES: FamilleDemo[] = [
     id: "mortalite",
     label: "Mortalité",
     membres: [
-      { id: "death_rate", label: "Mortalité", unite: "pour1000" },
       { id: "deaths_annual", label: "Décès", unite: "hab" },
       { id: "cancer_annual", label: "Cancer", unite: "hab" },
       { id: "suicide_annual", label: "Suicides", unite: "hab" },
@@ -119,7 +129,6 @@ export const FAMILLES: FamilleDemo[] = [
       { id: "road_annual", label: "Accidents de la route", unite: "hab" },
       { id: "diabetes_annual", label: "Diabète", unite: "hab" },
       { id: "maternal_annual", label: "Mortalité maternelle", unite: "hab" },
-      { id: "conflict_annual", label: "Conflits", unite: "hab" },
     ],
   },
 ];
@@ -139,7 +148,6 @@ const COMPTEUR_POSSIBLE = new Set<DemographyMetricId>([
   "road_annual",
   "diabetes_annual",
   "maternal_annual",
-  "conflict_annual",
 ]);
 export function compteurPossibleDemo(id: DemographyMetricId): boolean {
   return COMPTEUR_POSSIBLE.has(id);
@@ -181,17 +189,13 @@ interface Props {
   serie: { annee: number; v: number | null }[];
   sousLeGlobe?: React.ReactNode;
   /**
-   * Le compteur de l'année en cours, quand la métrique s'y prête (un
-   * effectif annuel, pas un taux). Ce n'est pas une mesure en direct :
-   * c'est la dernière valeur annuelle publiée, ramenée à la seconde et
-   * cumulée depuis le premier janvier.
+   * Vrai quand l'année affichée est la dernière du socle : les effectifs
+   * annuels (naissances, décès, chaque cause) y acceptent alors un compteur
+   * en direct, sur toutes leurs tuiles — pas seulement celle du moment —
+   * plutôt qu'une mesure figée. Ce n'est jamais le cas pour un taux ou pour
+   * la population, qui restent des valeurs posées.
    */
-  compteur?: {
-    base: number | null;
-    baseAnnee: number;
-    parSeconde: number;
-    depuisMs: number;
-  };
+  enDirect: boolean;
 }
 
 export function GlobeDemographie({
@@ -203,24 +207,42 @@ export function GlobeDemographie({
   nomFr,
   serie,
   sousLeGlobe,
-  compteur,
+  enDirect,
 }: Props) {
   const fiche: CountryDemographyData | undefined = choisi ? annee.countries[choisi] : undefined;
   const famille = familleDe(metrique.id);
+  /* Le repère « pour 100 000 habitants » : seule la famille Mortalité le
+     propose, un effectif s'y compare mal d'un pays à l'autre sans lui. */
+  const [pour100k, setPour100k] = useState(false);
+  useEffect(() => {
+    if (famille.id !== "mortalite") setPour100k(false);
+  }, [famille.id]);
+
+  /** La valeur d'une grandeur, ramenée pour 100 000 habitants si demandé. */
+  const versUnite = useCallback(
+    (v: number | null | undefined, population = fiche?.population): number | null => {
+      if (v === null || v === undefined || !Number.isFinite(v)) return null;
+      if (!pour100k) return v;
+      if (!population) return null;
+      return (v / population) * 100000;
+    },
+    [pour100k, fiche],
+  );
 
   const rang = useMemo(() => {
-    const v = fiche?.[metrique.id];
-    if (v === undefined || !Number.isFinite(v)) return null;
+    const val = (d: CountryDemographyData) => versUnite(d[metrique.id] ?? null, d.population);
+    const v = fiche ? val(fiche) : null;
+    if (v === null) return null;
     let mieux = 0;
     let total = 0;
     for (const d of Object.values(annee.countries)) {
-      const w = d[metrique.id];
-      if (w === undefined || !Number.isFinite(w)) continue;
+      const w = val(d);
+      if (w === null) continue;
       total += 1;
       if (w > v) mieux += 1;
     }
     return { rang: mieux + 1, total };
-  }, [fiche, annee, metrique]);
+  }, [fiche, annee, metrique, versUnite]);
 
   const courbe = useMemo(() => {
     const pts = serie.filter((p) => p.v !== null) as { annee: number; v: number }[];
@@ -302,7 +324,37 @@ export function GlobeDemographie({
     };
   }, [courbe, bornes]);
 
-  const vedette = pieceDemo(fiche?.[metrique.id], metrique.unite);
+  /** Comme pieceDemo, mais ramenée pour 100 000 habitants quand ce repère
+      est actif — les taux (pour1000) n'ont pas ce repère, il ne vaut que
+      pour les effectifs annuels de la famille Mortalité. */
+  const piece = useCallback(
+    (brut: number | null | undefined, unite: MetriqueDemo["unite"]) => {
+      if (!pour100k || unite !== "hab") return pieceDemo(brut, unite);
+      const v = versUnite(brut);
+      if (v === null) return { v: null, dec: 0, unite: "" };
+      return { v, dec: v < 10 ? 2 : 1, unite: "" };
+    },
+    [pour100k, versUnite],
+  );
+
+  /* Un effectif annuel, sur le dernier pas, tourne en direct depuis le
+     premier janvier — vedette et voisines pareillement, plutôt que la
+     seule tuile du moment. */
+  const infosTuile = useCallback(
+    (m: MetriqueDemo, brut: number | undefined) => {
+      const eligible = enDirect && compteurPossibleDemo(m.id) && brut !== undefined;
+      if (eligible && (!pour100k || fiche?.population)) {
+        const parSeconde =
+          pour100k && fiche?.population ? ((brut as number) / AN_SECONDES) * (100000 / fiche.population) : (brut as number) / AN_SECONDES;
+        return { live: true as const, parSeconde, dec: pour100k ? 2 : 0 };
+      }
+      return { live: false as const, piece: piece(brut, m.unite) };
+    },
+    [enDirect, pour100k, fiche, piece],
+  );
+
+  const infoVedette = infosTuile(metrique, fiche?.[metrique.id]);
+  const depuisAnnee = origine(Date.UTC(annee.year, 0, 1));
 
   return (
     <div className="ge">
@@ -334,8 +386,8 @@ export function GlobeDemographie({
               metric={metrique.id}
               selectedCountry={choisi}
               onCountryClick={(n) => onChoisi(n)}
-              key={theme}
-              palette={jour ? PALETTE_JOUR : PALETTE}
+              key={`${theme}-${pour100k}`}
+              palette={palette(!jour, pour100k)}
               marge={1.06}
               onCadrage={mesureLimbe}
               /* Pas de plafond de texels : un plafond bas ne montrait plus
@@ -351,7 +403,8 @@ export function GlobeDemographie({
                 style={{ background: `linear-gradient(90deg, ${(jour ? BLEUS_JOUR : BLEUS).join(", ")})` }}
               />
               <span className="ge-echelle-l">
-                {metrique.label} · faible à élevé
+                {metrique.label}
+                {pour100k ? " /100k" : ""} · faible à élevé
                 <i className="ge-echelle-sans" /> sans donnée
               </span>
             </div>
@@ -363,33 +416,57 @@ export function GlobeDemographie({
           <div className="ge-fiche">
             {fiche && choisi ? (
               <>
-                <h3 className="ge-nom">{nomFr(choisi)}</h3>
+                <div className="ge-tete-fiche">
+                  <h3 className="ge-nom">{nomFr(choisi)}</h3>
+                  {famille.id === "mortalite" && (
+                    <div className="ge-unites" role="tablist" aria-label="Unité affichée">
+                      <button
+                        type="button"
+                        role="tab"
+                        aria-selected={!pour100k}
+                        className={`ge-unite${!pour100k ? " ge-unite-on" : ""}`}
+                        onClick={() => setPour100k(false)}
+                      >
+                        Montant
+                      </button>
+                      <button
+                        type="button"
+                        role="tab"
+                        aria-selected={pour100k}
+                        className={`ge-unite${pour100k ? " ge-unite-on" : ""}`}
+                        onClick={() => setPour100k(true)}
+                      >
+                        /100 000 hab.
+                      </button>
+                    </div>
+                  )}
+                </div>
 
                 <div className="ge-vedette">
                   <span className="ge-vedette-l">
-                    {compteur ? `${metrique.label} depuis le 1er janvier` : metrique.label}
+                    {infoVedette.live ? `${metrique.label} depuis le 1er janvier` : metrique.label}
                   </span>
-                  {compteur && compteur.base !== null ? (
+                  {infoVedette.live ? (
                     <>
                       <Odometre
                         className="ge-vedette-v"
                         valeur={0}
-                        parSeconde={compteur.parSeconde}
-                        depuis={origine(compteur.depuisMs)}
-                        dec={0}
+                        parSeconde={infoVedette.parSeconde}
+                        depuis={depuisAnnee}
+                        dec={infoVedette.dec}
                         unite=""
                       />
                       <span className="ge-vedette-r">
-                        sur {nb(compteur.base, 0)} en {compteur.baseAnnee}
+                        sur {nb(versUnite(fiche[metrique.id]) ?? 0, infoVedette.dec)} en {annee.year}
                       </span>
                     </>
                   ) : (
                     <>
                       <Odometre
                         className="ge-vedette-v"
-                        valeur={vedette.v}
-                        dec={vedette.dec}
-                        unite={vedette.unite}
+                        valeur={infoVedette.piece.v}
+                        dec={infoVedette.piece.dec}
+                        unite={infoVedette.piece.unite}
                         duree={950}
                         tours={1}
                       />
@@ -407,11 +484,29 @@ export function GlobeDemographie({
                   {famille.membres
                     .filter((m) => m.id !== metrique.id)
                     .map((m) => {
-                      const p = pieceDemo(fiche[m.id], m.unite);
+                      const info = infosTuile(m, fiche[m.id]);
                       return (
                         <button key={m.id} type="button" className="ge-autre" onClick={() => onMetrique(m.id)}>
                           <span className="ge-autre-l">{m.label}</span>
-                          <Odometre className="ge-autre-v" valeur={p.v} dec={p.dec} unite={p.unite} duree={950} tours={1} />
+                          {info.live ? (
+                            <Odometre
+                              className="ge-autre-v"
+                              valeur={0}
+                              parSeconde={info.parSeconde}
+                              depuis={depuisAnnee}
+                              dec={info.dec}
+                              unite=""
+                            />
+                          ) : (
+                            <Odometre
+                              className="ge-autre-v"
+                              valeur={info.piece.v}
+                              dec={info.piece.dec}
+                              unite={info.piece.unite}
+                              duree={950}
+                              tours={1}
+                            />
+                          )}
                         </button>
                       );
                     })}

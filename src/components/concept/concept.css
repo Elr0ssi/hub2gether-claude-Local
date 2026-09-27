@@ -2055,7 +2055,32 @@ body:has(.cg) { background: #05080c; }
   scrollbar-width: thin;
 }
 .ge-sur { font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--encre-3); }
+.ge-tete-fiche { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 .ge-nom { margin: 0; font-size: clamp(20px, 2.1vw, 25px); font-weight: 400; line-height: 1.1; color: var(--encre); }
+
+/* Le repère « montant / pour 100 000 habitants », en haut à droite de la
+   fiche : deux pastilles, comme les onglets de famille mais plus petites —
+   ce n'est pas une nouvelle grandeur, seulement une autre façon de lire
+   celle déjà affichée. */
+.ge-unites { display: flex; gap: 4px; flex-shrink: 0; }
+.ge-unite {
+  padding: 5px 9px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--voile) 3%, transparent);
+  font: inherit;
+  font-size: 10px;
+  white-space: nowrap;
+  color: var(--encre-2);
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s, background 0.3s;
+}
+.ge-unite:hover { color: var(--encre); border-color: var(--bord); }
+.ge-unite-on {
+  color: var(--encre);
+  border-color: rgba(158, 199, 216, 0.55);
+  background: rgba(158, 199, 216, 0.14);
+}
 
 .ge-vedette {
   display: flex;
