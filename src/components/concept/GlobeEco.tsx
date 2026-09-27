@@ -410,12 +410,13 @@ export function GlobeEco({
                  laissait près d'un cinquième de vide autour d'elle. */
               marge={1.06}
               onCadrage={mesureLimbe}
-              /* Ce globe tient dans une colonne de six cents pixels. Les
-                 toiles de huit mille texels du fond de carte du site n'y
-                 montrent rien de plus : quatre toiles de cette taille pèsent
-                 cinq cents méga-octets et leur peinture tient la main du
-                 navigateur plusieurs secondes à l'ouverture. */
-              texelsMax={4096}
+              /* Un plafond à quatre mille texels ne montrait rien de plus
+                 qu'un aplat flou une fois zoomé : le zoom concentre une
+                 tranche étroite de la toile sur toute la scène, et c'est
+                 justement là qu'il faut des texels à revendre. On laisse
+                 la machine décider comme sur le reste du site — un
+                 appareil capable peint la toile pleine, les autres restent
+                 sur la plus légère. */
             />
             {/* L'éclat qui sort de la sphère : un anneau de lumière posé sur
                 son bord, en fusion d'écran, qui respire. Il ne tourne pas avec

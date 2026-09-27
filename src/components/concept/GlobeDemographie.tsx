@@ -282,7 +282,10 @@ export function GlobeDemographie({
               palette={jour ? PALETTE_JOUR : PALETTE}
               marge={1.06}
               onCadrage={mesureLimbe}
-              texelsMax={4096}
+              /* Pas de plafond de texels : un plafond bas ne montrait plus
+                 rien qu'un aplat flou une fois zoomé, le zoom concentrant
+                 une tranche étroite de la toile sur toute la scène. La
+                 machine décide comme sur le reste du site. */
             />
             <span className="ge-eclat" aria-hidden="true" />
             <span className="ge-eclat ge-eclat-2" aria-hidden="true" />

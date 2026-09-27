@@ -1218,9 +1218,14 @@ export function DemographyGlobe({
       const dy = e.clientY - prevY;
       prevX = e.clientX;
       prevY = e.clientY;
-      globe.rotation.y += dx * 0.0062;
-      globe.rotation.x = Math.max(-0.85, Math.min(0.85, globe.rotation.x + dy * 0.0034));
-      spin = dx * 0.0062;
+      // The 0.0062 / 0.0034 rates are tuned at BASE_FOV, at rest. Zoomed in,
+      // the field narrows and the same pixel span covers a smaller angle on
+      // the sphere — without this scale the globe kept spinning at the
+      // resting rate and ran away from the cursor under any zoom.
+      const echelle = Math.tan((camera.fov * Math.PI) / 360) / Math.tan((BASE_FOV * Math.PI) / 360);
+      globe.rotation.y += dx * 0.0062 * echelle;
+      globe.rotation.x = Math.max(-0.85, Math.min(0.85, globe.rotation.x + dy * 0.0034 * echelle));
+      spin = dx * 0.0062 * echelle;
     };
 
     const hitTest = (clientX: number, clientY: number): string | null => {
