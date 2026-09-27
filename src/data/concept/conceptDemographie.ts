@@ -1,4 +1,4 @@
-import { DEMOGRAPHY_YEARS, SOURCES_SOCLE_DEMO } from "@/data/demographie/demographie";
+import { CAUSES_MORTALITE, DEMOGRAPHY_YEARS, SOURCES_SOCLE_DEMO } from "@/data/demographie/demographie";
 import { countryFr } from "@/data/countryNamesFr";
 
 /**
@@ -18,7 +18,7 @@ export interface SocleDemo {
   lignes: Record<number, Ligne[]>;
 }
 
-/* Cinq grandeurs comparables d'un pays à l'autre — le nombre de naissances
+/* Les grandeurs comparables d'un pays à l'autre — le nombre de naissances
    et de décès par seconde ne le sont pas, ce sont les compteurs en direct
    qui s'en servent, pas le classement. */
 const CHAMPS: [string, number][] = [
@@ -27,6 +27,9 @@ const CHAMPS: [string, number][] = [
   ["death_rate", 2],
   ["natural_change", 0],
   ["net_migration", 0],
+  ["births_annual", 0],
+  ["deaths_annual", 0],
+  ...CAUSES_MORTALITE.map((c): [string, number] => [`${c}_annual`, 0]),
 ];
 
 export function socleDemo(): SocleDemo {

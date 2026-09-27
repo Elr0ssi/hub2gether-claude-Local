@@ -4,9 +4,20 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "./Theme";
 import type { CountryDemographyData, DemographyMetricId, DemographyYear } from "@/data/demographie/demographie";
+import { SOURCES_SOCLE_DEMO } from "@/data/demographie/demographie";
 import type { PaletteGlobe } from "@/components/map/DemographyGlobe";
 import { getValueIntensityDemo } from "@/lib/demographyColors";
 import { Odometre } from "./Roulement";
+
+/** Le temps écoulé depuis une date, ramené sur l'horloge des animations. */
+function origine(depuisMs: number) {
+  return performance.now() - (Date.now() - depuisMs);
+}
+
+/** Un nombre, en français, sans décimale superflue. */
+function nb(v: number, d = 0) {
+  return v.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d });
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE GLOBE DÉMOGRAPHIE DU PROTOTYPE
@@ -91,16 +102,48 @@ export const FAMILLES: FamilleDemo[] = [
   {
     id: "natalite",
     label: "Natalité",
-    membres: [{ id: "birth_rate", label: "Natalité", unite: "pour1000" }],
+    membres: [
+      { id: "birth_rate", label: "Natalité", unite: "pour1000" },
+      { id: "births_annual", label: "Naissances", unite: "hab" },
+    ],
   },
   {
     id: "mortalite",
     label: "Mortalité",
-    membres: [{ id: "death_rate", label: "Mortalité", unite: "pour1000" }],
+    membres: [
+      { id: "death_rate", label: "Mortalité", unite: "pour1000" },
+      { id: "deaths_annual", label: "Décès", unite: "hab" },
+      { id: "cancer_annual", label: "Cancer", unite: "hab" },
+      { id: "suicide_annual", label: "Suicides", unite: "hab" },
+      { id: "homicide_annual", label: "Homicides", unite: "hab" },
+      { id: "road_annual", label: "Accidents de la route", unite: "hab" },
+      { id: "diabetes_annual", label: "Diabète", unite: "hab" },
+      { id: "maternal_annual", label: "Mortalité maternelle", unite: "hab" },
+      { id: "conflict_annual", label: "Conflits", unite: "hab" },
+    ],
   },
 ];
 
 export const TOUTES = FAMILLES.flatMap((f) => f.membres);
+
+/* Les grandeurs qui sont un effectif annuel — pas un taux — acceptent un
+   compteur en direct sur le dernier pas : ce qu'annonce l'année en cours
+   n'est pas mesuré à la seconde, c'est cette valeur annuelle étalée depuis
+   le premier janvier. Exactement la règle du PIB sur la page Économie. */
+const COMPTEUR_POSSIBLE = new Set<DemographyMetricId>([
+  "births_annual",
+  "deaths_annual",
+  "cancer_annual",
+  "suicide_annual",
+  "homicide_annual",
+  "road_annual",
+  "diabetes_annual",
+  "maternal_annual",
+  "conflict_annual",
+]);
+export function compteurPossibleDemo(id: DemographyMetricId): boolean {
+  return COMPTEUR_POSSIBLE.has(id);
+}
 
 export function familleDe(id: DemographyMetricId): FamilleDemo {
   return FAMILLES.find((f) => f.membres.some((m) => m.id === id)) ?? FAMILLES[0];
@@ -137,6 +180,18 @@ interface Props {
   nomFr: (nom: string) => string;
   serie: { annee: number; v: number | null }[];
   sousLeGlobe?: React.ReactNode;
+  /**
+   * Le compteur de l'année en cours, quand la métrique s'y prête (un
+   * effectif annuel, pas un taux). Ce n'est pas une mesure en direct :
+   * c'est la dernière valeur annuelle publiée, ramenée à la seconde et
+   * cumulée depuis le premier janvier.
+   */
+  compteur?: {
+    base: number | null;
+    baseAnnee: number;
+    parSeconde: number;
+    depuisMs: number;
+  };
 }
 
 export function GlobeDemographie({
@@ -148,6 +203,7 @@ export function GlobeDemographie({
   nomFr,
   serie,
   sousLeGlobe,
+  compteur,
 }: Props) {
   const fiche: CountryDemographyData | undefined = choisi ? annee.countries[choisi] : undefined;
   const famille = familleDe(metrique.id);
@@ -310,20 +366,40 @@ export function GlobeDemographie({
                 <h3 className="ge-nom">{nomFr(choisi)}</h3>
 
                 <div className="ge-vedette">
-                  <span className="ge-vedette-l">{metrique.label}</span>
-                  <Odometre
-                    className="ge-vedette-v"
-                    valeur={vedette.v}
-                    dec={vedette.dec}
-                    unite={vedette.unite}
-                    duree={950}
-                    tours={1}
-                  />
-                  {rang && (
-                    <span className="ge-vedette-r">
-                      {rang.rang}
-                      <sup>e</sup> sur {rang.total}
-                    </span>
+                  <span className="ge-vedette-l">
+                    {compteur ? `${metrique.label} depuis le 1er janvier` : metrique.label}
+                  </span>
+                  {compteur && compteur.base !== null ? (
+                    <>
+                      <Odometre
+                        className="ge-vedette-v"
+                        valeur={0}
+                        parSeconde={compteur.parSeconde}
+                        depuis={origine(compteur.depuisMs)}
+                        dec={0}
+                        unite=""
+                      />
+                      <span className="ge-vedette-r">
+                        sur {nb(compteur.base, 0)} en {compteur.baseAnnee}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Odometre
+                        className="ge-vedette-v"
+                        valeur={vedette.v}
+                        dec={vedette.dec}
+                        unite={vedette.unite}
+                        duree={950}
+                        tours={1}
+                      />
+                      {rang && (
+                        <span className="ge-vedette-r">
+                          {rang.rang}
+                          <sup>e</sup> sur {rang.total}
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -433,7 +509,10 @@ export function GlobeDemographie({
                   )}
                 </div>
 
-                <p className="ge-source">Nations Unies, World Population Prospects 2024 · {annee.year}</p>
+                <p className="ge-source">
+                  {SOURCES_SOCLE_DEMO[metrique.id]?.source ?? "Nations Unies, World Population Prospects 2024"} ·{" "}
+                  {annee.year}
+                </p>
               </>
             ) : (
               <p className="ge-vide">Cliquez un pays sur le globe pour ouvrir sa fiche.</p>

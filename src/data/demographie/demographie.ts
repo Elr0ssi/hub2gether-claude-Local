@@ -9,6 +9,14 @@ import SOCLE from "./genere/socle-demographie.json";
  * ne publie pas pour un pays reste absente — elle ne devient jamais zéro.
  */
 
+/** Les sept causes de décès que la base détaille, chacune en effectif
+    annuel. Trois territoires sur les 219 n'en ont aucune (source ONU sans
+    décomposition par cause) : leurs champs restent absents, pas à zéro. */
+export const CAUSES_MORTALITE = [
+  "suicide", "homicide", "conflict", "diabetes", "cancer", "maternal", "road",
+] as const;
+export type CauseMortalite = (typeof CAUSES_MORTALITE)[number];
+
 export interface CountryDemographyData {
   /** Population au milieu de l'année. */
   population?: number;
@@ -22,12 +30,33 @@ export interface CountryDemographyData {
   deaths_per_second?: number;
   /** Solde migratoire net annuel, en personnes. */
   net_migration?: number;
+  /** Naissances et décès de l'année, en effectif — pas un taux. */
+  births_annual?: number;
+  deaths_annual?: number;
+  /** Décès annuels par cause : 1990-2019 mesurés (IHME GBD 2019), 2020-2026
+      modélisés à parts de causes constantes (moyenne 2017-2019) appliquées
+      aux décès totaux publiés par l'ONU pour l'année. */
+  suicide_annual?: number;
+  homicide_annual?: number;
+  conflict_annual?: number;
+  diabetes_annual?: number;
+  cancer_annual?: number;
+  maternal_annual?: number;
+  road_annual?: number;
 }
 
-/** Les cinq grandeurs comparables d'un pays à l'autre — celles que le globe
-    peut colorer et que le classement peut trier. Les deux compteurs par
-    seconde n'en font pas partie : ils n'ont de sens qu'agrégés sur le monde. */
-export type DemographyMetricId = "population" | "birth_rate" | "death_rate" | "natural_change" | "net_migration";
+/** Les grandeurs comparables d'un pays à l'autre — celles que le globe peut
+    colorer et que le classement peut trier. Les deux compteurs par seconde
+    n'en font pas partie : ils n'ont de sens qu'agrégés sur le monde. */
+export type DemographyMetricId =
+  | "population"
+  | "birth_rate"
+  | "death_rate"
+  | "natural_change"
+  | "net_migration"
+  | "births_annual"
+  | "deaths_annual"
+  | `${CauseMortalite}_annual`;
 
 export interface DemographyYear {
   year: number;

@@ -8,7 +8,7 @@ import { Enseigne, EnTete, Pied } from "./pieces";
 import { Loupe } from "./Loupe";
 import { Odometre, gelerOdometres } from "./Roulement";
 import { Lettres } from "./Lettres";
-import { GlobeDemographie, TOUTES } from "./GlobeDemographie";
+import { compteurPossibleDemo, familleDe, GlobeDemographie, TOUTES, type MetriqueDemo } from "./GlobeDemographie";
 import { Titre, useProgression, useVu } from "./EconomiePage";
 import { cle } from "@/data/concept/cle";
 import "./concept.css";
@@ -41,17 +41,10 @@ export interface DemoProps {
 }
 
 type Rang = { nom: string; fr: string } & Record<DemographyMetricId, number | null>;
-type Unite = "hab" | "pour1000";
 
-const COLONNES: { id: DemographyMetricId; label: string; unite: Unite }[] = [
-  { id: "population", label: "Population", unite: "hab" },
-  { id: "birth_rate", label: "Natalité", unite: "pour1000" },
-  { id: "death_rate", label: "Mortalité", unite: "pour1000" },
-  { id: "natural_change", label: "Accroissement naturel", unite: "hab" },
-  { id: "net_migration", label: "Solde migratoire", unite: "hab" },
-];
+const AN_SECONDES = 365.2425 * 24 * 3600;
 
-function val(v: number | null, unite: Unite): string {
+function val(v: number | null, unite: MetriqueDemo["unite"]): string {
   if (v === null) return "n.d.";
   if (unite === "pour1000") return `${v.toFixed(1).replace(".", ",")} ‰`;
   const a = Math.abs(v);
@@ -146,10 +139,14 @@ const FriseDemo = ({
   annees,
   valeur,
   onAnnee,
+  compteurPossible,
 }: {
   annees: number[];
   valeur: number;
   onAnnee: (a: number) => void;
+  /** Vrai quand la grandeur affichée est un effectif annuel, donc éligible
+      au compteur en direct sur le dernier pas. */
+  compteurPossible: boolean;
 }) => {
   const [vue, setVue] = useState(valeur);
   const vueRef = useRef(valeur);
@@ -274,12 +271,41 @@ const FriseDemo = ({
                 {a}
               </button>
             ))}
+
+          {/* Le dernier pas n'est pas une année publiée comme les autres :
+              pour les effectifs annuels (naissances, décès, causes), c'est
+              une valeur modélisée étalée depuis le premier janvier, comptée
+              en direct — pas une mesure. */}
+          <button
+            type="button"
+            className={`cg-frise2-direct${vue === annees[annees.length - 1] ? " cg-frise2-direct-on" : ""}`}
+            style={{ left: "100%" }}
+            onClick={() => vise(annees[annees.length - 1], true)}
+          >
+            <span className="cg-frise2-direct-p" aria-hidden="true" />
+            en temps réel
+          </button>
         </div>
       </div>
 
       <p className="cg-frise-n">
         Les dates affichées sont celles publiées par la source. Rien n&apos;est interpolé entre deux repères : une
         année absente reste absente.
+        {vue === annees[annees.length - 1] && (
+          <>
+            {" "}
+            <b>
+              {annees[annees.length - 1]} est une projection, pas une mesure.
+              {compteurPossible &&
+                " Le nombre affiché ici n'est pas mesuré à la seconde : c'est cette projection annuelle, étalée depuis le "}
+              {compteurPossible && (
+                <>
+                  1<sup>er</sup> janvier et cumulée en direct.
+                </>
+              )}
+            </b>
+          </>
+        )}
       </p>
     </div>
   );
@@ -296,6 +322,7 @@ const MARGE = 8;
 
 function TableauDemo({
   lignes,
+  colonnes,
   col,
   sens,
   choisi,
@@ -303,6 +330,7 @@ function TableauDemo({
   onTrier,
 }: {
   lignes: Rang[];
+  colonnes: MetriqueDemo[];
   col: DemographyMetricId;
   sens: 1 | -1;
   choisi: string | null;
@@ -343,7 +371,7 @@ function TableauDemo({
 
   const a = Math.min(fen.a, Math.max(0, lignes.length - 1));
   const b = Math.min(fen.b, lignes.length);
-  const nCol = COLONNES.length + 2;
+  const nCol = colonnes.length + 2;
 
   return (
     <div className="cg-tab-cadre" ref={cadre} style={{ "--cg-tab-h": `${haut}px` } as React.CSSProperties}>
@@ -352,7 +380,7 @@ function TableauDemo({
           <tr>
             <th className="cg-tab-r">#</th>
             <th className="cg-tab-p">Pays</th>
-            {COLONNES.map((c) => (
+            {colonnes.map((c) => (
               <th key={c.id}>
                 <button
                   type="button"
@@ -377,7 +405,7 @@ function TableauDemo({
             <tr key={r.nom} data-pays={r.nom} className={choisi === r.nom ? "cg-tab-on" : undefined} onClick={() => onChoisi(r.nom)}>
               <td className="cg-tab-r">{String(a + i + 1).padStart(2, "0")}</td>
               <td className="cg-tab-p">{r.fr}</td>
-              {COLONNES.map((c) => (
+              {colonnes.map((c) => (
                 <td key={c.id} className={r[c.id] === null ? "cg-tab-vide" : undefined}>
                   {val(r[c.id], c.unite)}
                 </td>
@@ -446,15 +474,9 @@ export function DemographiePage({ socle, compteur }: DemoProps) {
         const x = i === undefined ? null : ligne[i];
         return typeof x === "number" && Number.isFinite(x) ? x : null;
       };
-      return {
-        nom: p.nom,
-        fr: p.fr,
-        population: v("population"),
-        birth_rate: v("birth_rate"),
-        death_rate: v("death_rate"),
-        natural_change: v("natural_change"),
-        net_migration: v("net_migration"),
-      };
+      const r = { nom: p.nom, fr: p.fr } as Rang;
+      for (const m of TOUTES) r[m.id] = v(m.id);
+      return r;
     });
   }, [socle, annee]);
 
@@ -490,18 +512,39 @@ export function DemographiePage({ socle, compteur }: DemoProps) {
     setSens(-1);
   }, []);
 
+  /* Les colonnes du classement suivent la famille regardée, comme sur la
+     page Économie : neuf causes de mortalité côte à côte avec les deux
+     autres familles n'auraient plus rien de lisible. */
+  const colonnesActives = useMemo(() => familleDe(metrique).membres, [metrique]);
+
+  /* Un effectif annuel, sur le dernier pas publié, accepte un compteur en
+     direct — pas un taux. Le globe garde les teintes de l'année publiée ;
+     seul le compteur avance, à partir de cette valeur ramenée à la seconde
+     depuis le premier janvier. */
+  const derniereAnnee = socle.annees[socle.annees.length - 1];
+  const enCours = annee === derniereAnnee && compteurPossibleDemo(metrique);
+  const compteurGlobe = useMemo(() => {
+    if (!enCours || !choisi) return undefined;
+    const base = rangs.find((r) => r.nom === choisi)?.[metrique] ?? null;
+    return {
+      base,
+      baseAnnee: derniereAnnee,
+      parSeconde: (base ?? 0) / AN_SECONDES,
+      depuisMs: Date.UTC(derniereAnnee, 0, 1),
+    };
+  }, [enCours, choisi, rangs, metrique, derniereAnnee]);
+
   /* L'année remise au format complet, pour le globe : le socle compact ne
      transporte que ce qu'une date publie, le globe veut un objet par pays. */
   const anneeDemo = useMemo<DemographyYear>(() => {
     const countries: DemographyYear["countries"] = {};
     for (const r of rangs) {
-      countries[r.nom] = {
-        population: r.population ?? undefined,
-        birth_rate: r.birth_rate ?? undefined,
-        death_rate: r.death_rate ?? undefined,
-        natural_change: r.natural_change ?? undefined,
-        net_migration: r.net_migration ?? undefined,
-      };
+      const fiche: DemographyYear["countries"][string] = {};
+      for (const m of TOUTES) {
+        const v = r[m.id];
+        if (v !== null) fiche[m.id] = v;
+      }
+      countries[r.nom] = fiche;
     }
     return { year: annee, countries };
   }, [rangs, annee]);
@@ -573,7 +616,15 @@ export function DemographiePage({ socle, compteur }: DemoProps) {
             onChoisi={setChoisi}
             nomFr={(n) => socle.pays.find((p) => p.nom === n)?.fr ?? n}
             serie={serie}
-            sousLeGlobe={<FriseDemo annees={socle.annees} valeur={annee} onAnnee={setAnnee} />}
+            compteur={compteurGlobe}
+            sousLeGlobe={
+              <FriseDemo
+                annees={socle.annees}
+                valeur={annee}
+                onAnnee={setAnnee}
+                compteurPossible={compteurPossibleDemo(metrique)}
+              />
+            }
           />
         </div>
       </section>
@@ -582,8 +633,8 @@ export function DemographiePage({ socle, compteur }: DemoProps) {
         <div className="cg-bande-h">
           <h2 className="cg-bande-t">Le classement</h2>
           <p className="cg-bande-c">
-            {socle.pays.length} pays, {socle.annees.length} dates, cinq indicateurs. Choisissez une année, triez la
-            colonne qui vous intéresse.
+            {socle.pays.length} pays, {socle.annees.length} dates. Choisissez une famille sur le globe, une année,
+            triez la colonne qui vous intéresse.
           </p>
 
           <div className="cg-bande-ctrl">
@@ -609,7 +660,15 @@ export function DemographiePage({ socle, compteur }: DemoProps) {
         </div>
 
         <div className="cg-bande-bloc">
-          <TableauDemo lignes={tries} col={metrique} sens={sens} choisi={choisi} onChoisi={setChoisi} onTrier={trier} />
+          <TableauDemo
+            lignes={tries}
+            colonnes={colonnesActives}
+            col={metrique}
+            sens={sens}
+            choisi={choisi}
+            onChoisi={setChoisi}
+            onTrier={trier}
+          />
           <p className="cg-bande-n">
             {tries.length} pays affichés · « n.d. » signale une valeur que la source ne publie pas pour ce pays cette
             année-là ; ces pays passent en fin de tri, ils ne sont pas classés derniers. Cliquez une ligne pour la
