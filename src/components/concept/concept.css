@@ -4339,3 +4339,41 @@ body:has(.cg) { background: #05080c; }
 
 .cg-fo-note { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--bord-fin); font-size: 11.5px; line-height: 1.6; color: var(--encre-3); }
 .cg-fo-total { margin-top: 18px; font-size: 11.5px; color: var(--encre-3); text-align: center; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ESPACE PERSONNEL, DANS LE CONCEPT
+
+   La connexion et le tableau de bord reprennent les classes `.cp-*` de
+   l'ancien site (globals.css) plutôt que de les récrire : ces jetons —
+   --ink, --surface, --border… — sont ici réaffectés aux jetons du concept.
+   Aucune règle `.cp-*` n'a besoin d'être dupliquée ; seules les couleurs
+   codées en clair (rouge, vert) sont reprises pour tenir sur fond de nuit.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cg {
+  --bg: var(--fond);
+  --surface-3: var(--surface-2);
+  --border: var(--bord);
+  --border-light: var(--bord-fin);
+  --ink: var(--encre);
+  --ink-2: var(--encre-2);
+  --ink-3: var(--encre-3);
+  --ink-4: var(--encre-3);
+  --ink-5: var(--bord);
+}
+.cg .cp { padding-top: clamp(120px, 16vh, 170px); }
+.cg .cp-erreur {
+  color: var(--rouge);
+  background: color-mix(in srgb, var(--rouge) 14%, transparent);
+  border-color: color-mix(in srgb, var(--rouge) 30%, transparent);
+}
+.cg .cp-ok,
+.cg .cp-role {
+  color: var(--vert);
+  background: color-mix(in srgb, var(--vert) 14%, transparent);
+  border-color: color-mix(in srgb, var(--vert) 30%, transparent);
+}
+.cg .cp-envoi { border-color: var(--encre); background: var(--encre); color: var(--fond); }
+.cg .cp-envoi:hover:not(:disabled) { background: var(--encre-2); }
+.cg .cp-champ input:focus,
+.cg .cp-champ textarea:focus { border-color: var(--vert); background: var(--surface); }
+.cg .cp-google { color: var(--encre); }

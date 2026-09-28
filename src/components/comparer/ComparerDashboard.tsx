@@ -233,9 +233,6 @@ export function ComparerDashboard({ catalogue, defaut }: { catalogue: Pays[]; de
           <button type="button" className="nc-btn" onClick={() => setReglages((r) => !r)} aria-expanded={reglages}>
             Personnaliser
           </button>
-          <Link href="/neo" className="nc-btn">
-            Live
-          </Link>
         </div>
       </header>
 

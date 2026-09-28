@@ -380,7 +380,7 @@ export function LectureArticle({
             <Link href="/comparer" className="lx-outil">
               Comparer les pays
             </Link>
-            <Link href="/community" className="lx-outil">
+            <Link href="/forum" className="lx-outil">
               En débattre
             </Link>
           </div>
@@ -460,7 +460,7 @@ export function LectureArticle({
               Le forum est ouvert : une objection avec sa source vaut mieux qu&apos;un commentaire
               sous l&apos;article.
             </p>
-            <Link href="/community" className="lx-relance-b">
+            <Link href="/forum" className="lx-relance-b">
               Ouvrir le fil →
             </Link>
           </section>

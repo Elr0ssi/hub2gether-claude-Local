@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { EnTete, Pied } from "@/components/concept/pieces";
 import { FormProfil } from "@/components/compte/FormProfil";
 import { Pastille } from "@/components/compte/Pastille";
 import { deconnecter } from "./actions";
@@ -12,6 +11,7 @@ import { filParId } from "@/data/community/fils";
 import { donneesPays } from "@/data/concept/conceptGeo";
 import { getArticleBySlug } from "@/data/articles";
 import { TableauDeBord } from "@/components/compte/TableauDeBord";
+import "@/components/concept/concept.css";
 
 export const metadata: Metadata = {
   title: "Mon espace · The Essential Data",
@@ -63,9 +63,9 @@ export default async function ComptePage() {
   void anneeSocle;
 
   return (
-    <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
-      <Navbar />
-      <main style={{ paddingTop: "var(--navbar-height)" }}>
+    <div className="cg">
+      <EnTete />
+      <main>
         <div className="cp">
           <header className="cp-tete">
             <Pastille pseudo={compte.profil.pseudo} taille={56} />
@@ -135,7 +135,7 @@ export default async function ComptePage() {
               {messages.length === 0 ? (
                 <p className="cp-vide">
                   Vous n&apos;avez encore rien écrit.{" "}
-                  <Link href="/community">Ouvrir le forum</Link>
+                  <Link href="/forum">Ouvrir le forum</Link>
                 </p>
               ) : (
                 <ul className="cp-messages">
@@ -143,7 +143,7 @@ export default async function ComptePage() {
                     const fil = filParId(m.cible_id);
                     return (
                       <li key={m.id}>
-                        <Link href="/community" className="cp-msg-fil">
+                        <Link href="/forum" className="cp-msg-fil">
                           {fil?.titre ?? m.cible_id}
                         </Link>
                         <p className="cp-msg-texte">{m.texte}</p>
@@ -164,7 +164,7 @@ export default async function ComptePage() {
           </div>
         </div>
       </main>
-      <Footer />
+      <Pied />
     </div>
   );
 }

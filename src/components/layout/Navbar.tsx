@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Globe, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { THEMES } from "@/data/themes";
 import { LienCompte } from "@/components/compte/LienCompte";
 
-/** Grisees dans le menu, mais toujours en ligne : leurs pages repondent. */
-const NAV_A_VENIR = new Set(["empires", "politics", "military", "epidemics"]);
+/* Le menu ne montre plus qu'Économie parmi les anciens thèmes : les autres
+   (Empires, Politique, Conflits, Militaire, Épidémies) ne sont pas repris
+   dans le concept, et Économie reste comme base au cas où on la retravaille. */
 
 export function Navbar() {
   const pathname = usePathname();
@@ -77,57 +77,6 @@ export function Navbar() {
             )}
           </Link>
           <Link
-            href="/decouvrir"
-            className={cn(
-              "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
-              pathname === "/decouvrir"
-                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
-                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
-            )}
-          >
-            Découvrir
-            {pathname === "/decouvrir" && (
-              <span
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
-                style={{ background: "var(--accent)" }}
-              />
-            )}
-          </Link>
-          <Link
-            href="/neo"
-            className={cn(
-              "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
-              pathname === "/neo"
-                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
-                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
-            )}
-          >
-            Live
-            {pathname === "/neo" && (
-              <span
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
-                style={{ background: "var(--accent)" }}
-              />
-            )}
-          </Link>
-          <Link
-            href="/community"
-            className={cn(
-              "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
-              pathname === "/community"
-                ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
-                : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
-            )}
-          >
-            Community
-            {pathname === "/community" && (
-              <span
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
-                style={{ background: "var(--accent)" }}
-              />
-            )}
-          </Link>
-          <Link
             href="/test-article"
             className={cn(
               "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
@@ -144,75 +93,27 @@ export function Navbar() {
               />
             )}
           </Link>
+          {/* Le seul ancien thème encore dans le menu : une base à
+              retravailler si besoin, pas une rubrique active. Les autres
+              (Empires, Politique, Conflits, Militaire, Épidémies) ne sont
+              plus dans le concept. */}
           <Link
-            href="/lecture/pib-par-pays-2025-classement-complet"
+            href="/map/economy"
             className={cn(
               "relative px-2.5 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-150",
-              pathname.startsWith("/lecture")
+              pathname === "/map/economy" || pathname.startsWith("/map/economy/")
                 ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
                 : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
             )}
           >
-            Lecture
-            {pathname.startsWith("/lecture") && (
+            Économie
+            {(pathname === "/map/economy" || pathname.startsWith("/map/economy/")) && (
               <span
                 className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
                 style={{ background: "var(--accent)" }}
               />
             )}
           </Link>
-          {THEMES.map((theme) => {
-            const isActive =
-              pathname === `/map/${theme.slug}` ||
-              pathname.startsWith(`/map/${theme.slug}/`);
-
-            if (!theme.available || NAV_A_VENIR.has(theme.id)) {
-              /* La pastille « Bientôt » ne se repete pas sur chaque onglet :
-                 une seule, posee apres le dernier, dit la meme chose sans
-                 charger la barre. */
-              return (
-                <div
-                  key={theme.id}
-                  className="relative px-2.5 py-1.5 rounded-lg text-sm font-medium cursor-not-allowed opacity-50"
-                  style={{ color: "var(--ink-4)" }}
-                  title={`${theme.label}, bientôt disponible`}
-                >
-                  {theme.label}
-                </div>
-              );
-            }
-
-            return (
-              <Link
-                key={theme.id}
-                href={`/map/${theme.slug}`}
-                className={cn(
-                  "relative px-2.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-150",
-                  isActive
-                    ? "bg-[rgba(57,255,136,0.12)] text-[#0D7A40]"
-                    : "text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--surface-2)]"
-                )}
-              >
-                {theme.label}
-                {isActive && (
-                  <span
-                    className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full"
-                    style={{ background: "var(--accent)" }}
-                  />
-                )}
-              </Link>
-            );
-          })}
-          <span
-            className="ml-1 px-1.5 py-0.5 rounded-md font-semibold"
-            style={{
-              background: "var(--surface-2)",
-              color: "var(--ink-4)",
-              fontSize: "0.65rem",
-            }}
-          >
-            Bientôt
-          </span>
         </nav>
 
         <div className="flex items-center gap-2 shrink-0">

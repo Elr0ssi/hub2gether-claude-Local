@@ -114,7 +114,7 @@ export function FormConnexion({ mode }: { mode: "connexion" | "inscription" }) {
       <p className="cp-legal">
         En créant un compte, vous acceptez que vos messages soient publics et rattachés à votre
         pseudo. Vous pouvez les effacer et fermer votre compte à tout moment.{" "}
-        <Link href="/community">Retour au forum</Link>
+        <Link href="/forum">Retour au forum</Link>
       </p>
     </div>
   );

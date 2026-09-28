@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { EnTete, Pied } from "@/components/concept/pieces";
 import { FormConnexion } from "@/components/compte/FormConnexion";
 import { COMPTES_ACTIFS } from "@/lib/supabase/config";
 import { lireCompte } from "@/lib/supabase/serveur";
+import "@/components/concept/concept.css";
 
 export const metadata: Metadata = {
   title: "Se connecter · The Essential Data",
@@ -24,9 +24,9 @@ export default async function ConnexionPage({
   if (compte) redirect("/compte");
 
   return (
-    <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
-      <Navbar />
-      <main style={{ paddingTop: "var(--navbar-height)" }}>
+    <div className="cg">
+      <EnTete />
+      <main>
         <div className="cp cp-etroit">
           <h1 className="cp-h1">Votre espace</h1>
           <p className="cp-chapo">
@@ -48,7 +48,7 @@ export default async function ConnexionPage({
           )}
         </div>
       </main>
-      <Footer />
+      <Pied />
     </div>
   );
 }

@@ -196,6 +196,9 @@ const NAV_GAUCHE: Onglet[] = [
 const NAV_DROITE: Onglet[] = [
   { label: "Analyses", href: "/concept-globe#analyses" },
   { label: "Dette", href: "/france/economie/dette-publique" },
+  /* Comparer des thématiques dans le temps, sur un graphe : la suite de
+     l'actuel /comparaison, encore à construire dans le concept. */
+  { label: "Live" },
 ];
 const NAV: Onglet[] = [...NAV_GAUCHE, ...NAV_DROITE];
 

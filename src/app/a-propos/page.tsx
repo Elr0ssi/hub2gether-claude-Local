@@ -170,7 +170,7 @@ export default function Page() {
           ) : (
             <>Le forum est ouvert pour cela, et un signalement y vaut correction.</>
           )}{" "}
-          Les fils de discussion sont sur <Link href="/community">la page communauté</Link>.
+          Les fils de discussion sont sur <Link href="/forum">le forum</Link>.
         </p>
 
         <p className="hub-note">
