@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { DemographiePage } from "@/components/concept/DemographiePage";
-import { compteurDemo, socleDemo } from "@/data/concept/conceptDemographie";
+import { articlesDemo, compteurDemo, socleDemo } from "@/data/concept/conceptDemographie";
 import { jsonLdString } from "@/lib/schema";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -99,7 +99,7 @@ export default function Page() {
         zéro.
       </p>
 
-      <DemographiePage socle={socle} compteur={compteur} />
+      <DemographiePage socle={socle} compteur={compteur} articles={articlesDemo(9)} />
     </>
   );
 }

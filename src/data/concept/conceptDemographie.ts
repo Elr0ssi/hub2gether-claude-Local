@@ -1,5 +1,7 @@
 import { CAUSES_MORTALITE, DEMOGRAPHY_YEARS, SOURCES_SOCLE_DEMO } from "@/data/demographie/demographie";
 import { countryFr } from "@/data/countryNamesFr";
+import { EPIDEMICS_ARTICLES } from "@/data/articles";
+import type { FicheArticle } from "./conceptGeo";
 
 /**
  * Le socle démographique, préparé pour le prototype.
@@ -112,4 +114,27 @@ export interface LigneSourceDemo {
 
 export function sourcesDemo(): LigneSourceDemo[] {
   return Object.values(SOURCES_SOCLE_DEMO).map((f) => ({ libelle: f.libelle, source: f.source }));
+}
+
+/* ── Les articles ────────────────────────────────────────────────────────── */
+
+/* Le site n'a pas de rubrique « Démographie » : les épidémies sont ce qui
+   s'en approche le plus, population et mortalité au cœur de chaque texte.
+   On les affiche donc sous leur vraie rubrique, Épidémies — ce sont ces
+   articles-là, pas des textes redécoupés pour l'occasion. */
+export function articlesDemo(n = 9): FicheArticle[] {
+  return [...EPIDEMICS_ARTICLES]
+    .sort((a, b) => {
+      const f = Number(Boolean(b.featured)) - Number(Boolean(a.featured));
+      return f !== 0 ? f : (b.publishedAt ?? "").localeCompare(a.publishedAt ?? "");
+    })
+    .slice(0, n)
+    .map((a) => ({
+      slug: a.slug,
+      titre: a.title,
+      chapo: a.excerpt,
+      rubrique: "Épidémies",
+      duree: a.readingTime ? `${a.readingTime} min` : "durée inconnue",
+      mots: [...(a.tags ?? []), a.title].join(" · ").toLowerCase(),
+    }));
 }

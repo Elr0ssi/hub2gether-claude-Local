@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SocleDemo } from "@/data/concept/conceptDemographie";
+import type { FicheArticle } from "@/data/concept/conceptGeo";
 import type { DemographyMetricId, DemographyYear } from "@/data/demographie/demographie";
 import { Dessin, Jetons } from "./Jetons";
-import { Enseigne, EnTete, Pied } from "./pieces";
+import { Enseigne, EnTete, ImagePlaceholder, Pied } from "./pieces";
 import { Loupe } from "./Loupe";
 import { Odometre, gelerOdometres } from "./Roulement";
 import { Lettres } from "./Lettres";
@@ -38,6 +39,7 @@ export interface CompteurDemoProps {
 export interface DemoProps {
   socle: SocleDemo;
   compteur: CompteurDemoProps;
+  articles: FicheArticle[];
 }
 
 type Rang = { nom: string; fr: string } & Record<DemographyMetricId, number | null>;
@@ -421,12 +423,15 @@ function TableauDemo({
   );
 }
 
-export function DemographiePage({ socle, compteur }: DemoProps) {
+export function DemographiePage({ socle, compteur, articles }: DemoProps) {
   const [annee, setAnnee] = useState(socle.annees[socle.annees.length - 1]);
   const [metrique, setMetrique] = useState<DemographyMetricId>("population");
   const [sens, setSens] = useState<1 | -1>(-1);
   const [filtre, setFiltre] = useState("");
   const [choisi, setChoisi] = useState<string | null>("France");
+  const [qArticle, setQArticle] = useState("");
+  const rail2 = useRef<HTMLDivElement>(null);
+  const prise2 = useRef<{ x: number; g: number } | null>(null);
 
   const bande = useVu(20);
   const haut = useVu(260);
@@ -551,6 +556,12 @@ export function DemographiePage({ socle, compteur }: DemoProps) {
     });
   }, [socle, choisi, metrique]);
 
+  const articlesVus = useMemo(() => {
+    const q = qArticle.trim().toLowerCase();
+    if (!q) return articles;
+    return articles.filter((a) => `${a.titre} ${a.chapo} ${a.mots ?? ""}`.toLowerCase().includes(q));
+  }, [articles, qArticle]);
+
   return (
     <div className="cg cg-eco">
       <EnTete actif="Démographie" />
@@ -662,6 +673,70 @@ export function DemographiePage({ socle, compteur }: DemoProps) {
             année-là ; ces pays passent en fin de tri, ils ne sont pas classés derniers. Cliquez une ligne pour la
             retrouver sur le globe.
           </p>
+        </div>
+      </section>
+
+      {/* ── Les articles ─────────────────────────────────────────────────── */}
+      <section className="cg-section cg-lectures">
+        <div className="cg-wrap">
+          <div className="cg-arts-tete">
+            <h2 className="cg-arts-h">Articles</h2>
+            <input
+              className="cg-filtre cg-filtre-gros"
+              type="search"
+              placeholder="Chercher un article"
+              value={qArticle}
+              onChange={(e) => setQArticle(e.target.value)}
+              aria-label="Chercher un article"
+            />
+          </div>
+
+          {articlesVus.length === 0 ? (
+            <p className="cg-frise-n">Aucun article ne correspond à cette recherche.</p>
+          ) : (
+            <div className="cg-arts-l">
+              <article className="cg-art cg-art-une">
+                <ImagePlaceholder nom="IMAGE_PNG_DEMO_01" ratio="16 / 10" />
+                <span className="cg-rubrique">
+                  {articlesVus[0].rubrique} · {articlesVus[0].duree}
+                </span>
+                <h3 className="cg-art-t">{articlesVus[0].titre}</h3>
+                <p className="cg-art-c">{articlesVus[0].chapo}</p>
+              </article>
+
+              <div className="cg-arts-c">
+                <div
+                  ref={rail2}
+                  className="cg-arts"
+                  onPointerDown={(e) => {
+                    prise2.current = { x: e.clientX, g: e.currentTarget.scrollLeft };
+                    e.currentTarget.setPointerCapture(e.pointerId);
+                  }}
+                  onPointerMove={(e) => {
+                    if (!prise2.current || !rail2.current) return;
+                    rail2.current.scrollLeft = prise2.current.g - (e.clientX - prise2.current.x);
+                  }}
+                  onPointerUp={() => {
+                    prise2.current = null;
+                  }}
+                  onPointerCancel={() => {
+                    prise2.current = null;
+                  }}
+                >
+                  {articlesVus.slice(1).map((a, k) => (
+                    <article key={a.slug} className="cg-art">
+                      <ImagePlaceholder nom={`IMAGE_PNG_DEMO_0${((k + 1) % 9) + 1}`} ratio="16 / 9" />
+                      <span className="cg-rubrique">
+                        {a.rubrique} · {a.duree}
+                      </span>
+                      <h4 className="cg-art-t">{a.titre}</h4>
+                    </article>
+                  ))}
+                </div>
+                <div className="cg-arts-f" aria-hidden="true" />
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

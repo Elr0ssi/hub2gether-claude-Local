@@ -39,7 +39,11 @@ type Forme =
   | "feuille"
   | "mains"
   | "personnes"
-  | "globeTerre";
+  | "globeTerre"
+  | "bulle"
+  | "epingle"
+  | "balance"
+  | "flamme";
 
 interface Tuile {
   /** Le dessin, ou rien quand la tuile porte du texte. */
@@ -137,6 +141,35 @@ const TUILES_DEMOGRAPHIE: Tuile[] = [
   { f: "mains", c: CORAIL, x: 66, y: 74, k: 34, d: 16, z: 1.25, o: 4 },
   { f: "personnes", c: BLEU, x: 79, y: 12, k: 34, d: 12, z: 0.7, petit: true, o: 20 },
   { f: "feuille", c: VERT, x: 96, y: 14, k: 36, d: 14, z: 0.75, o: 10 },
+];
+
+/* Encore les mêmes positions, pour le forum : la discussion, l'arbitrage
+   entre deux avis, ce qu'on épingle, ce qui s'enflamme. */
+const TUILES_FORUM: Tuile[] = [
+  /* ── Le bord gauche ─────────────────────────────────────────────────── */
+  { f: "bulle", c: BLEU, x: 8, y: 22, k: 46, d: 11, z: 1.1, petit: true, o: 3, vif: true },
+  { f: "balance", c: VIOLET, x: 17, y: 12, k: 40, d: 14, z: 0.8, petit: true, o: 11 },
+  { f: "personnes", c: PALE, x: 5, y: 44, k: 52, d: 13, z: 1.2, o: 7 },
+  { f: "epingle", c: OR, x: 21, y: 33, k: 42, d: 9, z: 0.9, petit: true, o: 16 },
+  { f: "flamme", c: CORAIL, x: 12, y: 58, k: 38, d: 16, z: 1, o: 1 },
+  { f: "mains", c: VERT, x: 26, y: 54, k: 44, d: 12, z: 1.15, o: 13 },
+  { f: "bulle", c: BLEU, x: 30, y: 20, k: 38, d: 10, z: 0.75, o: 19 },
+  { f: "balance", c: VIOLET, x: 24, y: 71, k: 36, d: 15, z: 1.25, petit: true, o: 5 },
+  { f: "epingle", c: OR, x: 34, y: 38, k: 34, d: 13, z: 0.7, o: 9 },
+  { f: "flamme", c: CORAIL, x: 33, y: 63, k: 34, d: 11, z: 0.85, petit: true, o: 17 },
+
+  /* ── Le bord droit ──────────────────────────────────────────────────── */
+  { f: "personnes", c: PALE, x: 63, y: 30, k: 44, d: 12, z: 1.05, petit: true, o: 0, vif: true },
+  { f: "flamme", c: CORAIL, x: 70, y: 16, k: 36, d: 10, z: 0.8, o: 12 },
+  { f: "bulle", c: BLEU, x: 88, y: 28, k: 52, d: 14, z: 1.2, o: 6 },
+  { f: "mains", c: VERT, x: 76, y: 44, k: 42, d: 9, z: 0.95, petit: true, o: 15 },
+  { f: "epingle", c: OR, x: 74, y: 24, k: 40, d: 15, z: 1.1, petit: true, o: 2, vif: true },
+  { f: "balance", c: VIOLET, x: 94, y: 52, k: 38, d: 11, z: 0.9, o: 18 },
+  { f: "personnes", c: PALE, x: 82, y: 66, k: 36, d: 13, z: 1.3, petit: true, o: 8 },
+  { f: "flamme", c: CORAIL, x: 92, y: 70, k: 38, d: 10, z: 1.15, petit: true, o: 14 },
+  { f: "mains", c: VERT, x: 66, y: 74, k: 34, d: 16, z: 1.25, o: 4 },
+  { f: "bulle", c: BLEU, x: 79, y: 12, k: 34, d: 12, z: 0.7, petit: true, o: 20 },
+  { f: "epingle", c: OR, x: 96, y: 14, k: 36, d: 14, z: 0.75, o: 10 },
 ];
 
 const TRAIT = {
@@ -295,6 +328,41 @@ export function Dessin({ f }: { f: Forme }) {
           <circle cx="12" cy="12" r="9" {...TRAIT} />
           <path d="M3 12 H21" {...TRAIT} />
           <path d="M12 3 C8 3 6.5 7.5 6.5 12 C6.5 16.5 8 21 12 21 C16 21 17.5 16.5 17.5 12 C17.5 7.5 16 3 12 3 Z" {...TRAIT} />
+        </svg>
+      );
+    case "bulle":
+      /* Une bulle de dialogue, rien de plus. */
+      return (
+        <svg viewBox="0 0 24 24">
+          <path d="M3.5 5.5 H20.5 V16 H10 L5.5 19.5 V16 H3.5 Z" {...TRAIT} />
+          <path d="M7.5 9.5 H16.5 M7.5 12.5 H13.5" {...TRAIT} />
+        </svg>
+      );
+    case "epingle":
+      /* Une épingle plantée, comme un sujet retenu en tête de liste. */
+      return (
+        <svg viewBox="0 0 24 24">
+          <path d="M9 4 H16 L15 9.5 L18.5 13 H13.5 L11 20.5 L9.5 13 H5.5 L9 9.5 Z" {...TRAIT} />
+        </svg>
+      );
+    case "balance":
+      /* Deux plateaux qui s'équilibrent : arbitrer, peser deux avis. */
+      return (
+        <svg viewBox="0 0 24 24">
+          <path d="M12 3 V19 M6 19 H18" {...TRAIT} />
+          <path d="M3.5 7 H10.5 M13.5 7 H20.5" {...TRAIT} />
+          <path d="M3.5 7 C3.5 10 7 10 7 7 Z" {...TRAIT} />
+          <path d="M17 7 C17 10 20.5 10 20.5 7 Z" {...TRAIT} />
+        </svg>
+      );
+    case "flamme":
+      /* Un sujet qui s'enflamme : la flamme la plus simple, sans détail. */
+      return (
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M12 2.5 C15 6 16.5 8.5 16.5 12 C16.5 16 13.5 19 10.5 19 C7 19 5 16.5 5 13.5 C5 11.5 6 10 7.5 9 C7.2 11 8 12 9 12 C9 9 9.5 6.5 12 2.5 Z"
+            {...TRAIT}
+          />
         </svg>
       );
   }
@@ -481,10 +549,10 @@ function useLancer(champ: React.RefObject<HTMLDivElement | null>) {
   }, [champ]);
 }
 
-export function Jetons({ theme = "finance" }: { theme?: "finance" | "demographie" }) {
+export function Jetons({ theme = "finance" }: { theme?: "finance" | "demographie" | "forum" }) {
   const champ = useRef<HTMLDivElement>(null);
   useLancer(champ);
-  const tuiles = theme === "demographie" ? TUILES_DEMOGRAPHIE : TUILES;
+  const tuiles = theme === "demographie" ? TUILES_DEMOGRAPHIE : theme === "forum" ? TUILES_FORUM : TUILES;
   return (
     <div className="cg-tuiles" ref={champ} aria-hidden="true">
       {tuiles.map((j, i) => (

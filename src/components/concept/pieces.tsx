@@ -271,7 +271,7 @@ export function EnTete({ actif }: { actif?: string }) {
         <div className="cg-bout">
           <ChoixMonnaie />
           <BoutonTheme className="cg-jour" />
-          <a href="/community" className="cg-bout-l">
+          <a href="/forum" className="cg-bout-l">
             Forum
           </a>
           <LienCompte className="cg-cnx" />
@@ -292,7 +292,7 @@ export function Pied() {
               {n.label}
             </a>
           ))}
-          <a href="/community">Forum</a>
+          <a href="/forum">Forum</a>
           <a href="/compte/connexion">Mon compte</a>
         </nav>
         <span className="cg-pied-note">Prototype de direction artistique · non indexé</span>
