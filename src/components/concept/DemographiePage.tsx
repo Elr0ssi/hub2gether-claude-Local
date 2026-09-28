@@ -74,7 +74,6 @@ function TempsReelDemo({ compteur }: { compteur: CompteurDemoProps }) {
     <section className="cg-section" id="temps-reel-demo">
       <div className="cg-wrap">
         <TitreSection
-          direct
           titre="Données en temps réel"
           sous={
             <>

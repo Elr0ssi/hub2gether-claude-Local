@@ -143,23 +143,44 @@ export function Titre({ texte }: { texte: string }) {
 
     La page arrive avec la seule dernière année publiée — de quoi dessiner le
     globe, la fiche et le classement du moment. Les autres années, qui ne
-    servent qu'à la frise et à la courbe, suivent aussitôt par une requête à
-    part : un fichier statique, compressé et mis en cache, plutôt qu'un
-    mégaoctet recopié deux fois dans le HTML de chaque visite. */
+    servent qu'à la frise et à la courbe, suivent par une requête à part : un
+    fichier statique, compressé et mis en cache, plutôt qu'un mégaoctet
+    recopié deux fois dans le HTML de chaque visite.
+
+    La requête part au repos du navigateur, pas au montage : posée tout de
+    suite, elle arrivait pendant que la page finissait de s'installer, et le
+    calcul qui range soixante-sept années de plus — le tri du classement, la
+    palette du globe — retombait sur la même image que l'hydratation. Sur un
+    appareil modeste, les deux ensemble se voyaient comme un blocage. */
 export function useSocleComplet<T>(leger: T, url: string): T {
   const [socle, setSocle] = useState(leger);
   useEffect(() => {
     let vivant = true;
-    fetch(url)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((complet: T | null) => {
-        if (vivant && complet) setSocle(complet);
-      })
-      .catch(() => {
-        /* Sans le reste des années, la page reste utilisable sur la dernière. */
-      });
+    let annule: (() => void) | undefined;
+
+    const charge = () => {
+      fetch(url)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((complet: T | null) => {
+          if (vivant && complet) setSocle(complet);
+        })
+        .catch(() => {
+          /* Sans le reste des années, la page reste utilisable sur la dernière. */
+        });
+    };
+
+    const ric = window.requestIdleCallback;
+    if (ric) {
+      const id = ric(charge, { timeout: 2000 });
+      annule = () => window.cancelIdleCallback?.(id);
+    } else {
+      const id = window.setTimeout(charge, 300);
+      annule = () => window.clearTimeout(id);
+    }
+
     return () => {
       vivant = false;
+      annule?.();
     };
   }, [url]);
   return socle;

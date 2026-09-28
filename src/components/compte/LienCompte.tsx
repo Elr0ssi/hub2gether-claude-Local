@@ -23,9 +23,10 @@ export function LienCompte({ className }: { className?: string }) {
     const sb = clientNavigateur();
     if (!sb) return;
     /* La session est lue dans le cookie, sans aller au serveur. */
-    void sb.auth.getSession().then((r: { data: { session: unknown } }) =>
-      setConnecte(Boolean(r.data.session))
-    );
+    void sb.auth
+      .getSession()
+      .then((r: { data: { session: unknown } }) => setConnecte(Boolean(r.data.session)))
+      .catch(() => {});
     const { data: ecoute } = sb.auth.onAuthStateChange((_e: string, session: unknown) =>
       setConnecte(Boolean(session))
     );

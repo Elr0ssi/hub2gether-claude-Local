@@ -200,7 +200,6 @@ function TempsReelEco({ pib }: { pib: PibMonde }) {
     <section className="cg-section" id="temps-reel-eco">
       <div className="cg-wrap">
         <TitreSection
-          direct
           titre="Données en temps réel"
           sous={
             <>

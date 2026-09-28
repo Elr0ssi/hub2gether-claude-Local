@@ -37,17 +37,25 @@ export interface Profil {
   widgets: string[];
 }
 
-/** Le compte connecté, avec son profil, ou null. */
+/** Le compte connecté, avec son profil, ou null.
+ *
+ * Un aléa réseau vers le service d'authentification ne doit pas faire
+ * tomber la page qui demande qui est connecté : au pire, elle traite le
+ * visiteur comme non connecté, comme s'il n'avait pas de session. */
 export async function lireCompte(): Promise<{ email: string; profil: Profil } | null> {
-  const sb = await clientServeur();
-  if (!sb) return null;
-  const { data } = await sb.auth.getUser();
-  if (!data.user) return null;
-  const { data: profil } = await sb
-    .from("profils")
-    .select("id, pseudo, bio, role, cree_le, widgets")
-    .eq("id", data.user.id)
-    .single();
-  if (!profil) return null;
-  return { email: data.user.email ?? "", profil: profil as Profil };
+  try {
+    const sb = await clientServeur();
+    if (!sb) return null;
+    const { data } = await sb.auth.getUser();
+    if (!data.user) return null;
+    const { data: profil } = await sb
+      .from("profils")
+      .select("id, pseudo, bio, role, cree_le, widgets")
+      .eq("id", data.user.id)
+      .single();
+    if (!profil) return null;
+    return { email: data.user.email ?? "", profil: profil as Profil };
+  } catch {
+    return null;
+  }
 }
