@@ -1,19 +1,20 @@
 "use client";
 
-import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { donneesPays, type FicheArticle, type FichePays } from "@/data/concept/conceptGeo";
+import type { FicheArticle } from "@/data/concept/conceptGeo";
 import { type FicheDebat, type LigneSource, type SocleEco } from "@/data/concept/conceptEconomie";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import { Dessin, Jetons } from "./Jetons";
 import { monnaieCourante, useMonnaie } from "./Monnaie";
 import { convertir, fiche } from "@/data/finance/tauxChange";
 import { Loupe } from "./Loupe";
-import { Enseigne, EnTete, ImagePlaceholder, LENT, Monte, Pied } from "./pieces";
+import { EnTete, ImagePlaceholder, LENT, Monte, Pied, TitreSection } from "./pieces";
 import { gelerOdometres, Odometre } from "./Roulement";
 import { Lettres, MOT_MONNAIE } from "./Lettres";
 import { GlobeEco, familleDe, TOUTES } from "./GlobeEco";
 import { cle } from "@/data/concept/cle";
+import { Titre, usePret, useProgression, useSocleComplet, useVu } from "./ouverture";
 import "./concept.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -26,8 +27,21 @@ import "./concept.css";
    avec un zéro.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/** Le PIB mondial du dernier millésime, sommé côté serveur : le bandeau en
+    direct n'a besoin que de ce total, pas du socle pays par pays. */
+export interface PibMonde {
+  total: number;
+  n: number;
+  annee: number;
+}
+
 export interface EcoProps {
+  /** Le socle, allégé à la dernière année publiée : la page s'affiche
+      aussitôt, le reste des années arrive juste après (voir socleUrl). */
   socle: SocleEco;
+  /** L'adresse du socle complet, chargé une fois la page affichée. */
+  socleUrl: string;
+  pibMonde: PibMonde;
   /* Les compteurs qui couraient en ouverture sont sortis de la page. Le
      composant reste dans le dépôt : les remettre tient en une ligne, ailleurs
      et plus discrets si on le souhaite. */
@@ -130,51 +144,6 @@ function val(v: number | null, unite: Unite) {
    frise : le tableau ne dépend pas de l'année visée, seulement de l'année
    posée, et il n'a donc aucune raison de repasser par React entre-temps.
    C'est ce qui rendait la frise poisseuse. */
-/* L'ouverture de la bande au défilement.
-
-   whileInView de framer n'a jamais répondu ici, et un IntersectionObserver
-   posé au montage restait muet alors qu'un observateur créé après coup sur le
-   même nœud, lui, se déclenchait. Plutôt que de dépendre d'un mécanisme qui
-   se comporte différemment selon le moment où on l'installe, on lit la
-   position réelle à chaque défilement : c'est une lecture par image, sur un
-   seul nœud, et la mesure est relue à chaque fois donc jamais périmée. Une
-   fois la bande vue, on décroche tout et on n'y revient pas. */
-export function useVu(marge = 120) {
-  const ref = useRef<HTMLElement | null>(null);
-  const [vu, setVu] = useState(false);
-  useEffect(() => {
-    let vivant = true;
-    const regarde = () => {
-      const n = ref.current;
-      if (!n) return;
-      const r = n.getBoundingClientRect();
-      const h = window.innerHeight || 0;
-      /* Le rectangle doit réapparaître à chaque fois qu'on revient dessus,
-         pas seulement la première : on suit l'état au lieu de le figer. */
-      setVu(r.top < h - marge && r.bottom > marge);
-    };
-    /* On mesure dans l'écouteur, pas dans une image d'animation. Attendre
-       requestAnimationFrame liait l'ouverture au rythme de rendu : sur une
-       page où le globe tire la cadence vers le bas, la bande s'ouvrait avec
-       un défilement de retard. Lire la position d'un seul élément ne coûte
-       rien, et le résultat est juste au moment où on le lit. */
-    const planifie = () => {
-      if (!vivant) return;
-      regarde();
-    };
-    const decroche = () => {
-      vivant = false;
-      window.removeEventListener("scroll", planifie);
-      window.removeEventListener("resize", planifie);
-    };
-    window.addEventListener("scroll", planifie, { passive: true });
-    window.addEventListener("resize", planifie);
-    planifie();
-    return decroche;
-  }, [marge]);
-  return { ref, vu };
-}
-
 /* ── L'année en cours ────────────────────────────────────────────────────
    Le produit intérieur brut est un flux : il se renouvelle chaque année, et
    ce qu'un pays a produit depuis le premier janvier se déduit de sa dernière
@@ -215,7 +184,7 @@ const DEPENSES_ECO: { id: string; label: string; parSeconde: number }[] = [
   { id: "educatives", label: "Dépenses éducatives", parSeconde: 132_610 },
 ];
 
-function TempsReelEco() {
+function TempsReelEco({ pib }: { pib: PibMonde }) {
   const [monnaie] = useMonnaie();
   const f = fiche(monnaie);
 
@@ -225,26 +194,20 @@ function TempsReelEco() {
   }, []);
   const departDepenses = useMemo(() => performance.now() - (Date.now() - EPOQUE_DEPENSES), []);
 
-  const pib = useMemo(() => {
-    const { annee, pays } = donneesPays();
-    let total = 0;
-    let n = 0;
-    for (const p of Object.values(pays)) {
-      if (typeof p.pib === "number" && Number.isFinite(p.pib)) {
-        total += p.pib;
-        n++;
-      }
-    }
-    return { total, n, annee };
-  }, []);
   const pibMonnaie = convertir(pib.total, pib.annee, monnaie);
 
   return (
     <section className="cg-section" id="temps-reel-eco">
       <div className="cg-wrap">
-        <Enseigne droite={<span className="cg-demo-mini">Depuis le 1<sup>er</sup> janvier 2026</span>}>
-          <span className="cg-point-vif" aria-hidden="true" /> Données en temps réel
-        </Enseigne>
+        <TitreSection
+          direct
+          titre="Données en temps réel"
+          sous={
+            <>
+              Depuis le 1<sup>er</sup> janvier 2026
+            </>
+          }
+        />
 
         <div className="cg-cpt-l" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
           <div className="cg-cpt">
@@ -323,46 +286,6 @@ const VERS_NOM: Record<string, string> = Object.fromEntries(
   Object.entries(PAR_NOM).map(([n, id]) => [id, n]),
 );
 
-/**
- * La progression de l'ouverture : zéro quand elle tient l'écran, un quand
- * elle l'a quitté par le haut.
- *
- * Elle s'écrit directement dans le style de la section, sans passer par un
- * rendu React : le navigateur interpole tout le reste en CSS, à partir de
- * cette seule variable. Descendre et remonter sont donc le même mouvement,
- * joué dans un sens puis dans l'autre, et rien ne se rejoue d'un coup en
- * arrivant par le bas.
- *
- * La mesure se fait dans l'écouteur, comme pour `useVu` et pour la même
- * raison : une image d'animation de retard se voit sur cette page.
- */
-export function useProgression() {
-  const ref = useRef<HTMLElement | null>(null);
-  useEffect(() => {
-    let vivant = true;
-    const regarde = () => {
-      const n = ref.current;
-      if (!n || !vivant) return;
-      const r = n.getBoundingClientRect();
-      /* La course : la hauteur de l'ouverture. Une course plus courte
-         faisait disparaître les tuiles alors que l'ouverture tenait encore
-         l'écran — le mouvement prenait de l'avance sur la lecture. */
-      const course = Math.max(1, r.height);
-      const p = Math.min(1, Math.max(0, -r.top / course));
-      n.style.setProperty("--p", p.toFixed(3));
-    };
-    window.addEventListener("scroll", regarde, { passive: true });
-    window.addEventListener("resize", regarde);
-    regarde();
-    return () => {
-      vivant = false;
-      window.removeEventListener("scroll", regarde);
-      window.removeEventListener("resize", regarde);
-    };
-  }, []);
-  return ref;
-}
-
 /* ═══════════════════════════════════════════════════════════════════════════
    LA FRISE
 
@@ -376,24 +299,6 @@ export function useProgression() {
    qui passe, ils projettent une grandeur annuelle : les arrêter une seconde
    ne fausse rien, et cela rend au glissement les images qu'ils prenaient.
    ═══════════════════════════════════════════════════════════════════════════ */
-/* Un titre qui se lève, mot par mot, derrière un masque. Chaque mot porte son
-   rang : c'est le CSS qui décale les départs, rien ne tourne en JavaScript. */
-export function Titre({ texte }: { texte: string }) {
-  const mots = texte.split(" ");
-  return (
-    <>
-      {mots.map((m, i) => (
-        <Fragment key={`${m}-${i}`}>
-          <span className="cg-mot" style={{ "--i": i } as React.CSSProperties}>
-            <span>{m}</span>
-          </span>
-          {i < mots.length - 1 ? " " : null}
-        </Fragment>
-      ))}
-    </>
-  );
-}
-
 const Frise = memo(function Frise({
   annees,
   valeur,
@@ -730,7 +635,8 @@ const Tableau = memo(function Tableau({
   );
 });
 
-export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps) {
+export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, articles, debats, faq }: EcoProps) {
+  const socle = useSocleComplet(socleLeger, socleUrl);
   /* La page ne connaît qu'une année : celle qu'elle affiche. L'année visée
      pendant qu'on glisse appartient à la frise, et n'en sort qu'une fois le
      geste posé — c'est ce qui l'empêche de redessiner le globe à chaque
@@ -768,17 +674,8 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
    * paramètres de rendu : la page reste entièrement statique, donc servie
    * depuis le cache pour tout le monde, quelle que soit l'adresse demandée.
    */
-  const [pret, setPret] = useState(false);
+  const pret = usePret();
   const arrivee = useRef(false);
-  useEffect(() => {
-    const lance = () => requestAnimationFrame(() => setPret(true));
-    if (document.readyState === "complete") {
-      lance();
-      return;
-    }
-    window.addEventListener("load", lance);
-    return () => window.removeEventListener("load", lance);
-  }, []);
   const [qArticle, setQArticle] = useState("");
   const [choisi, setChoisi] = useState<string | null>("France");
   const [ouvert, setOuvert] = useState<number | null>(0);
@@ -1098,7 +995,7 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
         </div>
       </section>
 
-      <TempsReelEco />
+      <TempsReelEco pib={pibMonde} />
 
       {/* Le témoin que l'arc regarde : dès qu'il entre dans l'écran, l'arc
           s'allume et s'ouvre. */}
@@ -1107,9 +1004,10 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
       {/* ── Le globe, sa frise et ses raccourcis ─────────────────────────── */}
       <section id="globe" className="cg-section cg-eco-globe">
         <div className="cg-wrap">
-          <Enseigne droite={<span className="cg-demo-mini">Banque mondiale (WDI) · FMI</span>}>
-            Le globe, {annee}
-          </Enseigne>
+          <TitreSection
+            titre="Notre globe"
+            sous={`De ${socle.annees[0]} à ${ANNEE_EN_COURS} · Banque mondiale (WDI), FMI`}
+          />
 
           <GlobeEco
             annee={anneeEco}
@@ -1323,7 +1221,7 @@ export function EconomiePage({ socle, sources, articles, debats, faq }: EcoProps
       {/* ── La FAQ ───────────────────────────────────────────────────────── */}
       <section className="cg-section cg-questions">
         <div className="cg-wrap">
-          <Enseigne>Les questions d&apos;économie</Enseigne>
+          <TitreSection titre="Les questions d’économie" />
 
           {/* Le balisage que les moteurs lisent. Il décrit les questions et
               leurs réponses telles qu'elles sont affichées — jamais autre

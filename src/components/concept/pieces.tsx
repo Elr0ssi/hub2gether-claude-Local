@@ -155,6 +155,30 @@ export function Enseigne({ children, droite }: { children: React.ReactNode; droi
   );
 }
 
+/** Le titre de section des pages de sujet (Économie, Démographie, Forum…) :
+    un grand titre blanc, et en dessous, en petit, ce qui le situe — une
+    période, une source. Les pages de sujet partagent toutes cette forme. */
+export function TitreSection({
+  titre,
+  sous,
+  direct,
+}: {
+  titre: React.ReactNode;
+  sous?: React.ReactNode;
+  /** Un point vert qui bat devant le titre : la section avance en direct. */
+  direct?: boolean;
+}) {
+  return (
+    <div className="cg-ts">
+      <h2 className="cg-ts-t">
+        {direct && <span className="cg-point-vif" aria-hidden="true" />}
+        {titre}
+      </h2>
+      {sous && <p className="cg-ts-s">{sous}</p>}
+    </div>
+  );
+}
+
 /* ── L'en-tête et le pied, partagés par les pages du prototype ──────────── */
 
 interface Onglet {

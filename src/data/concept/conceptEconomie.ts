@@ -120,6 +120,21 @@ export function socleEco(): SocleEco {
   return { annees: ECONOMY_YEARS.map((y) => y.year), pays, cols, lignes };
 }
 
+/** Le PIB mondial du dernier millésime publié, sommé ici plutôt que dans le
+    navigateur : le bandeau en direct n'a pas à embarquer toute la base. */
+export function pibMonde(): { total: number; n: number; annee: number } {
+  const y = ECONOMY_YEARS[ECONOMY_YEARS.length - 1];
+  let total = 0;
+  let n = 0;
+  for (const d of Object.values(y.countries)) {
+    if (typeof d.gdp === "number" && Number.isFinite(d.gdp)) {
+      total += d.gdp;
+      n++;
+    }
+  }
+  return { total, n, annee: y.year };
+}
+
 export function articlesEco(n = 9): FicheArticle[] {
   return [...ECONOMY_ARTICLES]
     .sort((a, b) => {

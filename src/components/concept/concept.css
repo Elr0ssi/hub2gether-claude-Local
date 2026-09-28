@@ -518,6 +518,23 @@ body:has(.cg) { background: #05080c; }
   white-space: nowrap;
 }
 .cg-enseigne-r { flex: 1; height: 1px; background: var(--bord-fin); }
+
+/* Le titre des pages de sujet : grand, blanc, et sa légende en petit
+   dessous — pas de filet, pas de capitales espacées. */
+.cg-ts { margin-bottom: 34px; }
+.cg-ts-t {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+  font-size: clamp(30px, 3.4vw, 46px);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  color: var(--encre);
+}
+.cg-ts-t .cg-point-vif { width: 9px; height: 9px; flex-shrink: 0; }
+.cg-ts-s { margin: 10px 0 0; font-size: 14px; line-height: 1.5; color: var(--encre-3); }
 .cg-point-vif {
   width: 5px; height: 5px; border-radius: 5px; background: var(--vert);
   animation: cg-bat 2.4s ease-out infinite;

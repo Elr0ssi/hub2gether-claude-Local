@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DemographiePage } from "@/components/concept/DemographiePage";
 import { articlesDemo, compteurDemo, socleDemo } from "@/data/concept/conceptDemographie";
 import { jsonLdString } from "@/lib/schema";
+import { allegerSocle } from "@/data/concept/socleLeger";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    /demographie — LA PAGE PRINCIPALE DU SUJET DÉMOGRAPHIQUE
@@ -99,7 +100,12 @@ export default function Page() {
         zéro.
       </p>
 
-      <DemographiePage socle={socle} compteur={compteur} articles={articlesDemo(9)} />
+      <DemographiePage
+        socle={allegerSocle(socle, [derniere])}
+        socleUrl="/demographie/socle.json"
+        compteur={compteur}
+        articles={articlesDemo(9)}
+      />
     </>
   );
 }

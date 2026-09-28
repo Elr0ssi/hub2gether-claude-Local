@@ -5,12 +5,12 @@ import type { SocleDemo } from "@/data/concept/conceptDemographie";
 import type { FicheArticle } from "@/data/concept/conceptGeo";
 import type { DemographyMetricId, DemographyYear } from "@/data/demographie/demographie";
 import { Dessin, Jetons } from "./Jetons";
-import { Enseigne, EnTete, ImagePlaceholder, Pied } from "./pieces";
+import { EnTete, ImagePlaceholder, Pied, TitreSection } from "./pieces";
 import { Loupe } from "./Loupe";
 import { Odometre, gelerOdometres } from "./Roulement";
 import { Lettres } from "./Lettres";
 import { compteurPossibleDemo, familleDe, GlobeDemographie, TOUTES, type MetriqueDemo } from "./GlobeDemographie";
-import { Titre, useProgression, useVu } from "./EconomiePage";
+import { Titre, usePret, useProgression, useSocleComplet, useVu } from "./ouverture";
 import { cle } from "@/data/concept/cle";
 import "./concept.css";
 
@@ -37,7 +37,9 @@ export interface CompteurDemoProps {
 }
 
 export interface DemoProps {
+  /** Le socle allégé à la dernière année ; le reste arrive par socleUrl. */
   socle: SocleDemo;
+  socleUrl: string;
   compteur: CompteurDemoProps;
   articles: FicheArticle[];
 }
@@ -71,15 +73,15 @@ function TempsReelDemo({ compteur }: { compteur: CompteurDemoProps }) {
   return (
     <section className="cg-section" id="temps-reel-demo">
       <div className="cg-wrap">
-        <Enseigne
-          droite={
-            <span className="cg-demo-mini">
+        <TitreSection
+          direct
+          titre="Données en temps réel"
+          sous={
+            <>
               Depuis le 1<sup>er</sup> janvier {new Date().getFullYear()}
-            </span>
+            </>
           }
-        >
-          <span className="cg-point-vif" aria-hidden="true" /> Données en temps réel
-        </Enseigne>
+        />
         <div className="cg-cpt-l" style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
           <div className="cg-cpt">
             <span className="cg-cpt-l2">Population mondiale</span>
@@ -423,7 +425,8 @@ function TableauDemo({
   );
 }
 
-export function DemographiePage({ socle, compteur, articles }: DemoProps) {
+export function DemographiePage({ socle: socleLeger, socleUrl, compteur, articles }: DemoProps) {
+  const socle = useSocleComplet(socleLeger, socleUrl);
   const [annee, setAnnee] = useState(socle.annees[socle.annees.length - 1]);
   const [metrique, setMetrique] = useState<DemographyMetricId>("population");
   const [sens, setSens] = useState<1 | -1>(-1);
@@ -436,17 +439,8 @@ export function DemographiePage({ socle, compteur, articles }: DemoProps) {
   const bande = useVu(20);
   const haut = useVu(260);
   const ouverture = useProgression();
-  const [pret, setPret] = useState(false);
+  const pret = usePret();
   const arrivee = useRef(false);
-  useEffect(() => {
-    const lance = () => requestAnimationFrame(() => setPret(true));
-    if (document.readyState === "complete") {
-      lance();
-      return;
-    }
-    window.addEventListener("load", lance);
-    return () => window.removeEventListener("load", lance);
-  }, []);
 
   useEffect(() => {
     if (arrivee.current) return;
@@ -605,7 +599,10 @@ export function DemographiePage({ socle, compteur, articles }: DemoProps) {
 
       <section id="globe" className="cg-section cg-eco-globe">
         <div className="cg-wrap">
-          <Enseigne droite={<span className="cg-demo-mini">Nations Unies · WPP 2024</span>}>Le globe, {annee}</Enseigne>
+          <TitreSection
+            titre="Notre globe"
+            sous={`De ${socle.annees[0]} à ${socle.annees[socle.annees.length - 1]} · Nations Unies, World Population Prospects 2024`}
+          />
 
           <GlobeDemographie
             annee={anneeDemo}

@@ -4,10 +4,12 @@ import {
   articlesEco,
   debatsEco,
   faqEco,
+  pibMonde,
   socleEco,
   sourcesEco,
 } from "@/data/concept/conceptEconomie";
 import { jsonLdString } from "@/lib/schema";
+import { allegerSocle } from "@/data/concept/socleLeger";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    /economie — LA PAGE PRINCIPALE DU SUJET ÉCONOMIQUE
@@ -122,7 +124,9 @@ export default function Page() {
       </p>
 
       <EconomiePage
-        socle={socle}
+        socle={allegerSocle(socle, [derniere])}
+        socleUrl="/economie/socle.json"
+        pibMonde={pibMonde()}
         sources={sourcesEco()}
         debats={debatsEco()}
         articles={articlesEco(9)}

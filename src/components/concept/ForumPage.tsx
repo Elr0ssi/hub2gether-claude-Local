@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FILS, TAGS, type Fil } from "@/data/community/fils";
 import { ilYA, scoreFil, useForum, type Compte, type Message } from "@/components/community/store";
 import { Dessin, Jetons } from "./Jetons";
-import { Enseigne, EnTete, Pied } from "./pieces";
+import { EnTete, Pied, TitreSection } from "./pieces";
 import { Loupe } from "./Loupe";
-import { Titre, useProgression, useVu } from "./EconomiePage";
+import { Titre, usePret, useProgression, useVu } from "./ouverture";
 import "./concept.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -355,16 +355,7 @@ export function ForumPage() {
 
   const haut = useVu(260);
   const ouverture = useProgression();
-  const [prete, setPrete] = useState(false);
-  useEffect(() => {
-    const lance = () => requestAnimationFrame(() => setPrete(true));
-    if (document.readyState === "complete") {
-      lance();
-      return;
-    }
-    window.addEventListener("load", lance);
-    return () => window.removeEventListener("load", lance);
-  }, []);
+  const prete = usePret();
 
   const nbMessages = useMemo(() => {
     const c = new Map<string, number>();
@@ -454,21 +445,20 @@ export function ForumPage() {
 
       <section className="cg-section cg-eco-globe">
         <div className="cg-wrap">
-          <Enseigne
-            droite={
-              <span className="cg-demo-mini">
-                {compte ? (
-                  <>
-                    Connecté comme {compte.pseudo} · <a href="/compte">Mon espace</a>
-                  </>
-                ) : (
-                  <a href="/compte/connexion">Se connecter</a>
-                )}
-              </span>
+          <TitreSection
+            titre="Les fils du moment"
+            sous={
+              compte ? (
+                <>
+                  Connecté comme {compte.pseudo} · <a href="/compte">Mon espace</a>
+                </>
+              ) : (
+                <>
+                  <a href="/compte/connexion">Se connecter</a> pour écrire et voter
+                </>
+              )
             }
-          >
-            Les fils du moment
-          </Enseigne>
+          />
 
           <div className="cg-fo-barre">
             <div className="ge-metriques" role="tablist" aria-label="Tri">
