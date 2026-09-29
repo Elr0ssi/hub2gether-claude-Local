@@ -375,7 +375,7 @@ export function PoliticsGlobe({
       });
 
     Promise.all([
-      fetch("/geo/ne_50m_countries.geojson").then((r) => r.json()),
+      fetch("/geo/ne_50m_countries.simplified.geojson").then((r) => r.json()),
       loadEarth(),
     ])
       .then(([geojson, earth]: [GeoJSON.FeatureCollection, HTMLImageElement]) => {

@@ -895,8 +895,18 @@ body:has(.cg) { background: #05080c; }
   .cg-nav { display: none; }
   /* Sans onglets, la barre n'a plus que son nom au centre, et au bout le
      forum et le compte. Les deux se resserrent, et le libellé du compte
-     passe à sa forme courte, pour ne pas mordre sur le nom. */
-  .cg-bout { gap: 9px; }
+     passe à sa forme courte, pour ne pas mordre sur le nom.
+
+     Au-dessus de mille quatre-vingts pixels, l'entrée de compte n'apparaît
+     qu'au survol du nom — un geste qu'un écran tactile ne fait jamais. En
+     dessous, elle reste posée : sans elle, « Se connecter » existe dans la
+     page mais personne ne peut ni le voir ni le toucher. */
+  .cg-bout {
+    gap: 9px;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(-50%);
+  }
   .cg-bout-l { font-size: 12px; }
   .cg-cnx { padding: 6px 11px; font-size: 12px; }
   /* Le jeton de verre sous le nom déborde de trente-six pixels : sur une

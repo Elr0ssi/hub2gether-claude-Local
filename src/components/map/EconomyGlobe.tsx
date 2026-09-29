@@ -1110,12 +1110,14 @@ export function EconomyGlobe({
         else setTimeout(r, 0);
       });
 
-    /* Le tracé fin, et lui seul. Le fichier allégé de Natural Earth pèse
-       quatre fois moins, mais il ne connaît que cent soixante-dix-sept
-       entités contre deux cent trente et une : Singapour, Hong Kong, Malte,
-       Bahreïn et cinquante autres en sont absents. Sur un globe économique,
-       ce serait troquer des secondes contre des pays. */
-    const pTrace = fetch("/geo/ne_50m_countries.geojson").then((r) => r.json());
+    /* Le tracé fin, et lui seul. Le fichier allégé de Natural Earth (cent
+       soixante-dix-sept entités) coûterait Singapour, Hong Kong, Malte,
+       Bahreïn et cinquante autres : sur un globe économique, ce serait
+       troquer des secondes contre des pays. On garde les deux cent
+       trente et une entités, mais simplifiées : à l'échelle d'un globe qui
+       tient sur un écran, un tracé à cent points par pays se voit aussi bien
+       qu'à mille, pour un dixième du poids. */
+    const pTrace = fetch("/geo/ne_50m_countries.simplified.geojson").then((r) => r.json());
     const pTopo = loadImage(TOPOLOGY);
     const pPhoto = loadImage(IMAGERY);
 
