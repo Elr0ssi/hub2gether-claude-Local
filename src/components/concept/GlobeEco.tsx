@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "./Theme";
+import { usePret } from "./ouverture";
 import { monnaieCourante } from "./Monnaie";
 import { fiche } from "@/data/finance/tauxChange";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
@@ -23,8 +24,22 @@ import { Odometre } from "./Roulement";
 
 const EconomyGlobe = dynamic(
   () => import("@/components/map/EconomyGlobe").then((m) => m.EconomyGlobe),
-  { ssr: false, loading: () => <div className="ge-attente" /> },
+  { ssr: false, loading: () => <AttenteGlobe /> },
 );
+
+/** Le petit globe qui tourne, à la place du vrai le temps qu'il se construise.
+    Pur CSS : un anneau et un méridien, sur les jetons du thème — il n'a donc
+    rien à charger et s'adapte de lui-même au jour comme à la nuit. */
+function AttenteGlobe() {
+  return (
+    <div className="ge-attente" aria-hidden="true">
+      <span className="ge-attente-globe">
+        <span className="ge-attente-meridien" />
+        <span className="ge-attente-meridien ge-attente-meridien-2" />
+      </span>
+    </div>
+  );
+}
 
 /** La rampe bleue du prototype, du sombre au clair, en neuf pas. */
 const BLEUS = [
@@ -283,6 +298,14 @@ export function GlobeEco({
   const [theme] = useTheme();
   const jour = theme === "clair";
 
+  /* Le globe ne monte qu'une fois le reste de la page posé à l'écran.
+     Construire sa sphère — près de trois cent mille sommets, pour que le
+     relief suive vraiment les côtes — bloque le fil principal une bonne
+     fraction de seconde : lancé au montage, c'est ce blocage-là que la page
+     entière subissait en arrivant. Décalé de deux images, il démarre une
+     fois que le titre, les tuiles et la barre sont déjà peints. */
+  const pretGlobe = usePret();
+
   const cadre = useRef<HTMLDivElement>(null);
 
   /* La lumière du limbe suit la caméra.
@@ -394,30 +417,34 @@ export function GlobeEco({
       <div className="ge-corps">
         <div className="ge-colonne">
           <div className="ge-scene" ref={scene}>
-            <EconomyGlobe
-              economyYear={annee}
-              metric={metrique.id}
-              selectedCountry={choisi}
-              onCountryClick={(n) => onChoisi(n)}
-              /* Le globe peint ses fonds de carte une fois, au montage : un
-                 changement de palette après coup ne repeindrait que les
-                 remplissages, pas l'océan ni le graticule. On le remonte
-                 donc, ce qui ne se produit qu'au clic sur le bouton du
-                 thème. */
-              key={theme}
-              palette={jour ? PALETTE_JOUR : PALETTE}
-              /* La sphère occupe davantage son cadre : la valeur d'origine
-                 laissait près d'un cinquième de vide autour d'elle. */
-              marge={1.06}
-              onCadrage={mesureLimbe}
-              /* Un plafond à quatre mille texels ne montrait rien de plus
-                 qu'un aplat flou une fois zoomé : le zoom concentre une
-                 tranche étroite de la toile sur toute la scène, et c'est
-                 justement là qu'il faut des texels à revendre. On laisse
-                 la machine décider comme sur le reste du site — un
-                 appareil capable peint la toile pleine, les autres restent
-                 sur la plus légère. */
-            />
+            {pretGlobe ? (
+              <EconomyGlobe
+                economyYear={annee}
+                metric={metrique.id}
+                selectedCountry={choisi}
+                onCountryClick={(n) => onChoisi(n)}
+                /* Le globe peint ses fonds de carte une fois, au montage : un
+                   changement de palette après coup ne repeindrait que les
+                   remplissages, pas l'océan ni le graticule. On le remonte
+                   donc, ce qui ne se produit qu'au clic sur le bouton du
+                   thème. */
+                key={theme}
+                palette={jour ? PALETTE_JOUR : PALETTE}
+                /* La sphère occupe davantage son cadre : la valeur d'origine
+                   laissait près d'un cinquième de vide autour d'elle. */
+                marge={1.06}
+                onCadrage={mesureLimbe}
+                /* Un plafond à quatre mille texels ne montrait rien de plus
+                   qu'un aplat flou une fois zoomé : le zoom concentre une
+                   tranche étroite de la toile sur toute la scène, et c'est
+                   justement là qu'il faut des texels à revendre. On laisse
+                   la machine décider comme sur le reste du site — un
+                   appareil capable peint la toile pleine, les autres restent
+                   sur la plus légère. */
+              />
+            ) : (
+              <AttenteGlobe />
+            )}
             {/* L'éclat qui sort de la sphère : un anneau de lumière posé sur
                 son bord, en fusion d'écran, qui respire. Il ne tourne pas avec
                 le globe — c'est une lumière, pas une matière. */}

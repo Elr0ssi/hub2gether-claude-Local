@@ -2,6 +2,7 @@ import { CAUSES_MORTALITE, DEMOGRAPHY_YEARS, SOURCES_SOCLE_DEMO } from "@/data/d
 import { countryFr } from "@/data/countryNamesFr";
 import { EPIDEMICS_ARTICLES } from "@/data/articles";
 import type { FicheArticle } from "./conceptGeo";
+import type { FicheDebat } from "./conceptEconomie";
 
 /**
  * Le socle démographique, préparé pour le prototype.
@@ -137,4 +138,77 @@ export function articlesDemo(n = 9): FicheArticle[] {
       duree: a.readingTime ? `${a.readingTime} min` : "durée inconnue",
       mots: [...(a.tags ?? []), a.title].join(" · ").toLowerCase(),
     }));
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA FAQ DÉMOGRAPHIE
+
+   Une seule base derrière ces réponses — les Nations Unies, pas dix sources
+   à arbitrer comme sur la page Économie — mais la même honnêteté : ce qui
+   est mesuré, ce qui est projeté, ce qui manque et reste absent plutôt que
+   ramené à zéro.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+export function faqDemo(): { question: string; answer: string }[] {
+  return [
+    {
+      question: "Combien de personnes vivent sur Terre, et comment ce chiffre avance-t-il ?",
+      answer:
+        "Le socle donne un total par pays et par année, publié par les Nations Unies. Pour l'année en cours, ce total n'est pas mesuré en direct : il part du dernier chiffre publié et avance au rythme des naissances et des décès de l'année, comptés depuis le 1er janvier. C'est une projection à débit constant, pas une mesure seconde par seconde — la page le dit à côté du compteur.",
+    },
+    {
+      question: "Taux de natalité et nombre de naissances : pourquoi les deux ?",
+      answer:
+        "Le taux, pour mille habitants, compare des pays de toute taille sur un pied d'égalité. L'effectif, le nombre brut de naissances, dit ce qui se produit réellement sur le terrain — un pays au taux modeste peut compter plus de naissances qu'un petit pays au taux élevé. Les deux sont sur le globe, dans la même famille d'indicateurs, pour ne pas avoir à choisir.",
+    },
+    {
+      question: "Pourquoi un bouton « pour 100 000 habitants » seulement sur la mortalité ?",
+      answer:
+        "Un effectif brut de décès par cancer ou par accident de la route classe surtout les pays les plus peuplés en tête, quelle que soit leur situation réelle. Rapporté à 100 000 habitants, deux pays de taille très différente se comparent enfin sur la même échelle. Les causes détaillées — cancer, suicide, homicide, route, diabète, mortalité maternelle — ne remontent que depuis 1990 dans la base : les années antérieures restent grises sur cette famille, elles ne sont pas comptées pour zéro.",
+    },
+    {
+      question: "Accroissement naturel et solde migratoire, quelle différence ?",
+      answer:
+        "L'accroissement naturel est l'écart entre les naissances et les décès d'un pays : ce qu'il produit lui-même, sans personne qui entre ou qui sorte. Le solde migratoire compte les arrivées moins les départs. Une population peut croître alors que son accroissement naturel est négatif, portée par la migration — et inversement. Le globe les affiche comme deux indicateurs distincts, jamais fondus en un seul chiffre.",
+    },
+    {
+      question: "D'où viennent ces chiffres, et que se passe-t-il quand l'un d'eux manque ?",
+      answer:
+        "D'une seule base : les Nations Unies, World Population Prospects 2024. Une année qu'elle ne publie pas pour un pays reste absente — elle n'est ni devinée d'après ses voisines, ni ramenée à zéro. Le pays sort en gris sur le globe et porte la mention « n.d. » au classement : il n'est pas dernier, il n'est pas classé. Le détail par indicateur est donné au bas de cette page.",
+    },
+  ];
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DÉBATS DE DÉMOGRAPHIE
+
+   Rédigés comme des arbitrages, pas des opinions attribuées à quelqu'un —
+   même principe que les débats d'économie. Sans article dédié à pointer, ils
+   restent volontairement sans chiffre inventé : l'ancre dit une tendance
+   documentée, jamais un total précis qu'on ne mesure pas ici.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const DEBATS_DEMO: FicheDebat[] = [
+  {
+    id: "vieillissement-mondial",
+    question: "Le monde vieillit : faut-il reculer l'âge de la retraite partout ?",
+    ancre: "Natalité en repli, espérance de vie en hausse",
+    tags: ["Vieillissement", "Retraite"],
+  },
+  {
+    id: "migration-compense",
+    question: "Quand l'accroissement naturel recule, la migration doit-elle compenser ?",
+    ancre: "Deux moteurs, un seul total de population",
+    tags: ["Migration", "Population"],
+  },
+  {
+    id: "pic-population",
+    question: "La population mondiale va-t-elle vraiment plafonner ce siècle ?",
+    ancre: "Croissance mondiale en net ralentissement",
+    tags: ["Natalité", "Projection"],
+  },
+];
+
+export function debatsDemo(): FicheDebat[] {
+  return DEBATS_DEMO;
 }

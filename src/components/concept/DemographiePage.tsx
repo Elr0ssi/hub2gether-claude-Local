@@ -1,11 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import type { SocleDemo } from "@/data/concept/conceptDemographie";
 import type { FicheArticle } from "@/data/concept/conceptGeo";
+import type { FicheDebat } from "@/data/concept/conceptEconomie";
 import type { DemographyMetricId, DemographyYear } from "@/data/demographie/demographie";
 import { Dessin, Jetons } from "./Jetons";
-import { EnTete, ImagePlaceholder, Pied, TitreSection } from "./pieces";
+import { EnTete, ImagePlaceholder, LENT, Pied, TitreSection } from "./pieces";
 import { Loupe } from "./Loupe";
 import { Odometre, gelerOdometres } from "./Roulement";
 import { Lettres } from "./Lettres";
@@ -42,6 +44,9 @@ export interface DemoProps {
   socleUrl: string;
   compteur: CompteurDemoProps;
   articles: FicheArticle[];
+  debats: FicheDebat[];
+  faq: { question: string; answer: string }[];
+  sources: { libelle: string; source: string }[];
 }
 
 type Rang = { nom: string; fr: string } & Record<DemographyMetricId, number | null>;
@@ -424,7 +429,15 @@ function TableauDemo({
   );
 }
 
-export function DemographiePage({ socle: socleLeger, socleUrl, compteur, articles }: DemoProps) {
+export function DemographiePage({
+  socle: socleLeger,
+  socleUrl,
+  compteur,
+  articles,
+  debats,
+  faq,
+  sources,
+}: DemoProps) {
   const socle = useSocleComplet(socleLeger, socleUrl);
   const [annee, setAnnee] = useState(socle.annees[socle.annees.length - 1]);
   const [metrique, setMetrique] = useState<DemographyMetricId>("population");
@@ -432,8 +445,20 @@ export function DemographiePage({ socle: socleLeger, socleUrl, compteur, article
   const [filtre, setFiltre] = useState("");
   const [choisi, setChoisi] = useState<string | null>("France");
   const [qArticle, setQArticle] = useState("");
+  const [ouvertQ, setOuvertQ] = useState<number | null>(null);
   const rail2 = useRef<HTMLDivElement>(null);
   const prise2 = useRef<{ x: number; g: number } | null>(null);
+  const rail3 = useRef<HTMLDivElement>(null);
+  const prise3 = useRef<{ x: number; g: number } | null>(null);
+
+  /* La question des sources porte sa réponse dans un tableau plutôt que
+     d'ouvrir une seconde question qui dirait la même chose — même principe
+     que sur la page Économie. */
+  const questionsVues = useMemo(() => {
+    const i = faq.findIndex((q) => /sources|manque/i.test(q.question));
+    if (i < 0) return faq.map((q) => ({ ...q, tableau: false }));
+    return faq.map((q, k) => ({ ...q, tableau: k === i }));
+  }, [faq]);
 
   const bande = useVu(20);
   const haut = useVu(260);
@@ -700,6 +725,40 @@ export function DemographiePage({ socle: socleLeger, socleUrl, compteur, article
                 <p className="cg-art-c">{articlesVus[0].chapo}</p>
               </article>
 
+              {debats.length > 0 && (
+                <div className="cg-debats">
+                  <div className="cg-debats-t">
+                    <span>Sur le forum</span>
+                    <span className="cg-debats-n">{debats.length} débats</span>
+                  </div>
+                  <div
+                    ref={rail3}
+                    className="cg-debats-l"
+                    onPointerDown={(e) => {
+                      prise3.current = { x: e.clientX, g: e.currentTarget.scrollLeft };
+                      e.currentTarget.setPointerCapture(e.pointerId);
+                    }}
+                    onPointerMove={(e) => {
+                      if (!prise3.current || !rail3.current) return;
+                      rail3.current.scrollLeft = prise3.current.g - (e.clientX - prise3.current.x);
+                    }}
+                    onPointerUp={() => {
+                      prise3.current = null;
+                    }}
+                    onPointerCancel={() => {
+                      prise3.current = null;
+                    }}
+                  >
+                    {debats.map((d) => (
+                      <a key={d.id} href="/forum" className="cg-debat">
+                        <span className="cg-debat-q">{d.question}</span>
+                        <span className="cg-debat-a">{d.ancre}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="cg-arts-c">
                 <div
                   ref={rail2}
@@ -733,6 +792,81 @@ export function DemographiePage({ socle: socleLeger, socleUrl, compteur, article
               </div>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* ── La FAQ ───────────────────────────────────────────────────────── */}
+      <section className="cg-section cg-questions">
+        <div className="cg-wrap">
+          <TitreSection titre="Les questions de démographie" />
+
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                mainEntity: questionsVues.map((q) => ({
+                  "@type": "Question",
+                  name: q.question,
+                  acceptedAnswer: { "@type": "Answer", text: q.answer },
+                })),
+              }),
+            }}
+          />
+          <div className="cg-q-liste">
+            {questionsVues.map((q, k) => {
+              const on = ouvertQ === k;
+              return (
+                <div key={q.question} className={`cg-q${on ? " cg-q-on" : ""}`}>
+                  <button
+                    type="button"
+                    className="cg-q-t"
+                    aria-expanded={on}
+                    onClick={() => setOuvertQ(on ? null : k)}
+                  >
+                    {q.question}
+                    <span className="cg-q-signe" aria-hidden="true" />
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {on && (
+                      <motion.div
+                        className="cg-q-r"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.36, ease: LENT }}
+                      >
+                        <p>{q.answer}</p>
+                        {q.tableau && (
+                          <table className="cg-src-t">
+                            <caption className="cg-src-c">
+                              Sources des indicateurs démographiques, telles que la base les
+                              enregistre
+                            </caption>
+                            <thead>
+                              <tr>
+                                <th scope="col">Indicateur</th>
+                                <th scope="col">Source</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {sources.map((o) => (
+                                <tr key={o.libelle}>
+                                  <th scope="row">{o.libelle}</th>
+                                  <td>{o.source}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 

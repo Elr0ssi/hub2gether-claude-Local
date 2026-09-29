@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import { DemographiePage } from "@/components/concept/DemographiePage";
-import { articlesDemo, compteurDemo, socleDemo } from "@/data/concept/conceptDemographie";
+import {
+  articlesDemo,
+  compteurDemo,
+  debatsDemo,
+  faqDemo,
+  socleDemo,
+  sourcesDemo,
+} from "@/data/concept/conceptDemographie";
 import { jsonLdString } from "@/lib/schema";
 import { allegerSocle } from "@/data/concept/socleLeger";
 
@@ -105,6 +112,9 @@ export default function Page() {
         socleUrl="/demographie/socle.json"
         compteur={compteur}
         articles={articlesDemo(9)}
+        debats={debatsDemo()}
+        faq={faqDemo()}
+        sources={sourcesDemo()}
       />
     </>
   );

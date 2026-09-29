@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "./Theme";
+import { usePret } from "./ouverture";
 import type { CountryDemographyData, DemographyMetricId, DemographyYear } from "@/data/demographie/demographie";
 import { SOURCES_SOCLE_DEMO } from "@/data/demographie/demographie";
 import type { PaletteGlobe } from "@/components/map/DemographyGlobe";
@@ -34,8 +35,22 @@ function nb(v: number, d = 0) {
 
 const DemographyGlobe = dynamic(
   () => import("@/components/map/DemographyGlobe").then((m) => m.DemographyGlobe),
-  { ssr: false, loading: () => <div className="ge-attente" /> },
+  { ssr: false, loading: () => <AttenteGlobe /> },
 );
+
+/** Le petit globe qui tourne, à la place du vrai le temps qu'il se construise.
+    Pur CSS : un anneau et un méridien, sur les jetons du thème — il n'a donc
+    rien à charger et s'adapte de lui-même au jour comme à la nuit. */
+function AttenteGlobe() {
+  return (
+    <div className="ge-attente" aria-hidden="true">
+      <span className="ge-attente-globe">
+        <span className="ge-attente-meridien" />
+        <span className="ge-attente-meridien ge-attente-meridien-2" />
+      </span>
+    </div>
+  );
+}
 
 const BLEUS = [
   "#123a72", "#174a91", "#1c5cab", "#256abf", "#2f7ad2",
@@ -266,6 +281,12 @@ export function GlobeDemographie({
   const [theme] = useTheme();
   const jour = theme === "clair";
 
+  /* Le globe ne monte qu'une fois le reste de la page posé à l'écran. Voir
+     la même note dans GlobeEco.tsx : construire sa sphère bloque le fil
+     principal une bonne fraction de seconde, et décaler son montage de deux
+     images laisse le titre, les tuiles et la barre se peindre d'abord. */
+  const pretGlobe = usePret();
+
   const cadre = useRef<HTMLDivElement>(null);
 
   const scene = useRef<HTMLDivElement>(null);
@@ -381,20 +402,24 @@ export function GlobeDemographie({
       <div className="ge-corps">
         <div className="ge-colonne">
           <div className="ge-scene" ref={scene}>
-            <DemographyGlobe
-              demographyYear={annee}
-              metric={metrique.id}
-              selectedCountry={choisi}
-              onCountryClick={(n) => onChoisi(n)}
-              key={`${theme}-${pour100k}`}
-              palette={palette(!jour, pour100k)}
-              marge={1.06}
-              onCadrage={mesureLimbe}
-              /* Pas de plafond de texels : un plafond bas ne montrait plus
-                 rien qu'un aplat flou une fois zoomé, le zoom concentrant
-                 une tranche étroite de la toile sur toute la scène. La
-                 machine décide comme sur le reste du site. */
-            />
+            {pretGlobe ? (
+              <DemographyGlobe
+                demographyYear={annee}
+                metric={metrique.id}
+                selectedCountry={choisi}
+                onCountryClick={(n) => onChoisi(n)}
+                key={`${theme}-${pour100k}`}
+                palette={palette(!jour, pour100k)}
+                marge={1.06}
+                onCadrage={mesureLimbe}
+                /* Pas de plafond de texels : un plafond bas ne montrait plus
+                   rien qu'un aplat flou une fois zoomé, le zoom concentrant
+                   une tranche étroite de la toile sur toute la scène. La
+                   machine décide comme sur le reste du site. */
+              />
+            ) : (
+              <AttenteGlobe />
+            )}
             <span className="ge-eclat" aria-hidden="true" />
             <span className="ge-eclat ge-eclat-2" aria-hidden="true" />
             <div className="ge-echelle" aria-hidden="true">

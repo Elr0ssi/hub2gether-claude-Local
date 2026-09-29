@@ -2028,7 +2028,32 @@ body:has(.cg) { background: #05080c; }
 @media (prefers-reduced-motion: reduce) {
   .ge-eclat { animation: none; }
 }
-.ge-attente { position: absolute; inset: 0; }
+/* Le petit globe qui tourne, le temps que le vrai se construise. Un anneau
+   et deux méridiens, à la couleur du thème — jamais un chiffre, jamais un
+   texte qui bouge : juste de quoi dire que quelque chose se prépare. */
+.ge-attente { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.ge-attente-globe {
+  position: relative;
+  width: clamp(40px, 8vw, 60px);
+  height: clamp(40px, 8vw, 60px);
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--froid) 55%, transparent);
+  animation: ge-attente-tourne 2.4s linear infinite;
+}
+.ge-attente-meridien {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--froid) 32%, transparent);
+  transform: scaleX(0.38);
+}
+.ge-attente-meridien-2 { transform: scaleX(0.76); }
+@keyframes ge-attente-tourne {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ge-attente-globe { animation: none; }
+}
 
 .ge-echelle {
   position: absolute;
