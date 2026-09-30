@@ -1,0 +1,17 @@
+{
+  "country": "DOM",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "République dominicaine",
+  "iso2": "DO",
+  "data": {
+    "2000": 8.6,
+    "2005": 9.2,
+    "2010": 9.8,
+    "2015": 10.3,
+    "2020": 10.8,
+    "2023": 11.3,
+    "2025": 11.4
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "GRC",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Grèce",
+  "iso2": "GR",
+  "data": {
+    "2000": 10.9,
+    "2005": 11.1,
+    "2010": 11.1,
+    "2015": 10.9,
+    "2020": 10.7,
+    "2023": 10.4,
+    "2025": 10.4
+  }
+}

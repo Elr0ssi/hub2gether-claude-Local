@@ -1,0 +1,17 @@
+{
+  "country": "HRV",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Croatie",
+  "iso2": "HR",
+  "data": {
+    "2000": 4.5,
+    "2005": 4.4,
+    "2010": 4.4,
+    "2015": 4.2,
+    "2020": 4,
+    "2023": 3.9,
+    "2025": 3.8
+  }
+}

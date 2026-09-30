@@ -1,0 +1,28 @@
+{
+  "country": "THA",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Thaïlande",
+  "iso2": "TH",
+  "data": {
+    "2000": 58,
+    "2005": 47,
+    "2010": 43,
+    "2015": 44,
+    "2020": 51,
+    "2023": 61,
+    "2025": 64
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 58,
+        "2014": 45,
+        "2024": 63
+      }
+    }
+  ]
+}

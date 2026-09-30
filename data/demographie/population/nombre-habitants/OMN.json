@@ -1,0 +1,17 @@
+{
+  "country": "OMN",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Oman",
+  "iso2": "OM",
+  "data": {
+    "2000": 2.4,
+    "2005": 2.6,
+    "2010": 2.8,
+    "2015": 4.2,
+    "2020": 4.5,
+    "2023": 4.6,
+    "2025": 4.7
+  }
+}

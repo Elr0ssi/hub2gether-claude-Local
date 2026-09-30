@@ -2,18 +2,31 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Maximize2, Minimize2, ChevronLeft, PenLine, Map, Navigation, Satellite } from "lucide-react";
+import { Maximize2, Minimize2, ChevronLeft, Map, Globe, Satellite } from "lucide-react";
 import { EconomyInteractiveMap } from "./EconomyInteractiveMap";
-import { EconomyLeafletMap, type LeafletTileStyle } from "./EconomyLeafletMap";
+import { EconomyLeafletMap } from "./EconomyLeafletMap";
+import dynamic from "next/dynamic";
+
+// WebGL and the world file are only paid for when the reader asks for the globe.
+const EconomyGlobe = dynamic(() => import("./EconomyGlobe").then((m) => m.EconomyGlobe), {
+  ssr: false,
+  loading: () => null,
+});
 import { EconomySidePanel } from "@/components/sidebar/EconomySidePanel";
 import { EconomyRankingsTable } from "./EconomyRankingsTable";
-import { ThemeDropdown } from "./ThemeDropdown";
+import { EconomyYearTimeline } from "./EconomyYearTimeline";
 import { ECONOMY_METRICS, ECONOMY_YEARS, ECONOMY_YEAR_VALUES, getYearData, DEFAULT_YEAR } from "@/data/economy/economy";
 import type { EconomyMetricId, EconomyYear } from "@/types";
 import { MapArticleSection } from "@/components/articles/MapArticleSection";
+import { AdRail, AdBanner } from "@/components/layout/AdRail";
+import { SectionFlowCurves } from "./SectionFlowCurves";
+import { useScrollTeleport } from "@/hooks/useScrollTeleport";
 import { ECONOMY_ARTICLES } from "@/data/articles";
 
-const SLIDER_MIN = 2000;
+/* La frise commence où commence la base. Elle partait de 1950, quinze années
+   avant la première valeur publiée : le lecteur pouvait s'y poser sans que rien
+   ne change à l'écran. */
+const SLIDER_MIN = 1960;
 const SLIDER_MAX = 2025;
 
 // Top toolbar only ever showed the 4 main metrics. Their family sub-metrics (PIB/hab.,
@@ -52,7 +65,10 @@ function computeLiveYearData(baseYear: EconomyYear): EconomyYear {
     liveCountries[country] = {
       ...data,
       // GDP is a flow: prorate to days elapsed. Rates (debt/unemployment/companies) are stocks — unchanged.
-      gdp: Math.round(data.gdp * fraction),
+      // L'arrondi reste au million : la base couvre des pays dont le PIB
+      // annuel tient sous le milliard, et les arrondir à l'entier les
+      // effaçait de la carte.
+      gdp: data.gdp === undefined ? undefined : Math.round(data.gdp * fraction * 1000) / 1000,
     };
   }
   return {
@@ -63,24 +79,25 @@ function computeLiveYearData(baseYear: EconomyYear): EconomyYear {
   };
 }
 
-type MapStyle = "editorial" | LeafletTileStyle;
-
-const MAP_STYLES: { id: MapStyle; label: string; Icon: React.ElementType }[] = [
-  { id: "editorial", label: "Éditorial",  Icon: PenLine   },
-  { id: "standard",  label: "Standard",   Icon: Map       },
-  { id: "detailed",  label: "Détaillé",   Icon: Navigation },
-  { id: "satellite", label: "Satellite",  Icon: Satellite  },
-];
-
 export function EconomyMapView() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [sidePanelOpen, setSidePanelOpen] = useState(true);
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-  const [mapStyle, setMapStyle] = useState<MapStyle>("editorial");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ytdMode, setYtdMode] = useState(false);
+  const [view, setView] = useState<"map" | "globe">("map");
+  /**
+   * Satellite is a modifier, not a third view: it applies to whichever of the
+   * two is on screen. The flat map swaps its editorial rendering for aerial
+   * imagery under the same choropleth; the globe drops the tint and shows the
+   * photography it already carries.
+   */
+  const [satellite, setSatellite] = useState(false);
+  const mapSectionRef = useRef<HTMLElement>(null);
+  const rankSectionRef = useRef<HTMLElement>(null);
+  const articleSectionRef = useRef<HTMLElement>(null);
   // Local slider position: 2000-2025 (continuous), separate from data year
   const [sliderYear, setSliderYear] = useState(DEFAULT_YEAR);
 
@@ -89,8 +106,13 @@ export function EconomyMapView() {
   const economyYear = getYearData(year) ?? ECONOMY_YEARS[ECONOMY_YEARS.length - 1];
   const isCurrentYear = year === DEFAULT_YEAR;
 
-  // Keep slider in sync when URL year changes externally
-  useEffect(() => { setSliderYear(year); }, [year]);
+  // Keep the rail in sync when the URL year changes from somewhere else, but
+  // never overwrite a pick the reader just made: a year the dataset does not
+  // cover resolves to a neighbouring data year, and re-seeding from that year
+  // would silently snap the rail back off the mark they aimed at.
+  useEffect(() => {
+    setSliderYear((prev) => (findNearestDataYear(prev) === year ? prev : year));
+  }, [year]);
 
   // For "En direct": use previous year as base for prorating (2024 → live 2025 estimate)
   const prevEconomyYear = useMemo(
@@ -102,6 +124,10 @@ export function EconomyMapView() {
     () => (ytdMode && isCurrentYear ? computeLiveYearData(prevEconomyYear) : economyYear),
     [economyYear, ytdMode, isCurrentYear, prevEconomyYear]
   );
+
+  // One gesture, one section — see the hook for what it deliberately leaves
+  // alone. Suspended in fullscreen, where the page is not what is being read.
+  useScrollTeleport({ selector: ".eco-snap-target", offset: 64, enabled: !isFullscreen });
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setIsFullscreen(false); };
@@ -132,7 +158,22 @@ export function EconomyMapView() {
   }, []);
 
   return (
-    <>
+    // Three full-bleed stops. Each section owns a viewport: its mint ground
+    // runs edge to edge, it holds at least the full height under the navbar,
+    // and it is a scroll-snap target — so arriving at one means seeing only
+    // that one, never the tail of the block before it.
+    <div className="eco-snap">
+      {/* ── Carte interactive ── */}
+      <section
+        ref={mapSectionRef}
+        className={isFullscreen ? undefined : "eco-section eco-snap-target"}
+      >
+        {!isFullscreen && <SectionFlowCurves sectionRef={mapSectionRef} index={0} />}
+        <div className="eco-section-body">
+          <div className="eco-section-row">
+          <AdRail side="left" slot={1} />
+          <div className="eco-section-main">
+            <AdBanner />
       {/* Map card */}
       <div
         className={`border rounded-2xl overflow-hidden${isFullscreen ? " fixed inset-0 z-[9999] rounded-none flex flex-col" : ""}`}
@@ -144,9 +185,6 @@ export function EconomyMapView() {
           style={{ borderColor: "var(--border)", background: "var(--surface-2)" }}
         >
           <div className="flex items-center gap-3 flex-wrap">
-            <ThemeDropdown currentTheme="economy" />
-            <div className="h-4 w-px" style={{ background: "var(--border)" }} />
-
             {/* Metric selector */}
             <div className="flex items-center gap-1 flex-wrap">
               {TOOLBAR_METRICS.map((m) => {
@@ -173,25 +211,51 @@ export function EconomyMapView() {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Map style switcher */}
-            <div className="flex items-center rounded-lg overflow-hidden" style={{ border: "1px solid var(--border)" }}>
-              {MAP_STYLES.map(({ id, label, Icon }) => (
+            {/* Flat map or globe — same data, same colours, same click. */}
+            <div
+              className="flex items-center rounded-lg overflow-hidden"
+              style={{ border: "1px solid var(--border)" }}
+            >
+              {([
+                { id: "map" as const, label: "Carte", Icon: Map },
+                { id: "globe" as const, label: "Globe", Icon: Globe },
+              ]).map(({ id, label, Icon }) => (
                 <button
                   key={id}
-                  onClick={() => setMapStyle(id)}
-                  title={label}
+                  onClick={() => setView(id)}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium transition-all duration-150"
                   style={
-                    id === mapStyle
-                      ? { background: "var(--accent-dim)", color: "#0D7A40", borderRight: "1px solid rgba(57,255,136,0.2)" }
-                      : { background: "var(--surface-2)", color: "var(--ink-3)", borderRight: "1px solid var(--border)" }
+                    view === id
+                      ? { background: "var(--accent-dim)", color: "#0D7A40", fontWeight: 700 }
+                      : { background: "transparent", color: "var(--ink-3)" }
                   }
+                  aria-pressed={view === id}
                 >
-                  <Icon size={12} />
+                  <Icon size={13} />
                   <span className="hidden sm:inline">{label}</span>
                 </button>
               ))}
             </div>
+
+            <button
+              onClick={() => setSatellite((v) => !v)}
+              aria-pressed={satellite}
+              title="Vue satellite"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all duration-150"
+              style={
+                satellite
+                  ? {
+                      background: "var(--accent-dim)",
+                      color: "#0D7A40",
+                      fontWeight: 700,
+                      border: "1px solid rgba(57,255,136,0.4)",
+                    }
+                  : { background: "transparent", color: "var(--ink-3)", border: "1px solid var(--border)" }
+              }
+            >
+              <Satellite size={13} />
+              <span className="hidden sm:inline">Satellite</span>
+            </button>
 
             {sidePanelOpen ? (
               <button onClick={() => setSidePanelOpen(false)} className="btn-ghost px-2.5 py-1.5 text-xs gap-1.5">
@@ -214,137 +278,76 @@ export function EconomyMapView() {
         </div>
 
         {/* Year selector */}
-        <div className="px-5 py-3 border-b flex flex-col gap-2"
-          style={{ borderColor: "var(--border)", background: "var(--surface)" }}
-        >
-          {/* Top row: label / displayed year / count */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold" style={{ color: "var(--ink-3)" }}>Année :</span>
-            <span className="text-sm font-bold tabular-nums" style={{ color: "var(--ink)" }}>
-              {ytdMode ? "En direct" : sliderYear}
-            </span>
-            {sliderYear !== year && !ytdMode && (
-              <span className="text-xs" style={{ color: "var(--ink-4)" }}>
-                (données {year})
-              </span>
-            )}
-            <span className="text-xs ml-auto" style={{ color: "var(--ink-4)" }}>
-              {Object.keys(activeEconomyYear.countries).length} pays
-            </span>
-          </div>
-
-          {/* Slider row + En direct button */}
-          <div className="flex items-center gap-3">
-            <div className="relative flex flex-col gap-0 flex-1">
-              <input
-                type="range"
-                min={SLIDER_MIN}
-                max={SLIDER_MAX}
-                step={1}
-                value={sliderYear}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value);
-                  setSliderYear(val);
-                  handleYearChange(findNearestDataYear(val));
-                  setYtdMode(false);
-                }}
-                className="w-full appearance-none cursor-pointer"
-                style={{
-                  height: "6px",
-                  borderRadius: "9999px",
-                  background: `linear-gradient(to right, #0D7A40 0%, #0D7A40 ${((sliderYear - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)) * 100}%, var(--surface-2) ${((sliderYear - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)) * 100}%, var(--surface-2) 100%)`,
-                  outline: "none",
-                  accentColor: "#0D7A40",
-                }}
-              />
-              {/* Year ticks: mini mark every year, label every 5 years + data years */}
-              <div className="relative mt-1" style={{ height: "18px" }}>
-                {Array.from({ length: SLIDER_MAX - SLIDER_MIN + 1 }, (_, i) => SLIDER_MIN + i).map((y) => {
-                  const pct = ((y - SLIDER_MIN) / (SLIDER_MAX - SLIDER_MIN)) * 100;
-                  const isDataYear = ECONOMY_YEAR_VALUES.includes(y);
-                  const isActive = y === year && !ytdMode;
-                  const showLabel = y % 5 === 0 || y === 2023;
-                  return (
-                    <button
-                      key={y}
-                      onClick={() => { setSliderYear(y); handleYearChange(findNearestDataYear(y)); setYtdMode(false); }}
-                      className="absolute transform -translate-x-1/2"
-                      style={{ left: `${pct}%`, top: 0, padding: 0, lineHeight: 1 }}
-                      title={`${y}${!isDataYear ? ` → données ${findNearestDataYear(y)}` : ""}`}
-                    >
-                      {showLabel ? (
-                        <span style={{
-                          fontSize: "0.52rem",
-                          fontWeight: isActive ? 700 : isDataYear ? 600 : 400,
-                          color: isActive ? "#0D7A40" : isDataYear ? "var(--ink-3)" : "var(--ink-4)",
-                          display: "block",
-                        }}>
-                          {y}
-                        </span>
-                      ) : (
-                        <span style={{
-                          display: "block",
-                          width: isDataYear ? "3px" : "1px",
-                          height: isDataYear ? "5px" : "3px",
-                          borderRadius: "1px",
-                          background: isActive ? "#0D7A40" : isDataYear ? "var(--ink-3)" : "var(--border)",
-                          marginTop: "2px",
-                        }} />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* "En direct" button — always visible, right of slider */}
-            <button
-              onClick={() => { setSliderYear(DEFAULT_YEAR); handleYearChange(DEFAULT_YEAR); setYtdMode(true); }}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-all duration-200 shrink-0"
-              title="Prorata des données depuis le 1er janvier — PIB au jour actuel"
-              style={
-                ytdMode
-                  ? { background: "var(--accent-dim)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)", fontWeight: 700 }
-                  : { background: "transparent", color: "var(--ink-3)", border: "1px solid var(--border)" }
-              }
-            >
-              <span
-                className="w-1.5 h-1.5 rounded-full shrink-0"
-                style={{
-                  background: ytdMode ? "#39FF88" : "var(--ink-4)",
-                  boxShadow: ytdMode ? "0 0 6px rgba(57,255,136,0.8)" : "none",
-                  animation: ytdMode ? "pulse-glow 2s ease-in-out infinite" : "none",
-                }}
-              />
-              En direct
-            </button>
-          </div>
-
-          {ytdMode && (
-            <span className="text-xs" style={{ color: "var(--ink-4)" }}>
-              Prorata au {new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
-            </span>
-          )}
-        </div>
+        <EconomyYearTimeline
+          min={SLIDER_MIN}
+          max={SLIDER_MAX}
+          dataYears={ECONOMY_YEAR_VALUES}
+          value={sliderYear}
+          dataYear={year}
+          onChange={(y) => {
+            setSliderYear(y);
+            const target = findNearestDataYear(y);
+            if (target !== year) handleYearChange(target);
+            setYtdMode(false);
+          }}
+          countryCount={Object.keys(activeEconomyYear.countries).length}
+          liveMode={ytdMode}
+          onLive={() => {
+            setSliderYear(DEFAULT_YEAR);
+            handleYearChange(DEFAULT_YEAR);
+            setYtdMode(true);
+          }}
+        />
 
         {/* Map + Side panel */}
-        <div className={`flex flex-col lg:flex-row${isFullscreen ? " flex-1 overflow-hidden" : ""}`} style={isFullscreen ? {} : { minHeight: "480px" }}>
+        {/* The map area gives way on short screens: the card also carries a
+            toolbar, the year rail and a source line, and the section around it
+            has its own padding, so a fixed height overflowed a 1440x800
+            laptop. */}
+        <div
+          className={`relative flex flex-col lg:flex-row${isFullscreen ? " flex-1 overflow-hidden" : ""}`}
+          style={
+            isFullscreen
+              ? {}
+              : {
+                  // A definite height, not a range. The card also carries a
+                  // toolbar, the year rail and a source line, and the section
+                  // around it has its own padding — 330px in all, which is why
+                  // an intrinsic height ran past the bottom of a 1440x800
+                  // laptop. And with only a min and a max, selecting a country
+                  // grew the side panel, which grew the row, which resized the
+                  // globe's canvas: the sphere rescaled on every click.
+                  height: "clamp(320px, calc(100vh - 322px), 520px)",
+                  overflow: "hidden",
+                }
+          }
+        >
           <div className="flex-1 overflow-hidden" style={{ minWidth: 0 }}>
-            {mapStyle === "editorial" ? (
-              <EconomyInteractiveMap
+            {view === "globe" ? (
+              <EconomyGlobe
                 economyYear={activeEconomyYear}
                 metric={metric}
                 selectedCountry={selectedCountry}
                 onCountryClick={handleCountryClick}
+                satellite={satellite}
               />
-            ) : (
+            ) : satellite ? (
+              // Aerial imagery served as tiles: it keeps its detail all the
+              // way down, which is the whole point of asking for it.
               <EconomyLeafletMap
                 economyYear={activeEconomyYear}
                 metric={metric}
                 selectedCountry={selectedCountry}
                 onCountryClick={handleCountryClick}
-                tileStyle={mapStyle}
-                fillHeight={isFullscreen}
+                tileStyle="satellite"
+                fillHeight
+              />
+            ) : (
+              <EconomyInteractiveMap
+                economyYear={activeEconomyYear}
+                metric={metric}
+                selectedCountry={selectedCountry}
+                onCountryClick={handleCountryClick}
               />
             )}
           </div>
@@ -370,23 +373,60 @@ export function EconomyMapView() {
         </div>
       </div>
 
-      {/* Rankings table */}
-      <EconomyRankingsTable
-        metric={metric}
-        year={year}
-        activeEconomyYear={activeEconomyYear}
-        ytdMode={ytdMode}
-        onCountryClick={(name) => {
-          setSelectedCountry(name);
-          setSidePanelOpen(true);
-        }}
-      />
+          </div>
+          <AdRail side="right" slot={1} />
+          </div>
+        </div>
+      </section>
 
-      <MapArticleSection
-        themeArticles={ECONOMY_ARTICLES}
-        selectedCountry={selectedCountry}
-        themeLabel="Économie mondiale"
-      />
-    </>
+      {/* ── Classement mondial ── */}
+      <section ref={rankSectionRef} className="eco-section eco-snap-target">
+        <SectionFlowCurves sectionRef={rankSectionRef} index={1} />
+        <div className="eco-section-body">
+          <div className="eco-section-row">
+          <AdRail side="left" slot={2} />
+          <div className="eco-section-main">
+            <AdBanner />
+            <EconomyRankingsTable
+              metric={metric}
+              year={year}
+              activeEconomyYear={activeEconomyYear}
+              ytdMode={ytdMode}
+              onYearChange={(y) => {
+                setSliderYear(y);
+                handleYearChange(y);
+                setYtdMode(false);
+              }}
+              onCountryClick={(name) => {
+                setSelectedCountry(name);
+                setSidePanelOpen(true);
+              }}
+            />
+          </div>
+          <AdRail side="right" slot={2} />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Articles ── */}
+      <section ref={articleSectionRef} className="eco-section eco-snap-target">
+        <SectionFlowCurves sectionRef={articleSectionRef} index={2} />
+        <div className="eco-section-body">
+          <div className="eco-section-row">
+          <AdRail side="left" slot={3} />
+          <div className="eco-section-main">
+            <AdBanner />
+            <MapArticleSection
+              themeArticles={ECONOMY_ARTICLES}
+              selectedCountry={selectedCountry}
+              themeLabel="Économie mondiale"
+              spacing={0}
+            />
+          </div>
+          <AdRail side="right" slot={3} />
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }

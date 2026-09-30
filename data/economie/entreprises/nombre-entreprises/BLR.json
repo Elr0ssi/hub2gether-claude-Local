@@ -1,0 +1,16 @@
+{
+  "country": "BLR",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Biélorussie",
+  "iso2": "BY",
+  "data": {
+    "2000": 300,
+    "2005": 370,
+    "2010": 420,
+    "2015": 440,
+    "2020": 445,
+    "2023": 430
+  }
+}

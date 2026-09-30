@@ -1,0 +1,17 @@
+{
+  "country": "NOR",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Norvège",
+  "iso2": "NO",
+  "data": {
+    "2000": 3.4,
+    "2005": 4.6,
+    "2010": 3.5,
+    "2015": 4.4,
+    "2020": 4.7,
+    "2023": 3.6,
+    "2025": 3.7
+  }
+}

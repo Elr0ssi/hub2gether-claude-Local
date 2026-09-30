@@ -1,0 +1,17 @@
+{
+  "country": "LUX",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Luxembourg",
+  "iso2": "LU",
+  "data": {
+    "2000": 0.44,
+    "2005": 0.46,
+    "2010": 0.51,
+    "2015": 0.57,
+    "2020": 0.63,
+    "2023": 0.67,
+    "2025": 0.68
+  }
+}

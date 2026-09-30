@@ -1,0 +1,16 @@
+{
+  "country": "PAN",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Panama",
+  "iso2": "PA",
+  "data": {
+    "2000": 15.3,
+    "2005": 9.8,
+    "2010": 6.5,
+    "2015": 4.5,
+    "2020": 19.8,
+    "2023": 7.4
+  }
+}

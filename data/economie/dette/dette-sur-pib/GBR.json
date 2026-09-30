@@ -1,0 +1,17 @@
+{
+  "country": "GBR",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Royaume-Uni",
+  "iso2": "GB",
+  "data": {
+    "2000": 36,
+    "2005": 42,
+    "2010": 75,
+    "2015": 87,
+    "2020": 103,
+    "2023": 101,
+    "2025": 102
+  }
+}

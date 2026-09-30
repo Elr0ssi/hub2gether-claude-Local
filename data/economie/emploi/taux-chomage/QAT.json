@@ -1,0 +1,17 @@
+{
+  "country": "QAT",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Qatar",
+  "iso2": "QA",
+  "data": {
+    "2000": 1.5,
+    "2005": 1.2,
+    "2010": 0.6,
+    "2015": 0.4,
+    "2020": 0.3,
+    "2023": 0.5,
+    "2025": 0.1
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "ZAF",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Afrique du Sud",
+  "iso2": "ZA",
+  "data": {
+    "2000": 1200,
+    "2005": 1400,
+    "2010": 1600,
+    "2015": 1700,
+    "2020": 1700,
+    "2023": 1800,
+    "2025": 2600
+  }
+}

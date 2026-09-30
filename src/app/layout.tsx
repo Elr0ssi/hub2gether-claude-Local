@@ -14,11 +14,11 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theessentialdata.co
 
 export const metadata: Metadata = {
   title: {
-    default: "The Essential Data — Geopolitical Intelligence",
+    default: "The Essential Data · Geopolitical Intelligence",
     template: "%s | The Essential Data",
   },
   description:
-    "Cartes interactives mondiales : PIB par pays 2025, épidémies, empires historiques. Données FMI, Banque mondiale, OMS. The Essential Data — data journalism géopolitique.",
+    "Cartes interactives mondiales : PIB par pays 2025, épidémies, empires historiques. Données FMI, Banque mondiale, OMS. The Essential Data, data journalism géopolitique.",
   keywords: [
     "carte PIB monde 2025",
     "PIB par pays 2025",
@@ -48,13 +48,13 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     alternateLocale: ["en_US"],
     url: siteUrl,
-    title: "The Essential Data — Cartes géopolitiques interactives",
+    title: "The Essential Data · Cartes géopolitiques interactives",
     description:
       "PIB par pays 2025, épidémies mondiales, empires historiques. Données FMI & Banque mondiale visualisées en cartes interactives.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Essential Data — Cartes géopolitiques interactives",
+    title: "The Essential Data · Cartes géopolitiques interactives",
     description:
       "PIB par pays 2025, épidémies mondiales, empires historiques. Données FMI & Banque mondiale.",
   },
@@ -106,6 +106,17 @@ export default function RootLayout({
     <html lang="fr" suppressHydrationWarning className={inter.variable}>
       <head>
         <meta name="theme-color" content="#FAFAFA" />
+        {/* Le thème des pages Visualize, posé avant le premier rendu. Sans
+            ce passage, une page choisie en clair apparaîtrait noire le temps
+            d'une image, puis basculerait : c'est le défaut que tout le monde
+            connaît et que personne ne pardonne. Il ne fait rien d'autre que
+            relire un choix déjà pris, et se tait si le stockage est fermé. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{if(localStorage.getItem("visualize-theme")==="clair")document.documentElement.dataset.concept="clair"}catch(e){}',
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdString(websiteSchema) }}

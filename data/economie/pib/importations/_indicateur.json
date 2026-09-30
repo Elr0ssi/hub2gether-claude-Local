@@ -1,0 +1,15 @@
+{
+  "indicateur": "IMPORTS",
+  "libelle": "Importations de biens et services",
+  "unite": "MD_USD",
+  "categorie": "economie/pib",
+  "chemin": "data/economie/pib/importations",
+  "sources": [
+    "OMC · FMI (WEO) · Banque mondiale (BOP)"
+  ],
+  "annees": [
+    2024
+  ],
+  "paysCouverts": 60,
+  "misAJour": "2026-09-21"
+}

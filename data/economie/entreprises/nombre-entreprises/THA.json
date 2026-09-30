@@ -1,0 +1,17 @@
+{
+  "country": "THA",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Thaïlande",
+  "iso2": "TH",
+  "data": {
+    "2000": 1400,
+    "2005": 1500,
+    "2010": 1600,
+    "2015": 1650,
+    "2020": 1650,
+    "2023": 1700,
+    "2025": 1900
+  }
+}
