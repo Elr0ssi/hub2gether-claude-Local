@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "./Theme";
-import { usePret } from "./ouverture";
+import { usePretGlobe } from "./ouverture";
 import { monnaieCourante } from "./Monnaie";
 import { fiche } from "@/data/finance/tauxChange";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
@@ -298,13 +298,12 @@ export function GlobeEco({
   const [theme] = useTheme();
   const jour = theme === "clair";
 
-  /* Le globe ne monte qu'une fois le reste de la page posé à l'écran.
-     Construire sa sphère — près de trois cent mille sommets, pour que le
-     relief suive vraiment les côtes — bloque le fil principal une bonne
-     fraction de seconde : lancé au montage, c'est ce blocage-là que la page
-     entière subissait en arrivant. Décalé de deux images, il démarre une
-     fois que le titre, les tuiles et la barre sont déjà peints. */
-  const pretGlobe = usePret();
+  /* Le globe ne monte qu'une fois le reste de la page posé à l'écran ET
+     retombé — pas seulement peint. Construire sa sphère bloque le fil
+     principal une bonne fraction de seconde ; lancé en même temps que le
+     titre se lève et que les tuiles se posent, les deux animations se
+     disputaient ce même fil et aucune ne tournait plus rond. */
+  const pretGlobe = usePretGlobe();
 
   const cadre = useRef<HTMLDivElement>(null);
 

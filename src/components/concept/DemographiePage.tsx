@@ -449,7 +449,29 @@ export function DemographiePage({
   const rail2 = useRef<HTMLDivElement>(null);
   const prise2 = useRef<{ x: number; g: number } | null>(null);
   const rail3 = useRef<HTMLDivElement>(null);
-  const prise3 = useRef<{ x: number; g: number } | null>(null);
+  /* Vrai le temps d'un geste qui a réellement déplacé le rang : une
+     capture de pointeur sur le rang détournait jusqu'au clic lui-même vers
+     lui, et les liens à l'intérieur ne menaient donc plus nulle part. Voir
+     la même note dans ForumPage.tsx. */
+  const glisse3 = useRef(false);
+  const debutGlisse3 = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const el = rail3.current;
+    if (!el) return;
+    const x0 = e.clientX;
+    const g0 = el.scrollLeft;
+    glisse3.current = false;
+    const bouger = (ev: PointerEvent) => {
+      const dx = ev.clientX - x0;
+      if (Math.abs(dx) > 4) glisse3.current = true;
+      el.scrollLeft = g0 - dx;
+    };
+    const lacher = () => {
+      window.removeEventListener("pointermove", bouger);
+      window.removeEventListener("pointerup", lacher);
+    };
+    window.addEventListener("pointermove", bouger);
+    window.addEventListener("pointerup", lacher);
+  }, []);
 
   /* La question des sources porte sa réponse dans un tableau plutôt que
      d'ouvrir une seconde question qui dirait la même chose — même principe
@@ -731,26 +753,16 @@ export function DemographiePage({
                     <span>Sur le forum</span>
                     <span className="cg-debats-n">{debats.length} débats</span>
                   </div>
-                  <div
-                    ref={rail3}
-                    className="cg-debats-l"
-                    onPointerDown={(e) => {
-                      prise3.current = { x: e.clientX, g: e.currentTarget.scrollLeft };
-                      e.currentTarget.setPointerCapture(e.pointerId);
-                    }}
-                    onPointerMove={(e) => {
-                      if (!prise3.current || !rail3.current) return;
-                      rail3.current.scrollLeft = prise3.current.g - (e.clientX - prise3.current.x);
-                    }}
-                    onPointerUp={() => {
-                      prise3.current = null;
-                    }}
-                    onPointerCancel={() => {
-                      prise3.current = null;
-                    }}
-                  >
+                  <div ref={rail3} className="cg-debats-l" onPointerDown={debutGlisse3}>
                     {debats.map((d) => (
-                      <a key={d.id} href="/forum" className="cg-debat">
+                      <a
+                        key={d.id}
+                        href="/forum"
+                        className="cg-debat"
+                        onClick={(e) => {
+                          if (glisse3.current) e.preventDefault();
+                        }}
+                      >
                         <span className="cg-debat-q">{d.question}</span>
                         <span className="cg-debat-a">{d.ancre}</span>
                       </a>

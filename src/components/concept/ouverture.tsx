@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    L'OUVERTURE DES PAGES DE SUJET
@@ -29,6 +29,35 @@ export function usePret() {
       cancelAnimationFrame(a);
       cancelAnimationFrame(b);
     };
+  }, []);
+  return pret;
+}
+
+/** Vrai une fois le fil principal vraiment libre, pas seulement une image
+    plus tard.
+
+    Le globe construit sa sphère — près de trois cent mille sommets — de
+    façon synchrone, et ce calcul bloque le fil principal une bonne
+    fraction de seconde. Le monter au même instant que `usePret` — deux
+    images, environ trente millisecondes — le faisait démarrer pile pendant
+    que le titre se levait lettre par lettre et que les tuiles se posaient :
+    les deux se disputaient le même fil, et aucune des deux animations
+    n'avait la place de tourner. Ici, on attend que le navigateur se
+    déclare inactif, avec un plafond pour ne pas non plus attendre
+    indéfiniment sur un appareil qui ne l'est jamais. */
+export function usePretGlobe() {
+  const [pret, setPret] = useState(false);
+  useEffect(() => {
+    let annule: (() => void) | undefined;
+    const ric = window.requestIdleCallback;
+    if (ric) {
+      const id = ric(() => setPret(true), { timeout: 900 });
+      annule = () => window.cancelIdleCallback?.(id);
+    } else {
+      const id = window.setTimeout(() => setPret(true), 550);
+      annule = () => window.clearTimeout(id);
+    }
+    return () => annule?.();
   }, []);
   return pret;
 }
@@ -120,19 +149,22 @@ export function useProgression() {
 }
 
 
-/* Un titre qui se lève, mot par mot, derrière un masque. Chaque mot porte son
-   rang : c'est le CSS qui décale les départs, rien ne tourne en JavaScript. */
+/* Un titre qui se lève, lettre par lettre, derrière un masque. Chaque
+   lettre porte son rang : c'est le CSS qui décale les départs, rien ne
+   tourne en JavaScript.
+
+   Le titre des pages de sujet tient en un seul mot — « Économie »,
+   « Démographie », « Forum » — un décalage par mot ne levait donc rien
+   qu'un seul bloc, d'un coup. Décalé lettre par lettre, il se déroule
+   vraiment. */
 export function Titre({ texte }: { texte: string }) {
-  const mots = texte.split(" ");
+  const lettres = Array.from(texte);
   return (
     <>
-      {mots.map((m, i) => (
-        <Fragment key={`${m}-${i}`}>
-          <span className="cg-mot" style={{ "--i": i } as React.CSSProperties}>
-            <span>{m}</span>
-          </span>
-          {i < mots.length - 1 ? " " : null}
-        </Fragment>
+      {lettres.map((l, i) => (
+        <span key={`${l}-${i}`} className="cg-mot" style={{ "--i": i } as React.CSSProperties}>
+          <span>{l === " " ? " " : l}</span>
+        </span>
       ))}
     </>
   );

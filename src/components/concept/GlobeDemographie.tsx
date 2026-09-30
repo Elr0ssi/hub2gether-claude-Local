@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "./Theme";
-import { usePret } from "./ouverture";
+import { usePretGlobe } from "./ouverture";
 import type { CountryDemographyData, DemographyMetricId, DemographyYear } from "@/data/demographie/demographie";
 import { SOURCES_SOCLE_DEMO } from "@/data/demographie/demographie";
 import type { PaletteGlobe } from "@/components/map/DemographyGlobe";
@@ -281,11 +281,9 @@ export function GlobeDemographie({
   const [theme] = useTheme();
   const jour = theme === "clair";
 
-  /* Le globe ne monte qu'une fois le reste de la page posé à l'écran. Voir
-     la même note dans GlobeEco.tsx : construire sa sphère bloque le fil
-     principal une bonne fraction de seconde, et décaler son montage de deux
-     images laisse le titre, les tuiles et la barre se peindre d'abord. */
-  const pretGlobe = usePret();
+  /* Le globe ne monte qu'une fois le reste de la page posé à l'écran ET
+     retombé. Voir la même note dans GlobeEco.tsx. */
+  const pretGlobe = usePretGlobe();
 
   const cadre = useRef<HTMLDivElement>(null);
 

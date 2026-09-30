@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FILS, TAGS, type Fil } from "@/data/community/fils";
 import { ilYA, scoreFil, useForum, type Compte, type Message } from "@/components/community/store";
@@ -346,12 +346,44 @@ function Fil1Message({
    LA PAGE
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* Les thématiques du forum, dans l'ordre où elles apparaissent parmi les
+   fils — pas un thème choisi à la main, celui que chaque fil porte déjà. */
+const THEMES_FORUM = Array.from(new Set(FILS.map((f) => f.themeLabel)));
+
 export function ForumPage() {
   const { etat, pret, erreur, actif, compte, poster, supprimer, voter, signaler } = useForum();
   const [ouvert, setOuvert] = useState<string>(FILS[0].id);
-  const [tri, setTri] = useState<"actifs" | "recents">("actifs");
-  const [tag, setTag] = useState<string | null>(null);
+  const [theme, setThemeFiltre] = useState<string | null>(null);
+  const [recherche, setRecherche] = useState("");
   const [repondA, setRepondA] = useState<string | null>(null);
+  const rail = useRef<HTMLDivElement>(null);
+  /* Vrai le temps d'un geste qui a réellement déplacé le rang : sert à
+     avaler le clic qui suit un glissé, pour qu'on ne rouvre pas la carte
+     d'où le doigt est parti. */
+  const glisse = useRef(false);
+  const debutGlisse = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const el = rail.current;
+    if (!el) return;
+    const x0 = e.clientX;
+    const g0 = el.scrollLeft;
+    glisse.current = false;
+    /* Des écouteurs posés sur la fenêtre, pas une capture de pointeur sur
+       le rang : la capture redirige jusqu'au clic lui-même vers le rang,
+       et les cartes à l'intérieur ne le reçoivent alors plus jamais — tout
+       le carrousel restait bloqué sur la première carte. Ici, le rang suit
+       le geste sans jamais s'interposer entre le pointeur et son bouton. */
+    const bouger = (ev: PointerEvent) => {
+      const dx = ev.clientX - x0;
+      if (Math.abs(dx) > 4) glisse.current = true;
+      el.scrollLeft = g0 - dx;
+    };
+    const lacher = () => {
+      window.removeEventListener("pointermove", bouger);
+      window.removeEventListener("pointerup", lacher);
+    };
+    window.addEventListener("pointermove", bouger);
+    window.addEventListener("pointerup", lacher);
+  }, []);
 
   const haut = useVu(260);
   const ouverture = useProgression();
@@ -364,16 +396,19 @@ export function ForumPage() {
   }, [etat.messages]);
 
   const liste = useMemo(() => {
-    const base = tag ? FILS.filter((f) => f.tags.includes(tag)) : FILS;
-    const trie = [...base].sort((a, b) => {
+    const q = recherche.trim().toLowerCase();
+    const base = FILS.filter((f) => {
+      if (theme && f.themeLabel !== theme) return false;
+      if (!q) return true;
+      return `${f.titre} ${f.tags.join(" ")} ${f.corps.join(" ")}`.toLowerCase().includes(q);
+    });
+    return [...base].sort((a, b) => {
       if (a.epingle !== b.epingle) return a.epingle ? -1 : 1;
-      if (tri === "recents") return b.ouvertLe.localeCompare(a.ouvertLe);
       const da = (nbMessages.get(a.id) ?? 0) * 3 + scoreFil(etat, a.id);
       const db = (nbMessages.get(b.id) ?? 0) * 3 + scoreFil(etat, b.id);
       return db - da;
     });
-    return trie;
-  }, [tag, tri, nbMessages, etat]);
+  }, [theme, recherche, nbMessages, etat]);
 
   const fil: Fil = FILS.find((f) => f.id === ouvert) ?? FILS[0];
   const messages = useMemo(() => etat.messages.filter((m) => m.fil === fil.id), [etat.messages, fil.id]);
@@ -460,25 +495,25 @@ export function ForumPage() {
             }
           />
 
-          <div className="cg-fo-barre">
-            <div className="ge-metriques" role="tablist" aria-label="Tri">
-              <button type="button" className={`ge-metrique${tri === "actifs" ? " ge-metrique-on" : ""}`} onClick={() => setTri("actifs")}>
-                Actifs
-              </button>
-              <button type="button" className={`ge-metrique${tri === "recents" ? " ge-metrique-on" : ""}`} onClick={() => setTri("recents")}>
-                Récents
-              </button>
-            </div>
-            <div className="cg-fo-tags">
-              <button type="button" className={`ge-metrique${tag === null ? " ge-metrique-on" : ""}`} onClick={() => setTag(null)}>
+          <div className="cg-fo-outils">
+            <input
+              type="search"
+              className="cg-filtre cg-filtre-gros"
+              placeholder="Chercher un fil…"
+              value={recherche}
+              onChange={(e) => setRecherche(e.target.value)}
+              aria-label="Chercher un fil"
+            />
+            <div className="cg-fo-themes" role="tablist" aria-label="Thématique">
+              <button type="button" className={`ge-metrique${theme === null ? " ge-metrique-on" : ""}`} onClick={() => setThemeFiltre(null)}>
                 Tout
               </button>
-              {TAGS.map((t) => (
+              {THEMES_FORUM.map((t) => (
                 <button
                   key={t}
                   type="button"
-                  className={`ge-metrique${tag === t ? " ge-metrique-on" : ""}`}
-                  onClick={() => setTag(tag === t ? null : t)}
+                  className={`ge-metrique${theme === t ? " ge-metrique-on" : ""}`}
+                  onClick={() => setThemeFiltre(theme === t ? null : t)}
                 >
                   {t}
                 </button>
@@ -486,36 +521,38 @@ export function ForumPage() {
             </div>
           </div>
 
-          <div className="cg-fo-corps">
-            <aside className="cg-fo-liste">
-              <motion.ul layout className="cg-fo-fils">
-                {liste.map((f) => (
-                  <motion.li key={f.id} layout transition={{ type: "spring", stiffness: 420, damping: 38 }}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOuvert(f.id);
-                        setRepondA(null);
-                      }}
-                      className={`cg-fo-fil${f.id === ouvert ? " cg-fo-fil-on" : ""}`}
-                    >
-                      <span className="cg-fo-fil-tete">
-                        <span className="cg-fo-fil-theme">{f.themeLabel}</span>
-                        {f.epingle && <span className="cg-fo-fil-epingle">épinglé</span>}
-                        <span className="cg-fo-fil-ancre">{f.ancre.valeur}</span>
-                      </span>
-                      <span className="cg-fo-fil-titre">{f.titre}</span>
-                      <span className="cg-fo-fil-pied">
-                        {nbMessages.get(f.id) ?? 0} message{(nbMessages.get(f.id) ?? 0) > 1 ? "s" : ""}
-                        <span> · {f.tags[0]}</span>
-                      </span>
-                    </button>
-                  </motion.li>
-                ))}
-              </motion.ul>
-            </aside>
+          {/* Un rang de petites cartes qu'on fait glisser, pas une liste
+              qu'on parcourt : on voit tout de suite plusieurs sujets à la
+              fois, on choisit celui qui parle, on répond. */}
+          <div ref={rail} className="cg-fo-carrousel" onPointerDown={debutGlisse}>
+            {liste.length === 0 ? (
+              <p className="cg-frise-n">Aucun fil ne correspond à cette recherche.</p>
+            ) : (
+              liste.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => {
+                    if (glisse.current) return;
+                    setOuvert(f.id);
+                    setRepondA(null);
+                  }}
+                  className={`cg-fo-carte${f.id === ouvert ? " cg-fo-carte-on" : ""}`}
+                >
+                  <span className="cg-fo-carte-tete">
+                    <span>{f.themeLabel}</span>
+                    {f.epingle && <span className="cg-fo-carte-epingle">épinglé</span>}
+                  </span>
+                  <span className="cg-fo-carte-titre">{f.titre}</span>
+                  <span className="cg-fo-carte-pied">
+                    {nbMessages.get(f.id) ?? 0} message{(nbMessages.get(f.id) ?? 0) > 1 ? "s" : ""} · {f.ancre.valeur}
+                  </span>
+                </button>
+              ))
+            )}
+          </div>
 
-            <div className="cg-fo-panneau">
+          <div className="cg-fo-panneau">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={fil.id}
@@ -529,7 +566,7 @@ export function ForumPage() {
                       <Votes score={scoreFil(etat, fil.id)} mien={etat.votes[`fil:${fil.id}`]} onVote={(s) => void voter(`fil:${fil.id}`, s)} />
                       <div style={{ minWidth: 0 }}>
                         <p className="cg-fo-meta">
-                          <span className="cg-fo-fil-theme">{fil.themeLabel}</span>
+                          <span className="cg-fo-theme">{fil.themeLabel}</span>
                           <span>ouvert par la rédaction</span>
                           <span>·</span>
                           <span>{new Date(fil.ouvertLe).toLocaleDateString("fr-FR", { day: "numeric", month: "long" })}</span>
@@ -544,20 +581,10 @@ export function ForumPage() {
                       <em>{fil.ancre.source}</em>
                     </div>
 
-                    {fil.corps.map((p) => (
-                      <p key={p} className="cg-fo-para">
-                        {p}
-                      </p>
-                    ))}
-
-                    <div className="cg-fo-angles">
-                      <p className="cg-fo-angles-t">Trois angles pour démarrer</p>
-                      <ul>
-                        {fil.angles.map((a) => (
-                          <li key={a}>{a}</li>
-                        ))}
-                      </ul>
-                    </div>
+                    {/* La question, en un paragraphe : le reste — les autres
+                        angles, le détail — se dit dans les réponses, pas
+                        dans l'ouverture. */}
+                    <p className="cg-fo-para">{fil.corps[0]}</p>
 
                     <div className="cg-fo-liens">
                       <Link href={`/articles/${fil.article.slug}`} className="cg-lien-fleche">
@@ -608,7 +635,6 @@ export function ForumPage() {
                   </p>
                 </motion.div>
               </AnimatePresence>
-            </div>
           </div>
 
           <p className="cg-fo-total">
