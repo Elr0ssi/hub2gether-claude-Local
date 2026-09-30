@@ -2261,6 +2261,22 @@ body:has(.cg) { background: #05080c; }
   background: var(--surface);
 }
 
+/* ── L'ambiance des données en temps réel ─────────────────────────────────
+   Une section à part entière, et pas des tuiles posées entre le héros et
+   le globe : un fond qui se détache du noir de la page, une lueur discrète
+   qui monte depuis le haut, et deux traits fins qui referment la salle. Le
+   même principe que la bande claire du classement — une rupture de
+   registre qui dit « on change de propos » — en restant dans la nuit. */
+.cg-tr {
+  margin: clamp(26px, 3.6vh, 54px) 0;
+  padding: clamp(64px, 9vh, 108px) 0 clamp(56px, 7vh, 88px);
+  background:
+    radial-gradient(ellipse 70% 120% at 50% -12%, color-mix(in srgb, var(--froid) 11%, transparent), transparent 62%),
+    var(--fond-2);
+  border-top: 1px solid var(--bord-fin);
+  border-bottom: 1px solid var(--bord-fin);
+}
+
 /* ── Les compteurs ───────────────────────────────────────────────────────── */
 
 /* Les compteurs en rangée : cinq grandeurs empilées se lisaient comme une
@@ -3970,13 +3986,18 @@ body:has(.cg) { background: #05080c; }
    mot penche à gauche de son axe. */
 .cg-eco-titre {
   margin: 4px 0 0;
-  font-size: clamp(30px, 5.4vw, 74px);
+  font-size: clamp(26px, 4.2vw, 56px);
   font-weight: 300;
   line-height: 1.04;
-  letter-spacing: 0.2em;
-  text-indent: 0.2em;
+  letter-spacing: 0.16em;
+  text-indent: 0.16em;
   text-transform: uppercase;
   color: var(--encre);
+  /* Depuis que le titre se lève lettre par lettre, chaque lettre est son
+     propre bloc — et un mot fait de plusieurs blocs peut, en théorie,
+     couper n'importe où. « Démographie » le faisait vraiment, avec un « E »
+     livré seul sur une seconde ligne : un mot d'enseigne ne se coupe pas. */
+  white-space: nowrap;
 }
 .cg-eco-titre .cg-mot { display: inline-block; }
 .cg-eco-ouv .cg-eco-ouv-c { margin-top: 18px; }

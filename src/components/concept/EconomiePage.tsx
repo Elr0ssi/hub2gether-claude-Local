@@ -197,7 +197,7 @@ function TempsReelEco({ pib }: { pib: PibMonde }) {
   const pibMonnaie = convertir(pib.total, pib.annee, monnaie);
 
   return (
-    <section className="cg-section" id="temps-reel-eco">
+    <section className="cg-section cg-tr" id="temps-reel-eco">
       <div className="cg-wrap">
         <TitreSection
           titre="Données en temps réel"

@@ -76,7 +76,7 @@ function TempsReelDemo({ compteur }: { compteur: CompteurDemoProps }) {
   const accroissement = compteur.naissancesParSeconde - compteur.decesParSeconde;
 
   return (
-    <section className="cg-section" id="temps-reel-demo">
+    <section className="cg-section cg-tr" id="temps-reel-demo">
       <div className="cg-wrap">
         <TitreSection
           titre="Données en temps réel"
