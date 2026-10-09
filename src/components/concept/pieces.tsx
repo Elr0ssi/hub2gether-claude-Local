@@ -193,13 +193,9 @@ interface Onglet {
 const NAV: Onglet[] = [
   { label: "Économie", href: "/economie" },
   { label: "Démographie", href: "/demographie" },
-  { label: "Analyses", href: "/analyses" },
-  { label: "Dette", href: "/france/economie/dette-publique-v2" },
-  /* L'essai de la page Économie en néo-média. */
-  { label: "V2 éco", href: "/v2-eco" },
-  /* Comparer des thématiques dans le temps, sur un graphe : la suite de
-     l'actuel /comparaison, encore à construire dans le concept. */
-  { label: "Live" },
+  { label: "Forum", href: "/forum" },
+  /* Comparer des pays et des thématiques dans le temps : la prochaine grande page. */
+  { label: "Comparer" },
 ];
 
 /** Un onglet. Sans adresse, il se montre sans se laisser cliquer. */
@@ -334,7 +330,6 @@ export function Pied() {
               {n.label}
             </a>
           ))}
-          <a href="/forum">Forum</a>
           <a href="/compte/connexion">Mon compte</a>
           <a href="/confidentialite">Confidentialité</a>
           <a href="/cgu">CGU</a>

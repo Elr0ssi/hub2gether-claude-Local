@@ -131,6 +131,7 @@ export default function Page() {
         debats={debatsEco()}
         articles={articlesEco(9)}
         faq={faq}
+        variante="v2"
       />
     </>
   );

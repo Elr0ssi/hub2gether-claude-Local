@@ -189,6 +189,11 @@ const DEPENSES_ECO: { id: string; label: string; parSeconde: number }[] = [
   { id: "educatives", label: "Dépenses éducatives", parSeconde: 132_610 },
 ];
 
+/** Les articles de la rédaction qui ont déjà leur page. */
+const LIENS_ARTICLES: Record<string, string> = {
+  "dette-publique-france-2025-enjeux": "/france/economie/dette-publique-v2",
+};
+
 function TempsReelEco({ pib, v2 = false }: { pib: PibMonde; v2?: boolean }) {
   const vue = useVu(140);
   const [monnaie] = useMonnaie();
@@ -1240,11 +1245,13 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
                   ref={rail2}
                   className="cg-arts"
                   onPointerDown={(e) => {
+                    delete e.currentTarget.dataset.mv;
                     prise2.current = { x: e.clientX, g: e.currentTarget.scrollLeft };
                     e.currentTarget.setPointerCapture(e.pointerId);
                   }}
                   onPointerMove={(e) => {
                     if (!prise2.current || !rail2.current) return;
+                    if (Math.abs(e.clientX - prise2.current.x) > 5) rail2.current.dataset.mv = "1";
                     rail2.current.scrollLeft = prise2.current.g - (e.clientX - prise2.current.x);
                   }}
                   onPointerUp={() => {
@@ -1255,7 +1262,7 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
                   }}
                 >
                   {articlesVus.slice(1).map((a, k) => (
-                    <article key={a.slug} className="cg-art">
+                    <article key={a.slug} className="cg-art" onClick={LIENS_ARTICLES[a.slug] ? () => { if (!rail2.current?.dataset.mv) window.location.href = LIENS_ARTICLES[a.slug]; } : undefined} style={LIENS_ARTICLES[a.slug] ? { cursor: "pointer" } : undefined}>
                       <ImagePlaceholder nom={`IMAGE_PNG_ECO_0${((k + 1) % 9) + 1}`} ratio="16 / 9" />
                       <span className="cg-rubrique">
                         {a.rubrique} · {a.duree}

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Baby, HeartPulse, Users } from "lucide-react";
 import type { SocleDemo } from "@/data/concept/conceptDemographie";
 import type { FicheArticle } from "@/data/concept/conceptGeo";
 import type { FicheDebat } from "@/data/concept/conceptEconomie";
@@ -9,12 +10,14 @@ import type { DemographyMetricId, DemographyYear } from "@/data/demographie/demo
 import { Dessin, Jetons } from "./Jetons";
 import { EnTete, ImagePlaceholder, LENT, Pied, TitreSection } from "./pieces";
 import { Loupe } from "./Loupe";
+import { Selecteur } from "./Selecteur";
 import { Odometre, gelerOdometres } from "./Roulement";
 import { Lettres } from "./Lettres";
 import { compteurPossibleDemo, familleDe, GlobeDemographie, TOUTES, type MetriqueDemo } from "./GlobeDemographie";
 import { Titre, usePret, useProgression, useSocleComplet, useVu } from "./ouverture";
 import { cle } from "@/data/concept/cle";
 import "./concept.css";
+import "./v2eco.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA PAGE DÉMOGRAPHIE DU PROTOTYPE
@@ -69,6 +72,7 @@ function val(v: number | null, unite: MetriqueDemo["unite"]): string {
    Économie : rien n'est mesuré à la seconde, une grandeur annuelle est
    étalée sur l'année en cours. ═══════════════════════════════════════════ */
 function TempsReelDemo({ compteur }: { compteur: CompteurDemoProps }) {
+  const vue = useVu(140);
   const departAnnee = useMemo(() => {
     const t = new Date(new Date().getFullYear(), 0, 1).getTime();
     return performance.now() - (Date.now() - t);
@@ -76,18 +80,22 @@ function TempsReelDemo({ compteur }: { compteur: CompteurDemoProps }) {
   const accroissement = compteur.naissancesParSeconde - compteur.decesParSeconde;
 
   return (
-    <section className="cg-section cg-tr" id="temps-reel-demo">
+    <section
+      ref={vue.ref as React.RefObject<HTMLElement>}
+      className="cg-section cg-tr"
+      id="temps-reel-demo"
+      data-vu={vue.vu ? "1" : "0"}
+    >
       <div className="cg-wrap">
-        <TitreSection
-          titre="Données en temps réel"
-          sous={
-            <>
-              Depuis le 1<sup>er</sup> janvier {new Date().getFullYear()}
-            </>
-          }
-        />
+        <header className="v2-tete">
+          <h2 className="v2-h2">Données en temps réel</h2>
+          <p className="v2-sous">
+            Depuis le 1<sup>er</sup> janvier {new Date().getFullYear()}
+          </p>
+        </header>
         <div className="cg-cpt-l" style={{ gridTemplateColumns: "repeat(3, minmax(0, 1fr))" }}>
-          <div className="cg-cpt">
+          <div className="cg-cpt v2-cpt v2-cpt-pib" style={{ "--i": 0 } as React.CSSProperties}>
+            <span className="v2-cpt-i" aria-hidden="true"><Users size={18} /></span>
             <span className="cg-cpt-l2">Population mondiale</span>
             <Odometre
               className="cg-cpt-v"
@@ -99,7 +107,8 @@ function TempsReelDemo({ compteur }: { compteur: CompteurDemoProps }) {
             />
             <Lettres base={compteur.population} parSeconde={accroissement} depuis={departAnnee} mot="habitants" />
           </div>
-          <div className="cg-cpt">
+          <div className="cg-cpt v2-cpt v2-cpt-medicales" style={{ "--i": 1 } as React.CSSProperties}>
+            <span className="v2-cpt-i" aria-hidden="true"><Baby size={18} /></span>
             <span className="cg-cpt-l2">Naissances dans le monde</span>
             <Odometre
               className="cg-cpt-v"
@@ -111,7 +120,8 @@ function TempsReelDemo({ compteur }: { compteur: CompteurDemoProps }) {
             />
             <Lettres base={0} parSeconde={compteur.naissancesParSeconde} depuis={departAnnee} mot="naissances" />
           </div>
-          <div className="cg-cpt">
+          <div className="cg-cpt v2-cpt v2-cpt-militaires" style={{ "--i": 2 } as React.CSSProperties}>
+            <span className="v2-cpt-i" aria-hidden="true"><HeartPulse size={18} /></span>
             <span className="cg-cpt-l2">Décès dans le monde</span>
             <Odometre
               className="cg-cpt-v"
@@ -603,7 +613,7 @@ export function DemographiePage({
   }, [articles, qArticle]);
 
   return (
-    <div className="cg cg-eco">
+    <div className="cg cg-eco cg-v2">
       <EnTete actif="Démographie" />
       <Loupe />
 
@@ -625,10 +635,6 @@ export function DemographiePage({
             <h1 className="cg-eco-titre">
               <Titre texte="Démographie" />
             </h1>
-            <p className="cg-chapo cg-eco-ouv-c">
-              {socle.pays.length} pays et territoires, {socle.annees[0]}&ndash;{socle.annees[socle.annees.length - 1]},
-              population, natalité, mortalité.
-            </p>
           </div>
         </div>
         <div className="cg-arc" aria-hidden="true">
@@ -645,10 +651,10 @@ export function DemographiePage({
 
       <section id="globe" className="cg-section cg-eco-globe">
         <div className="cg-wrap">
-          <TitreSection
-            titre="Notre globe"
-            sous={`De ${socle.annees[0]} à ${socle.annees[socle.annees.length - 1]} · Nations Unies, World Population Prospects 2024`}
-          />
+          <header className="v2-tete">
+            <h2 className="v2-h2">Notre globe</h2>
+            <p className="v2-sous">{`De ${socle.annees[0]} à ${socle.annees[socle.annees.length - 1]} · Nations Unies, World Population Prospects 2024`}</p>
+          </header>
 
           <GlobeDemographie
             annee={anneeDemo}
@@ -682,13 +688,12 @@ export function DemographiePage({
           <div className="cg-bande-ctrl">
             <label className="cg-an-choix">
               <span className="cg-an-choix-l">Date</span>
-              <select value={annee} onChange={(e) => setAnnee(Number(e.target.value))} aria-label="Date du classement">
-                {[...socle.annees].reverse().map((a) => (
-                  <option key={a} value={a}>
-                    {a}
-                  </option>
-                ))}
-              </select>
+              <Selecteur
+                valeur={annee}
+                options={[...socle.annees].reverse()}
+                onChange={setAnnee}
+                label="Date du classement"
+              />
             </label>
             <input
               className="cg-filtre cg-filtre-clair"
@@ -750,7 +755,7 @@ export function DemographiePage({
               {debats.length > 0 && (
                 <div className="cg-debats">
                   <div className="cg-debats-t">
-                    <span>Sur le forum</span>
+                    <span className="cg-debats-st">Sur le forum</span>
                     <span className="cg-debats-n">{debats.length} débats</span>
                   </div>
                   <div ref={rail3} className="cg-debats-l" onPointerDown={debutGlisse3}>
@@ -772,6 +777,7 @@ export function DemographiePage({
               )}
 
               <div className="cg-arts-c">
+                <h3 className="cg-arts-st">Nos articles</h3>
                 <div
                   ref={rail2}
                   className="cg-arts"

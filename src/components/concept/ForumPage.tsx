@@ -10,6 +10,7 @@ import { EnTete, Pied, TitreSection } from "./pieces";
 import { Loupe } from "./Loupe";
 import { Titre, usePret, useProgression, useVu } from "./ouverture";
 import "./concept.css";
+import "./v2eco.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE FORUM DU PROTOTYPE
@@ -432,7 +433,7 @@ export function ForumPage() {
   const racines = enfants.get(null) ?? [];
 
   return (
-    <div className="cg cg-eco">
+    <div className="cg cg-eco cg-v2">
       <EnTete actif="Forum" />
       <Loupe />
 
@@ -454,10 +455,6 @@ export function ForumPage() {
             <h1 className="cg-eco-titre">
               <Titre texte="Forum" />
             </h1>
-            <p className="cg-chapo cg-eco-ouv-c">
-              {FILS.length} fils ouverts sur des chiffres publiés, {TAGS.length} sujets. On discute, on conteste, on
-              apporte une source.
-            </p>
           </div>
         </div>
         <div className="cg-arc" aria-hidden="true">
@@ -592,7 +589,7 @@ export function ForumPage() {
                     <p className="cg-fo-para">{fil.corps[0]}</p>
 
                     <div className="cg-fo-liens">
-                      <Link href={`/articles/${fil.article.slug}`} className="cg-lien-fleche">
+                      <Link href={fil.id === "dette-france" ? "/france/economie/dette-publique-v2" : `/articles/${fil.article.slug}`} className="cg-lien-fleche">
                         Lire l&apos;article <span aria-hidden="true">→</span>
                       </Link>
                       {fil.carte && (

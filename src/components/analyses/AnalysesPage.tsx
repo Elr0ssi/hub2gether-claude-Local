@@ -726,7 +726,7 @@ const SOURCES_FLUX = [
   { nom: "Institutions", pastilles: ["Banque mondiale", "FMI", "ONU", "INSEE"] },
 ] as const;
 
-const SORTIES = ["Le chiffre d'abord", "Des globes à manipuler", "Des compteurs en direct", "Des sources citées"];
+const SORTIES = ["Interprétation et décortication des chiffres", "Globes interactifs", "Données en temps réel", "Plus de 1 000 sources fiables"];
 
 function Position() {
   return (
@@ -923,7 +923,7 @@ export function AnalysesPage(props: Props) {
 
   return (
     <div className="cg ax" ref={racine}>
-      <EnTete actif="Analyses" />
+      <EnTete />
       <div className="ax-fond" aria-hidden="true" />
 
       <Ouverture {...props} />

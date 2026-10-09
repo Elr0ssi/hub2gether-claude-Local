@@ -442,3 +442,36 @@
 .cg-v2 .cg-debats-t { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 0; }
 .cg-v2 .cg-debats-t .cg-debats-n { font-size: 12px; font-weight: 700; color: var(--v2-vif-2); }
 .cg-v2 .cg-arts-c { margin-top: 10px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Le forum, dans la même manière : cartes violettes, rayons larges, survol qui monte
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cg-v2 .cg-fo-carte {
+  border: 1px solid var(--v2-ligne);
+  border-radius: 24px;
+  min-height: 150px;
+  padding: 18px 18px 16px;
+  background: linear-gradient(160deg, var(--v2-doux), var(--v2-carte));
+  transition: translate 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease, box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cg-v2 .cg-fo-carte:hover { transform: none; translate: 0 -7px; border-color: color-mix(in srgb, var(--v2-vif) 55%, transparent); box-shadow: 0 18px 38px var(--ombre-portee); }
+.cg-v2 .cg-fo-carte-on { border-color: transparent; color: #fff; background: radial-gradient(80% 70% at 100% 0%, rgba(255, 255, 255, 0.24), transparent 60%), linear-gradient(150deg, #4a1fd0, #7c4dff); }
+.cg-v2 .cg-fo-carte-on .cg-fo-carte-tete,
+.cg-v2 .cg-fo-carte-on .cg-fo-carte-pied,
+.cg-v2 .cg-fo-carte-on .cg-fo-carte-titre { color: #fff; }
+.cg-v2 .cg-fo-carte-titre { font-weight: 750; letter-spacing: -0.025em; }
+.cg-v2 .cg-fo-carte-tete { color: var(--v2-vif-2); font-weight: 700; }
+.cg-v2 .cg-fo-panneau { border: 1px solid var(--v2-ligne); border-radius: 30px; background: var(--v2-carte); padding: clamp(22px, 2.6vw, 34px); }
+.cg-v2 .cg-fo-ouverture-titre { font-weight: 800; letter-spacing: -0.04em; }
+.cg-v2 .cg-fo-theme { color: var(--v2-vif-2); font-weight: 700; }
+.cg-v2 .cg-fo-ancre { border-radius: 20px; }
+.cg-v2 .cg-fo-btn-plein { padding: 11px 20px; border-radius: 14px; color: #fff; background: linear-gradient(135deg, #4a1fd0, #7c4dff); box-shadow: 0 12px 26px -14px rgba(124, 77, 255, 0.9); transition: translate 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s; }
+.cg-v2 .cg-fo-btn-plein:hover:not(:disabled) { opacity: 1; translate: 0 -3px; }
+.cg-v2 .cg-fo-btn-fantome { padding: 10px 18px; border-radius: 14px; }
+.cg-v2 .cg-fo-btn-fantome:hover { border-color: var(--v2-vif); }
+.cg-v2 .cg-fo-invite { border-radius: 20px; background: var(--v2-doux); }
+.cg-v2 .cg-fo-moi { background: var(--v2-doux); color: var(--v2-vif-2); }
+.cg-v2 .cg-fo-texte:focus { border-color: var(--v2-vif); }
+.cg-v2 .cg-fo-fleche-on { color: var(--v2-vif-2); }
+
+.cg-v2 .cg-lien-fleche { color: var(--v2-vif-2); }

@@ -27,6 +27,8 @@ const nextConfig: NextConfig = {
      les liens déjà partagés et l'autorité acquise suivent. */
   async redirects() {
     return [
+      { source: "/analyses", destination: "/", permanent: true },
+      { source: "/v2-eco", destination: "/economie", permanent: true },
       { source: "/concept-globe", destination: "/", permanent: true },
       { source: "/concept-globe/economie", destination: "/economie", permanent: true },
       { source: "/accueil-v1", destination: "/", permanent: true },
