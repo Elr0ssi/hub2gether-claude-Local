@@ -14,7 +14,7 @@ import { TableauDeBord } from "@/components/compte/TableauDeBord";
 import "@/components/concept/concept.css";
 
 export const metadata: Metadata = {
-  title: "Mon espace · The Essential Data",
+  title: "Mon espace · Visualize",
   description: "Votre profil, vos messages.",
   alternates: { canonical: "/compte" },
   robots: { index: false, follow: false },
@@ -106,7 +106,7 @@ export default async function ComptePage() {
               {favoris.length === 0 ? (
                 <p className="cp-vide">
                   Vous n&apos;avez encore rien enregistré.{" "}
-                  <Link href="/articles">Parcourir les articles</Link>
+                  <Link href="/forum">Aller au forum</Link>
                 </p>
               ) : (
                 <ul className="cp-messages">

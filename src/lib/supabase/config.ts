@@ -11,8 +11,15 @@
    Les pages de compte le disent alors franchement au lieu de tomber.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export const URL_SUPABASE = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-export const CLE_SUPABASE = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "";
+/* Le fichier d'environnement local n'est pas versionné : sans valeurs de
+   repli, un site construit depuis le dépôt n'avait aucune adresse de base et
+   les comptes s'y disaient « pas branchés ». Les valeurs de repli sont celles
+   du projet du site ; elles sont publiques par nature (voir plus haut), et une
+   variable d'environnement les remplace dès qu'elle est posée. */
+export const URL_SUPABASE =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "https://umqksphaqhyairdchcxk.supabase.co";
+export const CLE_SUPABASE =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "sb_publishable_bArW3BssztiYaWT1bFRDig_HZq1GL8J";
 
 /** Vrai quand les comptes sont branchés. */
 export const COMPTES_ACTIFS = Boolean(URL_SUPABASE && CLE_SUPABASE);

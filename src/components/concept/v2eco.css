@@ -397,3 +397,28 @@
   background: linear-gradient(135deg, #5b2de0, #8a5cff);
 }
 .cg-v2 .cg-debat-a { color: var(--encre-3); font-size: 12px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TROISIÈME PASSE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* La couverture des articles réutilisait le filet d'origine, qui s'étire au
+   survol : il devenait un voile violet sur toute la carte. Elle est maintenant
+   un simple bloc en flux, immobile. */
+.cg-v2 .cg-art::before,
+.cg-v2 .cg-art:hover::before {
+  position: static;
+  inset: auto;
+  width: auto;
+  transform: none;
+  transition: none;
+  z-index: auto;
+}
+
+/* Le globe et la fiche prennent moins de place : le titre et les onglets de
+   l'indicateur restent à l'écran. */
+.cg-v2 .ge-corps { --ge-h: clamp(430px, 62vh, 620px); grid-template-columns: minmax(0, 1fr) minmax(0, 340px); }
+.cg-v2 .cg-eco-globe { padding-top: clamp(56px, 9vh, 104px); }
+.cg-v2 .ge-vedette { margin-top: 10px; padding: 11px 13px; }
+.cg-v2 .ge-vedette-v { font-size: clamp(22px, 2.2vw, 30px); }
+@media (max-width: 1080px) { .cg-v2 .ge-corps { grid-template-columns: minmax(0, 1fr); } }

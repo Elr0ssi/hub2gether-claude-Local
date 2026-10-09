@@ -7,7 +7,7 @@ import { lireCompte } from "@/lib/supabase/serveur";
 import "@/components/concept/concept.css";
 
 export const metadata: Metadata = {
-  title: "Se connecter · The Essential Data",
+  title: "Se connecter · Visualize",
   description: "Créez un compte pour écrire dans le forum et répondre aux articles.",
   alternates: { canonical: "/compte/connexion" },
   /* Une page de formulaire n'a rien à faire dans un index. */

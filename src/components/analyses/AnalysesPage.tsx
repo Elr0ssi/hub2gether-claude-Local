@@ -7,7 +7,9 @@ import {
   ArrowRight,
   ArrowUpRight,
   Banknote,
+  BookOpen,
   Check,
+  ChevronDown,
   Globe,
   Landmark,
   MessageCircle,
@@ -40,6 +42,9 @@ export interface Props {
   /** Le PIB mondial du dernier millésime, pour le compteur en direct. */
   pib: { total: number; n: number; annee: number };
 }
+
+const fmtPib = (v: number) =>
+  Math.abs(v) >= 1000 ? `${(v / 1000).toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} T$` : `${Math.round(v).toLocaleString("fr-FR")} Md$`;
 
 const nf = (v: number, d = 1) =>
   v.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -97,15 +102,17 @@ function Rev({
   d = 0,
   className = "",
   as: Tag = "div",
+  href,
 }: {
   children: React.ReactNode;
   d?: number;
   className?: string;
   as?: "div" | "li" | "article" | "p" | "h2" | "a";
+  href?: string;
 }) {
   const T = Tag as React.ElementType;
   return (
-    <T data-rev="" className={className} style={{ "--d": `${d}ms` } as React.CSSProperties}>
+    <T data-rev="" href={href} className={className} style={{ "--d": `${d}ms` } as React.CSSProperties}>
       {children}
     </T>
   );
@@ -146,7 +153,7 @@ function Monte({ texte }: { texte: string }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   1 · L'OUVERTURE — un titre, une phrase, et un globe entouré de petits chiffres
+   1 · L'OUVERTURE — le nom, un slogan, un globe qui porte les chiffres
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* Le globe en points du site : une scène WebGL, montée seulement côté client
@@ -173,11 +180,9 @@ function Ouverture({ reperes, donnees, annee, dette }: Props) {
     () =>
       Object.values(donnees)
         .filter((d): d is FichePays & { pib: number } => typeof d.pib === "number")
-        .sort((a, b) => b.pib - a.pib)
-        .slice(0, 5),
+        .sort((a, b) => b.pib - a.pib),
     [donnees],
   );
-  const hauteur = top.length ? top[0].pib : 1;
   const pibMonde = reperes.find((r) => r.nom === "PIB mondial");
   const pop = reperes.find((r) => r.nom === "Population");
 
@@ -185,7 +190,7 @@ function Ouverture({ reperes, donnees, annee, dette }: Props) {
   const [globe, setGlobe] = useState(false);
   const [sombre, setSombre] = useState(true);
   useEffect(() => {
-    const t = window.setTimeout(() => setGlobe(true), 700);
+    const t = window.setTimeout(() => setGlobe(true), 600);
     const lit = () => setSombre(document.documentElement.dataset.concept !== "clair");
     lit();
     const o = new MutationObserver(lit);
@@ -196,67 +201,102 @@ function Ouverture({ reperes, donnees, annee, dette }: Props) {
     };
   }, []);
 
+  /* Les chiffres sont posés sur la sphère, à de vraies coordonnées : ils
+     tournent avec elle, et il faut la faire tourner pour tous les voir. */
+  const marqueurs = useMemo(
+    () => [
+      { id: "pib", lat: 42, lon: -96, icon: Landmark, texte: { chiffre: pibMonde?.valeur ?? "—", label: `PIB mondial ${annee}` } },
+      { id: "top", lat: 34, lon: 108, icon: Landmark, texte: { chiffre: top[0] ? fmtPib(top[0].pib) : "—", label: top[0]?.fr ?? "1re économie" } },
+      { id: "pop", lat: 8, lon: 22, icon: Users, texte: { chiffre: pop?.valeur ?? "—", label: "Population" } },
+      { id: "fr", lat: 47, lon: 3, icon: Banknote, texte: { chiffre: `${nf(dette.ratio)} %`, label: "Dette France / PIB" } },
+      { id: "pays", lat: -18, lon: -58, icon: Globe, texte: { chiffre: "200+", label: "pays suivis" } },
+    ],
+    [pibMonde, pop, top, annee, dette.ratio],
+  );
+
   return (
     <header className="ax-ouv">
       <div className="ax-ouv-g">
         <div className="ax-ouv-t">
           <h1 className="ax-h1">
-            <Mots texte="Le monde en chiffres," />
-            <br />
-            <span className="ax-h1-v">
-              <Mots texte="sans le bruit." depart={4} />
-            </span>
+            <Mots texte="Visualize" />
           </h1>
-          <p className="ax-ouv-s ax-in" style={{ "--d": "600ms" } as React.CSSProperties}>
-            PIB, dette, chômage, population : plus de 200 pays à lire d&apos;un coup d&apos;œil.
+          <p className="ax-ouv-s ax-in" style={{ "--d": "500ms" } as React.CSSProperties}>
+            Chaque chiffre du monde, enfin lisible.
           </p>
-          <div className="ax-ouv-c ax-in" style={{ "--d": "750ms" } as React.CSSProperties}>
-            <a className="ax-bouton ax-bouton-vif" href="/economie">
-              Explorer le globe <ArrowRight size={16} aria-hidden="true" />
+          <div className="ax-ouv-c ax-in" style={{ "--d": "650ms" } as React.CSSProperties}>
+            <a className="ax-bouton ax-bouton-vif" href="#presentation">
+              Explorer notre site <ArrowRight size={16} aria-hidden="true" />
             </a>
           </div>
         </div>
 
         <div className="ax-globe-zone">
-          <div className="ax-globe-c" aria-hidden="true">
+          <div className="ax-globe-halo" aria-hidden="true" />
+          <div className="ax-globe-c">
             {globe && (
               <GlobePoints
-                markers={[]}
-                sphereColor={sombre ? "#0b1210" : undefined}
-                badgeBackground={sombre ? "rgba(10,16,14,0.88)" : undefined}
+                markers={marqueurs}
+                accent="#8b5cff"
+                sphereColor={sombre ? "#15102c" : "#e9e3fb"}
+                badgeBackground={sombre ? "rgba(22,17,44,0.82)" : "rgba(255,255,255,0.9)"}
+                badgeShadow={
+                  sombre
+                    ? "0 12px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(165,131,255,0.35)"
+                    : "0 12px 28px rgba(60,30,140,0.22), 0 0 0 1px rgba(91,45,224,0.18)"
+                }
+                iconColor={sombre ? "#cdbcff" : "#5b2de0"}
+                markerSize="clamp(30px, 3.4vw, 40px)"
               />
             )}
           </div>
-
-          {/* De petites cartes qui gravitent autour du globe. */}
-          <div className="ax-mini ax-mini-a ax-in" style={{ "--d": "1000ms" } as React.CSSProperties}>
-            <span>Cinq premières économies</span>
-            <ul>
-              {top.map((p, i) => (
-                <li key={p.fr}>
-                  <em>{p.fr}</em>
-                  <i style={{ "--w": `${(p.pib / hauteur) * 100}%`, "--i": i } as React.CSSProperties} />
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="ax-mini ax-mini-b ax-in" style={{ "--d": "1150ms" } as React.CSSProperties}>
-            <span>PIB mondial · {annee}</span>
-            <b>{pibMonde?.valeur ?? "—"}</b>
-          </div>
-          <div className="ax-mini ax-mini-c ax-in" style={{ "--d": "1300ms" } as React.CSSProperties}>
-            <span>Population</span>
-            <b>{pop?.valeur ?? "—"}</b>
-          </div>
-          <span className="ax-puce ax-puce-1 ax-in" style={{ "--d": "1450ms" } as React.CSSProperties}>
-            <Activity size={13} /> 200+ pays
-          </span>
-          <span className="ax-puce ax-puce-2 ax-in" style={{ "--d": "1600ms" } as React.CSSProperties}>
-            <Banknote size={13} /> France · {nf(dette.ratio)} % du PIB
-          </span>
         </div>
       </div>
     </header>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1 bis · CE QUE NOUS FAISONS — un tableau de bord de quatre blocs
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function Presentation() {
+  return (
+    <section className="ax-sec" id="presentation" aria-labelledby="ax-pr-t">
+      <Rev as="h2" className="ax-h2">
+        <span id="ax-pr-t">Des données, des globes, des articles</span>
+      </Rev>
+      <Rev as="p" className="ax-sous" d={80}>
+        On rassemble les chiffres, on les met sur des globes à manipuler, puis on vous laisse les
+        décortiquer dans nos articles ou en discuter sur le forum.
+      </Rev>
+      <div className="ax-dash">
+        <Rev as="a" href="#direct" className="ax-bloc ax-bloc-a" d={0}>
+          <span className="ax-bloc-i"><Activity size={18} aria-hidden="true" /></span>
+          <h3>Des données en temps réel</h3>
+          <p>PIB, dépenses, naissances, décès : des compteurs qui avancent à la seconde.</p>
+          <span className="ax-bloc-l">Voir les compteurs <ArrowUpRight size={14} aria-hidden="true" /></span>
+        </Rev>
+        <Rev as="a" href="/economie" className="ax-bloc ax-bloc-b" d={90}>
+          <span className="ax-bloc-i"><Globe size={18} aria-hidden="true" /></span>
+          <h3>Des globes interactifs</h3>
+          <p>Plus de 200 pays, de 1960 à aujourd&apos;hui, à tourner, comparer, zoomer.</p>
+          <span className="ax-bloc-l">Ouvrir les globes <ArrowUpRight size={14} aria-hidden="true" /></span>
+        </Rev>
+        <Rev as="a" href="/france/economie/dette-publique-v2" className="ax-bloc ax-bloc-c" d={180}>
+          <span className="ax-bloc-i"><BookOpen size={18} aria-hidden="true" /></span>
+          <h3>Des articles décortiqués</h3>
+          <p>Le montant d&apos;abord, l&apos;explication ensuite, la source toujours.</p>
+          <span className="ax-bloc-l">Lire un dossier <ArrowUpRight size={14} aria-hidden="true" /></span>
+        </Rev>
+        <Rev as="a" href="/forum" className="ax-bloc ax-bloc-d" d={270}>
+          <span className="ax-bloc-i"><MessageCircle size={18} aria-hidden="true" /></span>
+          <h3>Un forum pour en débattre</h3>
+          <p>Posez vos questions, contestez un chiffre, comparez vos lectures.</p>
+          <span className="ax-bloc-l">Rejoindre le forum <ArrowUpRight size={14} aria-hidden="true" /></span>
+        </Rev>
+      </div>
+    </section>
   );
 }
 
@@ -324,7 +364,7 @@ function EnDirect({ pib }: { pib: Props["pib"] }) {
   return (
     <section
       ref={zone}
-      className="ax-cles"
+      className="ax-cles" id="direct"
       style={{ height: `${total * 58 + 40}vh`, "--p": p, "--t": n } as React.CSSProperties}
       aria-label="Données en temps réel"
     >
@@ -380,15 +420,13 @@ function EnDirect({ pib }: { pib: Props["pib"] }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   3 · LES CLASSEMENTS — la page s'arrête, on défile, le classement change
+   3 · LES CLASSEMENTS — le podium en haut, la suite en dessous, le tout défile
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const INDICS = [
   { id: "pib", label: "PIB", titre: "Les plus grandes économies", unite: "md" },
   { id: "pibHab", label: "PIB par habitant", titre: "Les pays les plus riches par habitant", unite: "usd" },
   { id: "dette", label: "Dette publique", titre: "Les pays les plus endettés", unite: "pct" },
-  { id: "chomage", label: "Chômage", titre: "Le chômage le plus élevé", unite: "pct" },
-  { id: "inflation", label: "Inflation", titre: "L'inflation la plus forte", unite: "pct" },
   { id: "population", label: "Population", titre: "Les pays les plus peuplés", unite: "hab" },
 ] as const;
 
@@ -396,7 +434,7 @@ function fmt(v: number, u: (typeof INDICS)[number]["unite"]) {
   if (u === "hab") return `${nf(v, v >= 100 ? 0 : 1)} M`;
   if (u === "pct") return `${nf(v)} %`;
   if (u === "usd") return `${Math.round(v).toLocaleString("fr-FR")} $`;
-  return Math.abs(v) >= 1000 ? `${nf(v / 1000)} T$` : `${Math.round(v).toLocaleString("fr-FR")} Md$`;
+  return fmtPib(v);
 }
 
 function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; annee: number }) {
@@ -407,9 +445,8 @@ function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; a
           .map((d) => ({ fr: d.fr, v: d[ind.id] ?? null }))
           .filter((o): o is { fr: string; v: number } => typeof o.v === "number" && Number.isFinite(o.v))
           .sort((a, b) => b.v - a.v)
-          .slice(0, 5);
-        const haut = l.length ? Math.max(...l.map((o) => Math.abs(o.v))) : 1;
-        return { ...ind, lignes: l.map((o) => ({ ...o, part: Math.abs(o.v) / haut })) };
+          .slice(0, 10);
+        return { ...ind, lignes: l };
       }),
     [donnees],
   );
@@ -417,6 +454,7 @@ function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; a
   const zone = useRef<HTMLDivElement>(null);
   const [n, setN] = useState(0);
   const [p, setP] = useState(0);
+  const [plus, setPlus] = useState(false);
   useEffect(() => {
     let rendez = false;
     const lis = () => {
@@ -445,13 +483,17 @@ function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; a
   }, [fiches.length]);
 
   const f = fiches[n];
+  const haut = f.lignes.slice(0, 3);
+  /* Le podium se lit 2 · 1 · 3 : le premier au milieu, plus haut. */
+  const ordre = [haut[1], haut[0], haut[2]].filter(Boolean);
+  const suite = f.lignes.slice(3, plus ? 10 : 6);
 
   return (
     <section
       ref={zone}
       className="ax-cl2"
       id="classements"
-      style={{ height: `${fiches.length * 46 + 40}vh` }}
+      style={{ height: `${fiches.length * 50 + 40}vh` }}
       aria-labelledby="ax-cl-t"
     >
       <div className="ax-cl2-colle">
@@ -472,17 +514,37 @@ function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; a
 
           <div key={f.id} className="ax-cl2-carte">
             <p className="ax-cl2-t">{f.titre}</p>
-            <ol>
-              {f.lignes.map((o, i) => (
+            <div className="ax-pod2">
+              {ordre.map((o) => {
+                const rang = haut.indexOf(o) + 1;
+                return (
+                  <div key={o.fr} className={`ax-pod2-c ax-pod2-${rang}`}>
+                    <span className="ax-pod2-r">{rang}</span>
+                    <span className="ax-pod2-n">{o.fr}</span>
+                    <span className="ax-pod2-v">{fmt(o.v, f.unite)}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <ol className="ax-suite" start={4}>
+              {suite.map((o, i) => (
                 <li key={o.fr} style={{ "--i": i } as React.CSSProperties}>
-                  <span className="ax-cl2-r">{i + 1}</span>
-                  <span className="ax-cl2-n">{o.fr}</span>
-                  <span className="ax-cl2-b"><i style={{ "--w": `${o.part * 100}%` } as React.CSSProperties} /></span>
-                  <span className="ax-cl2-v">{fmt(o.v, f.unite)}</span>
+                  <span className="ax-suite-r">{i + 4}</span>
+                  <span className="ax-suite-n">{o.fr}</span>
+                  <span className="ax-suite-v">{fmt(o.v, f.unite)}</span>
                 </li>
               ))}
             </ol>
-            <p className="ax-source">Banque mondiale (WDI), FMI · {annee}</p>
+            <div className="ax-cl2-pied">
+              <p className="ax-source">Banque mondiale (WDI), FMI · {annee}</p>
+              <button type="button" className="ax-voir" onClick={() => setPlus(!plus)} aria-expanded={plus}>
+                {plus ? "Réduire" : "En voir plus"}
+                <ChevronDown size={14} aria-hidden="true" className={plus ? "ax-voir-ouv" : undefined} />
+              </button>
+              <a className="ax-voir ax-voir-l" href="/economie">
+                Classement complet <ArrowUpRight size={14} aria-hidden="true" />
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -491,95 +553,129 @@ function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; a
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   4 · LES CARTES
+   4 · NOS GLOBES INTERACTIFS
    ═══════════════════════════════════════════════════════════════════════════ */
 
 function Cartes() {
+  const items = [
+    { href: "/economie", classe: "eco", titre: "Économie", ligne: "PIB, dette, chômage, inflation, balance. 200 pays, de 1960 à aujourd'hui.", icone: Landmark },
+    { href: "/demographie", classe: "dem", titre: "Démographie", ligne: "Population, naissances, décès et causes de mortalité, en temps réel.", icone: Users },
+  ];
   return (
-    <section className="ax-sec" id="cartes" aria-labelledby="ax-ca-t">
+    <section className="ax-sec ax-sec-large" id="cartes" aria-labelledby="ax-ca-t">
       <Rev as="h2" className="ax-h2">
         <span id="ax-ca-t">Nos globes interactifs</span>
       </Rev>
       <div className="ax-cartes">
-        <Rev as="a" className="ax-globe ax-globe-eco" d={0}>
-          <span className="ax-orbites" aria-hidden="true">
-            <i /> <i /> <i />
-            <b />
-          </span>
-          <Landmark size={22} className="ax-ico" aria-hidden="true" />
-          <h3>Économie</h3>
-          <p>PIB, dette, chômage, inflation et balance de 200 pays, de 1960 à aujourd&apos;hui.</p>
-          <ul>
-            <li>PIB</li>
-            <li>Dette</li>
-            <li>Chômage</li>
-            <li>Inflation</li>
-          </ul>
-          <span className="ax-globe-c">
-            Ouvrir le globe <ArrowUpRight size={16} aria-hidden="true" />
-          </span>
-        </Rev>
-        <Rev as="a" className="ax-globe ax-globe-dem" d={120}>
-          <span className="ax-orbites" aria-hidden="true">
-            <i /> <i /> <i />
-            <b />
-          </span>
-          <Users size={22} className="ax-ico" aria-hidden="true" />
-          <h3>Démographie</h3>
-          <p>Population, naissances, décès et causes de mortalité, en temps réel depuis le 1er janvier.</p>
-          <ul>
-            <li>Population</li>
-            <li>Natalité</li>
-            <li>Mortalité</li>
-            <li>Causes</li>
-          </ul>
-          <span className="ax-globe-c">
-            Ouvrir le globe <ArrowUpRight size={16} aria-hidden="true" />
-          </span>
-        </Rev>
+        {items.map((g, i) => {
+          const Ic = g.icone;
+          return (
+            <Rev key={g.href} as="a" href={g.href} className={`ax-globe ax-globe-${g.classe}`} d={i * 120}>
+              <span className="ax-sph" aria-hidden="true"><i /><b /></span>
+              <span className="ax-globe-i"><Ic size={18} aria-hidden="true" /></span>
+              <h3>{g.titre}</h3>
+              <p>{g.ligne}</p>
+              <span className="ax-globe-cta">
+                Ouvrir le globe <ArrowUpRight size={15} aria-hidden="true" />
+              </span>
+            </Rev>
+          );
+        })}
       </div>
     </section>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   5 · LES DOSSIERS
+   5 · NOS CHIFFRES ANALYSÉS
    ═══════════════════════════════════════════════════════════════════════════ */
 
 function Dossiers({ dette }: { dette: Props["dette"] }) {
   return (
     <section className="ax-sec" id="dossiers" aria-labelledby="ax-do-t">
       <Rev as="h2" className="ax-h2">
-        <span id="ax-do-t">Nos chiffres décortiqués</span>
+        <span id="ax-do-t">Nos chiffres analysés</span>
       </Rev>
       <div className="ax-dossiers">
-        <Rev as="a" className="ax-dos ax-dos-une" d={0}>
-          <span className="ax-dos-e">France · Économie</span>
-          <h3>Dette publique</h3>
+        <Rev as="a" href="/france/economie/dette-publique-v2" className="ax-dos ax-dos-une" d={0}>
+          <span className="ax-dos-e">Dette publique · France</span>
           <p className="ax-dos-v">
             {nf(dette.montant)}
             <small>Md€</small>
           </p>
           <p className="ax-dos-s">{nf(dette.ratio)} % du PIB · déficit de {nf(dette.deficit)} Md€ en 2025</p>
           <span className="ax-dos-c">
-            Lire le dossier <ArrowRight size={16} aria-hidden="true" />
+            Lire l&apos;analyse <ArrowRight size={15} aria-hidden="true" />
           </span>
         </Rev>
-
-        <Rev as="a" className="ax-dos ax-dos-forum" d={100} >
-          <MessageCircle size={22} className="ax-ico" aria-hidden="true" />
-          <h3>Le forum</h3>
-          <p>Posez vos questions, débattez des chiffres du jour.</p>
-          <ArrowUpRight className="ax-dos-fl" size={20} aria-hidden="true" />
-        </Rev>
-
-        {["PIB mondial", "Emploi", "Natalité"].map((t, i) => (
-          <Rev key={t} className="ax-dos ax-dos-bientot" d={160 + i * 80}>
+        {["PIB mondial", "Emploi dans le monde", "Natalité mondiale"].map((t, i) => (
+          <Rev key={t} className="ax-dos ax-dos-bientot" d={120 + i * 80}>
             <span className="ax-dos-e">Bientôt</span>
             <h3>{t}</h3>
           </Rev>
         ))}
       </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5 bis · NOS ARTICLES, PAR CATÉGORIE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const CATEGORIES = [
+  {
+    nom: "Économie",
+    articles: [
+      { titre: "Dette publique de la France : les montants et qui la détient", href: "/france/economie/dette-publique-v2" },
+      { titre: "La dette publique pas à pas, en lecture longue", href: "/france/economie/dette-publique" },
+      { titre: "PIB mondial : qui produit quoi" },
+    ],
+  },
+  {
+    nom: "Démographie",
+    articles: [
+      { titre: "Naissances et décès dans le monde, depuis le 1er janvier" },
+      { titre: "Les causes de mortalité, pays par pays" },
+      { titre: "Population : qui grandit, qui recule" },
+    ],
+  },
+] as const;
+
+function Articles() {
+  const [c, setC] = useState(0);
+  const cat = CATEGORIES[c];
+  return (
+    <section className="ax-sec" id="articles" aria-labelledby="ax-ar-t">
+      <Rev as="h2" className="ax-h2">
+        <span id="ax-ar-t">Nos articles</span>
+      </Rev>
+      <Rev className="ax-tabs" d={80}>
+        <div role="tablist" aria-label="Catégorie">
+          {CATEGORIES.map((x, i) => (
+            <button key={x.nom} type="button" role="tab" aria-selected={i === c} className={i === c ? "ax-tab-on" : undefined} onClick={() => setC(i)}>
+              {x.nom}
+            </button>
+          ))}
+        </div>
+      </Rev>
+      <ul key={cat.nom} className="ax-arts">
+        {cat.articles.map((a, i) => {
+          const lien = "href" in a ? a.href : undefined;
+          const corps = (
+            <>
+              <span className="ax-art-n">{String(i + 1).padStart(2, "0")}</span>
+              <span className="ax-art-t">{a.titre}</span>
+              {lien ? <ArrowUpRight size={18} aria-hidden="true" /> : <em>Bientôt</em>}
+            </>
+          );
+          return (
+            <li key={a.titre} style={{ "--i": i } as React.CSSProperties}>
+              {lien ? <a href={lien}>{corps}</a> : <div className="ax-art-bientot">{corps}</div>}
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }
@@ -694,12 +790,16 @@ export function AnalysesPage(props: Props) {
       <div className="ax-fond" aria-hidden="true" />
 
       <Ouverture {...props} />
+      <div className="ax-col ax-col-haut">
+        <Presentation />
+      </div>
       <EnDirect pib={props.pib} />
 
       <div className="ax-col">
         <Classements donnees={props.donnees} annee={props.annee} />
         <Cartes />
         <Dossiers dette={props.dette} />
+        <Articles />
         <Rev className="ax-presse">
           <PresseCarousel
             id="presse"
