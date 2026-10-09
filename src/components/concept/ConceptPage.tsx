@@ -7,6 +7,7 @@ import { Layers } from "lucide-react";
 import { Loupe } from "./Loupe";
 import { EnTete, LENT } from "./pieces";
 import { TempsReel } from "./TempsReel";
+import { AnalysesNeo, type DetteResume } from "./AnalysesNeo";
 import {
   Classements,
   FeaturedStories,
@@ -58,9 +59,11 @@ export interface ConceptProps {
   annee: number;
   regions: readonly { id: string; label: string; pays: readonly string[] }[];
   vues: Record<string, { lat: number; lon: number }>;
+  /** Le résumé de la dette, pour la une des analyses. */
+  dette: DetteResume;
 }
 
-export function ConceptPage({ articles, comptes, donnees, annee, regions, vues }: ConceptProps) {
+export function ConceptPage({ articles, comptes, donnees, annee, regions, vues, dette }: ConceptProps) {
   const [pret, setPret] = useState(false);
 
   const marqueurs = useMemo(
@@ -233,6 +236,7 @@ export function ConceptPage({ articles, comptes, donnees, annee, regions, vues }
         </div>
         <Classements donnees={donnees} annee={annee} />
         <FluxSources />
+        <AnalysesNeo articles={articles} dette={dette} />
         <FeaturedStories articles={articles} />
         <TopicExplorer />
         <NumbersSection />
