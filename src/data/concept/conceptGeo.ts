@@ -159,7 +159,7 @@ export function reperes(): { annee: number; liste: Repere[] } {
   const fr = (n: number) => Math.round(n).toLocaleString("fr-FR");
   const liste: Repere[] = [];
   if (nPib) {
-    liste.push({ nom: "PIB mondial", valeur: `${(pib / 1000).toFixed(1).replace(".", ",")} T€`, note: `${nPib} pays` });
+    liste.push({ nom: "PIB mondial", valeur: `${(pib / 1000).toFixed(1).replace(".", ",")} T$`, note: `${nPib} pays` });
   }
   if (nPop) {
     liste.push({ nom: "Population", valeur: `${(pop / 1000).toFixed(2).replace(".", ",")} Md`, note: `${nPop} pays` });
@@ -174,7 +174,7 @@ export function reperes(): { annee: number; liste: Repere[] } {
     liste.push({ nom: "PIB moyen par pays", valeur: `${fr(pib / nPib)} Md $`, note: `${nPib} pays` });
   }
   if (pibHabHaut) {
-    liste.push({ nom: "PIB / habitant le plus haut", valeur: `${fr(pibHabHaut.v)} €`, note: pibHabHaut.nom });
+    liste.push({ nom: "PIB / habitant le plus haut", valeur: `${fr(pibHabHaut.v)} $`, note: pibHabHaut.nom });
   }
   liste.push({ nom: "Pays au socle", valeur: String(pays.length), note: "fiches" });
 

@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { ConceptPage } from "@/components/concept/ConceptPage";
-import { detteDerniere, ratioDernier, serieRatio } from "@/data/articles/detteFrancaise";
-import { DEFICIT_2025 } from "@/data/articles/financesPubliques";
 import { articlesEnUne, comptes, donneesPays, reperes, REGIONS, VUES } from "@/data/concept/conceptGeo";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -57,14 +55,6 @@ export default function Accueil() {
       annee={annee}
       regions={REGIONS}
       vues={VUES}
-      dette={{
-        montant: detteDerniere.valeur,
-        ratio: ratioDernier.valeur,
-        deficit: Math.abs(DEFICIT_2025.valeur),
-        points: serieRatio()
-          .map((p) => p.pctPib)
-          .filter((v): v is number => v !== null),
-      }}
     />
   );
 }

@@ -546,7 +546,7 @@ body:has(.d2) { background: #0a0912; }
   background: var(--d2-surface-2);
   border: 1px solid var(--d2-ligne);
 }
-.d2-cout b { font-size: clamp(24px, 2.8vw, 34px); font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+.d2-cout b { white-space: nowrap; font-size: clamp(20px, 2.3vw, 30px); font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
 .d2-cout span { font-size: 14px; font-weight: 600; line-height: 1.35; }
 .d2-cout em { font-style: normal; font-size: 12px; color: var(--d2-encre-3); }
 .d2-cout-g {
@@ -768,3 +768,291 @@ body:has(.d2) { background: #0a0912; }
 @media (prefers-reduced-motion: reduce) {
   .d2-flotte, .d2-point { animation: none; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA SECONDE PASSE : figures, onglets, étapes, graphique, rail repliable
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Les jetons du carrousel de presse suivent ceux du dossier. */
+.d2 {
+  --pc-carte: var(--d2-surface-2);
+  --pc-ligne: var(--d2-ligne);
+  --pc-vif: var(--d2-vif);
+  --pc-vif-2: var(--d2-vif-2);
+  --pc-doux: var(--d2-vif-doux);
+  --pc-encre-2: var(--d2-encre-2);
+  --pc-encre-3: var(--d2-encre-3);
+}
+.d2-chap-presse { padding-bottom: clamp(16px, 2vw, 24px); }
+
+/* Les périmètres sont retirés : la source suffit. */
+.d2 .d2-reuse .dp-perim { display: none; }
+
+/* Le titre, plus épuré. */
+.d2-ouv { padding-bottom: clamp(28px, 5vh, 48px); }
+.d2-h1-v { font-size: clamp(60px, 12.5vw, 150px); }
+.d2-chapo { margin-top: 18px; font-size: clamp(15px, 1.5vw, 18px); }
+.d2-chapo a { color: var(--d2-vif-2); text-decoration: none; font-weight: 600; }
+:root[data-concept="clair"] .d2-chapo a { color: var(--d2-vif); }
+
+/* Les ancres de chapitre. */
+.d2-perma {
+  margin-left: 10px;
+  font-size: 0.6em;
+  font-weight: 600;
+  color: var(--d2-encre-3);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.d2-chap-t h2:hover .d2-perma, .d2-perma:focus-visible { opacity: 1; }
+
+/* ── Les figures ───────────────────────────────────────────────────────── */
+
+.d2-fig { margin: 0; scroll-margin-top: 90px; }
+.d2-fig-corps { display: block; }
+.d2-fig-l {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--d2-ligne);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--d2-encre-3);
+}
+.d2-fig-l p { margin: 0; max-width: 68ch; }
+.d2-fig-l b { color: var(--d2-encre-2); font-weight: 700; }
+.d2-fig-pied { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.d2-source, .d2-ancre, .d2-voir {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--d2-encre-2);
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--d2-ligne);
+  transition: border-color 0.25s, color 0.25s;
+}
+.d2-source:hover, .d2-ancre:hover, .d2-voir:hover { border-color: var(--d2-vif); color: var(--d2-vif-2); }
+:root[data-concept="clair"] .d2-source:hover, :root[data-concept="clair"] .d2-ancre:hover, :root[data-concept="clair"] .d2-voir:hover { color: var(--d2-vif); }
+.d2-voir { background: var(--d2-vif-doux); border-color: transparent; }
+
+/* ── Les onglets recettes / dépenses / déficit ─────────────────────────── */
+
+.d2-onglets {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1.2fr);
+  gap: 10px;
+  align-items: stretch;
+  margin-bottom: 22px;
+}
+.d2-onglets-s { align-self: center; font-size: 26px; font-weight: 700; color: var(--d2-encre-3); }
+.d2-onglet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 18px 20px;
+  border-radius: 24px;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  background: var(--d2-surface-2);
+  border: 1.5px solid var(--d2-ligne);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s, background 0.25s;
+}
+.d2-onglet:hover { transform: translateY(-3px); }
+.d2-onglet span { font-size: 13px; font-weight: 600; color: var(--d2-encre-2); }
+.d2-onglet b { font-size: clamp(19px, 2.1vw, 28px); font-weight: 800; letter-spacing: -0.04em; line-height: 1; white-space: nowrap; }
+.d2-onglet i { display: block; height: 7px; width: var(--p); max-width: 100%; border-radius: 99px; background: var(--d2-menthe); margin-top: 4px; }
+.d2-onglet-dep i { background: var(--d2-corail); }
+.d2-onglet-def i { background: var(--d2-corail); }
+.d2-onglet-def b { color: var(--d2-corail); }
+.d2-onglet[aria-selected="true"] {
+  border-color: var(--d2-vif);
+  background: linear-gradient(160deg, var(--d2-vif-doux), var(--d2-surface-2));
+  box-shadow: 0 0 0 4px var(--d2-vif-doux);
+}
+.d2-panneau { animation: d2-pan 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.d2-panneau[hidden] { display: none; }
+@keyframes d2-pan { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (max-width: 760px) {
+  .d2-onglets { grid-template-columns: 1fr; }
+  .d2-onglets-s { display: none; }
+}
+
+/* ── Le graphique par dates ────────────────────────────────────────────── */
+
+.d2-graphe { padding: 6px 0 0; }
+.d2-graphe-tete { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; min-height: 64px; }
+.d2-graphe-v { margin: 0; font-size: clamp(34px, 4.4vw, 52px); font-weight: 800; letter-spacing: -0.045em; line-height: 1; }
+.d2-graphe-v small { font-size: 0.4em; font-weight: 700; color: var(--d2-encre-3); letter-spacing: -0.01em; }
+.d2-graphe-d { margin: 0; font-size: 14px; font-weight: 600; color: var(--d2-vif-2); }
+:root[data-concept="clair"] .d2-graphe-d { color: var(--d2-vif); }
+.d2-barres { display: flex; align-items: stretch; gap: clamp(6px, 1.4vw, 14px); height: 240px; margin-top: 14px; }
+.d2-barre-c {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0;
+  color: var(--d2-encre-3);
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+.d2-barre-v { font-size: 13px; font-weight: 700; opacity: 0.85; }
+.d2-barre-z { flex: 1 1 0; min-height: 0; width: 100%; display: flex; align-items: flex-end; }
+.d2-barre-b {
+  display: block;
+  width: 100%;
+  min-height: 6px;
+  border-radius: 14px 14px 6px 6px;
+  background: var(--d2-surface-2);
+  border: 1px solid var(--d2-ligne);
+  transform-origin: bottom;
+  animation: d2-pousse 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+  transition: background 0.3s, border-color 0.3s;
+}
+@keyframes d2-pousse { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.d2-barre-a { font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.d2-barre-on .d2-barre-b { background: linear-gradient(180deg, var(--d2-vif-2), var(--d2-vif)); border-color: transparent; }
+.d2-barre-on { color: var(--d2-encre); }
+.d2-barre-on .d2-barre-v { opacity: 1; color: var(--d2-vif-2); }
+:root[data-concept="clair"] .d2-barre-on .d2-barre-v { color: var(--d2-vif); }
+.d2-donnees { margin-top: 18px; font-size: 13px; }
+.d2-donnees summary { cursor: pointer; font-weight: 600; color: var(--d2-encre-2); }
+.d2-donnees table { width: 100%; margin-top: 10px; border-collapse: collapse; }
+.d2-donnees th, .d2-donnees td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--d2-ligne); }
+.d2-donnees th:first-child { text-align: left; }
+
+/* ── Le total qui réconcilie ───────────────────────────────────────────── */
+
+.d2-total {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  margin: 0 0 20px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--d2-encre-2);
+  background: var(--d2-vif-doux);
+}
+.d2-total span { flex: none; font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--d2-vif-2); }
+:root[data-concept="clair"] .d2-total span { color: var(--d2-vif); }
+
+/* ── Le dépliant des autres montants ───────────────────────────────────── */
+
+.d2-plus {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 10px 16px;
+  border-radius: 99px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--d2-encre);
+  cursor: pointer;
+  background: var(--d2-surface-2);
+  border: 1px solid var(--d2-ligne);
+}
+.d2-plus svg { transition: transform 0.3s; }
+.d2-plus-c { margin-top: 12px; padding: 16px 18px; border-radius: 18px; font-size: 14px; line-height: 1.6; color: var(--d2-encre-2); background: var(--d2-surface-2); animation: d2-pan 0.4s ease; }
+.d2-plus-c[hidden] { display: none; }
+.d2-plus-c p { margin: 0; }
+.d2-plus-c b { color: var(--d2-encre); }
+
+/* ── Les étapes cliquables ─────────────────────────────────────────────── */
+
+.d2-etapes { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr); gap: 14px; align-items: stretch; }
+.d2-etapes-l { display: grid; gap: 8px; align-content: start; }
+.d2-etapes-l button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  text-align: left;
+  font-size: 14.5px;
+  font-weight: 650;
+  color: var(--d2-encre-2);
+  cursor: pointer;
+  background: var(--d2-surface-2);
+  border: 1.5px solid var(--d2-ligne);
+  transition: border-color 0.25s, color 0.25s, transform 0.3s, background 0.25s;
+}
+.d2-etapes-l button span {
+  display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 10px;
+  font-size: 12px; font-weight: 800; color: var(--d2-encre-3); background: var(--d2-ligne);
+}
+.d2-etapes-l button:hover { color: var(--d2-encre); }
+.d2-etapes-l button.d2-etape-on { color: var(--d2-encre); border-color: var(--d2-vif); background: var(--d2-vif-doux); transform: translateX(6px); }
+.d2-etapes-l button.d2-etape-on span { color: #fff; background: linear-gradient(135deg, var(--d2-vif), var(--d2-vif-2)); }
+.d2-etapes-p {
+  position: relative;
+  padding: clamp(20px, 3vw, 30px);
+  border-radius: 26px;
+  color: #fff;
+  background:
+    radial-gradient(80% 70% at 100% 0%, rgba(255, 255, 255, 0.2), transparent 60%),
+    linear-gradient(150deg, #4a1fd0, #7c4dff);
+}
+.d2-etape-p { animation: d2-pan 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.d2-etape-p[hidden] { display: none; }
+.d2-etape-c { margin: 0 0 14px; font-size: clamp(24px, 3vw, 36px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.05; }
+.d2-etape-p h3 { margin: 0; font-size: 17px; font-weight: 700; opacity: 0.9; }
+.d2-etape-p p:not(.d2-etape-c) { margin: 10px 0 0; font-size: 15px; line-height: 1.6; color: rgba(255, 255, 255, 0.9); }
+@media (max-width: 760px) {
+  .d2-etapes { grid-template-columns: 1fr; }
+  .d2-etapes-l button.d2-etape-on { transform: none; }
+}
+
+/* ── Le rail de droite : défilant et repliable ─────────────────────────── */
+
+@media (min-width: 1100px) {
+  .d2-rail { max-height: calc(100vh - 112px); overflow-y: auto; padding-right: 4px; scrollbar-width: thin; }
+}
+.d2-rail-c { padding: 8px; }
+.d2-rail-b {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--d2-encre-3);
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+.d2-rail-b svg { transition: transform 0.3s; }
+.d2-rail-b svg.d2-rail-ouv, .d2-plus svg.d2-rail-ouv { transform: rotate(180deg); }
+.d2-rail-corps { padding: 0 4px 6px; animation: d2-pan 0.35s ease; }
+.d2-rail-corps[hidden] { display: none; }
+.d2-rail-c ul { padding: 0; }
+.d2-rail-explore .d2-rail-corps { display: grid; gap: 4px; }
+.d2-rail-explore a { gap: 12px; }
+.d2-rail-i {
+  display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 10px;
+  color: var(--d2-vif-2); background: var(--d2-vif-doux);
+}
+:root[data-concept="clair"] .d2-rail-i { color: var(--d2-vif); }
+.d2-rail-src .d2-rail-corps { padding: 0 12px 12px; }

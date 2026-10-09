@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
+import { Activity, Banknote, Landmark, Sparkles, Users, type LucideIcon } from "lucide-react";
 import { LienCompte } from "@/components/compte/LienCompte";
 import { BoutonTheme } from "./Theme";
 import { ChoixMonnaie } from "./Monnaie";
@@ -185,29 +186,38 @@ interface Onglet {
   label: string;
   /** Absent : la rubrique est annoncée, mais elle n'a pas encore de page. */
   href?: string;
+  /** Le petit symbole posé devant le nom, dans une pastille. */
+  icone?: LucideIcon;
 }
 
 /* Les onglets se répartissent de part et d'autre du nom. L'ordre de gauche
    se lit du bord vers le centre, comme à l'écran. */
 const NAV_GAUCHE: Onglet[] = [
-  { label: "Économie", href: "/economie" },
-  { label: "Démographie", href: "/demographie" },
+  { label: "Économie", href: "/economie", icone: Landmark },
+  { label: "Démographie", href: "/demographie", icone: Users },
 ];
 const NAV_DROITE: Onglet[] = [
-  { label: "Analyses", href: "/#analyses" },
-  { label: "Dette", href: "/france/economie/dette-publique" },
+  { label: "Analyses", href: "/analyses", icone: Sparkles },
+  { label: "Dette", href: "/france/economie/dette-publique-v2", icone: Banknote },
   /* Comparer des thématiques dans le temps, sur un graphe : la suite de
      l'actuel /comparaison, encore à construire dans le concept. */
-  { label: "Live" },
+  { label: "Live", icone: Activity },
 ];
 const NAV: Onglet[] = [...NAV_GAUCHE, ...NAV_DROITE];
 
 /** Un onglet. Sans adresse, il se montre sans se laisser cliquer. */
 function Lien({ n, actif, rang }: { n: Onglet; actif?: string; rang: number }) {
   const style = { "--i": rang } as React.CSSProperties;
+  const Icone = n.icone;
+  const pastille = Icone ? (
+    <span className="cg-nav-i" aria-hidden="true">
+      <Icone size={14} strokeWidth={2} />
+    </span>
+  ) : null;
   if (!n.href) {
     return (
       <span className="cg-nav-bientot" style={style}>
+        {pastille}
         {n.label}
         <em>bientôt</em>
       </span>
@@ -215,6 +225,7 @@ function Lien({ n, actif, rang }: { n: Onglet; actif?: string; rang: number }) {
   }
   return (
     <a href={n.href} className={actif === n.label ? "cg-nav-on" : undefined} style={style}>
+      {pastille}
       {n.label}
     </a>
   );

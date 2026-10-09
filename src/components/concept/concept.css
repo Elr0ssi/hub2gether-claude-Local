@@ -4475,3 +4475,24 @@ body:has(.cg) { background: #05080c; }
 .cg .cp-champ input:focus,
 .cg .cp-champ textarea:focus { border-color: var(--vert); background: var(--surface); }
 .cg .cp-google { color: var(--encre); }
+
+
+/* ── Les symboles du menu ────────────────────────────────────────────────
+   Chaque onglet porte une petite pastille, comme les entrées de la colonne
+   « Explorer le site » des dossiers : on reconnaît la rubrique avant de la
+   lire. */
+.cg-nav a,
+.cg-nav-bientot { display: inline-flex; align-items: center; gap: 9px; }
+.cg-nav-i {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  color: var(--chaud);
+  background: color-mix(in srgb, var(--voile) 9%, transparent);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.cg-nav a:hover .cg-nav-i { background: color-mix(in srgb, var(--chaud) 24%, transparent); }
+.cg-nav a.cg-nav-on .cg-nav-i { color: var(--fond); background: var(--chaud); }
