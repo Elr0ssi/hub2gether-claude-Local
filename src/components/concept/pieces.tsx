@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
-import { Activity, Banknote, Landmark, Sparkles, Users, type LucideIcon } from "lucide-react";
 import { LienCompte } from "@/components/compte/LienCompte";
 import { BoutonTheme } from "./Theme";
 import { ChoixMonnaie } from "./Monnaie";
@@ -186,66 +185,62 @@ interface Onglet {
   label: string;
   /** Absent : la rubrique est annoncée, mais elle n'a pas encore de page. */
   href?: string;
-  /** Le petit symbole posé devant le nom, dans une pastille. */
-  icone?: LucideIcon;
 }
 
-/* Les onglets se répartissent de part et d'autre du nom. L'ordre de gauche
-   se lit du bord vers le centre, comme à l'écran. */
-const NAV_GAUCHE: Onglet[] = [
-  { label: "Économie", href: "/economie", icone: Landmark },
-  { label: "Démographie", href: "/demographie", icone: Users },
-];
-const NAV_DROITE: Onglet[] = [
-  { label: "Analyses", href: "/analyses", icone: Sparkles },
-  { label: "Dette", href: "/france/economie/dette-publique-v2", icone: Banknote },
+/* Les onglets, dans l'ordre où ils se lisent. Aucun symbole : le nom suffit,
+   et un symbole devant chaque mot faisait de la barre une rangée de choses qui
+   se ressemblent. */
+const NAV: Onglet[] = [
+  { label: "Économie", href: "/economie" },
+  { label: "Démographie", href: "/demographie" },
+  { label: "Analyses", href: "/analyses" },
+  { label: "Dette", href: "/france/economie/dette-publique-v2" },
+  /* L'essai de la page Économie en néo-média. */
+  { label: "V2 éco", href: "/v2-eco" },
   /* Comparer des thématiques dans le temps, sur un graphe : la suite de
      l'actuel /comparaison, encore à construire dans le concept. */
-  { label: "Live", icone: Activity },
+  { label: "Live" },
 ];
-const NAV: Onglet[] = [...NAV_GAUCHE, ...NAV_DROITE];
 
 /** Un onglet. Sans adresse, il se montre sans se laisser cliquer. */
 function Lien({ n, actif, rang }: { n: Onglet; actif?: string; rang: number }) {
   const style = { "--i": rang } as React.CSSProperties;
-  const Icone = n.icone;
-  const pastille = Icone ? (
-    <span className="cg-nav-i" aria-hidden="true">
-      <Icone size={14} strokeWidth={2} />
-    </span>
-  ) : null;
   if (!n.href) {
     return (
       <span className="cg-nav-bientot" style={style}>
-        {pastille}
         {n.label}
         <em>bientôt</em>
       </span>
     );
   }
   return (
-    <a href={n.href} className={actif === n.label ? "cg-nav-on" : undefined} style={style}>
-      {pastille}
+    <a
+      href={n.href}
+      className={actif === n.label ? "cg-nav-on" : undefined}
+      aria-current={actif === n.label ? "page" : undefined}
+      style={style}
+    >
       {n.label}
     </a>
   );
 }
 
 export function EnTete({ actif }: { actif?: string }) {
-  /* Le menu tient tout entier dans son nom.
-
-     Au repos, « Visualize » est seul, au milieu de la page. On s'en approche
-     et il glisse vers la gauche pendant que le reste se déplie derrière lui,
-     sur un panneau de verre qui laisse voir la page en dessous.
+  /* Une pilule. Au repos, elle ne porte que le nom ; on s'en approche, ou on
+     la touche, et elle s'ouvre sur les rubriques puis sur les réglages et le
+     compte, séparés par un trait.
 
      L'ouverture se fait au survol et à la prise de focus : un menu qui ne
      répond qu'à la souris est un menu fermé pour qui navigue au clavier.
      Elle tient aussi au clic, sinon un écran tactile n'y accède jamais. */
   const [ouvert, setOuvert] = useState(false);
   const barre = useRef<HTMLElement>(null);
+  /* L'état du menu au moment où le doigt se pose : sur un écran tactile, la
+     prise de focus l'ouvre avant que le clic n'arrive, et le clic, voyant un
+     menu déjà ouvert, suivait le lien. On retient donc l'état d'avant. */
+  const avant = useRef(false);
 
-  /* Échap referme, et un clic ailleurs aussi : une barre ouverte qui couvre
-     le haut de la page doit pouvoir se refermer sans viser. */
+  /* Échap referme, et un clic ailleurs aussi. */
   useEffect(() => {
     if (!ouvert) return;
     const touche = (e: KeyboardEvent) => e.key === "Escape" && setOuvert(false);
@@ -268,52 +263,50 @@ export function EnTete({ actif }: { actif?: string }) {
       onPointerLeave={(e) => e.pointerType === "mouse" && setOuvert(false)}
       onFocus={() => setOuvert(true)}
     >
-      {/* Le verre : il n'existe qu'ouvert, et il ne floute que ce qui est
-          derrière lui. Une couche immobile — le navigateur la compose une
-          fois, pas à chaque image. */}
-      <span className="cg-header-verre" aria-hidden="true" />
-
-      <div className="cg-header-l">
-        <nav className="cg-nav cg-nav-g">
-          {NAV_GAUCHE.map((n, i) => (
-            /* Le rang compte depuis le centre : les onglets s'écartent du nom
-               vers les bords, et non de la gauche vers la droite. */
-            <Lien key={n.label} n={n} actif={actif} rang={NAV_GAUCHE.length - 1 - i} />
-          ))}
-        </nav>
-
+      <div className="cg-pill">
         <a
           href="/"
           className="cg-logo"
+          onPointerDownCapture={() => {
+            avant.current = ouvert;
+          }}
           onClick={(e) => {
-            if (!ouvert) {
+            if (!avant.current) {
               e.preventDefault();
               setOuvert(true);
             }
           }}
         >
-          <span className="cg-logo-m" aria-hidden="true" />
+          <span className="cg-logo-m" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
           <span className="cg-logo-t">Visualize</span>
         </a>
 
-        <nav className="cg-nav cg-nav-d">
-          {NAV_DROITE.map((n, i) => (
-            <Lien key={n.label} n={n} actif={actif} rang={i} />
-          ))}
-        </nav>
+        <div className="cg-pill-corps">
+          <nav className="cg-nav" aria-label="Rubriques">
+            {NAV.map((n, i) => (
+              <Lien key={n.label} n={n} actif={actif} rang={i} />
+            ))}
+          </nav>
 
-        {/* Au bout de la barre : la monnaie, le thème, le forum et l'entrée de
-            compte. Ils apparaissent avec les onglets, au survol du nom et à la
-            prise de focus, et pas avant : le menu tient tout entier dans un
-            seul geste. */}
-        <div className="cg-bout">
-          <ChoixMonnaie />
-          <BoutonTheme className="cg-jour" />
-          <a href="/forum" className="cg-bout-l">
-            Forum
-          </a>
-          <LienCompte className="cg-cnx" />
+          <span className="cg-sep" aria-hidden="true" />
+
+          <div className="cg-bout">
+            <ChoixMonnaie />
+            <BoutonTheme className="cg-jour" />
+            <a href="/forum" className="cg-bout-l">
+              Forum
+            </a>
+          </div>
         </div>
+
+        {/* L'entrée de compte reste posée sur mobile : sans elle, « Se
+            connecter » existerait dans la page sans que personne puisse le
+            toucher. Sur grand écran, elle arrive avec le reste. */}
+        <LienCompte className="cg-cnx" />
       </div>
     </header>
   );

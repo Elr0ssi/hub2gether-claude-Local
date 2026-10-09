@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Globe2, GraduationCap, HeartPulse, ShieldAlert } from "lucide-react";
 import type { FicheArticle } from "@/data/concept/conceptGeo";
 import { type FicheDebat, type LigneSource, type SocleEco } from "@/data/concept/conceptEconomie";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
@@ -16,6 +17,7 @@ import { GlobeEco, familleDe, TOUTES } from "./GlobeEco";
 import { cle } from "@/data/concept/cle";
 import { Titre, usePret, useProgression, useSocleComplet, useVu } from "./ouverture";
 import "./concept.css";
+import "./v2eco.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA PAGE ÉCONOMIE DU PROTOTYPE
@@ -49,6 +51,8 @@ export interface EcoProps {
   debats: FicheDebat[];
   articles: FicheArticle[];
   faq: { question: string; answer: string }[];
+  /** « v2 » : l'essai néo-média de la page, même logique et mêmes données. */
+  variante?: "v2";
 }
 
 type Col =
@@ -184,7 +188,8 @@ const DEPENSES_ECO: { id: string; label: string; parSeconde: number }[] = [
   { id: "educatives", label: "Dépenses éducatives", parSeconde: 132_610 },
 ];
 
-function TempsReelEco({ pib }: { pib: PibMonde }) {
+function TempsReelEco({ pib, v2 = false }: { pib: PibMonde; v2?: boolean }) {
+  const vue = useVu(140);
   const [monnaie] = useMonnaie();
   const f = fiche(monnaie);
 
@@ -197,19 +202,42 @@ function TempsReelEco({ pib }: { pib: PibMonde }) {
   const pibMonnaie = convertir(pib.total, pib.annee, monnaie);
 
   return (
-    <section className="cg-section cg-tr" id="temps-reel-eco">
+    <section
+      ref={vue.ref as React.RefObject<HTMLElement>}
+      className="cg-section cg-tr"
+      id="temps-reel-eco"
+      data-vu={vue.vu ? "1" : "0"}
+    >
       <div className="cg-wrap">
-        <TitreSection
-          titre="Données en temps réel"
-          sous={
-            <>
+        {v2 ? (
+          <header className="v2-tete">
+            <p className="v2-puce">
+              <span className="v2-point" aria-hidden="true" />
+              En direct
+            </p>
+            <h2 className="v2-h2">Données en temps réel</h2>
+            <p className="v2-sous">
               Depuis le 1<sup>er</sup> janvier 2026
-            </>
-          }
-        />
+            </p>
+          </header>
+        ) : (
+          <TitreSection
+            titre="Données en temps réel"
+            sous={
+              <>
+                Depuis le 1<sup>er</sup> janvier 2026
+              </>
+            }
+          />
+        )}
 
         <div className="cg-cpt-l" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
-          <div className="cg-cpt">
+          <div className={`cg-cpt${v2 ? " v2-cpt v2-cpt-pib" : ""}`} style={{ "--i": 0 } as React.CSSProperties}>
+            {v2 && (
+              <span className="v2-cpt-i" aria-hidden="true">
+                <Globe2 size={18} />
+              </span>
+            )}
             <span className="cg-cpt-l2">PIB mondial</span>
             {pibMonnaie === null ? (
               <span className="cg-cpt-v">non convertible avant {f.depuis}</span>
@@ -236,8 +264,17 @@ function TempsReelEco({ pib }: { pib: PibMonde }) {
             )}
           </div>
 
-          {DEPENSES_ECO.map((d) => (
-            <div className="cg-cpt" key={d.id}>
+          {DEPENSES_ECO.map((d, k) => (
+            <div
+              className={`cg-cpt${v2 ? ` v2-cpt v2-cpt-${d.id}` : ""}`}
+              key={d.id}
+              style={{ "--i": k + 1 } as React.CSSProperties}
+            >
+              {v2 && (
+                <span className="v2-cpt-i" aria-hidden="true">
+                  {d.id === "medicales" ? <HeartPulse size={18} /> : d.id === "educatives" ? <GraduationCap size={18} /> : <ShieldAlert size={18} />}
+                </span>
+              )}
               <span className="cg-cpt-l2">{d.label}</span>
               <Odometre
                 className="cg-cpt-v"
@@ -634,7 +671,8 @@ const Tableau = memo(function Tableau({
   );
 });
 
-export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, articles, debats, faq }: EcoProps) {
+export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, articles, debats, faq, variante }: EcoProps) {
+  const v2 = variante === "v2";
   const socle = useSocleComplet(socleLeger, socleUrl);
   /* La page ne connaît qu'une année : celle qu'elle affiche. L'année visée
      pendant qu'on glisse appartient à la frise, et n'en sort qu'une fois le
@@ -942,7 +980,7 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
   };
 
   return (
-    <div className="cg cg-eco">
+    <div className={`cg cg-eco${v2 ? " cg-v2" : ""}`}>
       <EnTete actif="Économie" />
       <Loupe />
 
@@ -978,10 +1016,12 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
             <h1 className="cg-eco-titre">
               <Titre texte="Économie" />
             </h1>
-            <p className="cg-chapo cg-eco-ouv-c">
-              {socle.pays.length} pays, {socle.annees[0]}&ndash;
-              {socle.annees[socle.annees.length - 1]}, dix indicateurs.
-            </p>
+            {!v2 && (
+              <p className="cg-chapo cg-eco-ouv-c">
+                {socle.pays.length} pays, {socle.annees[0]}&ndash;
+                {socle.annees[socle.annees.length - 1]}, dix indicateurs.
+              </p>
+            )}
           </div>
         </div>
         <div className="cg-arc" aria-hidden="true">
@@ -994,7 +1034,7 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
         </div>
       </section>
 
-      <TempsReelEco pib={pibMonde} />
+      <TempsReelEco pib={pibMonde} v2={v2} />
 
       {/* Le témoin que l'arc regarde : dès qu'il entre dans l'écran, l'arc
           s'allume et s'ouvre. */}
@@ -1003,10 +1043,18 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
       {/* ── Le globe, sa frise et ses raccourcis ─────────────────────────── */}
       <section id="globe" className="cg-section cg-eco-globe">
         <div className="cg-wrap">
-          <TitreSection
-            titre="Notre globe"
-            sous={`De ${socle.annees[0]} à ${ANNEE_EN_COURS} · Banque mondiale (WDI), FMI`}
-          />
+          {v2 ? (
+            <header className="v2-tete">
+              <p className="v2-puce">Globe</p>
+              <h2 className="v2-h2">Notre globe</h2>
+              <p className="v2-sous">{`De ${socle.annees[0]} à ${ANNEE_EN_COURS} · Banque mondiale (WDI), FMI`}</p>
+            </header>
+          ) : (
+            <TitreSection
+              titre="Notre globe"
+              sous={`De ${socle.annees[0]} à ${ANNEE_EN_COURS} · Banque mondiale (WDI), FMI`}
+            />
+          )}
 
           <GlobeEco
             annee={anneeEco}

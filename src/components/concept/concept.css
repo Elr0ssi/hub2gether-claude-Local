@@ -113,274 +113,211 @@ body:has(.cg) { background: #05080c; }
 .cg-tabulaire { font-variant-numeric: tabular-nums; }
 .cg-pt { color: var(--chaud); }
 
-/* ── L'en-tête ───────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE MENU — UNE PILULE
+
+   Au repos, elle ne porte que le nom. On s'en approche et elle s'ouvre : les
+   rubriques d'abord, un trait, puis les réglages et le compte. Aucun symbole
+   devant les mots — ils se confondaient entre eux —, et un seul accent, le
+   violet, pour la rubrique où l'on se trouve et pour l'entrée de compte.
+
+   Sur mobile, la même pilule s'ouvre en panneau sous le nom ; l'entrée de
+   compte reste posée à côté, pour qu'on puisse toujours se connecter.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 .cg-header {
+  --mn-vif: #7c4dff;
+  --mn-vif-2: #a583ff;
   position: fixed;
-  top: 0;
+  top: 14px;
   left: 0;
   right: 0;
   z-index: 40;
-  padding: 22px 0;
-  /* Pas de fond, pas d'ombre : seul un voile qui naît au défilement. */
-  background: linear-gradient(180deg, rgba(5, 8, 12, 0.72), transparent);
-  backdrop-filter: blur(3px);
-}
-.cg-header-l {
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 0 clamp(28px, 4.4vw, 76px);
   display: flex;
-  align-items: center;
-  gap: clamp(24px, 4vw, 64px);
-}
-
-/* ── Le menu centré ──────────────────────────────────────────────────────
-
-   Le nom ne bouge plus. Il tient le milieu de la barre, et les onglets se
-   rangent de part et d'autre : deux à gauche, deux à droite.
-
-   Trois colonnes, « 1fr auto 1fr » : les deux gouttières sont égales par
-   construction, donc le nom tombe au centre exact de la barre quelle que
-   soit la largeur des deux groupes d'onglets. Aucune mesure, aucun calcul.
-
-   Au repos, la barre n'intercepte rien : elle couvre toute la largeur et
-   bloquerait un clic sur la page. Seuls le nom et l'entrée de compte
-   restent saisissables.
-   ──────────────────────────────────────────────────────────────────────── */
-
-.cg-header { pointer-events: none; background: none; backdrop-filter: none; }
-.cg-header .cg-logo,
-.cg-header-ouvert { pointer-events: auto; }
-.cg-header-l {
-  position: relative;
-  min-height: 44px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: clamp(18px, 2.6vw, 40px);
-}
-
-/* Le verre, seulement quand le menu est ouvert. */
-.cg-header-verre {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
+  justify-content: center;
+  padding: 0 12px;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(8, 13, 20, 0.66), rgba(8, 13, 20, 0.22));
-  backdrop-filter: blur(16px) saturate(1.25);
-  -webkit-backdrop-filter: blur(16px) saturate(1.25);
-  border-bottom: 1px solid color-mix(in srgb, var(--voile) 7%, transparent);
-  transition: opacity 0.5s ease;
 }
-.cg-header-ouvert .cg-header-verre { opacity: 1; }
+:root[data-concept="clair"] .cg-header { --mn-vif: #5b2de0; --mn-vif-2: #6f45f0; }
 
-/* Le nom, au centre de la colonne du milieu, et immobile.
-
-   La colonne est nommée explicitement : sur mobile les onglets passent en
-   `display: none`, ils cessent d'occuper une cellule, et un placement
-   automatique ferait glisser le nom dans la première colonne. */
-.cg-logo {
+.cg-pill {
   position: relative;
-  grid-column: 2;
-  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 6px;
+  border-radius: 999px;
+  pointer-events: auto;
+  background: color-mix(in srgb, var(--fond) 76%, transparent);
+  border: 1px solid var(--bord);
+  backdrop-filter: blur(18px) saturate(1.3);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: 0 16px 44px -20px var(--ombre-portee);
+}
+
+/* Le nom, et sa marque : trois barres qui montent, comme une donnée. */
+.cg-logo {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  z-index: 2;
-  pointer-events: auto;
-}
-
-/* Le jeton de verre sous le nom : il disparaît quand le verre du menu prend
-   le relais, sinon on lirait deux fonds l'un sur l'autre. */
-.cg-logo::before {
-  content: "";
-  position: absolute;
-  inset: -10px -18px;
-  z-index: -1;
+  padding: 4px 14px 4px 5px;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--voile) 8%, transparent);
-  background: rgba(8, 13, 20, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: opacity 0.45s ease;
-}
-.cg-header-ouvert .cg-logo::before { opacity: 0; }
-
-/* La marque : un anneau et un point, dessinés, jamais une image. */
-.cg-logo-m {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 1px solid var(--froid);
-  position: relative;
-  flex: none;
-  transition: transform 0.66s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s;
-}
-.cg-logo-m::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 5px;
-  height: 5px;
-  margin: -2.5px 0 0 -2.5px;
-  border-radius: 50%;
-  background: var(--chaud);
-}
-.cg-header-ouvert .cg-logo-m { transform: rotate(-120deg) scale(1.06); }
-.cg-logo-t {
-  font-size: 15.5px;
-  letter-spacing: -0.01em;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   color: var(--encre);
+  text-decoration: none;
   white-space: nowrap;
 }
+.cg-logo-m {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  padding: 7px 7px;
+  border-radius: 11px;
+  background: linear-gradient(140deg, var(--mn-vif), var(--mn-vif-2));
+  box-shadow: 0 8px 18px -8px rgba(124, 77, 255, 0.9);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cg-logo-m i { display: block; width: 4px; border-radius: 2px; background: #fff; transform-origin: bottom; }
+.cg-logo-m i:nth-child(1) { height: 7px; }
+.cg-logo-m i:nth-child(2) { height: 11px; }
+.cg-logo-m i:nth-child(3) { height: 15px; }
+.cg-header-ouvert .cg-logo-m { transform: rotate(-6deg) scale(1.06); }
+.cg-header-ouvert .cg-logo-m i { animation: cg-barre 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+.cg-header-ouvert .cg-logo-m i:nth-child(2) { animation-delay: 0.07s; }
+.cg-header-ouvert .cg-logo-m i:nth-child(3) { animation-delay: 0.14s; }
+@keyframes cg-barre { from { transform: scaleY(0.2); } }
 
-/* Les onglets : tassés contre le nom et effacés au repos, ils s'écartent
-   vers leur bord quand la barre s'ouvre. Chacun part du bon côté. */
-.cg-nav {
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity 0.45s ease,
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.cg-nav-g { grid-column: 1; justify-self: end; transform: translateX(18px); }
-/* Les onglets de droite se serrent contre le nom : la fin de leur colonne
-   reste libre, et c'est là que se pose l'entrée de compte. */
-.cg-nav-d { grid-column: 3; justify-self: start; transform: translateX(-18px); }
-.cg-header-ouvert .cg-nav {
-  opacity: 1;
-  transform: none;
-  pointer-events: auto;
-  transition-delay: 0.14s;
-}
-/* Chaque onglet monte à son tour. */
+/* Le corps de la pilule : absent au repos, il arrive d'un geste. */
+.cg-pill-corps { display: none; align-items: center; gap: 6px; }
+.cg-header-ouvert .cg-pill-corps { display: flex; animation: cg-pill-in 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes cg-pill-in { from { opacity: 0; transform: translateX(-12px); } }
+
+.cg-nav { display: flex; gap: 2px; }
 .cg-nav a,
 .cg-nav-bientot {
-  opacity: 0;
-  transform: translateY(-6px);
-  transition:
-    opacity 0.4s ease,
-    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    color 0.3s ease;
-}
-.cg-header-ouvert .cg-nav a,
-.cg-header-ouvert .cg-nav-bientot {
-  opacity: 1;
-  transform: none;
-  transition-delay: calc(0.22s + var(--i, 0) * 45ms);
-}
-@media (prefers-reduced-motion: reduce) {
-  .cg-logo,
-  .cg-nav,
-  .cg-nav a,
-  .cg-nav-bientot,
-  .cg-cnx,
-  .cg-bout,
-  .cg-bout-l,
-  .cg-header-verre { transition: none; }
-}
-
-.cg-logo {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--encre);
-  white-space: nowrap;
-  text-decoration: none;
-}
-.cg-logo-m {
-  width: 9px;
-  height: 9px;
-  border-radius: 9px;
-  border: 1px solid var(--chaud);
-  box-shadow: inset 0 0 0 2px rgba(214, 167, 122, 0.22);
-}
-
-.cg-nav { display: flex; gap: clamp(16px, 1.8vw, 30px); }
-.cg-nav a {
-  font-size: 13.5px;
-  font-weight: 400;
-  color: var(--encre-2);
-  transition: color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.cg-nav a:hover { color: var(--encre); }
-
-/* Le forum et l'entrée de compte, au bout de la barre et hors du flux :
-   ils ne pèsent pas sur les trois colonnes, donc ils ne décalent pas le
-   nom. */
-/* Le bout de barre suit la même règle que les onglets : au repos il n'est
-   pas là, il arrive quand le nom s'ouvre. Tout le menu tient donc dans un
-   seul geste, au lieu d'avoir deux moitiés qui n'obéissent pas au même
-   principe. */
-.cg-bout {
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity 0.45s ease,
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  position: absolute;
-  /* Le décalage d'un élément hors flux se mesure sur la boîte de padding :
-     il faut donc reprendre la gouttière à la main pour s'aligner sur le
-     reste du contenu, et non sur le bord du conteneur. */
-  right: clamp(28px, 4.4vw, 76px);
-  top: 50%;
-  transform: translateY(-50%) translateX(16px);
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-.cg-header-ouvert .cg-bout {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(-50%);
-  transition-delay: 0.18s;
-}
-.cg-bout-l {
-  font-size: 13.5px;
-  color: var(--encre-2);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color 0.3s;
-}
-.cg-bout-l:hover { color: var(--encre); }
-.cg-cnx {
-  padding: 8px 16px;
-  border: 1px solid var(--bord);
-  border-radius: 999px;
-  background: rgba(8, 13, 20, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  font-size: 13px;
-  color: var(--encre);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: border-color 0.3s, background 0.3s;
-}
-.cg-cnx:hover { border-color: rgba(214, 167, 122, 0.55); background: rgba(214, 167, 122, 0.1); }
-/* Ouverte, la barre porte déjà son verre : le jeton sous le bouton ferait
-   un second fond. */
-.cg-header-ouvert .cg-cnx { background: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
-.cg-header-ouvert .cg-cnx:hover { background: rgba(214, 167, 122, 0.1); }
-
-/* Les rubriques annoncées : lisibles, pas cliquables. */
-.cg-nav-bientot {
   display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 999px;
   font-size: 13.5px;
-  color: var(--encre-3, rgba(226, 232, 240, 0.42));
-  cursor: default;
+  font-weight: 600;
+  color: var(--encre-2);
+  text-decoration: none;
   white-space: nowrap;
+  animation: cg-item 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 45ms + 90ms);
+  transition: color 0.25s, background 0.25s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+@keyframes cg-item { from { opacity: 0; transform: translateY(-6px); } }
+.cg-nav a:hover { color: var(--encre); background: color-mix(in srgb, var(--voile) 10%, transparent); transform: translateY(-1px); }
+.cg-header .cg-nav a.cg-nav-on,
+.cg-header .cg-nav a.cg-nav-on:hover { color: #fff; background: linear-gradient(135deg, var(--mn-vif), var(--mn-vif-2)); }
+.cg-nav-bientot { color: var(--encre-3); cursor: default; }
 .cg-nav-bientot em {
   font-style: normal;
+  padding: 2px 7px;
+  border-radius: 99px;
   font-size: 9.5px;
-  letter-spacing: 0.12em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--chaud);
-  opacity: 0.7;
+  color: var(--mn-vif-2);
+  background: color-mix(in srgb, var(--mn-vif) 16%, transparent);
 }
+
+.cg-sep { width: 1px; height: 22px; margin: 0 6px; background: var(--bord); }
+
+.cg-bout { display: flex; align-items: center; gap: 6px; }
+.cg-bout-l {
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--encre-2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.25s, background 0.25s;
+}
+.cg-bout-l:hover { color: var(--encre); background: color-mix(in srgb, var(--voile) 10%, transparent); }
+
+.cg-pill .cg-jour,
+.cg-pill .cg-monnaie-b {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  background: color-mix(in srgb, var(--voile) 8%, transparent);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: background 0.25s, color 0.25s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cg-pill .cg-jour:hover,
+.cg-pill .cg-monnaie:hover .cg-monnaie-b,
+.cg-pill .cg-monnaie:focus-within .cg-monnaie-b {
+  color: var(--encre);
+  background: color-mix(in srgb, var(--voile) 16%, transparent);
+  transform: translateY(-1px);
+}
+
+/* L'entrée de compte : le seul aplat de la barre. Sur grand écran elle
+   arrive avec le reste ; sur mobile elle est toujours là. */
+.cg-pill .cg-cnx {
+  display: none;
+  align-items: center;
+  padding: 9px 18px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, var(--mn-vif), var(--mn-vif-2));
+  box-shadow: 0 10px 22px -10px rgba(124, 77, 255, 0.85);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;
+}
+.cg-pill .cg-cnx:hover { transform: translateY(-1px); box-shadow: 0 14px 28px -10px rgba(124, 77, 255, 1); background: linear-gradient(135deg, var(--mn-vif), var(--mn-vif-2)); }
+.cg-header-ouvert .cg-pill .cg-cnx { display: inline-flex; animation: cg-item 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.35s backwards; }
+
+/* Sous 900 px : la pilule s'ouvre en panneau, et le compte reste posé. */
+@media (max-width: 900px) {
+  .cg-pill .cg-cnx { display: inline-flex; padding: 8px 14px; font-size: 13px; }
+  .cg-pill-corps {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    width: min(92vw, 380px);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding: 12px;
+    border-radius: 28px;
+    transform: translateX(-50%);
+    background: color-mix(in srgb, var(--fond) 94%, transparent);
+    border: 1px solid var(--bord);
+    backdrop-filter: blur(22px) saturate(1.3);
+    -webkit-backdrop-filter: blur(22px) saturate(1.3);
+    box-shadow: 0 24px 60px -20px var(--ombre-portee);
+  }
+  .cg-header-ouvert .cg-pill-corps { animation: cg-panneau 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes cg-panneau { from { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.97); } }
+  .cg-nav { flex-direction: column; gap: 2px; }
+  .cg-nav a, .cg-nav-bientot { padding: 12px 14px; font-size: 15px; }
+  .cg-sep { width: auto; height: 1px; margin: 6px 4px; }
+  .cg-bout { justify-content: space-between; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cg-pill-corps, .cg-nav a, .cg-nav-bientot, .cg-logo-m i, .cg-pill .cg-cnx { animation: none !important; }
+}
+
 
 .cg-demo-mini {
   font-size: 10px;
@@ -892,28 +829,6 @@ body:has(.cg) { background: #05080c; }
   .cg-preuves-l { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .cg-panneaux { height: auto; flex-direction: column; }
   .cg-panneau { height: 190px; flex-grow: 0 !important; }
-  .cg-nav { display: none; }
-  /* Sans onglets, la barre n'a plus que son nom au centre, et au bout le
-     forum et le compte. Les deux se resserrent, et le libellé du compte
-     passe à sa forme courte, pour ne pas mordre sur le nom.
-
-     Au-dessus de mille quatre-vingts pixels, l'entrée de compte n'apparaît
-     qu'au survol du nom — un geste qu'un écran tactile ne fait jamais. En
-     dessous, elle reste posée : sans elle, « Se connecter » existe dans la
-     page mais personne ne peut ni le voir ni le toucher. */
-  .cg-bout {
-    gap: 9px;
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(-50%);
-  }
-  .cg-bout-l { font-size: 12px; }
-  .cg-cnx { padding: 6px 11px; font-size: 12px; }
-  /* Le jeton de verre sous le nom déborde de trente-six pixels : sur une
-     barre de trois cent quatre-vingt-dix, c'est ce qui le faisait mordre sur
-     « Forum ». Le nom se lit très bien sans lui sur un fond sombre. */
-  .cg-logo::before { display: none; }
-  .cg-logo-t { font-size: 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1629,14 +1544,7 @@ body:has(.cg) { background: #05080c; }
    LA PAGE ÉCONOMIE
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.cg-nav-on { color: var(--encre) !important; }
-.cg-nav-on::after {
-  content: "";
-  display: block;
-  height: 1px;
-  margin-top: 5px;
-  background: linear-gradient(90deg, var(--froid), transparent);
-}
+.cg-nav-on { color: #fff !important; }
 
 .cg-eco-haut { padding-top: clamp(120px, 15vh, 180px); padding-bottom: clamp(26px, 3.5vh, 48px); }
 .cg-eco-h1 { margin-top: 14px; max-width: none; font-size: clamp(34px, 4.6vw, 64px); text-wrap: balance; }
@@ -3956,9 +3864,6 @@ body:has(.cg) { background: #05080c; }
   background: rgba(255, 255, 255, 0.72);
   border-color: rgba(12, 16, 22, 0.1);
 }
-:root[data-concept="clair"] .cg-cnx {
-  background: rgba(255, 255, 255, 0.72);
-}
 
 /* Le témoin « sans donnée » de la légende reprend la teinte que le globe
    emploie vraiment, laquelle change avec le thème. */
@@ -4475,24 +4380,3 @@ body:has(.cg) { background: #05080c; }
 .cg .cp-champ input:focus,
 .cg .cp-champ textarea:focus { border-color: var(--vert); background: var(--surface); }
 .cg .cp-google { color: var(--encre); }
-
-
-/* ── Les symboles du menu ────────────────────────────────────────────────
-   Chaque onglet porte une petite pastille, comme les entrées de la colonne
-   « Explorer le site » des dossiers : on reconnaît la rubrique avant de la
-   lire. */
-.cg-nav a,
-.cg-nav-bientot { display: inline-flex; align-items: center; gap: 9px; }
-.cg-nav-i {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 26px;
-  height: 26px;
-  border-radius: 9px;
-  color: var(--chaud);
-  background: color-mix(in srgb, var(--voile) 9%, transparent);
-  transition: background 0.3s ease, color 0.3s ease;
-}
-.cg-nav a:hover .cg-nav-i { background: color-mix(in srgb, var(--chaud) 24%, transparent); }
-.cg-nav a.cg-nav-on .cg-nav-i { color: var(--fond); background: var(--chaud); }
