@@ -9,7 +9,6 @@ import {
   Banknote,
   BookOpen,
   Check,
-  ChevronDown,
   Globe,
   Landmark,
   MessageCircle,
@@ -264,11 +263,10 @@ function Presentation() {
   return (
     <section className="ax-sec" id="presentation" aria-labelledby="ax-pr-t">
       <Rev as="h2" className="ax-h2">
-        <span id="ax-pr-t">Des données, des globes, des articles</span>
+        <span id="ax-pr-t">Nos fonctionnalités</span>
       </Rev>
-      <Rev as="p" className="ax-sous" d={80}>
-        On rassemble les chiffres, on les met sur des globes à manipuler, puis on vous laisse les
-        décortiquer dans nos articles ou en discuter sur le forum.
+      <Rev as="p" className="ax-sous ax-sous-ligne" d={80}>
+        Des chiffres rassemblés, des globes à manipuler, des articles pour comprendre et un forum pour en discuter.
       </Rev>
       <div className="ax-dash">
         <Rev as="a" href="#direct" className="ax-bloc ax-bloc-a" d={0}>
@@ -424,10 +422,10 @@ function EnDirect({ pib }: { pib: Props["pib"] }) {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const INDICS = [
-  { id: "pib", label: "PIB", titre: "Les plus grandes économies", unite: "md" },
-  { id: "pibHab", label: "PIB par habitant", titre: "Les pays les plus riches par habitant", unite: "usd" },
-  { id: "dette", label: "Dette publique", titre: "Les pays les plus endettés", unite: "pct" },
-  { id: "population", label: "Population", titre: "Les pays les plus peuplés", unite: "hab" },
+  { id: "pib", label: "PIB", titre: "Les plus grandes économies", unite: "md", href: "/economie" },
+  { id: "pibHab", label: "PIB par habitant", titre: "Les pays les plus riches par habitant", unite: "usd", href: "/economie" },
+  { id: "dette", label: "Dette publique", titre: "Les pays les plus endettés", unite: "pct", href: "/economie" },
+  { id: "population", label: "Population", titre: "Les pays les plus peuplés", unite: "hab", href: "/demographie" },
 ] as const;
 
 function fmt(v: number, u: (typeof INDICS)[number]["unite"]) {
@@ -435,6 +433,15 @@ function fmt(v: number, u: (typeof INDICS)[number]["unite"]) {
   if (u === "pct") return `${nf(v)} %`;
   if (u === "usd") return `${Math.round(v).toLocaleString("fr-FR")} $`;
   return fmtPib(v);
+}
+
+/** Un texte qui se renouvelle sans que son cadre bouge : seul lui rejoue un fondu. */
+function Change({ texte }: { texte: string }) {
+  return (
+    <span key={texte} className="ax-change">
+      {texte}
+    </span>
+  );
 }
 
 function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; annee: number }) {
@@ -445,7 +452,7 @@ function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; a
           .map((d) => ({ fr: d.fr, v: d[ind.id] ?? null }))
           .filter((o): o is { fr: string; v: number } => typeof o.v === "number" && Number.isFinite(o.v))
           .sort((a, b) => b.v - a.v)
-          .slice(0, 10);
+          .slice(0, 8);
         return { ...ind, lignes: l };
       }),
     [donnees],
@@ -454,7 +461,6 @@ function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; a
   const zone = useRef<HTMLDivElement>(null);
   const [n, setN] = useState(0);
   const [p, setP] = useState(0);
-  const [plus, setPlus] = useState(false);
   useEffect(() => {
     let rendez = false;
     const lis = () => {
@@ -483,10 +489,10 @@ function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; a
   }, [fiches.length]);
 
   const f = fiches[n];
-  const haut = f.lignes.slice(0, 3);
-  /* Le podium se lit 2 · 1 · 3 : le premier au milieu, plus haut. */
-  const ordre = [haut[1], haut[0], haut[2]].filter(Boolean);
-  const suite = f.lignes.slice(3, plus ? 10 : 6);
+  /* Le podium se lit 2 · 1 · 3 : le premier au milieu, plus haut. Les cellules
+     gardent leur place d'un classement à l'autre — seuls les noms et les
+     montants changent. */
+  const ordre = [1, 0, 2];
 
   return (
     <section
@@ -512,37 +518,36 @@ function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; a
             <div className="ax-cl2-rail" aria-hidden="true"><span style={{ transform: `scaleY(${p})` }} /></div>
           </div>
 
-          <div key={f.id} className="ax-cl2-carte">
-            <p className="ax-cl2-t">{f.titre}</p>
+          <div className="ax-cl2-carte">
+            <p className="ax-cl2-t"><Change texte={f.titre} /></p>
             <div className="ax-pod2">
-              {ordre.map((o) => {
-                const rang = haut.indexOf(o) + 1;
+              {ordre.map((i) => {
+                const o = f.lignes[i];
                 return (
-                  <div key={o.fr} className={`ax-pod2-c ax-pod2-${rang}`}>
-                    <span className="ax-pod2-r">{rang}</span>
-                    <span className="ax-pod2-n">{o.fr}</span>
-                    <span className="ax-pod2-v">{fmt(o.v, f.unite)}</span>
+                  <div key={i} className={`ax-pod2-c ax-pod2-${i + 1}`}>
+                    <span className="ax-pod2-r">{i + 1}</span>
+                    <span className="ax-pod2-n"><Change texte={o?.fr ?? ""} /></span>
+                    <span className="ax-pod2-v"><Change texte={o ? fmt(o.v, f.unite) : ""} /></span>
                   </div>
                 );
               })}
             </div>
             <ol className="ax-suite" start={4}>
-              {suite.map((o, i) => (
-                <li key={o.fr} style={{ "--i": i } as React.CSSProperties}>
-                  <span className="ax-suite-r">{i + 4}</span>
-                  <span className="ax-suite-n">{o.fr}</span>
-                  <span className="ax-suite-v">{fmt(o.v, f.unite)}</span>
-                </li>
-              ))}
+              {[3, 4, 5, 6, 7].map((i) => {
+                const o = f.lignes[i];
+                return (
+                  <li key={i}>
+                    <span className="ax-suite-r">{i + 1}</span>
+                    <span className="ax-suite-n"><Change texte={o?.fr ?? ""} /></span>
+                    <span className="ax-suite-v"><Change texte={o ? fmt(o.v, f.unite) : ""} /></span>
+                  </li>
+                );
+              })}
             </ol>
             <div className="ax-cl2-pied">
               <p className="ax-source">Banque mondiale (WDI), FMI · {annee}</p>
-              <button type="button" className="ax-voir" onClick={() => setPlus(!plus)} aria-expanded={plus}>
-                {plus ? "Réduire" : "En voir plus"}
-                <ChevronDown size={14} aria-hidden="true" className={plus ? "ax-voir-ouv" : undefined} />
-              </button>
-              <a className="ax-voir ax-voir-l" href="/economie">
-                Classement complet <ArrowUpRight size={14} aria-hidden="true" />
+              <a className="ax-voir ax-voir-l" href={f.href}>
+                En voir plus <ArrowUpRight size={14} aria-hidden="true" />
               </a>
             </div>
           </div>
@@ -587,17 +592,25 @@ function Cartes() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   5 · NOS CHIFFRES ANALYSÉS
+   5 · NOS ARTICLES — un grand chiffre, une file d'articles, le forum
    ═══════════════════════════════════════════════════════════════════════════ */
 
-function Dossiers({ dette }: { dette: Props["dette"] }) {
+const FILE_ARTICLES = [
+  { rubrique: "Économie", titre: "La dette publique pas à pas, en lecture longue", href: "/france/economie/dette-publique" },
+  { rubrique: "Économie", titre: "PIB mondial : qui produit quoi" },
+  { rubrique: "Démographie", titre: "Naissances et décès dans le monde, depuis le 1er janvier" },
+  { rubrique: "Démographie", titre: "Les causes de mortalité, pays par pays" },
+  { rubrique: "Démographie", titre: "Population : qui grandit, qui recule" },
+] as const;
+
+function Articles({ dette }: { dette: Props["dette"] }) {
   return (
-    <section className="ax-sec" id="dossiers" aria-labelledby="ax-do-t">
+    <section className="ax-sec ax-sec-large" id="articles" aria-labelledby="ax-ar-t">
       <Rev as="h2" className="ax-h2">
-        <span id="ax-do-t">Nos chiffres analysés</span>
+        <span id="ax-ar-t">Nos articles</span>
       </Rev>
-      <div className="ax-dossiers">
-        <Rev as="a" href="/france/economie/dette-publique-v2" className="ax-dos ax-dos-une" d={0}>
+      <div className="ax-na">
+        <Rev as="a" href="/france/economie/dette-publique-v2" className="ax-dos ax-dos-une ax-na-une" d={0}>
           <span className="ax-dos-e">Dette publique · France</span>
           <p className="ax-dos-v">
             {nf(dette.montant)}
@@ -608,74 +621,88 @@ function Dossiers({ dette }: { dette: Props["dette"] }) {
             Lire l&apos;analyse <ArrowRight size={15} aria-hidden="true" />
           </span>
         </Rev>
-        {["PIB mondial", "Emploi dans le monde", "Natalité mondiale"].map((t, i) => (
-          <Rev key={t} className="ax-dos ax-dos-bientot" d={120 + i * 80}>
-            <span className="ax-dos-e">Bientôt</span>
-            <h3>{t}</h3>
-          </Rev>
-        ))}
+
+        <Rev className="ax-na-rail" d={120}>
+          <ul className="ax-na-piste">
+            {FILE_ARTICLES.map((a, i) => {
+              const lien = "href" in a ? a.href : undefined;
+              const corps = (
+                <>
+                  <span className="ax-na-r">{a.rubrique}</span>
+                  <span className="ax-na-t">{a.titre}</span>
+                  {lien ? (
+                    <ArrowUpRight size={18} aria-hidden="true" className="ax-na-f" />
+                  ) : (
+                    <em>Bientôt</em>
+                  )}
+                </>
+              );
+              return (
+                <li key={a.titre} className={`ax-na-c ax-na-c${i % 4}`}>
+                  {lien ? <a href={lien}>{corps}</a> : <div className="ax-na-attente">{corps}</div>}
+                </li>
+              );
+            })}
+          </ul>
+        </Rev>
+
+        <Rev as="a" href="/forum" className="ax-dos ax-na-forum" d={200}>
+          <span className="ax-bloc-i"><MessageCircle size={18} aria-hidden="true" /></span>
+          <div>
+            <h3>Un forum pour en débattre</h3>
+            <p>Posez vos questions, contestez un chiffre, comparez vos lectures.</p>
+          </div>
+          <ArrowUpRight size={20} aria-hidden="true" className="ax-dos-fl" />
+        </Rev>
       </div>
     </section>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   5 bis · NOS ARTICLES, PAR CATÉGORIE
+   5 bis · NOTRE PLACE — entre le média et le site de données
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const CATEGORIES = [
+const POSITION = [
   {
-    nom: "Économie",
-    articles: [
-      { titre: "Dette publique de la France : les montants et qui la détient", href: "/france/economie/dette-publique-v2" },
-      { titre: "La dette publique pas à pas, en lecture longue", href: "/france/economie/dette-publique" },
-      { titre: "PIB mondial : qui produit quoi" },
-    ],
+    nom: "Les médias traditionnels",
+    points: ["Expliquent bien, chiffres figés dans le texte", "Un article, un instant, un angle", "Peu d'outils pour explorer soi-même"],
   },
   {
-    nom: "Démographie",
-    articles: [
-      { titre: "Naissances et décès dans le monde, depuis le 1er janvier" },
-      { titre: "Les causes de mortalité, pays par pays" },
-      { titre: "Population : qui grandit, qui recule" },
-    ],
+    nom: "Les sites de données",
+    exemples: "Worldometer, Statista…",
+    points: ["Beaucoup de chiffres, souvent bruts", "Des tableaux denses, peu de contexte", "À vous de relier et d'interpréter"],
+  },
+  {
+    nom: "Visualize",
+    vif: true,
+    points: ["Le chiffre d'abord, l'explication juste après", "Des globes et des compteurs en mouvement", "Ultra clair, ultra condensé, sources à l'appui"],
   },
 ] as const;
 
-function Articles() {
-  const [c, setC] = useState(0);
-  const cat = CATEGORIES[c];
+function Position() {
   return (
-    <section className="ax-sec" id="articles" aria-labelledby="ax-ar-t">
+    <section className="ax-sec ax-sec-large" id="position" aria-labelledby="ax-po-t">
       <Rev as="h2" className="ax-h2">
-        <span id="ax-ar-t">Nos articles</span>
+        <span id="ax-po-t">Où se place Visualize</span>
       </Rev>
-      <Rev className="ax-tabs" d={80}>
-        <div role="tablist" aria-label="Catégorie">
-          {CATEGORIES.map((x, i) => (
-            <button key={x.nom} type="button" role="tab" aria-selected={i === c} className={i === c ? "ax-tab-on" : undefined} onClick={() => setC(i)}>
-              {x.nom}
-            </button>
-          ))}
-        </div>
+      <Rev as="p" className="ax-sous" d={80}>
+        À la jonction des médias traditionnels et des sites de data-visualisation : nous optimisons la
+        lecture, la rendons ergonomique et lui donnons de nouvelles dynamiques.
       </Rev>
-      <ul key={cat.nom} className="ax-arts">
-        {cat.articles.map((a, i) => {
-          const lien = "href" in a ? a.href : undefined;
-          const corps = (
-            <>
-              <span className="ax-art-n">{String(i + 1).padStart(2, "0")}</span>
-              <span className="ax-art-t">{a.titre}</span>
-              {lien ? <ArrowUpRight size={18} aria-hidden="true" /> : <em>Bientôt</em>}
-            </>
-          );
-          return (
-            <li key={a.titre} style={{ "--i": i } as React.CSSProperties}>
-              {lien ? <a href={lien}>{corps}</a> : <div className="ax-art-bientot">{corps}</div>}
-            </li>
-          );
-        })}
-      </ul>
+      <div className="ax-pos">
+        {POSITION.map((c, i) => (
+          <Rev key={c.nom} className={`ax-pos-c${"vif" in c ? " ax-pos-vif" : ""}`} d={i * 110}>
+            <h3>{c.nom}</h3>
+            {"exemples" in c && <span className="ax-pos-ex">{c.exemples}</span>}
+            <ul>
+              {c.points.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ul>
+          </Rev>
+        ))}
+      </div>
     </section>
   );
 }
@@ -798,8 +825,8 @@ export function AnalysesPage(props: Props) {
       <div className="ax-col">
         <Classements donnees={props.donnees} annee={props.annee} />
         <Cartes />
-        <Dossiers dette={props.dette} />
-        <Articles />
+        <Articles dette={props.dette} />
+        <Position />
         <Rev className="ax-presse">
           <PresseCarousel
             id="presse"

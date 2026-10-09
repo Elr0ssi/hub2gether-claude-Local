@@ -674,3 +674,99 @@ a.ax-dos:hover { transform: translateY(-5px); border-color: var(--ax-vif); }
 .ax-arts em { font-style: normal; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; color: var(--ax-vif-2); background: var(--ax-doux); }
 
 .ax-cl2-carte .ax-suite li:first-child { color: inherit; background: var(--ax-carte-2); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PASSE DE FINITION — fonctionnalités, classements, globes, articles, place
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Nos fonctionnalités : plus compact, la phrase tient sur une ligne. */
+.ax-bloc-a, .ax-bloc-b { min-height: 168px; }
+.ax-bloc-c, .ax-bloc-d { min-height: 150px; }
+.ax-bloc { padding: clamp(16px, 1.7vw, 22px); }
+.ax-bloc h3 { margin-top: 14px; }
+@media (min-width: 1000px) { .ax-sous-ligne { max-width: none; white-space: nowrap; font-size: 16px; } }
+
+/* Les classements : plus grands, plus aérés, et le cadre ne se reconstruit plus. */
+.ax-cl2-carte { max-width: 680px; padding: clamp(22px, 2.6vw, 34px); border-radius: 32px; animation: none; }
+.ax-cl2-t { margin: 0 0 18px; font-size: 15px; min-height: 1.4em; }
+.ax-pod2 { gap: 12px; }
+.ax-pod2-c { padding: 16px 16px 18px; border-radius: 22px; gap: 6px; animation: none; }
+.ax-pod2-1 { min-height: 190px; }
+.ax-pod2-2 { min-height: 154px; }
+.ax-pod2-3 { min-height: 128px; }
+.ax-pod2-n { font-size: 15px; min-height: 2.3em; display: flex; align-items: flex-end; }
+.ax-pod2-v { font-size: clamp(20px, 2.3vw, 30px); }
+.ax-cl2-carte .ax-suite { margin-top: 16px; gap: 8px; max-height: none; overflow: visible; }
+.ax-suite li { padding: 14px 16px; border-radius: 16px; font-size: 14.5px; animation: none; min-height: 50px; }
+.ax-cl2-pied { margin-top: 20px; }
+.ax-change { display: inline-block; animation: ax-change 0.45s var(--ax-ease) backwards; }
+@keyframes ax-change { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { .ax-change { animation: none; } }
+@media (max-height: 760px) {
+  .ax-pod2-1 { min-height: 150px; }
+  .ax-pod2-2 { min-height: 126px; }
+  .ax-pod2-3 { min-height: 106px; }
+  .ax-suite li { padding: 9px 14px; min-height: 0; }
+  .ax-cl2-carte .ax-suite { gap: 5px; margin-top: 12px; }
+}
+
+/* Les globes : beaucoup d'air, pour que la section suivante n'apparaisse pas. */
+.ax-sec-large { padding-top: clamp(150px, 30vh, 320px); padding-bottom: clamp(60px, 14vh, 190px); }
+.ax-globe[data-rev][data-vu="1"] { animation-name: ax-rev-net; }
+@keyframes ax-rev-net { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+.ax-globe, .ax-dos, .ax-bloc { will-change: auto; }
+.ax-globe:hover { transform: none; translate: 0 -7px; }
+.ax-globe { transition: translate 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+.ax-globe:hover .ax-sph { transform: scale(1.04); }
+
+/* Nos articles : le grand chiffre, la file d'articles, le forum. */
+.ax-na { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; margin-top: 30px; }
+.ax-na-une { grid-column: span 5; grid-row: span 2; min-height: 400px; }
+.ax-na-une .ax-dos-e { color: rgba(255, 255, 255, 0.85); }
+.ax-na-une .ax-dos-v { font-size: clamp(54px, 6vw, 92px); }
+.ax-na-rail { grid-column: span 7; min-width: 0; }
+.ax-na-piste {
+  list-style: none; margin: -14px -20px -26px 0; padding: 14px 72px 26px 0; display: flex; gap: 14px; overflow-x: auto;
+  scroll-snap-type: x proximity; mask-image: linear-gradient(90deg, #000 calc(100% - 72px), transparent);
+}
+.ax-na-c { flex: 0 0 clamp(210px, 19vw, 262px); scroll-snap-align: start; }
+.ax-na-c a, .ax-na-attente {
+  position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; min-height: 260px; height: 100%;
+  padding: 20px; border-radius: 26px; color: #fff; text-decoration: none; overflow: hidden; background: var(--cv);
+  transition: translate 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ax-na-c0 { --cv: linear-gradient(150deg, #4a1fd0, #8a5cff); }
+.ax-na-c1 { --cv: linear-gradient(150deg, #7c4dff, #ff8fb0); }
+.ax-na-c2 { --cv: linear-gradient(150deg, #2b5bd7, #7c4dff); }
+.ax-na-c3 { --cv: linear-gradient(150deg, #5b2de0, #c06bff); }
+.ax-na-c a:hover { translate: 0 -7px; box-shadow: 0 18px 38px var(--ax-ombre-c, rgba(0, 0, 0, 0.42)); }
+:root[data-concept="clair"] .ax { --ax-ombre-c: rgba(14, 17, 22, 0.14); }
+.ax-na-attente { opacity: 0.55; filter: saturate(0.7); }
+.ax-na-r { font-size: 11.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.85; }
+.ax-na-t { font-size: clamp(17px, 1.5vw, 21px); font-weight: 750; letter-spacing: -0.03em; line-height: 1.15; }
+.ax-na-c em { align-self: flex-start; font-style: normal; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; background: rgba(255, 255, 255, 0.2); }
+.ax-na-f { position: absolute; top: 18px; right: 18px; }
+.ax-na-forum { grid-column: span 7; flex-direction: row; align-items: center; gap: 16px; min-height: 0; padding: 20px 24px; border-radius: 26px; background: var(--ax-carte-2); box-shadow: none; }
+.ax-na-forum h3 { margin: 0; font-size: 18px; }
+.ax-na-forum p { margin: 4px 0 0; font-size: 14px; color: var(--encre-2); }
+.ax-na-forum .ax-bloc-i { flex: none; }
+.ax-na-forum .ax-dos-fl { position: static; margin-left: auto; flex: none; }
+a.ax-dos { transition: translate 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s, box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+a.ax-dos:hover { transform: none; translate: 0 -7px; box-shadow: 0 18px 38px var(--ax-ombre-c, rgba(0, 0, 0, 0.42)); }
+@media (max-width: 1000px) {
+  .ax-na-une, .ax-na-rail, .ax-na-forum { grid-column: span 12; grid-row: auto; }
+  .ax-na-une { min-height: 300px; }
+}
+
+/* Notre place : le média, le site de données, et nous. */
+.ax-pos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 32px; }
+.ax-pos-c { padding: clamp(22px, 2.4vw, 32px); border-radius: 28px; background: var(--ax-carte); border: 1px solid var(--ax-ligne); }
+.ax-pos-c h3 { margin: 0; font-size: clamp(20px, 2vw, 26px); font-weight: 780; letter-spacing: -0.035em; }
+.ax-pos-ex { display: inline-block; margin-top: 8px; font-size: 13px; color: var(--encre-3); }
+.ax-pos-c ul { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
+.ax-pos-c li { position: relative; padding-left: 20px; font-size: 14.5px; line-height: 1.45; color: var(--encre-2); }
+.ax-pos-c li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 8px; height: 8px; border-radius: 50%; background: var(--ax-ligne); }
+.ax-pos-vif { color: #fff; border-color: transparent; background: radial-gradient(80% 60% at 100% 0%, rgba(255, 255, 255, 0.24), transparent 60%), linear-gradient(150deg, #4a1fd0, #7c4dff); }
+.ax-pos-vif li { color: rgba(255, 255, 255, 0.92); }
+.ax-pos-vif li::before { background: #fff; }
+@media (max-width: 900px) { .ax-pos { grid-template-columns: 1fr; } }

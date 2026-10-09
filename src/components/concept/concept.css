@@ -2318,7 +2318,7 @@ body:has(.cg) { background: #05080c; }
   /* La place du relief, sur les quatre côtés. Elle manquait à gauche et à
      droite : l'ombre de la première et de la dernière fiche était tranchée
      net par le bord du rail. */
-  padding: 14px 20px 26px;
+  padding: 14px 64px 26px 20px;
   margin: -14px -20px -26px;
   display: flex;
   gap: 12px;
@@ -2329,7 +2329,7 @@ body:has(.cg) { background: #05080c; }
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
-  mask-image: linear-gradient(90deg, #000 0 93%, transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - 64px), transparent);
 }
 .cg-arts::-webkit-scrollbar { display: none; }
 .cg-arts:active { cursor: grabbing; }
@@ -3285,6 +3285,7 @@ body:has(.cg) { background: #05080c; }
 .cg-arts-c { position: relative; min-width: 0; }
 /* Un fondu au bord droit : la file continue, et on le voit. */
 .cg-arts-f {
+  display: none; /* le fondu est porté par le masque du rail, à son vrai bord */
   position: absolute;
   top: 0;
   right: 0;
@@ -4397,7 +4398,7 @@ body:has(.cg) { background: #05080c; }
   --ink-4: var(--encre-3);
   --ink-5: var(--bord);
 }
-.cg .cp { padding-top: clamp(120px, 16vh, 170px); }
+.cg .cp { padding-top: clamp(120px, 16vh, 170px); position: relative; z-index: 1; }
 .cg .cp-erreur {
   color: var(--rouge);
   background: color-mix(in srgb, var(--rouge) 14%, transparent);
@@ -4437,3 +4438,27 @@ body:has(.cg) { background: #05080c; }
 .ge-evo-pt-f { width: 10px; height: 10px; margin: -5px 0 0 -5px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--froid) 22%, transparent); }
 .ge-evo-pt-e { width: 10px; height: 10px; margin: -5px 0 0 -5px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--froid) 22%, transparent); }
 .ge-evo-pt-l { width: 10px; height: 10px; margin: -5px 0 0 -5px; background: var(--encre); box-shadow: 0 0 0 4px color-mix(in srgb, var(--voile) 14%, transparent); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES ASCENSEURS
+
+   Un rail fin, de la couleur du site, qui ne s'impose qu'au survol. Posé avec
+   `:where` : il ne pèse rien, et toute règle plus précise (ceux qu'on masque
+   volontairement) garde la main.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:where(.cg, .d2, .ax) * {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(138, 108, 255, 0.45) transparent;
+}
+:where(.cg, .d2, .ax) *::-webkit-scrollbar { width: 8px; height: 8px; }
+:where(.cg, .d2, .ax) *::-webkit-scrollbar-track { background: transparent; }
+:where(.cg, .d2, .ax) *::-webkit-scrollbar-thumb {
+  background: rgba(138, 108, 255, 0.4);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+:where(.cg, .d2, .ax) *::-webkit-scrollbar-thumb:hover {
+  background: rgba(138, 108, 255, 0.75);
+  background-clip: content-box;
+}

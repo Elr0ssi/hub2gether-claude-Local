@@ -212,23 +212,31 @@ export function useSocleComplet<T>(leger: T, url: string): T {
     let vivant = true;
     let annule: (() => void) | undefined;
 
-    const charge = () => {
-      fetch(url)
-        .then((r) => (r.ok ? r.json() : null))
-        .then((complet: T | null) => {
-          if (vivant && complet) setSocle(complet);
-        })
-        .catch(() => {
-          /* Sans le reste des années, la page reste utilisable sur la dernière. */
-        });
+    /* Le téléchargement part tout de suite ; seule l'application au rendu
+       attend un temps mort. Les années anciennes arrivent ainsi sans retard
+       perceptible, sans bloquer l'hydratation. */
+    let recu: T | null = null;
+    let pret = false;
+    const applique = () => {
+      pret = true;
+      if (vivant && recu) setSocle(recu);
     };
+    fetch(url)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((complet: T | null) => {
+        recu = complet;
+        if (pret && vivant && complet) setSocle(complet);
+      })
+      .catch(() => {
+        /* Sans le reste des années, la page reste utilisable sur la dernière. */
+      });
 
     const ric = window.requestIdleCallback;
     if (ric) {
-      const id = ric(charge, { timeout: 2000 });
+      const id = ric(applique, { timeout: 600 });
       annule = () => window.cancelIdleCallback?.(id);
     } else {
-      const id = window.setTimeout(charge, 300);
+      const id = window.setTimeout(applique, 200);
       annule = () => window.clearTimeout(id);
     }
 
