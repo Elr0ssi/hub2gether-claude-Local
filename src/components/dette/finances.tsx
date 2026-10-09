@@ -656,30 +656,60 @@ export function BruteNette() {
 export function Porteurs() {
   const [info, setInfo] = useState(false);
   const [serie, setSerie] = useState(false);
+  /* La part survolée ou choisie : l'anneau la détache, le centre la nomme et
+     la ligne de la légende s'allume. Au repos, c'est la première. */
+  const [actif, setActif] = useState<number | null>(null);
   const { ref, vu } = useVu<HTMLDivElement>(90);
-  /* Un anneau en conic-gradient : cinq parts qui font exactement 100 %, et
-     aucune bibliothèque pour le tracer. */
+  const lu = PORTEURS[actif ?? 0];
+
+  /* Un anneau en arcs SVG, un par part : chacun reçoit le survol et le clic. */
+  const R = 42;
+  const C = 2 * Math.PI * R;
   let acc = 0;
-  const parts = PORTEURS.map((p, i) => {
-    const debut = acc;
-    acc += p.pct;
-    return `var(--c${i}) ${debut}% ${acc}%`;
-  }).join(", ");
+  const arcs = PORTEURS.map((p, i) => {
+    const long = (p.pct / 100) * C;
+    const arc = { i, long, decal: -acc };
+    acc += long;
+    return arc;
+  });
 
   return (
     <div className="dp-porteurs" ref={ref} data-vu={vu ? "1" : "0"}>
-      {/* Le libellé est posé à côté de l'anneau, pas dedans : le masque qui
-          creuse le disque découperait aussi son propre contenu. */}
       <div className="dp-anneau-w">
-        <div className="dp-anneau" aria-hidden="true" style={{ "--parts": parts } as React.CSSProperties} />
-        <span className="dp-anneau-c" aria-hidden="true">
-          <b>57,5 %</b>
-          non-résidents
+        <svg className="dp-anneau-svg" viewBox="0 0 100 100" role="img" aria-label="Répartition des détenteurs de la dette de l'État">
+          {arcs.map(({ i, long, decal }) => (
+            <circle
+              key={PORTEURS[i].nom}
+              cx="50"
+              cy="50"
+              r={R}
+              fill="none"
+              stroke={`var(--c${i})`}
+              strokeWidth={actif === i ? 14 : 11}
+              strokeDasharray={`${Math.max(0, long - 0.8)} ${C}`}
+              strokeDashoffset={decal}
+              transform="rotate(-90 50 50)"
+              className={`dp-arc${actif !== null && actif !== i ? " dp-arc-sombre" : ""}`}
+              onPointerEnter={() => setActif(i)}
+              onPointerLeave={() => setActif(null)}
+              onClick={() => setActif(actif === i ? null : i)}
+            />
+          ))}
+        </svg>
+        <span className="dp-anneau-c" aria-live="polite">
+          <b>{pct(lu.pct)}</b>
+          {lu.nom}
         </span>
       </div>
       <ul className="dp-porteurs-l">
         {PORTEURS.map((p, i) => (
-          <li key={p.nom} style={{ "--i": i } as React.CSSProperties}>
+          <li
+            key={p.nom}
+            style={{ "--i": i } as React.CSSProperties}
+            className={actif === i ? "dp-porteurs-on" : undefined}
+            onPointerEnter={() => setActif(i)}
+            onPointerLeave={() => setActif(null)}
+          >
             <span className="dp-porteurs-p" aria-hidden="true" />
             <span className="dp-porteurs-n">{p.nom}</span>
             <b>{pct(p.pct)}</b>

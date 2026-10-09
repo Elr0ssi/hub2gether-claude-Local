@@ -7,6 +7,7 @@ import type { FicheArticle } from "@/data/concept/conceptGeo";
 import { type FicheDebat, type LigneSource, type SocleEco } from "@/data/concept/conceptEconomie";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import { Dessin, Jetons } from "./Jetons";
+import { Selecteur } from "./Selecteur";
 import { monnaieCourante, useMonnaie } from "./Monnaie";
 import { convertir, fiche } from "@/data/finance/tauxChange";
 import { Loupe } from "./Loupe";
@@ -211,10 +212,6 @@ function TempsReelEco({ pib, v2 = false }: { pib: PibMonde; v2?: boolean }) {
       <div className="cg-wrap">
         {v2 ? (
           <header className="v2-tete">
-            <p className="v2-puce">
-              <span className="v2-point" aria-hidden="true" />
-              En direct
-            </p>
             <h2 className="v2-h2">Données en temps réel</h2>
             <p className="v2-sous">
               Depuis le 1<sup>er</sup> janvier 2026
@@ -1045,7 +1042,6 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
         <div className="cg-wrap">
           {v2 ? (
             <header className="v2-tete">
-              <p className="v2-puce">Globe</p>
               <h2 className="v2-h2">Notre globe</h2>
               <p className="v2-sous">{`De ${socle.annees[0]} à ${ANNEE_EN_COURS} · Banque mondiale (WDI), FMI`}</p>
             </header>
@@ -1123,17 +1119,26 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
           <div className="cg-bande-ctrl">
             <label className="cg-an-choix">
               <span className="cg-an-choix-l">Date</span>
+              {v2 ? (
+                <Selecteur
+                  valeur={annee}
+                  options={[...socle.annees].reverse()}
+                  onChange={setAnnee}
+                  label="Date du classement"
+                />
+              ) : (
               <select
-                value={annee}
-                onChange={(e) => setAnnee(Number(e.target.value))}
-                aria-label="Date du classement"
-              >
-                {[...socle.annees].reverse().map((a) => (
-                  <option key={a} value={a}>
-                    {a}
-                  </option>
-                ))}
-              </select>
+                  value={annee}
+                  onChange={(e) => setAnnee(Number(e.target.value))}
+                  aria-label="Date du classement"
+                >
+                  {[...socle.annees].reverse().map((a) => (
+                    <option key={a} value={a}>
+                      {a}
+                    </option>
+                  ))}
+                </select>
+              )}
             </label>
             <input
               className="cg-filtre cg-filtre-clair"

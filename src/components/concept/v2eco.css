@@ -35,7 +35,7 @@
 /* ── L'ouverture : le titre en gras, l'accent en violet ──────────────────── */
 
 .cg-v2 .cg-eco-titre {
-  font-size: clamp(56px, 9.6vw, 140px);
+  font-size: clamp(44px, 7.2vw, 104px);
   font-weight: 800;
   letter-spacing: -0.055em;
   text-indent: 0;
@@ -43,6 +43,14 @@
   line-height: 0.95;
 }
 .cg-v2 .cg-eco-titre::after { content: "."; color: var(--v2-vif-2); }
+/* Le masque de chaque lettre coupait le haut du « É » : on lui rend de la
+   place au-dessus, sans bouger la ligne. */
+.cg-v2 .cg-eco-titre .cg-mot { padding-top: 0.2em; margin-top: -0.2em; }
+/* Le trait sous le titre : un violet doux, lisible de nuit comme de jour. */
+.cg-v2 .cg-eco-ouv::after {
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--v2-vif) 70%, transparent), transparent);
+  opacity: 0.8;
+}
 /* L'ocre de l'horizon, du sceau et de la lueur passe au violet. */
 .cg-v2 .cg-arc,
 .cg-v2 .cg-sceau,
@@ -99,8 +107,8 @@
   background: var(--v2-carte);
   box-shadow: var(--v2-ombre);
   overflow: hidden;
-  transition: transform 0.5s var(--v2-ease), border-color 0.3s, box-shadow 0.4s, opacity 0.8s ease;
-  transition-delay: 0s, 0s, 0s, calc(var(--i, 0) * 90ms);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.5s ease, box-shadow 0.7s ease;
+  will-change: auto;
 }
 /* Elles arrivent une à une, repartent quand on s'éloigne, et reviennent. */
 .cg-v2 .cg-tr[data-vu="0"] .v2-cpt { opacity: 0; transform: translateY(34px) scale(0.97); }
@@ -118,16 +126,16 @@
   aspect-ratio: 1;
   border-radius: 50%;
   background: radial-gradient(circle, color-mix(in srgb, var(--v2-teinte) 34%, transparent), transparent 70%);
-  opacity: 0.55;
-  transition: opacity 0.4s, transform 0.7s var(--v2-ease);
+  opacity: 0.5;
+  transition: opacity 0.6s ease;
   pointer-events: none;
 }
 .cg-v2 .v2-cpt:hover {
-  transform: translateY(-7px);
-  border-color: color-mix(in srgb, var(--v2-teinte) 55%, transparent);
-  box-shadow: 0 30px 60px -28px color-mix(in srgb, var(--v2-teinte) 70%, transparent);
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--v2-teinte) 50%, transparent);
+  box-shadow: 0 26px 50px -30px color-mix(in srgb, var(--v2-teinte) 70%, transparent);
 }
-.cg-v2 .v2-cpt:hover::before { opacity: 1; transform: scale(1.25) translate(-8%, 8%); }
+.cg-v2 .v2-cpt:hover::before { opacity: 0.85; }
 .cg-v2 .v2-cpt-pib { --v2-teinte: #7c4dff; }
 .cg-v2 .v2-cpt-militaires { --v2-teinte: var(--v2-corail); }
 .cg-v2 .v2-cpt-medicales { --v2-teinte: var(--v2-menthe); }
@@ -143,9 +151,9 @@
   border-radius: 13px;
   color: var(--v2-teinte);
   background: color-mix(in srgb, var(--v2-teinte) 16%, transparent);
-  transition: transform 0.5s var(--v2-ease);
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.cg-v2 .v2-cpt:hover .v2-cpt-i { transform: rotate(-8deg) scale(1.1); }
+.cg-v2 .v2-cpt:hover .v2-cpt-i { transform: rotate(-6deg) scale(1.06); }
 .cg-v2 .cg-cpt-l2 { position: relative; font-size: 12.5px; font-weight: 650; letter-spacing: 0; text-transform: none; color: var(--encre-2); }
 .cg-v2 .cg-cpt-v { position: relative; font-size: clamp(16px, 1.45vw, 21px); font-weight: 750; letter-spacing: -0.025em; }
 .cg-v2 .cg-cpt-n { position: relative; font-size: 12px; }
@@ -201,22 +209,19 @@
 }
 .cg-v2 .ge-nom { font-weight: 800; letter-spacing: -0.035em; }
 
-/* ── Le classement : une carte, plus compacte ────────────────────────────── */
+/* ── Le classement : l'ouverture d'origine, les couleurs de la V2 ────────── */
 
-.cg-v2 .cg-bande {
-  clip-path: none;
-  margin: clamp(40px, 6vh, 80px) clamp(14px, 3vw, 44px);
-  padding: clamp(36px, 5vh, 60px) clamp(14px, 3vw, 40px) clamp(24px, 4vh, 40px);
-  border-radius: 40px;
-  background: var(--v2-carte-2);
-  color: var(--encre);
+.cg-v2 .cg-bande { background: var(--v2-carte-2); color: var(--encre); }
+.cg-v2 .cg-bande-t { font-size: clamp(30px, 4vw, 54px); font-weight: 800; letter-spacing: -0.045em; color: var(--encre); }
+.cg-v2 .cg-bande-c { color: var(--encre-3); }
+.cg-v2 .cg-an-choix-l { color: var(--encre-3); }
+.cg-v2 .cg-filtre-clair {
   border: 1px solid var(--v2-ligne);
+  border-radius: 999px;
+  background: var(--v2-carte);
+  color: var(--encre);
 }
-.cg-v2 .cg-bande::before,
-.cg-v2 .cg-bande::after { display: none; }
-.cg-v2 .cg-bande-t,
-.cg-v2 .cg-bande-c,
-.cg-v2 .cg-bande-ctrl,
+.cg-v2 .cg-filtre-clair::placeholder { color: var(--encre-3); }
 .cg-v2 .cg-bande-bloc { opacity: 1; transform: none; transition: opacity 0.8s ease, transform 0.9s var(--v2-ease); }
 .cg-v2 .cg-bande[data-vu="0"] .cg-bande-t,
 .cg-v2 .cg-bande[data-vu="0"] .cg-bande-c,
@@ -236,8 +241,6 @@
 }
 .cg-v2 .cg-filtre-clair::placeholder { color: var(--encre-3); }
 .cg-v2 .cg-bande-bloc {
-  max-width: 1320px;
-  margin-top: 22px;
   padding: 8px;
   border-radius: 30px;
   background: var(--v2-carte);
@@ -262,3 +265,64 @@
 @media (prefers-reduced-motion: reduce) {
   .v2-point, .cg-v2 .cg-tr[data-vu="1"] .v2-cpt { animation: none; }
 }
+
+
+/* ── Le globe : les rectangles de la fiche prennent du relief ────────────── */
+
+.cg-v2 .ge-vedette,
+.cg-v2 .ge-autre {
+  border: 1px solid var(--v2-ligne);
+  border-radius: 20px;
+  background: var(--v2-carte-2);
+  box-shadow: 0 16px 30px -18px rgba(0, 0, 0, 0.55), inset 0 1px 0 color-mix(in srgb, var(--voile) 8%, transparent);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease, border-color 0.4s ease;
+}
+.cg-v2 .ge-autre:hover,
+.cg-v2 .ge-vedette:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--v2-vif) 45%, transparent);
+  box-shadow: 0 24px 40px -20px rgba(0, 0, 0, 0.6), inset 0 1px 0 color-mix(in srgb, var(--voile) 10%, transparent);
+}
+
+/* ── Les articles : autre typo, autre organisation ───────────────────────── */
+
+.cg-v2 .cg-arts-h { font-size: clamp(28px, 3.4vw, 46px); font-weight: 800; letter-spacing: -0.045em; }
+.cg-v2 .cg-art {
+  border: 1px solid var(--v2-ligne);
+  border-radius: 28px;
+  background: var(--v2-carte);
+  box-shadow: var(--v2-ombre);
+  overflow: hidden;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s ease, box-shadow 0.6s ease;
+}
+.cg-v2 .cg-art:hover { transform: translateY(-5px); border-color: color-mix(in srgb, var(--v2-vif) 50%, transparent); }
+.cg-v2 .cg-art .image-placeholder { border-radius: 0; }
+.cg-v2 .cg-rubrique {
+  display: inline-block;
+  margin: 14px 18px 0;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--v2-vif-2);
+}
+:root[data-concept="clair"] .cg-v2 .cg-rubrique { color: var(--v2-vif); }
+.cg-v2 .cg-art-t { margin: 6px 18px 18px; font-weight: 750; letter-spacing: -0.03em; line-height: 1.18; }
+.cg-v2 .cg-art-une .cg-art-t { font-size: clamp(24px, 2.6vw, 34px); font-weight: 800; letter-spacing: -0.04em; }
+.cg-v2 .cg-art-c { margin: 0 18px 22px; color: var(--encre-2); }
+.cg-v2 .cg-debat {
+  border: 1px solid var(--v2-ligne);
+  border-radius: 24px;
+  background: linear-gradient(160deg, var(--v2-doux), var(--v2-carte));
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s ease;
+}
+.cg-v2 .cg-debat:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--v2-vif) 50%, transparent); }
+.cg-v2 .cg-debat-q { font-weight: 750; letter-spacing: -0.02em; }
+.cg-v2 .cg-debats-t { font-weight: 700; }
+
+/* De jour, l'horizon d'origine est bleu : il glisse au violet de moins loin
+   que l'ocre de nuit. */
+:root[data-concept="clair"] .cg-v2 .cg-arc,
+:root[data-concept="clair"] .cg-v2 .cg-sceau,
+:root[data-concept="clair"] .cg-v2 .cg-eco-lueur { filter: hue-rotate(48deg) saturate(1.1); }

@@ -235,6 +235,17 @@ export function EnTete({ actif }: { actif?: string }) {
      Elle tient aussi au clic, sinon un écran tactile n'y accède jamais. */
   const [ouvert, setOuvert] = useState(false);
   const barre = useRef<HTMLElement>(null);
+  /* Vrai quand l'ouverture est terminée : le corps cesse alors de rogner son
+     contenu, pour laisser la liste des monnaies déborder. */
+  const [fini, setFini] = useState(false);
+  useEffect(() => {
+    if (!ouvert) {
+      setFini(false);
+      return;
+    }
+    const t = window.setTimeout(() => setFini(true), 720);
+    return () => window.clearTimeout(t);
+  }, [ouvert]);
   /* L'état du menu au moment où le doigt se pose : sur un écran tactile, la
      prise de focus l'ouvre avant que le clic n'arrive, et le clic, voyant un
      menu déjà ouvert, suivait le lien. On retient donc l'état d'avant. */
@@ -258,7 +269,7 @@ export function EnTete({ actif }: { actif?: string }) {
   return (
     <header
       ref={barre}
-      className={`cg-header${ouvert ? " cg-header-ouvert" : ""}`}
+      className={`cg-header${ouvert ? " cg-header-ouvert" : ""}${fini ? " cg-header-fini" : ""}`}
       onPointerEnter={(e) => e.pointerType === "mouse" && setOuvert(true)}
       onPointerLeave={(e) => e.pointerType === "mouse" && setOuvert(false)}
       onFocus={() => setOuvert(true)}

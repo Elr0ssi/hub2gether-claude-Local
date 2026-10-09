@@ -33,7 +33,10 @@ import {
   ACTEURS_2025,
   CHARGE_DETTE_PROGRAMME,
   DEFICIT_2025,
+  DEFICIT_PAR_ACTEUR,
   DEPENSES_2025,
+  DEPENSES_FONCTION,
+  DEPENSES_NATURE,
   DEPENSES_PCT_PIB_2025,
   DETTE_BRUTE,
   DETTE_NETTE,
@@ -52,7 +55,7 @@ import { PRESSE_DETTE } from "@/data/concept/presse";
 import { EnTete } from "@/components/concept/pieces";
 import { PresseCarousel } from "@/components/presse/PresseCarousel";
 import { Compteur, Leve } from "@/components/dette/pieces";
-import { BruteNette, CompositionDette, OuVaLArgent, Porteurs, Waterfall } from "@/components/dette/finances";
+import { BruteNette, CompositionDette, Porteurs } from "@/components/dette/finances";
 import { Comparaison, Detenteurs } from "@/components/dette/scenes";
 import "@/components/concept/concept.css";
 import "@/components/dette/dette.css";
@@ -363,15 +366,67 @@ function GrapheRatio() {
   );
 }
 
-/* ── Recettes, dépenses, déficit : trois onglets ─────────────────────────── */
+/* ── Une répartition : le même visuel pour les recettes, les dépenses et le
+   déficit — une barre segmentée, puis la liste des montants et des parts. ── */
+
+const COULEURS = ["var(--d2-s0)", "var(--d2-s1)", "var(--d2-s2)", "var(--d2-s3)", "var(--d2-s4)", "var(--d2-s5)"];
+
+function Repart({
+  lignes,
+  nom,
+  negatif = false,
+}: {
+  lignes: { nom: string; md: number }[];
+  nom: string;
+  negatif?: boolean;
+}) {
+  const positives = lignes.filter((l) => l.md > 0);
+  const somme = positives.reduce((t, l) => t + l.md, 0);
+  const [actif, setActif] = useState<number | null>(null);
+  return (
+    <div className="d2-rep">
+      <div className="d2-pile-b" role="img" aria-label={nom}>
+        {positives.map((l, i) => (
+          <span
+            key={l.nom}
+            className={actif !== null && actif !== i ? "d2-seg-sombre" : undefined}
+            style={{ flexGrow: l.md, background: COULEURS[i % COULEURS.length] }}
+            title={`${l.nom} · ${md(l.md)}`}
+            onPointerEnter={() => setActif(i)}
+            onPointerLeave={() => setActif(null)}
+          />
+        ))}
+      </div>
+      <ul className="d2-pile-l">
+        {lignes.map((l, i) => (
+          <li
+            key={l.nom}
+            className={`${l.md < 0 ? "d2-pile-neg" : ""}${actif === i && l.md > 0 ? " d2-pile-on" : ""}`}
+            onPointerEnter={() => l.md > 0 && setActif(i)}
+            onPointerLeave={() => setActif(null)}
+          >
+            <i style={{ background: l.md > 0 ? COULEURS[i % COULEURS.length] : "var(--d2-s5)" }} aria-hidden="true" />
+            <span>{l.nom}</span>
+            <b className={negatif ? "d2-neg" : undefined}>
+              {negatif || l.md < 0 ? "−" : ""}
+              {nf(Math.abs(l.md))} Md€
+            </b>
+            <em>{l.md > 0 ? `${nf((l.md / somme) * 100)} %` : "en déduction"}</em>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/* ── Recettes, dépenses, déficit : trois onglets, un seul visuel ─────────── */
 
 function Deficit() {
   const [onglet, setOnglet] = useState<"recettes" | "depenses" | "deficit">("recettes");
+  const [lecture, setLecture] = useState<"nature" | "fonction">("nature");
   const rec = RECETTES_2025.valeur;
   const dep = DEPENSES_2025.valeur;
   const solde = Math.abs(DEFICIT_2025.valeur);
-  const segments = RECETTES_DETAIL.filter((p) => p.md > 0);
-  const somme = segments.reduce((s, p) => s + p.md, 0);
   const etat = Math.abs(ACTEURS_2025[0].lignes?.[0].md ?? 0);
 
   return (
@@ -425,24 +480,7 @@ function Deficit() {
           source={RECETTES_2025}
           voir={[{ href: "#depenses-publiques", label: "Voir les dépenses" }]}
         >
-          <div className="d2-pile-b" role="img" aria-label="Répartition des recettes publiques 2025">
-            {segments.map((p, i) => (
-              <span key={p.nom} style={{ flexGrow: p.md, "--i": i } as React.CSSProperties} title={`${p.nom} · ${md(p.md)}`} />
-            ))}
-          </div>
-          <ul className="d2-pile-l">
-            {RECETTES_DETAIL.map((p, i) => (
-              <li key={p.nom} className={p.md < 0 ? "d2-pile-neg" : undefined}>
-                <i style={{ "--i": i } as React.CSSProperties} aria-hidden="true" />
-                <span>{p.nom}</span>
-                <b>
-                  {p.md < 0 ? "−" : ""}
-                  {nf(Math.abs(p.md))} Md€
-                </b>
-                <em>{p.md > 0 ? `${nf((p.md / somme) * 100)} %` : "en déduction"}</em>
-              </li>
-            ))}
-          </ul>
+          <Repart lignes={RECETTES_DETAIL} nom="Répartition des recettes publiques 2025" />
         </Figure>
       </div>
 
@@ -450,12 +488,26 @@ function Deficit() {
         <Figure
           id="depenses-publiques"
           titre="Où va l'argent public"
-          legende={`Les ${nf(dep, 0)} milliards d'euros de dépenses publiques 2025 lus par nature (salaires, prestations sociales, investissement, intérêts), par fonction (protection sociale, santé, éducation, défense) et par administration.`}
+          legende={`Les ${nf(dep, 0)} milliards d'euros de dépenses publiques 2025 lus par nature (salaires, prestations sociales, investissement, intérêts) ou par fonction (protection sociale, santé, éducation, défense).`}
           source={DEPENSES_2025}
           voir={[{ href: "#recettes-publiques", label: "Voir les recettes" }]}
-          reuse
         >
-          <OuVaLArgent />
+          <div className="d2-lectures" role="group" aria-label="Lecture des dépenses">
+            <button type="button" className={lecture === "nature" ? "d2-lec-on" : undefined} onClick={() => setLecture("nature")}>
+              Par nature
+            </button>
+            <button type="button" className={lecture === "fonction" ? "d2-lec-on" : undefined} onClick={() => setLecture("fonction")}>
+              Par fonction
+            </button>
+          </div>
+          {lecture === "nature" ? (
+            <Repart lignes={DEPENSES_NATURE} nom="Dépenses publiques 2025 par nature" />
+          ) : (
+            <>
+              <Repart lignes={DEPENSES_FONCTION} nom="Dépenses publiques par fonction" />
+              <p className="d2-notule">Dernière ventilation par fonction publiée : 2024.</p>
+            </>
+          )}
         </Figure>
       </div>
 
@@ -466,9 +518,12 @@ function Deficit() {
           legende={`${nf(etat)} des ${nf(solde)} milliards d'euros de déficit public 2025 viennent de l'État ; les collectivités locales et la Sécurité sociale pèsent bien moins.`}
           source={DEFICIT_2025}
           voir={[{ href: "#evolution", label: "Voir l'évolution de la dette" }]}
-          reuse
         >
-          <Waterfall />
+          <Repart
+            lignes={DEFICIT_PAR_ACTEUR.map((d) => ({ nom: d.nom, md: Math.abs(d.md) }))}
+            nom="Déficit public 2025 par administration"
+            negatif
+          />
         </Figure>
       </div>
     </>

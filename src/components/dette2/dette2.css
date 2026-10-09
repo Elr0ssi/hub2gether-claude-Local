@@ -1056,3 +1056,32 @@ body:has(.d2) { background: #0a0912; }
 }
 :root[data-concept="clair"] .d2-rail-i { color: var(--d2-vif); }
 .d2-rail-src .d2-rail-corps { padding: 0 12px 12px; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA TROISIÈME PASSE : tailles resserrées, un seul visuel pour les trois onglets
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.d2-h1-v { font-size: clamp(52px, 10vw, 118px); }
+.d2-chap { padding: clamp(18px, 2.6vw, 32px); }
+.d2-chap-t h2 { font-size: clamp(22px, 2.7vw, 32px); }
+.d2-carte { padding: 18px; border-radius: 22px; }
+.d2-carte-v { font-size: clamp(19px, 1.9vw, 26px); margin-top: 16px; }
+.d2-c-a .d2-carte-v { font-size: clamp(34px, 3.8vw, 52px); margin-top: 28px; }
+.d2-carte-l { font-size: 13.5px; }
+.d2-onglet { padding: 14px 16px; border-radius: 20px; }
+.d2-onglet b { font-size: clamp(17px, 1.8vw, 23px); }
+.d2-cout { padding: 16px; }
+.d2-cout b { font-size: clamp(18px, 1.9vw, 24px); }
+.d2-cout-g b { font-size: clamp(30px, 3.6vw, 46px); }
+.d2-graphe-v { font-size: clamp(28px, 3.4vw, 42px); }
+
+.d2-rep { display: block; }
+.d2-rep .d2-pile-b span { transition: opacity 0.3s ease, filter 0.3s ease; cursor: default; }
+.d2-rep .d2-pile-b span.d2-seg-sombre { opacity: 0.3; }
+.d2-pile-l li { border-radius: 12px; padding-left: 8px; padding-right: 8px; transition: background 0.25s; }
+.d2-pile-l li.d2-pile-on { background: var(--d2-vif-doux); }
+.d2-pile-l i { background: var(--d2-s5); }
+.d2-lectures { display: inline-flex; gap: 4px; margin-bottom: 14px; padding: 4px; border-radius: 999px; background: var(--d2-surface-2); border: 1px solid var(--d2-ligne); }
+.d2-lectures button { padding: 8px 16px; border: 0; border-radius: 999px; font-size: 13px; font-weight: 650; color: var(--d2-encre-2); cursor: pointer; background: none; transition: background 0.25s, color 0.25s; }
+.d2-lectures button.d2-lec-on { color: #fff; background: linear-gradient(135deg, var(--d2-vif), var(--d2-vif-2)); }

@@ -1,0 +1,65 @@
+/* Le sélecteur personnalisé : mêmes jetons que la page qui l'accueille. */
+.sl { position: relative; display: inline-block; }
+.sl-b {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 108px;
+  padding: 9px 14px 9px 18px;
+  border: 1px solid var(--v2-ligne, rgba(255, 255, 255, 0.12));
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  color: var(--encre);
+  cursor: pointer;
+  background: var(--v2-carte, var(--surface));
+  transition: border-color 0.25s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sl-b:hover { border-color: var(--v2-vif, var(--froid)); transform: translateY(-1px); }
+.sl-b span { flex: 1; text-align: left; }
+.sl-b svg { color: var(--encre-3); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.sl-b svg.sl-ouv { transform: rotate(180deg); }
+.sl-l {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 100%;
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid var(--v2-ligne, rgba(255, 255, 255, 0.12));
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--v2-carte, var(--surface)) 94%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 24px 50px -20px rgba(0, 0, 0, 0.55);
+  scrollbar-width: thin;
+  animation: sl-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes sl-in { from { opacity: 0; transform: translateY(-6px) scale(0.98); } }
+.sl-l button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--encre-2);
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  transition: background 0.15s, color 0.15s;
+}
+.sl-l button.sl-vise { background: color-mix(in srgb, var(--voile) 9%, transparent); color: var(--encre); }
+.sl-l button.sl-on { color: #fff; background: linear-gradient(135deg, #5b2de0, #8a5cff); }
+@media (prefers-reduced-motion: reduce) { .sl-l { animation: none; } }

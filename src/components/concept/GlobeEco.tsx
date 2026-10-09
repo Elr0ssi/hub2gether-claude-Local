@@ -605,20 +605,6 @@ export function GlobeEco({
                             strokeLinejoin="round"
                             strokeLinecap="round"
                           />
-                          <circle
-                            cx={courbe.debut.x}
-                            cy={courbe.debut.y}
-                            r="0.9"
-                            fill="var(--encre-3)"
-                            vectorEffect="non-scaling-stroke"
-                          />
-                          <circle
-                            cx={courbe.fin.x}
-                            cy={courbe.fin.y}
-                            r="1.3"
-                            fill="var(--froid)"
-                            vectorEffect="non-scaling-stroke"
-                          />
                           {ecart && (
                             <>
                               <rect
@@ -639,13 +625,6 @@ export function GlobeEco({
                                     strokeWidth="1"
                                     vectorEffect="non-scaling-stroke"
                                   />
-                                  <circle
-                                    cx={m.x}
-                                    cy={m.y}
-                                    r="1.7"
-                                    fill="var(--froid)"
-                                    vectorEffect="non-scaling-stroke"
-                                  />
                                 </g>
                               ))}
                             </>
@@ -661,16 +640,18 @@ export function GlobeEco({
                                 strokeWidth="1"
                                 vectorEffect="non-scaling-stroke"
                               />
-                              <circle
-                                cx={lu.x}
-                                cy={lu.y}
-                                r="1.8"
-                                fill="var(--encre)"
-                                vectorEffect="non-scaling-stroke"
-                              />
                             </>
                           )}
                         </svg>
+                        <div className="ge-evo-pts" aria-hidden="true">
+                          <span className="ge-evo-pt ge-evo-pt-d" style={{ left: `${courbe.debut.x}%`, top: `${(courbe.debut.y / 30) * 100}%` }} />
+                          <span className="ge-evo-pt ge-evo-pt-f" style={{ left: `${courbe.fin.x}%`, top: `${(courbe.fin.y / 30) * 100}%` }} />
+                          {ecart &&
+                            [ecart.a, ecart.b].map((m) => (
+                              <span key={m.annee} className="ge-evo-pt ge-evo-pt-e" style={{ left: `${m.x}%`, top: `${(m.y / 30) * 100}%` }} />
+                            ))}
+                          {lu && <span className="ge-evo-pt ge-evo-pt-l" style={{ left: `${lu.x}%`, top: `${(lu.y / 30) * 100}%` }} />}
+                        </div>
                       </div>
                       <p className="ge-evo-aide">
                         {bornes.length === 0

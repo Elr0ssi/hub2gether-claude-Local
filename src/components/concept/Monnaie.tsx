@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MONNAIES, fiche, type Monnaie } from "@/data/finance/tauxChange";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -66,10 +66,37 @@ export function useMonnaie(): [Monnaie, (m: Monnaie) => void] {
 export function ChoixMonnaie({ className }: { className?: string }) {
   const [m, change] = useMonnaie();
   const f = fiche(m);
+  /* La liste s'ouvre au clic, pas au simple passage : en survol, elle
+     disparaissait avant qu'on puisse l'atteindre. */
+  const [ouvert, setOuvert] = useState(false);
+  const racine = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!ouvert) return;
+    const ailleurs = (e: PointerEvent) => {
+      if (!racine.current?.contains(e.target as Node)) setOuvert(false);
+    };
+    const touche = (e: KeyboardEvent) => e.key === "Escape" && setOuvert(false);
+    window.addEventListener("pointerdown", ailleurs);
+    window.addEventListener("keydown", touche);
+    return () => {
+      window.removeEventListener("pointerdown", ailleurs);
+      window.removeEventListener("keydown", touche);
+    };
+  }, [ouvert]);
 
   return (
-    <div className={`cg-monnaie${className ? ` ${className}` : ""}`}>
-      <button type="button" className="cg-monnaie-b" aria-haspopup="true">
+    <div
+      ref={racine}
+      className={`cg-monnaie${className ? ` ${className}` : ""}`}
+      data-ouvert={ouvert ? "1" : "0"}
+    >
+      <button
+        type="button"
+        className="cg-monnaie-b"
+        aria-haspopup="true"
+        aria-expanded={ouvert}
+        onClick={() => setOuvert(!ouvert)}
+      >
         <span className="sr-only">Monnaie d&apos;affichage : {f.libelle}</span>
         <span aria-hidden="true">{f.unitaire}</span>
       </button>
@@ -81,7 +108,10 @@ export function ChoixMonnaie({ className }: { className?: string }) {
             role="menuitemradio"
             aria-checked={x.code === m}
             className={x.code === m ? "on" : undefined}
-            onClick={() => change(x.code)}
+            onClick={() => {
+              change(x.code);
+              setOuvert(false);
+            }}
           >
             <b>{x.unitaire}</b>
             {x.libelle}

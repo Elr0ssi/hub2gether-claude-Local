@@ -1513,3 +1513,14 @@ body:has(.dp) { background: var(--nuit); }
   --pousse: #0d7a52;
   --voile: #0b0f14;
 }
+
+
+/* L'anneau des détenteurs, interactif : l'arc survolé s'épaissit, les autres
+   s'estompent, et la ligne correspondante de la légende s'allume. */
+.dp-anneau-svg { display: block; width: 100%; height: 100%; opacity: 0; transform: rotate(-12deg) scale(0.94); transition: opacity 0.7s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1); }
+.dp-porteurs[data-vu="1"] .dp-anneau-svg { opacity: 1; transform: none; }
+.dp-arc { cursor: pointer; transition: stroke-width 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease; }
+.dp-arc-sombre { opacity: 0.35; }
+.dp-anneau-c b { transition: color 0.3s; }
+.dp-porteurs-l li { transition: background 0.25s, padding 0.3s; border-radius: 10px; }
+.dp-porteurs-l li.dp-porteurs-on { background: color-mix(in srgb, var(--voile) 7%, transparent); }

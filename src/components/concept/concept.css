@@ -194,12 +194,27 @@ body:has(.cg) { background: #05080c; }
 .cg-header-ouvert .cg-logo-m i:nth-child(3) { animation-delay: 0.14s; }
 @keyframes cg-barre { from { transform: scaleY(0.2); } }
 
-/* Le corps de la pilule : absent au repos, il arrive d'un geste. */
-.cg-pill-corps { display: none; align-items: center; gap: 6px; }
-.cg-header-ouvert .cg-pill-corps { display: flex; animation: cg-pill-in 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
-@keyframes cg-pill-in { from { opacity: 0; transform: translateX(-12px); } }
+/* Le corps de la pilule : sa largeur passe de zéro à son contenu, d'un seul
+   mouvement continu. Les éléments apparaissent à la suite, sans saut. */
+:root { interpolate-size: allow-keywords; }
+.cg-pill { gap: 0; }
+.cg-pill-corps {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+}
+.cg-header-ouvert .cg-pill-corps { width: auto; opacity: 1; pointer-events: auto; }
+/* Une fois ouvert, plus rien n'est rogné : la liste des monnaies déborde. */
+.cg-header-fini .cg-pill-corps { overflow: visible; }
 
 .cg-nav { display: flex; gap: 2px; }
+.cg-nav { margin-left: 4px; }
 .cg-nav a,
 .cg-nav-bientot {
   display: inline-flex;
@@ -212,12 +227,18 @@ body:has(.cg) { background: #05080c; }
   color: var(--encre-2);
   text-decoration: none;
   white-space: nowrap;
-  animation: cg-item 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-  animation-delay: calc(var(--i, 0) * 45ms + 90ms);
-  transition: color 0.25s, background 0.25s, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: opacity 0.3s ease, transform 0.3s ease, color 0.25s, background 0.25s;
 }
-@keyframes cg-item { from { opacity: 0; transform: translateY(-6px); } }
-.cg-nav a:hover { color: var(--encre); background: color-mix(in srgb, var(--voile) 10%, transparent); transform: translateY(-1px); }
+.cg-header-ouvert .cg-nav a,
+.cg-header-ouvert .cg-nav-bientot {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.55s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), color 0.25s, background 0.25s;
+  transition-delay: calc(var(--i, 0) * 40ms + 140ms), calc(var(--i, 0) * 40ms + 140ms), 0s, 0s;
+}
+.cg-header-ouvert .cg-nav a:hover { color: var(--encre); background: color-mix(in srgb, var(--voile) 10%, transparent); transition-delay: 0s; }
 .cg-header .cg-nav a.cg-nav-on,
 .cg-header .cg-nav a.cg-nav-on:hover { color: #fff; background: linear-gradient(135deg, var(--mn-vif), var(--mn-vif-2)); }
 .cg-nav-bientot { color: var(--encre-3); cursor: default; }
@@ -260,7 +281,7 @@ body:has(.cg) { background: #05080c; }
 }
 .cg-pill .cg-jour:hover,
 .cg-pill .cg-monnaie:hover .cg-monnaie-b,
-.cg-pill .cg-monnaie:focus-within .cg-monnaie-b {
+.cg-pill .cg-monnaie[data-ouvert="1"] .cg-monnaie-b {
   color: var(--encre);
   background: color-mix(in srgb, var(--voile) 16%, transparent);
   transform: translateY(-1px);
@@ -269,9 +290,14 @@ body:has(.cg) { background: #05080c; }
 /* L'entrée de compte : le seul aplat de la barre. Sur grand écran elle
    arrive avec le reste ; sur mobile elle est toujours là. */
 .cg-pill .cg-cnx {
-  display: none;
+  display: inline-flex;
   align-items: center;
-  padding: 9px 18px;
+  max-width: 0;
+  padding: 9px 0;
+  margin-left: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
   border: 0;
   border-radius: 999px;
   font-size: 13.5px;
@@ -281,14 +307,14 @@ body:has(.cg) { background: #05080c; }
   box-shadow: 0 10px 22px -10px rgba(124, 77, 255, 0.85);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s;
+  transition: max-width 0.7s cubic-bezier(0.22, 1, 0.36, 1), padding 0.7s cubic-bezier(0.22, 1, 0.36, 1), margin 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease, box-shadow 0.3s;
 }
 .cg-pill .cg-cnx:hover { transform: translateY(-1px); box-shadow: 0 14px 28px -10px rgba(124, 77, 255, 1); background: linear-gradient(135deg, var(--mn-vif), var(--mn-vif-2)); }
-.cg-header-ouvert .cg-pill .cg-cnx { display: inline-flex; animation: cg-item 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.35s backwards; }
+.cg-header-ouvert .cg-pill .cg-cnx { max-width: 200px; padding: 9px 18px; margin-left: 6px; opacity: 1; }
 
 /* Sous 900 px : la pilule s'ouvre en panneau, et le compte reste posé. */
 @media (max-width: 900px) {
-  .cg-pill .cg-cnx { display: inline-flex; padding: 8px 14px; font-size: 13px; }
+  .cg-pill .cg-cnx { max-width: 200px; padding: 8px 14px; margin-left: 6px; opacity: 1; font-size: 13px; }
   .cg-pill-corps {
     position: absolute;
     top: calc(100% + 10px);
@@ -299,23 +325,32 @@ body:has(.cg) { background: #05080c; }
     gap: 4px;
     padding: 12px;
     border-radius: 28px;
-    transform: translateX(-50%);
+    overflow: visible;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(-8px) scale(0.97);
     background: color-mix(in srgb, var(--fond) 94%, transparent);
     border: 1px solid var(--bord);
     backdrop-filter: blur(22px) saturate(1.3);
     -webkit-backdrop-filter: blur(22px) saturate(1.3);
     box-shadow: 0 24px 60px -20px var(--ombre-portee);
+    transition: opacity 0.35s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.5s;
   }
-  .cg-header-ouvert .cg-pill-corps { animation: cg-panneau 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
-  @keyframes cg-panneau { from { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.97); } }
-  .cg-nav { flex-direction: column; gap: 2px; }
+  .cg-header-ouvert .cg-pill-corps {
+    width: min(92vw, 380px);
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%);
+    transition-delay: 0s;
+  }
+  .cg-nav { flex-direction: column; gap: 2px; margin-left: 0; }
   .cg-nav a, .cg-nav-bientot { padding: 12px 14px; font-size: 15px; }
   .cg-sep { width: auto; height: 1px; margin: 6px 4px; }
   .cg-bout { justify-content: space-between; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cg-pill-corps, .cg-nav a, .cg-nav-bientot, .cg-logo-m i, .cg-pill .cg-cnx { animation: none !important; }
+  .cg-pill-corps, .cg-nav a, .cg-nav-bientot, .cg-logo-m i, .cg-pill .cg-cnx { animation: none !important; transition: none !important; }
 }
 
 
@@ -4000,8 +4035,7 @@ body:has(.cg) { background: #05080c; }
   transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 5;
 }
-.cg-monnaie:hover .cg-monnaie-l,
-.cg-monnaie:focus-within .cg-monnaie-l {
+.cg-monnaie[data-ouvert="1"] .cg-monnaie-l {
   opacity: 1;
   transform: none;
   pointer-events: auto;
@@ -4380,3 +4414,26 @@ body:has(.cg) { background: #05080c; }
 .cg .cp-champ input:focus,
 .cg .cp-champ textarea:focus { border-color: var(--vert); background: var(--surface); }
 .cg .cp-google { color: var(--encre); }
+
+
+/* ── Les points de la courbe d'évolution ─────────────────────────────────
+   Ils étaient des cercles dans le dessin, étiré sans conserver ses
+   proportions : ils devenaient des ellipses aplaties. Ce sont maintenant de
+   vrais ronds, posés par-dessus aux mêmes coordonnées en pourcentage. Le
+   bandeau du haut garde aussi une hauteur fixe, pour que la courbe ne saute
+   plus quand on passe de deux valeurs à une seule. */
+.ge-evo-c { position: relative; }
+.ge-evo-h { min-height: 42px; align-items: flex-end; }
+.ge-evo-pts { position: absolute; left: 0; right: 0; top: 4px; height: 56px; pointer-events: none; }
+.ge-evo-pt {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--froid);
+}
+.ge-evo-pt-d { width: 6px; height: 6px; margin: -3px 0 0 -3px; background: var(--encre-3); }
+.ge-evo-pt-f { width: 10px; height: 10px; margin: -5px 0 0 -5px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--froid) 22%, transparent); }
+.ge-evo-pt-e { width: 10px; height: 10px; margin: -5px 0 0 -5px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--froid) 22%, transparent); }
+.ge-evo-pt-l { width: 10px; height: 10px; margin: -5px 0 0 -5px; background: var(--encre); box-shadow: 0 0 0 4px color-mix(in srgb, var(--voile) 14%, transparent); }
