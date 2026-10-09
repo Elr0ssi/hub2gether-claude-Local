@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Dette2Page, type Suggestion } from "@/components/dette2/Dette2Page";
+import { SUJETS } from "@/data/concept/sujets";
 import { detteDerniere, FAQ } from "@/data/articles/detteFrancaise";
 import { jsonLdString } from "@/lib/schema";
 
@@ -108,7 +109,7 @@ export default function Page() {
       {jeux.map((j) => (
         <script key={j["@id"]} type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(j) }} />
       ))}
-      <Dette2Page suggestions={suggestions()} />
+      <Dette2Page suggestions={suggestions()} sujet={SUJETS["dette-publique-france"]} />
     </>
   );
 }

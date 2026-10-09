@@ -37,3 +37,7 @@ a.pc-lien:hover { transform: translateY(-4px); border-color: var(--pc-vif, #7c4d
 .pc-vide .pc-lien { border-style: dashed; opacity: 0.8; }
 .pc-vide .pc-titre { color: var(--pc-encre-2, #bdb8da); font-weight: 600; }
 .pc-note { margin: 6px 0 0; font-size: 12.5px; color: var(--pc-encre-3, #8c86ad); }
+
+.pc-piste { cursor: grab; user-select: none; -webkit-user-select: none; }
+.pc-piste[data-glisse] { cursor: grabbing; scroll-snap-type: none; }
+.pc-piste[data-glisse] a { pointer-events: none; }

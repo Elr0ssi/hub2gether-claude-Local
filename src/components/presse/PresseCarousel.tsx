@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Newspaper } from "lucide-react";
 import type { Citation } from "@/data/concept/presse";
+import { useGlisser } from "@/lib/useGlisser";
 import "./presse.css";
 
 /* Un carrousel d'articles de presse. Il défile au doigt, à la molette
@@ -19,7 +20,8 @@ export function PresseCarousel({
   citations: Citation[];
   id?: string;
 }) {
-  const piste = useRef<HTMLUListElement>(null);
+  const glisse = useGlisser<HTMLUListElement>();
+  const piste = glisse.ref;
   const [debut, setDebut] = useState(true);
   const [fin, setFin] = useState(false);
 
@@ -67,7 +69,7 @@ export function PresseCarousel({
         </div>
       </header>
 
-      <ul className="pc-piste" ref={piste}>
+      <ul className="pc-piste" {...glisse}>
         {citations.map((c, i) => {
           const corps = (
             <>

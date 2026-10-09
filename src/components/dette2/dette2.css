@@ -1133,3 +1133,6 @@ body:has(.d2) { background: #0a0912; }
 /* Les visuels repris suivent la même palette. */
 .d2 .dp-porteurs { --c0: #7c4dff; --c1: #a98bfa; --c2: #c9a8ff; --c3: #e8a2d8; --c4: #8c86ad; }
 .d2 .dp-porteurs-l li:nth-child(1) .dp-porteurs-p { background: var(--c0); }
+
+.d2-rail-pt { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--d2-vif-2); margin-bottom: 2px; }
+.d2-rail-explore a { align-items: flex-start; line-height: 1.3; }

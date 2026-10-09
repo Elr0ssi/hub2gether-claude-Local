@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { EnTete, Pied } from "@/components/concept/pieces";
-import { FormProfil } from "@/components/compte/FormProfil";
-import { Pastille } from "@/components/compte/Pastille";
-import { deconnecter } from "./actions";
+import { EspaceCompte } from "@/components/compte/EspaceCompte";
 import { COMPTES_ACTIFS } from "@/lib/supabase/config";
 import { clientServeur, lireCompte } from "@/lib/supabase/serveur";
 import { filParId } from "@/data/community/fils";
 import { donneesPays } from "@/data/concept/conceptGeo";
 import { getArticleBySlug } from "@/data/articles";
-import { TableauDeBord } from "@/components/compte/TableauDeBord";
 import "@/components/concept/concept.css";
 
 export const metadata: Metadata = {
@@ -62,107 +58,28 @@ export default async function ComptePage() {
   }
   void anneeSocle;
 
+  const pays = Object.values(socle)
+    .filter((f) => typeof f.pib === "number")
+    .map((f) => ({ fr: f.fr, pib: f.pib, pibHab: f.pibHab, population: f.population ?? null }))
+    .sort((x, y) => x.fr.localeCompare(y.fr, "fr"));
+
   return (
     <div className="cg">
       <EnTete />
       <main>
-        <div className="cp">
-          <header className="cp-tete">
-            <Pastille pseudo={compte.profil.pseudo} taille={56} />
-            <div>
-              <h1 className="cp-h1">{compte.profil.pseudo}</h1>
-              <p className="cp-sous">
-                {compte.email} · inscrit le{" "}
-                {new Date(compte.profil.cree_le).toLocaleDateString("fr-FR", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-                {compte.profil.role !== "lecteur" && <span className="cp-role">{compte.profil.role}</span>}
-              </p>
-            </div>
-            <form action={deconnecter} className="cp-sortie">
-              <button type="submit">Se déconnecter</button>
-            </form>
-          </header>
-
-          <div className="cp-grille">
-            <section className="cp-bloc">
-              <h2 className="cp-h2">Profil</h2>
-              <FormProfil pseudo={compte.profil.pseudo} bio={compte.profil.bio} />
-            </section>
-
-            <section className="cp-bloc">
-              <h2 className="cp-h2">Mon tableau de bord</h2>
-              <TableauDeBord
-                widgetsInitial={compte.profil.widgets}
-                sommePib={sommePib}
-                sommePopulation={sommePopulation}
-              />
-            </section>
-
-            <section className="cp-bloc">
-              <h2 className="cp-h2">Mes articles enregistrés</h2>
-              {favoris.length === 0 ? (
-                <p className="cp-vide">
-                  Vous n&apos;avez encore rien enregistré.{" "}
-                  <Link href="/forum">Aller au forum</Link>
-                </p>
-              ) : (
-                <ul className="cp-messages">
-                  {favoris.map((f) => (
-                    <li key={f.slug}>
-                      <Link href={`/lecture/${f.slug}`} className="cp-msg-fil">
-                        {f.article.title}
-                      </Link>
-                      <p className="cp-msg-texte">{f.article.excerpt}</p>
-                      <span className="cp-msg-date">
-                        Enregistré le{" "}
-                        {new Date(f.cree_le).toLocaleDateString("fr-FR", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-
-            <section className="cp-bloc">
-              <h2 className="cp-h2">Mes messages</h2>
-              {messages.length === 0 ? (
-                <p className="cp-vide">
-                  Vous n&apos;avez encore rien écrit.{" "}
-                  <Link href="/forum">Ouvrir le forum</Link>
-                </p>
-              ) : (
-                <ul className="cp-messages">
-                  {messages.map((m) => {
-                    const fil = filParId(m.cible_id);
-                    return (
-                      <li key={m.id}>
-                        <Link href="/forum" className="cp-msg-fil">
-                          {fil?.titre ?? m.cible_id}
-                        </Link>
-                        <p className="cp-msg-texte">{m.texte}</p>
-                        <span className="cp-msg-date">
-                          {new Date(m.cree_le).toLocaleDateString("fr-FR", {
-                            day: "numeric",
-                            month: "long",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </section>
-          </div>
-        </div>
+        <EspaceCompte
+          pseudo={compte.profil.pseudo}
+          email={compte.email}
+          bio={compte.profil.bio}
+          role={compte.profil.role}
+          inscritLe={compte.profil.cree_le}
+          widgets={compte.profil.widgets}
+          sommePib={sommePib}
+          sommePopulation={sommePopulation}
+          messages={messages.map((m) => ({ ...m, titre: filParId(m.cible_id)?.titre ?? m.cible_id }))}
+          favoris={favoris.map((f) => ({ slug: f.slug, titre: f.article.title, extrait: f.article.excerpt, cree_le: f.cree_le }))}
+          pays={pays}
+        />
       </main>
       <Pied />
     </div>

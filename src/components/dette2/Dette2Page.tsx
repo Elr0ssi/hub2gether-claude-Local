@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type { Sujet } from "@/data/concept/sujets";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -559,7 +560,7 @@ function Rail({
   );
 }
 
-export function Dette2Page({ suggestions }: { suggestions: Suggestion[] }) {
+export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; sujet?: Sujet }) {
   const solde = Math.abs(DEFICIT_2025.valeur);
   const etat = Math.abs(ACTEURS_2025[0].lignes?.[0].md ?? 0);
   const [autres, setAutres] = useState(false);
@@ -967,24 +968,25 @@ export function Dette2Page({ suggestions }: { suggestions: Suggestion[] }) {
 
         {/* ── Colonne de droite ─────────────────────────────────────────── */}
         <aside className="d2-rail" aria-label="Autres pages">
-          <Rail titre="Explorer le site" classe="d2-rail-explore">
-            <a href="/economie">
-              <span className="d2-rail-i"><Landmark size={16} aria-hidden="true" /></span>
-              Globe économie
-            </a>
-            <a href="/demographie">
-              <span className="d2-rail-i"><Users size={16} aria-hidden="true" /></span>
-              Globe démographie
-            </a>
-            <a href="/analyses">
-              <span className="d2-rail-i"><Sparkles size={16} aria-hidden="true" /></span>
-              Analyses
-            </a>
-            <a href="/forum">
-              <span className="d2-rail-i"><MessageCircle size={16} aria-hidden="true" /></span>
-              Forum
-            </a>
-          </Rail>
+          {sujet && (
+            <Rail titre="En voir plus sur le sujet" classe="d2-rail-explore">
+              <a href={sujet.globe.href}>
+                <span className="d2-rail-i">
+                  {sujet.globe.theme === "demographie" ? <Users size={16} aria-hidden="true" /> : <Landmark size={16} aria-hidden="true" />}
+                </span>
+                {sujet.globe.label}
+              </a>
+              {sujet.forum.map((f) => (
+                <a key={f.fil} href={`/forum#${f.fil}`}>
+                  <span className="d2-rail-i"><MessageCircle size={16} aria-hidden="true" /></span>
+                  <span>
+                    <small className="d2-rail-pt">En débattre</small>
+                    {f.titre}
+                  </span>
+                </a>
+              ))}
+            </Rail>
+          )}
 
           <Rail titre="À lire aussi">
             <ul>

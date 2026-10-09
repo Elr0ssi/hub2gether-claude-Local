@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FILS, TAGS, type Fil } from "@/data/community/fils";
 import { ilYA, scoreFil, useForum, type Compte, type Message } from "@/components/community/store";
@@ -353,6 +353,11 @@ const THEMES_FORUM = Array.from(new Set(FILS.map((f) => f.themeLabel)));
 export function ForumPage() {
   const { etat, pret, erreur, actif, compte, poster, supprimer, voter, signaler } = useForum();
   const [ouvert, setOuvert] = useState<string>(FILS[0].id);
+  /* Une adresse comme /forum#dette-france ouvre directement ce fil. */
+  useEffect(() => {
+    const h = window.location.hash.slice(1);
+    if (h && FILS.some((f) => f.id === h)) setOuvert(h);
+  }, []);
   const [theme, setThemeFiltre] = useState<string | null>(null);
   const [recherche, setRecherche] = useState("");
   const [repondA, setRepondA] = useState<string | null>(null);

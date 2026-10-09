@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { EnTete, Pied } from "@/components/concept/pieces";
 import { Odometre } from "@/components/concept/Roulement";
+import { useGlisser } from "@/lib/useGlisser";
 import { PresseCarousel } from "@/components/presse/PresseCarousel";
 import { PRESSE_MONDE } from "@/data/concept/presse";
 import { ETAPES } from "@/data/concept/conceptData";
@@ -122,50 +123,6 @@ function Rev({
     pour que la carte ne clignote pas en montant sous le curseur. */
 function Lift({ children }: { children: React.ReactNode }) {
   return <div className="ax-hit">{children}</div>;
-}
-
-/** Faire glisser une file à la souris, sans bloquer le clic sur ses liens. */
-function useGlisser<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
-  const prise = useRef<{ x: number; g: number; bouge: boolean } | null>(null);
-  const props = {
-    ref,
-    onPointerDown: (e: React.PointerEvent<T>) => {
-      if (e.pointerType !== "mouse" || e.button !== 0) return;
-      prise.current = { x: e.clientX, g: e.currentTarget.scrollLeft, bouge: false };
-    },
-    onPointerMove: (e: React.PointerEvent<T>) => {
-      const p = prise.current;
-      const el = ref.current;
-      if (!p || !el) return;
-      const dx = e.clientX - p.x;
-      if (!p.bouge && Math.abs(dx) > 5) {
-        p.bouge = true;
-        el.setPointerCapture(e.pointerId);
-        el.dataset.glisse = "1";
-      }
-      if (p.bouge) el.scrollLeft = p.g - dx;
-    },
-    onPointerUp: () => {
-      const el = ref.current;
-      if (el) delete el.dataset.glisse;
-      /* Le clic qui suit un glissé est avalé ; un simple clic passe. */
-      const bouge = prise.current?.bouge;
-      prise.current = null;
-      if (bouge) {
-        const bloque = (ev: Event) => ev.stopPropagation();
-        el?.addEventListener("click", bloque, { capture: true, once: true });
-        window.setTimeout(() => el?.removeEventListener("click", bloque, { capture: true }), 0);
-      }
-    },
-    onPointerCancel: () => {
-      prise.current = null;
-      const el = ref.current;
-      if (el) delete el.dataset.glisse;
-    },
-    onDragStart: (e: React.DragEvent) => e.preventDefault(),
-  };
-  return props;
 }
 
 /** Un nombre qui roule d'une valeur à l'autre au lieu de sauter. */
@@ -775,26 +732,26 @@ function Position() {
   return (
     <section className="ax-sec ax-sec-large" id="position" aria-labelledby="ax-po-t">
       <Rev as="h2" className="ax-h2">
-        <span id="ax-po-t">Où se place Visualize</span>
+        <span id="ax-po-t">Pourquoi Visualize ?</span>
       </Rev>
       <Rev as="p" className="ax-sous ax-sous-ligne" d={80}>
-        À la jonction des médias et des sites de données : tout arrive au même endroit, clair et condensé.
+        Ce qui nous différencie : à la jonction des médias et des sites de données, tout arrive au même endroit, clair et condensé.
       </Rev>
       <Rev className="ax-flux" d={120}>
-        <svg className="ax-flux-svg" viewBox="0 0 1000 440" aria-hidden="true" preserveAspectRatio="none">
+        <svg className="ax-flux-svg" viewBox="0 0 1000 320" aria-hidden="true" preserveAspectRatio="none">
           <defs>
             <marker id="ax-fl" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
               <path d="M1 1 L9 5 L1 9" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </marker>
           </defs>
-          <path className="ax-flux-l" style={{ "--k": 0 } as React.CSSProperties} d="M340 70 C 420 70, 420 220, 452 220" markerEnd="url(#ax-fl)" />
-          <path className="ax-flux-l" style={{ "--k": 1 } as React.CSSProperties} d="M340 220 L 452 220" markerEnd="url(#ax-fl)" />
-          <path className="ax-flux-l" style={{ "--k": 2 } as React.CSSProperties} d="M340 370 C 420 370, 420 220, 452 220" markerEnd="url(#ax-fl)" />
-          <path className="ax-flux-l" style={{ "--k": 3 } as React.CSSProperties} d="M548 220 L 652 220" markerEnd="url(#ax-fl)" />
+          <path className="ax-flux-l" style={{ "--k": 0 } as React.CSSProperties} d="M340 52 C 420 52, 420 160, 452 160" markerEnd="url(#ax-fl)" />
+          <path className="ax-flux-l" style={{ "--k": 1 } as React.CSSProperties} d="M340 160 L 452 160" markerEnd="url(#ax-fl)" />
+          <path className="ax-flux-l" style={{ "--k": 2 } as React.CSSProperties} d="M340 268 C 420 268, 420 160, 452 160" markerEnd="url(#ax-fl)" />
+          <path className="ax-flux-l" style={{ "--k": 3 } as React.CSSProperties} d="M548 160 L 652 160" markerEnd="url(#ax-fl)" />
         </svg>
         <div className="ax-flux-g">
-          {SOURCES_FLUX.map((g) => (
-            <div key={g.nom} className="ax-flux-grp">
+          {SOURCES_FLUX.map((g, k) => (
+            <div key={g.nom} className="ax-flux-grp" style={{ "--k": k } as React.CSSProperties}>
               <b>{g.nom}</b>
               <span>
                 {g.pastilles.map((x) => (
@@ -812,8 +769,10 @@ function Position() {
           <strong>Visualize</strong>
         </div>
         <div className="ax-flux-s">
-          {SORTIES.map((x) => (
-            <span key={x}>{x}</span>
+          {SORTIES.map((x, k) => (
+            <span key={x} style={{ "--k": k } as React.CSSProperties}>
+              {x}
+            </span>
           ))}
         </div>
       </Rev>
@@ -837,6 +796,51 @@ const SOURCES_DEFILE = [
   "OMS",
   "OIT",
 ];
+
+/** Les sources, en défilement continu : on peut les saisir à la souris, les faire glisser
+    au doigt, et elles reprennent leur course ensuite. */
+function Defile() {
+  const arret = useRef(false);
+  const glisse = useGlisser<HTMLDivElement>((actif) => {
+    arret.current = actif;
+  });
+  const piste = glisse.ref;
+  useEffect(() => {
+    const el = piste.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let id = 0;
+    let pos = el.scrollLeft;
+    const pas = () => {
+      const moitie = el.scrollWidth / 2;
+      if (!arret.current && moitie > 0) {
+        if (Math.abs(el.scrollLeft - pos) > 1.5) pos = el.scrollLeft;
+        pos += 0.55;
+        if (pos >= moitie) pos -= moitie;
+        el.scrollLeft = pos;
+      } else {
+        pos = el.scrollLeft;
+      }
+      /* Au-delà de la moitié (au doigt ou à la souris), on reboucle sans à-coup. */
+      if (el.scrollLeft >= moitie) el.scrollLeft -= moitie;
+      else if (el.scrollLeft <= 0 && moitie > 0 && arret.current) el.scrollLeft += moitie;
+      id = requestAnimationFrame(pas);
+    };
+    id = requestAnimationFrame(pas);
+    return () => cancelAnimationFrame(id);
+  }, [piste]);
+  return (
+    <div className="ax-defile" aria-label="Nos sources" {...glisse}>
+      <div className="ax-defile-p">
+        {[...SOURCES_DEFILE, ...SOURCES_DEFILE].map((s, i) => (
+          <span key={`${s}-${i}`} aria-hidden={i >= SOURCES_DEFILE.length ? "true" : undefined}>
+            {s}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function Fonctionnement() {
   const zone = useRef<HTMLOListElement>(null);
@@ -880,15 +884,7 @@ function Fonctionnement() {
         divergences font l&apos;article.
       </Rev>
 
-      <div className="ax-defile" aria-label="Nos sources">
-        <div className="ax-defile-p">
-          {[...SOURCES_DEFILE, ...SOURCES_DEFILE].map((s, i) => (
-            <span key={`${s}-${i}`} aria-hidden={i >= SOURCES_DEFILE.length ? "true" : undefined}>
-              {s}
-            </span>
-          ))}
-        </div>
-      </div>
+      <Defile />
 
       <ol ref={zone} className="ax-etapes">
         <span className="ax-etapes-fil" aria-hidden="true" />
@@ -966,8 +962,11 @@ export function AnalysesPage(props: Props) {
 
       {/* Un horizon pour finir : la moitié d'une planète qui se lève. */}
       <div className="ax-horizon" aria-hidden="true">
-        <span className="ax-hz-astre"><i /><b /></span>
         <span className="ax-hz-etoiles" />
+        <span className="ax-hz-aurore" />
+        <span className="ax-hz-orbite ax-hz-orbite-1"><em /></span>
+        <span className="ax-hz-orbite ax-hz-orbite-2"><em /></span>
+        <span className="ax-hz-astre"><i /><b /><u /></span>
       </div>
 
       <Pied />
