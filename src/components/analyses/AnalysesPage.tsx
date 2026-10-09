@@ -7,6 +7,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   Banknote,
+  BarChart3,
   BookOpen,
   Check,
   Globe,
@@ -115,6 +116,89 @@ function Rev({
       {children}
     </T>
   );
+}
+
+/** Un cadre immobile autour d'une carte qui se soulève : c'est lui qui reçoit le survol,
+    pour que la carte ne clignote pas en montant sous le curseur. */
+function Lift({ children }: { children: React.ReactNode }) {
+  return <div className="ax-hit">{children}</div>;
+}
+
+/** Faire glisser une file à la souris, sans bloquer le clic sur ses liens. */
+function useGlisser<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const prise = useRef<{ x: number; g: number; bouge: boolean } | null>(null);
+  const props = {
+    ref,
+    onPointerDown: (e: React.PointerEvent<T>) => {
+      if (e.pointerType !== "mouse" || e.button !== 0) return;
+      prise.current = { x: e.clientX, g: e.currentTarget.scrollLeft, bouge: false };
+    },
+    onPointerMove: (e: React.PointerEvent<T>) => {
+      const p = prise.current;
+      const el = ref.current;
+      if (!p || !el) return;
+      const dx = e.clientX - p.x;
+      if (!p.bouge && Math.abs(dx) > 5) {
+        p.bouge = true;
+        el.setPointerCapture(e.pointerId);
+        el.dataset.glisse = "1";
+      }
+      if (p.bouge) el.scrollLeft = p.g - dx;
+    },
+    onPointerUp: () => {
+      const el = ref.current;
+      if (el) delete el.dataset.glisse;
+      /* Le clic qui suit un glissé est avalé ; un simple clic passe. */
+      const bouge = prise.current?.bouge;
+      prise.current = null;
+      if (bouge) {
+        const bloque = (ev: Event) => ev.stopPropagation();
+        el?.addEventListener("click", bloque, { capture: true, once: true });
+        window.setTimeout(() => el?.removeEventListener("click", bloque, { capture: true }), 0);
+      }
+    },
+    onPointerCancel: () => {
+      prise.current = null;
+      const el = ref.current;
+      if (el) delete el.dataset.glisse;
+    },
+    onDragStart: (e: React.DragEvent) => e.preventDefault(),
+  };
+  return props;
+}
+
+/** Un nombre qui roule d'une valeur à l'autre au lieu de sauter. */
+function Roule({ v, f }: { v: number | null; f: (x: number) => string }) {
+  const [aff, setAff] = useState<number | null>(v);
+  const depuis = useRef<number | null>(v);
+  useEffect(() => {
+    if (v === null) {
+      depuis.current = null;
+      setAff(null);
+      return;
+    }
+    const d0 = depuis.current ?? v;
+    if (d0 === v || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      depuis.current = v;
+      setAff(v);
+      return;
+    }
+    const t0 = performance.now();
+    const DUREE = 900;
+    let id = 0;
+    const pas = (t: number) => {
+      const u = Math.min(1, Math.max(0, (t - t0) / DUREE));
+      const e = 1 - Math.pow(1 - u, 4);
+      const x = d0 + (v - d0) * e;
+      depuis.current = x;
+      setAff(x);
+      if (u < 1) id = requestAnimationFrame(pas);
+    };
+    id = requestAnimationFrame(pas);
+    return () => cancelAnimationFrame(id);
+  }, [v]);
+  return <>{aff === null ? "" : f(aff)}</>;
 }
 
 /* ── Un nombre qui monte jusqu'à sa valeur ───────────────────────────────── */
@@ -269,30 +353,38 @@ function Presentation() {
         Des chiffres rassemblés, des globes à manipuler, des articles pour comprendre et un forum pour en discuter.
       </Rev>
       <div className="ax-dash">
+        <Lift>
         <Rev as="a" href="#direct" className="ax-bloc ax-bloc-a" d={0}>
           <span className="ax-bloc-i"><Activity size={18} aria-hidden="true" /></span>
           <h3>Des données en temps réel</h3>
           <p>PIB, dépenses, naissances, décès : des compteurs qui avancent à la seconde.</p>
           <span className="ax-bloc-l">Voir les compteurs <ArrowUpRight size={14} aria-hidden="true" /></span>
         </Rev>
+        </Lift>
+        <Lift>
         <Rev as="a" href="/economie" className="ax-bloc ax-bloc-b" d={90}>
           <span className="ax-bloc-i"><Globe size={18} aria-hidden="true" /></span>
           <h3>Des globes interactifs</h3>
           <p>Plus de 200 pays, de 1960 à aujourd&apos;hui, à tourner, comparer, zoomer.</p>
           <span className="ax-bloc-l">Ouvrir les globes <ArrowUpRight size={14} aria-hidden="true" /></span>
         </Rev>
+        </Lift>
+        <Lift>
         <Rev as="a" href="/france/economie/dette-publique-v2" className="ax-bloc ax-bloc-c" d={180}>
           <span className="ax-bloc-i"><BookOpen size={18} aria-hidden="true" /></span>
           <h3>Des articles décortiqués</h3>
           <p>Le montant d&apos;abord, l&apos;explication ensuite, la source toujours.</p>
           <span className="ax-bloc-l">Lire un dossier <ArrowUpRight size={14} aria-hidden="true" /></span>
         </Rev>
+        </Lift>
+        <Lift>
         <Rev as="a" href="/forum" className="ax-bloc ax-bloc-d" d={270}>
           <span className="ax-bloc-i"><MessageCircle size={18} aria-hidden="true" /></span>
           <h3>Un forum pour en débattre</h3>
           <p>Posez vos questions, contestez un chiffre, comparez vos lectures.</p>
           <span className="ax-bloc-l">Rejoindre le forum <ArrowUpRight size={14} aria-hidden="true" /></span>
         </Rev>
+        </Lift>
       </div>
     </section>
   );
@@ -527,7 +619,7 @@ function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; a
                   <div key={i} className={`ax-pod2-c ax-pod2-${i + 1}`}>
                     <span className="ax-pod2-r">{i + 1}</span>
                     <span className="ax-pod2-n"><Change texte={o?.fr ?? ""} /></span>
-                    <span className="ax-pod2-v"><Change texte={o ? fmt(o.v, f.unite) : ""} /></span>
+                    <span className="ax-pod2-v"><Roule v={o?.v ?? null} f={(x) => fmt(x, f.unite)} /></span>
                   </div>
                 );
               })}
@@ -537,9 +629,10 @@ function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; a
                 const o = f.lignes[i];
                 return (
                   <li key={i}>
+                    <i className="ax-suite-b" style={{ width: o && f.lignes[0] ? `${Math.max(6, (o.v / f.lignes[0].v) * 100)}%` : "0%" }} />
                     <span className="ax-suite-r">{i + 1}</span>
                     <span className="ax-suite-n"><Change texte={o?.fr ?? ""} /></span>
-                    <span className="ax-suite-v"><Change texte={o ? fmt(o.v, f.unite) : ""} /></span>
+                    <span className="ax-suite-v"><Roule v={o?.v ?? null} f={(x) => fmt(x, f.unite)} /></span>
                   </li>
                 );
               })}
@@ -575,7 +668,8 @@ function Cartes() {
         {items.map((g, i) => {
           const Ic = g.icone;
           return (
-            <Rev key={g.href} as="a" href={g.href} className={`ax-globe ax-globe-${g.classe}`} d={i * 120}>
+            <Lift key={g.href}>
+            <Rev as="a" href={g.href} className={`ax-globe ax-globe-${g.classe}`} d={i * 120}>
               <span className="ax-sph" aria-hidden="true"><i /><b /></span>
               <span className="ax-globe-i"><Ic size={18} aria-hidden="true" /></span>
               <h3>{g.titre}</h3>
@@ -584,6 +678,7 @@ function Cartes() {
                 Ouvrir le globe <ArrowUpRight size={15} aria-hidden="true" />
               </span>
             </Rev>
+            </Lift>
           );
         })}
       </div>
@@ -604,12 +699,14 @@ const FILE_ARTICLES = [
 ] as const;
 
 function Articles({ dette }: { dette: Props["dette"] }) {
+  const glisse = useGlisser<HTMLUListElement>();
   return (
     <section className="ax-sec ax-sec-large" id="articles" aria-labelledby="ax-ar-t">
       <Rev as="h2" className="ax-h2">
         <span id="ax-ar-t">Nos articles</span>
       </Rev>
       <div className="ax-na">
+        <Lift>
         <Rev as="a" href="/france/economie/dette-publique-v2" className="ax-dos ax-dos-une ax-na-une" d={0}>
           <span className="ax-dos-e">Dette publique · France</span>
           <p className="ax-dos-v">
@@ -621,9 +718,10 @@ function Articles({ dette }: { dette: Props["dette"] }) {
             Lire l&apos;analyse <ArrowRight size={15} aria-hidden="true" />
           </span>
         </Rev>
+        </Lift>
 
         <Rev className="ax-na-rail" d={120}>
-          <ul className="ax-na-piste">
+          <ul className="ax-na-piste" {...glisse}>
             {FILE_ARTICLES.map((a, i) => {
               const lien = "href" in a ? a.href : undefined;
               const corps = (
@@ -646,6 +744,7 @@ function Articles({ dette }: { dette: Props["dette"] }) {
           </ul>
         </Rev>
 
+        <Lift>
         <Rev as="a" href="/forum" className="ax-dos ax-na-forum" d={200}>
           <span className="ax-bloc-i"><MessageCircle size={18} aria-hidden="true" /></span>
           <div>
@@ -654,6 +753,7 @@ function Articles({ dette }: { dette: Props["dette"] }) {
           </div>
           <ArrowUpRight size={20} aria-hidden="true" className="ax-dos-fl" />
         </Rev>
+        </Lift>
       </div>
     </section>
   );
@@ -663,22 +763,13 @@ function Articles({ dette }: { dette: Props["dette"] }) {
    5 bis · NOTRE PLACE — entre le média et le site de données
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const POSITION = [
-  {
-    nom: "Les médias traditionnels",
-    points: ["Expliquent bien, chiffres figés dans le texte", "Un article, un instant, un angle", "Peu d'outils pour explorer soi-même"],
-  },
-  {
-    nom: "Les sites de données",
-    exemples: "Worldometer, Statista…",
-    points: ["Beaucoup de chiffres, souvent bruts", "Des tableaux denses, peu de contexte", "À vous de relier et d'interpréter"],
-  },
-  {
-    nom: "Visualize",
-    vif: true,
-    points: ["Le chiffre d'abord, l'explication juste après", "Des globes et des compteurs en mouvement", "Ultra clair, ultra condensé, sources à l'appui"],
-  },
+const SOURCES_FLUX = [
+  { nom: "Médias", pastilles: ["Presse", "Télévision", "Agences"] },
+  { nom: "Sites de données", pastilles: ["Worldometer", "Statista", "Bases ouvertes"] },
+  { nom: "Institutions", pastilles: ["Banque mondiale", "FMI", "ONU", "INSEE"] },
 ] as const;
+
+const SORTIES = ["Le chiffre d'abord", "Des globes à manipuler", "Des compteurs en direct", "Des sources citées"];
 
 function Position() {
   return (
@@ -686,23 +777,46 @@ function Position() {
       <Rev as="h2" className="ax-h2">
         <span id="ax-po-t">Où se place Visualize</span>
       </Rev>
-      <Rev as="p" className="ax-sous" d={80}>
-        À la jonction des médias traditionnels et des sites de data-visualisation : nous optimisons la
-        lecture, la rendons ergonomique et lui donnons de nouvelles dynamiques.
+      <Rev as="p" className="ax-sous ax-sous-ligne" d={80}>
+        À la jonction des médias et des sites de données : tout arrive au même endroit, clair et condensé.
       </Rev>
-      <div className="ax-pos">
-        {POSITION.map((c, i) => (
-          <Rev key={c.nom} className={`ax-pos-c${"vif" in c ? " ax-pos-vif" : ""}`} d={i * 110}>
-            <h3>{c.nom}</h3>
-            {"exemples" in c && <span className="ax-pos-ex">{c.exemples}</span>}
-            <ul>
-              {c.points.map((t) => (
-                <li key={t}>{t}</li>
-              ))}
-            </ul>
-          </Rev>
-        ))}
-      </div>
+      <Rev className="ax-flux" d={120}>
+        <svg className="ax-flux-svg" viewBox="0 0 1000 440" aria-hidden="true" preserveAspectRatio="none">
+          <defs>
+            <marker id="ax-fl" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M1 1 L9 5 L1 9" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </marker>
+          </defs>
+          <path className="ax-flux-l" style={{ "--k": 0 } as React.CSSProperties} d="M340 70 C 420 70, 420 220, 452 220" markerEnd="url(#ax-fl)" />
+          <path className="ax-flux-l" style={{ "--k": 1 } as React.CSSProperties} d="M340 220 L 452 220" markerEnd="url(#ax-fl)" />
+          <path className="ax-flux-l" style={{ "--k": 2 } as React.CSSProperties} d="M340 370 C 420 370, 420 220, 452 220" markerEnd="url(#ax-fl)" />
+          <path className="ax-flux-l" style={{ "--k": 3 } as React.CSSProperties} d="M548 220 L 652 220" markerEnd="url(#ax-fl)" />
+        </svg>
+        <div className="ax-flux-g">
+          {SOURCES_FLUX.map((g) => (
+            <div key={g.nom} className="ax-flux-grp">
+              <b>{g.nom}</b>
+              <span>
+                {g.pastilles.map((x) => (
+                  <i key={x}>{x}</i>
+                ))}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="ax-flux-v">
+          <span className="ax-flux-halo" />
+          <span className="ax-flux-logo">
+            <BarChart3 size={22} aria-hidden="true" />
+          </span>
+          <strong>Visualize</strong>
+        </div>
+        <div className="ax-flux-s">
+          {SORTIES.map((x) => (
+            <span key={x}>{x}</span>
+          ))}
+        </div>
+      </Rev>
     </section>
   );
 }
@@ -848,6 +962,12 @@ export function AnalysesPage(props: Props) {
             </a>
           </div>
         </Rev>
+      </div>
+
+      {/* Un horizon pour finir : la moitié d'une planète qui se lève. */}
+      <div className="ax-horizon" aria-hidden="true">
+        <span className="ax-hz-astre"><i /><b /></span>
+        <span className="ax-hz-etoiles" />
       </div>
 
       <Pied />

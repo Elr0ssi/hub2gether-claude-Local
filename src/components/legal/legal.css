@@ -1,5 +1,5 @@
 .lg { display: block; }
-.lg-col { max-width: 760px; margin: 0 auto; padding: clamp(110px, 16vh, 170px) clamp(20px, 5vw, 40px) 80px; }
+.lg-col { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: clamp(110px, 16vh, 170px) clamp(20px, 5vw, 40px) 80px; }
 .lg-maj { margin: 0; font-size: 13px; color: var(--encre-3); }
 .lg-h1 { margin: 10px 0 30px; font-size: clamp(32px, 5vw, 52px); font-weight: 800; letter-spacing: -0.045em; line-height: 1.04; }
 .lg-sec { margin-top: 30px; padding: 24px 26px; border-radius: 24px; background: var(--surface); border: 1px solid var(--bord-fin); }

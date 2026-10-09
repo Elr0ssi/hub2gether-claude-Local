@@ -1203,7 +1203,7 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
               {debats.length > 0 && (
                 <div className="cg-debats">
                   <div className="cg-debats-t">
-                    <span>Nos plus gros débats</span>
+                    <span className="cg-debats-st">Nos plus gros débats</span>
                     <span className="cg-debats-n">{debats.length} en cours</span>
                   </div>
                   <div
@@ -1235,6 +1235,7 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
               )}
 
               <div className="cg-arts-c">
+                <h3 className="cg-arts-st">Nos articles</h3>
                 <div
                   ref={rail2}
                   className="cg-arts"

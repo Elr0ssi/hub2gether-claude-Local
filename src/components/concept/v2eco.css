@@ -422,3 +422,23 @@
 .cg-v2 .ge-vedette { margin-top: 10px; padding: 11px 13px; }
 .cg-v2 .ge-vedette-v { font-size: clamp(22px, 2.2vw, 30px); }
 @media (max-width: 1080px) { .cg-v2 .ge-corps { grid-template-columns: minmax(0, 1fr); } }
+
+/* ── Articles : le grand article se fait plus discret, chaque bloc a son titre ── */
+.cg-arts-st, .cg-debats-st { display: none; }
+.cg-v2 .cg-arts-l { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr); }
+.cg-v2 .cg-art-une::before { height: clamp(130px, 15vw, 180px); }
+.cg-v2 .cg-art-une .cg-art-t { font-size: clamp(19px, 1.9vw, 25px); margin-bottom: 12px; }
+.cg-v2 .cg-art-une .cg-art-c { font-size: 14px; line-height: 1.5; }
+.cg-v2 .cg-arts-st,
+.cg-v2 .cg-debats-st {
+  display: block;
+  margin: 0 0 14px;
+  font-size: clamp(19px, 1.7vw, 24px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  color: var(--encre);
+}
+.cg-v2 .cg-debats-t { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 0; }
+.cg-v2 .cg-debats-t .cg-debats-n { font-size: 12px; font-weight: 700; color: var(--v2-vif-2); }
+.cg-v2 .cg-arts-c { margin-top: 10px; }

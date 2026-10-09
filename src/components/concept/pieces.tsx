@@ -339,7 +339,7 @@ export function Pied() {
           <a href="/confidentialite">Confidentialité</a>
           <a href="/cgu">CGU</a>
         </nav>
-        <span className="cg-pied-note">Données : Banque mondiale, FMI, Nations Unies</span>
+        <a className="cg-pied-note" href="/analyses#fonctionnement">Sources des données</a>
       </div>
     </footer>
   );
