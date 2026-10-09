@@ -3,6 +3,7 @@ import { AnalysesPage } from "@/components/analyses/AnalysesPage";
 import { detteDerniere, ratioDernier } from "@/data/articles/detteFrancaise";
 import { DEFICIT_2025 } from "@/data/articles/financesPubliques";
 import { donneesPays, reperes } from "@/data/concept/conceptGeo";
+import { pibMonde } from "@/data/concept/conceptEconomie";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    /analyses
@@ -28,6 +29,7 @@ export default function Page() {
       reperes={liste}
       donnees={pays}
       annee={annee}
+      pib={pibMonde()}
       dette={{
         montant: detteDerniere.valeur,
         ratio: ratioDernier.valeur,

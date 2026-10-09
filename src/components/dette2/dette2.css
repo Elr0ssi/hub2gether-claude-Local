@@ -1085,3 +1085,50 @@ body:has(.d2) { background: #0a0912; }
 .d2-lectures { display: inline-flex; gap: 4px; margin-bottom: 14px; padding: 4px; border-radius: 999px; background: var(--d2-surface-2); border: 1px solid var(--d2-ligne); }
 .d2-lectures button { padding: 8px 16px; border: 0; border-radius: 999px; font-size: 13px; font-weight: 650; color: var(--d2-encre-2); cursor: pointer; background: none; transition: background 0.25s, color 0.25s; }
 .d2-lectures button.d2-lec-on { color: #fff; background: linear-gradient(135deg, var(--d2-vif), var(--d2-vif-2)); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   QUATRIÈME PASSE : une palette dans nos tons, des onglets plus nets, du survol
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Du violet au rose, en dégradé : plus de vert, de moutarde ni de rouge. */
+.d2 { --d2-s0: #5b2de0; --d2-s1: #7c4dff; --d2-s2: #9b78ff; --d2-s3: #b79cff; --d2-s4: #d0a6ff; --d2-s5: #e8a2d8; --d2-s6: #7e8cff; --d2-s7: #8c86ad; }
+:root[data-concept="clair"] .d2 { --d2-s0: #4a1fd0; --d2-s1: #6a3df0; --d2-s2: #8a63f5; --d2-s3: #a98bfa; --d2-s4: #c28cf5; --d2-s5: #dc86c4; --d2-s6: #6a78e8; --d2-s7: #766f9a; }
+.d2-pile-b span { background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 70%); }
+.d2-pile-l i { background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0)); }
+
+/* Les trois onglets : sobres au repos, pleins quand ils sont choisis. */
+.d2-onglet { border-width: 1px; box-shadow: none; transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s, border-color 0.3s, color 0.3s; }
+.d2-onglet:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--d2-vif) 45%, transparent); }
+.d2-onglet i,
+.d2-onglet-dep i,
+.d2-onglet-def i { background: linear-gradient(90deg, var(--d2-vif), var(--d2-vif-2)); opacity: 0.7; }
+.d2-onglet-def b { color: var(--d2-encre); }
+.d2-onglet[aria-selected="true"],
+.d2-onglet[aria-selected="true"]:hover {
+  border-color: transparent;
+  color: #fff;
+  background: radial-gradient(90% 80% at 100% 0%, rgba(255, 255, 255, 0.22), transparent 60%), linear-gradient(150deg, #4a1fd0, #7c4dff);
+  box-shadow: 0 18px 34px -20px rgba(124, 77, 255, 0.9);
+}
+.d2-onglet[aria-selected="true"] span,
+.d2-onglet[aria-selected="true"] b { color: #fff; }
+.d2-onglet[aria-selected="true"] i { background: rgba(255, 255, 255, 0.8); opacity: 1; }
+
+/* Du survol sur les rectangles, partout. */
+.d2-carte,
+.d2-cout,
+.d2-flux-e,
+.d2-etapes-l button,
+.d2-rail-c,
+.d2-faq details {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s, box-shadow 0.5s, background 0.3s;
+}
+.d2-carte:hover,
+.d2-cout:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--d2-vif) 45%, transparent); box-shadow: 0 22px 40px -26px rgba(124, 77, 255, 0.7); }
+.d2-carte-vif:hover { border-color: transparent; }
+.d2-faq details:hover { border-color: color-mix(in srgb, var(--d2-vif) 40%, transparent); }
+
+/* Les visuels repris suivent la même palette. */
+.d2 .dp-porteurs { --c0: #7c4dff; --c1: #a98bfa; --c2: #c9a8ff; --c3: #e8a2d8; --c4: #8c86ad; }
+.d2 .dp-porteurs-l li:nth-child(1) .dp-porteurs-p { background: var(--c0); }

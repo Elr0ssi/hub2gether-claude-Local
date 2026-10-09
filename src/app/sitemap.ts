@@ -32,6 +32,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteUrl}/france`, priority: 0.8, changeFrequency: "monthly" as const },
     { url: `${siteUrl}/france/economie`, priority: 0.85, changeFrequency: "monthly" as const },
     { url: `${siteUrl}/methodologie-donnees`, priority: 0.6, changeFrequency: "monthly" as const },
+    { url: `${siteUrl}/confidentialite`, priority: 0.3, changeFrequency: "yearly" as const },
+    { url: `${siteUrl}/cgu`, priority: 0.3, changeFrequency: "yearly" as const },
     { url: `${siteUrl}/a-propos`, priority: 0.6, changeFrequency: "monthly" as const },
   ].map((r) => ({ ...r, lastModified: new Date("2026-09-22") }));
 

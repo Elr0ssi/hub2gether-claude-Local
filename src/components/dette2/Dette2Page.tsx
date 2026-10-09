@@ -369,7 +369,7 @@ function GrapheRatio() {
 /* ── Une répartition : le même visuel pour les recettes, les dépenses et le
    déficit — une barre segmentée, puis la liste des montants et des parts. ── */
 
-const COULEURS = ["var(--d2-s0)", "var(--d2-s1)", "var(--d2-s2)", "var(--d2-s3)", "var(--d2-s4)", "var(--d2-s5)"];
+const COULEURS = ["var(--d2-s0)", "var(--d2-s1)", "var(--d2-s2)", "var(--d2-s3)", "var(--d2-s4)", "var(--d2-s5)", "var(--d2-s6)", "var(--d2-s7)"];
 
 function Repart({
   lignes,
@@ -390,7 +390,7 @@ function Repart({
           <span
             key={l.nom}
             className={actif !== null && actif !== i ? "d2-seg-sombre" : undefined}
-            style={{ flexGrow: l.md, background: COULEURS[i % COULEURS.length] }}
+            style={{ flexGrow: l.md, backgroundColor: COULEURS[i % COULEURS.length] }}
             title={`${l.nom} · ${md(l.md)}`}
             onPointerEnter={() => setActif(i)}
             onPointerLeave={() => setActif(null)}
@@ -405,7 +405,7 @@ function Repart({
             onPointerEnter={() => l.md > 0 && setActif(i)}
             onPointerLeave={() => setActif(null)}
           >
-            <i style={{ background: l.md > 0 ? COULEURS[i % COULEURS.length] : "var(--d2-s5)" }} aria-hidden="true" />
+            <i style={{ backgroundColor: l.md > 0 ? COULEURS[i % COULEURS.length] : "var(--d2-s7)" }} aria-hidden="true" />
             <span>{l.nom}</span>
             <b className={negatif ? "d2-neg" : undefined}>
               {negatif || l.md < 0 ? "−" : ""}

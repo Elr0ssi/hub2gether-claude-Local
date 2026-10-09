@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   Activity,
@@ -14,6 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { EnTete, Pied } from "@/components/concept/pieces";
+import { Odometre } from "@/components/concept/Roulement";
 import { PresseCarousel } from "@/components/presse/PresseCarousel";
 import { PRESSE_MONDE } from "@/data/concept/presse";
 import { ETAPES } from "@/data/concept/conceptData";
@@ -35,6 +37,8 @@ export interface Props {
   donnees: Record<string, FichePays>;
   annee: number;
   dette: { montant: number; ratio: number; deficit: number };
+  /** Le PIB mondial du dernier millésime, pour le compteur en direct. */
+  pib: { total: number; n: number; annee: number };
 }
 
 const nf = (v: number, d = 1) =>
@@ -142,8 +146,15 @@ function Monte({ texte }: { texte: string }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   1 · L'OUVERTURE
+   1 · L'OUVERTURE — un titre, une phrase, et un globe entouré de petits chiffres
    ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Le globe en points du site : une scène WebGL, montée seulement côté client
+   et une fois le titre posé, pour ne pas disputer le fil principal. */
+const GlobePoints = dynamic(() => import("@/components/globe/InteractiveGlobeIcons"), {
+  ssr: false,
+  loading: () => null,
+});
 
 function Mots({ texte, depart = 0 }: { texte: string; depart?: number }) {
   return (
@@ -170,6 +181,21 @@ function Ouverture({ reperes, donnees, annee, dette }: Props) {
   const pibMonde = reperes.find((r) => r.nom === "PIB mondial");
   const pop = reperes.find((r) => r.nom === "Population");
 
+  /* Le globe arrive après le titre ; sa teinte suit le thème du site. */
+  const [globe, setGlobe] = useState(false);
+  const [sombre, setSombre] = useState(true);
+  useEffect(() => {
+    const t = window.setTimeout(() => setGlobe(true), 700);
+    const lit = () => setSombre(document.documentElement.dataset.concept !== "clair");
+    lit();
+    const o = new MutationObserver(lit);
+    o.observe(document.documentElement, { attributes: true, attributeFilter: ["data-concept"] });
+    return () => {
+      window.clearTimeout(t);
+      o.disconnect();
+    };
+  }, []);
+
   return (
     <header className="ax-ouv">
       <div className="ax-ouv-g">
@@ -181,51 +207,52 @@ function Ouverture({ reperes, donnees, annee, dette }: Props) {
               <Mots texte="sans le bruit." depart={4} />
             </span>
           </h1>
-          <p className="ax-ouv-s ax-in" style={{ "--d": "700ms" } as React.CSSProperties}>
-            PIB, dette, chômage et population de plus de 200 pays. Des cartes qui se lisent d&apos;un
-            coup d&apos;œil, des dossiers qui vont droit au montant.
+          <p className="ax-ouv-s ax-in" style={{ "--d": "600ms" } as React.CSSProperties}>
+            PIB, dette, chômage, population : plus de 200 pays à lire d&apos;un coup d&apos;œil.
           </p>
-          <div className="ax-ouv-c ax-in" style={{ "--d": "850ms" } as React.CSSProperties}>
+          <div className="ax-ouv-c ax-in" style={{ "--d": "750ms" } as React.CSSProperties}>
             <a className="ax-bouton ax-bouton-vif" href="/economie">
-              Explorer le globe <ArrowRight size={17} aria-hidden="true" />
-            </a>
-            <a className="ax-bouton" href="/france/economie/dette-publique-v2">
-              Lire le dossier dette
+              Explorer le globe <ArrowRight size={16} aria-hidden="true" />
             </a>
           </div>
         </div>
 
-        {/* La scène : des cartes qui se posent l'une après l'autre, puis
-            flottent. */}
-        <div className="ax-scene" aria-hidden="true">
-          <div className="ax-sc ax-sc-a ax-in" style={{ "--d": "500ms" } as React.CSSProperties}>
-            <span className="ax-sc-l">PIB mondial · {annee}</span>
-            <p className="ax-sc-v">{pibMonde?.valeur ?? "—"}</p>
-            <span className="ax-sc-n">{pibMonde?.note}</span>
+        <div className="ax-globe-zone">
+          <div className="ax-globe-c" aria-hidden="true">
+            {globe && (
+              <GlobePoints
+                markers={[]}
+                sphereColor={sombre ? "#0b1210" : undefined}
+                badgeBackground={sombre ? "rgba(10,16,14,0.88)" : undefined}
+              />
+            )}
           </div>
 
-          <div className="ax-sc ax-sc-b ax-in" style={{ "--d": "700ms" } as React.CSSProperties}>
-            <span className="ax-sc-l">Les cinq premières économies</span>
+          {/* De petites cartes qui gravitent autour du globe. */}
+          <div className="ax-mini ax-mini-a ax-in" style={{ "--d": "1000ms" } as React.CSSProperties}>
+            <span>Cinq premières économies</span>
             <ul>
               {top.map((p, i) => (
                 <li key={p.fr}>
-                  <span>{p.fr}</span>
+                  <em>{p.fr}</em>
                   <i style={{ "--w": `${(p.pib / hauteur) * 100}%`, "--i": i } as React.CSSProperties} />
                 </li>
               ))}
             </ul>
           </div>
-
-          <div className="ax-sc ax-sc-c ax-in" style={{ "--d": "900ms" } as React.CSSProperties}>
-            <span className="ax-sc-l">Population</span>
-            <p className="ax-sc-v ax-sc-v-s">{pop?.valeur ?? "—"}</p>
+          <div className="ax-mini ax-mini-b ax-in" style={{ "--d": "1150ms" } as React.CSSProperties}>
+            <span>PIB mondial · {annee}</span>
+            <b>{pibMonde?.valeur ?? "—"}</b>
           </div>
-
-          <span className="ax-puce ax-puce-1 ax-in" style={{ "--d": "1100ms" } as React.CSSProperties}>
-            <Banknote size={14} /> France · {nf(dette.ratio)} % du PIB
+          <div className="ax-mini ax-mini-c ax-in" style={{ "--d": "1300ms" } as React.CSSProperties}>
+            <span>Population</span>
+            <b>{pop?.valeur ?? "—"}</b>
+          </div>
+          <span className="ax-puce ax-puce-1 ax-in" style={{ "--d": "1450ms" } as React.CSSProperties}>
+            <Activity size={13} /> 200+ pays
           </span>
-          <span className="ax-puce ax-puce-2 ax-in" style={{ "--d": "1250ms" } as React.CSSProperties}>
-            <Activity size={14} /> 200+ pays
+          <span className="ax-puce ax-puce-2 ax-in" style={{ "--d": "1600ms" } as React.CSSProperties}>
+            <Banknote size={13} /> France · {nf(dette.ratio)} % du PIB
           </span>
         </div>
       </div>
@@ -234,14 +261,29 @@ function Ouverture({ reperes, donnees, annee, dette }: Props) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   2 · LES CHIFFRES CLÉS — la page s'arrête, les chiffres défilent
+   2 · EN DIRECT — la page s'arrête, les chiffres tournent, puis ce que l'on fait
    ═══════════════════════════════════════════════════════════════════════════ */
 
-function ChiffresCles({ reperes }: { reperes: Repere[] }) {
-  const etapes = reperes.slice(0, 6);
+const AN_SECONDES = 365.2425 * 24 * 3600;
+const EPOQUE_DEPENSES = Date.UTC(2026, 0, 1);
+const DIRECT = [
+  { nom: "PIB mondial", unite: " Md $", dec: 3, note: "Produit intérieur brut du monde, ramené à la seconde" },
+  { nom: "Dépenses militaires", parSeconde: 55_160, unite: " $", dec: 0, note: "Dans le monde, depuis le 1er janvier 2026" },
+  { nom: "Dépenses médicales", parSeconde: 200_130, unite: " $", dec: 0, note: "Dans le monde, depuis le 1er janvier 2026" },
+  { nom: "Dépenses éducatives", parSeconde: 132_610, unite: " $", dec: 0, note: "Dans le monde, depuis le 1er janvier 2026" },
+] as const;
+
+function EnDirect({ pib }: { pib: Props["pib"] }) {
   const zone = useRef<HTMLDivElement>(null);
   const [n, setN] = useState(0);
   const [p, setP] = useState(0);
+  const total = DIRECT.length + 1;
+
+  const departAnnee = useMemo(() => {
+    const t = new Date(new Date().getFullYear(), 0, 1).getTime();
+    return performance.now() - (Date.now() - t);
+  }, []);
+  const departDepenses = useMemo(() => performance.now() - (Date.now() - EPOQUE_DEPENSES), []);
 
   useEffect(() => {
     let rendez = false;
@@ -253,7 +295,7 @@ function ChiffresCles({ reperes }: { reperes: Repere[] }) {
       const course = b.height - window.innerHeight;
       const u = course > 0 ? Math.min(1, Math.max(0, -b.top / course)) : 0;
       setP(u);
-      setN(Math.min(etapes.length - 1, Math.floor(u * etapes.length)));
+      setN(Math.min(total - 1, Math.floor(u * total)));
     };
     const plan = () => {
       if (!rendez) {
@@ -268,44 +310,62 @@ function ChiffresCles({ reperes }: { reperes: Repere[] }) {
       window.removeEventListener("scroll", plan);
       window.removeEventListener("resize", plan);
     };
-  }, [etapes.length]);
+  }, [total]);
 
   const saute = (i: number) => {
     const z = zone.current;
     if (!z) return;
     const course = z.offsetHeight - window.innerHeight;
-    window.scrollTo({ top: z.offsetTop + ((i + 0.5) / etapes.length) * course, behavior: "smooth" });
+    window.scrollTo({ top: z.offsetTop + ((i + 0.5) / total) * course, behavior: "smooth" });
   };
 
-  if (!etapes.length) return null;
-  const e = etapes[n];
+  const d = n < DIRECT.length ? DIRECT[n] : null;
 
   return (
     <section
       ref={zone}
       className="ax-cles"
-      style={{ height: `${etapes.length * 62 + 38}vh`, "--p": p, "--t": n } as React.CSSProperties}
-      aria-label="Les chiffres du monde"
+      style={{ height: `${total * 58 + 40}vh`, "--p": p, "--t": n } as React.CSSProperties}
+      aria-label="Données en temps réel"
     >
       <div className="ax-cles-col">
         <div className="ax-cles-lueur" aria-hidden="true" />
         <div className="ax-cles-g">
           <div className="ax-cles-gauche">
-            <p className="ax-etiq">Le monde, en ce moment</p>
+            <p className="ax-etiq">{d ? "En temps réel" : "Ce que nous faisons"}</p>
             <div key={n} className="ax-cles-bloc">
-              <p className="ax-cles-v">
-                <Monte texte={e.valeur} />
-              </p>
-              <p className="ax-cles-n">{e.nom}</p>
-              <p className="ax-cles-note">{e.note}</p>
+              {d ? (
+                <>
+                  <p className="ax-cles-v ax-cles-v-d">
+                    <Odometre
+                      valeur={0}
+                      parSeconde={"parSeconde" in d ? d.parSeconde : pib.total / AN_SECONDES}
+                      depuis={"parSeconde" in d ? departDepenses : departAnnee}
+                      dec={d.dec}
+                      unite={d.unite}
+                    />
+                  </p>
+                  <p className="ax-cles-n">{d.nom}</p>
+                  <p className="ax-cles-note">{d.note}</p>
+                </>
+              ) : (
+                <>
+                  <p className="ax-cles-v ax-cles-v-t">Recoupé, daté, sourcé.</p>
+                  <p className="ax-cles-n">Un chiffre n&apos;est publié que s&apos;il a été vu par plusieurs sources.</p>
+                  <p className="ax-cles-note">
+                    Banque mondiale, FMI, Nations Unies, INSEE : chaque donnée garde sa source et sa date,
+                    et une valeur absente reste absente.
+                  </p>
+                </>
+              )}
             </div>
           </div>
           <ol className="ax-cles-liste" aria-label="Choisir un chiffre">
-            {etapes.map((r, i) => (
-              <li key={r.nom}>
+            {[...DIRECT.map((x) => x.nom), "Ce que nous faisons"].map((nom, i) => (
+              <li key={nom}>
                 <button type="button" className={i === n ? "ax-cles-on" : undefined} onClick={() => saute(i)}>
                   <span>{String(i + 1).padStart(2, "0")}</span>
-                  {r.nom}
+                  {nom}
                 </button>
               </li>
             ))}
@@ -320,13 +380,13 @@ function ChiffresCles({ reperes }: { reperes: Repere[] }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   3 · LES CLASSEMENTS
+   3 · LES CLASSEMENTS — la page s'arrête, on défile, le classement change
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const INDICS = [
   { id: "pib", label: "PIB", titre: "Les plus grandes économies", unite: "md" },
   { id: "pibHab", label: "PIB par habitant", titre: "Les pays les plus riches par habitant", unite: "usd" },
-  { id: "dette", label: "Dette", titre: "Les pays les plus endettés", unite: "pct" },
+  { id: "dette", label: "Dette publique", titre: "Les pays les plus endettés", unite: "pct" },
   { id: "chomage", label: "Chômage", titre: "Le chômage le plus élevé", unite: "pct" },
   { id: "inflation", label: "Inflation", titre: "L'inflation la plus forte", unite: "pct" },
   { id: "population", label: "Population", titre: "Les pays les plus peuplés", unite: "hab" },
@@ -340,72 +400,91 @@ function fmt(v: number, u: (typeof INDICS)[number]["unite"]) {
 }
 
 function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; annee: number }) {
-  const [id, setId] = useState<(typeof INDICS)[number]["id"]>("pib");
-  const ind = INDICS.find((i) => i.id === id)!;
+  const fiches = useMemo(
+    () =>
+      INDICS.map((ind) => {
+        const l = Object.values(donnees)
+          .map((d) => ({ fr: d.fr, v: d[ind.id] ?? null }))
+          .filter((o): o is { fr: string; v: number } => typeof o.v === "number" && Number.isFinite(o.v))
+          .sort((a, b) => b.v - a.v)
+          .slice(0, 5);
+        const haut = l.length ? Math.max(...l.map((o) => Math.abs(o.v))) : 1;
+        return { ...ind, lignes: l.map((o) => ({ ...o, part: Math.abs(o.v) / haut })) };
+      }),
+    [donnees],
+  );
 
-  const lignes = useMemo(() => {
-    const l = Object.values(donnees)
-      .map((d) => ({ fr: d.fr, v: d[id] ?? null }))
-      .filter((o): o is { fr: string; v: number } => typeof o.v === "number" && Number.isFinite(o.v))
-      .sort((a, b) => b.v - a.v)
-      .slice(0, 8);
-    const haut = l.length ? Math.max(...l.map((o) => Math.abs(o.v))) : 1;
-    return l.map((o) => ({ ...o, part: Math.abs(o.v) / haut }));
-  }, [donnees, id]);
+  const zone = useRef<HTMLDivElement>(null);
+  const [n, setN] = useState(0);
+  const [p, setP] = useState(0);
+  useEffect(() => {
+    let rendez = false;
+    const lis = () => {
+      rendez = false;
+      const z = zone.current;
+      if (!z) return;
+      const b = z.getBoundingClientRect();
+      const course = b.height - window.innerHeight;
+      const u = course > 0 ? Math.min(1, Math.max(0, -b.top / course)) : 0;
+      setP(u);
+      setN(Math.min(fiches.length - 1, Math.floor(u * fiches.length)));
+    };
+    const plan = () => {
+      if (!rendez) {
+        rendez = true;
+        requestAnimationFrame(lis);
+      }
+    };
+    window.addEventListener("scroll", plan, { passive: true });
+    window.addEventListener("resize", plan);
+    lis();
+    return () => {
+      window.removeEventListener("scroll", plan);
+      window.removeEventListener("resize", plan);
+    };
+  }, [fiches.length]);
 
-  const [podium, reste] = [lignes.slice(0, 3), lignes.slice(3)];
-  /* Le podium se lit dans l'ordre 2, 1, 3 : le premier au milieu, plus haut. */
-  const ordre = [podium[1], podium[0], podium[2]].filter(Boolean);
+  const f = fiches[n];
 
   return (
-    <section className="ax-sec" id="classements" aria-labelledby="ax-cl-t">
-      <Rev as="h2" className="ax-h2">
-        <span id="ax-cl-t">Classements</span>
-      </Rev>
-      <Rev className="ax-tabs" d={80}>
-        <div role="tablist" aria-label="Indicateur">
-          {INDICS.map((i) => (
-            <button
-              key={i.id}
-              type="button"
-              role="tab"
-              aria-selected={i.id === id}
-              className={i.id === id ? "ax-tab-on" : undefined}
-              onClick={() => setId(i.id)}
-            >
-              {i.label}
-            </button>
-          ))}
-        </div>
-      </Rev>
+    <section
+      ref={zone}
+      className="ax-cl2"
+      id="classements"
+      style={{ height: `${fiches.length * 46 + 40}vh` }}
+      aria-labelledby="ax-cl-t"
+    >
+      <div className="ax-cl2-colle">
+        <div className="ax-cl2-g">
+          <div className="ax-cl2-gauche">
+            <h2 id="ax-cl-t" className="ax-h2">Nos classements</h2>
+            {/* Les titres ne se cliquent pas : ils suivent le défilement. */}
+            <ol className="ax-cl2-liste">
+              {fiches.map((x, i) => (
+                <li key={x.id} className={i === n ? "ax-cl2-on" : i < n ? "ax-cl2-fait" : undefined}>
+                  <span>{String(i + 1).padStart(2, "0")}</span>
+                  {x.label}
+                </li>
+              ))}
+            </ol>
+            <div className="ax-cl2-rail" aria-hidden="true"><span style={{ transform: `scaleY(${p})` }} /></div>
+          </div>
 
-      <div key={id} className="ax-cl">
-        <h3 className="ax-cl-t">{ind.titre}</h3>
-        <div className="ax-podium">
-          {ordre.map((o) => {
-            const rang = podium.indexOf(o) + 1;
-            return (
-              <div key={o.fr} className={`ax-pod ax-pod-${rang}`}>
-                <span className="ax-pod-r">{rang}</span>
-                <span className="ax-pod-n">{o.fr}</span>
-                <span className="ax-pod-v">{fmt(o.v, ind.unite)}</span>
-              </div>
-            );
-          })}
+          <div key={f.id} className="ax-cl2-carte">
+            <p className="ax-cl2-t">{f.titre}</p>
+            <ol>
+              {f.lignes.map((o, i) => (
+                <li key={o.fr} style={{ "--i": i } as React.CSSProperties}>
+                  <span className="ax-cl2-r">{i + 1}</span>
+                  <span className="ax-cl2-n">{o.fr}</span>
+                  <span className="ax-cl2-b"><i style={{ "--w": `${o.part * 100}%` } as React.CSSProperties} /></span>
+                  <span className="ax-cl2-v">{fmt(o.v, f.unite)}</span>
+                </li>
+              ))}
+            </ol>
+            <p className="ax-source">Banque mondiale (WDI), FMI · {annee}</p>
+          </div>
         </div>
-        <ol className="ax-liste" start={4}>
-          {reste.map((o, i) => (
-            <li key={o.fr} style={{ "--i": i } as React.CSSProperties}>
-              <span className="ax-liste-r">{i + 4}</span>
-              <span className="ax-liste-n">{o.fr}</span>
-              <span className="ax-liste-b">
-                <i style={{ "--w": `${o.part * 100}%` } as React.CSSProperties} />
-              </span>
-              <span className="ax-liste-v">{fmt(o.v, ind.unite)}</span>
-            </li>
-          ))}
-        </ol>
-        <p className="ax-source">Banque mondiale (WDI), FMI · {annee}</p>
       </div>
     </section>
   );
@@ -419,7 +498,7 @@ function Cartes() {
   return (
     <section className="ax-sec" id="cartes" aria-labelledby="ax-ca-t">
       <Rev as="h2" className="ax-h2">
-        <span id="ax-ca-t">Deux globes, deux lectures</span>
+        <span id="ax-ca-t">Nos globes interactifs</span>
       </Rev>
       <div className="ax-cartes">
         <Rev as="a" className="ax-globe ax-globe-eco" d={0}>
@@ -471,7 +550,7 @@ function Dossiers({ dette }: { dette: Props["dette"] }) {
   return (
     <section className="ax-sec" id="dossiers" aria-labelledby="ax-do-t">
       <Rev as="h2" className="ax-h2">
-        <span id="ax-do-t">Dossiers</span>
+        <span id="ax-do-t">Nos chiffres décortiqués</span>
       </Rev>
       <div className="ax-dossiers">
         <Rev as="a" className="ax-dos ax-dos-une" d={0}>
@@ -615,7 +694,7 @@ export function AnalysesPage(props: Props) {
       <div className="ax-fond" aria-hidden="true" />
 
       <Ouverture {...props} />
-      <ChiffresCles reperes={props.reperes} />
+      <EnDirect pib={props.pib} />
 
       <div className="ax-col">
         <Classements donnees={props.donnees} annee={props.annee} />
