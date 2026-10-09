@@ -56,10 +56,65 @@ export function getMaxMetricValueDemo(
   return Math.max(...values, 1);
 }
 
+/* Les bornes de l'échelle viennent des centiles, pas du minimum et du maximum :
+   quelques pays hors norme (l'Inde, la Chine, un micro-État) ne doivent pas
+   écraser tout le reste sur les mêmes deux ou trois teintes. */
+interface Bornes {
+  lo: number;
+  hi: number;
+  /** Les valeurs positives, triées : elles servent au rang pour les grandeurs en échelle « log ». */
+  rang?: number[];
+}
+const BORNES = new WeakMap<object, Map<string, Bornes>>();
+
+function centile(tri: number[], f: number): number {
+  return tri[Math.min(tri.length - 1, Math.max(0, Math.round(f * (tri.length - 1))))];
+}
+
+function bornes(
+  countries: Record<string, CountryDemographyData>,
+  metric: DemographyMetricId,
+  pour100k: boolean,
+): Bornes {
+  let m = BORNES.get(countries);
+  if (!m) {
+    m = new Map();
+    BORNES.set(countries, m);
+  }
+  const clef = `${metric}|${pour100k ? 1 : 0}`;
+  const connu = m.get(clef);
+  if (connu) return connu;
+
+  const tri = Object.values(countries)
+    .map((d) => {
+      const v = getMetricValueDemo(d, metric);
+      return v === undefined ? null : normalise(v, d.population, pour100k);
+    })
+    .filter((v): v is number => v !== null && Number.isFinite(v))
+    .sort((a, b) => a - b);
+
+  let r: Bornes;
+  if (tri.length === 0) r = { lo: 0, hi: 1 };
+  else if (SIGNES.has(metric) && !pour100k) {
+    const m95 = Math.max(Math.abs(centile(tri, 0.05)), Math.abs(centile(tri, 0.95)), 1e-9);
+    r = { lo: -m95, hi: m95 };
+  } else if (!pour100k && LOG.has(metric)) {
+    const pos = tri.filter((v) => v > 0);
+    const lo = Math.max(pos.length ? centile(pos, 0.03) : 1, 1);
+    r = { lo, hi: Math.max(pos.length ? pos[pos.length - 1] : lo * 10, lo * 10), rang: pos };
+  } else {
+    const lo = centile(tri, 0.05);
+    const hi = centile(tri, 0.95);
+    r = { lo, hi: hi > lo ? hi : lo + 1 };
+  }
+  m.set(clef, r);
+  return r;
+}
+
 export function getValueIntensityDemo(
   countryName: string,
   countries: Record<string, CountryDemographyData>,
-  maxValue: number,
+  _maxValue: number,
   metric: DemographyMetricId,
   pour100k = false,
 ): number | null {
@@ -68,22 +123,31 @@ export function getValueIntensityDemo(
   const raw = getMetricValueDemo(data, metric);
   if (raw === undefined) return null;
 
+  const { lo, hi, rang } = bornes(countries, metric, pour100k);
+
   if (SIGNES.has(metric) && !pour100k) {
-    const values = Object.values(countries)
-      .map((d) => getMetricValueDemo(d, metric))
-      .filter((x): x is number => x !== undefined);
-    const min = Math.min(...values, 0);
-    const max = Math.max(...values, 0);
-    if (max === min) return 0.5;
-    return (raw - min) / (max - min);
+    return Math.max(0, Math.min(1, 0.5 + (raw / hi) * 0.5));
   }
 
   const v = normalise(raw, data.population, pour100k);
   if (v === null || v === 0) return null;
   if (!pour100k && LOG.has(metric)) {
-    return Math.log10(v + 1) / Math.log10(maxValue + 1);
+    if (v <= 0) return null;
+    /* Le rang du pays parmi tous les autres, mêlé à sa position logarithmique :
+       les teintes se répartissent sur toute la rampe au lieu de s'entasser
+       du côté des très grandes valeurs. */
+    const logT = Math.max(0, Math.min(1, (Math.log10(v) - Math.log10(lo)) / (Math.log10(hi) - Math.log10(lo))));
+    if (!rang || rang.length < 2) return logT;
+    let a = 0;
+    let b = rang.length;
+    while (a < b) {
+      const m = (a + b) >> 1;
+      if (rang[m] < v) a = m + 1;
+      else b = m;
+    }
+    return 0.25 * logT + 0.75 * (a / (rang.length - 1));
   }
-  return Math.max(0, Math.min(v / maxValue, 1));
+  return Math.max(0, Math.min(1, (v - lo) / (hi - lo)));
 }
 
 export function getCountryFillColorDemo(

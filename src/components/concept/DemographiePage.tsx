@@ -56,7 +56,7 @@ type Rang = { nom: string; fr: string } & Record<DemographyMetricId, number | nu
 
 function val(v: number | null, unite: MetriqueDemo["unite"]): string {
   if (v === null) return "n.d.";
-  if (unite === "pour1000") return `${v.toFixed(1).replace(".", ",")} ‰`;
+  if (unite === "pour1000") return `${v.toFixed(1).replace(".", ",")} pour 1 000`;
   const a = Math.abs(v);
   if (a >= 1e6) return `${(v / 1e6).toFixed(2).replace(".", ",")} M`;
   if (a >= 1e3) return `${(v / 1e3).toFixed(1).replace(".", ",")} k`;
@@ -105,7 +105,7 @@ function TempsReelDemo({ compteur }: { compteur: CompteurDemoProps }) {
               dec={0}
               unite=""
             />
-            <Lettres base={compteur.population} parSeconde={accroissement} depuis={departAnnee} mot="habitants" />
+            <Lettres className="cg-cpt-n" base={compteur.population} parSeconde={accroissement} depuis={departAnnee} mot="habitants" />
           </div>
           <div className="cg-cpt v2-cpt v2-cpt-medicales" style={{ "--i": 1 } as React.CSSProperties}>
             <span className="v2-cpt-i" aria-hidden="true"><Baby size={18} /></span>
@@ -118,7 +118,7 @@ function TempsReelDemo({ compteur }: { compteur: CompteurDemoProps }) {
               dec={0}
               unite=""
             />
-            <Lettres base={0} parSeconde={compteur.naissancesParSeconde} depuis={departAnnee} mot="naissances" />
+            <Lettres className="cg-cpt-n" base={0} parSeconde={compteur.naissancesParSeconde} depuis={departAnnee} mot="naissances" />
           </div>
           <div className="cg-cpt v2-cpt v2-cpt-militaires" style={{ "--i": 2 } as React.CSSProperties}>
             <span className="v2-cpt-i" aria-hidden="true"><HeartPulse size={18} /></span>
@@ -131,7 +131,7 @@ function TempsReelDemo({ compteur }: { compteur: CompteurDemoProps }) {
               dec={0}
               unite=""
             />
-            <Lettres base={0} parSeconde={compteur.decesParSeconde} depuis={departAnnee} mot="décès" />
+            <Lettres className="cg-cpt-n" base={0} parSeconde={compteur.decesParSeconde} depuis={departAnnee} mot="décès" />
           </div>
         </div>
         <p className="sr-only">

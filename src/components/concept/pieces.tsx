@@ -304,9 +304,6 @@ export function EnTete({ actif }: { actif?: string }) {
           <div className="cg-bout">
             <ChoixMonnaie />
             <BoutonTheme className="cg-jour" />
-            <a href="/forum" className="cg-bout-l">
-              Forum
-            </a>
           </div>
         </div>
 
@@ -334,7 +331,7 @@ export function Pied() {
           <a href="/confidentialite">Confidentialité</a>
           <a href="/cgu">CGU</a>
         </nav>
-        <a className="cg-pied-note" href="/analyses#fonctionnement">Sources des données</a>
+        <a className="cg-pied-note" href="/#fonctionnement">Sources des données</a>
       </div>
     </footer>
   );

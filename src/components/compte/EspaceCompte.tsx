@@ -2,19 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { BarChart3, BookMarked, Globe2, MessageSquare, UserRound, ArrowUpRight } from "lucide-react";
+import { BarChart3, BookMarked, MessageSquare, UserRound } from "lucide-react";
 import { deconnecter } from "@/app/compte/actions";
 import { Pastille } from "./Pastille";
 import { FormProfil } from "./FormProfil";
-import { TableauDeBord } from "./TableauDeBord";
+import { TableauWidgets, type PaysCompare } from "./TableauWidgets";
 import "./espace.css";
-
-export interface PaysCompare {
-  fr: string;
-  pib: number | null;
-  pibHab: number | null;
-  population: number | null;
-}
 
 interface Message { id: string; cible_id: string; texte: string; cree_le: string; titre: string }
 interface Favori { slug: string; titre: string; extrait: string; cree_le: string }
@@ -29,67 +22,6 @@ type Onglet = (typeof ONGLETS)[number]["id"];
 
 const date = (iso: string, long = false) =>
   new Date(iso).toLocaleDateString("fr-FR", long ? { day: "numeric", month: "long", year: "numeric" } : { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
-
-function fmtPib(v: number) {
-  return v >= 1000 ? `${(v / 1000).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} T$` : `${Math.round(v).toLocaleString("fr-FR")} Md$`;
-}
-
-const INDIC = [
-  { id: "pib", label: "PIB", f: fmtPib },
-  { id: "pibHab", label: "PIB par habitant", f: (v: number) => `${Math.round(v).toLocaleString("fr-FR")} $` },
-  { id: "population", label: "Population", f: (v: number) => `${v.toLocaleString("fr-FR", { maximumFractionDigits: v >= 100 ? 0 : 1 })} M` },
-] as const;
-
-/** Trois pays côte à côte : le choix reste dans ce navigateur. */
-function Comparateur({ pays }: { pays: PaysCompare[] }) {
-  const [noms, setNoms] = useState<string[]>(["France", "États-Unis", "Chine"]);
-  useEffect(() => {
-    try {
-      const s = JSON.parse(localStorage.getItem("visualize-compare") ?? "null");
-      if (Array.isArray(s) && s.length === 3) setNoms(s);
-    } catch {}
-  }, []);
-  const change = (i: number, v: string) => {
-    const n = noms.map((x, k) => (k === i ? v : x));
-    setNoms(n);
-    try {
-      localStorage.setItem("visualize-compare", JSON.stringify(n));
-    } catch {}
-  };
-  const choisis = noms.map((n) => pays.find((p) => p.fr === n));
-  return (
-    <div className="es-carte">
-      <h3 className="es-h3">Comparer des pays</h3>
-      <div className="es-choix">
-        {noms.map((n, i) => (
-          <select key={i} value={n} onChange={(e) => change(i, e.target.value)} aria-label={`Pays ${i + 1}`}>
-            {pays.map((p) => (
-              <option key={p.fr} value={p.fr}>{p.fr}</option>
-            ))}
-          </select>
-        ))}
-      </div>
-      <div className="es-barres">
-        {INDIC.map((ind) => {
-          const vals = choisis.map((p) => (p ? p[ind.id] : null));
-          const max = Math.max(1, ...vals.map((v) => v ?? 0));
-          return (
-            <div key={ind.id} className="es-ligne">
-              <span className="es-ligne-t">{ind.label}</span>
-              {vals.map((v, i) => (
-                <div key={i} className="es-barre" style={{ "--c": i } as React.CSSProperties}>
-                  <i style={{ width: v ? `${Math.max(4, (v / max) * 100)}%` : "0%" }} />
-                  <b>{noms[i]}</b>
-                  <em>{v ? ind.f(v) : "—"}</em>
-                </div>
-              ))}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 export function EspaceCompte({
   pseudo,
@@ -163,22 +95,7 @@ export function EspaceCompte({
 
         <section className="es-panneau" key={onglet} role="tabpanel">
           {onglet === "dashboard" && (
-            <>
-              <div className="es-carte es-carte-vif">
-                <h3 className="es-h3">Mes compteurs en direct</h3>
-                <TableauDeBord widgetsInitial={widgets} sommePib={sommePib} sommePopulation={sommePopulation} />
-              </div>
-              <Comparateur pays={pays} />
-              <div className="es-carte es-globe">
-                <span className="es-sph" aria-hidden="true"><i /><b /></span>
-                <h3 className="es-h3">Mes globes</h3>
-                <p>Retrouvez en un clic les deux globes du site.</p>
-                <div className="es-liens">
-                  <Link href="/economie"><Globe2 size={16} aria-hidden="true" /> Économie <ArrowUpRight size={14} aria-hidden="true" /></Link>
-                  <Link href="/demographie"><Globe2 size={16} aria-hidden="true" /> Démographie <ArrowUpRight size={14} aria-hidden="true" /></Link>
-                </div>
-              </div>
-            </>
+            <TableauWidgets widgetsInitial={widgets} sommePib={sommePib} sommePopulation={sommePopulation} pays={pays} />
           )}
 
           {onglet === "discussions" && (

@@ -475,3 +475,10 @@
 .cg-v2 .cg-fo-fleche-on { color: var(--v2-vif-2); }
 
 .cg-v2 .cg-lien-fleche { color: var(--v2-vif-2); }
+
+.cg-v2 .cg-art-lien { display: inline-block; margin: 0 18px 18px; font-size: 13px; font-weight: 750; color: var(--v2-vif-2); text-decoration: none; }
+.cg-v2 .cg-art-lien:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* La carte vedette garde du blanc dans les deux thèmes. */
+.cg-v2 .v2-cpt-pib :is(.cg-cpt-v, .cg-cpt-v *, .cg-cpt-n, .cg-cpt-l2) { color: #fff !important; }
+.cg-v2 .v2-cpt-pib :is(.cg-cpt-n, .cg-cpt-l2) { opacity: 0.9; }

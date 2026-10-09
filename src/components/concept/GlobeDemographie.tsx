@@ -174,7 +174,7 @@ export function familleDe(id: DemographyMetricId): FamilleDemo {
 
 export function fmtDemo(v: number | null | undefined, unite: MetriqueDemo["unite"]): string {
   if (v === null || v === undefined || !Number.isFinite(v)) return "n.d.";
-  if (unite === "pour1000") return `${v.toFixed(1).replace(".", ",")} ‰`;
+  if (unite === "pour1000") return `${v.toFixed(1).replace(".", ",")} pour 1 000`;
   const a = Math.abs(v);
   if (a >= 1e6) return `${(v / 1e6).toFixed(2).replace(".", ",")} M`;
   if (a >= 1e3) return `${(v / 1e3).toFixed(1).replace(".", ",")} k`;

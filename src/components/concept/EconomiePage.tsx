@@ -905,8 +905,10 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
 
   const articlesVus = useMemo(() => {
     const q = qArticle.trim().toLowerCase();
-    if (!q) return articles;
-    return articles.filter((a) => `${a.titre} ${a.chapo} ${a.mots ?? ""}`.toLowerCase().includes(q));
+    /* Les articles qui ont leur page passent en tête : ce sont les seuls à lire. */
+    const ordre = [...articles].sort((a, b) => Number(Boolean(LIENS_ARTICLES[b.slug])) - Number(Boolean(LIENS_ARTICLES[a.slug])));
+    if (!q) return ordre;
+    return ordre.filter((a) => `${a.titre} ${a.chapo} ${a.mots ?? ""}`.toLowerCase().includes(q));
   }, [articles, qArticle]);
 
   /* « D'où viennent ces chiffres » n'était pas une section : c'est une
@@ -1196,13 +1198,20 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
                débats en cours au-dessus, la file des autres lectures en
                dessous. Le grand article tient la hauteur des deux. */
             <div className="cg-arts-l">
-              <article className="cg-art cg-art-une">
+              <article
+                className="cg-art cg-art-une"
+                onClick={LIENS_ARTICLES[articlesVus[0].slug] ? () => { window.location.href = LIENS_ARTICLES[articlesVus[0].slug]; } : undefined}
+                style={LIENS_ARTICLES[articlesVus[0].slug] ? { cursor: "pointer" } : undefined}
+              >
                 <ImagePlaceholder nom="IMAGE_PNG_ECO_01" ratio="16 / 10" />
                 <span className="cg-rubrique">
                   {articlesVus[0].rubrique} · {articlesVus[0].duree}
                 </span>
                 <h3 className="cg-art-t">{articlesVus[0].titre}</h3>
                 <p className="cg-art-c">{articlesVus[0].chapo}</p>
+                {LIENS_ARTICLES[articlesVus[0].slug] && (
+                  <a className="cg-art-lien" href={LIENS_ARTICLES[articlesVus[0].slug]}>Lire le dossier <span aria-hidden="true">→</span></a>
+                )}
               </article>
 
               {debats.length > 0 && (
@@ -1268,6 +1277,9 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
                         {a.rubrique} · {a.duree}
                       </span>
                       <h4 className="cg-art-t">{a.titre}</h4>
+                      {LIENS_ARTICLES[a.slug] && (
+                        <a className="cg-art-lien" href={LIENS_ARTICLES[a.slug]}>Lire le dossier <span aria-hidden="true">→</span></a>
+                      )}
                     </article>
                   ))}
                 </div>

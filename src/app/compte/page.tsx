@@ -6,6 +6,7 @@ import { COMPTES_ACTIFS } from "@/lib/supabase/config";
 import { clientServeur, lireCompte } from "@/lib/supabase/serveur";
 import { filParId } from "@/data/community/fils";
 import { donneesPays } from "@/data/concept/conceptGeo";
+import { centresPays } from "@/data/concept/centres";
 import { getArticleBySlug } from "@/data/articles";
 import "@/components/concept/concept.css";
 
@@ -58,9 +59,20 @@ export default async function ComptePage() {
   }
   void anneeSocle;
 
-  const pays = Object.values(socle)
-    .filter((f) => typeof f.pib === "number")
-    .map((f) => ({ fr: f.fr, pib: f.pib, pibHab: f.pibHab, population: f.population ?? null }))
+  const centres = centresPays();
+  const pays = Object.entries(socle)
+    .filter(([, f]) => typeof f.pib === "number")
+    .map(([nom, f]) => ({
+      nom,
+      fr: f.fr,
+      pib: f.pib,
+      pibHab: f.pibHab,
+      population: f.population ?? null,
+      dette: f.dette ?? null,
+      inflation: f.inflation,
+      lat: centres[nom]?.lat ?? null,
+      lon: centres[nom]?.lon ?? null,
+    }))
     .sort((x, y) => x.fr.localeCompare(y.fr, "fr"));
 
   return (
