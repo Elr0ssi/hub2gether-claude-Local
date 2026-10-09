@@ -1,0 +1,17 @@
+{
+  "country": "CZE",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Tchéquie",
+  "iso2": "CZ",
+  "data": {
+    "2000": 900,
+    "2005": 1050,
+    "2010": 1000,
+    "2015": 1050,
+    "2020": 1100,
+    "2023": 1100,
+    "2025": 1100
+  }
+}

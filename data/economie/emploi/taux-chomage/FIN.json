@@ -1,0 +1,17 @@
+{
+  "country": "FIN",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Finlande",
+  "iso2": "FI",
+  "data": {
+    "2000": 9.8,
+    "2005": 8.4,
+    "2010": 8.4,
+    "2015": 9.4,
+    "2020": 7.7,
+    "2023": 7.6,
+    "2025": 7.5
+  }
+}

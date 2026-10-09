@@ -1,0 +1,16 @@
+{
+  "country": "HND",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Honduras",
+  "iso2": "HN",
+  "data": {
+    "2000": 56,
+    "2005": 40,
+    "2010": 35,
+    "2015": 45,
+    "2020": 54,
+    "2023": 48
+  }
+}

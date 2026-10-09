@@ -1,0 +1,17 @@
+{
+  "country": "CHN",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Chine",
+  "iso2": "CN",
+  "data": {
+    "2000": 8000,
+    "2005": 12000,
+    "2010": 20000,
+    "2015": 32000,
+    "2020": 44000,
+    "2023": 55000,
+    "2025": 58000
+  }
+}

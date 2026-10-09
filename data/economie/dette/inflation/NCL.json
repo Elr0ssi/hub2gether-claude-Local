@@ -1,0 +1,16 @@
+{
+  "country": "NCL",
+  "indicator": "INFLATION",
+  "unit": "PCT",
+  "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+  "name": "Nouvelle-Calédonie",
+  "iso2": "NC",
+  "data": {
+    "2011": 2.42899693753383,
+    "2012": 1.74967234600262,
+    "2013": 1.27761318992718,
+    "2014": 0.178851060785511,
+    "2015": 0.570508141048402,
+    "2016": 0.578317435520754
+  }
+}

@@ -8,6 +8,7 @@ import type { ArticleSection } from "@/types";
 import { ArticleRankingTable } from "./ArticleRankingTable";
 import { ReadingLanguageBar } from "@/components/learning/ReadingLanguageBar";
 import { TranslationBubble } from "@/components/learning/TranslationBubble";
+import { useSelectionTranslation } from "@/hooks/useSelectionTranslation";
 
 const ArticleWorldMap = dynamic(
   () => import("./ArticleWorldMap").then(m => m.ArticleWorldMap),
@@ -85,7 +86,7 @@ function CarouselSection({
               border: "none",
               cursor: "pointer",
             }}
-            aria-label={`${item.name} — cliquez pour détails`}
+            aria-label={`${item.name} · cliquez pour détails`}
           >
             <motion.div
               className="w-full h-full relative"
@@ -318,8 +319,7 @@ function QuoteSection({ text, source }: { text: string; source: string }) {
       <cite
         className="text-xs not-italic font-semibold"
         style={{ color: "var(--ink-3)" }}
-      >
-        — {source}
+      > · {source}
       </cite>
     </blockquote>
   );
@@ -487,33 +487,7 @@ function ListSection({
 export function ArticleBody({ sections }: { sections: ArticleSection[] }) {
   const [learningEnabled, setLearningEnabled] = useState(true);
   const [targetLang, setTargetLang] = useState("en");
-  const [selection, setSelection] = useState<{ text: string; rect: DOMRect } | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleMouseUp = () => {
-      if (!learningEnabled) { setSelection(null); return; }
-      const sel = window.getSelection();
-      if (!sel || sel.isCollapsed || sel.rangeCount === 0) { setSelection(null); return; }
-      const text = sel.toString().trim();
-      if (!text || text.length < 2) { setSelection(null); return; }
-      const range = sel.getRangeAt(0);
-      if (!containerRef.current?.contains(range.commonAncestorContainer)) { setSelection(null); return; }
-      setSelection({ text, rect: range.getBoundingClientRect() });
-    };
-
-    const handleScroll = () => setSelection(null);
-    const handleKeyDown = (e: KeyboardEvent) => { if (e.key === "Escape") setSelection(null); };
-
-    document.addEventListener("mouseup", handleMouseUp);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mouseup", handleMouseUp);
-      window.removeEventListener("scroll", handleScroll);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [learningEnabled]);
+  const { containerRef, selection, clear } = useSelectionTranslation(learningEnabled);
 
   return (
     <>
@@ -522,7 +496,7 @@ export function ArticleBody({ sections }: { sections: ArticleSection[] }) {
         toLang={targetLang}
         onToLangChange={setTargetLang}
         enabled={learningEnabled}
-        onToggle={() => { setLearningEnabled((e) => !e); setSelection(null); }}
+        onToggle={() => { setLearningEnabled((e) => !e); clear(); }}
       />
       <div ref={containerRef} className="article-body">
       {sections.map((section, i) => {

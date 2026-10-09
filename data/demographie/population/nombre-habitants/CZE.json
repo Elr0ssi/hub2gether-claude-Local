@@ -1,0 +1,17 @@
+{
+  "country": "CZE",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Tchéquie",
+  "iso2": "CZ",
+  "data": {
+    "2000": 10.3,
+    "2005": 10.2,
+    "2010": 10.5,
+    "2015": 10.5,
+    "2020": 10.7,
+    "2023": 10.9,
+    "2025": 10.9
+  }
+}

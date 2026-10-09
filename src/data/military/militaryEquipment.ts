@@ -572,7 +572,7 @@ export const MILITARY_EQUIPMENT: Record<string, MilitaryEquipment[]> = {
     {
       name: "K2PL Black Panther (Pologne)",
       type: "tank",
-      description: "1 000 K2 commandés dont 180 livrés en 2024 — réarmement le plus massif en Europe.",
+      description: "1 000 K2 commandés dont 180 livrés en 2024 · réarmement le plus massif en Europe.",
       count: 180,
       unitCostM: 8.5,
       imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/K2_Black_Panther_%28cropped%29.jpg/320px-K2_Black_Panther_%28cropped%29.jpg",

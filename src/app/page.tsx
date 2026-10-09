@@ -1,116 +1,57 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Layout } from "@/components/layout/Layout";
-import { HeroSection } from "@/components/hero/HeroSection";
-import { KeyStatsSection } from "@/components/home/KeyStatsSection";
-import { EditorialSection } from "@/components/home/EditorialSection";
-import { FAQSection } from "@/components/faq/FAQSection";
-import { FAQS_EMPIRES } from "@/data/faqs";
+import { AnalysesPage } from "@/components/analyses/AnalysesPage";
+import { detteDerniere, ratioDernier } from "@/data/articles/detteFrancaise";
+import { DEFICIT_2025 } from "@/data/articles/financesPubliques";
+import { donneesPays, reperes } from "@/data/concept/conceptGeo";
+import { pibMonde } from "@/data/concept/conceptEconomie";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE D'ACCUEIL
+
+   L'essai « Analyses » est devenu l'accueil du site. /analyses redirige ici
+   (voir next.config.ts), et la page est offerte aux moteurs.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theessentialdata.com";
 
 export const metadata: Metadata = {
-  title: "The Essential Data — Cartes géopolitiques interactives PIB, Épidémies, Politique",
+  title: { absolute: "Visualize · L'économie et la démographie du monde, en données" },
   description:
-    "Explorez le PIB par pays 2025, les épidémies mondiales, les régimes politiques et les forces militaires grâce à des cartes interactives. Données FMI, Banque mondiale, OMS. Data journalism géopolitique de référence.",
+    "PIB, dette, chômage, population, natalité et mortalité de plus de 200 pays, de 1960 à aujourd'hui, sur un globe interactif et en temps réel. Sources : Banque mondiale, FMI, Nations Unies.",
   keywords: [
-    "carte PIB monde 2025",
-    "PIB par pays 2025",
-    "carte géopolitique interactive",
-    "données économiques mondiales",
-    "régimes politiques carte",
-    "épidémies mondiales carte",
-    "world GDP map",
-    "geopolitical data journalism",
-    "comparaison pays économie",
+    "données mondiales",
+    "PIB par pays",
+    "PIB mondial en temps réel",
+    "population mondiale",
+    "classement des pays",
+    "globe interactif",
+    "démographie mondiale",
+    "dette publique par pays",
   ],
-  alternates: {
-    canonical: "/",
-  },
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "The Essential Data — Cartes géopolitiques interactives",
-    description:
-      "PIB par pays 2025, épidémies mondiales (COVID, VIH, Peste Noire), régimes politiques, puissances militaires. Cartes interactives avec données FMI, Banque mondiale et OMS.",
     type: "website",
+    url: siteUrl,
+    title: "Visualize · L'économie et la démographie du monde, en données",
+    description: "Plus de 200 pays, de 1960 à aujourd'hui, sur un globe interactif et en temps réel.",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "The Essential Data — Cartes géopolitiques interactives",
-    description:
-      "PIB par pays 2025, épidémies mondiales, régimes politiques. Data journalism géopolitique.",
-  },
+  robots: { index: true, follow: true },
 };
 
-function AITransparencyBanner() {
+export default function Accueil() {
+  const { annee, pays } = donneesPays();
+  const { liste } = reperes();
   return (
-    <section
-      className="max-w-5xl mx-auto px-6 py-10"
-      aria-label="Transparence éditoriale et conformité EU AI Act"
-    >
-      <div
-        className="rounded-2xl p-7"
-        style={{
-          background: "linear-gradient(135deg, rgba(57,255,136,0.06) 0%, rgba(57,255,136,0.02) 100%)",
-          border: "1px solid rgba(57,255,136,0.25)",
-        }}
-      >
-        <div className="flex flex-col md:flex-row gap-6 items-start">
-          <div className="flex-shrink-0">
-            <span
-              className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full"
-              style={{ background: "rgba(57,255,136,0.2)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.5)" }}
-            >
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true">
-                <circle cx="5" cy="5" r="4" fillOpacity="0.2" stroke="currentColor" strokeWidth="1.5" fill="none" />
-                <path d="M5 3v2.5l1.5 1" strokeLinecap="round" strokeWidth="1.2" stroke="currentColor" fill="none" />
-              </svg>
-              EU AI Act — Transparence
-            </span>
-          </div>
-          <div>
-            <h2 className="font-bold text-sm mb-2" style={{ color: "var(--ink)" }}>
-              Un condensé mondial, impartial et multi-perspectives
-            </h2>
-            <p className="text-sm leading-relaxed mb-3" style={{ color: "var(--ink-2)" }}>
-              The Essential Data est un <strong>agrégateur éditorial assisté par intelligence artificielle</strong>.
-              Chaque article est une synthèse d&apos;<strong>articles médiatiques du monde entier</strong> — presse internationale,
-              rapports d&apos;institutions (FMI, Banque mondiale, OMS, SIPRI…) et recherches académiques — condensés pour offrir
-              une <strong>vision impartiale, avec des points de vue multiples</strong>, en temps réel.
-            </p>
-            <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--ink-3)" }}>
-              Conformément au règlement européen sur l&apos;intelligence artificielle (EU AI Act), nous indiquons explicitement
-              lorsqu&apos;un contenu est généré ou synthétisé par IA, et nous citons l&apos;intégralité des sources utilisées dans
-              chaque article.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/methodology"
-                className="text-xs font-semibold underline underline-offset-2"
-                style={{ color: "#0D7A40" }}
-              >
-                Notre méthodologie →
-              </Link>
-              <Link
-                href="/sources"
-                className="text-xs font-semibold underline underline-offset-2"
-                style={{ color: "#0D7A40" }}
-              >
-                Sources de données →
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export default function HomePage() {
-  return (
-    <Layout>
-      <HeroSection />
-      <KeyStatsSection />
-      <EditorialSection />
-      <AITransparencyBanner />
-      <FAQSection items={FAQS_EMPIRES} />
-    </Layout>
+    <AnalysesPage
+      reperes={liste}
+      donnees={pays}
+      annee={annee}
+      pib={pibMonde()}
+      dette={{
+        montant: detteDerniere.valeur,
+        ratio: ratioDernier.valeur,
+        deficit: Math.abs(DEFICIT_2025.valeur),
+      }}
+    />
   );
 }

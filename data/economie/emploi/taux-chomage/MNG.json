@@ -1,0 +1,16 @@
+{
+  "country": "MNG",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Mongolie",
+  "iso2": "MN",
+  "data": {
+    "2000": 4.6,
+    "2005": 3.3,
+    "2010": 3.3,
+    "2015": 7.6,
+    "2020": 8.4,
+    "2023": 6.5
+  }
+}

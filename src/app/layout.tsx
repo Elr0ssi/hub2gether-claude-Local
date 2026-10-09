@@ -14,11 +14,11 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theessentialdata.co
 
 export const metadata: Metadata = {
   title: {
-    default: "The Essential Data — Geopolitical Intelligence",
-    template: "%s | The Essential Data",
+    default: "Visualize · L'économie et la démographie du monde, en données",
+    template: "%s | Visualize",
   },
   description:
-    "Cartes interactives mondiales : PIB par pays 2025, épidémies, empires historiques. Données FMI, Banque mondiale, OMS. The Essential Data — data journalism géopolitique.",
+    "Cartes interactives mondiales : PIB par pays 2025, épidémies, empires historiques. Données FMI, Banque mondiale, OMS. The Essential Data, data journalism géopolitique.",
   keywords: [
     "carte PIB monde 2025",
     "PIB par pays 2025",
@@ -44,19 +44,18 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   openGraph: {
     type: "website",
-    siteName: "The Essential Data",
+    siteName: "Visualize",
     locale: "fr_FR",
     alternateLocale: ["en_US"],
     url: siteUrl,
-    title: "The Essential Data — Cartes géopolitiques interactives",
+    title: "Visualize · L'économie et la démographie du monde, en données",
     description:
-      "PIB par pays 2025, épidémies mondiales, empires historiques. Données FMI & Banque mondiale visualisées en cartes interactives.",
+      "Plus de 200 pays, de 1960 à aujourd'hui, sur un globe interactif. Sources : Banque mondiale, FMI, Nations Unies.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Essential Data — Cartes géopolitiques interactives",
-    description:
-      "PIB par pays 2025, épidémies mondiales, empires historiques. Données FMI & Banque mondiale.",
+    title: "Visualize · L'économie et la démographie du monde, en données",
+    description: "Plus de 200 pays, de 1960 à aujourd'hui, sur un globe interactif.",
   },
   robots: {
     index: true,
@@ -69,9 +68,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>",
-  },
 };
 
 export default function RootLayout({
@@ -80,14 +76,14 @@ export default function RootLayout({
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "The Essential Data",
+    name: "Visualize",
     description:
-      "Cartes interactives mondiales : PIB par pays 2025, épidémies, empires historiques. Données FMI et Banque mondiale.",
+      "L'économie et la démographie du monde en données : classements, cartes et dossiers sourcés.",
     url: siteUrl,
     inLanguage: ["fr", "en"],
     publisher: {
       "@type": "Organization",
-      name: "The Essential Data",
+      name: "Visualize",
       url: siteUrl,
     },
   };
@@ -95,10 +91,10 @@ export default function RootLayout({
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "The Essential Data",
+    name: "Visualize",
     url: siteUrl,
     description:
-      "Média de data-journalisme géopolitique. Cartes interactives mondiales : PIB, épidémies, empires historiques, régimes politiques et puissances militaires.",
+      "Média de données : économie et démographie du monde, classements, cartes interactives et dossiers sourcés.",
     sameAs: [],
   };
 
@@ -106,6 +102,17 @@ export default function RootLayout({
     <html lang="fr" suppressHydrationWarning className={inter.variable}>
       <head>
         <meta name="theme-color" content="#FAFAFA" />
+        {/* Le thème des pages Visualize, posé avant le premier rendu. Sans
+            ce passage, une page choisie en clair apparaîtrait noire le temps
+            d'une image, puis basculerait : c'est le défaut que tout le monde
+            connaît et que personne ne pardonne. Il ne fait rien d'autre que
+            relire un choix déjà pris, et se tait si le stockage est fermé. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{if(localStorage.getItem("visualize-theme")==="clair")document.documentElement.dataset.concept="clair"}catch(e){}',
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdString(websiteSchema) }}

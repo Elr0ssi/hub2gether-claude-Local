@@ -1,0 +1,17 @@
+{
+  "country": "TUR",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Turquie",
+  "iso2": "TR",
+  "data": {
+    "2000": 63.2,
+    "2005": 67.5,
+    "2010": 72.3,
+    "2015": 78,
+    "2020": 83.4,
+    "2023": 85.3,
+    "2025": 86
+  }
+}

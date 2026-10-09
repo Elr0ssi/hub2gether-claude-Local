@@ -1,0 +1,17 @@
+{
+  "country": "LKA",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Sri Lanka",
+  "iso2": "LK",
+  "data": {
+    "2000": 18.8,
+    "2005": 19.5,
+    "2010": 20.3,
+    "2015": 20.9,
+    "2020": 21.9,
+    "2023": 22,
+    "2025": 22
+  }
+}

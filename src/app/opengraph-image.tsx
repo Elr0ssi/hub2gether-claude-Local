@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "The Essential Data — Cartes géopolitiques interactives";
+export const alt = "Visualize · Le monde en chiffres, sans le bruit";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -14,75 +14,30 @@ export default function OgImage() {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
+          alignItems: "flex-start",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #0a0a0a 0%, #111827 60%, #0d1a12 100%)",
+          padding: "0 96px",
+          background: "linear-gradient(135deg, #0a0912 0%, #1b1240 60%, #3a1d8a 100%)",
           fontFamily: "system-ui, sans-serif",
-          position: "relative",
+          color: "#f5f3ff",
         }}
       >
-        {/* Grid lines */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage:
-              "linear-gradient(rgba(57,255,136,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,136,0.05) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-          }}
-        />
-
-        {/* Globe emoji */}
-        <div style={{ fontSize: 72, marginBottom: 24, display: "flex" }}>🌍</div>
-
-        {/* Brand */}
-        <div
-          style={{
-            fontSize: 48,
-            fontWeight: 900,
-            color: "#ffffff",
-            letterSpacing: "-0.03em",
-            marginBottom: 12,
-            display: "flex",
-          }}
-        >
-          The Essential Data
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 6, width: 76, height: 76, padding: 16, borderRadius: 22, background: "linear-gradient(140deg, #5b2de0, #a583ff)" }}>
+            <div style={{ width: 11, height: 18, borderRadius: 4, background: "#fff" }} />
+            <div style={{ width: 11, height: 28, borderRadius: 4, background: "#fff" }} />
+            <div style={{ width: 11, height: 42, borderRadius: 4, background: "#fff" }} />
+          </div>
+          <div style={{ fontSize: 56, fontWeight: 800, letterSpacing: -2 }}>Visualize</div>
         </div>
-
-        {/* Tagline */}
-        <div
-          style={{
-            fontSize: 22,
-            color: "rgba(255,255,255,0.6)",
-            marginBottom: 32,
-            display: "flex",
-          }}
-        >
-          Cartes géopolitiques interactives · Data journalism
+        <div style={{ marginTop: 48, fontSize: 84, fontWeight: 800, letterSpacing: -3, lineHeight: 1.02 }}>
+          Le monde en chiffres, sans le bruit.
         </div>
-
-        {/* Tags */}
-        <div style={{ display: "flex", gap: 12 }}>
-          {["PIB mondial", "Épidémies", "Empires historiques", "Militaire"].map((tag) => (
-            <div
-              key={tag}
-              style={{
-                background: "rgba(57,255,136,0.15)",
-                border: "1px solid rgba(57,255,136,0.4)",
-                color: "#39ff88",
-                fontSize: 14,
-                fontWeight: 600,
-                padding: "6px 16px",
-                borderRadius: 9999,
-                display: "flex",
-              }}
-            >
-              {tag}
-            </div>
-          ))}
+        <div style={{ marginTop: 28, fontSize: 32, color: "#bdb8da" }}>
+          PIB, dette, chômage, population : plus de 200 pays, sourcés.
         </div>
       </div>
     ),
-    { ...size }
+    { ...size },
   );
 }

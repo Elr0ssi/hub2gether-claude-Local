@@ -1,0 +1,17 @@
+{
+  "country": "NZL",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Nouvelle-Zélande",
+  "iso2": "NZ",
+  "data": {
+    "2000": 330,
+    "2005": 400,
+    "2010": 450,
+    "2015": 500,
+    "2020": 530,
+    "2023": 550,
+    "2025": 630
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "country": "BHR",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Bahreïn",
+  "iso2": "BH",
+  "data": {
+    "2000": 28,
+    "2005": 25,
+    "2010": 30,
+    "2015": 64,
+    "2020": 132,
+    "2023": 113
+  }
+}

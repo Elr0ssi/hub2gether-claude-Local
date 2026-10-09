@@ -1,0 +1,17 @@
+{
+  "country": "DNK",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Danemark",
+  "iso2": "DK",
+  "data": {
+    "2000": 5.3,
+    "2005": 5.4,
+    "2010": 5.5,
+    "2015": 5.7,
+    "2020": 5.8,
+    "2023": 5.9,
+    "2025": 6
+  }
+}

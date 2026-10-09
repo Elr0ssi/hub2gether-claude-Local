@@ -1,0 +1,17 @@
+{
+  "country": "GHA",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Ghana",
+  "iso2": "GH",
+  "data": {
+    "2000": 4.2,
+    "2005": 5.2,
+    "2010": 5.8,
+    "2015": 2.4,
+    "2020": 4.9,
+    "2023": 14.7,
+    "2025": 3.6
+  }
+}

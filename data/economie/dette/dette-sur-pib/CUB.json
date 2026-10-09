@@ -1,0 +1,16 @@
+{
+  "country": "CUB",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Cuba",
+  "iso2": "CU",
+  "data": {
+    "2000": 75,
+    "2005": 45,
+    "2010": 35,
+    "2015": 30,
+    "2020": 65,
+    "2023": 82
+  }
+}

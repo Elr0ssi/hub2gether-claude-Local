@@ -1,0 +1,17 @@
+{
+  "country": "MOZ",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Mozambique",
+  "iso2": "MZ",
+  "data": {
+    "2000": 90,
+    "2005": 120,
+    "2010": 150,
+    "2015": 170,
+    "2020": 185,
+    "2023": 200,
+    "2025": 310
+  }
+}

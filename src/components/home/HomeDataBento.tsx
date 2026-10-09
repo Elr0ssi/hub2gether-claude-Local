@@ -50,7 +50,7 @@ const CARDS = [
     accentBorder: "rgba(239,68,68,0.22)",
     value: "7,04M",
     label: "Décès COVID-19 confirmés",
-    sub: "OMS · données cumulées 2020–2024",
+    sub: "OMS · données cumulées 2020-2024",
     span: "lg:col-span-1",
   },
   {
@@ -83,7 +83,7 @@ export function HomeDataBento() {
           Le monde en chiffres essentiels
         </h2>
         <p className="text-body" style={{ maxWidth: "480px", color: "var(--ink-3)" }}>
-          Les indicateurs qui structurent l'actualité géopolitique — économie,
+          Les indicateurs qui structurent l'actualité géopolitique, économie,
           défense, démocratie, santé. Cliquez pour explorer la carte interactive.
         </p>
       </motion.div>

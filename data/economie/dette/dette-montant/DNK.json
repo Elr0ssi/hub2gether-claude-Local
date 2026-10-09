@@ -1,0 +1,13 @@
+{
+  "country": "DNK",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Danemark",
+  "iso2": "DK",
+  "data": {
+    "2000": 80,
+    "2014": 100,
+    "2024": 140
+  }
+}
