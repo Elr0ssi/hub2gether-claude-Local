@@ -298,13 +298,6 @@ export function GlobeEco({
   const [theme] = useTheme();
   const jour = theme === "clair";
 
-  /* Le globe ne monte qu'une fois le reste de la page posé à l'écran ET
-     retombé — pas seulement peint. Construire sa sphère bloque le fil
-     principal une bonne fraction de seconde ; lancé en même temps que le
-     titre se lève et que les tuiles se posent, les deux animations se
-     disputaient ce même fil et aucune ne tournait plus rond. */
-  const pretGlobe = usePretGlobe();
-
   const cadre = useRef<HTMLDivElement>(null);
 
   /* La lumière du limbe suit la caméra.
@@ -319,6 +312,12 @@ export function GlobeEco({
      La lumière s'éteint alors progressivement plutôt que de venir baver sur
      les bords de la scène. */
   const scene = useRef<HTMLDivElement>(null);
+  /* Le globe ne monte qu'une fois l'entrée du héros finie, ou quand on
+     arrive à lui en défilant — pas seulement peint. Construire sa sphère bloque le fil
+     principal une bonne fraction de seconde ; lancé en même temps que le
+     titre se lève et que les tuiles se posent, les deux animations se
+     disputaient ce même fil et aucune ne tournait plus rond. */
+  const pretGlobe = usePretGlobe(scene);
   const mesureLimbe = useCallback((diametre: number) => {
     const el = scene.current;
     if (!el) return;
@@ -433,13 +432,13 @@ export function GlobeEco({
                    laissait près d'un cinquième de vide autour d'elle. */
                 marge={1.06}
                 onCadrage={mesureLimbe}
-                /* Un plafond à quatre mille texels ne montrait rien de plus
-                   qu'un aplat flou une fois zoomé : le zoom concentre une
-                   tranche étroite de la toile sur toute la scène, et c'est
-                   justement là qu'il faut des texels à revendre. On laisse
-                   la machine décider comme sur le reste du site — un
-                   appareil capable peint la toile pleine, les autres restent
-                   sur la plus légère. */
+                /* On démarre à quatre mille texels : le globe tient dans une
+                   colonne de six cents pixels et y est net. Les toiles pleines
+                   (huit mille) tenaient le navigateur plusieurs secondes à
+                   l'ouverture — c'était le gel de la page. Le globe passe de
+                   lui-même à la toile pleine au premier zoom appuyé, là où
+                   elle sert. */
+                texelsMax={4096}
               />
             ) : (
               <AttenteGlobe />

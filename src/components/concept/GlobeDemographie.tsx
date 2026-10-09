@@ -281,13 +281,12 @@ export function GlobeDemographie({
   const [theme] = useTheme();
   const jour = theme === "clair";
 
-  /* Le globe ne monte qu'une fois le reste de la page posé à l'écran ET
-     retombé. Voir la même note dans GlobeEco.tsx. */
-  const pretGlobe = usePretGlobe();
-
   const cadre = useRef<HTMLDivElement>(null);
 
   const scene = useRef<HTMLDivElement>(null);
+  /* Le globe ne monte qu'une fois l'entrée du héros finie, ou quand on
+     arrive à lui en défilant. Voir la même note dans GlobeEco.tsx. */
+  const pretGlobe = usePretGlobe(scene);
   const mesureLimbe = useCallback((diametre: number) => {
     const el = scene.current;
     if (!el) return;
@@ -410,10 +409,9 @@ export function GlobeDemographie({
                 palette={palette(!jour, pour100k)}
                 marge={1.06}
                 onCadrage={mesureLimbe}
-                /* Pas de plafond de texels : un plafond bas ne montrait plus
-                   rien qu'un aplat flou une fois zoomé, le zoom concentrant
-                   une tranche étroite de la toile sur toute la scène. La
-                   machine décide comme sur le reste du site. */
+                /* Quatre mille texels au départ, la toile pleine au premier
+                   zoom appuyé : voir la même note dans GlobeEco.tsx. */
+                texelsMax={4096}
               />
             ) : (
               <AttenteGlobe />

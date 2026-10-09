@@ -3,7 +3,6 @@ import { countryFr } from "@/data/countryNamesFr";
 import { DEBT_DATA } from "@/data/economy/debtData";
 import { DEBATS } from "@/data/community/debates";
 import { ECONOMY_ARTICLES } from "@/data/economy/articles";
-import { FAQS_ECONOMY } from "@/data/economy/faqs";
 import type { FicheArticle } from "./conceptGeo";
 
 /**
@@ -154,9 +153,131 @@ export function articlesEco(n = 9): FicheArticle[] {
     }));
 }
 
-/** La FAQ économie du site, telle quelle. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA FAQ ÉCONOMIE
+
+   Mondiale, et calculée. Celle du site d'origine s'ouvrait sur « le PIB de
+   la France en 2025 » : une question qu'un lecteur de São Paulo ou de
+   Lagos ne se pose pas, sur une page qui parle de deux cents pays. Ici
+   chaque réponse est tirée du socle au moment du build — le PIB mondial,
+   les dix premières économies, la dette, le chômage, l'inflation — et se
+   met donc à jour d'elle-même quand la base change. Deux questions de
+   définition, intemporelles, ferment la liste.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+type Champ = "gdp" | "gdp_per_capita" | "debt_ratio" | "unemployment" | "inflation";
+
+/** La dernière date qui couvre vraiment l'indicateur : au moins `min` pays. */
+function derniere(champ: Champ, min = 80) {
+  for (let i = ECONOMY_YEARS.length - 1; i >= 0; i--) {
+    const y = ECONOMY_YEARS[i];
+    const lignes = Object.entries(y.countries).filter(
+      ([, d]) => typeof d[champ] === "number" && Number.isFinite(d[champ] as number),
+    ) as [string, Record<Champ, number>][];
+    if (lignes.length >= min) return { annee: y.year, lignes };
+  }
+  return null;
+}
+
+const nf = (v: number, d = 0) =>
+  v.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const mds = (v: number) => `${nf(v)} milliards de dollars`;
+
 export function faqEco(): { question: string; answer: string }[] {
-  return FAQS_ECONOMY.map((f) => ({ question: f.question, answer: f.answer }));
+  const out: { question: string; answer: string }[] = [];
+
+  const pib = derniere("gdp");
+  if (pib) {
+    const tri = [...pib.lignes].sort((a, b) => b[1].gdp - a[1].gdp);
+    const total = tri.reduce((s, [, d]) => s + d.gdp, 0);
+    const dix = tri.slice(0, 10);
+    const partDix = dix.reduce((s, [, d]) => s + d.gdp, 0) / total;
+    out.push({
+      question: `Quel est le PIB mondial en ${pib.annee} ?`,
+      answer: `Environ ${mds(total)}, en additionnant les ${tri.length} pays publiés par la Banque mondiale pour ${pib.annee}. Sur la page, le compteur en temps réel prolonge ce total au rythme de la dernière année publiée, depuis le 1er janvier.`,
+    });
+    out.push({
+      question: `Quelles sont les plus grandes économies du monde en ${pib.annee} ?`,
+      answer:
+        `Par PIB nominal : ` +
+        dix.map(([n, d], i) => `${i + 1}. ${countryFr(n)} (${mds(d.gdp)})`).join(", ") +
+        `. À elles dix, elles pèsent ${nf(partDix * 100)} % du PIB mondial.`,
+    });
+    const [premier, second] = tri;
+    out.push({
+      question: "La richesse mondiale est-elle concentrée dans quelques pays ?",
+      answer: `Oui, très fortement. ${countryFr(premier[0])} et ${countryFr(second[0])} réunissent à eux seuls ${nf(((premier[1].gdp + second[1].gdp) / total) * 100)} % du PIB mondial en ${pib.annee}, les dix premières économies ${nf(partDix * 100)} %, et les ${tri.length - 10} autres pays se partagent le reste. Le globe de la page, en mode PIB, rend cette concentration visible d'un coup d'œil.`,
+    });
+  }
+
+  const hab = derniere("gdp_per_capita");
+  if (hab) {
+    const tri = [...hab.lignes].sort((a, b) => b[1].gdp_per_capita - a[1].gdp_per_capita);
+    const bas = tri.slice(-5).reverse();
+    out.push({
+      question: `Quels sont les pays les plus riches par habitant en ${hab.annee} ?`,
+      answer:
+        `PIB par habitant le plus élevé : ` +
+        tri.slice(0, 8).map(([n, d], i) => `${i + 1}. ${countryFr(n)} (${nf(d.gdp_per_capita)} $)`).join(", ") +
+        `. À l'autre bout : ` +
+        bas.map(([n, d]) => `${countryFr(n)} (${nf(d.gdp_per_capita)} $)`).join(", ") +
+        `. L'écart entre les deux extrémités dépasse un facteur ${nf(tri[0][1].gdp_per_capita / tri[tri.length - 1][1].gdp_per_capita)}.`,
+    });
+  }
+
+  const dette = derniere("debt_ratio");
+  if (dette) {
+    const tri = [...dette.lignes].sort((a, b) => b[1].debt_ratio - a[1].debt_ratio);
+    const med = tri[Math.floor(tri.length / 2)][1].debt_ratio;
+    out.push({
+      question: `Quels sont les pays les plus endettés du monde en ${dette.annee} ?`,
+      answer:
+        `Rapportée au PIB, la dette publique la plus lourde : ` +
+        tri.slice(0, 8).map(([n, d], i) => `${i + 1}. ${countryFr(n)} (${nf(d.debt_ratio)} %)`).join(", ") +
+        `. Le pays médian se situe autour de ${nf(med)} %. Un ratio élevé ne fait pas une crise à lui seul : la monnaie d'émission, le coût de l'emprunt et la croissance comptent autant.`,
+    });
+  }
+
+  const cho = derniere("unemployment");
+  if (cho) {
+    const tri = [...cho.lignes].sort((a, b) => b[1].unemployment - a[1].unemployment);
+    out.push({
+      question: `Où le chômage est-il le plus élevé et le plus bas dans le monde en ${cho.annee} ?`,
+      answer:
+        `Les taux les plus élevés : ` +
+        tri.slice(0, 6).map(([n, d]) => `${countryFr(n)} ${nf(d.unemployment, 1)} %`).join(", ") +
+        `. Les plus bas : ` +
+        tri.slice(-6).reverse().map(([n, d]) => `${countryFr(n)} ${nf(d.unemployment, 1)} %`).join(", ") +
+        `. Définition de l'Organisation internationale du travail, la même pour tous les pays.`,
+    });
+  }
+
+  const inf = derniere("inflation");
+  if (inf) {
+    const tri = [...inf.lignes].sort((a, b) => b[1].inflation - a[1].inflation);
+    out.push({
+      question: `Quels pays ont l'inflation la plus forte en ${inf.annee} ?`,
+      answer:
+        `Hausse des prix la plus rapide : ` +
+        tri.slice(0, 6).map(([n, d]) => `${countryFr(n)} ${nf(d.inflation, 1)} %`).join(", ") +
+        `. À l'inverse, ${tri.filter(([, d]) => d.inflation < 0).length} pays connaissent une baisse des prix cette année-là.`,
+    });
+  }
+
+  out.push(
+    {
+      question: "Quelle différence entre le PIB et le PIB par habitant ?",
+      answer:
+        "Le PIB mesure tout ce qu'un pays produit en un an : il dit la taille d'une économie, donc sa puissance. Le PIB par habitant divise ce total par la population : il approche le niveau de vie moyen. Une grande économie peut avoir un niveau de vie modeste, et un petit pays un niveau de vie très élevé — c'est pourquoi le globe propose les deux.",
+    },
+    {
+      question: "Comment comparer l'économie de deux pays ?",
+      answer:
+        "Cliquez un pays sur le globe pour ouvrir sa fiche — PIB, PIB par habitant, balance commerciale, courbe depuis 1960 — puis un second. Le classement, plus bas, range tous les pays sur l'indicateur de votre choix, pour l'année de votre choix.",
+    },
+  );
+
+  return out;
 }
 
 /* ── Les compteurs qui avancent ──────────────────────────────────────────────

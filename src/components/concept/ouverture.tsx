@@ -45,20 +45,42 @@ export function usePret() {
     n'avait la place de tourner. Ici, on attend que le navigateur se
     déclare inactif, avec un plafond pour ne pas non plus attendre
     indéfiniment sur un appareil qui ne l'est jamais. */
-export function usePretGlobe() {
+export function usePretGlobe(cible?: React.RefObject<HTMLElement | null>) {
+  /* Deux portes, la première qui s'ouvre suffit : l'entrée du héros est
+     finie — le titre levé, les premières tuiles posées — ou le globe arrive
+     à l'écran parce qu'on a défilé jusqu'à lui. Avant, il ne se passe rien :
+     l'ouverture garde le fil principal pour elle seule. */
+  const [porte, setPorte] = useState(false);
+  useEffect(() => {
+    const delai = window.setTimeout(() => setPorte(true), 2200);
+    const regarde = () => {
+      const n = cible?.current;
+      if (!n) return;
+      const r = n.getBoundingClientRect();
+      if (r.top < window.innerHeight + 260) setPorte(true);
+    };
+    window.addEventListener("scroll", regarde, { passive: true });
+    regarde();
+    return () => {
+      window.clearTimeout(delai);
+      window.removeEventListener("scroll", regarde);
+    };
+  }, [cible]);
+
   const [pret, setPret] = useState(false);
   useEffect(() => {
+    if (!porte) return;
     let annule: (() => void) | undefined;
     const ric = window.requestIdleCallback;
     if (ric) {
-      const id = ric(() => setPret(true), { timeout: 900 });
+      const id = ric(() => setPret(true), { timeout: 700 });
       annule = () => window.cancelIdleCallback?.(id);
     } else {
-      const id = window.setTimeout(() => setPret(true), 550);
+      const id = window.setTimeout(() => setPret(true), 120);
       annule = () => window.clearTimeout(id);
     }
     return () => annule?.();
-  }, []);
+  }, [porte]);
   return pret;
 }
 

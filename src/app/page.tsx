@@ -1,57 +1,60 @@
 import type { Metadata } from "next";
-import { Layout } from "@/components/layout/Layout";
-import { IntroHeroGlobe } from "@/components/presentation2/IntroHeroGlobe";
-import { DataStoryScene } from "@/components/presentation2/DataStoryScene";
-import { ArticlesShowcase } from "@/components/presentation2/ArticlesShowcase";
+import { ConceptPage } from "@/components/concept/ConceptPage";
+import { articlesEnUne, comptes, donneesPays, reperes, REGIONS, VUES } from "@/data/concept/conceptGeo";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE D'ACCUEIL
+
+   L'univers Visualize est désormais le site : on y arrive directement. Il
+   vivait sous /concept-globe, marqué « ne pas indexer » parce que c'était
+   un prototype posé à côté de l'ancien site. L'ancien accueil est retiré ;
+   /concept-globe redirige ici (voir next.config.ts), et la page est cette
+   fois offerte aux moteurs.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theessentialdata.com";
 
 export const metadata: Metadata = {
-  title: "The Essential Data · Cartes géopolitiques interactives PIB, Épidémies, Politique",
+  title: {
+    absolute: "Visualize · L'économie et la démographie du monde, en données",
+  },
   description:
-    "Explorez le PIB par pays 2025, les épidémies mondiales, les régimes politiques et les forces militaires grâce à des cartes interactives. Données FMI, Banque mondiale, OMS. Data journalism géopolitique de référence.",
+    "PIB, dette, chômage, population, natalité et mortalité de plus de 200 pays, de 1960 à aujourd'hui, sur un globe interactif et en temps réel. Sources : Banque mondiale, FMI, Nations Unies.",
   keywords: [
-    "carte PIB monde 2025",
-    "PIB par pays 2025",
-    "carte géopolitique interactive",
-    "données économiques mondiales",
-    "régimes politiques carte",
-    "épidémies mondiales carte",
-    "world GDP map",
-    "geopolitical data journalism",
-    "comparaison pays économie",
+    "données mondiales",
+    "PIB par pays",
+    "PIB mondial en temps réel",
+    "population mondiale",
+    "classement des pays",
+    "globe interactif",
+    "démographie mondiale",
+    "dette publique par pays",
   ],
-  alternates: {
-    canonical: "/",
-  },
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "The Essential Data · Cartes géopolitiques interactives",
-    description:
-      "PIB par pays 2025, épidémies mondiales (COVID, VIH, Peste Noire), régimes politiques, puissances militaires. Cartes interactives avec données FMI, Banque mondiale et OMS.",
     type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "The Essential Data · Cartes géopolitiques interactives",
+    url: siteUrl,
+    title: "Visualize · L'économie et la démographie du monde, en données",
     description:
-      "PIB par pays 2025, épidémies mondiales, régimes politiques. Data journalism géopolitique.",
+      "Plus de 200 pays, de 1960 à aujourd'hui, sur un globe interactif et en temps réel.",
   },
+  robots: { index: true, follow: true },
 };
 
-/**
- * The home page.
- *
- * What used to live at /presentation-2 is now the front door: globe, the
- * thematic maps, then the articles. The previous home is not deleted — it
- * sits at /accueil-v1 and can be swapped back by exchanging the two files.
- */
-export default function HomePage() {
+export default function Accueil() {
+  /* Le globe affiche de vraies valeurs : la page serveur lit le socle et
+     n'envoie que la fiche de chaque pays. */
+  const { annee, pays } = donneesPays();
+  const { liste: bandeau } = reperes();
   return (
-    <Layout>
-      {/* .p2-snap turns on scroll snapping for this page only */}
-      <div className="p2-snap">
-        <IntroHeroGlobe />
-        <DataStoryScene />
-        <ArticlesShowcase />
-      </div>
-    </Layout>
+    <ConceptPage
+      articles={articlesEnUne(4)}
+      reperes={bandeau}
+      comptes={comptes()}
+      donnees={pays}
+      annee={annee}
+      regions={REGIONS}
+      vues={VUES}
+    />
   );
 }

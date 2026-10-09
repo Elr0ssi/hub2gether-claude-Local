@@ -133,18 +133,33 @@ export function Odometre({
   /* Le nombre de rouleaux ne suit pas la valeur image par image : il ne
      change que quand l'ordre de grandeur change, sinon la ligne sauterait en
      largeur à chaque tour d'unité. */
+  /* Monté ou pas encore. Le premier rendu — celui du serveur, et celui de
+     l'hydratation qui doit lui ressembler trait pour trait — ne lit jamais
+     l'heure. La page est pré-rendue au build : un compteur qui comptait ses
+     chiffres à l'heure du build (98 millions de naissances, huit rouleaux)
+     n'en comptait plus autant à l'heure de la visite (101 millions, neuf).
+     React voyait deux pages différentes, jetait celle du serveur et
+     redessinait tout — thème compris, animations comprises. */
+  const [hydrate, setHydrate] = useState(false);
+  useEffect(() => setHydrate(true), []);
+
   const entiers = useMemo(() => {
-    /* On dimensionne sur la valeur d'aujourd'hui, pas sur celle de la fin de
-       l'année : viser la fin ajoutait un zéro de tête qui se lisait comme une
-       faute de frappe. Le rouleau supplémentaire arrivera quand la grandeur
-       le mérite — au prix d'un remontage, une fois l'an. */
+    /* Monté, on dimensionne sur la valeur d'aujourd'hui, pas sur celle de la
+       fin de l'année : viser la fin ajoutait un zéro de tête qui se lisait
+       comme une faute de frappe. Avant le montage, on ne peut que viser une
+       grandeur qui ne dépend pas de l'heure : la fin d'année, le temps d'une
+       image. */
     const fin = continu
-      ? Math.abs(cible + (parSeconde as number) * ((performance.now() - (depuis ?? 0)) / 1000))
+      ? Math.abs(
+          cible +
+            (parSeconde as number) *
+              (hydrate ? (performance.now() - (depuis ?? 0)) / 1000 : 365.2425 * 86400),
+        )
       : Math.abs(reference ?? cible);
     const q = Math.pow(10, dec);
     return Math.max(1, nbChiffres(Math.round(fin * q) / q));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [continu, cible, parSeconde, reference, depuis, dec]);
+  }, [continu, cible, parSeconde, reference, depuis, dec, hydrate]);
 
   const negatif = cible < 0;
   const cases = useMemo(

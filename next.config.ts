@@ -20,6 +20,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  /* L'ancien site est retiré : son accueil, la page d'essai d'article et les
+     anciennes cartes. Leurs adresses ne tombent pas pour autant en erreur —
+     chacune mène vers ce qui l'a remplacée, de façon permanente, pour que
+     les liens déjà partagés et l'autorité acquise suivent. */
+  async redirects() {
+    return [
+      { source: "/concept-globe", destination: "/", permanent: true },
+      { source: "/concept-globe/economie", destination: "/economie", permanent: true },
+      { source: "/accueil-v1", destination: "/", permanent: true },
+      { source: "/test-article", destination: "/", permanent: true },
+      { source: "/map/economy/:chemin*", destination: "/economie", permanent: true },
+      { source: "/map/:chemin*", destination: "/", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

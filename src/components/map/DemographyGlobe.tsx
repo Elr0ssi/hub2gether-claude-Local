@@ -33,6 +33,9 @@ const RADIUS = 1;
 let TEXTURE_W = 4096;
 let TEXTURE_H = 2048;
 let ZOOM_CEILING = 2.6;
+/** Vrai quand la machine pourrait porter la toile pleine, même si la page
+    a demandé de commencer plus léger. */
+let HD_POSSIBLE = false;
 /** Field of view at rest. Zooming past the dolly limit narrows it. */
 const BASE_FOV = 34;
 
@@ -43,6 +46,7 @@ function chooseTextureSize(renderer: THREE.WebGLRenderer, plafond?: number) {
   const roomy = maxTex >= 8192 && memory >= 8 && !coarse;
 
   TEXTURE_W = roomy ? 8192 : 4096;
+  HD_POSSIBLE = roomy;
   /* Un plafond demandé par la page. Quatre toiles pleines sont peintes au
      montage ; à 8192 sur 4096, chacune pèse cent trente méga-octets et sa
      peinture tient la main du navigateur plusieurs secondes. Un globe qui
@@ -52,6 +56,10 @@ function chooseTextureSize(renderer: THREE.WebGLRenderer, plafond?: number) {
   // Capped where the texture still has texels to give: past it the map stops
   // gaining detail and only gains blur.
   ZOOM_CEILING = TEXTURE_W >= 8192 ? 5 : TEXTURE_W >= 4096 ? 2.6 : 1.8;
+  /* Une machine capable de la toile pleine peut zoomer jusqu'au bout même
+     si la page démarre plus léger : la toile pleine arrive au premier zoom
+     appuyé (voir `demandeHD`). */
+  if (HD_POSSIBLE && TEXTURE_W < 8192) ZOOM_CEILING = 5;
 }
 /** La teinte d'un pays pour la métrique affichée. */
 type Remplissage = (
@@ -759,6 +767,9 @@ export function DemographyGlobe({
      savoir, sinon un globe passé en satellite avant elle garderait ses
      terres grises. */
   const [photoPrete, setPhotoPrete] = useState(false);
+  /* Vrai une fois la toile pleine posée : la peinture des pays doit alors
+     se refaire à la nouvelle taille. */
+  const [hd, setHd] = useState(false);
 
   const byNameRef = useRef<Map<string, GeoJSON.Feature>>(new Map());
   const baseMapRef = useRef<HTMLCanvasElement | null>(null);
@@ -855,7 +866,7 @@ export function DemographyGlobe({
       texture.needsUpdate = true;
     });
     return () => cancelAnimationFrame(handle);
-  }, [demographyYear, metric, ready, satellite, photoPrete]);
+  }, [demographyYear, metric, ready, satellite, photoPrete, hd]);
 
   /* ── Selection: an outline in 3D, so picking never repaints the map ───── */
   useEffect(() => {
@@ -1309,12 +1320,53 @@ export function DemographyGlobe({
       hoverRef.current = outline;
     };
 
+    /* La toile pleine, à la demande.
+
+       Peindre quatre toiles de 8192 sur 4096 au montage tenait le
+       navigateur plusieurs secondes : c'était le gel à l'ouverture des
+       pages Économie et Démographie. À 4096 le globe est net au repos —
+       il occupe six cents pixels. Seul le zoom profond a besoin de plus :
+       la toile des pays passe donc à 8192 au premier zoom appuyé, une
+       fois le geste posé, comme une carte qui s'affine. Le relief et
+       l'ombrage restent à leur taille : la sphère n'a pas assez de
+       sommets pour en montrer davantage. */
+    let hdDemandee = false;
+    let hdMinuteur = 0;
+    const demandeHD = () => {
+      if (!HD_POSSIBLE || TEXTURE_W >= 8192 || hdDemandee || zoom < 1.45) return;
+      window.clearTimeout(hdMinuteur);
+      hdMinuteur = window.setTimeout(() => {
+        const geo = geojsonRef.current;
+        if (cancelled || !geo || hdDemandee) return;
+        hdDemandee = true;
+        TEXTURE_W = 8192;
+        TEXTURE_H = 4096;
+        baseMapRef.current = buildBaseMap(geo);
+        satelliteMapRef.current = null;
+        const toile = document.createElement("canvas");
+        toile.width = TEXTURE_W;
+        toile.height = TEXTURE_H;
+        toile.getContext("2d")!.drawImage(baseMapRef.current, 0, 0);
+        const neuve = new THREE.CanvasTexture(toile);
+        neuve.colorSpace = THREE.SRGBColorSpace;
+        neuve.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        const ancienne = textureRef.current;
+        fillCanvasRef.current = toile;
+        textureRef.current = neuve;
+        material.map = neuve;
+        material.needsUpdate = true;
+        ancienne?.dispose();
+        setHd(true);
+      }, 420);
+    };
+
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       // Normalised so a trackpad and a mouse wheel travel at the same rate.
       const step = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY) / 320, 0.18);
       zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, zoom * (1 - step)));
       applyCamera();
+      demandeHD();
     };
 
     // Pinch: two pointers, the distance between them drives the same zoom.
@@ -1338,6 +1390,7 @@ export function DemographyGlobe({
       const d = Math.hypot(a.x - c.x, a.y - c.y);
       zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, (pinchZoom * d) / pinchStart));
       applyCamera();
+      demandeHD();
     };
     const onPinchUp = (e: PointerEvent) => {
       active.delete(e.pointerId);
@@ -1384,6 +1437,7 @@ export function DemographyGlobe({
 
     return () => {
       cancelled = true;
+      window.clearTimeout(hdMinuteur);
       cancelAnimationFrame(frame);
       ro.disconnect();
       el.removeEventListener("wheel", onWheel);

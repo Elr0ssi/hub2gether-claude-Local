@@ -194,7 +194,7 @@ const NAV_GAUCHE: Onglet[] = [
   { label: "Démographie", href: "/demographie" },
 ];
 const NAV_DROITE: Onglet[] = [
-  { label: "Analyses", href: "/concept-globe#analyses" },
+  { label: "Analyses", href: "/#analyses" },
   { label: "Dette", href: "/france/economie/dette-publique" },
   /* Comparer des thématiques dans le temps, sur un graphe : la suite de
      l'actuel /comparaison, encore à construire dans le concept. */
@@ -272,7 +272,7 @@ export function EnTete({ actif }: { actif?: string }) {
         </nav>
 
         <a
-          href="/concept-globe"
+          href="/"
           className="cg-logo"
           onClick={(e) => {
             if (!ouvert) {
@@ -322,7 +322,7 @@ export function Pied() {
           <a href="/forum">Forum</a>
           <a href="/compte/connexion">Mon compte</a>
         </nav>
-        <span className="cg-pied-note">Prototype de direction artistique · non indexé</span>
+        <span className="cg-pied-note">Données : Banque mondiale, FMI, Nations Unies</span>
       </div>
     </footer>
   );
