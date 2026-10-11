@@ -1,0 +1,65 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES PAGES PAR PAYS ET PAR COMPARAISON — sobres, lisibles, dans le style du site
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sg { display: block; }
+.sg-page { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: clamp(100px, 14vh, 150px) clamp(16px, 3vw, 32px) 40px; }
+.sg-fil ol { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0 0 22px; padding: 0; font-size: 13px; color: var(--encre-3); }
+.sg-fil li + li::before { content: "›"; margin-right: 6px; color: var(--encre-3); }
+.sg-fil a { color: var(--encre-2); text-decoration: none; }
+.sg-fil a:hover { color: #8b5cff; }
+.sg-h1 { margin: 0; font-size: clamp(34px, 5.4vw, 72px); font-weight: 800; letter-spacing: -0.05em; line-height: 1; }
+.sg-h1 span:not(.sg-drap) { background: linear-gradient(100deg, #8b5cff, #ff6fa5 70%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.sg-drap { display: inline-block; margin-right: 12px; font-size: 0.8em; }
+.sg-intro { max-width: 70ch; margin: 22px 0 0; font-size: clamp(16px, 1.4vw, 19px); line-height: 1.6; color: var(--encre-2); }
+.sg-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+.sg-bouton { display: inline-flex; align-items: center; gap: 8px; padding: 13px 22px; border-radius: 16px; font-size: 15px; font-weight: 750; text-decoration: none; color: #fff; background: linear-gradient(135deg, #4a1fd0, #7c4dff); box-shadow: 0 14px 30px -14px rgba(124, 77, 255, 0.9); transition: translate 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+.sg-bouton:hover { translate: 0 -3px; }
+.sg-bouton-2 { color: var(--encre); background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.14)); box-shadow: none; }
+.sg-sec { margin-top: clamp(44px, 7vh, 80px); }
+.sg-h2 { margin: 0 0 18px; font-size: clamp(24px, 3vw, 38px); font-weight: 800; letter-spacing: -0.045em; line-height: 1.1; }
+.sg-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.sg-carte { padding: 20px 22px; border-radius: 26px; background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); transition: translate 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s; }
+.sg-carte:hover { translate: 0 -5px; box-shadow: 0 18px 38px var(--ombre-portee, rgba(0, 0, 0, 0.4)); }
+.sg-carte h3 { margin: 0; font-size: 13px; font-weight: 750; letter-spacing: 0.04em; text-transform: uppercase; color: var(--encre-3); }
+.sg-carte strong { display: block; margin-top: 8px; font-size: clamp(24px, 2.6vw, 34px); font-weight: 800; letter-spacing: -0.045em; line-height: 1.05; }
+.sg-carte p { margin: 8px 0 0; font-size: 13px; line-height: 1.45; color: var(--encre-2); }
+.sg-carte-vif { color: #fff; border-color: transparent; background: radial-gradient(70% 90% at 100% 0%, rgba(255, 255, 255, 0.24), transparent 60%), linear-gradient(150deg, #3a14b8, #7c4dff); }
+.sg-carte-vif h3, .sg-carte-vif p { color: rgba(255, 255, 255, 0.86); }
+.sg-courbes { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.sg-courbe { padding: 20px 22px; border-radius: 26px; background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); }
+.sg-courbe h3 { margin: 0 0 10px; font-size: 16px; font-weight: 800; }
+.sg-courbe p { margin: 8px 0 0; font-size: 12.5px; color: var(--encre-3); }
+.sg-mini { display: block; width: 100%; height: auto; }
+.sg-tab { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 22px; background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); }
+.sg-tab th, .sg-tab td { padding: 14px 18px; text-align: left; font-size: 14.5px; border-bottom: 1px solid var(--bord, rgba(255, 255, 255, 0.08)); }
+.sg-tab thead th { font-size: 13px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--encre-3); background: var(--surface-2); }
+.sg-tab tbody th { font-weight: 700; }
+.sg-tab td { font-variant-numeric: tabular-nums; font-weight: 700; }
+.sg-tab tr:last-child > * { border-bottom: 0; }
+.sg-tab .sg-gagne { color: #8b5cff; }
+.sg-tab small { display: block; font-size: 11.5px; font-weight: 600; color: var(--encre-3); }
+.sg-duel { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 30px; }
+.sg-duel > div { padding: 22px 24px; border-radius: 28px; background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); }
+.sg-duel > div:first-child { border-color: rgba(139, 92, 255, 0.5); }
+.sg-duel > div:last-child { border-color: rgba(255, 111, 165, 0.5); }
+.sg-duel .sg-drap { display: block; margin: 0 0 8px; font-size: 44px; }
+.sg-duel h2 { margin: 0; font-size: clamp(22px, 2.4vw, 32px); font-weight: 800; letter-spacing: -0.04em; }
+.sg-duel a { color: inherit; text-decoration: none; }
+.sg-duel a:hover { color: #8b5cff; }
+.sg-faq { display: grid; gap: 10px; }
+.sg-faq details { padding: 4px 22px; border-radius: 22px; background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); }
+.sg-faq summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 0; font-size: 16px; font-weight: 750; letter-spacing: -0.02em; cursor: pointer; list-style: none; }
+.sg-faq summary::-webkit-details-marker { display: none; }
+.sg-faq summary::after { content: "+"; font-size: 22px; font-weight: 400; color: #8b5cff; transition: rotate 0.3s; }
+.sg-faq details[open] summary::after { rotate: 45deg; }
+.sg-faq p { margin: 0 0 18px; font-size: 15px; line-height: 1.65; color: var(--encre-2); }
+.sg-liens { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+.sg-liens a { display: inline-block; padding: 9px 16px; border-radius: 99px; font-size: 14px; font-weight: 650; text-decoration: none; color: var(--encre); background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.14)); transition: translate 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s; }
+.sg-liens a:hover { translate: 0 -2px; border-color: #8b5cff; }
+.sg-note { margin: 40px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--encre-3); }
+.sg-index { columns: 3 240px; column-gap: 28px; list-style: none; margin: 0; padding: 0; }
+.sg-index li { break-inside: avoid; margin-bottom: 8px; }
+.sg-index a { color: var(--encre); text-decoration: none; font-size: 15px; font-weight: 600; }
+.sg-index a:hover { color: #8b5cff; }
+.sg-lettre { margin: 22px 0 8px; font-size: 22px; font-weight: 800; color: #8b5cff; break-after: avoid; }
+@media (max-width: 700px) { .sg-duel { grid-template-columns: 1fr; } .sg-tab th, .sg-tab td { padding: 11px 12px; font-size: 13px; } }

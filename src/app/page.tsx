@@ -3,6 +3,8 @@ import { AnalysesPage } from "@/components/analyses/AnalysesPage";
 import { detteDerniere, ratioDernier } from "@/data/articles/detteFrancaise";
 import { DEFICIT_2025 } from "@/data/articles/financesPubliques";
 import { donneesPays, reperes } from "@/data/concept/conceptGeo";
+import { FAQ_ACCUEIL } from "@/data/seo/faqAccueil";
+import { JsonLd, schemaFaq } from "@/components/seo/Elements";
 import { pibMonde } from "@/data/concept/conceptEconomie";
 import { compteurDemo } from "@/data/concept/conceptDemographie";
 
@@ -43,6 +45,8 @@ export default function Accueil() {
   const { annee, pays } = donneesPays();
   const { liste } = reperes();
   return (
+    <>
+    <JsonLd data={[schemaFaq(FAQ_ACCUEIL)]} />
     <AnalysesPage
       reperes={liste}
       donnees={pays}
@@ -58,5 +62,6 @@ export default function Accueil() {
         deficit: Math.abs(DEFICIT_2025.valeur),
       }}
     />
+    </>
   );
 }

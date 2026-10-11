@@ -4462,3 +4462,10 @@ body:has(.cg) { background: #05080c; }
   background: rgba(138, 108, 255, 0.75);
   background-clip: content-box;
 }
+
+/* Le pied de page : les comparaisons populaires, sur une ligne à part. */
+.cg-pied-pop { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 18px; padding-top: 14px; font-size: 12px; color: var(--encre-3); }
+.cg-pied-pop nav { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.cg-pied-pop a { color: var(--encre-3); transition: color 0.3s; }
+.cg-pied-pop a:hover { color: var(--encre); }
+.ax .cg-pied-pop, .ax .cg-pied-pop a { color: rgba(236, 232, 255, 0.7); }

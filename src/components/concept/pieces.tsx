@@ -315,6 +315,17 @@ export function EnTete({ actif }: { actif?: string }) {
   );
 }
 
+const COMPARAISONS_POPULAIRES: [string, string][] = [
+  ["France ou Allemagne", "allemagne-vs-france"],
+  ["États-Unis ou Chine", "chine-vs-etats-unis"],
+  ["France ou Royaume-Uni", "france-vs-royaume-uni"],
+  ["France ou Italie", "france-vs-italie"],
+  ["France ou Espagne", "espagne-vs-france"],
+  ["Chine ou Inde", "chine-vs-inde"],
+  ["États-Unis ou France", "etats-unis-vs-france"],
+  ["France ou Brésil", "bresil-vs-france"],
+];
+
 export function Pied() {
   return (
     <footer className="cg-pied">
@@ -326,11 +337,21 @@ export function Pied() {
               {n.label}
             </a>
           ))}
+          <a href="/pays">Pays</a>
           <a href="/compte/connexion">Mon compte</a>
           <a href="/confidentialite">Confidentialité</a>
           <a href="/cgu">CGU</a>
         </nav>
         <a className="cg-pied-note" href="/#fonctionnement">Sources des données</a>
+      </div>
+      {/* Des liens vers les comparaisons les plus cherchées : pour les lecteurs, et pour les moteurs. */}
+      <div className="cg-wrap cg-pied-pop">
+        <span>Comparaisons populaires</span>
+        <nav aria-label="Comparaisons populaires">
+          {COMPARAISONS_POPULAIRES.map(([label, slug]) => (
+            <a key={slug} href={`/comparer/${slug}`}>{label}</a>
+          ))}
+        </nav>
       </div>
     </footer>
   );

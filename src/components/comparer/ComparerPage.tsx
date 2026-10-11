@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Crown, HelpCircle, Pause, Play, Plus, Share2, Sparkles, X } from "lucide-react";
 import { EnTete, Pied } from "@/components/concept/pieces";
-import { ChoixPays, drapeau, type OptionPays } from "@/components/concept/ChoixPays";
+import { ChoixPays, type OptionPays } from "@/components/concept/ChoixPays";
+import { drapeau } from "@/lib/drapeau";
 import { Dessin, Jetons } from "@/components/concept/Jetons";
 import { Titre, usePret, useProgression, useVu } from "@/components/concept/ouverture";
 import { useSocleDemo, useSocleEco, valeurSocle } from "@/components/compte/socles";
@@ -31,7 +32,7 @@ type Demo = ReturnType<typeof useSocleDemo>;
    dessous, tous les indicateurs d'un coup d'œil : un clic en choisit un.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-export function ComparerPage({ iso2 }: { iso2: Record<string, string> }) {
+export function ComparerPage({ iso2, apres }: { iso2: Record<string, string>; apres?: React.ReactNode }) {
   const eco = useSocleEco();
   const demo = useSocleDemo();
   const ouverture = useProgression();
@@ -307,6 +308,7 @@ export function ComparerPage({ iso2 }: { iso2: Record<string, string> }) {
           Sources : Banque mondiale (WDI), FMI, Nations Unies (World Population Prospects 2024). Une valeur absente reste absente : elle n&apos;est jamais comptée pour zéro.
         </p>
       </main>
+      {apres}
       <Pied />
     </div>
   );

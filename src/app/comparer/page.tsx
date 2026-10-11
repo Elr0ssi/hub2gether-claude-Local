@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ComparerPage } from "@/components/comparer/ComparerPage";
+import { BlocComparer } from "@/components/seo/BlocComparer";
 import SOCLE from "@/data/economy/genere/socle-economie.json";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -30,5 +31,5 @@ export default function Page() {
   const pays = SOCLE.pays as Record<string, { iso2?: string }>;
   const iso2: Record<string, string> = {};
   for (const [nom, p] of Object.entries(pays)) if (p.iso2) iso2[nom] = p.iso2;
-  return <ComparerPage iso2={iso2} />;
+  return <ComparerPage iso2={iso2} apres={<BlocComparer />} />;
 }

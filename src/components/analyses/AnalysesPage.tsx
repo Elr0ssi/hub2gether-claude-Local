@@ -19,6 +19,9 @@ import {
 import { EnTete, Pied } from "@/components/concept/pieces";
 import { Odometre } from "@/components/concept/Roulement";
 import { Lettres } from "@/components/concept/Lettres";
+import { Faq } from "@/components/seo/Elements";
+import { FAQ_ACCUEIL } from "@/data/seo/faqAccueil";
+import "@/components/seo/seo.css";
 import { useGlisser } from "@/lib/useGlisser";
 import { PresseCarousel } from "@/components/presse/PresseCarousel";
 import { PRESSE_MONDE } from "@/data/concept/presse";
@@ -954,6 +957,10 @@ export function AnalysesPage(props: Props) {
           />
         </Rev>
         <Fonctionnement />
+
+        <div className="sg ax-faq">
+          <Faq titre="Questions fréquentes" questions={FAQ_ACCUEIL} />
+        </div>
 
         <Rev className="ax-fin">
           <h2>Prêt à explorer ?</h2>

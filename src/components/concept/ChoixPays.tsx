@@ -2,18 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
+import { drapeau } from "@/lib/drapeau";
 import "./choixpays.css";
 
 export interface OptionPays {
   nom: string;
   fr: string;
   iso2?: string;
-}
-
-/** Le drapeau d'un pays à partir de son code à deux lettres. */
-export function drapeau(iso2?: string): string {
-  if (!iso2 || iso2.length !== 2) return "🌐";
-  return String.fromCodePoint(...[...iso2.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));
 }
 
 /* Un sélecteur de pays qui se cherche : on tape quelques lettres, on valide. Il

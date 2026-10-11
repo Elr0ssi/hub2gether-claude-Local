@@ -10,7 +10,7 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theessentialdata.com";
+import { SITE_URL as siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: {
@@ -18,35 +18,28 @@ export const metadata: Metadata = {
     template: "%s | Visualize",
   },
   description:
-    "Cartes interactives mondiales : PIB par pays 2025, épidémies, empires historiques. Données FMI, Banque mondiale, OMS. The Essential Data, data journalism géopolitique.",
+    "PIB, dette, chômage, population, natalité et mortalité de plus de 200 pays, de 1960 à aujourd'hui, sur un globe interactif. Comparez deux pays. Sources : Banque mondiale, FMI, Nations Unies.",
   keywords: [
-    "carte PIB monde 2025",
-    "PIB par pays 2025",
+    "PIB par pays",
+    "population par pays",
+    "comparer deux pays",
     "dette publique par pays",
-    "carte chômage monde",
-    "world GDP map 2025",
-    "country GDP comparison",
-    "carte empire romain interactif",
-    "Roman Empire interactive map",
-    "carte épidémies mondiales",
-    "COVID-19 carte mondiale",
-    "données économiques pays 2025",
-    "comparaison économique pays",
-    "geopolitical data map",
-    "carte géopolitique interactive",
-    "données FMI 2025",
-    "world economic data",
-    "carte hantavirus",
-    "carte VIH monde",
-    "empire romain carte",
-    "Black Death map",
+    "inflation par pays",
+    "taux de chômage par pays",
+    "classement des pays",
+    "carte du monde interactive",
+    "globe interactif",
+    "données économiques mondiales",
+    "données démographiques",
+    "évolution du PIB depuis 1960",
+    "population mondiale en temps réel",
+    "statistiques par pays",
   ],
   metadataBase: new URL(siteUrl),
   openGraph: {
     type: "website",
     siteName: "Visualize",
     locale: "fr_FR",
-    alternateLocale: ["en_US"],
     url: siteUrl,
     title: "Visualize · L'économie et la démographie du monde, en données",
     description:
@@ -80,7 +73,7 @@ export default function RootLayout({
     description:
       "L'économie et la démographie du monde en données : classements, cartes et dossiers sourcés.",
     url: siteUrl,
-    inLanguage: ["fr", "en"],
+    inLanguage: "fr",
     publisher: {
       "@type": "Organization",
       name: "Visualize",
