@@ -237,37 +237,68 @@ export function ComparerPage({ iso2 }: { iso2: Record<string, string> }) {
               </div>
             </section>
 
-            {/* ── Tous les indicateurs, d'un coup d'œil ─────────────────────── */}
+            {/* ── Tous les indicateurs, par catégorie ──────────────────────── */}
             <section className="cmp-tout" aria-label="Tous les indicateurs">
               <header className="cmp-tout-t">
                 <h2>Tout en un coup d&apos;œil</h2>
                 <p>En {anneeVue}. Cliquez une carte pour la comparer en grand.</p>
               </header>
-              <div className="cmp-tout-g">
-                <div className="cmp-cartes">
-                  {INDICS.map((i, k) => {
-                    const vals = pays.map((n) => lit(i, n, anneeVue));
-                    const pos = vals.filter((v): v is number => v !== null && v > 0);
-                    const max = Math.max(1e-9, ...vals.map((v) => (v === null ? 0 : Math.abs(v))));
-                    const top = vals.reduce<number>((m, v, j) => (v !== null && (vals[m] === null || v > (vals[m] as number)) ? j : m), 0);
-                    return (
-                      <button key={i.id} type="button" className={`cmp-carte${indicId === i.id ? " cmp-carte-on" : ""}`} onClick={() => { setIndicId(i.id); window.scrollTo({ top: (document.querySelector(".cmp-scene2") as HTMLElement | null)?.offsetTop ? (document.querySelector(".cmp-scene2") as HTMLElement).getBoundingClientRect().top + window.scrollY - 140 : 0, behavior: "smooth" }); }} style={{ "--k": k } as React.CSSProperties}>
-                        <span className="cmp-carte-t">{i.label}</span>
-                        <span className="cmp-carte-mini" aria-hidden="true">
-                          {vals.map((v, j) => (
-                            <i key={j} style={{ "--c": COULEURS[j], height: v === null ? 3 : `${Math.max(8, (Math.abs(v) / max) * 100)}%` } as React.CSSProperties} />
-                          ))}
-                        </span>
-                        <span className="cmp-carte-v">
-                          {vals[top] === null ? "—" : <>{drapeau(iso2[pays[top]])} {i.fmt(vals[top] as number)}</>}
-                        </span>
-                        <span className="cmp-carte-e">{pos.length > 1 ? `×${ratio(Math.max(...pos), Math.min(...pos))} d'écart` : "—"}</span>
-                      </button>
-                    );
-                  })}
+              {(["Économie", "Démographie"] as const).map((g) => (
+                <div key={g} className="cmp-cat">
+                  <h3>{g}</h3>
+                  <div className="cmp-cartes">
+                    {INDICS.filter((i) => i.groupe === g).map((i, k) => {
+                      const vals = pays.map((n) => lit(i, n, anneeVue));
+                      const pos = vals.filter((v): v is number => v !== null && v > 0);
+                      const max = Math.max(1e-9, ...vals.map((v) => (v === null ? 0 : Math.abs(v))));
+                      const haut = vals.some((v) => v !== null) ? Math.max(...vals.filter((v): v is number => v !== null)) : null;
+                      return (
+                        <button
+                          key={i.id}
+                          type="button"
+                          className={`cmp-carte${indicId === i.id ? " cmp-carte-on" : ""}`}
+                          style={{ "--k": k } as React.CSSProperties}
+                          onClick={() => {
+                            setIndicId(i.id);
+                            const sc = document.querySelector(".cmp-scene2") as HTMLElement | null;
+                            if (sc) window.scrollTo({ top: sc.getBoundingClientRect().top + window.scrollY - 140, behavior: "smooth" });
+                          }}
+                        >
+                          <span className="cmp-carte-tete">
+                            <span className="cmp-carte-t">{i.label}</span>
+                            {pos.length > 1 && <em>×{ratio(Math.max(...pos), Math.min(...pos))} d&apos;écart</em>}
+                          </span>
+                          <span className="cmp-carte-l">
+                            {vals.map((v, j) => (
+                              <span key={j} className="cmp-carte-r" style={{ "--c": COULEURS[j], "--l": v === null ? "0%" : `${Math.max(3, (Math.abs(v) / max) * 100)}%` } as React.CSSProperties}>
+                                <span className="cmp-carte-n">{drapeau(iso2[pays[j]])} {fr(pays[j])}</span>
+                                <span className="cmp-carte-b"><i /></span>
+                                <span className="cmp-carte-x">
+                                  {v !== null && v === haut && pos.length > 1 && <Crown size={12} aria-hidden="true" />}
+                                  {v === null ? "—" : i.fmt(v)}
+                                </span>
+                              </span>
+                            ))}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-                <Profil pays={pays} annee={anneeVue} lit={lit} eco={eco} demo={demo} />
+              ))}
+              <div className="cmp-cat cmp-cat-bientot">
+                <h3>Ressources <em>bientôt</em></h3>
+                <p>Eau, énergie, forêts : de nouveaux indicateurs arrivent ici.</p>
               </div>
+            </section>
+
+            {/* ── D'autres lectures ─────────────────────────────────────────── */}
+            <section className="cmp-plus" aria-label="D'autres lectures">
+              <header className="cmp-tout-t">
+                <h2>D&apos;autres lectures</h2>
+                <p>Une vue d&apos;ensemble de vos pays sur plusieurs indicateurs à la fois.</p>
+              </header>
+              <Profil pays={pays} annee={anneeVue} lit={lit} eco={eco} demo={demo} fr={fr} />
             </section>
           </>
         )}
@@ -546,7 +577,7 @@ function Courbe({
    LE PROFIL — un radar des rangs, sur tous les indicateurs
    ═══════════════════════════════════════════════════════════════════════════ */
 
-function Profil({ pays, annee, lit, eco, demo }: { pays: string[]; annee: number; lit: Lit; eco: Eco; demo: Demo }) {
+function Profil({ pays, annee, lit, eco, demo, fr }: { pays: string[]; annee: number; lit: Lit; eco: Eco; demo: Demo; fr: (n: string) => string }) {
   const rang = useMemo(
     () => (i: Indic, nom: string): number | null => {
       const s = i.src === "eco" ? eco : demo;
@@ -571,8 +602,28 @@ function Profil({ pays, annee, lit, eco, demo }: { pays: string[]; annee: number
   };
   if (axes.length < 3) return null;
   return (
-    <div className="cmp-radar-c">
-      <h3>Profil</h3>
+    <div className="cmp-radar-c cmp-radar-large">
+      <div className="cmp-radar-t">
+        <h3>Profil</h3>
+        <p>Plus un point est loin du centre, plus le pays dépasse de pays sur cet indicateur.</p>
+        <div className="cmp-tab">
+          <div className="cmp-tab-l cmp-tab-t">
+            <span />
+            {pays.map((n, j) => (
+              <span key={j} style={{ "--c": COULEURS[j] } as React.CSSProperties}><i />{fr(n)}</span>
+            ))}
+          </div>
+          {axes.map((a) => (
+            <div key={a.id} className="cmp-tab-l">
+              <span>{a.label}</span>
+              {pays.map((n, j) => {
+                const r = rang(a, n);
+                return <span key={j} style={{ "--c": COULEURS[j] } as React.CSSProperties}>{r === null ? "—" : `${Math.round(r * 100)}ᵉ centile`}</span>;
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
       <svg viewBox="-70 -10 600 480" className="cmp-radar" role="img" aria-label="Profil comparé">
         {[0.25, 0.5, 0.75, 1].map((r) => (
           <polygon key={r} points={axes.map((_, k) => pt(k, r).join(",")).join(" ")} className="cmp-toile" />
@@ -599,7 +650,6 @@ function Profil({ pays, annee, lit, eco, demo }: { pays: string[]; annee: number
           );
         })}
       </svg>
-      <p className="cmp-note">Plus un point est loin du centre, plus le pays dépasse de pays sur cet indicateur.</p>
     </div>
   );
 }
