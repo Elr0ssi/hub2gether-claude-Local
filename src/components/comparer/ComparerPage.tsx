@@ -4,9 +4,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRightLeft, Crown, LineChart, Plus, Radar, Share2, Sparkles, X } from "lucide-react";
 import { EnTete, Pied } from "@/components/concept/pieces";
 import { ChoixPays, drapeau, type OptionPays } from "@/components/concept/ChoixPays";
+import { Dessin, Jetons } from "@/components/concept/Jetons";
+import { Titre, usePret, useProgression, useVu } from "@/components/concept/ouverture";
 import { useSocleDemo, useSocleEco, valeurSocle } from "@/components/compte/socles";
 import { COULEURS, INDICS, PRESETS, type Indic } from "./indicateurs";
 import "@/components/concept/concept.css";
+import "@/components/concept/v2eco.css";
 import "./comparer.css";
 
 type Vue = "face" | "evolution" | "profil";
@@ -25,6 +28,9 @@ const ratio = (a: number, b: number) => {
 export function ComparerPage({ iso2 }: { iso2: Record<string, string> }) {
   const eco = useSocleEco();
   const demo = useSocleDemo();
+  const ouverture = useProgression();
+  const haut = useVu(260);
+  const arrive = usePret();
 
   const [pays, setPays] = useState<string[]>(DEFAUT_PAYS);
   const [indics, setIndics] = useState<string[]>(DEFAUT_INDICS);
@@ -104,81 +110,125 @@ export function ComparerPage({ iso2 }: { iso2: Record<string, string> }) {
   const bascule = (id: string) => setIndics((l) => (l.includes(id) ? (l.length > 1 ? l.filter((x) => x !== id) : l) : [...l, id]));
 
   return (
-    <div className="cg cmp">
+    <div className="cg cg-eco cg-v2 cmp">
       <EnTete actif="Comparer" />
-      <div className="cmp-fond" aria-hidden="true" />
+
+      {/* ── L'ouverture, comme les autres pages ──────────────────────────── */}
+      <section
+        ref={ouverture as React.RefObject<HTMLElement>}
+        className="cg-section cg-eco-haut"
+        data-vu={haut.vu ? "1" : "0"}
+        data-pret={arrive ? "1" : "0"}
+      >
+        <div className="cg-eco-lueur" aria-hidden="true" />
+        <Jetons theme="comparer" />
+        <div className="cg-wrap">
+          <div className="cg-eco-ouv">
+            <span className="cg-sceau" aria-hidden="true">
+              <span className="cg-sceau-i">
+                <Dessin f="balance" />
+              </span>
+            </span>
+            <h1 className="cg-eco-titre">
+              <Titre texte="Comparaison" />
+            </h1>
+          </div>
+        </div>
+        <div className="cg-arc" aria-hidden="true">
+          <span className="cg-arc-corps" />
+          <span className="cg-arc-trait" />
+          <span className="cg-arc-nappe" />
+          <span className="cg-arc-point" />
+        </div>
+      </section>
+      <div ref={haut.ref as React.RefObject<HTMLDivElement>} className="cg-temoin" aria-hidden="true" />
 
       <main className="cmp-page">
-        {/* ── L'ouverture ─────────────────────────────────────────────────── */}
-        <header className="cmp-tete">
-          <p className="cmp-sur"><ArrowRightLeft size={14} aria-hidden="true" /> Comparer</p>
-          <h1 className="cmp-h1">
-            Deux pays, quatre pays,
-            <br />
-            <span>une seule lecture.</span>
-          </h1>
-          <p className="cmp-sous">Choisissez vos pays et ce qui compte. Tout se lit dans la même base, de 1960 à aujourd&apos;hui.</p>
-        </header>
-
-        {/* ── Les pays ────────────────────────────────────────────────────── */}
-        <section className="cmp-scene" aria-label="Pays comparés">
-          <div className="cmp-pays">
-            {pays.map((nom, i) => (
-              <div key={`${i}-${nom}`} className="cmp-pays-c" style={{ "--c": COULEURS[i] } as React.CSSProperties}>
-                <span className="cmp-pays-p" aria-hidden="true" />
-                <ChoixPays valeur={nom} options={options} label={`Pays ${i + 1}`} onChange={(v) => setPays((l) => l.map((x, k) => (k === i ? v : x)))} />
-                {pays.length > 2 && (
-                  <button type="button" className="cmp-x" aria-label={`Retirer ${fr(nom)}`} onClick={() => setPays((l) => l.filter((_, k) => k !== i))}>
-                    <X size={14} aria-hidden="true" />
-                  </button>
-                )}
-              </div>
-            ))}
-            {pays.length < 4 && (
-              <button type="button" className="cmp-ajout" onClick={() => setPays((l) => [...l, ["Germany", "Japan", "Brazil", "India"].find((x) => !l.includes(x)) ?? "Japan"])}>
-                <Plus size={15} aria-hidden="true" /> Ajouter un pays
-              </button>
-            )}
+        {/* ── 1 · Les pays ────────────────────────────────────────────────── */}
+        <section className="cmp-etape" aria-labelledby="cmp-e1">
+          <header className="cmp-etape-t">
+            <span>1</span>
+            <div>
+              <h2 id="cmp-e1">Vos pays</h2>
+              <p>Jusqu&apos;à quatre. Cliquez sur un nom pour en changer.</p>
+            </div>
+          </header>
+          <div className="cmp-scene">
+            <div className="cmp-pays">
+              {pays.map((nom, i) => (
+                <div key={`${i}-${nom}`} className="cmp-pays-c" style={{ "--c": COULEURS[i] } as React.CSSProperties}>
+                  <span className="cmp-pays-p" aria-hidden="true" />
+                  <ChoixPays valeur={nom} options={options} label={`Pays ${i + 1}`} onChange={(v) => setPays((l) => l.map((x, k) => (k === i ? v : x)))} />
+                  {pays.length > 2 && (
+                    <button type="button" className="cmp-x" aria-label={`Retirer ${fr(nom)}`} onClick={() => setPays((l) => l.filter((_, k) => k !== i))}>
+                      <X size={14} aria-hidden="true" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              {pays.length < 4 && (
+                <button type="button" className="cmp-ajout" onClick={() => setPays((l) => [...l, ["Germany", "Japan", "Brazil", "India"].find((x) => !l.includes(x)) ?? "Japan"])}>
+                  <Plus size={15} aria-hidden="true" /> Ajouter un pays
+                </button>
+              )}
+            </div>
+            <div className="cmp-presets">
+              <span><Sparkles size={13} aria-hidden="true" /> Idées</span>
+              {PRESETS.filter((p) => p.pays.every((n) => options.some((o) => o.nom === n))).map((p) => (
+                <button key={p.label} type="button" onClick={() => setPays(p.pays)}>{p.label}</button>
+              ))}
+            </div>
           </div>
-          <div className="cmp-presets">
-            <span><Sparkles size={13} aria-hidden="true" /> Essayez</span>
-            {PRESETS.filter((p) => p.pays.every((n) => options.some((o) => o.nom === n))).map((p) => (
-              <button key={p.label} type="button" onClick={() => setPays(p.pays)}>{p.label}</button>
+        </section>
+
+        {/* ── 2 · Ce qu'on compare ────────────────────────────────────────── */}
+        <section className="cmp-etape" aria-labelledby="cmp-e2">
+          <header className="cmp-etape-t">
+            <span>2</span>
+            <div>
+              <h2 id="cmp-e2">Ce que vous comparez</h2>
+              <p>Cochez les indicateurs qui vous intéressent : ils servent aux trois lectures ci-dessous.</p>
+            </div>
+          </header>
+          <div className="cmp-regle">
+            {(["Économie", "Démographie"] as const).map((g) => (
+              <div key={g} className="cmp-groupe">
+                <b>{g}</b>
+                {INDICS.filter((i) => i.groupe === g).map((i) => (
+                  <button key={i.id} type="button" className={indics.includes(i.id) ? "on" : ""} aria-pressed={indics.includes(i.id)} onClick={() => bascule(i.id)}>
+                    {i.label}
+                  </button>
+                ))}
+              </div>
             ))}
           </div>
         </section>
 
-        {/* ── Ce qu'on compare ────────────────────────────────────────────── */}
-        <section className="cmp-regle" aria-label="Indicateurs">
-          {(["Économie", "Démographie"] as const).map((g) => (
-            <div key={g} className="cmp-groupe">
-              <b>{g}</b>
-              {INDICS.filter((i) => i.groupe === g).map((i) => (
-                <button key={i.id} type="button" className={indics.includes(i.id) ? "on" : ""} aria-pressed={indics.includes(i.id)} onClick={() => bascule(i.id)}>
-                  {i.label}
+        {/* ── 3 · La lecture ──────────────────────────────────────────────── */}
+        <section className="cmp-etape" aria-labelledby="cmp-e3">
+          <header className="cmp-etape-t">
+            <span>3</span>
+            <div>
+              <h2 id="cmp-e3">Votre comparaison</h2>
+              <p>Trois façons de la lire.</p>
+            </div>
+          </header>
+          <div className="cmp-barre">
+            <div className="cmp-vues" role="tablist" aria-label="Type de lecture">
+              {([
+                ["face", "Face à face", ArrowRightLeft],
+                ["evolution", "Évolution", LineChart],
+                ["profil", "Profil", Radar],
+              ] as const).map(([id, lib, Ic]) => (
+                <button key={id} type="button" role="tab" aria-selected={vue === id} className={vue === id ? "on" : ""} onClick={() => setVue(id)}>
+                  <Ic size={16} aria-hidden="true" /> {lib}
                 </button>
               ))}
             </div>
-          ))}
-        </section>
-
-        {/* ── Les trois lectures ──────────────────────────────────────────── */}
-        <div className="cmp-barre">
-          <div className="cmp-vues" role="tablist" aria-label="Type de lecture">
-            {([
-              ["face", "Face à face", ArrowRightLeft],
-              ["evolution", "Évolution", LineChart],
-              ["profil", "Profil", Radar],
-            ] as const).map(([id, lib, Ic]) => (
-              <button key={id} type="button" role="tab" aria-selected={vue === id} className={vue === id ? "on" : ""} onClick={() => setVue(id)}>
-                <Ic size={16} aria-hidden="true" /> {lib}
-              </button>
-            ))}
+            <button type="button" className="cmp-partage" onClick={partager}>
+              <Share2 size={14} aria-hidden="true" /> {copie ? "Lien copié" : "Partager"}
+            </button>
           </div>
-          <button type="button" className="cmp-partage" onClick={partager}>
-            <Share2 size={14} aria-hidden="true" /> {copie ? "Lien copié" : "Partager"}
-          </button>
-        </div>
 
         {!eco ? (
           <div className="cmp-attente" aria-label="Chargement des données"><i /><i /><i /></div>
@@ -196,6 +246,7 @@ export function ComparerPage({ iso2 }: { iso2: Record<string, string> }) {
             {vue === "evolution" && (
               <Evolution
                 pays={pays}
+                indics={indics}
                 courbe={courbe}
                 setCourbe={setCourbe}
                 de={de}
@@ -215,6 +266,8 @@ export function ComparerPage({ iso2 }: { iso2: Record<string, string> }) {
             {vue === "profil" && <Profil pays={pays} indics={indics} annee={anneeVue} lit={lit} fr={fr} eco={eco} demo={demo} />}
           </>
         )}
+
+        </section>
 
         <p className="cmp-sources">
           Sources : Banque mondiale (WDI), FMI, Nations Unies (World Population Prospects 2024). Une valeur absente reste absente : elle n&apos;est jamais comptée pour zéro.
@@ -349,9 +402,10 @@ const H = 440;
 const M = { g: 64, d: 24, h: 24, b: 40 };
 
 function Evolution({
-  pays, courbe, setCourbe, de, a, setDe, setA, base100, setBase100, log, setLog, lit, fr, iso2, anneeMax,
+  pays, indics, courbe, setCourbe, de, a, setDe, setA, base100, setBase100, log, setLog, lit, fr, iso2, anneeMax,
 }: {
   pays: string[];
+  indics: string[];
   courbe: string;
   setCourbe: (s: string) => void;
   de: number;
@@ -367,7 +421,8 @@ function Evolution({
   iso2: Record<string, string>;
   anneeMax: number;
 }) {
-  const i = INDICS.find((x) => x.id === courbe) ?? INDICS[0];
+  const choix = INDICS.filter((x) => indics.includes(x.id));
+  const i = choix.find((x) => x.id === courbe) ?? choix[0] ?? INDICS[0];
   const debut = Math.min(de, a - 1);
   const fin = Math.max(a, debut + 1);
   const ans = useMemo(() => Array.from({ length: fin - debut + 1 }, (_, k) => debut + k), [debut, fin]);
@@ -431,14 +486,14 @@ function Evolution({
   };
 
   const fmtAxe = (v: number) => (base100 ? v.toLocaleString("fr-FR", { maximumFractionDigits: 0 }) : i.fmt(v));
-  const rafraichit = `${courbe}-${debut}-${fin}-${base100}-${echelleLog}-${pays.join("|")}`;
+  const rafraichit = `${i.id}-${debut}-${fin}-${base100}-${echelleLog}-${pays.join("|")}`;
 
   return (
     <div className="cmp-evo">
       <div className="cmp-evo-ctrl">
         <div className="cmp-evo-indic" role="tablist" aria-label="Indicateur de la courbe">
-          {INDICS.map((x) => (
-            <button key={x.id} type="button" role="tab" aria-selected={courbe === x.id} className={courbe === x.id ? "on" : ""} onClick={() => setCourbe(x.id)}>
+          {choix.map((x) => (
+            <button key={x.id} type="button" role="tab" aria-selected={i.id === x.id} className={i.id === x.id ? "on" : ""} onClick={() => setCourbe(x.id)}>
               {x.label}
             </button>
           ))}
@@ -447,12 +502,12 @@ function Evolution({
           <label className="cmp-bascule">
             <input type="checkbox" checked={base100} onChange={(e) => setBase100(e.target.checked)} />
             <span />
-            Base 100 au départ
+            <b>Comparer la croissance<small>Base 100 : tous partent de 100</small></b>
           </label>
           <label className={`cmp-bascule${peutLog ? "" : " cmp-bascule-off"}`}>
             <input type="checkbox" checked={echelleLog} disabled={!peutLog} onChange={(e) => setLog(e.target.checked)} />
             <span />
-            Échelle logarithmique
+            <b>Mieux voir les petits pays<small>Échelle logarithmique</small></b>
           </label>
         </div>
       </div>
@@ -526,6 +581,26 @@ function Evolution({
             </article>
           );
         })}
+      </div>
+
+      <div className="cmp-aide">
+        <h4>Comment lire ce graphique ?</h4>
+        <div>
+          <article>
+            <b>Comparer la croissance (base 100)</b>
+            <p>
+              Chaque pays démarre à 100 la première année de la période. Une courbe à 300 a triplé, une courbe à 150 a gagné la moitié. Cela compare la
+              <em> vitesse</em> à laquelle chacun a grandi, quelle que soit sa taille de départ.
+            </p>
+          </article>
+          <article>
+            <b>Mieux voir les petits pays (échelle logarithmique)</b>
+            <p>
+              Sur l&apos;échelle habituelle, un géant écrase les autres. En logarithmique, chaque graduation multiplie par dix au lieu d&apos;ajouter : les petits pays
+              redeviennent lisibles, et une pente plus raide veut dire une croissance plus rapide. Indisponible pour les valeurs qui peuvent être négatives.
+            </p>
+          </article>
+        </div>
       </div>
     </div>
   );

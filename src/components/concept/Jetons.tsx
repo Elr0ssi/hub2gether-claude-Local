@@ -172,6 +172,10 @@ const TUILES_FORUM: Tuile[] = [
   { f: "epingle", c: OR, x: 96, y: 14, k: 36, d: 14, z: 0.75, o: 10 },
 ];
 
+/* Pour la page Comparer : les mêmes positions, avec des signes de mise en regard. */
+const FORME_COMPARER: Partial<Record<string, Forme>> = { bulle: "barres", flamme: "pourcent", epingle: "courbe", mains: "globeTerre" };
+const TUILES_COMPARER: Tuile[] = TUILES_FORUM.map((t) => ({ ...t, f: (t.f && FORME_COMPARER[t.f]) || t.f }));
+
 const TRAIT = {
   fill: "none",
   stroke: "currentColor",
@@ -549,10 +553,10 @@ function useLancer(champ: React.RefObject<HTMLDivElement | null>) {
   }, [champ]);
 }
 
-export function Jetons({ theme = "finance" }: { theme?: "finance" | "demographie" | "forum" }) {
+export function Jetons({ theme = "finance" }: { theme?: "finance" | "demographie" | "forum" | "comparer" }) {
   const champ = useRef<HTMLDivElement>(null);
   useLancer(champ);
-  const tuiles = theme === "demographie" ? TUILES_DEMOGRAPHIE : theme === "forum" ? TUILES_FORUM : TUILES;
+  const tuiles = theme === "demographie" ? TUILES_DEMOGRAPHIE : theme === "forum" ? TUILES_FORUM : theme === "comparer" ? TUILES_COMPARER : TUILES;
   return (
     <div className="cg-tuiles" ref={champ} aria-hidden="true">
       {tuiles.map((j, i) => (
