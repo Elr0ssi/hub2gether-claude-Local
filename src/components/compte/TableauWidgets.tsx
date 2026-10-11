@@ -1,185 +1,157 @@
 "use client";
 
-import { startTransition, useEffect, useMemo, useRef, useState } from "react";
+import { startTransition, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import { Globe2, GripVertical, Maximize2, Plus, X } from "lucide-react";
+import { GripVertical, Plus, Settings2, X, Check } from "lucide-react";
 import { Odometre } from "@/components/concept/Roulement";
 import { CADENCES_EXEMPLE, POPULATION_PAR_AN } from "@/data/concept/tempsReel";
 import { majWidgets } from "@/app/compte/actions";
+import { useSocleDemo, useSocleEco, valeurSocle } from "./socles";
 
-const GlobePoints = dynamic(() => import("@/components/globe/InteractiveGlobeIcons"), {
+const GlobePerso = dynamic(() => import("./GlobePerso").then((m) => m.GlobePerso), {
   ssr: false,
   loading: () => <div className="es-globe-attente" aria-hidden="true" />,
 });
 
 const AN = 365.2425 * 24 * 3600;
-const CLE = "visualize-tableau-v2";
+const CLE = "visualize-tableau-v3";
 
 export interface PaysCompare {
   nom: string;
   fr: string;
-  pib: number | null;
-  pibHab: number | null;
-  population: number | null;
-  dette: number | null;
-  inflation: number | null;
-  lat: number | null;
-  lon: number | null;
 }
 
+type Taille = 2 | 3 | 6;
+type Texte = "s" | "m" | "l";
 interface Item {
   id: string;
   /** Largeur sur 6 colonnes : 2 (petit), 3 (moyen), 6 (large). */
-  t: 2 | 3 | 6;
+  t: Taille;
+  /** Taille du texte d'un compteur. */
+  x?: Texte;
 }
-
-const TAILLES: Item["t"][] = [2, 3, 6];
+const TAILLES: Taille[] = [2, 3, 6];
 const NOM_TAILLE: Record<number, string> = { 2: "Petit", 3: "Moyen", 6: "Large" };
-
-const INDIC = [
-  { id: "pib", label: "PIB", f: (v: number) => (v >= 1000 ? `${(v / 1000).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} T$` : `${Math.round(v)} Md$`) },
-  { id: "pibHab", label: "PIB / habitant", f: (v: number) => `${Math.round(v).toLocaleString("fr-FR")} $` },
-  { id: "population", label: "Population", f: (v: number) => `${v.toLocaleString("fr-FR", { maximumFractionDigits: v >= 100 ? 0 : 1 })} M` },
-  { id: "dette", label: "Dette / PIB", f: (v: number) => `${Math.round(v)} %` },
-  { id: "inflation", label: "Inflation", f: (v: number) => `${v.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %` },
-] as const;
-type IndicId = (typeof INDIC)[number]["id"];
-
-/* ── Le globe du tableau de bord ─────────────────────────────────────────── */
-
-function GlobeWidget({ pays }: { pays: PaysCompare[] }) {
-  const avecCentre = useMemo(() => pays.filter((p) => p.lat !== null && p.lon !== null), [pays]);
-  const [indic, setIndic] = useState<IndicId>("pib");
-  const [noms, setNoms] = useState<string[]>(["France", "États-Unis", "Chine", "Inde", "Brésil"]);
-  const [sombre, setSombre] = useState(true);
-
-  useEffect(() => {
-    try {
-      const s = JSON.parse(localStorage.getItem("visualize-globe-perso") ?? "null");
-      if (s?.indic) setIndic(s.indic);
-      if (Array.isArray(s?.noms)) setNoms(s.noms);
-    } catch {}
-    const lit = () => setSombre(document.documentElement.getAttribute("data-concept") !== "clair");
-    lit();
-    const o = new MutationObserver(lit);
-    o.observe(document.documentElement, { attributes: true, attributeFilter: ["data-concept"] });
-    return () => o.disconnect();
-  }, []);
-  const garde = (i: IndicId, n: string[]) => {
-    try {
-      localStorage.setItem("visualize-globe-perso", JSON.stringify({ indic: i, noms: n }));
-    } catch {}
-  };
-
-  const spec = INDIC.find((i) => i.id === indic) ?? INDIC[0];
-  const marqueurs = useMemo(
-    () =>
-      noms
-        .map((n) => avecCentre.find((p) => p.fr === n))
-        .filter((p): p is PaysCompare => Boolean(p))
-        .map((p) => {
-          const v = p[indic];
-          return { id: p.nom, lat: p.lat as number, lon: p.lon as number, icon: Globe2, texte: { chiffre: v === null ? "—" : spec.f(v), label: p.fr } };
-        }),
-    [noms, avecCentre, indic, spec],
-  );
-  const dispo = avecCentre.filter((p) => !noms.includes(p.fr));
-
-  return (
-    <div className="es-gw">
-      <div className="es-gw-ctrl">
-        <div className="es-gw-indic" role="tablist" aria-label="Indicateur affiché">
-          {INDIC.map((i) => (
-            <button key={i.id} type="button" role="tab" aria-selected={indic === i.id} className={indic === i.id ? "on" : ""} onClick={() => { setIndic(i.id); garde(i.id, noms); }}>
-              {i.label}
-            </button>
-          ))}
-        </div>
-        <div className="es-gw-pays">
-          {noms.map((n) => (
-            <span key={n} className="es-puce">
-              {n}
-              <button type="button" aria-label={`Retirer ${n}`} onClick={() => { const x = noms.filter((y) => y !== n); setNoms(x); garde(indic, x); }}>
-                <X size={12} aria-hidden="true" />
-              </button>
-            </span>
-          ))}
-          {noms.length < 8 && (
-            <select
-              value=""
-              aria-label="Ajouter un pays"
-              onChange={(e) => { if (e.target.value) { const x = [...noms, e.target.value]; setNoms(x); garde(indic, x); } }}
-            >
-              <option value="">+ Ajouter un pays</option>
-              {dispo.map((p) => (
-                <option key={p.nom} value={p.fr}>{p.fr}</option>
-              ))}
-            </select>
-          )}
-        </div>
-      </div>
-      <div className="es-gw-zone">
-        <GlobePoints
-          markers={marqueurs}
-          accent="#8b5cff"
-          sphereColor={sombre ? "#15102c" : "#e9e3fb"}
-          badgeBackground={sombre ? "rgba(22,17,44,0.82)" : "rgba(255,255,255,0.9)"}
-          badgeShadow={sombre ? "0 12px 30px rgba(0,0,0,0.5), 0 0 0 1px rgba(165,131,255,0.35)" : "0 12px 28px rgba(60,30,140,0.22), 0 0 0 1px rgba(91,45,224,0.18)"}
-          iconColor={sombre ? "#cdbcff" : "#5b2de0"}
-          markerSize="clamp(26px, 3vw, 34px)"
-        />
-      </div>
-    </div>
-  );
-}
+const TEXTES: Texte[] = ["s", "m", "l"];
 
 /* ── Le comparateur ──────────────────────────────────────────────────────── */
 
-function Comparateur({ pays }: { pays: PaysCompare[] }) {
-  const [noms, setNoms] = useState<string[]>(["France", "États-Unis", "Chine"]);
+const INDICS = [
+  { id: "gdp", src: "eco", label: "PIB", f: (v: number) => (v >= 1000 ? `${(v / 1000).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} T$` : `${Math.round(v)} Md$`) },
+  { id: "gdp_per_capita", src: "eco", label: "PIB par habitant", f: (v: number) => `${Math.round(v).toLocaleString("fr-FR")} $` },
+  { id: "population", src: "demo", label: "Population", f: (v: number) => (v >= 1e6 ? `${(v / 1e6).toLocaleString("fr-FR", { maximumFractionDigits: v >= 1e8 ? 0 : 1 })} M` : `${Math.round(v).toLocaleString("fr-FR")}`) },
+  { id: "debt_ratio", src: "eco", label: "Dette / PIB", f: (v: number) => `${v.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %` },
+  { id: "inflation", src: "eco", label: "Inflation", f: (v: number) => `${v.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %` },
+  { id: "unemployment", src: "eco", label: "Chômage", f: (v: number) => `${v.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %` },
+  { id: "birth_rate", src: "demo", label: "Natalité", f: (v: number) => `${v.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} pour 1 000` },
+] as const;
+
+interface ConfigCompare {
+  noms: string[];
+  indics: string[];
+  annee: number | null;
+}
+const CONFIG_DEFAUT: ConfigCompare = { noms: ["France", "United States of America", "China"], indics: ["gdp", "gdp_per_capita", "population"], annee: null };
+
+function multiplicateur(v: number, ref: number): string | null {
+  if (!ref || !v) return null;
+  const r = v >= ref ? v / ref : ref / v;
+  const t = r.toLocaleString("fr-FR", { maximumFractionDigits: r >= 10 ? 0 : 1 });
+  return v >= ref ? `${t}× plus` : `${t}× moins`;
+}
+
+function Comparateur({ edition }: { edition: boolean }) {
+  const eco = useSocleEco();
+  const demo = useSocleDemo();
+  const [cfg, setCfg] = useState<ConfigCompare>(CONFIG_DEFAUT);
   useEffect(() => {
     try {
-      const s = JSON.parse(localStorage.getItem("visualize-compare") ?? "null");
-      if (Array.isArray(s) && s.length === 3) setNoms(s);
+      const s = JSON.parse(localStorage.getItem("visualize-compare-v2") ?? "null") as ConfigCompare | null;
+      if (s && Array.isArray(s.noms) && Array.isArray(s.indics)) setCfg(s);
     } catch {}
   }, []);
-  const change = (i: number, v: string) => {
-    const n = noms.map((x, k) => (k === i ? v : x));
-    setNoms(n);
+  const maj = (c: ConfigCompare) => {
+    setCfg(c);
     try {
-      localStorage.setItem("visualize-compare", JSON.stringify(n));
+      localStorage.setItem("visualize-compare-v2", JSON.stringify(c));
     } catch {}
   };
-  const choisis = noms.map((n) => pays.find((p) => p.fr === n));
+
+  if (!eco) return <div className="es-globe-attente" aria-label="Chargement" />;
+  const derniere = eco.annees[eco.annees.length - 1];
+  const annee = cfg.annee ?? derniere;
+  const fr = (nom: string) => eco.pays.find((p) => p.nom === nom)?.fr ?? nom;
+  const lit = (src: "eco" | "demo", nom: string, champ: string): number | null => {
+    if (src === "eco") return valeurSocle(eco, nom, annee, champ);
+    return demo && demo.annees.includes(annee) ? valeurSocle(demo, nom, annee, champ) : null;
+  };
+  const actives = INDICS.filter((i) => cfg.indics.includes(i.id));
+
   return (
-    <div>
-      <div className="es-choix">
-        {noms.map((n, i) => (
-          <select key={i} value={n} onChange={(e) => change(i, e.target.value)} aria-label={`Pays ${i + 1}`}>
-            {pays.map((p) => (
-              <option key={p.nom} value={p.fr}>{p.fr}</option>
+    <div className="es-cp">
+      {edition && (
+        <div className="es-cp-ctrl">
+          <div className="es-cp-ligne">
+            <span>Pays</span>
+            {cfg.noms.map((n, i) => (
+              <select key={i} value={n} aria-label={`Pays ${i + 1}`} onChange={(e) => maj({ ...cfg, noms: cfg.noms.map((x, k) => (k === i ? e.target.value : x)) })}>
+                {eco.pays.map((p) => (
+                  <option key={p.nom} value={p.nom}>{p.fr}</option>
+                ))}
+              </select>
             ))}
-          </select>
-        ))}
-      </div>
-      <div className="es-barres">
-        {INDIC.slice(0, 3).map((ind) => {
-          const vals = choisis.map((p) => (p ? p[ind.id] : null));
-          const max = Math.max(1, ...vals.map((v) => v ?? 0));
-          return (
-            <div key={ind.id} className="es-ligne">
-              <span className="es-ligne-t">{ind.label}</span>
-              {vals.map((v, i) => (
-                <div key={i} className="es-barre" style={{ "--c": i } as React.CSSProperties}>
-                  <i style={{ width: v ? `${Math.max(4, (v / max) * 100)}%` : "0%" }} />
-                  <b>{noms[i]}</b>
-                  <em>{v ? ind.f(v) : "—"}</em>
-                </div>
+            {cfg.noms.length < 3 && (
+              <button type="button" onClick={() => maj({ ...cfg, noms: [...cfg.noms, "Germany"] })}>+ 3<sup>e</sup> pays</button>
+            )}
+            {cfg.noms.length > 2 && (
+              <button type="button" onClick={() => maj({ ...cfg, noms: cfg.noms.slice(0, 2) })}>− 3<sup>e</sup> pays</button>
+            )}
+          </div>
+          <div className="es-cp-ligne">
+            <span>Année</span>
+            <select value={annee} aria-label="Année" onChange={(e) => maj({ ...cfg, annee: Number(e.target.value) })}>
+              {[...eco.annees].reverse().map((a) => (
+                <option key={a} value={a}>{a}</option>
               ))}
-            </div>
-          );
-        })}
-      </div>
+            </select>
+          </div>
+          <div className="es-cp-ligne">
+            <span>Comparer</span>
+            {INDICS.map((i) => (
+              <button key={i.id} type="button" className={cfg.indics.includes(i.id) ? "on" : ""} aria-pressed={cfg.indics.includes(i.id)} onClick={() => maj({ ...cfg, indics: cfg.indics.includes(i.id) ? cfg.indics.filter((x) => x !== i.id) : [...cfg.indics, i.id] })}>
+                {i.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <p className="es-cp-an">Année {annee}</p>
+      {actives.length === 0 ? (
+        <p className="es-vide">Choisissez au moins un indicateur dans « Personnaliser ».</p>
+      ) : (
+        <div className="es-barres">
+          {actives.map((ind) => {
+            const vals = cfg.noms.map((n) => lit(ind.src, n, ind.id));
+            const max = Math.max(1e-9, ...vals.map((v) => (v === null ? 0 : Math.abs(v))));
+            return (
+              <div key={ind.id} className="es-ligne">
+                <span className="es-ligne-t">{ind.label}</span>
+                {vals.map((v, i) => (
+                  <div key={i} className="es-barre" style={{ "--c": i } as React.CSSProperties}>
+                    <i style={{ width: v ? `${Math.max(4, (Math.abs(v) / max) * 100)}%` : "0%" }} />
+                    <b>{fr(cfg.noms[i])}</b>
+                    <em>{v === null ? "—" : ind.f(v)}</em>
+                    {i > 0 && v !== null && vals[0] !== null && multiplicateur(v, vals[0] as number) && (
+                      <u>{multiplicateur(v, vals[0] as number)} que {fr(cfg.noms[0])}</u>
+                    )}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -200,12 +172,11 @@ export function TableauWidgets({
   widgetsInitial,
   sommePib,
   sommePopulation,
-  pays,
 }: {
   widgetsInitial: string[];
   sommePib: number;
   sommePopulation: number;
-  pays: PaysCompare[];
+  pays?: PaysCompare[];
 }) {
   const depart = useMemo(() => {
     const t = new Date(new Date().getFullYear(), 0, 1).getTime();
@@ -222,32 +193,37 @@ export function TableauWidgets({
   }, [sommePib, sommePopulation]);
 
   const NOMS: Record<string, string> = useMemo(
-    () => ({ ...Object.fromEntries(compteurs.map((c) => [c.id, c.label])), globe: "Mon globe", comparateur: "Comparer des pays" }),
+    () => ({
+      ...Object.fromEntries(compteurs.map((c) => [c.id, c.label])),
+      "globe-eco": "Mon globe économie",
+      "globe-demo": "Mon globe démographie",
+      comparateur: "Comparer des pays",
+    }),
     [compteurs],
   );
+  const estLarge = (id: string) => id.startsWith("globe") || id === "comparateur";
 
   const defaut = useMemo<Item[]>(() => {
     const c = (widgetsInitial.length ? widgetsInitial : ["pib", "population"]).filter((id) => compteurs.some((x) => x.id === id));
     return [
-      ...c.map((id) => ({ id, t: 3 as const })),
-      { id: "globe", t: 6 as const },
-      { id: "comparateur", t: 6 as const },
+      ...c.map((id) => ({ id, t: 2 as Taille, x: "m" as Texte })),
+      { id: "globe-eco", t: 6 as Taille },
+      { id: "comparateur", t: 6 as Taille },
     ];
   }, [widgetsInitial, compteurs]);
 
   const [items, setItems] = useState<Item[]>(defaut);
-  const pret = useRef(false);
+  const [edition, setEdition] = useState(false);
   useEffect(() => {
     try {
       const s = JSON.parse(localStorage.getItem(CLE) ?? "null") as Item[] | null;
       if (Array.isArray(s) && s.every((x) => x.id in NOMS && TAILLES.includes(x.t))) setItems(s);
     } catch {}
-    pret.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* Chaque changement est gardé ici, et les compteurs choisis (quatre au plus)
-     rejoignent le profil pour suivre d'un appareil à l'autre. */
+  /* Chaque changement est gardé sur l'appareil ; les compteurs choisis (quatre
+     au plus) rejoignent aussi le profil. */
   const maj = (suite: Item[]) => {
     setItems(suite);
     try {
@@ -272,61 +248,99 @@ export function TableauWidgets({
     l.splice(j, 0, x);
     maj(l);
   };
-  const retirables = Object.keys(NOMS).filter((id) => !items.some((x) => x.id === id));
+  const bascule = (id: string) => {
+    if (items.some((x) => x.id === id)) maj(items.filter((x) => x.id !== id));
+    else maj([...items, estLarge(id) ? { id, t: 6 } : { id, t: 2, x: "m" }]);
+  };
 
   return (
-    <div className="es-wb">
+    <div className={`es-wb${edition ? " es-wb-edition" : ""}`}>
+      <div className="es-wb-barre">
+        <h2 className="es-wb-t">Mon dashboard</h2>
+        <button type="button" className={`es-wb-perso${edition ? " on" : ""}`} aria-pressed={edition} onClick={() => setEdition(!edition)}>
+          {edition ? <Check size={15} aria-hidden="true" /> : <Settings2 size={15} aria-hidden="true" />}
+          {edition ? "Terminer" : "Personnaliser"}
+        </button>
+      </div>
+
+      {edition && (
+        <div className="es-wb-bandeau" role="region" aria-label="Personnaliser les widgets">
+          <p className="es-wb-bandeau-t"><Plus size={14} aria-hidden="true" /> Choisissez vos widgets</p>
+          <div className="es-wb-chips">
+            {Object.keys(NOMS).map((id) => {
+              const on = items.some((x) => x.id === id);
+              return (
+                <button key={id} type="button" className={on ? "on" : ""} aria-pressed={on} onClick={() => bascule(id)}>
+                  {on && <Check size={12} aria-hidden="true" />}
+                  {NOMS[id]}
+                </button>
+              );
+            })}
+          </div>
+          <p className="es-wb-aide">Glissez une carte par sa poignée pour la déplacer. Réglez sa largeur et la taille de son texte depuis son en-tête.</p>
+        </div>
+      )}
+
       <div className="es-wb-grille">
         {items.map((it) => {
           const c = compteurs.find((x) => x.id === it.id);
+          const x = it.x ?? "m";
           return (
             <article
               key={it.id}
-              className={`es-w es-w-${it.t}${glisse === it.id ? " es-w-glisse" : ""}${survol === it.id && glisse !== it.id ? " es-w-cible" : ""}`}
-              draggable
-              onDragStart={(e) => { setGlisse(it.id); e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", it.id); }}
-              onDragOver={(e) => { e.preventDefault(); setSurvol(it.id); }}
+              className={`es-w es-w-${it.t}${edition ? " es-w-edit" : ""}${glisse === it.id ? " es-w-glisse" : ""}${survol === it.id && glisse !== it.id ? " es-w-cible" : ""}`}
+              draggable={edition}
+              onDragStart={(e) => { if (!edition) return; setGlisse(it.id); e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", it.id); }}
+              onDragOver={(e) => { if (!edition) return; e.preventDefault(); setSurvol(it.id); }}
               onDragLeave={() => setSurvol((s) => (s === it.id ? null : s))}
-              onDrop={(e) => { e.preventDefault(); if (glisse) deplace(glisse, it.id); setGlisse(null); setSurvol(null); }}
+              onDrop={(e) => { if (!edition) return; e.preventDefault(); if (glisse) deplace(glisse, it.id); setGlisse(null); setSurvol(null); }}
               onDragEnd={() => { setGlisse(null); setSurvol(null); }}
             >
               <header className="es-w-t">
-                <span className="es-w-poignee" aria-hidden="true"><GripVertical size={16} /></span>
+                {edition && <span className="es-w-poignee" aria-hidden="true"><GripVertical size={16} /></span>}
                 <h4>{NOMS[it.id]}</h4>
                 {c?.exemple && <span className="es-w-ex">exemple</span>}
-                <button type="button" className="es-w-b" title={`Taille : ${NOM_TAILLE[it.t]}`} aria-label={`Changer la taille (${NOM_TAILLE[it.t]})`} onClick={() => maj(items.map((x) => (x.id === it.id ? { ...x, t: TAILLES[(TAILLES.indexOf(x.t) + 1) % TAILLES.length] } : x)))}>
-                  <Maximize2 size={14} aria-hidden="true" />
-                </button>
-                <button type="button" className="es-w-b" aria-label={`Retirer ${NOMS[it.id]}`} onClick={() => maj(items.filter((x) => x.id !== it.id))}>
-                  <X size={15} aria-hidden="true" />
-                </button>
+                {edition && (
+                  <div className="es-w-reglages">
+                    {!estLarge(it.id) && (
+                      <div className="es-seg" role="group" aria-label="Largeur">
+                        {TAILLES.slice(0, 2).map((t) => (
+                          <button key={t} type="button" className={it.t === t ? "on" : ""} aria-pressed={it.t === t} onClick={() => maj(items.map((y) => (y.id === it.id ? { ...y, t } : y)))}>
+                            {NOM_TAILLE[t]}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {c && (
+                      <div className="es-seg" role="group" aria-label="Taille du texte">
+                        {TEXTES.map((t) => (
+                          <button key={t} type="button" className={x === t ? "on" : ""} aria-pressed={x === t} aria-label={`Texte ${t === "s" ? "petit" : t === "m" ? "moyen" : "gros"}`} onClick={() => maj(items.map((y) => (y.id === it.id ? { ...y, x: t } : y)))}>
+                            <span style={{ fontSize: t === "s" ? 11 : t === "m" ? 13.5 : 16 }}>A</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <button type="button" className="es-w-b" aria-label={`Retirer ${NOMS[it.id]}`} onClick={() => maj(items.filter((y) => y.id !== it.id))}>
+                      <X size={15} aria-hidden="true" />
+                    </button>
+                  </div>
+                )}
               </header>
-              <div className="es-w-c" draggable={false} onDragStart={(e) => e.stopPropagation()}>
+              <div className="es-w-c">
                 {c && (
-                  <div className="es-w-cpt">
+                  <div className={`es-w-cpt es-x-${x}`}>
                     <Odometre className="es-w-v" valeur={c.base} parSeconde={c.parSeconde} depuis={depart} dec={c.dec} unite={c.unite} />
                     <p>Depuis le 1<sup>er</sup> janvier</p>
                   </div>
                 )}
-                {it.id === "globe" && <GlobeWidget pays={pays} />}
-                {it.id === "comparateur" && <Comparateur pays={pays} />}
+                {it.id === "globe-eco" && <GlobePerso type="eco" />}
+                {it.id === "globe-demo" && <GlobePerso type="demo" />}
+                {it.id === "comparateur" && <Comparateur edition={edition} />}
               </div>
             </article>
           );
         })}
       </div>
-
-      {retirables.length > 0 && (
-        <div className="es-wb-ajout">
-          <span><Plus size={14} aria-hidden="true" /> Ajouter un widget</span>
-          {retirables.map((id) => (
-            <button key={id} type="button" onClick={() => maj([...items, { id, t: id === "globe" || id === "comparateur" ? 6 : 3 }])}>
-              {NOMS[id]}
-            </button>
-          ))}
-        </div>
-      )}
-      <p className="es-wb-aide">Glissez un widget par sa poignée pour le déplacer, changez sa taille avec le bouton ⤢. Votre disposition est gardée sur cet appareil.</p>
     </div>
   );
 }

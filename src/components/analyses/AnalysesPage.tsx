@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { EnTete, Pied } from "@/components/concept/pieces";
 import { Odometre } from "@/components/concept/Roulement";
+import { Lettres } from "@/components/concept/Lettres";
 import { useGlisser } from "@/lib/useGlisser";
 import { PresseCarousel } from "@/components/presse/PresseCarousel";
 import { PRESSE_MONDE } from "@/data/concept/presse";
@@ -42,6 +43,8 @@ export interface Props {
   dette: { montant: number; ratio: number; deficit: number };
   /** Le PIB mondial du dernier millésime, pour le compteur en direct. */
   pib: { total: number; n: number; annee: number };
+  /** La population mondiale et son accroissement par seconde (naissances moins décès). */
+  population: { total: number; parSeconde: number };
 }
 
 const fmtPib = (v: number) =>
@@ -358,13 +361,14 @@ const DIRECT = [
   { nom: "Dépenses militaires", parSeconde: 55_160, unite: " $", dec: 0, note: "Dans le monde, depuis le 1er janvier 2026" },
   { nom: "Dépenses médicales", parSeconde: 200_130, unite: " $", dec: 0, note: "Dans le monde, depuis le 1er janvier 2026" },
   { nom: "Dépenses éducatives", parSeconde: 132_610, unite: " $", dec: 0, note: "Dans le monde, depuis le 1er janvier 2026" },
+  { nom: "Population mondiale", unite: "", dec: 0, note: "Au rythme des naissances et des décès de l'année, depuis le 1er janvier" },
 ] as const;
 
-function EnDirect({ pib }: { pib: Props["pib"] }) {
+function EnDirect({ pib, population }: { pib: Props["pib"]; population: Props["population"] }) {
   const zone = useRef<HTMLDivElement>(null);
   const [n, setN] = useState(0);
   const [p, setP] = useState(0);
-  const total = DIRECT.length + 1;
+  const total = DIRECT.length;
 
   const departAnnee = useMemo(() => {
     const t = new Date(new Date().getFullYear(), 0, 1).getTime();
@@ -419,36 +423,40 @@ function EnDirect({ pib }: { pib: Props["pib"] }) {
         <div className="ax-cles-lueur" aria-hidden="true" />
         <div className="ax-cles-g">
           <div className="ax-cles-gauche">
-            <p className="ax-etiq">{d ? "En temps réel" : "Ce que nous faisons"}</p>
+            <p className="ax-etiq">En temps réel</p>
             <div key={n} className="ax-cles-bloc">
               {d ? (
                 <>
-                  <p className="ax-cles-v ax-cles-v-d">
-                    <Odometre
-                      valeur={0}
-                      parSeconde={"parSeconde" in d ? d.parSeconde : pib.total / AN_SECONDES}
-                      depuis={"parSeconde" in d ? departDepenses : departAnnee}
-                      dec={d.dec}
-                      unite={d.unite}
-                    />
-                  </p>
-                  <p className="ax-cles-n">{d.nom}</p>
-                  <p className="ax-cles-note">{d.note}</p>
+                  {(() => {
+                    const estPib = d.nom === "PIB mondial";
+                    const estPop = d.nom === "Population mondiale";
+                    const rythme = estPop ? population.parSeconde : "parSeconde" in d ? d.parSeconde : pib.total / AN_SECONDES;
+                    const base = estPop ? population.total : 0;
+                    const origine = "parSeconde" in d ? departDepenses : departAnnee;
+                    return (
+                      <>
+                        <p className="ax-cles-v ax-cles-v-d">
+                          <Odometre valeur={base} parSeconde={rythme} depuis={origine} dec={d.dec} unite={d.unite} />
+                        </p>
+                        <p className="ax-cles-n">{d.nom}</p>
+                        {/* Le même montant, dit en toutes lettres : il bouge moins vite, et se lit d'un coup d'œil. */}
+                        <Lettres
+                          className="ax-cles-lettres"
+                          base={base}
+                          parSeconde={estPib ? rythme * 1e9 : rythme}
+                          depuis={origine}
+                          mot={estPop ? "habitants" : "dollars"}
+                        />
+                        <p className="ax-cles-note">{d.note}</p>
+                      </>
+                    );
+                  })()}
                 </>
-              ) : (
-                <>
-                  <p className="ax-cles-v ax-cles-v-t">Recoupé, daté, sourcé.</p>
-                  <p className="ax-cles-n">Un chiffre n&apos;est publié que s&apos;il a été vu par plusieurs sources.</p>
-                  <p className="ax-cles-note">
-                    Banque mondiale, FMI, Nations Unies, INSEE : chaque donnée garde sa source et sa date,
-                    et une valeur absente reste absente.
-                  </p>
-                </>
-              )}
+              ) : null}
             </div>
           </div>
           <ol className="ax-cles-liste" aria-label="Choisir un chiffre">
-            {[...DIRECT.map((x) => x.nom), "Ce que nous faisons"].map((nom, i) => (
+            {DIRECT.map((x) => x.nom).map((nom, i) => (
               <li key={nom}>
                 <button type="button" className={i === n ? "ax-cles-on" : undefined} onClick={() => saute(i)}>
                   <span>{String(i + 1).padStart(2, "0")}</span>
@@ -930,7 +938,7 @@ export function AnalysesPage(props: Props) {
       <div className="ax-col ax-col-haut">
         <Presentation />
       </div>
-      <EnDirect pib={props.pib} />
+      <EnDirect pib={props.pib} population={props.population} />
 
       <div className="ax-col">
         <Classements donnees={props.donnees} annee={props.annee} />

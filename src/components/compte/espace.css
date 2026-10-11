@@ -151,3 +151,57 @@
 .es-wb-aide { margin: 12px 0 0; font-size: 12.5px; color: var(--encre-3); }
 @media (max-width: 900px) { .es-w-2, .es-w-3 { grid-column: span 6; } .es-w-b { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .es-w { transition: none; } }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   « PERSONNALISER » — on ne déplace rien tant qu'on n'a pas demandé à le faire
+   ═══════════════════════════════════════════════════════════════════════════ */
+.es-wb-barre { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.es-wb-t { margin: 0; font-size: clamp(20px, 2vw, 26px); font-weight: 800; letter-spacing: -0.04em; }
+.es-wb-perso { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border: 1px solid var(--bord, rgba(255, 255, 255, 0.14)); border-radius: 14px; font: inherit; font-size: 13.5px; font-weight: 700; color: var(--encre); background: var(--surface); cursor: pointer; transition: translate 0.4s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s; }
+.es-wb-perso:hover { translate: 0 -2px; }
+.es-wb-perso.on { color: #fff; border-color: transparent; background: linear-gradient(135deg, #4a1fd0, #7c4dff); }
+
+.es-wb-bandeau { margin-bottom: 14px; padding: 14px 16px; border-radius: 22px; background: rgba(124, 77, 255, 0.1); border: 1px dashed rgba(124, 77, 255, 0.5); animation: es-entre 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+.es-wb-bandeau-t { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; font-size: 13px; font-weight: 750; }
+.es-wb-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.es-wb-chips button { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border: 1px solid var(--bord, rgba(255, 255, 255, 0.14)); border-radius: 99px; font: inherit; font-size: 12px; font-weight: 650; color: var(--encre-2); background: var(--surface); cursor: pointer; transition: background 0.25s, color 0.25s; }
+.es-wb-chips button:hover { color: var(--encre); }
+.es-wb-chips button.on { color: #fff; border-color: transparent; background: linear-gradient(135deg, #4a1fd0, #7c4dff); }
+.es-wb-aide { margin: 10px 0 0; font-size: 12px; color: var(--encre-3); }
+
+.es-w { padding: 16px 18px 18px; }
+.es-w:hover { translate: none; box-shadow: none; }
+.es-w-6:hover { translate: none; }
+.es-w-edit { border-style: dashed; border-color: rgba(124, 77, 255, 0.55); cursor: grab; }
+.es-w-edit:hover { translate: 0 -3px; }
+.es-w-edit .es-w-c { pointer-events: none; user-select: none; }
+.es-w-t { flex-wrap: wrap; row-gap: 8px; }
+.es-w-reglages { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+.es-w-b { opacity: 1; }
+.es-seg { display: inline-flex; padding: 2px; border-radius: 10px; background: color-mix(in srgb, var(--encre) 8%, transparent); }
+.es-seg button { min-width: 28px; padding: 4px 9px; border: 0; border-radius: 8px; font: inherit; font-size: 12px; font-weight: 700; color: var(--encre-2); background: none; cursor: pointer; }
+.es-seg button.on { color: #fff; background: #7c4dff; }
+
+/* La taille du texte d'un compteur */
+.es-w-cpt { min-height: 96px; }
+.es-x-s .es-w-v { font-size: clamp(16px, 1.5vw, 20px); }
+.es-x-m .es-w-v { font-size: clamp(20px, 2vw, 28px); }
+.es-x-l .es-w-v { font-size: clamp(28px, 3.2vw, 44px); }
+.es-w-2.es-w .es-w-v { font-size: revert-layer; }
+.es-w-cpt p { margin: 8px 0 0; }
+
+/* Le globe : celui des pages Économie et Démographie */
+.es-ge { margin: 0 -4px; }
+.es-ge .cg-eco { background: none; }
+.es-globe-attente { min-height: 320px; border-radius: 22px; background: linear-gradient(110deg, transparent 30%, rgba(124, 77, 255, 0.12) 50%, transparent 70%) 0 0 / 200% 100%, var(--surface-2); animation: es-charge 1.4s linear infinite; }
+@keyframes es-charge { to { background-position: -200% 0; } }
+
+/* Le comparateur */
+.es-cp-ctrl { display: grid; gap: 10px; margin-bottom: 16px; padding: 12px 14px; border-radius: 18px; background: var(--surface-2); }
+.es-cp-ligne { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.es-cp-ligne > span { min-width: 64px; font-size: 12px; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; color: var(--encre-3); }
+.es-cp-ligne select, .es-cp-ligne button { padding: 6px 11px; border: 1px solid var(--bord, rgba(255, 255, 255, 0.14)); border-radius: 99px; font: inherit; font-size: 12.5px; font-weight: 650; color: var(--encre); background: var(--surface); cursor: pointer; }
+.es-cp-ligne button.on { color: #fff; border-color: transparent; background: linear-gradient(135deg, #4a1fd0, #7c4dff); }
+.es-cp-an { margin: 0 0 10px; font-size: 13px; font-weight: 700; color: var(--encre-3); }
+.es-barre u { position: relative; flex: none; padding: 2px 8px; border-radius: 99px; font-size: 11.5px; font-weight: 750; text-decoration: none; color: var(--es-vif); background: rgba(124, 77, 255, 0.16); }
+.es-barre { flex-wrap: wrap; }

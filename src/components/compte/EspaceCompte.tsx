@@ -6,7 +6,7 @@ import { BarChart3, BookMarked, MessageSquare, UserRound } from "lucide-react";
 import { deconnecter } from "@/app/compte/actions";
 import { Pastille } from "./Pastille";
 import { FormProfil } from "./FormProfil";
-import { TableauWidgets, type PaysCompare } from "./TableauWidgets";
+import { TableauWidgets } from "./TableauWidgets";
 import "./espace.css";
 
 interface Message { id: string; cible_id: string; texte: string; cree_le: string; titre: string }
@@ -34,7 +34,6 @@ export function EspaceCompte({
   sommePopulation,
   messages,
   favoris,
-  pays,
 }: {
   pseudo: string;
   email: string;
@@ -46,7 +45,6 @@ export function EspaceCompte({
   sommePopulation: number;
   messages: Message[];
   favoris: Favori[];
-  pays: PaysCompare[];
 }) {
   const [onglet, setOnglet] = useState<Onglet>("dashboard");
   useEffect(() => {
@@ -95,7 +93,7 @@ export function EspaceCompte({
 
         <section className="es-panneau" key={onglet} role="tabpanel">
           {onglet === "dashboard" && (
-            <TableauWidgets widgetsInitial={widgets} sommePib={sommePib} sommePopulation={sommePopulation} pays={pays} />
+            <TableauWidgets widgetsInitial={widgets} sommePib={sommePib} sommePopulation={sommePopulation} />
           )}
 
           {onglet === "discussions" && (

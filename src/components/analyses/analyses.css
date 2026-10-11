@@ -935,3 +935,8 @@ a.ax-dos:hover { border-color: var(--ax-ligne); }
 :root[data-concept="clair"] .ax .cg-pied-l, :root[data-concept="clair"] .ax .cg-pied-l a { color: rgba(255, 255, 255, 0.88); }
 .ax-presse { padding-bottom: clamp(70px, 12vh, 150px); }
 @media (prefers-reduced-motion: reduce) { .ax-hz-orbite em, .ax-hz-aurore, .ax-hz-astre u { animation: none; } }
+
+/* Temps réel : des montants plus sobres, et le même montant en toutes lettres dessous. */
+.ax-cles-v-d { font-size: clamp(30px, 5vw, 68px); }
+.ax-cles-n { margin-top: 16px; }
+.ax-cles-lettres { display: block; margin-top: 10px; font-size: clamp(17px, 1.9vw, 24px); font-weight: 600; letter-spacing: -0.02em; color: var(--encre-2); }

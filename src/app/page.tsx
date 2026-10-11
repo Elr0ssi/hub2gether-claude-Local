@@ -4,6 +4,7 @@ import { detteDerniere, ratioDernier } from "@/data/articles/detteFrancaise";
 import { DEFICIT_2025 } from "@/data/articles/financesPubliques";
 import { donneesPays, reperes } from "@/data/concept/conceptGeo";
 import { pibMonde } from "@/data/concept/conceptEconomie";
+import { compteurDemo } from "@/data/concept/conceptDemographie";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA PAGE D'ACCUEIL
@@ -47,6 +48,10 @@ export default function Accueil() {
       donnees={pays}
       annee={annee}
       pib={pibMonde()}
+      population={(() => {
+        const c = compteurDemo();
+        return { total: c.population, parSeconde: c.naissancesParSeconde - c.decesParSeconde };
+      })()}
       dette={{
         montant: detteDerniere.valeur,
         ratio: ratioDernier.valeur,
