@@ -1,0 +1,101 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE TÉLÉPHONE, D'ABORD
+
+   Des zones qu'un pouce atteint sans viser : 44 px au moins pour tout ce qui se
+   touche, des marges qui laissent respirer, rien qui déborde. Ces règles ne
+   s'appliquent qu'aux écrans tactiles ou étroits.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+img, video, svg, canvas { max-width: 100%; }
+
+/* Du texte pour les lecteurs d'écran et les moteurs : présent, jamais vu. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (pointer: coarse), (max-width: 900px) {
+  /* Le pied de page : des liens qu'on peut toucher. */
+  .cg-pied-l nav, .cg-pied-pop nav { gap: 0 8px; flex-wrap: wrap; }
+  .cg-pied-l a, .cg-pied-pop a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; }
+  .cg-pied-l { gap: 0 16px; }
+  .cg-pied-pop { gap: 0 16px; }
+  .cg-pied-note { margin-left: 0; }
+  .cg-pied { padding: 18px 0 28px; }
+
+  /* Le fil d'Ariane et les liens de texte courts. */
+  .sg-fil a, .sg-fil span { display: inline-flex; align-items: center; min-height: 40px; }
+  .sg-fil ol { gap: 0 6px; }
+  .sg-liens a { padding: 12px 18px; min-height: 44px; display: inline-flex; align-items: center; }
+  .sg-index a { display: inline-flex; align-items: center; min-height: 44px; }
+  .sg-index li { margin: 0; }
+  .sg-bouton { min-height: 48px; justify-content: center; }
+  .sg-cta { gap: 10px; }
+  .sg-cta .sg-bouton { flex: 1 1 auto; }
+  .sg-faq summary { min-height: 52px; }
+
+  /* La frise : une zone de toucher plus large que le chiffre. */
+  .cg-frise2-b { position: relative; }
+  .cg-frise2-b::after, .cg-frise2-direct::after { content: ""; position: absolute; inset: -14px -10px; }
+
+  /* Les boutons de vote du forum, de retrait d'un pays, des chips. */
+  .cg-fo-fleche { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .cmp-x { width: 40px; height: 40px; }
+  .cmp-presets button, .cmp-lentille button, .cmp-groupe button { min-height: 40px; }
+  .chp-b { min-height: 44px; }
+  .chp-l li { min-height: 44px; }
+  .es-onglets button, .es-wb-perso, .es-w-b, .es-seg button { min-height: 40px; }
+  .es-w-b { width: 40px; height: 40px; }
+  .dv button { min-height: 44px; min-width: 48px; }
+  .dd-tri button { min-height: 44px; }
+  .cg-nav a, .cg-bout a, .cg-bout button { min-height: 44px; }
+
+  /* Du texte qu'on lit sans zoomer. */
+  .cg-pied-l, .cg-pied-pop { font-size: 13.5px; }
+  .sg-note, .cmp-sources { font-size: 13px; }
+  input, select, textarea { font-size: 16px; }
+}
+
+@media (max-width: 600px) {
+  /* Des marges latérales régulières, partout. */
+  .sg-page, .cmp-page, .es { padding-left: 16px; padding-right: 16px; }
+  .sg-h1 { font-size: clamp(30px, 9vw, 44px); line-height: 1.04; }
+  .sg-h2 { font-size: clamp(22px, 6.4vw, 30px); }
+  .sg-grille { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .sg-carte { padding: 16px 16px; border-radius: 22px; }
+  .sg-carte strong { font-size: clamp(20px, 6vw, 26px); overflow-wrap: anywhere; }
+  .sg-tab { font-size: 13px; }
+  .sg-tab th, .sg-tab td { padding: 10px 10px; }
+  .sg-duel > div { padding: 18px 18px; }
+  .sg-index { columns: 2 150px; }
+}
+
+/* Les liens d'un sous-titre restent dans la teinte du site. */
+.cg-ts-s a { color: var(--mn-vif-2, #a78bfa); text-decoration: underline; text-underline-offset: 3px; }
+
+@media (max-width: 600px) {
+  /* Le pas « en temps réel » sort de la ligne : posé à son extrémité, il
+     débordait de l'écran. Il passe au-dessus, aligné à droite. */
+  .cg-frise2 { margin-top: 44px; }
+  .cg-frise2-direct { left: auto !important; right: 0; transform: none; margin: 0; min-height: 30px; padding: 4px 11px 4px 9px; font-size: 11px; }
+}
+
+@media (max-width: 760px) {
+  /* L'ouverture : le nom, puis le globe en pleine largeur — côte à côte, les
+     deux se disputaient 390 px. */
+  .ax .ax-ouv { padding: 104px 0 36px; align-items: flex-start; }
+  .ax .ax-ouv-g { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .ax .ax-ouv-t { text-align: center; }
+  .ax .ax-ouv-s { margin-left: auto; margin-right: auto; max-width: 24ch; }
+  .ax .ax-ouv-c { justify-content: center; }
+  .ax .ax-globe-zone { width: min(100%, 420px); margin: 0 auto; }
+  .cg-frise2-direct { top: -34px !important; bottom: auto !important; }
+}

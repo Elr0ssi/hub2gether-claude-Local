@@ -1,0 +1,71 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DOSSIERS DE DETTE — pensés d'abord pour le téléphone
+   ═══════════════════════════════════════════════════════════════════════════ */
+.dd-hero { padding-bottom: 8px; }
+.dd-sur { display: inline-flex; align-items: center; gap: 7px; margin: 0 0 16px; padding: 6px 13px; border-radius: 99px; font-size: 12.5px; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; color: #8b5cff; background: rgba(124, 77, 255, 0.14); }
+.dd-h1 { margin: 0; font-size: clamp(30px, 6vw, 68px); font-weight: 800; letter-spacing: -0.05em; line-height: 1.02; overflow-wrap: anywhere; }
+.dd-h1 span:not(.dd-drap) { background: linear-gradient(100deg, #8b5cff, #ff6fa5 70%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.dd-drap { margin-right: 10px; font-size: 0.8em; }
+.dd-grand { margin: 26px 0 0; font-size: clamp(40px, 9vw, 112px); font-weight: 800; letter-spacing: -0.06em; line-height: 0.95; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.dd-grand small { display: block; margin-top: 12px; font-size: clamp(14px, 1.6vw, 20px); font-weight: 650; letter-spacing: -0.01em; color: var(--encre-2); }
+.dd-intro { max-width: 68ch; margin: 22px 0 0; font-size: clamp(15.5px, 1.4vw, 18px); line-height: 1.65; color: var(--encre-2); }
+.dd-devise { margin-top: 18px; }
+.dd-sec { margin-top: clamp(40px, 7vh, 80px); }
+.dd-cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+.dd-cartes-2 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.dd-carte { position: relative; padding: 20px 22px; border-radius: 26px; background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); transition: translate 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s; }
+.dd-carte:hover { translate: 0 -5px; box-shadow: 0 18px 38px var(--ombre-portee, rgba(0, 0, 0, 0.4)); }
+.dd-carte h3 { margin: 12px 0 0; font-size: 13px; font-weight: 750; letter-spacing: 0.04em; text-transform: uppercase; color: var(--encre-3); }
+.dd-carte strong { display: block; margin-top: 8px; font-size: clamp(24px, 3vw, 36px); font-weight: 800; letter-spacing: -0.045em; line-height: 1.05; overflow-wrap: anywhere; }
+.dd-carte p { margin: 8px 0 0; font-size: 13px; color: var(--encre-2); }
+.dd-i { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; color: #8b5cff; background: rgba(124, 77, 255, 0.14); }
+.dd-carte-vif { color: #fff; border-color: transparent; background: radial-gradient(70% 90% at 100% 0%, rgba(255, 255, 255, 0.24), transparent 60%), linear-gradient(150deg, #3a14b8, #7c4dff); }
+.dd-carte-vif h3, .dd-carte-vif p { color: rgba(255, 255, 255, 0.86); }
+.dd-carte-vif .dd-i { color: #fff; background: rgba(255, 255, 255, 0.2); }
+.dd-graphes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.dd-graphe { margin: 0; padding: 20px 22px 18px; border-radius: 26px; background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); }
+.dd-graphe figcaption { margin-bottom: 14px; font-size: 15px; font-weight: 800; }
+.dd-barres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: end; height: 220px; }
+.dd-b { display: grid; grid-template-rows: auto 1fr auto; gap: 8px; height: 100%; text-align: center; min-width: 0; }
+.dd-b-v { font-size: clamp(11px, 1.3vw, 14px); font-weight: 800; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.dd-b-colonne { position: relative; display: flex; align-items: flex-end; border-radius: 12px; background: color-mix(in srgb, var(--encre) 6%, transparent); overflow: hidden; }
+.dd-b-colonne i { display: block; width: 100%; border-radius: 12px; background: linear-gradient(180deg, #8b5cff, #5b2de0); transition: height 0.9s cubic-bezier(0.22, 1, 0.36, 1); }
+.dd-b-rose .dd-b-colonne i { background: linear-gradient(180deg, #ff8fb8, #ff6fa5); }
+.dd-b-an { font-size: 12.5px; font-weight: 700; color: var(--encre-3); }
+.dd-texte { max-width: 72ch; margin: 18px 0 0; font-size: 15.5px; line-height: 1.65; color: var(--encre-2); }
+.dd-note { margin: 12px 0 0; font-size: 12.5px; color: var(--encre-3); }
+.dd-segments { display: flex; height: 38px; border-radius: 99px; overflow: hidden; gap: 3px; }
+.dd-segments span { min-width: 6px; }
+.dd-legende { display: flex; flex-wrap: wrap; gap: 8px 22px; list-style: none; margin: 14px 0 0; padding: 0; font-size: 14px; }
+.dd-legende li { display: inline-flex; align-items: center; gap: 8px; }
+.dd-legende i { width: 12px; height: 12px; border-radius: 4px; }
+.dd-tab-c { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.dd-tab-c .sg-tab { min-width: 420px; }
+.dd-tab-c a { color: inherit; text-decoration: none; font-weight: 700; }
+.dd-tab-c a:hover { color: #8b5cff; }
+.dd-moi th, .dd-moi td { background: rgba(124, 77, 255, 0.12); }
+@media (max-width: 600px) {
+  .dd-barres { height: 190px; gap: 8px; }
+  .dd-graphe { padding: 16px 14px; }
+  .dd-carte { padding: 18px 18px; }
+}
+
+/* Le classement mondial */
+.dd-tri { display: flex; flex-wrap: wrap; gap: 8px; }
+.dd-tri button { padding: 9px 16px; border: 1px solid var(--bord, rgba(255, 255, 255, 0.14)); border-radius: 99px; font: inherit; font-size: 14px; font-weight: 700; color: var(--encre-2); background: var(--surface); cursor: pointer; }
+.dd-tri button.on { color: #fff; border-color: transparent; background: linear-gradient(135deg, #4a1fd0, #7c4dff); }
+.dd-liste { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 8px; }
+.dd-ligne { display: grid; grid-template-columns: 34px minmax(110px, 200px) minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 18px; text-decoration: none; color: var(--encre); background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); transition: translate 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s; }
+.dd-ligne:hover { translate: 6px 0; border-color: #8b5cff; }
+.dd-rang { font-size: 13px; font-weight: 800; color: var(--encre-3); }
+.dd-pays { font-size: 15px; font-weight: 750; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dd-piste { height: 10px; border-radius: 99px; background: color-mix(in srgb, var(--encre) 8%, transparent); overflow: hidden; }
+.dd-piste i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #8b5cff, #ff6fa5); }
+.dd-val { min-width: 84px; text-align: right; font-size: 14.5px; font-weight: 800; font-variant-numeric: tabular-nums; }
+@media (max-width: 600px) {
+  .dd-ligne { grid-template-columns: 26px minmax(0, 1fr) auto; grid-template-areas: "r p v" "r b b"; row-gap: 6px; padding: 12px 14px; }
+  .dd-rang { grid-area: r; align-self: start; padding-top: 2px; }
+  .dd-pays { grid-area: p; }
+  .dd-val { grid-area: v; min-width: 0; }
+  .dd-piste { grid-area: b; }
+}

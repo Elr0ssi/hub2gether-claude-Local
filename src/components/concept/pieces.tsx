@@ -338,6 +338,7 @@ export function Pied() {
             </a>
           ))}
           <a href="/pays">Pays</a>
+          <a href="/dette-publique">Dette publique</a>
           <a href="/compte/connexion">Mon compte</a>
           <a href="/confidentialite">Confidentialité</a>
           <a href="/cgu">CGU</a>

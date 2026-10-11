@@ -309,11 +309,17 @@ body:has(.cg) { background: #05080c; }
   -webkit-backdrop-filter: none;
   transition: max-width 0.7s cubic-bezier(0.22, 1, 0.36, 1), padding 0.7s cubic-bezier(0.22, 1, 0.36, 1), margin 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease, box-shadow 0.3s;
 }
+.cg-pill .cg-cnx .lc-court { display: none; }
 .cg-pill .cg-cnx:hover { transform: translateY(-1px); box-shadow: 0 14px 28px -10px rgba(124, 77, 255, 1); background: linear-gradient(135deg, var(--mn-vif), var(--mn-vif-2)); }
 .cg-header-ouvert .cg-pill .cg-cnx { max-width: 200px; padding: 9px 18px; margin-left: 6px; opacity: 1; }
 
 /* Sous 900 px : la pilule s'ouvre en panneau, et le compte reste posé. */
 @media (max-width: 900px) {
+  .cg-pill .cg-cnx .lc-court { display: inline; }
+  .cg-pill .cg-cnx .lc-long { display: none; }
+  .cg-pill {
+    background: color-mix(in srgb, var(--fond) 92%, transparent);
+  }
   .cg-pill .cg-cnx { max-width: 200px; padding: 8px 14px; margin-left: 6px; opacity: 1; font-size: 13px; }
   .cg-pill-corps {
     position: absolute;

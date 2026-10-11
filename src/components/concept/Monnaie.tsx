@@ -62,6 +62,22 @@ export function useMonnaie(): [Monnaie, (m: Monnaie) => void] {
   return [m, change];
 }
 
+/** La monnaie des articles : celle que le lecteur a choisie, et à défaut l'euro,
+    qui est la monnaie d'origine des montants des dossiers. Avant tout choix, le
+    rendu serveur et le premier rendu du navigateur sont donc identiques. */
+export function useMonnaieArticle(): [Monnaie, (m: Monnaie) => void] {
+  const [m, change] = useMonnaie();
+  const [choisi, setChoisi] = useState(false);
+  useEffect(() => {
+    try {
+      setChoisi(window.localStorage.getItem(CLE) !== null);
+    } catch {
+      /* Pas de stockage : on reste sur l'euro. */
+    }
+  }, [m]);
+  return [choisi ? m : "eur", (v) => { setChoisi(true); change(v); }];
+}
+
 /** Le sélecteur : le signe en place, les autres au survol, sous le verre. */
 export function ChoixMonnaie({ className }: { className?: string }) {
   const [m, change] = useMonnaie();

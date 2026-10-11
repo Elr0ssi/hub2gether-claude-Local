@@ -108,3 +108,21 @@ export function convertir(v: number | null, annee: number, m: Monnaie): number |
 export function fiche(m: Monnaie): FicheMonnaie {
   return MONNAIES.find((x) => x.code === m) ?? MONNAIES[0];
 }
+
+/** Un montant exprimé dans une monnaie, ramené à une autre au taux moyen de l'année.
+    Les montants de la base sont en dollars ; ceux des dossiers de dette sont en euros :
+    on passe toujours par le dollar. Sans taux pour l'année, rien n'est inventé : null. */
+export function convertirMontant(v: number | null, source: Monnaie, annee: number, cible: Monnaie): number | null {
+  if (v === null || !Number.isFinite(v)) return null;
+  if (source === cible) return v;
+  let usd: number | null;
+  if (source === "usd") usd = v;
+  else if (source === "eur") {
+    const t = USD_PAR_EUR[annee];
+    usd = t ? v * t : null;
+  } else {
+    const t = CNY_PAR_USD[annee];
+    usd = t ? v / t : null;
+  }
+  return usd === null ? null : convertir(usd, annee, cible);
+}

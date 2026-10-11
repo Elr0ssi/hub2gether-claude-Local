@@ -1,6 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useMonnaieArticle } from "@/components/concept/Monnaie";
+import { DeviseArticle } from "@/components/concept/DeviseArticle";
+import { fmtMontant, valeurConvertie } from "@/lib/montant";
+import type { Monnaie } from "@/data/finance/tauxChange";
 import type { Sujet } from "@/data/concept/sujets";
 import {
   ArrowRight,
@@ -74,7 +78,12 @@ import "./dette2.css";
 
 const nf = (v: number, d = 1) =>
   v.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d });
-const md = (v: number, d = 1) => `${nf(Math.abs(v), d)} Md€`;
+/* Les montants de l'article sont des euros d'origine ; ils s'affichent dans la monnaie du lecteur
+   (l'euro tant qu'il n'a rien choisi). `DEVISE` est posée à chaque rendu de la page : tout ce qui
+   s'en sert se redessine avec elle. */
+let DEVISE: Monnaie = "eur";
+const M = (v: number, d = 1, annee = 2025) => fmtMontant(v, "eur", annee, DEVISE, d);
+const md = (v: number, d = 1) => M(Math.abs(v), d);
 
 export interface Suggestion {
   href: string;
@@ -318,7 +327,7 @@ function GrapheRatio() {
         </p>
         <p className="d2-graphe-d">
           {p.etiq}
-          {p.md !== null ? ` · ${nf(p.md)} Md€` : ""}
+          {p.md !== null ? ` · ${M(p.md)}` : ""}
           {repere ? ` · ${repere.nom}` : ""}
         </p>
       </div>
@@ -357,7 +366,7 @@ function GrapheRatio() {
               <tr key={pt.cle}>
                 <th scope="row">{pt.etiq}</th>
                 <td>{nf(pt.pct)} %</td>
-                <td>{pt.md !== null ? `${nf(pt.md)} Md€` : "—"}</td>
+                <td>{pt.md !== null ? `${M(pt.md)}` : "—"}</td>
               </tr>
             ))}
           </tbody>
@@ -410,7 +419,7 @@ function Repart({
             <span>{l.nom}</span>
             <b className={negatif ? "d2-neg" : undefined}>
               {negatif || l.md < 0 ? "−" : ""}
-              {nf(Math.abs(l.md))} Md€
+              {M(Math.abs(l.md), 0)}
             </b>
             <em>{l.md > 0 ? `${nf((l.md / somme) * 100)} %` : "en déduction"}</em>
           </li>
@@ -442,7 +451,7 @@ function Deficit() {
           onClick={() => setOnglet("recettes")}
         >
           <span>Recettes</span>
-          <b>{nf(rec, 0)} Md€</b>
+          <b>{M(rec, 0)}</b>
           <i style={{ "--p": `${(rec / dep) * 100}%` } as React.CSSProperties} />
         </button>
         <span className="d2-onglets-s" aria-hidden="true">−</span>
@@ -455,7 +464,7 @@ function Deficit() {
           onClick={() => setOnglet("depenses")}
         >
           <span>Dépenses</span>
-          <b>{nf(dep, 0)} Md€</b>
+          <b>{M(dep, 0)}</b>
           <i style={{ "--p": "100%" } as React.CSSProperties} />
         </button>
         <span className="d2-onglets-s" aria-hidden="true">=</span>
@@ -468,7 +477,7 @@ function Deficit() {
           onClick={() => setOnglet("deficit")}
         >
           <span>Déficit</span>
-          <b>−{nf(solde)} Md€</b>
+          <b>−{M(solde)}</b>
           <i style={{ "--p": `${(solde / dep) * 400}%` } as React.CSSProperties} />
         </button>
       </div>
@@ -561,6 +570,9 @@ function Rail({
 }
 
 export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; sujet?: Sujet }) {
+  const [devise] = useMonnaieArticle();
+  DEVISE = devise;
+  const hero = valeurConvertie(detteDerniere.valeur, "eur", 2026, devise);
   const solde = Math.abs(DEFICIT_2025.valeur);
   const etat = Math.abs(ACTEURS_2025[0].lignes?.[0].md ?? 0);
   const [autres, setAutres] = useState(false);
@@ -584,8 +596,8 @@ export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; 
         <h1 className="d2-h1">
           <span className="d2-h1-s">Dette publique de la France</span>
           <span className="d2-h1-v">
-            <Compteur valeur={detteDerniere.valeur} decimales={1} duree={1500} />
-            <small>Md€</small>
+            <Compteur valeur={hero.v} decimales={1} duree={1500} />
+            <small>{hero.suffixe}</small>
           </span>
         </h1>
         <p className="d2-chapo">
@@ -594,6 +606,7 @@ export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; 
             INSEE ↗
           </a>
         </p>
+        <DeviseArticle className="d2-devise" />
       </header>
 
       <div className="d2-grille">
@@ -619,19 +632,19 @@ export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; 
               </Leve>
               <Leve tag="figure" className="d2-carte d2-c-b" delai={70}>
                 <TrendingUp size={20} className="d2-ico" aria-hidden="true" />
-                <p className="d2-carte-v">+{nf(variationTrimestre.valeur)} Md€</p>
+                <p className="d2-carte-v">+{M(variationTrimestre.valeur)}</p>
                 <p className="d2-carte-l">en un trimestre</p>
                 <p className="d2-carte-t">Entre fin 2025 et fin mars 2026.</p>
               </Leve>
               <Leve tag="figure" className="d2-carte d2-c-c" delai={140}>
                 <Scale size={20} className="d2-ico" aria-hidden="true" />
-                <p className="d2-carte-v d2-neg">−{nf(solde)} Md€</p>
+                <p className="d2-carte-v d2-neg">−{M(solde)}</p>
                 <p className="d2-carte-l">de déficit public en 2025</p>
-                <p className="d2-carte-t">{`${nf(deficit2025.valeur)} % du PIB, dont ${nf(etat)} Md€ pour l'État.`}</p>
+                <p className="d2-carte-t">{`${nf(deficit2025.valeur)} % du PIB, dont ${M(etat)} pour l'État.`}</p>
               </Leve>
               <Leve tag="figure" className="d2-carte d2-c-d" delai={70}>
                 <Banknote size={20} className="d2-ico" aria-hidden="true" />
-                <p className="d2-carte-v">{nf(INTERETS_APU_2025.valeur)} Md€</p>
+                <p className="d2-carte-v">{M(INTERETS_APU_2025.valeur)}</p>
                 <p className="d2-carte-l">d&apos;intérêts en 2025</p>
                 <p className="d2-carte-t">Toutes administrations publiques.</p>
               </Leve>
@@ -671,8 +684,8 @@ export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; 
             titre="Déficit public de la France"
             reponse={
               <>
-                {`En 2025, les administrations publiques ont dépensé ${nf(DEPENSES_2025.valeur, 0)} Md€ pour ${nf(RECETTES_2025.valeur, 0)} Md€ de recettes : `}
-                <b>{`${nf(solde)} Md€ de déficit, soit ${nf(deficit2025.valeur)} % du PIB`}</b>
+                {`En 2025, les administrations publiques ont dépensé ${M(DEPENSES_2025.valeur, 0)} pour ${M(RECETTES_2025.valeur, 0)} de recettes : `}
+                <b>{`${M(solde)} de déficit, soit ${nf(deficit2025.valeur)} % du PIB`}</b>
                 {`. Les dépenses pèsent ${nf(DEPENSES_PCT_PIB_2025.valeur)} % du PIB.`}
               </>
             }
@@ -710,8 +723,8 @@ export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; 
             reponse={
               <>
                 {`L'État porte `}
-                <b>{`${nf(DETTE_PAR_EMETTEUR[0].md, 0)} Md€`}</b>
-                {` (${nf(DETTE_PAR_EMETTEUR[0].pct)} %), la Sécurité sociale ${nf(DETTE_PAR_EMETTEUR[1].md, 0)} Md€, les collectivités ${nf(DETTE_PAR_EMETTEUR[2].md, 0)} Md€ et les organismes centraux ${nf(DETTE_PAR_EMETTEUR[3].md, 0)} Md€.`}
+                <b>{`${M(DETTE_PAR_EMETTEUR[0].md, 0)}`}</b>
+                {` (${nf(DETTE_PAR_EMETTEUR[0].pct)} %), la Sécurité sociale ${M(DETTE_PAR_EMETTEUR[1].md, 0)}, les collectivités ${M(DETTE_PAR_EMETTEUR[2].md, 0)} et les organismes centraux ${M(DETTE_PAR_EMETTEUR[3].md, 0)}.`}
               </>
             }
           >
@@ -739,7 +752,7 @@ export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; 
             reponse={
               <>
                 <b>{`${nf(PORTEURS_MESURE.valeur)} %`}</b>
-                {` de la dette négociable de l'État est détenue par des non-résidents (T1 2026, valeur de marché). Ce taux ne s'applique pas tel quel aux ${nf(detteDerniere.valeur, 0)} Md€ de Maastricht ; sur les titres de long terme de l'ensemble des administrations, la Banque de France compte ${nf(nonResidents.valeur)} %.`}
+                {` de la dette négociable de l'État est détenue par des non-résidents (T1 2026, valeur de marché). Ce taux ne s'applique pas tel quel aux ${M(detteDerniere.valeur, 0)} de Maastricht ; sur les titres de long terme de l'ensemble des administrations, la Banque de France compte ${nf(nonResidents.valeur)} %.`}
               </>
             }
           >
@@ -764,7 +777,7 @@ export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; 
             reponse={
               <>
                 {`La France a payé `}
-                <b>{`${nf(INTERETS_APU_2025.valeur)} Md€ d'intérêts en 2025`}</b>
+                <b>{`${M(INTERETS_APU_2025.valeur)} d'intérêts en 2025`}</b>
                 {`, en hausse de 11,2 %. C'est le coût annuel de la dette, à ne pas confondre avec son montant.`}
               </>
             }
@@ -778,11 +791,11 @@ export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; 
             >
               <div className="d2-couts">
                 <Leve className="d2-cout d2-cout-g">
-                  <b>{nf(INTERETS_APU_2025.valeur)} Md€</b>
+                  <b>{M(INTERETS_APU_2025.valeur)}</b>
                   <span>d&apos;intérêts par an, toutes administrations publiques</span>
                 </Leve>
                 <Leve className="d2-cout" delai={60}>
-                  <b>{nf(INTERETS_ETAT_2025.valeur)} Md€</b>
+                  <b>{M(INTERETS_ETAT_2025.valeur)}</b>
                   <span>dont l&apos;État</span>
                 </Leve>
                 <Leve className="d2-cout" delai={120}>
@@ -790,7 +803,7 @@ export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; 
                   <span>taux moyen des OAT émises en 2026</span>
                 </Leve>
                 <Leve className="d2-cout" delai={180}>
-                  <b>{nf(ENCOURS_NEGOCIABLE.valeur)} Md€</b>
+                  <b>{M(ENCOURS_NEGOCIABLE.valeur)}</b>
                   <span>de dette négociable de l&apos;État en circulation</span>
                 </Leve>
               </div>
@@ -803,10 +816,10 @@ export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; 
                 <p>
                   Le budget de l&apos;État est présenté de deux façons. En comptabilité budgétaire, la
                   ligne « Charge de la dette et trésorerie de l&apos;État » vaut{" "}
-                  <b>{nf(CHARGE_DETTE_PROGRAMME.valeur)} Md€</b>, et la mission « Engagements
-                  financiers de l&apos;État », plus large, <b>{nf(ENGAGEMENTS_FINANCIERS.valeur)} Md€</b>. En
+                  <b>{M(CHARGE_DETTE_PROGRAMME.valeur)}</b>, et la mission « Engagements
+                  financiers de l&apos;État », plus large, <b>{M(ENGAGEMENTS_FINANCIERS.valeur)}</b>. En
                   comptabilité nationale, les intérêts de l&apos;État sont de{" "}
-                  <b>{nf(INTERETS_ETAT_2025.valeur)} Md€</b>. Ces montants sont tous exacts : ils ne
+                  <b>{M(INTERETS_ETAT_2025.valeur)}</b>. Ces montants sont tous exacts : ils ne
                   comptent ni les mêmes opérations, ni le même périmètre.
                 </p>
               </div>
@@ -868,7 +881,7 @@ export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; 
               etapes={[
                 {
                   titre: "Le besoin de financement",
-                  chiffre: `${nf(solde)} Md€ de déficit en 2025`,
+                  chiffre: `${M(solde)} de déficit en 2025`,
                   texte:
                     "Il se compose du déficit de l'année, du remboursement des titres qui arrivent à échéance et d'autres besoins de trésorerie. Les émissions brutes sont donc bien plus élevées que la dette nouvelle.",
                 },

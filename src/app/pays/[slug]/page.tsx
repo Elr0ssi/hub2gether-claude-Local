@@ -5,6 +5,7 @@ import { EnTete, Pied } from "@/components/concept/pieces";
 import { Faq, Fil, JsonLd, Mini, schemaFaq, schemaFil } from "@/components/seo/Elements";
 import { drapeau } from "@/lib/drapeau";
 import { paysParSlug, paysVedettes, serieDe, slugPaire, tousLesPays, voisinsEco, paysParNom } from "@/data/seo/pays";
+import { tousLesDossiers } from "@/data/dettes/dossiers";
 import { descriptionPays, faqPays, introPays, LIGNES, titrePays } from "@/data/seo/textes";
 import { avec, cap, deNom, fmtHabCourt, fmtMdCourt, nf, rangTexte } from "@/data/seo/francais";
 import { SITE_URL, urlAbs } from "@/lib/site";
@@ -43,6 +44,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const pib = serieDe(f, "pib");
   const pop = serieDe(f, "population");
   const url = urlAbs(`/pays/${f.slug}`);
+  const dossierDette = tousLesDossiers().find((x) => x.nom === f.nom);
 
   const cartes = LIGNES.flatMap((l, i) => {
     const m = l.get(f);
@@ -144,6 +146,16 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             ))}
           </ul>
         </section>
+
+        {dossierDette && (
+          <section className="sg-sec" aria-labelledby="sg-dette">
+            <h2 id="sg-dette" className="sg-h2">Dette publique</h2>
+            <p className="sg-intro" style={{ marginTop: 0 }}>
+              {cap(avec(f.fr))} : dette de {nf(dossierDette.p2024, 1)} % du PIB en 2024 ({nf(dossierDette.p2000, 1)} % en 2000).{" "}
+              <Link href={dossierDette.slug === "france" ? "/france/economie/dette-publique" : `/dette-publique/${dossierDette.slug}`}>Lire le dossier : montant, créanciers, inflation →</Link>
+            </p>
+          </section>
+        )}
 
         {voisins.length > 0 && (
           <section className="sg-sec" aria-labelledby="sg-voisins">

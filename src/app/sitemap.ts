@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { ARTICLES } from "@/data/articles";
+import { tousLesDossiers } from "@/data/dettes/dossiers";
 import { pairesVedettes, paysVedettes, slugPaire, tousLesPays } from "@/data/seo/pays";
 import { SITE_URL as siteUrl } from "@/lib/site";
 
@@ -59,6 +60,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const grands = paysVedettes(8);
   for (const p of tousLesPays()) for (const g of grands) if (p.nom !== g.nom) ajoute(p, g);
 
+  const dettes = [
+    { url: `${siteUrl}/dette-publique`, priority: 0.85, changeFrequency: "monthly" as const, lastModified: aujourdhui },
+    ...tousLesDossiers().filter((d) => d.slug !== "france").map((d) => ({
+      url: `${siteUrl}/dette-publique/${d.slug}`,
+      priority: 0.65,
+      changeFrequency: "monthly" as const,
+      lastModified: aujourdhui,
+    })),
+  ];
   const outils = [
     { url: `${siteUrl}/comparer`, priority: 0.9, changeFrequency: "weekly" as const },
     { url: `${siteUrl}/pays`, priority: 0.85, changeFrequency: "weekly" as const },
@@ -66,6 +76,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     ...outils,
+    ...dettes,
     ...pays,
     ...paires,
     dette,
