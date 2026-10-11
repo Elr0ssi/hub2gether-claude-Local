@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRightLeft, Crown, LineChart, Plus, Radar, Share2, Sparkles, X } from "lucide-react";
+import { Crown, HelpCircle, Pause, Play, Plus, Share2, Sparkles, X } from "lucide-react";
 import { EnTete, Pied } from "@/components/concept/pieces";
 import { ChoixPays, drapeau, type OptionPays } from "@/components/concept/ChoixPays";
 import { Dessin, Jetons } from "@/components/concept/Jetons";
@@ -12,17 +12,23 @@ import "@/components/concept/concept.css";
 import "@/components/concept/v2eco.css";
 import "./comparer.css";
 
-type Vue = "face" | "evolution" | "profil";
 const DEFAUT_PAYS = ["France", "United States of America", "China"];
-const DEFAUT_INDICS = ["gdp", "gdp_per_capita", "population", "inflation", "unemployment"];
+const AN_MIN = 1960;
 
 const ratio = (a: number, b: number) => {
   const r = a >= b ? a / b : b / a;
   return r.toLocaleString("fr-FR", { maximumFractionDigits: r >= 10 ? 0 : 1 });
 };
+type Lit = (i: Indic, nom: string, an: number) => number | null;
+type Eco = NonNullable<ReturnType<typeof useSocleEco>>;
+type Demo = ReturnType<typeof useSocleDemo>;
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LA PAGE
+   LA PAGE — un seul écran de travail
+
+   Les pays en haut, un indicateur à la fois, puis la scène : les barres de
+   l'année choisie et la courbe de toutes les années, reliées entre elles. En
+   dessous, tous les indicateurs d'un coup d'œil : un clic en choisit un.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export function ComparerPage({ iso2 }: { iso2: Record<string, string> }) {
@@ -33,34 +39,24 @@ export function ComparerPage({ iso2 }: { iso2: Record<string, string> }) {
   const arrive = usePret();
 
   const [pays, setPays] = useState<string[]>(DEFAUT_PAYS);
-  const [indics, setIndics] = useState<string[]>(DEFAUT_INDICS);
+  const [indicId, setIndicId] = useState<string>("gdp");
   const [annee, setAnnee] = useState<number>(2025);
-  const [vue, setVue] = useState<Vue>("face");
-  const [courbe, setCourbe] = useState<string>("gdp");
-  const [de, setDe] = useState<number>(1960);
-  const [a, setA] = useState<number>(2025);
   const [base100, setBase100] = useState(false);
   const [log, setLog] = useState(false);
   const [copie, setCopie] = useState(false);
+  const [focus, setFocus] = useState<number | null>(null);
+  const [epingle, setEpingle] = useState<number | null>(null);
+  const [lecture, setLecture] = useState(false);
 
-  /* L'adresse pilote la première vue, et la suit ensuite : un lien partage la comparaison. */
   const pret = useRef(false);
   useEffect(() => {
     const q = new URLSearchParams(window.location.search);
     const p = q.get("pays")?.split(",").filter(Boolean);
     if (p?.length) setPays(p.slice(0, 4));
-    const i = q.get("indic")?.split(",").filter((x) => INDICS.some((y) => y.id === x));
-    if (i?.length) setIndics(i);
+    const i = q.get("indic");
+    if (i && INDICS.some((y) => y.id === i)) setIndicId(i);
     const an = Number(q.get("annee"));
-    if (an >= 1960 && an <= 2026) setAnnee(an);
-    const v = q.get("vue");
-    if (v === "face" || v === "evolution" || v === "profil") setVue(v);
-    const c = q.get("courbe");
-    if (c && INDICS.some((y) => y.id === c)) setCourbe(c);
-    const d0 = Number(q.get("de"));
-    const a0 = Number(q.get("a"));
-    if (d0 >= 1960) setDe(d0);
-    if (a0 <= 2026 && a0 > 1960) setA(a0);
+    if (an >= AN_MIN && an <= 2026) setAnnee(an);
     if (q.get("b100") === "1") setBase100(true);
     if (q.get("log") === "1") setLog(true);
     pret.current = true;
@@ -69,35 +65,39 @@ export function ComparerPage({ iso2 }: { iso2: Record<string, string> }) {
     if (!pret.current) return;
     const q = new URLSearchParams();
     q.set("pays", pays.join(","));
-    q.set("indic", indics.join(","));
+    q.set("indic", indicId);
     q.set("annee", String(annee));
-    q.set("vue", vue);
-    q.set("courbe", courbe);
-    q.set("de", String(de));
-    q.set("a", String(a));
     if (base100) q.set("b100", "1");
     if (log) q.set("log", "1");
     window.history.replaceState(null, "", `?${q.toString()}`);
-  }, [pays, indics, annee, vue, courbe, de, a, base100, log]);
+  }, [pays, indicId, annee, base100, log]);
 
-  const options = useMemo<OptionPays[]>(
-    () => (eco ? eco.pays.map((p) => ({ nom: p.nom, fr: p.fr, iso2: iso2[p.nom] })) : []),
-    [eco, iso2],
-  );
+  const options = useMemo<OptionPays[]>(() => (eco ? eco.pays.map((p) => ({ nom: p.nom, fr: p.fr, iso2: iso2[p.nom] })) : []), [eco, iso2]);
   const fr = useCallback((nom: string) => options.find((o) => o.nom === nom)?.fr ?? nom, [options]);
-  const indic = (id: string) => INDICS.find((i) => i.id === id) as Indic;
+  const indic = INDICS.find((i) => i.id === indicId) ?? INDICS[0];
 
-  const lit = useCallback(
-    (i: Indic, nom: string, an: number): number | null => {
-      if (i.src === "eco") return eco ? valeurSocle(eco, nom, an, i.champ) : null;
-      return demo ? valeurSocle(demo, nom, an, i.champ) : null;
-    },
+  const lit = useCallback<Lit>(
+    (i, nom, an) => (i.src === "eco" ? (eco ? valeurSocle(eco, nom, an, i.champ) : null) : demo ? valeurSocle(demo, nom, an, i.champ) : null),
     [eco, demo],
   );
 
-  const annees = eco ? eco.annees : [];
-  const anneeMax = annees.length ? annees[annees.length - 1] : 2025;
-  const anneeVue = Math.min(annee, 2026);
+  const anneeMax = Math.max(eco ? eco.annees[eco.annees.length - 1] : 2025, demo ? demo.annees[demo.annees.length - 1] : 0);
+  const anneeVue = Math.min(annee, anneeMax);
+
+  /* La lecture automatique : on déroule les années, les barres suivent. */
+  useEffect(() => {
+    if (!lecture) return;
+    const id = window.setInterval(() => {
+      setAnnee((a) => {
+        if (a >= anneeMax) {
+          setLecture(false);
+          return anneeMax;
+        }
+        return a + 1;
+      });
+    }, 230);
+    return () => window.clearInterval(id);
+  }, [lecture, anneeMax]);
 
   const partager = async () => {
     try {
@@ -106,14 +106,17 @@ export function ComparerPage({ iso2 }: { iso2: Record<string, string> }) {
       window.setTimeout(() => setCopie(false), 1800);
     } catch {}
   };
-
-  const bascule = (id: string) => setIndics((l) => (l.includes(id) ? (l.length > 1 ? l.filter((x) => x !== id) : l) : [...l, id]));
+  const retire = (k: number) => {
+    setPays((l) => l.filter((_, i) => i !== k));
+    setEpingle(null);
+    setFocus(null);
+  };
+  const actif = epingle ?? focus;
 
   return (
     <div className="cg cg-eco cg-v2 cmp">
       <EnTete actif="Comparer" />
 
-      {/* ── L'ouverture, comme les autres pages ──────────────────────────── */}
       <section
         ref={ouverture as React.RefObject<HTMLElement>}
         className="cg-section cg-eco-haut"
@@ -144,58 +147,45 @@ export function ComparerPage({ iso2 }: { iso2: Record<string, string> }) {
       <div ref={haut.ref as React.RefObject<HTMLDivElement>} className="cg-temoin" aria-hidden="true" />
 
       <main className="cmp-page">
-        {/* ── 1 · Les pays ────────────────────────────────────────────────── */}
-        <section className="cmp-etape" aria-labelledby="cmp-e1">
-          <header className="cmp-etape-t">
-            <span>1</span>
-            <div>
-              <h2 id="cmp-e1">Vos pays</h2>
-              <p>Jusqu&apos;à quatre. Cliquez sur un nom pour en changer.</p>
-            </div>
-          </header>
-          <div className="cmp-scene">
-            <div className="cmp-pays">
-              {pays.map((nom, i) => (
-                <div key={`${i}-${nom}`} className="cmp-pays-c" style={{ "--c": COULEURS[i] } as React.CSSProperties}>
-                  <span className="cmp-pays-p" aria-hidden="true" />
-                  <ChoixPays valeur={nom} options={options} label={`Pays ${i + 1}`} onChange={(v) => setPays((l) => l.map((x, k) => (k === i ? v : x)))} />
-                  {pays.length > 2 && (
-                    <button type="button" className="cmp-x" aria-label={`Retirer ${fr(nom)}`} onClick={() => setPays((l) => l.filter((_, k) => k !== i))}>
-                      <X size={14} aria-hidden="true" />
-                    </button>
-                  )}
-                </div>
-              ))}
-              {pays.length < 4 && (
-                <button type="button" className="cmp-ajout" onClick={() => setPays((l) => [...l, ["Germany", "Japan", "Brazil", "India"].find((x) => !l.includes(x)) ?? "Japan"])}>
-                  <Plus size={15} aria-hidden="true" /> Ajouter un pays
-                </button>
-              )}
-            </div>
+        {/* ── Les pays, et l'indicateur regardé ─────────────────────────────── */}
+        <section className="cmp-barre-haut" aria-label="Pays et indicateur">
+          <div className="cmp-pays">
+            {pays.map((nom, i) => (
+              <div key={`${i}-${nom}`} className={`cmp-pays-c${actif === i ? " cmp-pays-on" : ""}`} style={{ "--c": COULEURS[i] } as React.CSSProperties} onPointerEnter={() => setFocus(i)} onPointerLeave={() => setFocus(null)}>
+                <span className="cmp-pays-p" aria-hidden="true" />
+                <ChoixPays valeur={nom} options={options} label={`Pays ${i + 1}`} onChange={(v) => setPays((l) => l.map((x, k) => (k === i ? v : x)))} />
+                {pays.length > 2 && (
+                  <button type="button" className="cmp-x" aria-label={`Retirer ${fr(nom)}`} onClick={() => retire(i)}>
+                    <X size={14} aria-hidden="true" />
+                  </button>
+                )}
+              </div>
+            ))}
+            {pays.length < 4 && (
+              <button type="button" className="cmp-ajout" onClick={() => setPays((l) => [...l, ["Germany", "Japan", "Brazil", "India"].find((x) => !l.includes(x)) ?? "Japan"])}>
+                <Plus size={15} aria-hidden="true" /> Ajouter
+              </button>
+            )}
+          </div>
+
+          <div className="cmp-ligne-outils">
             <div className="cmp-presets">
               <span><Sparkles size={13} aria-hidden="true" /> Idées</span>
               {PRESETS.filter((p) => p.pays.every((n) => options.some((o) => o.nom === n))).map((p) => (
-                <button key={p.label} type="button" onClick={() => setPays(p.pays)}>{p.label}</button>
+                <button key={p.label} type="button" onClick={() => { setPays(p.pays); setEpingle(null); }}>{p.label}</button>
               ))}
             </div>
+            <button type="button" className="cmp-partage" onClick={partager}>
+              <Share2 size={14} aria-hidden="true" /> {copie ? "Lien copié" : "Partager"}
+            </button>
           </div>
-        </section>
 
-        {/* ── 2 · Ce qu'on compare ────────────────────────────────────────── */}
-        <section className="cmp-etape" aria-labelledby="cmp-e2">
-          <header className="cmp-etape-t">
-            <span>2</span>
-            <div>
-              <h2 id="cmp-e2">Ce que vous comparez</h2>
-              <p>Cochez les indicateurs qui vous intéressent : ils servent aux trois lectures ci-dessous.</p>
-            </div>
-          </header>
-          <div className="cmp-regle">
+          <div className="cmp-lentille" role="tablist" aria-label="Indicateur comparé">
             {(["Économie", "Démographie"] as const).map((g) => (
-              <div key={g} className="cmp-groupe">
+              <div key={g} className="cmp-lentille-g">
                 <b>{g}</b>
                 {INDICS.filter((i) => i.groupe === g).map((i) => (
-                  <button key={i.id} type="button" className={indics.includes(i.id) ? "on" : ""} aria-pressed={indics.includes(i.id)} onClick={() => bascule(i.id)}>
+                  <button key={i.id} type="button" role="tab" aria-selected={indicId === i.id} className={indicId === i.id ? "on" : ""} onClick={() => setIndicId(i.id)}>
                     {i.label}
                   </button>
                 ))}
@@ -204,70 +194,83 @@ export function ComparerPage({ iso2 }: { iso2: Record<string, string> }) {
           </div>
         </section>
 
-        {/* ── 3 · La lecture ──────────────────────────────────────────────── */}
-        <section className="cmp-etape" aria-labelledby="cmp-e3">
-          <header className="cmp-etape-t">
-            <span>3</span>
-            <div>
-              <h2 id="cmp-e3">Votre comparaison</h2>
-              <p>Trois façons de la lire.</p>
-            </div>
-          </header>
-          <div className="cmp-barre">
-            <div className="cmp-vues" role="tablist" aria-label="Type de lecture">
-              {([
-                ["face", "Face à face", ArrowRightLeft],
-                ["evolution", "Évolution", LineChart],
-                ["profil", "Profil", Radar],
-              ] as const).map(([id, lib, Ic]) => (
-                <button key={id} type="button" role="tab" aria-selected={vue === id} className={vue === id ? "on" : ""} onClick={() => setVue(id)}>
-                  <Ic size={16} aria-hidden="true" /> {lib}
-                </button>
-              ))}
-            </div>
-            <button type="button" className="cmp-partage" onClick={partager}>
-              <Share2 size={14} aria-hidden="true" /> {copie ? "Lien copié" : "Partager"}
-            </button>
-          </div>
-
         {!eco ? (
-          <div className="cmp-attente" aria-label="Chargement des données"><i /><i /><i /></div>
+          <div className="cmp-attente" aria-label="Chargement des données"><i /><i /></div>
         ) : (
           <>
-            {vue !== "evolution" && (
-              <div className="cmp-annee">
-                <span>Année</span>
-                <input type="range" min={1960} max={2026} value={anneeVue} onChange={(e) => setAnnee(Number(e.target.value))} aria-label="Année comparée" />
-                <strong>{anneeVue}</strong>
-              </div>
-            )}
-
-            {vue === "face" && <FaceAFace pays={pays} indics={indics} annee={anneeVue} lit={lit} fr={fr} iso2={iso2} eco={eco} indic={indic} />}
-            {vue === "evolution" && (
-              <Evolution
+            {/* ── La scène : barres de l'année + courbe de toutes les années ── */}
+            <section className="cmp-scene2" aria-label={`Comparaison : ${indic.label}`}>
+              <Barres
                 pays={pays}
-                indics={indics}
-                courbe={courbe}
-                setCourbe={setCourbe}
-                de={de}
-                a={a}
-                setDe={setDe}
-                setA={setA}
+                indic={indic}
+                annee={anneeVue}
+                lit={lit}
+                fr={fr}
+                iso2={iso2}
+                eco={eco}
+                demo={demo}
+                actif={actif}
+                epingle={epingle}
+                setFocus={setFocus}
+                setEpingle={setEpingle}
+              />
+              <Courbe
+                pays={pays}
+                indic={indic}
+                annee={anneeVue}
+                setAnnee={(a) => { setLecture(false); setAnnee(a); }}
+                anneeMax={anneeMax}
+                lit={lit}
+                fr={fr}
                 base100={base100}
                 setBase100={setBase100}
                 log={log}
                 setLog={setLog}
-                lit={lit}
-                fr={fr}
-                iso2={iso2}
-                anneeMax={Math.max(anneeMax, demo ? demo.annees[demo.annees.length - 1] : 0)}
+                actif={actif}
               />
-            )}
-            {vue === "profil" && <Profil pays={pays} indics={indics} annee={anneeVue} lit={lit} fr={fr} eco={eco} demo={demo} />}
+              <div className="cmp-temps">
+                <button type="button" className="cmp-lecture" aria-label={lecture ? "Pause" : "Lire l'évolution année par année"} onClick={() => { if (!lecture && anneeVue >= anneeMax) setAnnee(AN_MIN); setLecture(!lecture); }}>
+                  {lecture ? <Pause size={18} aria-hidden="true" /> : <Play size={18} aria-hidden="true" />}
+                </button>
+                <input type="range" min={AN_MIN} max={anneeMax} value={anneeVue} onChange={(e) => { setLecture(false); setAnnee(Number(e.target.value)); }} aria-label="Année comparée" />
+                <strong>{anneeVue}</strong>
+              </div>
+            </section>
+
+            {/* ── Tous les indicateurs, d'un coup d'œil ─────────────────────── */}
+            <section className="cmp-tout" aria-label="Tous les indicateurs">
+              <header className="cmp-tout-t">
+                <h2>Tout en un coup d&apos;œil</h2>
+                <p>En {anneeVue}. Cliquez une carte pour la comparer en grand.</p>
+              </header>
+              <div className="cmp-tout-g">
+                <div className="cmp-cartes">
+                  {INDICS.map((i, k) => {
+                    const vals = pays.map((n) => lit(i, n, anneeVue));
+                    const pos = vals.filter((v): v is number => v !== null && v > 0);
+                    const max = Math.max(1e-9, ...vals.map((v) => (v === null ? 0 : Math.abs(v))));
+                    const top = vals.reduce<number>((m, v, j) => (v !== null && (vals[m] === null || v > (vals[m] as number)) ? j : m), 0);
+                    return (
+                      <button key={i.id} type="button" className={`cmp-carte${indicId === i.id ? " cmp-carte-on" : ""}`} onClick={() => { setIndicId(i.id); window.scrollTo({ top: (document.querySelector(".cmp-scene2") as HTMLElement | null)?.offsetTop ? (document.querySelector(".cmp-scene2") as HTMLElement).getBoundingClientRect().top + window.scrollY - 140 : 0, behavior: "smooth" }); }} style={{ "--k": k } as React.CSSProperties}>
+                        <span className="cmp-carte-t">{i.label}</span>
+                        <span className="cmp-carte-mini" aria-hidden="true">
+                          {vals.map((v, j) => (
+                            <i key={j} style={{ "--c": COULEURS[j], height: v === null ? 3 : `${Math.max(8, (Math.abs(v) / max) * 100)}%` } as React.CSSProperties} />
+                          ))}
+                        </span>
+                        <span className="cmp-carte-v">
+                          {vals[top] === null ? "—" : <>{drapeau(iso2[pays[top]])} {i.fmt(vals[top] as number)}</>}
+                        </span>
+                        <span className="cmp-carte-e">{pos.length > 1 ? `×${ratio(Math.max(...pos), Math.min(...pos))} d'écart` : "—"}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <Profil pays={pays} annee={anneeVue} lit={lit} eco={eco} demo={demo} />
+              </div>
+            </section>
           </>
         )}
-
-        </section>
 
         <p className="cmp-sources">
           Sources : Banque mondiale (WDI), FMI, Nations Unies (World Population Prospects 2024). Une valeur absente reste absente : elle n&apos;est jamais comptée pour zéro.
@@ -278,189 +281,163 @@ export function ComparerPage({ iso2 }: { iso2: Record<string, string> }) {
   );
 }
 
-type Lit = (i: Indic, nom: string, an: number) => number | null;
-
 /* ═══════════════════════════════════════════════════════════════════════════
-   FACE À FACE
+   LES BARRES — l'année choisie
    ═══════════════════════════════════════════════════════════════════════════ */
 
-function FaceAFace({
-  pays,
-  indics,
-  annee,
-  lit,
-  fr,
-  iso2,
-  eco,
-  indic,
+function Barres({
+  pays, indic, annee, lit, fr, iso2, eco, demo, actif, epingle, setFocus, setEpingle,
 }: {
   pays: string[];
-  indics: string[];
+  indic: Indic;
   annee: number;
   lit: Lit;
   fr: (n: string) => string;
   iso2: Record<string, string>;
-  eco: NonNullable<ReturnType<typeof useSocleEco>>;
-  indic: (id: string) => Indic;
+  eco: Eco;
+  demo: Demo;
+  actif: number | null;
+  epingle: number | null;
+  setFocus: (i: number | null) => void;
+  setEpingle: (i: number | null) => void;
 }) {
-  /* Le rang de chaque pays dans le monde, sur le PIB de l'année. */
-  const rangs = useMemo(() => {
-    const m = new Map<string, number>();
-    const place = (eco.cols[annee] ?? {})["gdp"];
-    if (place === undefined) return m;
-    const vals = (eco.lignes[annee] ?? []).map((l) => ({ nom: eco.pays[l[0] as number].nom, v: l[place] })).filter((x): x is { nom: string; v: number } => typeof x.v === "number");
-    vals.sort((x, y) => y.v - x.v);
-    vals.forEach((x, i) => m.set(x.nom, i + 1));
-    return m;
-  }, [eco, annee]);
+  const vals = pays.map((n) => lit(indic, n, annee));
+  const max = Math.max(1e-9, ...vals.map((v) => (v === null ? 0 : Math.abs(v))));
+  const present = vals.filter((v): v is number => v !== null);
+  const haut = present.length > 1 ? Math.max(...present) : null;
 
-  /* Les phrases qui disent l'écart : le plus grand contre le plus petit. */
-  const faits = useMemo(() => {
-    const l: { v: string; t: string }[] = [];
-    for (const id of ["gdp", "gdp_per_capita", "population", "unemployment", "inflation"]) {
-      const i = indic(id);
-      const vals = pays.map((n) => ({ n, v: lit(i, n, annee) })).filter((x): x is { n: string; v: number } => x.v !== null && x.v > 0);
-      if (vals.length < 2) continue;
-      vals.sort((x, y) => y.v - x.v);
-      const haut = vals[0];
-      const bas = vals[vals.length - 1];
-      if (haut.v / bas.v < 1.05) continue;
-      l.push({ v: `×${ratio(haut.v, bas.v)}`, t: `${fr(haut.n)} : ${i.nom} est ${ratio(haut.v, bas.v)} fois celui de ${fr(bas.n)}.` });
-      if (l.length === 3) break;
-    }
-    return l;
-  }, [pays, annee, lit, fr, indic]);
+  /* Le rang mondial de chaque pays sur cet indicateur, cette année-là. */
+  const rangs = useMemo(() => {
+    const s = indic.src === "eco" ? eco : demo;
+    const m = new Map<string, { rang: number; total: number }>();
+    if (!s) return m;
+    const place = (s.cols[annee] ?? {})[indic.champ];
+    if (place === undefined) return m;
+    const tous = (s.lignes[annee] ?? [])
+      .map((l) => ({ nom: s.pays[l[0] as number].nom, v: l[place] }))
+      .filter((x): x is { nom: string; v: number } => typeof x.v === "number")
+      .sort((a, b) => b.v - a.v);
+    tous.forEach((x, i) => m.set(x.nom, { rang: i + 1, total: tous.length }));
+    return m;
+  }, [indic, eco, demo, annee]);
+
+  const pos = present.filter((v) => v > 0);
+  const phrase = useMemo(() => {
+    const l = vals.map((v, i) => ({ v, i })).filter((x): x is { v: number; i: number } => x.v !== null && x.v > 0);
+    if (l.length < 2) return null;
+    l.sort((a, b) => b.v - a.v);
+    return { haut: l[0].i, bas: l[l.length - 1].i, r: ratio(l[0].v, l[l.length - 1].v) };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vals.join("|")]);
 
   return (
-    <div className="cmp-face">
-      <div className="cmp-tetes" style={{ "--n": pays.length } as React.CSSProperties}>
-        {pays.map((n, i) => (
-          <article key={`${i}-${n}`} className="cmp-tete-p" style={{ "--c": COULEURS[i] } as React.CSSProperties}>
-            <span className="cmp-drap" aria-hidden="true">{drapeau(iso2[n])}</span>
-            <h2>{fr(n)}</h2>
-            <p>{rangs.get(n) ? `${rangs.get(n)}${rangs.get(n) === 1 ? "re" : "ᵉ"} économie du monde en ${annee}` : `Données ${annee}`}</p>
-          </article>
-        ))}
-      </div>
-
-      {faits.length > 0 && (
-        <div className="cmp-faits">
-          {faits.map((f, i) => (
-            <article key={i} className="cmp-fait" style={{ "--k": i } as React.CSSProperties}>
-              <strong>{f.v}</strong>
-              <p>{f.t}</p>
-            </article>
-          ))}
-        </div>
+    <div className="cmp-barres2">
+      <header className="cmp-sc-t">
+        <h2>{indic.label}</h2>
+        <span>en {annee}</span>
+        {pos.length > 1 && <em>×{ratio(Math.max(...pos), Math.min(...pos))} d&apos;écart</em>}
+      </header>
+      {phrase && (
+        <p className="cmp-phrase">
+          <b style={{ color: COULEURS[phrase.haut] }}>{fr(pays[phrase.haut])}</b> : {indic.nom} est <strong>{phrase.r} fois</strong> celui de{" "}
+          <b style={{ color: COULEURS[phrase.bas] }}>{fr(pays[phrase.bas])}</b>.
+        </p>
       )}
 
-      <div className="cmp-lignes">
-        {indics.map((id, k) => {
-          const i = indic(id);
-          const vals = pays.map((n) => lit(i, n, annee));
-          const max = Math.max(1e-9, ...vals.map((v) => (v === null ? 0 : Math.abs(v))));
-          const present = vals.filter((v): v is number => v !== null);
-          const meilleur = present.length > 1 ? Math.max(...present.map((v) => v)) : null;
-          const pos = present.filter((v) => v > 0);
+      <div className="cmp-b2-l">
+        {pays.map((n, j) => {
+          const v = vals[j];
+          const r = rangs.get(n);
           return (
-            <section key={id} className="cmp-ligne" style={{ "--k": k } as React.CSSProperties}>
-              <header>
-                <h3>{i.label}</h3>
-                {pos.length > 1 && <span className="cmp-ecart">×{ratio(Math.max(...pos), Math.min(...pos))} d&apos;écart</span>}
-              </header>
-              <div className="cmp-barres">
-                {vals.map((v, j) => (
-                  <div key={j} className={`cmp-b${v !== null && v === meilleur ? " cmp-b-top" : ""}`} style={{ "--c": COULEURS[j] } as React.CSSProperties}>
-                    <span className="cmp-b-n">{drapeau(iso2[pays[j]])} {fr(pays[j])}</span>
-                    <span className="cmp-b-piste">
-                      <i style={{ width: v === null ? "0%" : `${Math.max(2, (Math.abs(v) / max) * 100)}%` }} />
-                    </span>
-                    <span className="cmp-b-v">
-                      {v !== null && v === meilleur && <Crown size={13} aria-label="Valeur la plus élevée" />}
-                      {v === null ? "—" : i.fmt(v)}
-                    </span>
-                    {j > 0 && v !== null && vals[0] !== null && v > 0 && (vals[0] as number) > 0 && (
-                      <span className="cmp-b-m">{v >= (vals[0] as number) ? "×" : "÷"}{ratio(v, vals[0] as number)}</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </section>
+            <button
+              key={`${j}-${n}`}
+              type="button"
+              className={`cmp-b2${actif === j ? " cmp-b2-on" : ""}${actif !== null && actif !== j ? " cmp-b2-pale" : ""}${epingle === j ? " cmp-b2-epingle" : ""}`}
+              style={{ "--c": COULEURS[j], "--l": v === null ? "0%" : `${Math.max(3, (Math.abs(v) / max) * 100)}%` } as React.CSSProperties}
+              onPointerEnter={() => setFocus(j)}
+              onPointerLeave={() => setFocus(null)}
+              onFocus={() => setFocus(j)}
+              onBlur={() => setFocus(null)}
+              onClick={() => setEpingle(epingle === j ? null : j)}
+              aria-pressed={epingle === j}
+            >
+              <span className="cmp-b2-fond" aria-hidden="true" />
+              <span className="cmp-b2-nom">
+                <span className="cmp-b2-drap">{drapeau(iso2[n])}</span>
+                {fr(n)}
+                {v !== null && v === haut && <Crown size={14} aria-label="Valeur la plus élevée" />}
+              </span>
+              <span className="cmp-b2-val">{v === null ? "—" : indic.fmt(v)}</span>
+              {epingle === j || actif === j ? (
+                <span className="cmp-b2-detail">
+                  {r ? `${r.rang}${r.rang === 1 ? "er" : "ᵉ"} sur ${r.total} dans le monde` : "Rang indisponible"}
+                  {j > 0 && v !== null && vals[0] !== null && v > 0 && (vals[0] as number) > 0 && ` · ${v >= (vals[0] as number) ? "×" : "÷"}${ratio(v, vals[0] as number)} ${fr(pays[0])}`}
+                </span>
+              ) : null}
+            </button>
           );
         })}
       </div>
+      <p className="cmp-astuce">Survolez ou cliquez un pays pour le mettre en avant sur la courbe.</p>
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ÉVOLUTION
+   LA COURBE — toutes les années
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const W = 1000;
-const H = 440;
-const M = { g: 64, d: 24, h: 24, b: 40 };
+const W = 760;
+const H = 400;
+const M = { g: 58, d: 18, h: 18, b: 34 };
 
-function Evolution({
-  pays, indics, courbe, setCourbe, de, a, setDe, setA, base100, setBase100, log, setLog, lit, fr, iso2, anneeMax,
+function Courbe({
+  pays, indic, annee, setAnnee, anneeMax, lit, fr, base100, setBase100, log, setLog, actif,
 }: {
   pays: string[];
-  indics: string[];
-  courbe: string;
-  setCourbe: (s: string) => void;
-  de: number;
-  a: number;
-  setDe: (n: number) => void;
-  setA: (n: number) => void;
+  indic: Indic;
+  annee: number;
+  setAnnee: (a: number) => void;
+  anneeMax: number;
+  lit: Lit;
+  fr: (n: string) => string;
   base100: boolean;
   setBase100: (b: boolean) => void;
   log: boolean;
   setLog: (b: boolean) => void;
-  lit: Lit;
-  fr: (n: string) => string;
-  iso2: Record<string, string>;
-  anneeMax: number;
+  actif: number | null;
 }) {
-  const choix = INDICS.filter((x) => indics.includes(x.id));
-  const i = choix.find((x) => x.id === courbe) ?? choix[0] ?? INDICS[0];
-  const debut = Math.min(de, a - 1);
-  const fin = Math.max(a, debut + 1);
-  const ans = useMemo(() => Array.from({ length: fin - debut + 1 }, (_, k) => debut + k), [debut, fin]);
-
-  const series = useMemo(() => {
-    return pays.map((n) => {
-      const brut = ans.map((an) => lit(i, n, an));
-      const premier = brut.find((v) => v !== null && v !== 0) ?? null;
-      const vals = brut.map((v) => (v === null ? null : base100 ? (premier ? (v / premier) * 100 : null) : v));
-      return { n, brut, vals };
-    });
-  }, [pays, ans, i, lit, base100]);
-
-  const peutLog = !i.signe;
+  const ans = useMemo(() => Array.from({ length: anneeMax - AN_MIN + 1 }, (_, k) => AN_MIN + k), [anneeMax]);
+  const peutLog = !indic.signe;
   const echelleLog = log && peutLog;
 
-  const { ymin, ymax, ticks, y } = useMemo(() => {
+  const series = useMemo(
+    () =>
+      pays.map((n) => {
+        const brut = ans.map((an) => lit(indic, n, an));
+        const premier = brut.find((v) => v !== null && v !== 0) ?? null;
+        return { n, brut, vals: brut.map((v) => (v === null ? null : base100 ? (premier ? (v / premier) * 100 : null) : v)) };
+      }),
+    [pays, ans, indic, lit, base100],
+  );
+
+  const { ticks, y } = useMemo(() => {
     const tous = series.flatMap((s) => s.vals).filter((v): v is number => v !== null && (!echelleLog || v > 0));
     let lo = tous.length ? Math.min(...tous) : 0;
     let hi = tous.length ? Math.max(...tous) : 1;
-    if (!echelleLog) lo = Math.min(lo, 0) === lo && lo < 0 ? lo : Math.min(0, lo);
+    if (!echelleLog) lo = Math.min(0, lo);
     if (hi === lo) hi = lo + 1;
     const f = echelleLog
       ? (v: number) => (Math.log10(v) - Math.log10(lo)) / (Math.log10(hi) - Math.log10(lo))
       : (v: number) => (v - lo) / (hi - lo);
     const t: number[] = [];
     if (echelleLog) {
-      const e0 = Math.floor(Math.log10(lo));
-      const e1 = Math.ceil(Math.log10(hi));
-      for (let e = e0; e <= e1; e++) if (10 ** e >= lo * 0.999 && 10 ** e <= hi * 1.001) t.push(10 ** e);
-    } else {
-      for (let k = 0; k <= 4; k++) t.push(lo + ((hi - lo) * k) / 4);
-    }
-    return { ymin: lo, ymax: hi, ticks: t, y: (v: number) => M.h + (1 - Math.max(0, Math.min(1, f(v)))) * (H - M.h - M.b) };
+      for (let e = Math.floor(Math.log10(lo)); e <= Math.ceil(Math.log10(hi)); e++) if (10 ** e >= lo * 0.999 && 10 ** e <= hi * 1.001) t.push(10 ** e);
+    } else for (let k = 0; k <= 4; k++) t.push(lo + ((hi - lo) * k) / 4);
+    return { ticks: t, y: (v: number) => M.h + (1 - Math.max(0, Math.min(1, f(v)))) * (H - M.h - M.b) };
   }, [series, echelleLog]);
 
-  const x = (an: number) => M.g + ((an - debut) / (fin - debut)) * (W - M.g - M.d);
-
+  const x = (an: number) => M.g + ((an - AN_MIN) / (anneeMax - AN_MIN)) * (W - M.g - M.d);
   const chemin = (vals: (number | null)[]) => {
     let d = "";
     let ouvert = false;
@@ -476,231 +453,153 @@ function Evolution({
   };
 
   const [vise, setVise] = useState<number | null>(null);
+  const [aide, setAide] = useState(false);
   const zone = useRef<SVGSVGElement>(null);
-  const survol = (e: React.PointerEvent) => {
+  const bas = useRef(false);
+  const an_de = (e: React.PointerEvent) => {
     const r = zone.current?.getBoundingClientRect();
-    if (!r) return;
-    const px = ((e.clientX - r.left) / r.width) * W;
-    const t = (px - M.g) / (W - M.g - M.d);
-    setVise(Math.max(0, Math.min(ans.length - 1, Math.round(t * (ans.length - 1)))));
+    if (!r) return null;
+    const t = ((e.clientX - r.left) / r.width * W - M.g) / (W - M.g - M.d);
+    return Math.max(0, Math.min(ans.length - 1, Math.round(t * (ans.length - 1))));
   };
-
-  const fmtAxe = (v: number) => (base100 ? v.toLocaleString("fr-FR", { maximumFractionDigits: 0 }) : i.fmt(v));
-  const rafraichit = `${i.id}-${debut}-${fin}-${base100}-${echelleLog}-${pays.join("|")}`;
+  const fmtAxe = (v: number) => (base100 ? v.toLocaleString("fr-FR", { maximumFractionDigits: 0 }) : indic.fmt(v));
+  const cle = `${indic.id}-${base100}-${echelleLog}-${pays.join("|")}`;
+  const iAnnee = annee - AN_MIN;
 
   return (
-    <div className="cmp-evo">
-      <div className="cmp-evo-ctrl">
-        <div className="cmp-evo-indic" role="tablist" aria-label="Indicateur de la courbe">
-          {choix.map((x) => (
-            <button key={x.id} type="button" role="tab" aria-selected={i.id === x.id} className={i.id === x.id ? "on" : ""} onClick={() => setCourbe(x.id)}>
-              {x.label}
-            </button>
-          ))}
-        </div>
-        <div className="cmp-evo-opts">
-          <label className="cmp-bascule">
+    <div className="cmp-courbe">
+      <header className="cmp-sc-t">
+        <h2>Depuis {AN_MIN}</h2>
+        <div className="cmp-opts">
+          <label className="cmp-bascule" title="Tous les pays partent de 100 : on compare la vitesse de croissance, pas la taille.">
             <input type="checkbox" checked={base100} onChange={(e) => setBase100(e.target.checked)} />
             <span />
-            <b>Comparer la croissance<small>Base 100 : tous partent de 100</small></b>
+            Croissance (base 100)
           </label>
-          <label className={`cmp-bascule${peutLog ? "" : " cmp-bascule-off"}`}>
+          <label className={`cmp-bascule${peutLog ? "" : " cmp-bascule-off"}`} title="Chaque graduation multiplie par dix : les petits pays restent lisibles.">
             <input type="checkbox" checked={echelleLog} disabled={!peutLog} onChange={(e) => setLog(e.target.checked)} />
             <span />
-            <b>Mieux voir les petits pays<small>Échelle logarithmique</small></b>
+            Échelle log
           </label>
+          <button type="button" className="cmp-aide-b" aria-expanded={aide} aria-label="Aide sur ces options" onClick={() => setAide(!aide)}>
+            <HelpCircle size={17} aria-hidden="true" />
+          </button>
         </div>
-      </div>
+      </header>
+      {aide && (
+        <div className="cmp-aide2">
+          <p><b>Croissance (base 100)</b> : chaque pays part de 100 à la première année. Une courbe à 300 a triplé. On compare la <em>vitesse</em>, pas la taille.</p>
+          <p><b>Échelle log</b> : chaque graduation multiplie par dix au lieu d&apos;ajouter. Les petits pays redeviennent lisibles ; une pente raide veut dire une croissance rapide.</p>
+        </div>
+      )}
 
-      <div className="cmp-evo-carte">
-        <svg ref={zone} viewBox={`0 0 ${W} ${H}`} className="cmp-svg" role="img" aria-label={`Évolution : ${i.label}`} onPointerMove={survol} onPointerLeave={() => setVise(null)}>
+      <div className="cmp-svg-c">
+        <svg
+          ref={zone}
+          viewBox={`0 0 ${W} ${H}`}
+          className="cmp-svg"
+          role="img"
+          aria-label={`Évolution : ${indic.label}`}
+          onPointerDown={(e) => { bas.current = true; const k = an_de(e); if (k !== null) setAnnee(ans[k]); }}
+          onPointerMove={(e) => { const k = an_de(e); setVise(k); if (bas.current && k !== null) setAnnee(ans[k]); }}
+          onPointerUp={() => { bas.current = false; }}
+          onPointerLeave={() => { setVise(null); bas.current = false; }}
+        >
           {ticks.map((t, k) => (
             <g key={k}>
               <line x1={M.g} x2={W - M.d} y1={y(t)} y2={y(t)} className="cmp-grille" />
-              <text x={M.g - 10} y={y(t) + 4} textAnchor="end" className="cmp-axe">{fmtAxe(t)}</text>
+              <text x={M.g - 8} y={y(t) + 4} textAnchor="end" className="cmp-axe">{fmtAxe(t)}</text>
             </g>
           ))}
-          {ans.filter((an) => an % (fin - debut > 40 ? 10 : fin - debut > 15 ? 5 : 2) === 0).map((an) => (
-            <text key={an} x={x(an)} y={H - 12} textAnchor="middle" className="cmp-axe">{an}</text>
+          {ans.filter((an) => an % 10 === 0).map((an) => (
+            <text key={an} x={x(an)} y={H - 10} textAnchor="middle" className="cmp-axe">{an}</text>
           ))}
-          {ymin < 0 && ymax > 0 && !echelleLog && <line x1={M.g} x2={W - M.d} y1={y(0)} y2={y(0)} className="cmp-zero" />}
           {series.map((s, k) => (
-            <path key={`${rafraichit}-${k}`} d={chemin(s.vals)} pathLength={1} className="cmp-ligne-c" style={{ "--c": COULEURS[k], "--k": k } as React.CSSProperties} />
+            <path key={`${cle}-${k}`} d={chemin(s.vals)} pathLength={1} className={`cmp-ligne-c${actif !== null && actif !== k ? " cmp-ligne-pale" : ""}${actif === k ? " cmp-ligne-forte" : ""}`} style={{ "--c": COULEURS[k], "--k": k } as React.CSSProperties} />
           ))}
-          {vise !== null && (
-            <g>
-              <line x1={x(ans[vise])} x2={x(ans[vise])} y1={M.h} y2={H - M.b} className="cmp-reperes" />
-              {series.map((s, k) => {
-                const v = s.vals[vise];
-                return v === null || (echelleLog && v <= 0) ? null : <circle key={k} cx={x(ans[vise])} cy={y(v)} r={6} fill={COULEURS[k]} className="cmp-point" />;
-              })}
-            </g>
-          )}
+          <line x1={x(annee)} x2={x(annee)} y1={M.h} y2={H - M.b} className="cmp-annee-l" />
+          {series.map((s, k) => {
+            const v = s.vals[iAnnee];
+            return v === null || v === undefined || (echelleLog && v <= 0) ? null : <circle key={k} cx={x(annee)} cy={y(v)} r={actif === k ? 8 : 6} fill={COULEURS[k]} className="cmp-point" />;
+          })}
+          {vise !== null && vise !== iAnnee && <line x1={x(ans[vise])} x2={x(ans[vise])} y1={M.h} y2={H - M.b} className="cmp-reperes" />}
         </svg>
-
         {vise !== null && (
-          <div className="cmp-info" style={{ left: `${(x(ans[vise]) / W) * 100}%` }} data-droite={x(ans[vise]) > W * 0.62 ? "1" : "0"}>
+          <div className="cmp-info" style={{ left: `${(x(ans[vise]) / W) * 100}%` }} data-droite={x(ans[vise]) > W * 0.6 ? "1" : "0"}>
             <b>{ans[vise]}</b>
             {series.map((s, k) => (
               <span key={k} style={{ "--c": COULEURS[k] } as React.CSSProperties}>
                 <i />
                 {fr(s.n)}
-                <em>{s.brut[vise] === null ? "—" : i.fmt(s.brut[vise] as number)}</em>
+                <em>{s.brut[vise] === null ? "—" : indic.fmt(s.brut[vise] as number)}</em>
               </span>
             ))}
           </div>
         )}
-
-        <div className="cmp-evo-periode">
-          <label>
-            De <strong>{debut}</strong>
-            <input type="range" min={1960} max={anneeMax - 1} value={debut} onChange={(e) => setDe(Math.min(Number(e.target.value), fin - 1))} aria-label="Début de la période" />
-          </label>
-          <label>
-            à <strong>{fin}</strong>
-            <input type="range" min={1961} max={anneeMax} value={fin} onChange={(e) => setA(Math.max(Number(e.target.value), debut + 1))} aria-label="Fin de la période" />
-          </label>
-        </div>
       </div>
-
-      <div className="cmp-bilans">
-        {series.map((s, k) => {
-          const pts = s.brut.map((v, idx) => ({ v, an: ans[idx] })).filter((p): p is { v: number; an: number } => p.v !== null && p.v > 0);
-          const d0 = pts[0];
-          const d1 = pts[pts.length - 1];
-          const taux = d0 && d1 && d1.an > d0.an ? (Math.pow(d1.v / d0.v, 1 / (d1.an - d0.an)) - 1) * 100 : null;
-          return (
-            <article key={k} className="cmp-bilan" style={{ "--c": COULEURS[k] } as React.CSSProperties}>
-              <span className="cmp-bilan-p" aria-hidden="true" />
-              <h4>{drapeau(iso2[s.n])} {fr(s.n)}</h4>
-              <strong>{d1 ? i.fmt(d1.v) : "—"}</strong>
-              <p>
-                {d0 && d1 ? `${d0.an} : ${i.fmt(d0.v)}` : "Pas de série sur cette période"}
-                {taux !== null && !i.signe && <em> · {taux >= 0 ? "+" : ""}{taux.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} % par an</em>}
-              </p>
-            </article>
-          );
-        })}
-      </div>
-
-      <div className="cmp-aide">
-        <h4>Comment lire ce graphique ?</h4>
-        <div>
-          <article>
-            <b>Comparer la croissance (base 100)</b>
-            <p>
-              Chaque pays démarre à 100 la première année de la période. Une courbe à 300 a triplé, une courbe à 150 a gagné la moitié. Cela compare la
-              <em> vitesse</em> à laquelle chacun a grandi, quelle que soit sa taille de départ.
-            </p>
-          </article>
-          <article>
-            <b>Mieux voir les petits pays (échelle logarithmique)</b>
-            <p>
-              Sur l&apos;échelle habituelle, un géant écrase les autres. En logarithmique, chaque graduation multiplie par dix au lieu d&apos;ajouter : les petits pays
-              redeviennent lisibles, et une pente plus raide veut dire une croissance plus rapide. Indisponible pour les valeurs qui peuvent être négatives.
-            </p>
-          </article>
-        </div>
-      </div>
+      <p className="cmp-astuce">Cliquez ou glissez sur la courbe pour changer d&apos;année : les barres suivent.</p>
     </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   PROFIL — un radar des rangs
+   LE PROFIL — un radar des rangs, sur tous les indicateurs
    ═══════════════════════════════════════════════════════════════════════════ */
 
-function Profil({
-  pays, indics, annee, lit, fr, eco, demo,
-}: {
-  pays: string[];
-  indics: string[];
-  annee: number;
-  lit: Lit;
-  fr: (n: string) => string;
-  eco: NonNullable<ReturnType<typeof useSocleEco>>;
-  demo: ReturnType<typeof useSocleDemo>;
-}) {
-  /* Le rang d'un pays sur un indicateur : la part des autres pays qu'il dépasse. */
-  const rang = useMemo(() => {
-    const f = (i: Indic, nom: string): number | null => {
+function Profil({ pays, annee, lit, eco, demo }: { pays: string[]; annee: number; lit: Lit; eco: Eco; demo: Demo }) {
+  const rang = useMemo(
+    () => (i: Indic, nom: string): number | null => {
       const s = i.src === "eco" ? eco : demo;
       if (!s) return null;
       const place = (s.cols[annee] ?? {})[i.champ];
       const v = lit(i, nom, annee);
       if (place === undefined || v === null) return null;
       const vals = (s.lignes[annee] ?? []).map((l) => l[place]).filter((x): x is number => typeof x === "number");
-      if (vals.length < 2) return null;
-      return vals.filter((x) => x < v).length / (vals.length - 1);
-    };
-    return f;
-  }, [eco, demo, annee, lit]);
-
-  const axes = useMemo(
-    () => INDICS.filter((i) => indics.includes(i.id)).filter((i) => pays.some((n) => rang(i, n) !== null)),
-    [indics, pays, rang],
+      return vals.length < 2 ? null : vals.filter((x) => x < v).length / (vals.length - 1);
+    },
+    [eco, demo, annee, lit],
   );
-
+  const axes = useMemo(
+    () => INDICS.filter((i) => ["gdp", "gdp_per_capita", "population", "inflation", "unemployment", "birth_rate", "death_rate"].includes(i.id)).filter((i) => pays.some((n) => rang(i, n) !== null)),
+    [pays, rang],
+  );
   const C = 230;
-  const R = 160;
+  const R = 150;
   const pt = (k: number, v: number) => {
-    const ang = (-Math.PI / 2) + (k / Math.max(1, axes.length)) * Math.PI * 2;
+    const ang = -Math.PI / 2 + (k / Math.max(1, axes.length)) * Math.PI * 2;
     return [C + Math.cos(ang) * R * v, C + Math.sin(ang) * R * v] as const;
   };
-
-  if (axes.length < 3) {
-    return <p className="cmp-vide">Choisissez au moins trois indicateurs disponibles pour {annee} afin de tracer un profil.</p>;
-  }
-
+  if (axes.length < 3) return null;
   return (
-    <div className="cmp-profil">
-      <div className="cmp-radar-c">
-        <svg viewBox="-70 -10 600 480" className="cmp-radar" role="img" aria-label="Profil comparé">
-          {[0.25, 0.5, 0.75, 1].map((r) => (
-            <polygon key={r} points={axes.map((_, k) => pt(k, r).join(",")).join(" ")} className="cmp-toile" />
-          ))}
-          {axes.map((a, k) => {
-            const [px, py] = pt(k, 1);
-            const [lx, ly] = pt(k, 1.16);
-            return (
-              <g key={a.id}>
-                <line x1={C} y1={C} x2={px} y2={py} className="cmp-toile" />
-                <text x={lx} y={ly} textAnchor={lx < C - 6 ? "end" : lx > C + 6 ? "start" : "middle"} dominantBaseline="middle" className="cmp-radar-l">{a.label}</text>
-              </g>
-            );
-          })}
-          {pays.map((n, j) => {
-            const pts = axes.map((a, k) => pt(k, rang(a, n) ?? 0));
-            return (
-              <g key={`${j}-${n}`} style={{ "--c": COULEURS[j], "--k": j } as React.CSSProperties} className="cmp-radar-g">
-                <polygon points={pts.map((p) => p.join(",")).join(" ")} className="cmp-radar-p" />
-                {pts.map((p, k) => (
-                  <circle key={k} cx={p[0]} cy={p[1]} r={4} className="cmp-radar-pt" />
-                ))}
-              </g>
-            );
-          })}
-        </svg>
-        <p className="cmp-note">Chaque axe place le pays parmi tous les autres en {annee} : plus c&apos;est loin du centre, plus il dépasse de pays sur cet indicateur.</p>
-      </div>
-
-      <div className="cmp-tab">
-        <div className="cmp-tab-l cmp-tab-t">
-          <span />
-          {pays.map((n, j) => (
-            <span key={j} style={{ "--c": COULEURS[j] } as React.CSSProperties}><i />{fr(n)}</span>
-          ))}
-        </div>
-        {axes.map((a) => (
-          <div key={a.id} className="cmp-tab-l">
-            <span>{a.label}</span>
-            {pays.map((n, j) => {
-              const r = rang(a, n);
-              return <span key={j} style={{ "--c": COULEURS[j] } as React.CSSProperties}>{r === null ? "—" : `${Math.round(r * 100)}ᵉ centile`}</span>;
-            })}
-          </div>
+    <div className="cmp-radar-c">
+      <h3>Profil</h3>
+      <svg viewBox="-70 -10 600 480" className="cmp-radar" role="img" aria-label="Profil comparé">
+        {[0.25, 0.5, 0.75, 1].map((r) => (
+          <polygon key={r} points={axes.map((_, k) => pt(k, r).join(",")).join(" ")} className="cmp-toile" />
         ))}
-      </div>
+        {axes.map((a, k) => {
+          const [px, py] = pt(k, 1);
+          const [lx, ly] = pt(k, 1.17);
+          return (
+            <g key={a.id}>
+              <line x1={C} y1={C} x2={px} y2={py} className="cmp-toile" />
+              <text x={lx} y={ly} textAnchor={lx < C - 6 ? "end" : lx > C + 6 ? "start" : "middle"} dominantBaseline="middle" className="cmp-radar-l">{a.label}</text>
+            </g>
+          );
+        })}
+        {pays.map((n, j) => {
+          const pts = axes.map((a, k) => pt(k, rang(a, n) ?? 0));
+          return (
+            <g key={`${j}-${n}`} style={{ "--c": COULEURS[j], "--k": j } as React.CSSProperties}>
+              <polygon points={pts.map((p) => p.join(",")).join(" ")} className="cmp-radar-p" />
+              {pts.map((p, k) => (
+                <circle key={k} cx={p[0]} cy={p[1]} r={4} className="cmp-radar-pt" />
+              ))}
+            </g>
+          );
+        })}
+      </svg>
+      <p className="cmp-note">Plus un point est loin du centre, plus le pays dépasse de pays sur cet indicateur.</p>
     </div>
   );
 }

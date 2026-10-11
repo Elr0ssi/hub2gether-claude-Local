@@ -184,3 +184,87 @@
 .cmp-aide b { display: block; font-size: 14.5px; font-weight: 800; }
 .cmp-aide p { margin: 8px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--encre-2); }
 .cmp-aide em { font-style: normal; font-weight: 750; color: var(--encre); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA VERSION EN UN SEUL ÉCRAN : pays, indicateur, scène, vue d'ensemble
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cmp-page { padding-top: clamp(28px, 5vh, 56px); }
+.cmp-barre-haut { display: grid; gap: 14px; padding: clamp(16px, 2vw, 24px); border-radius: 30px; background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); }
+.cmp-ligne-outils { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.cmp-ligne-outils .cmp-presets { margin: 0; }
+.cmp-pays-on { box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 35%, transparent); }
+.cmp-lentille { display: grid; gap: 8px; padding-top: 14px; border-top: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); }
+.cmp-lentille-g { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.cmp-lentille-g b { min-width: 104px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--encre-3); }
+.cmp-lentille button { padding: 7px 15px; border: 1px solid var(--bord, rgba(255, 255, 255, 0.14)); border-radius: 99px; font: inherit; font-size: 13px; font-weight: 700; color: var(--encre-2); background: var(--surface-2); cursor: pointer; transition: background 0.25s, color 0.25s, translate 0.35s var(--cmp-ease); }
+.cmp-lentille button:hover { translate: 0 -2px; color: var(--encre); }
+.cmp-lentille button.on { color: #fff; border-color: transparent; background: linear-gradient(135deg, #4a1fd0, #7c4dff); box-shadow: 0 10px 22px -12px rgba(124, 77, 255, 0.9); }
+
+.cmp-scene2 { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 16px; margin-top: 16px; }
+.cmp-scene2 > .cmp-temps { grid-column: 1 / -1; }
+.cmp-barres2, .cmp-courbe { padding: clamp(16px, 2vw, 26px); border-radius: 30px; background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); min-width: 0; }
+.cmp-sc-t { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.cmp-sc-t h2 { margin: 0; font-size: clamp(22px, 2.4vw, 32px); font-weight: 800; letter-spacing: -0.045em; }
+.cmp-sc-t > span { font-size: 14px; font-weight: 700; color: var(--encre-3); }
+.cmp-sc-t em { margin-left: auto; padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: 750; font-style: normal; color: var(--cmp-vif); background: rgba(124, 77, 255, 0.14); }
+.cmp-phrase { margin: 0 0 16px; font-size: 14.5px; line-height: 1.5; color: var(--encre-2); }
+.cmp-phrase strong { color: var(--encre); }
+.cmp-astuce { margin: 12px 0 0; font-size: 12px; color: var(--encre-3); }
+
+/* Les barres : de vrais boutons, qui répondent */
+.cmp-b2-l { display: grid; gap: 10px; }
+.cmp-b2 { position: relative; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2px 14px; min-height: 66px; padding: 12px 18px; border: 1px solid color-mix(in srgb, var(--c) 30%, transparent); border-radius: 20px; font: inherit; text-align: left; color: var(--encre); background: color-mix(in srgb, var(--c) 8%, transparent); overflow: hidden; cursor: pointer; transition: translate 0.4s var(--cmp-ease), opacity 0.3s, border-color 0.3s, box-shadow 0.4s var(--cmp-ease); }
+.cmp-b2-fond { position: absolute; inset: 0 auto 0 0; width: var(--l); border-radius: 20px; background: linear-gradient(90deg, color-mix(in srgb, var(--c) 55%, transparent), color-mix(in srgb, var(--c) 22%, transparent)); transform-origin: left; transition: width 0.7s var(--cmp-ease); animation: cmp-barre 1s var(--cmp-ease) backwards; }
+.cmp-b2 > span:not(.cmp-b2-fond) { position: relative; }
+.cmp-b2:hover, .cmp-b2-on { translate: 6px 0; border-color: var(--c); box-shadow: 0 14px 30px -14px color-mix(in srgb, var(--c) 70%, transparent); }
+.cmp-b2-pale { opacity: 0.45; }
+.cmp-b2-epingle { border-color: var(--c); border-width: 2px; }
+.cmp-b2-nom { display: inline-flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
+.cmp-b2-nom svg { color: #ffb86b; }
+.cmp-b2-drap { font-size: 22px; line-height: 1; }
+.cmp-b2-val { font-size: clamp(18px, 1.8vw, 24px); font-weight: 800; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.cmp-b2-detail { grid-column: 1 / -1; font-size: 12.5px; font-weight: 650; color: var(--encre-2); animation: cmp-in 0.35s var(--cmp-ease) backwards; }
+
+/* La courbe */
+.cmp-opts { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-left: auto; }
+.cmp-aide-b { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 50%; color: var(--encre-3); background: color-mix(in srgb, var(--encre) 8%, transparent); cursor: pointer; }
+.cmp-aide-b:hover, .cmp-aide-b[aria-expanded="true"] { color: #fff; background: #7c4dff; }
+.cmp-aide2 { margin: 0 0 12px; padding: 12px 16px; border-radius: 18px; background: rgba(124, 77, 255, 0.1); border: 1px dashed rgba(124, 77, 255, 0.45); animation: cmp-in 0.35s var(--cmp-ease) backwards; }
+.cmp-aide2 p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--encre-2); }
+.cmp-aide2 p + p { margin-top: 8px; }
+.cmp-aide2 b, .cmp-aide2 em { font-style: normal; font-weight: 800; color: var(--encre); }
+.cmp-svg-c { position: relative; }
+.cmp-ligne-c { transition: opacity 0.3s, stroke-width 0.3s; }
+.cmp-ligne-pale { opacity: 0.18; }
+.cmp-ligne-forte { stroke-width: 5; }
+.cmp-annee-l { stroke: var(--cmp-vif); stroke-width: 2; }
+
+/* La lecture dans le temps */
+.cmp-temps { display: flex; align-items: center; gap: 16px; padding: 12px 20px; border-radius: 24px; background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); }
+.cmp-lecture { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border: 0; border-radius: 50%; color: #fff; background: linear-gradient(135deg, #4a1fd0, #7c4dff); cursor: pointer; box-shadow: 0 12px 26px -12px rgba(124, 77, 255, 0.9); transition: translate 0.35s var(--cmp-ease); }
+.cmp-lecture:hover { translate: 0 -2px; }
+.cmp-temps strong { min-width: 58px; text-align: right; font-size: 28px; font-weight: 800; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+
+/* Tout en un coup d'œil */
+.cmp-tout { margin-top: clamp(36px, 6vh, 60px); }
+.cmp-tout-t { margin-bottom: 16px; }
+.cmp-tout-t h2 { margin: 0; font-size: clamp(24px, 3vw, 38px); font-weight: 800; letter-spacing: -0.045em; }
+.cmp-tout-t p { margin: 6px 0 0; font-size: 14px; color: var(--encre-2); }
+.cmp-tout-g { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.cmp-cartes { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 12px; }
+.cmp-carte { position: relative; display: grid; gap: 6px; align-content: start; min-height: 150px; padding: 16px 16px 14px; border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); border-radius: 24px; font: inherit; text-align: left; color: var(--encre); background: var(--surface); cursor: pointer; transition: translate 0.4s var(--cmp-ease), box-shadow 0.4s var(--cmp-ease), border-color 0.3s; animation: cmp-in 0.7s var(--cmp-ease) calc(var(--k) * 40ms) backwards; }
+.cmp-carte:hover { translate: 0 -6px; box-shadow: 0 18px 38px var(--ombre-portee, rgba(0, 0, 0, 0.4)); border-color: var(--cmp-vif); }
+.cmp-carte-on { color: #fff; border-color: transparent; background: radial-gradient(80% 70% at 100% 0%, rgba(255, 255, 255, 0.24), transparent 60%), linear-gradient(150deg, #3a14b8, #7c4dff); }
+.cmp-carte-t { font-size: 13px; font-weight: 750; opacity: 0.9; }
+.cmp-carte-mini { display: flex; align-items: flex-end; gap: 4px; height: 34px; }
+.cmp-carte-mini i { flex: 1; min-height: 3px; border-radius: 4px 4px 2px 2px; background: var(--c); }
+.cmp-carte-v { font-size: 17px; font-weight: 800; letter-spacing: -0.03em; }
+.cmp-carte-e { font-size: 11.5px; font-weight: 700; opacity: 0.75; }
+.cmp-radar-c { padding: clamp(14px, 2vw, 22px); border-radius: 30px; background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); }
+.cmp-radar-c h3 { margin: 0 0 4px; font-size: 20px; font-weight: 800; letter-spacing: -0.03em; }
+.cmp-radar { max-width: 460px; }
+
+@media (max-width: 1000px) {
+  .cmp-scene2, .cmp-tout-g { grid-template-columns: 1fr; }
+  .cmp-lentille-g b { min-width: 100%; }
+}
