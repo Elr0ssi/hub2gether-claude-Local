@@ -69,3 +69,21 @@
   .dd-val { grid-area: v; min-width: 0; }
   .dd-piste { grid-area: b; }
 }
+
+/* Les analyses : des cartes qui se lisent d'un coup d'œil */
+.dd-analyses { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.dd-analyse { display: flex; flex-direction: column; gap: 8px; padding: 20px 22px; border-radius: 26px; text-decoration: none; color: var(--encre); background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); transition: translate 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s, border-color 0.25s; }
+.dd-analyse:hover { translate: 0 -7px; box-shadow: 0 18px 38px var(--ombre-portee, rgba(0, 0, 0, 0.4)); border-color: #8b5cff; }
+.dd-analyse small { font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #8b5cff; }
+.dd-analyse strong { font-size: 19px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; }
+.dd-analyse span { font-size: 14px; line-height: 1.5; color: var(--encre-2); }
+
+/* Les tableaux défilent à l'horizontale ; le nom du pays reste en vue. */
+.dd-tab-c { position: relative; border-radius: 22px; }
+.dd-tab-c .sg-tab tbody th { position: sticky; left: 0; z-index: 1; background: var(--surface); }
+.dd-tab-c .sg-tab thead th:first-child { position: sticky; left: 0; z-index: 1; }
+@media (max-width: 600px) {
+  .dd-tab-c .sg-tab { min-width: 460px; }
+  .dd-tab-c .sg-tab tbody th { min-width: 118px; box-shadow: 8px 0 12px -10px rgba(0, 0, 0, 0.5); }
+}
+.dd-tab-c .sg-tab td { white-space: nowrap; }

@@ -99,3 +99,9 @@ img, video, svg, canvas { max-width: 100%; }
   .ax .ax-globe-zone { width: min(100%, 420px); margin: 0 auto; }
   .cg-frise2-direct { top: -34px !important; bottom: auto !important; }
 }
+
+@media (pointer: coarse), (max-width: 900px) {
+  button.cmp-x.cmp-x { width: 40px; height: 40px; min-width: 40px; }
+  .dd-tab-c a { display: inline-flex; align-items: center; min-height: 40px; }
+  .cg-ts-s a, .sg-note a, .dd-note a, .cmp-sources a { padding: 10px 2px; margin: -10px 0; display: inline-block; }
+}

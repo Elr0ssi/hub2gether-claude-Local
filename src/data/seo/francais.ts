@@ -8,10 +8,10 @@ const MASC = new Set([
   "Liban", "Liberia", "Liechtenstein", "Luxembourg", "Malawi", "Mali", "Maroc", "Mexique", "Monténégro", "Mozambique", "Népal", "Nicaragua",
   "Niger", "Nigeria", "Ouzbékistan", "Pakistan", "Panama", "Paraguay", "Pérou", "Portugal", "Qatar", "Royaume-Uni", "Rwanda", "Salvador",
   "Soudan", "Soudan du Sud", "Sri Lanka", "Suriname", "Sénégal", "Tadjikistan", "Tchad", "Timor oriental", "Togo", "Turkménistan",
-  "Uruguay", "Venezuela", "Viêt Nam", "Yémen", "Zimbabwe",
+  "Uruguay", "Venezuela", "Viêt Nam", "Vietnam", "Ouganda", "Yémen", "Zimbabwe",
 ]);
 const PLUR = new Set([
-  "États-Unis", "Pays-Bas", "Philippines", "Émirats arabes unis", "Bahamas", "Comores", "Seychelles", "Fidji", "Palaos", "Bermudes",
+  "États-Unis", "Pays-Bas", "Philippines", "Émirats arabes unis", "Émirats Arabes Unis", "Bahamas", "Comores", "Seychelles", "Fidji", "Palaos", "Bermudes",
   "Îles Caïmans", "Îles Féroé", "Îles Marshall", "Îles Salomon", "Îles Mariannes du Nord", "Îles Turques-et-Caïques",
   "Îles Vierges des États-Unis", "Samoa américaines",
 ]);

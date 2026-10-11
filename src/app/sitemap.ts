@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { ARTICLES } from "@/data/articles";
+import { ANALYSES } from "@/data/dettes/analyses";
 import { tousLesDossiers } from "@/data/dettes/dossiers";
 import { pairesVedettes, paysVedettes, slugPaire, tousLesPays } from "@/data/seo/pays";
 import { SITE_URL as siteUrl } from "@/lib/site";
@@ -62,6 +63,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const dettes = [
     { url: `${siteUrl}/dette-publique`, priority: 0.85, changeFrequency: "monthly" as const, lastModified: aujourdhui },
+    ...ANALYSES.map((a) => ({ url: `${siteUrl}/dette-publique/analyses/${a.slug}`, priority: 0.75, changeFrequency: "monthly" as const, lastModified: aujourdhui })),
     ...tousLesDossiers().filter((d) => d.slug !== "france").map((d) => ({
       url: `${siteUrl}/dette-publique/${d.slug}`,
       priority: 0.65,

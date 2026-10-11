@@ -3,6 +3,7 @@ import Link from "next/link";
 import { EnTete, Pied } from "@/components/concept/pieces";
 import { Faq, Fil, JsonLd, schemaFaq, schemaFil } from "@/components/seo/Elements";
 import { ClassementDette } from "@/components/dettes/ClassementDette";
+import { ANALYSES } from "@/data/dettes/analyses";
 import { tousLesDossiers } from "@/data/dettes/dossiers";
 import type { QR } from "@/data/dettes/textes";
 import { nf } from "@/data/seo/francais";
@@ -84,6 +85,19 @@ export default function Page() {
         <section className="dd-sec" aria-labelledby="dd-cl">
           <h2 id="dd-cl" className="sg-h2">Le classement</h2>
           <ClassementDette dossiers={dossiers} />
+        </section>
+
+        <section className="dd-sec" aria-labelledby="dd-an">
+          <h2 id="dd-an" className="sg-h2">Les analyses</h2>
+          <div className="dd-analyses">
+            {ANALYSES.map((a) => (
+              <Link key={a.slug} href={`/dette-publique/analyses/${a.slug}`} className="dd-analyse">
+                <small>{a.famille === "region" ? "Par région" : "Classement"}</small>
+                <strong>{a.h1[0]} {a.h1[1]}</strong>
+                <span>{a.accroche}</span>
+              </Link>
+            ))}
+          </div>
         </section>
 
         <Faq titre="Comprendre la dette publique" questions={FAQ} />
