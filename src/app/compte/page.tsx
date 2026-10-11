@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { EnTete, Pied } from "@/components/concept/pieces";
 import { EspaceCompte } from "@/components/compte/EspaceCompte";
+import SOCLE from "@/data/economy/genere/socle-economie.json";
 import { COMPTES_ACTIFS } from "@/lib/supabase/config";
 import { clientServeur, lireCompte } from "@/lib/supabase/serveur";
 import { filParId } from "@/data/community/fils";
@@ -58,6 +59,9 @@ export default async function ComptePage() {
   }
   void anneeSocle;
 
+  const iso2: Record<string, string> = {};
+  for (const [nom, p] of Object.entries(SOCLE.pays as Record<string, { iso2?: string }>)) if (p.iso2) iso2[nom] = p.iso2;
+
   return (
     <div className="cg">
       <EnTete />
@@ -71,6 +75,7 @@ export default async function ComptePage() {
           widgets={compte.profil.widgets}
           sommePib={sommePib}
           sommePopulation={sommePopulation}
+          iso2={iso2}
           messages={messages.map((m) => ({ ...m, titre: filParId(m.cible_id)?.titre ?? m.cible_id }))}
           favoris={favoris.map((f) => ({ slug: f.slug, titre: f.article.title, extrait: f.article.excerpt, cree_le: f.cree_le }))}
         />

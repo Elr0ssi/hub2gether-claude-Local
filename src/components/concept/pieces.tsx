@@ -194,8 +194,7 @@ const NAV: Onglet[] = [
   { label: "Économie", href: "/economie" },
   { label: "Démographie", href: "/demographie" },
   { label: "Forum", href: "/forum" },
-  /* Comparer des pays et des thématiques dans le temps : la prochaine grande page. */
-  { label: "Comparer" },
+  { label: "Comparer", href: "/comparer" },
 ];
 
 /** Un onglet. Sans adresse, il se montre sans se laisser cliquer. */

@@ -34,6 +34,7 @@ export function EspaceCompte({
   sommePopulation,
   messages,
   favoris,
+  iso2 = {},
 }: {
   pseudo: string;
   email: string;
@@ -45,6 +46,7 @@ export function EspaceCompte({
   sommePopulation: number;
   messages: Message[];
   favoris: Favori[];
+  iso2?: Record<string, string>;
 }) {
   const [onglet, setOnglet] = useState<Onglet>("dashboard");
   useEffect(() => {
@@ -93,7 +95,7 @@ export function EspaceCompte({
 
         <section className="es-panneau" key={onglet} role="tabpanel">
           {onglet === "dashboard" && (
-            <TableauWidgets widgetsInitial={widgets} sommePib={sommePib} sommePopulation={sommePopulation} />
+            <TableauWidgets widgetsInitial={widgets} sommePib={sommePib} sommePopulation={sommePopulation} iso2={iso2} />
           )}
 
           {onglet === "discussions" && (

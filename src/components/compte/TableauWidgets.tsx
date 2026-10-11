@@ -6,6 +6,7 @@ import { GripVertical, Plus, Settings2, X, Check } from "lucide-react";
 import { Odometre } from "@/components/concept/Roulement";
 import { CADENCES_EXEMPLE, POPULATION_PAR_AN } from "@/data/concept/tempsReel";
 import { majWidgets } from "@/app/compte/actions";
+import { ChoixPays } from "@/components/concept/ChoixPays";
 import { useSocleDemo, useSocleEco, valeurSocle } from "./socles";
 
 const GlobePerso = dynamic(() => import("./GlobePerso").then((m) => m.GlobePerso), {
@@ -14,7 +15,7 @@ const GlobePerso = dynamic(() => import("./GlobePerso").then((m) => m.GlobePerso
 });
 
 const AN = 365.2425 * 24 * 3600;
-const CLE = "visualize-tableau-v3";
+const CLE = "visualize-tableau-v4";
 
 export interface PaysCompare {
   nom: string;
@@ -60,7 +61,7 @@ function multiplicateur(v: number, ref: number): string | null {
   return v >= ref ? `${t}× plus` : `${t}× moins`;
 }
 
-function Comparateur({ edition }: { edition: boolean }) {
+function Comparateur({ edition, iso2 }: { edition: boolean; iso2: Record<string, string> }) {
   const eco = useSocleEco();
   const demo = useSocleDemo();
   const [cfg, setCfg] = useState<ConfigCompare>(CONFIG_DEFAUT);
@@ -94,11 +95,7 @@ function Comparateur({ edition }: { edition: boolean }) {
           <div className="es-cp-ligne">
             <span>Pays</span>
             {cfg.noms.map((n, i) => (
-              <select key={i} value={n} aria-label={`Pays ${i + 1}`} onChange={(e) => maj({ ...cfg, noms: cfg.noms.map((x, k) => (k === i ? e.target.value : x)) })}>
-                {eco.pays.map((p) => (
-                  <option key={p.nom} value={p.nom}>{p.fr}</option>
-                ))}
-              </select>
+              <ChoixPays key={i} compact label={`Pays ${i + 1}`} valeur={n} options={eco.pays.map((p) => ({ nom: p.nom, fr: p.fr, iso2: iso2[p.nom] }))} onChange={(v) => maj({ ...cfg, noms: cfg.noms.map((x, k) => (k === i ? v : x)) })} />
             ))}
             {cfg.noms.length < 3 && (
               <button type="button" onClick={() => maj({ ...cfg, noms: [...cfg.noms, "Germany"] })}>+ 3<sup>e</sup> pays</button>
@@ -172,11 +169,13 @@ export function TableauWidgets({
   widgetsInitial,
   sommePib,
   sommePopulation,
+  iso2 = {},
 }: {
   widgetsInitial: string[];
   sommePib: number;
   sommePopulation: number;
   pays?: PaysCompare[];
+  iso2?: Record<string, string>;
 }) {
   const depart = useMemo(() => {
     const t = new Date(new Date().getFullYear(), 0, 1).getTime();
@@ -195,8 +194,7 @@ export function TableauWidgets({
   const NOMS: Record<string, string> = useMemo(
     () => ({
       ...Object.fromEntries(compteurs.map((c) => [c.id, c.label])),
-      "globe-eco": "Mon globe économie",
-      "globe-demo": "Mon globe démographie",
+      globe: "Mon globe",
       comparateur: "Comparer des pays",
     }),
     [compteurs],
@@ -207,7 +205,7 @@ export function TableauWidgets({
     const c = (widgetsInitial.length ? widgetsInitial : ["pib", "population"]).filter((id) => compteurs.some((x) => x.id === id));
     return [
       ...c.map((id) => ({ id, t: 2 as Taille, x: "m" as Texte })),
-      { id: "globe-eco", t: 6 as Taille },
+      { id: "globe", t: 6 as Taille },
       { id: "comparateur", t: 6 as Taille },
     ];
   }, [widgetsInitial, compteurs]);
@@ -333,9 +331,8 @@ export function TableauWidgets({
                     <p>Depuis le 1<sup>er</sup> janvier</p>
                   </div>
                 )}
-                {it.id === "globe-eco" && <GlobePerso type="eco" />}
-                {it.id === "globe-demo" && <GlobePerso type="demo" />}
-                {it.id === "comparateur" && <Comparateur edition={edition} />}
+                {it.id === "globe" && <GlobePerso edition={edition} />}
+                {it.id === "comparateur" && <Comparateur edition={edition} iso2={iso2} />}
               </div>
             </article>
           );

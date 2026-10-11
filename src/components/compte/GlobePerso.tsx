@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CountryEconomyData, EconomyMetricId, EconomyYear } from "@/types";
 import type { DemographyMetricId, DemographyYear } from "@/data/demographie/demographie";
 import { GlobeEco, TOUTES as TOUTES_ECO } from "@/components/concept/GlobeEco";
@@ -25,9 +25,8 @@ const CHAMPS_ECO: [EconomyMetricId, keyof CountryEconomyData][] = [
   ["companies", "companies"],
 ];
 
-function GlobeEcoPerso() {
+function GlobeEcoPerso({ metrique, onMetrique }: { metrique: EconomyMetricId; onMetrique: (id: EconomyMetricId) => void }) {
   const socle = useSocleEco();
-  const [metrique, setMetrique] = useState<EconomyMetricId>("gdp");
   const [choisi, setChoisi] = useState<string | null>("France");
 
   const derniere = socle ? socle.annees[socle.annees.length - 1] : 0;
@@ -64,7 +63,7 @@ function GlobeEcoPerso() {
     <GlobeEco
       annee={annee}
       metrique={TOUTES_ECO.find((m) => m.id === metrique) ?? TOUTES_ECO[0]}
-      onMetrique={setMetrique}
+      onMetrique={onMetrique}
       choisi={choisi}
       onChoisi={setChoisi}
       nomFr={(n) => socle.pays.find((p) => p.nom === n)?.fr ?? n}
@@ -74,9 +73,8 @@ function GlobeEcoPerso() {
   );
 }
 
-function GlobeDemoPerso() {
+function GlobeDemoPerso({ metrique, onMetrique }: { metrique: DemographyMetricId; onMetrique: (id: DemographyMetricId) => void }) {
   const socle = useSocleDemo();
-  const [metrique, setMetrique] = useState<DemographyMetricId>("population");
   const [choisi, setChoisi] = useState<string | null>("France");
 
   const derniere = socle ? socle.annees[socle.annees.length - 1] : 0;
@@ -113,7 +111,7 @@ function GlobeDemoPerso() {
     <GlobeDemographie
       annee={annee}
       metrique={TOUTES_DEMO.find((m) => m.id === metrique) ?? TOUTES_DEMO[0]}
-      onMetrique={setMetrique}
+      onMetrique={onMetrique}
       choisi={choisi}
       onChoisi={setChoisi}
       nomFr={(n) => socle.pays.find((p) => p.nom === n)?.fr ?? n}
@@ -123,10 +121,98 @@ function GlobeDemoPerso() {
   );
 }
 
-export function GlobePerso({ type }: { type: "eco" | "demo" }) {
+/* Ce que le globe sait montrer : tous les indicateurs économiques et démographiques du site. */
+interface Choix {
+  cle: string;
+  src: "eco" | "demo";
+  id: string;
+  label: string;
+}
+const CATALOGUE: Choix[] = [
+  ...TOUTES_ECO.map((m) => ({ cle: `eco:${m.id}`, src: "eco" as const, id: m.id as string, label: m.label })),
+  ...TOUTES_DEMO.map((m) => ({ cle: `demo:${m.id}`, src: "demo" as const, id: m.id as string, label: m.label })),
+];
+const DEFAUT = ["eco:gdp", "eco:gdp_per_capita", "demo:population", "eco:inflation"];
+const CLE_LS = "visualize-globe-perso-v3";
+
+/** Le globe personnel : le même rendu que les pages Économie et Démographie,
+    mais c'est vous qui décidez des indicateurs qu'il peut montrer, tous
+    thèmes confondus. */
+export function GlobePerso({ edition = false }: { edition?: boolean }) {
+  const [selection, setSelection] = useState<string[]>(DEFAUT);
+  const [actif, setActif] = useState<string>(DEFAUT[0]);
+
+  useEffect(() => {
+    try {
+      const s = JSON.parse(localStorage.getItem(CLE_LS) ?? "null") as { selection?: string[]; actif?: string } | null;
+      if (s?.selection?.length) {
+        const ok = s.selection.filter((c) => CATALOGUE.some((x) => x.cle === c));
+        if (ok.length) {
+          setSelection(ok);
+          setActif(s.actif && ok.includes(s.actif) ? s.actif : ok[0]);
+        }
+      }
+    } catch {}
+  }, []);
+  const garde = (sel: string[], a: string) => {
+    try {
+      localStorage.setItem(CLE_LS, JSON.stringify({ selection: sel, actif: a }));
+    } catch {}
+  };
+
+  const va = (cle: string) => {
+    setActif(cle);
+    garde(selection, cle);
+  };
+  const bascule = (cle: string) => {
+    let sel = selection.includes(cle) ? selection.filter((c) => c !== cle) : [...selection, cle];
+    if (sel.length === 0) sel = [cle];
+    const a = sel.includes(actif) ? actif : sel[0];
+    setSelection(sel);
+    setActif(a);
+    garde(sel, a);
+  };
+
+  const courant = CATALOGUE.find((c) => c.cle === actif) ?? CATALOGUE[0];
+
   return (
-    <div className="cg-v2 cg-eco es-ge">
-      {type === "eco" ? <GlobeEcoPerso /> : <GlobeDemoPerso />}
+    <div className="es-gp">
+      {edition && (
+        <div className="es-gp-choix">
+          <p>Choisissez les indicateurs que votre globe peut afficher</p>
+          {(["eco", "demo"] as const).map((src) => (
+            <div key={src} className="es-gp-groupe">
+              <span>{src === "eco" ? "Économie" : "Démographie"}</span>
+              {CATALOGUE.filter((c) => c.src === src).map((c) => (
+                <button key={c.cle} type="button" className={selection.includes(c.cle) ? "on" : ""} aria-pressed={selection.includes(c.cle)} onClick={() => bascule(c.cle)}>
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="es-gp-pills" role="tablist" aria-label="Indicateur affiché sur le globe">
+        {selection.map((cle) => {
+          const c = CATALOGUE.find((x) => x.cle === cle);
+          if (!c) return null;
+          return (
+            <button key={cle} type="button" role="tab" aria-selected={actif === cle} className={actif === cle ? "on" : ""} onClick={() => va(cle)}>
+              {c.label}
+              <i>{c.src === "eco" ? "Éco" : "Démo"}</i>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="cg-v2 cg-eco es-ge es-ge-sanstabs">
+        {courant.src === "eco" ? (
+          <GlobeEcoPerso metrique={courant.id as EconomyMetricId} onMetrique={(id) => va(`eco:${id}`)} />
+        ) : (
+          <GlobeDemoPerso metrique={courant.id as DemographyMetricId} onMetrique={(id) => va(`demo:${id}`)} />
+        )}
+      </div>
     </div>
   );
 }
