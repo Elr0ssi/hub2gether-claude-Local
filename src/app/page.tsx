@@ -47,6 +47,8 @@ export default function Accueil() {
   const { liste } = reperes();
   return (
     <>
+    {/* Le fond de carte du globe d'ouverture : demandé dès le HTML, il est là quand la scène en a besoin. */}
+    <link rel="preload" href="/geo/ne_110m_admin_0_countries.geojson" as="fetch" crossOrigin="anonymous" />
     <JsonLd data={[schemaFaq(FAQ_ACCUEIL)]} />
     <AnalysesPage
       articlesDette={articlesDette(6).map((a) => ({ rubrique: a.rubrique, titre: a.titre, href: a.href! }))}

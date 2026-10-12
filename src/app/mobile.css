@@ -94,7 +94,7 @@ img, video, svg, canvas { max-width: 100%; }
   :root .ax .ax-ouv { padding: 96px 0 28px; align-items: flex-start; }
   :root .ax .ax-ouv-g { grid-template-columns: minmax(0, 1fr); gap: 6px; }
   :root .ax .ax-ouv-s { max-width: 26ch; }
-  :root .ax .ax-globe-zone { width: calc(100% + 40px); max-width: 520px; margin: 26px -20px 0; }
+  :root .ax .ax-globe-zone { width: 100%; max-width: 440px; margin: 22px auto 0; }
   :root .cg-frise2-direct { top: -34px !important; bottom: auto !important; }
 
   /* Le globe d'abord : le titre de section, puis les onglets et la sphère.
@@ -119,4 +119,64 @@ img, video, svg, canvas { max-width: 100%; }
   :root button.cmp-x { width: 40px; height: 40px; min-width: 40px; }
   :root .dd-tab-c a { display: inline-flex; align-items: center; min-height: 40px; }
   :root .cg-ts-s a, :root .sg-note a, :root .dd-note a, :root .cmp-sources a { padding: 10px 2px; margin: -10px 0; display: inline-block; }
+}
+
+/* Le globe d'ouverture : une sphère de repos pendant que la scène 3D se prépare,
+   pour que la page ne s'ouvre pas sur un trou. Elle est recouverte par la vraie. */
+.ax-globe-c::before {
+  content: "";
+  position: absolute;
+  inset: 6.5%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle at 36% 30%, #2b2354, #15102c 68%);
+  box-shadow: 0 0 60px rgba(124, 77, 255, 0.18);
+}
+:root[data-concept="clair"] .ax-globe-c::before { background: radial-gradient(circle at 36% 30%, #f4f0ff, #e1d9fa 70%); }
+
+@media (max-width: 760px) {
+  /* Les classements : la carte reste dans l'écran (la liste de rubriques, sur
+     une ligne, élargissait toute la grille). Les rubriques passent en grille. */
+  :root .ax-cl2-g { grid-template-columns: minmax(0, 1fr); }
+  :root .ax-cl2-gauche, :root .ax-cl2-carte { min-width: 0; max-width: 100%; justify-self: stretch; }
+  :root .ax-cl2-carte { padding: 18px 16px; border-radius: 26px; }
+  :root .ax-cl2-liste, :root .ax-cles-liste { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; overflow: visible; margin-top: 14px; }
+  :root .ax-cl2-liste li { white-space: normal; font-size: 13.5px; }
+  :root .ax-cl2-liste li, :root .ax-cles-liste li { min-width: 0; }
+  :root .ax-cl2-liste li.ax-cl2-on { transform: none; }
+  :root .ax-cles-liste button { width: 100%; min-width: 0; white-space: normal; text-align: left; justify-content: flex-start; padding: 10px 12px; font-size: 13.5px; line-height: 1.25; }
+  :root .ax-cl2-colle { padding-top: 74px; align-items: flex-start; }
+  :root .ax-pod2-1 { min-height: 150px; }
+  :root .ax-pod2-2 { min-height: 122px; }
+  :root .ax-pod2-3 { min-height: 100px; }
+  :root .ax-cl2-carte li { padding-top: 8px; padding-bottom: 8px; }
+  :root .ax-cl2-carte ol { gap: 4px; }
+  :root .ax-pod2 { gap: 6px; }
+  :root .ax-pod2-c { padding: 12px 10px 14px; border-radius: 18px; min-width: 0; }
+  :root .ax-pod2-n { font-size: 12.5px; }
+  :root .ax-pod2-v { font-size: clamp(14px, 4.2vw, 17px); white-space: nowrap; }
+  :root .ax-cl2-pied { gap: 10px; }
+}
+
+@media (max-width: 760px) {
+  /* « Pourquoi Visualize ? » : le schéma se lit de haut en bas — les sources,
+     le site au milieu, ce qu'il en sort — au lieu d'être écrasé sur la gauche. */
+  :root .ax .ax-flux { aspect-ratio: auto; display: grid; justify-items: stretch; gap: 0; margin-top: 24px; }
+  :root .ax .ax-flux-svg { display: none; }
+  :root .ax .ax-flux-g, :root .ax .ax-flux-v, :root .ax .ax-flux-s { position: static; width: 100%; translate: none; inset: auto; }
+  :root .ax .ax-flux-g { display: grid; grid-template-rows: none; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  :root .ax .ax-flux-grp { padding: 14px 16px; gap: 10px; border-radius: 20px; }
+  :root .ax .ax-flux-grp b { font-size: 12px; }
+  :root .ax .ax-flux-grp i { font-size: 13px; padding: 5px 12px; display: inline-block; }
+  :root .ax .ax-flux-grp i:nth-child(n + 3) { display: inline-block; }
+  :root .ax .ax-flux-v { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 34px 0; position: relative; }
+  :root .ax .ax-flux-v::before, :root .ax .ax-flux-v::after { content: ""; position: absolute; left: 50%; width: 0; height: 26px; border-left: 2px dashed var(--ax-vif-2); opacity: 0.8; }
+  :root .ax .ax-flux-v::before { top: 4px; }
+  :root .ax .ax-flux-v::after { bottom: 4px; }
+  :root .ax .ax-flux-halo { top: 34px; }
+  :root .ax .ax-flux-logo { width: 56px; }
+  :root .ax .ax-flux-halo { width: 56px; }
+  :root .ax .ax-flux-v strong { font-size: 17px; }
+  :root .ax .ax-flux-s { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  :root .ax .ax-flux-s span { padding: 14px 16px; font-size: 15px; border-radius: 16px; }
 }

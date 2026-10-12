@@ -238,7 +238,7 @@ function Ouverture({ reperes, donnees, annee, dette }: Props) {
   const [globe, setGlobe] = useState(false);
   const [sombre, setSombre] = useState(true);
   useEffect(() => {
-    const t = window.setTimeout(() => setGlobe(true), 600);
+    const t = window.setTimeout(() => setGlobe(true), 120);
     const lit = () => setSombre(document.documentElement.dataset.concept !== "clair");
     lit();
     const o = new MutationObserver(lit);

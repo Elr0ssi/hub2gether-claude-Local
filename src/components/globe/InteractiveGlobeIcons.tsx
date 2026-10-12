@@ -438,7 +438,11 @@ export default function InteractiveGlobeIcons({
           const h = hoverFactors[i];
 
           const scale = 0.82 + 0.22 * Math.max(0, front) + 0.07 * h;
-          el.style.transform = `translate(-50%, -50%) translate(${x + floatX}px, ${
+          /* Sur un écran étroit, la sphère occupe presque toute la largeur : un
+             marqueur qui passe au bord serait coupé. Il reste dans le cadre. */
+          const demi = half * scale + 2;
+          const cx = W > demi * 2 ? Math.min(Math.max(x + floatX, demi), W - demi) : x + floatX;
+          el.style.transform = `translate(-50%, -50%) translate(${cx}px, ${
             y + floatY - 4 * h
           }px) scale(${scale})`;
           el.style.opacity = String(opacity);
@@ -512,8 +516,8 @@ export default function InteractiveGlobeIcons({
                 position: "absolute",
                 left: 0,
                 top: 0,
-                width: "clamp(112px, 13vw, 152px)",
-                padding: "12px 15px",
+                width: "clamp(98px, 13vw, 152px)",
+                padding: "clamp(9px, 2.6vw, 12px) clamp(11px, 3vw, 15px)",
                 borderRadius: 13,
                 border: "1px solid rgba(255,255,255,0.14)",
                 background: "rgba(10,16,24,0.42)",
@@ -525,7 +529,7 @@ export default function InteractiveGlobeIcons({
                 willChange: "transform, opacity",
               }}
             >
-              <div style={{ fontSize: 19, fontWeight: 400, color: "#fff", letterSpacing: "-0.01em" }}>
+              <div style={{ fontSize: "clamp(15px, 4.4vw, 19px)", fontWeight: 400, color: "#fff", letterSpacing: "-0.01em", whiteSpace: "nowrap" }}>
                 {marker.texte.chiffre}
               </div>
               <div style={{ fontSize: 10.5, color: "rgba(255,255,255,0.62)", marginTop: 2 }}>
