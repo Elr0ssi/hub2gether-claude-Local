@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { jsonLdString } from "@/lib/schema";
 import "./globals.css";
@@ -12,6 +12,12 @@ const inter = Inter({
 });
 
 import { SITE_URL as siteUrl } from "@/lib/site";
+
+/* L'écran entier : le fond de la page passe sous l'encoche et l'heure, comme sur une app. */
+export const viewport: Viewport = {
+  viewportFit: "cover",
+  themeColor: "#05080c",
+};
 
 export const metadata: Metadata = {
   title: {

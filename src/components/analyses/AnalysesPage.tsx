@@ -369,6 +369,27 @@ const DIRECT = [
   { nom: "Population mondiale", unite: "", dec: 0, note: "Au rythme des naissances et des décès de l'année, depuis le 1er janvier" },
 ] as const;
 
+/** Sur téléphone, la liste des rubriques devient un rail : la rubrique en cours
+    est au centre, ses voisines s'estompent de part et d'autre, et le rail glisse
+    quand elle change. Sur grand écran la liste reste une liste (le CSS ignore --dx). */
+function useCentre(actif: number) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const pose = () => {
+      const w = ref.current;
+      const ol = w?.querySelector("ol");
+      const li = ol?.children[actif] as HTMLElement | undefined;
+      if (!w || !ol || !li) return;
+      ol.style.setProperty("--dx", `${w.clientWidth / 2 - (li.offsetLeft + li.offsetWidth / 2)}px`);
+    };
+    pose();
+    window.addEventListener("resize", pose);
+    void document.fonts?.ready.then(pose);
+    return () => window.removeEventListener("resize", pose);
+  }, [actif]);
+  return ref;
+}
+
 function EnDirect({ pib, population }: { pib: Props["pib"]; population: Props["population"] }) {
   const zone = useRef<HTMLDivElement>(null);
   const [n, setN] = useState(0);
@@ -416,6 +437,7 @@ function EnDirect({ pib, population }: { pib: Props["pib"]; population: Props["p
   };
 
   const d = n < DIRECT.length ? DIRECT[n] : null;
+  const rail = useCentre(Math.min(n, DIRECT.length - 1));
 
   return (
     <section
@@ -460,6 +482,7 @@ function EnDirect({ pib, population }: { pib: Props["pib"]; population: Props["p
               ) : null}
             </div>
           </div>
+          <div className="ax-rail-c" ref={rail}>
           <ol className="ax-cles-liste" aria-label="Choisir un chiffre">
             {DIRECT.map((x) => x.nom).map((nom, i) => (
               <li key={nom}>
@@ -470,6 +493,7 @@ function EnDirect({ pib, population }: { pib: Props["pib"]; population: Props["p
               </li>
             ))}
           </ol>
+          </div>
         </div>
         <div className="ax-cles-rail" aria-hidden="true">
           <span style={{ transform: `scaleX(${p})` }} />
@@ -550,6 +574,7 @@ function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; a
     };
   }, [fiches.length]);
 
+  const rail = useCentre(n);
   const f = fiches[n];
   /* Le podium se lit 2 · 1 · 3 : le premier au milieu, plus haut. Les cellules
      gardent leur place d'un classement à l'autre — seuls les noms et les
@@ -569,6 +594,7 @@ function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; a
           <div className="ax-cl2-gauche">
             <h2 id="ax-cl-t" className="ax-h2">Nos classements</h2>
             {/* Les titres ne se cliquent pas : ils suivent le défilement. */}
+            <div className="ax-rail-c" ref={rail}>
             <ol className="ax-cl2-liste">
               {fiches.map((x, i) => (
                 <li key={x.id} className={i === n ? "ax-cl2-on" : i < n ? "ax-cl2-fait" : undefined}>
@@ -577,6 +603,7 @@ function Classements({ donnees, annee }: { donnees: Record<string, FichePays>; a
                 </li>
               ))}
             </ol>
+            </div>
             <div className="ax-cl2-rail" aria-hidden="true"><span style={{ transform: `scaleY(${p})` }} /></div>
           </div>
 

@@ -77,6 +77,8 @@ function appliquer(t: Theme) {
   const r = document.documentElement;
   if (t === "clair") r.dataset.concept = "clair";
   else delete r.dataset.concept;
+  /* La barre d'état du téléphone prend la couleur de la page. */
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", t === "clair" ? "#f6f5f2" : "#05080c");
 }
 
 /** Le bouton : un soleil, une lune, et l'état annoncé pour qui n'y voit pas. */

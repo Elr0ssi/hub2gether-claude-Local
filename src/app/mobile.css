@@ -139,11 +139,14 @@ img, video, svg, canvas { max-width: 100%; }
   :root .ax-cl2-g { grid-template-columns: minmax(0, 1fr); }
   :root .ax-cl2-gauche, :root .ax-cl2-carte { min-width: 0; max-width: 100%; justify-self: stretch; }
   :root .ax-cl2-carte { padding: 18px 16px; border-radius: 26px; }
-  :root .ax-cl2-liste, :root .ax-cles-liste { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; overflow: visible; margin-top: 14px; }
-  :root .ax-cl2-liste li { white-space: normal; font-size: 13.5px; }
-  :root .ax-cl2-liste li, :root .ax-cles-liste li { min-width: 0; }
-  :root .ax-cl2-liste li.ax-cl2-on { transform: none; }
-  :root .ax-cles-liste button { width: 100%; min-width: 0; white-space: normal; text-align: left; justify-content: flex-start; padding: 10px 12px; font-size: 13.5px; line-height: 1.25; }
+  /* Les rubriques : un rail. L'active au centre, les voisines estompées. */
+  :root .ax-rail-c { overflow: hidden; margin: 14px -20px 0; padding: 6px 0; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24%, #000 76%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 24%, #000 76%, transparent 100%); }
+  :root .ax-cl2-liste, :root .ax-cles-liste { position: relative; display: flex; flex-wrap: nowrap; width: max-content; gap: 8px; margin: 0; overflow: visible; transform: translateX(var(--dx, 0px)); transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+  :root .ax-cl2-liste li, :root .ax-cles-liste li { flex: none; min-width: 0; white-space: nowrap; font-size: 17px; font-weight: 700; opacity: 0.32; transform: scale(0.92); transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+  :root .ax-cl2-liste li.ax-cl2-on, :root .ax-cles-liste li:has(.ax-cles-on) { opacity: 1; transform: scale(1); }
+  :root .ax-cl2-liste li.ax-cl2-on { transform: scale(1); }
+  :root .ax-cles-liste button { width: auto; white-space: nowrap; padding: 10px 16px; font-size: 17px; font-weight: 700; transform: none; }
+  :root .ax-cl2-liste li.ax-cl2-fait { opacity: 0.32; }
   :root .ax-cl2-colle { padding-top: 74px; align-items: flex-start; }
   :root .ax-pod2-1 { min-height: 150px; }
   :root .ax-pod2-2 { min-height: 122px; }
@@ -179,3 +182,26 @@ img, video, svg, canvas { max-width: 100%; }
   :root .ax .ax-flux-s { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
   :root .ax .ax-flux-s span { padding: 14px 16px; font-size: 15px; border-radius: 16px; }
 }
+
+@media (max-width: 760px) {
+  /* Des respirations plus courtes entre les sections de l'accueil. */
+  :root .ax .ax-sec { padding-top: 40px; }
+  :root .ax .ax-sec-large { padding-top: 44px; padding-bottom: 6px; }
+  :root .ax .ax-presse { padding-bottom: 28px; }
+  :root .ax .ax-sec-ligne, :root .ax .ax-sous-ligne { margin-top: 10px; }
+}
+
+@media (max-width: 900px) {
+  /* Le menu ouvert : la monnaie et le thème côte à côte, du même côté. */
+  :root .cg-bout { justify-content: flex-start; gap: 10px; }
+}
+
+@media (max-width: 600px) {
+  /* « En temps réel » descend sous la frise : il ne gêne plus le glissé sur ses côtés. */
+  :root .cg-frise2 { margin-top: 28px; margin-bottom: 8px; }
+  :root .cg-frise2-piste { padding-bottom: 40px; }
+  :root .cg-frise2-direct { top: calc(100% + 32px) !important; bottom: auto !important; right: auto; left: 0 !important; }
+}
+
+/* La zone sûre des iPhone : le fond court jusqu'en haut, le menu reste dessous. */
+:root .cg-header { top: calc(14px + env(safe-area-inset-top, 0px)); }
