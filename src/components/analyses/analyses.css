@@ -930,9 +930,6 @@ a.ax-dos:hover { border-color: var(--ax-ligne); }
 .ax-hz-orbite em { position: absolute; left: 0; top: 0; width: 9px; height: 9px; border-radius: 50%; background: #fff; box-shadow: 0 0 14px 4px rgba(190, 170, 255, 0.9); offset-path: ellipse(50% 50% at 50% 50%); animation: ax-sat 16s linear infinite; }
 .ax-hz-orbite-2 em { background: #ffd0e6; box-shadow: 0 0 14px 4px rgba(255, 150, 200, 0.9); animation-duration: 11s; animation-direction: reverse; }
 @keyframes ax-sat { from { offset-distance: 0%; } to { offset-distance: 100%; } }
-.ax .cg-pied { position: relative; z-index: 2; background: transparent; border-top: 0; }
-.ax .cg-pied-l, .ax .cg-pied-l a { color: rgba(236, 232, 255, 0.78); }
-:root[data-concept="clair"] .ax .cg-pied-l, :root[data-concept="clair"] .ax .cg-pied-l a { color: rgba(255, 255, 255, 0.88); }
 .ax-presse { padding-bottom: clamp(70px, 12vh, 150px); }
 @media (prefers-reduced-motion: reduce) { .ax-hz-orbite em, .ax-hz-aurore, .ax-hz-astre u { animation: none; } }
 

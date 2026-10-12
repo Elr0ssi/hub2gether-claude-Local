@@ -315,44 +315,33 @@ export function EnTete({ actif }: { actif?: string }) {
   );
 }
 
-const COMPARAISONS_POPULAIRES: [string, string][] = [
-  ["France ou Allemagne", "allemagne-vs-france"],
-  ["États-Unis ou Chine", "chine-vs-etats-unis"],
-  ["France ou Royaume-Uni", "france-vs-royaume-uni"],
-  ["France ou Italie", "france-vs-italie"],
-  ["France ou Espagne", "espagne-vs-france"],
-  ["Chine ou Inde", "chine-vs-inde"],
-  ["États-Unis ou France", "etats-unis-vs-france"],
-  ["France ou Brésil", "bresil-vs-france"],
-];
-
+/** Le pied de page : la marque, quatre entrées, trois mentions. Rien d'autre. */
 export function Pied() {
   return (
     <footer className="cg-pied">
-      <div className="cg-wrap cg-pied-l">
-        <span>Visualize</span>
-        <nav>
-          {NAV.filter((n) => n.href).map((n) => (
-            <a key={n.label} href={n.href}>
-              {n.label}
-            </a>
-          ))}
-          <a href="/pays">Pays</a>
-          <a href="/dette-publique">Dette publique</a>
-          <a href="/compte/connexion">Mon compte</a>
-          <a href="/confidentialite">Confidentialité</a>
-          <a href="/cgu">CGU</a>
+      <div className="cg-wrap cg-pied-in">
+        <a href="/" className="cg-pied-marque">
+          <span className="cg-logo-m" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </span>
+          Visualize
+        </a>
+        <nav className="cg-pied-nav" aria-label="Rubriques">
+          <a href="/economie">Économie</a>
+          <a href="/demographie">Démographie</a>
+          <a href="/comparer">Comparer</a>
+          <a href="/forum">Forum</a>
         </nav>
-        <a className="cg-pied-note" href="/#fonctionnement">Sources des données</a>
-      </div>
-      {/* Des liens vers les comparaisons les plus cherchées : pour les lecteurs, et pour les moteurs. */}
-      <div className="cg-wrap cg-pied-pop">
-        <span>Comparaisons populaires</span>
-        <nav aria-label="Comparaisons populaires">
-          {COMPARAISONS_POPULAIRES.map(([label, slug]) => (
-            <a key={slug} href={`/comparer/${slug}`}>{label}</a>
-          ))}
-        </nav>
+        <div className="cg-pied-bas">
+          <span>© Visualize</span>
+          <nav aria-label="Informations">
+            <a href="/#fonctionnement">Sources</a>
+            <a href="/confidentialite">Confidentialité</a>
+            <a href="/cgu">CGU</a>
+          </nav>
+        </div>
       </div>
     </footer>
   );

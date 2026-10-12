@@ -852,12 +852,22 @@ body:has(.cg) { background: #05080c; }
 
 .cg-citation { margin-top: clamp(56px, 7vw, 96px); font-size: clamp(15px, 1.4vw, 19px); line-height: 1.6; color: var(--encre-3); font-style: italic; }
 
-.cg-pied { position: relative; border-top: 1px solid var(--bord-fin); padding: 26px 0 34px; }
-.cg-pied-l { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; font-size: 12px; color: var(--encre-3); }
-.cg-pied-l nav { display: flex; gap: 20px; }
-.cg-pied-l a { color: var(--encre-3); transition: color 0.3s; }
-.cg-pied-l a:hover { color: var(--encre); }
-.cg-pied-note { margin-left: auto; }
+/* Le pied de page : épuré, plein jusqu'au bas de la page. */
+.cg-pied { position: relative; z-index: 2; border-top: 1px solid var(--bord-fin); background: var(--fond); padding: 40px 0 calc(30px + env(safe-area-inset-bottom)); }
+.cg-pied-in { display: grid; gap: 26px; }
+.cg-pied-marque { display: inline-flex; align-items: center; gap: 10px; width: fit-content; font-size: 16px; font-weight: 800; letter-spacing: -0.03em; color: var(--encre); text-decoration: none; }
+.cg-pied-nav { display: flex; flex-wrap: wrap; gap: 6px 26px; }
+.cg-pied-nav a { font-size: 15px; font-weight: 600; color: var(--encre-2); text-decoration: none; transition: color 0.3s; }
+.cg-pied-bas { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 24px; padding-top: 20px; border-top: 1px solid var(--bord-fin); font-size: 13px; color: var(--encre-3); }
+.cg-pied-bas nav { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+.cg-pied-bas a { color: var(--encre-3); text-decoration: none; transition: color 0.3s; }
+.cg-pied .cg-logo-m { background: linear-gradient(140deg, #7c4dff, #a583ff); }
+.cg-pied-nav a:hover, .cg-pied-bas a:hover, .cg-pied-marque:hover { color: var(--encre); }
+@media (min-width: 900px) {
+  .cg-pied-in { grid-template-columns: auto 1fr; align-items: center; column-gap: 56px; }
+  .cg-pied-nav { justify-content: flex-end; }
+  .cg-pied-bas { grid-column: 1 / -1; }
+}
 
 /* ── En dessous du desktop ───────────────────────────────────────────────── */
 
@@ -4469,9 +4479,3 @@ body:has(.cg) { background: #05080c; }
   background-clip: content-box;
 }
 
-/* Le pied de page : les comparaisons populaires, sur une ligne à part. */
-.cg-pied-pop { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 18px; padding-top: 14px; font-size: 12px; color: var(--encre-3); }
-.cg-pied-pop nav { display: flex; flex-wrap: wrap; gap: 6px 16px; }
-.cg-pied-pop a { color: var(--encre-3); transition: color 0.3s; }
-.cg-pied-pop a:hover { color: var(--encre); }
-.ax .cg-pied-pop, .ax .cg-pied-pop a { color: rgba(236, 232, 255, 0.7); }
