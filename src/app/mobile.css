@@ -24,84 +24,99 @@ img, video, svg, canvas { max-width: 100%; }
 
 @media (pointer: coarse), (max-width: 900px) {
   /* Le pied de page : des liens qu'on peut toucher. */
-  .cg-pied-l nav, .cg-pied-pop nav { gap: 0 8px; flex-wrap: wrap; }
-  .cg-pied-l a, .cg-pied-pop a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; }
-  .cg-pied-l { gap: 0 16px; }
-  .cg-pied-pop { gap: 0 16px; }
-  .cg-pied-note { margin-left: 0; }
-  .cg-pied { padding: 18px 0 28px; }
+  :root .cg-pied-l nav, :root .cg-pied-pop nav { gap: 0 8px; flex-wrap: wrap; }
+  :root .cg-pied-l a, :root .cg-pied-pop a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; }
+  :root .cg-pied-l { gap: 0 16px; }
+  :root .cg-pied-pop { gap: 0 16px; }
+  :root .cg-pied-note { margin-left: 0; }
+  :root .cg-pied { padding: 18px 0 28px; }
 
   /* Le fil d'Ariane et les liens de texte courts. */
-  .sg-fil a, .sg-fil span { display: inline-flex; align-items: center; min-height: 40px; }
-  .sg-fil ol { gap: 0 6px; }
-  .sg-liens a { padding: 12px 18px; min-height: 44px; display: inline-flex; align-items: center; }
-  .sg-index a { display: inline-flex; align-items: center; min-height: 44px; }
-  .sg-index li { margin: 0; }
-  .sg-bouton { min-height: 48px; justify-content: center; }
-  .sg-cta { gap: 10px; }
-  .sg-cta .sg-bouton { flex: 1 1 auto; }
-  .sg-faq summary { min-height: 52px; }
+  :root .sg-fil a, :root .sg-fil span { display: inline-flex; align-items: center; min-height: 40px; }
+  :root .sg-fil ol { gap: 0 6px; }
+  :root .sg-liens a { padding: 12px 18px; min-height: 44px; display: inline-flex; align-items: center; }
+  :root .sg-index a { display: inline-flex; align-items: center; min-height: 44px; }
+  :root .sg-index li { margin: 0; }
+  :root .sg-bouton { min-height: 48px; justify-content: center; }
+  :root .sg-cta { gap: 10px; }
+  :root .sg-cta .sg-bouton { flex: 1 1 auto; }
+  :root .sg-faq summary { min-height: 52px; }
 
   /* La frise : une zone de toucher plus large que le chiffre. */
-  .cg-frise2-b { position: relative; }
-  .cg-frise2-b::after, .cg-frise2-direct::after { content: ""; position: absolute; inset: -14px -10px; }
+  :root .cg-frise2-b { position: relative; }
+  :root .cg-frise2-b::after, :root .cg-frise2-direct::after { content: ""; position: absolute; inset: -14px -10px; }
 
   /* Les boutons de vote du forum, de retrait d'un pays, des chips. */
-  .cg-fo-fleche { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
-  .cmp-x { width: 40px; height: 40px; }
-  .cmp-presets button, .cmp-lentille button, .cmp-groupe button { min-height: 40px; }
-  .chp-b { min-height: 44px; }
-  .chp-l li { min-height: 44px; }
-  .es-onglets button, .es-wb-perso, .es-w-b, .es-seg button { min-height: 40px; }
-  .es-w-b { width: 40px; height: 40px; }
-  .dv button { min-height: 44px; min-width: 48px; }
-  .dd-tri button { min-height: 44px; }
-  .cg-nav a, .cg-bout a, .cg-bout button { min-height: 44px; }
+  :root .cg-fo-fleche { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  :root .cmp-x { width: 40px; height: 40px; }
+  :root .cmp-presets button, :root .cmp-lentille button, :root .cmp-groupe button { min-height: 40px; }
+  :root .chp-b { min-height: 44px; }
+  :root .chp-l li { min-height: 44px; }
+  :root .es-onglets button, :root .es-wb-perso, :root .es-w-b, :root .es-seg button { min-height: 40px; }
+  :root .es-w-b { width: 40px; height: 40px; }
+  :root .dv button { min-height: 44px; min-width: 48px; }
+  :root .dd-tri button { min-height: 44px; }
+  :root .cg-nav a, :root .cg-bout a, :root .cg-bout button { min-height: 44px; }
 
   /* Du texte qu'on lit sans zoomer. */
-  .cg-pied-l, .cg-pied-pop { font-size: 13.5px; }
-  .sg-note, .cmp-sources { font-size: 13px; }
-  input, select, textarea { font-size: 16px; }
+  :root .cg-pied-l, :root .cg-pied-pop { font-size: 13.5px; }
+  :root .sg-note, :root .cmp-sources { font-size: 13px; }
+  :root input, :root select, :root textarea { font-size: 16px; }
 }
 
 @media (max-width: 600px) {
   /* Des marges latérales régulières, partout. */
-  .sg-page, .cmp-page, .es { padding-left: 16px; padding-right: 16px; }
-  .sg-h1 { font-size: clamp(30px, 9vw, 44px); line-height: 1.04; }
-  .sg-h2 { font-size: clamp(22px, 6.4vw, 30px); }
-  .sg-grille { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .sg-carte { padding: 16px 16px; border-radius: 22px; }
-  .sg-carte strong { font-size: clamp(20px, 6vw, 26px); overflow-wrap: anywhere; }
-  .sg-tab { font-size: 13px; }
-  .sg-tab th, .sg-tab td { padding: 10px 10px; }
-  .sg-duel > div { padding: 18px 18px; }
-  .sg-index { columns: 2 150px; }
+  :root .sg-page, :root .cmp-page, :root .es { padding-left: 16px; padding-right: 16px; }
+  :root .sg-h1 { font-size: clamp(30px, 9vw, 44px); line-height: 1.04; }
+  :root .sg-h2 { font-size: clamp(22px, 6.4vw, 30px); }
+  :root .sg-grille { grid-template-columns: 1fr 1fr; gap: 10px; }
+  :root .sg-carte { padding: 16px 16px; border-radius: 22px; }
+  :root .sg-carte strong { font-size: clamp(20px, 6vw, 26px); overflow-wrap: anywhere; }
+  :root .sg-tab { font-size: 13px; }
+  :root .sg-tab th, :root .sg-tab td { padding: 10px 10px; }
+  :root .sg-duel > div { padding: 18px 18px; }
+  :root .sg-index { columns: 2 150px; }
 }
 
 /* Les liens d'un sous-titre restent dans la teinte du site. */
-.cg-ts-s a { color: var(--mn-vif-2, #a78bfa); text-decoration: underline; text-underline-offset: 3px; }
+:root .cg-ts-s a { color: var(--mn-vif-2, #a78bfa); text-decoration: underline; text-underline-offset: 3px; }
 
 @media (max-width: 600px) {
   /* Le pas « en temps réel » sort de la ligne : posé à son extrémité, il
      débordait de l'écran. Il passe au-dessus, aligné à droite. */
-  .cg-frise2 { margin-top: 44px; }
-  .cg-frise2-direct { left: auto !important; right: 0; transform: none; margin: 0; min-height: 30px; padding: 4px 11px 4px 9px; font-size: 11px; }
+  :root .cg-frise2 { margin-top: 44px; }
+  :root .cg-frise2-direct { left: auto !important; right: 0; transform: none; margin: 0; min-height: 30px; padding: 4px 11px 4px 9px; font-size: 11px; }
 }
 
 @media (max-width: 760px) {
-  /* L'ouverture : le nom, puis le globe en pleine largeur — côte à côte, les
-     deux se disputaient 390 px. */
-  .ax .ax-ouv { padding: 104px 0 36px; align-items: flex-start; }
-  .ax .ax-ouv-g { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-  .ax .ax-ouv-t { text-align: center; }
-  .ax .ax-ouv-s { margin-left: auto; margin-right: auto; max-width: 24ch; }
-  .ax .ax-ouv-c { justify-content: center; }
-  .ax .ax-globe-zone { width: min(100%, 420px); margin: 0 auto; }
-  .cg-frise2-direct { top: -34px !important; bottom: auto !important; }
+  /* L'ouverture : le nom et sa phrase, puis le globe dessous, en pleine
+     largeur. Même alignement qu'à l'ordinateur : à gauche. */
+  :root .ax .ax-ouv { padding: 96px 0 28px; align-items: flex-start; }
+  :root .ax .ax-ouv-g { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  :root .ax .ax-ouv-s { max-width: 26ch; }
+  :root .ax .ax-globe-zone { width: calc(100% + 40px); max-width: 520px; margin: 26px -20px 0; }
+  :root .cg-frise2-direct { top: -34px !important; bottom: auto !important; }
+
+  /* Le globe d'abord : le titre de section, puis les onglets et la sphère.
+     La ligne de sources (descriptive) passe après le globe et sa fiche. */
+  :root .cg-v2 .cg-section.cg-eco-globe { padding-top: 8px; }
+  :root .cg-v2 .cg-section.cg-eco-globe > .cg-wrap { display: flex; flex-direction: column; }
+  :root .cg-v2 .cg-eco-globe .v2-tete { display: contents; }
+  :root .cg-v2 .cg-eco-globe .v2-h2 { order: 0; margin-bottom: 14px; }
+  :root .cg-v2 .cg-eco-globe .ge { order: 1; }
+  :root .cg-v2 .cg-eco-globe .v2-sous { order: 2; margin: 18px 0 0; font-size: 13px; }
+  :root .cg-v2 .cg-tr { padding-bottom: 8px; }
+}
+
+/* Les articles des pages Économie et Démographie : une colonne, comme les autres rubriques. */
+@media (max-width: 1080px) {
+  :root .cg-v2 .cg-arts-l { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
+  :root .cg-v2 .cg-art-une, :root .cg-v2 .cg-debats, :root .cg-v2 .cg-arts-c { grid-column: 1; grid-row: auto; }
+  :root .cg-v2 .cg-art-une { height: auto; }
 }
 
 @media (pointer: coarse), (max-width: 900px) {
-  button.cmp-x.cmp-x { width: 40px; height: 40px; min-width: 40px; }
-  .dd-tab-c a { display: inline-flex; align-items: center; min-height: 40px; }
-  .cg-ts-s a, .sg-note a, .dd-note a, .cmp-sources a { padding: 10px 2px; margin: -10px 0; display: inline-block; }
+  :root button.cmp-x { width: 40px; height: 40px; min-width: 40px; }
+  :root .dd-tab-c a { display: inline-flex; align-items: center; min-height: 40px; }
+  :root .cg-ts-s a, :root .sg-note a, :root .dd-note a, :root .cmp-sources a { padding: 10px 2px; margin: -10px 0; display: inline-block; }
 }

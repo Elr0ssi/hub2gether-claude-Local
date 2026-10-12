@@ -82,7 +82,8 @@ const nf = (v: number, d = 1) =>
    (l'euro tant qu'il n'a rien choisi). `DEVISE` est posée à chaque rendu de la page : tout ce qui
    s'en sert se redessine avec elle. */
 let DEVISE: Monnaie = "eur";
-const M = (v: number, d = 1, annee = 2025) => fmtMontant(v, "eur", annee, DEVISE, d);
+/* L'article a toujours écrit « Md€ », sans espace : on garde cette typographie. */
+const M = (v: number, d = 1, annee = 2025) => fmtMontant(v, "eur", annee, DEVISE, d).replace(/Md[\s\u00a0]([€$])/g, "Md$1");
 const md = (v: number, d = 1) => M(Math.abs(v), d);
 
 export interface Suggestion {
@@ -597,7 +598,7 @@ export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; 
           <span className="d2-h1-s">Dette publique de la France</span>
           <span className="d2-h1-v">
             <Compteur valeur={hero.v} decimales={1} duree={1500} />
-            <small>{hero.suffixe}</small>
+            <small>{hero.suffixe.replace(/Md[\s\u00a0]([€$])/, "Md$1")}</small>
           </span>
         </h1>
         <p className="d2-chapo">
