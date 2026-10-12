@@ -62,20 +62,37 @@ export function useMonnaie(): [Monnaie, (m: Monnaie) => void] {
   return [m, change];
 }
 
-/** La monnaie des articles : celle que le lecteur a choisie, et à défaut l'euro,
-    qui est la monnaie d'origine des montants des dossiers. Avant tout choix, le
-    rendu serveur et le premier rendu du navigateur sont donc identiques. */
+/** La monnaie des articles : celle du sélecteur du menu. Tant que le lecteur n'a
+    rien choisi, un article s'ouvre en euros (la monnaie d'origine des montants
+    des dossiers) et le menu l'indique ; en quittant l'article, la page retrouve
+    sa monnaie habituelle. Avant le premier rendu du navigateur, la valeur est
+    l'euro : rendu serveur et rendu client sont identiques. */
+let ARTICLES_OUVERTS = 0;
+const aChoisi = () => {
+  try {
+    return window.localStorage.getItem(CLE) !== null;
+  } catch {
+    return false;
+  }
+};
+
 export function useMonnaieArticle(): [Monnaie, (m: Monnaie) => void] {
   const [m, change] = useMonnaie();
-  const [choisi, setChoisi] = useState(false);
+  const [pret, setPret] = useState(false);
   useEffect(() => {
-    try {
-      setChoisi(window.localStorage.getItem(CLE) !== null);
-    } catch {
-      /* Pas de stockage : on reste sur l'euro. */
+    const compte = !aChoisi();
+    if (compte) {
+      ARTICLES_OUVERTS++;
+      if (COURANTE !== "eur") diffuse("eur");
     }
-  }, [m]);
-  return [choisi ? m : "eur", (v) => { setChoisi(true); change(v); }];
+    setPret(true);
+    return () => {
+      if (!compte) return;
+      ARTICLES_OUVERTS--;
+      if (ARTICLES_OUVERTS === 0 && !aChoisi()) diffuse("usd");
+    };
+  }, []);
+  return [pret ? m : "eur", change];
 }
 
 /** Le sélecteur : le signe en place, les autres au survol, sous le verre. */

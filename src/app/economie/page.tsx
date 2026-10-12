@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { EconomiePage } from "@/components/concept/EconomiePage";
+import { articlesDette } from "@/data/dettes/fiches";
 import {
   articlesEco,
   debatsEco,
@@ -129,7 +130,7 @@ export default function Page() {
         pibMonde={pibMonde()}
         sources={sourcesEco()}
         debats={debatsEco()}
-        articles={articlesEco(9)}
+        articles={[...articlesEco(9), ...articlesDette()]}
         faq={faq}
         variante="v2"
       />

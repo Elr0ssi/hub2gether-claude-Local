@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { ArrowUpRight, BarChart3 } from "lucide-react";
 import { useMonnaieArticle } from "@/components/concept/Monnaie";
-import { DeviseArticle } from "@/components/concept/DeviseArticle";
 import { Faq } from "@/components/seo/Elements";
 import { fmtMontant, fmtUnitaire } from "@/lib/montant";
 import { ANALYSES, analyseParSlug } from "@/data/dettes/analyses";
@@ -30,7 +29,6 @@ export function AnalyseDette({ slug, dossiers }: { slug: string; dossiers: Dossi
         <p className="dd-sur"><BarChart3 size={14} aria-hidden="true" /> Analyse · Dette publique</p>
         <h1 className="dd-h1">{analyse.h1[0]} <span>{analyse.h1[1]}</span></h1>
         <p className="dd-intro">{c.intro}</p>
-        <DeviseArticle className="dd-devise" />
       </header>
 
       <section className="dd-sec" aria-label="Chiffres clés">

@@ -12,6 +12,9 @@ import {
 import { Compteur, Leve, Precision, Progression, Source } from "./pieces";
 import { Etiquette } from "./finances";
 import { EnTete } from "@/components/concept/pieces";
+import { useMonnaieArticle } from "@/components/concept/Monnaie";
+import { convertirMontant, fiche } from "@/data/finance/tauxChange";
+import { mdArticle, mdMots, nombreArticle, poserMonnaieArticle } from "@/lib/montant";
 import "@/components/concept/concept.css";
 import {
   AnneeReelle,
@@ -60,7 +63,12 @@ const nb = (v: number, d = 0) =>
   v.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d });
 
 export function DettePage() {
-  const euros = Math.round(detteDerniere.valeur * 1e9);
+  /* Les montants suivent la monnaie du menu (l'euro, tant que rien n'est choisi). */
+  const [mon] = useMonnaieArticle();
+  poserMonnaieArticle(mon);
+  const converti = convertirMontant(detteDerniere.valeur, "eur", 2026, mon);
+  const euros = Math.round((converti ?? detteDerniere.valeur) * 1e9);
+  const signe = converti === null ? "€" : fiche(mon).unitaire;
 
   return (
     <div className="dp">
@@ -83,7 +91,7 @@ export function DettePage() {
               comme surtitre. */}
           <h1 className="dp-h1">
             <span className="dp-h1-s">Dette publique française</span>
-            La France doit {nb(detteDerniere.valeur, 1)}{" "}milliards d&apos;euros.
+            La France doit {mdMots(detteDerniere.valeur, 1)}.
             <span className="dp-h1-q"> Mais qu&apos;est-ce que cela veut vraiment dire ?</span>
           </h1>
           <p className="dp-chapo">
@@ -107,10 +115,10 @@ export function DettePage() {
 
           <Leve className="dp-geant">
             <p className="dp-geant-v">
-              <Compteur valeur={euros} /> €
+              <Compteur key={mon} valeur={euros} /> {signe}
             </p>
             <p className="dp-geant-s">
-              soit <b>{nb(detteDerniere.valeur, 1)} Md€</b>
+              soit <b>{mdArticle(detteDerniere.valeur, 1)}</b>
             </p>
           </Leve>
 
@@ -133,7 +141,7 @@ export function DettePage() {
           <div className="dp-cartes">
             {[
               {
-                v: `${nb(detteDerniere.valeur, 1)} Md€`,
+                v: mdArticle(detteDerniere.valeur, 1),
                 l: "de dette publique",
                 t: "C'est le stock de dette accumulé par l'ensemble des administrations publiques.",
                 c: detteDerniere,
@@ -145,9 +153,9 @@ export function DettePage() {
                 c: ratioDernier,
               },
               {
-                v: `+${nb(variationTrimestre.valeur, 1)} Md€`,
+                v: `+${mdArticle(variationTrimestre.valeur, 1)}`,
                 l: "en trois mois",
-                t: `Entre fin 2025 et la fin du premier trimestre 2026, la dette publique a augmenté de ${nb(variationTrimestre.valeur, 1)} milliards d'euros.`,
+                t: `Entre fin 2025 et la fin du premier trimestre 2026, la dette publique a augmenté de ${mdMots(variationTrimestre.valeur, 1)}.`,
                 c: variationTrimestre,
               },
               {
@@ -248,7 +256,7 @@ export function DettePage() {
             <div className="dp-duo-t">
               <h3>Pourquoi regarder les deux unités ?</h3>
               <p>
-                Parce que {nb(detteDerniere.valeur, 0)}{" "}milliards d&apos;euros de dette ne
+                Parce que {mdMots(detteDerniere.valeur, 0)} de dette ne
                 signifient pas la même chose pour une économie produisant 1 000 milliards ou 3 000
                 milliards par an. Le ratio dette/PIB rapporte la dette à la taille de
                 l&apos;économie : il permet de comparer différentes périodes et différents pays.
@@ -375,7 +383,7 @@ export function DettePage() {
 
           <p className="dp-garde">
             Les statistiques disponibles ne permettent pas de dire simplement que « X % des{" "}
-            {nb(detteDerniere.valeur, 1)}{" "}milliards appartiennent à l&apos;étranger » : les sources
+            {nombreArticle(detteDerniere.valeur, 1)}{" "}milliards appartiennent à l&apos;étranger » : les sources
             mesurent différents périmètres de titres et de dette. Ce pourcentage ne doit pas être
             appliqué mécaniquement à la dette de Maastricht.
           </p>
@@ -388,9 +396,9 @@ export function DettePage() {
           <Leve className="dp-encart">
             <p>
               Les portefeuilles de dette publique détenus par la Banque de France dans le cadre des
-              programmes APP et PEPP représentaient encore {eurosysteme.actuel.valeur}{" "}milliards
-              d&apos;euros en coût amorti {eurosysteme.actuel.periode}, contre{" "}
-              {eurosysteme.precedent.valeur}{" "}milliards {eurosysteme.precedent.periode}. Cette baisse
+              programmes APP et PEPP représentaient encore {mdMots(eurosysteme.actuel.valeur, 0)}
+              {" "}en coût amorti {eurosysteme.actuel.periode}, contre{" "}
+              {nombreArticle(eurosysteme.precedent.valeur, 0, 2025)}{" "}milliards {eurosysteme.precedent.periode}. Cette baisse
               provient de titres arrivant à échéance, les réinvestissements de ces programmes ayant
               cessé.
             </p>
@@ -419,7 +427,7 @@ export function DettePage() {
           <Leve className="dp-egal">
             <p className="dp-egal-a">
               Dette
-              <b>{nb(detteDerniere.valeur, 1)} Md€</b>
+              <b>{mdArticle(detteDerniere.valeur, 1)}</b>
             </p>
             <p className="dp-egal-s" aria-hidden="true">
               ≠
@@ -438,7 +446,7 @@ export function DettePage() {
             <div className="dp-duo-t">
               <h3>Pourquoi les taux mettent du temps à se voir</h3>
               <p>
-                Une hausse des taux ne renchérit pas instantanément les {nb(detteDerniere.valeur, 1)}{" "}milliards d&apos;euros. Les titres existants conservent leurs conditions.
+                Une hausse des taux ne renchérit pas instantanément les {mdMots(detteDerniere.valeur, 1)}. Les titres existants conservent leurs conditions.
                 L&apos;effet se diffuse progressivement lorsque de nouveaux titres sont émis et
                 lorsque d&apos;anciens titres arrivant à échéance doivent être refinancés.
               </p>
@@ -473,7 +481,7 @@ export function DettePage() {
             </p>
             <ul className="dp-chiffres">
               <li>
-                <b>2 903,8 Md€</b>encours de dette négociable de l&apos;État
+                <b>{mdArticle(2903.8, 1)}</b>encours de dette négociable de l&apos;État
               </li>
               <li>
                 <b>3,50 %</b>taux moyen pondéré des OAT émises en 2026
@@ -488,22 +496,22 @@ export function DettePage() {
           {/* Quatre mesures du coût, qui ne disent pas la même chose. */}
           <div className="dp-couts">
             <div>
-              <b>64,7 Md€</b>
+              <b>{mdArticle(64.7, 1)}</b>
               <span>intérêts payés par l&apos;ensemble des administrations publiques en 2025</span>
               <Etiquette perimetre="GENERAL_GOVERNMENT" base="NATIONAL_ACCOUNTS" periode="2025" />
             </div>
             <div>
-              <b>52,4 Md€</b>
+              <b>{mdArticle(52.4, 1)}</b>
               <span>dont l&apos;État, en comptabilité nationale</span>
               <Etiquette perimetre="STATE" base="NATIONAL_ACCOUNTS" periode="2025" />
             </div>
             <div>
-              <b>50,9 Md€</b>
+              <b>{mdArticle(50.9, 1)}</b>
               <span>programme « Charge de la dette et trésorerie de l&apos;État »</span>
               <Etiquette perimetre="STATE" base="BUDGETARY_ACCOUNTING" periode="2025" />
             </div>
             <div>
-              <b>53,2 Md€</b>
+              <b>{mdArticle(53.2, 1)}</b>
               <span>mission « Engagements financiers de l&apos;État », plus large</span>
               <Etiquette perimetre="STATE" base="BUDGETARY_ACCOUNTING" periode="2025" />
             </div>
@@ -632,7 +640,7 @@ export function DettePage() {
           <Leve className="dp-cle">
             <p>
               La vraie question n&apos;est donc pas « quand remboursera-t-on{" "}
-              {nb(detteDerniere.valeur, 1)}{" "}milliards ? », mais « la France pourra-t-elle continuer
+              {nombreArticle(detteDerniere.valeur, 1)}{" "}milliards ? », mais « la France pourra-t-elle continuer
               à financer durablement cette dette ? ». C&apos;est ce que l&apos;on appelle la
               soutenabilité de la dette.
             </p>
@@ -681,7 +689,7 @@ export function DettePage() {
         <div className="dp-wrap">
           <ol className="dp-chaine">
             {[
-              [`${nb(detteDerniere.valeur, 1)} Md€`, "C'est le stock de dette publique."],
+              [mdArticle(detteDerniere.valeur, 1), "C'est le stock de dette publique."],
               [`${nb(ratioDernier.valeur, 1)} % du PIB`, "C'est sa taille relativement à l'économie."],
               ["Déficits", "Ils contribuent à créer de nouveaux besoins de financement."],
               ["Obligations", "Elles permettent notamment à l'État d'emprunter."],
@@ -699,7 +707,7 @@ export function DettePage() {
           </ol>
           <Leve className="dp-final">
             <p className="dp-final-t">
-              Vous venez de décortiquer {nb(detteDerniere.valeur, 1)}{" "}milliards d&apos;euros.
+              Vous venez de décortiquer {mdMots(detteDerniere.valeur, 1)}.
             </p>
             <p className="dp-final-s">Dette publique française · Visualize</p>
           </Leve>

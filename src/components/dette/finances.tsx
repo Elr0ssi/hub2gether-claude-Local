@@ -29,6 +29,7 @@ import {
   type BaseComptable,
 } from "@/data/articles/financesPubliques";
 import { Donnees, useVu } from "./pieces";
+import { mdArticle, mdMots, nombreArticle, uniteArticle } from "@/lib/montant";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LES FINANCES PUBLIQUES, PAR PALIERS
@@ -41,8 +42,9 @@ import { Donnees, useVu } from "./pieces";
    pouvoir regarder un graphique sans savoir de quoi il parle.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const md = (v: number, d = 1) =>
-  `${Math.abs(v).toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d })} Md€`;
+/* Les montants s'écrivent dans la monnaie de l'article (l'euro, tant que le lecteur n'a rien choisi). */
+const md = (v: number, d = 1) => mdArticle(Math.abs(v), d);
+const nA = (v: number) => nombreArticle(v, Number.isInteger(v) ? 0 : 1);
 const pct = (v: number, d = 1) =>
   `${v.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d })} %`;
 
@@ -167,7 +169,7 @@ export function Recettes() {
           </p>
 
           <div className="dp-impots" hidden={famille === null}>
-              <p className="dp-impots-t">Les 882 Md€ d&apos;impôts, par famille</p>
+              <p className="dp-impots-t">Les {md(882, 0)} d&apos;impôts, par famille</p>
               <div className="dp-impots-f">
                 {IMPOTS_FAMILLES.map((f, i) => (
                   <button
@@ -195,15 +197,15 @@ export function Recettes() {
               ))}
               <p className="dp-garde">
                 Ce sont les <b>principaux</b> impôts, pas une liste à additionner pour retrouver les
-                882 Md€ : certains appartiennent à des familles plus larges, et l&apos;énumération
+                {md(882, 0)} : certains appartiennent à des familles plus larges, et l&apos;énumération
                 n&apos;est pas exhaustive.
               </p>
           </div>
 
           <Donnees
             titre="Recettes publiques 2025, par nature"
-            colonnes={["Poste", "Montant (Md€)", "Part"]}
-            lignes={RECETTES_DETAIL.map((p) => [p.nom, p.md.toLocaleString("fr-FR"), p.part ? pct(p.part) : "n.d."])}
+            colonnes={["Poste", `Montant (${uniteArticle()})`, "Part"]}
+            lignes={RECETTES_DETAIL.map((p) => [p.nom, nA(p.md), p.part ? pct(p.part) : "n.d."])}
           />
           <Etiquette perimetre="GENERAL_GOVERNMENT" base="NATIONAL_ACCOUNTS" periode="2025" />
           <SourceM m={RECETTES_2025} />
@@ -219,7 +221,7 @@ export function Prelevements() {
   return (
     <div className="dp-carte-x">
       <button type="button" aria-expanded={ouvert} onClick={() => setOuvert((o) => !o)}>
-        1 562 Md€ de recettes, mais 1 305 Md€ de prélèvements obligatoires. Pourquoi ?
+        {md(1562, 0)} de recettes, mais {md(1305, 0)} de prélèvements obligatoires. Pourquoi ?
         <span aria-hidden="true">{ouvert ? "−" : "+"}</span>
       </button>
       <div className="dp-carte-xr" hidden={!ouvert}>
@@ -230,10 +232,10 @@ export function Prelevements() {
           </p>
           <div className="dp-vs">
             <span>
-              <b>1 305 Md€</b>prélèvements obligatoires 2025
+              <b>{md(1305, 0)}</b>prélèvements obligatoires 2025
             </span>
             <span>
-              <b>≈ 1 562 Md€</b>ensemble des recettes publiques 2025
+              <b>≈ {md(1562, 0)}</b>ensemble des recettes publiques 2025
             </span>
           </div>
           <Etiquette perimetre="GENERAL_GOVERNMENT" base="NATIONAL_ACCOUNTS" periode="2025" />
@@ -274,7 +276,7 @@ export function OuVaLArgent() {
       </p>
 
       <div className="dp-deploie" hidden={vue !== "nature"}>
-          <h3 className="dp-ouva-t">Comment dépense-t-on 1 714 milliards d&apos;euros ?</h3>
+          <h3 className="dp-ouva-t">Comment dépense-t-on {mdMots(1714, 0)} ?</h3>
           <ul className="dp-postes">
             {DEPENSES_NATURE.map((p) => (
               <li key={p.nom}>
@@ -300,7 +302,7 @@ export function OuVaLArgent() {
           </p>
           <p className="dp-texte">
             Près de 45 % de la dépense publique correspond ainsi à des prestations sociales. Les
-            rémunérations représentent 370 milliards d&apos;euros, tandis que l&apos;investissement
+            rémunérations représentent {mdMots(370, 0)}, tandis que l&apos;investissement
             public atteint environ 132 milliards.
           </p>
           <Etiquette perimetre="GENERAL_GOVERNMENT" base="NATIONAL_ACCOUNTS" periode="2025" />
@@ -313,7 +315,7 @@ export function OuVaLArgent() {
             pas extrapolée à 2025.
           </p>
           <h3 className="dp-ouva-t">
-            Sur {DEPENSES_FONCTION_TOTAL.toLocaleString("fr-FR")} Md€ de dépenses publiques en
+            Sur {md(DEPENSES_FONCTION_TOTAL, 0)} de dépenses publiques en
             2024…
           </h3>
           <ul className="dp-fonctions">
@@ -361,8 +363,8 @@ export function OuVaLArgent() {
           )}
           <Donnees
             titre="Dépenses publiques par fonction, 2024"
-            colonnes={["Fonction", "Montant (Md€)", "Part"]}
-            lignes={DEPENSES_FONCTION.map((f) => [f.nom, f.md.toLocaleString("fr-FR"), f.pct ? `${f.pct} %` : "n.d."])}
+            colonnes={["Fonction", `Montant (${uniteArticle()})`, "Part"]}
+            lignes={DEPENSES_FONCTION.map((f) => [f.nom, nA(f.md), f.pct ? `${f.pct} %` : "n.d."])}
           />
           <Etiquette perimetre="GENERAL_GOVERNMENT" base="NATIONAL_ACCOUNTS" periode="2024" />
           <a className="dp-src" href={SOURCE_FONCTION.url} target="_blank" rel="noopener noreferrer">
@@ -410,7 +412,7 @@ export function OuVaLArgent() {
           ))}
           <div className="dp-garde">
             <p>
-              681,1 + 335,5 + 803,3 dépasse 1 714 Md€, et ce n&apos;est pas une erreur. Les
+              {nA(681.1)} + {nA(335.5)} + {nA(803.3)} dépasse {md(1714, 0)}, et ce n&apos;est pas une erreur. Les
               administrations publiques se transfèrent aussi de l&apos;argent entre elles :
               lorsqu&apos;on calcule le total de la dépense publique française, ces flux internes
               sont consolidés afin de ne pas compter deux fois le même euro.
@@ -474,7 +476,7 @@ export function ZoomEtat() {
 
           <div className="dp-solde">
             <p>
-              <b>318,7 Md€</b> de recettes nettes, <b>{md(ETAT_DEPENSES.valeur)}</b> de dépenses
+              <b>{md(318.7, 1)}</b> de recettes nettes, <b>{md(ETAT_DEPENSES.valeur)}</b> de dépenses
               nettes, puis comptes spéciaux et budgets annexes.
             </p>
             <p className="dp-solde-v">{md(ETAT_SOLDE.valeur)} de solde budgétaire de l&apos;État</p>
@@ -500,16 +502,16 @@ export function TvaDeuxMesures() {
   return (
     <div className="dp-carte-x">
       <button type="button" aria-expanded={ouvert} onClick={() => setOuvert((o) => !o)}>
-        Pourquoi la TVA vaut 208,8 Md€ ici et 98,1 Md€ là ?
+        Pourquoi la TVA vaut {md(208.8, 1)} ici et {md(98.1, 1)} là ?
         <span aria-hidden="true">{ouvert ? "−" : "+"}</span>
       </button>
       <div className="dp-carte-xr" hidden={!ouvert}>
           <div className="dp-vs">
             <span>
-              <b>208,8 Md€</b>comptes nationaux, toutes administrations publiques, 2025
+              <b>{md(208.8, 1)}</b>comptes nationaux, toutes administrations publiques, 2025
             </span>
             <span>
-              <b>≈ 98,1 Md€</b>recettes fiscales nettes du budget de l&apos;État, 2025
+              <b>≈ {md(98.1, 1)}</b>recettes fiscales nettes du budget de l&apos;État, 2025
             </span>
           </div>
           <p>
@@ -630,10 +632,10 @@ export function BruteNette() {
       <div className="dp-carte-xr" hidden={!ouvert}>
           <div className="dp-vs">
             <span>
-              <b>3 536,1 Md€</b>dette brute de Maastricht, T1 2026
+              <b>{md(3536.1, 1)}</b>dette brute de Maastricht, T1 2026
             </span>
             <span>
-              <b>3 301,1 Md€</b>dette nette sur le même champ d&apos;instruments · 109,7 % du PIB
+              <b>{md(3301.1, 1)}</b>dette nette sur le même champ d&apos;instruments · 109,7 % du PIB
             </span>
           </div>
           <p>
@@ -788,8 +790,8 @@ export function Porteurs() {
       <div className="dp-garde">
         <p>
           Cette répartition concerne les titres de la <b>dette négociable de l&apos;État</b>,
-          exprimés en valeur de marché. Elle ne correspond pas directement aux 3 536 milliards
-          d&apos;euros de dette publique de Maastricht.
+          exprimés en valeur de marché. Elle ne correspond pas directement aux {mdMots(3536, 0)}
+          de dette publique de Maastricht.
         </p>
       </div>
       <Etiquette perimetre="STATE_NEGOTIABLE_DEBT" base="NATIONAL_FINANCIAL_STATISTICS" periode="T1 2026" />
@@ -810,20 +812,20 @@ export function ZoomSecu() {
       <div className="dp-carte-xr" hidden={!ouvert}>
           <div className="dp-vs">
             <span>
-              <b>−6,7 Md€</b>administrations de sécurité sociale, comptabilité nationale, 2025
+              <b>−{md(6.7, 1)}</b>administrations de sécurité sociale, comptabilité nationale, 2025
             </span>
             <span>
-              <b>−21,6 Md€</b>régimes obligatoires de base et FSV, 2025
+              <b>−{md(21.6, 1)}</b>régimes obligatoires de base et FSV, 2025
             </span>
           </div>
           <p>
             Parce que ce n&apos;est pas le même périmètre. Les « administrations de sécurité
             sociale » de la comptabilité nationale englobent un ensemble plus large d&apos;organismes
             que les seuls régimes obligatoires de base et le Fonds de solidarité vieillesse. Leurs
-            dépenses atteignent environ 803 Md€ en 2025.
+            dépenses atteignent environ {md(803, 0)} en 2025.
           </p>
           <p>
-            L&apos;ONDAM 2025 s&apos;établit à <b>265,4 Md€</b> : ce sont les dépenses relevant de
+            L&apos;ONDAM 2025 s&apos;établit à <b>{md(265.4, 1)}</b> : ce sont les dépenses relevant de
             l&apos;objectif national des dépenses d&apos;assurance maladie, et non l&apos;ensemble
             de la santé publique.
           </p>
@@ -839,17 +841,17 @@ export function DeuxMesures() {
   return (
     <div className="dp-carte-x">
       <button type="button" aria-expanded={ouvert} onClick={() => setOuvert((o) => !o)}>
-        149 Md€ d&apos;enseignement, ou 87,7 Md€ ? Les deux.
+        {md(149, 0)} d&apos;enseignement, ou {md(87.7, 1)} ? Les deux.
         <span aria-hidden="true">{ouvert ? "−" : "+"}</span>
       </button>
       <div className="dp-carte-xr" hidden={!ouvert}>
           <div className="dp-vs">
             <span>
-              <b>149 Md€</b>fonction « enseignement » de toutes les administrations publiques,
+              <b>{md(149, 0)}</b>fonction « enseignement » de toutes les administrations publiques,
               comptabilité nationale, 2024
             </span>
             <span>
-              <b>87,7 Md€</b>mission « Enseignement scolaire » du budget de l&apos;État,
+              <b>{md(87.7, 1)}</b>mission « Enseignement scolaire » du budget de l&apos;État,
               comptabilité budgétaire, exécution 2025
             </span>
           </div>

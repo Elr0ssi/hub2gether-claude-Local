@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { ArrowUpRight, Landmark, Percent, TrendingUp, Users } from "lucide-react";
 import { useMonnaieArticle } from "@/components/concept/Monnaie";
-import { DeviseArticle } from "@/components/concept/DeviseArticle";
 import { Faq } from "@/components/seo/Elements";
 import { fmtMontant, fmtUnitaire } from "@/lib/montant";
 import { avec, deNom, nf } from "@/data/seo/francais";
@@ -46,7 +45,6 @@ export function DossierDette({ d }: { d: Dossier }) {
           <small>en 2024 · {nf(d.p2024, 1)} % du PIB</small>
         </p>
         <p className="dd-intro">{introDossier(d, f)}</p>
-        <DeviseArticle className="dd-devise" />
       </header>
 
       <section className="dd-sec" aria-labelledby="dd-ess">

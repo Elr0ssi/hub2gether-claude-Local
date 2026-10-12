@@ -21,7 +21,7 @@
 .sg-carte { padding: 20px 22px; border-radius: 26px; background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.1)); transition: translate 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s; }
 .sg-carte:hover { translate: 0 -5px; box-shadow: 0 18px 38px var(--ombre-portee, rgba(0, 0, 0, 0.4)); }
 .sg-carte h3 { margin: 0; font-size: 13px; font-weight: 750; letter-spacing: 0.04em; text-transform: uppercase; color: var(--encre-3); }
-.sg-carte strong { display: block; margin-top: 8px; font-size: clamp(24px, 2.6vw, 34px); font-weight: 800; letter-spacing: -0.045em; line-height: 1.05; }
+.sg-carte strong { display: block; margin-top: 8px; font-size: clamp(19px, 1.9vw, 25px); font-weight: 800; letter-spacing: -0.045em; line-height: 1.05; }
 .sg-carte p { margin: 8px 0 0; font-size: 13px; line-height: 1.45; color: var(--encre-2); }
 .sg-carte-vif { color: #fff; border-color: transparent; background: radial-gradient(70% 90% at 100% 0%, rgba(255, 255, 255, 0.24), transparent 60%), linear-gradient(150deg, #3a14b8, #7c4dff); }
 .sg-carte-vif h3, .sg-carte-vif p { color: rgba(255, 255, 255, 0.86); }

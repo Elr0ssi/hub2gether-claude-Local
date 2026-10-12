@@ -48,6 +48,8 @@ export interface Props {
   pib: { total: number; n: number; annee: number };
   /** La population mondiale et son accroissement par seconde (naissances moins décès). */
   population: { total: number; parSeconde: number };
+  /** Les articles de dette (analyses et dossiers) qui entrent dans la file. */
+  articlesDette?: { rubrique: string; titre: string; href: string }[];
 }
 
 const fmtPib = (v: number) =>
@@ -666,7 +668,7 @@ const FILE_ARTICLES = [
   { rubrique: "Démographie", titre: "Population : qui grandit, qui recule" },
 ] as const;
 
-function Articles({ dette }: { dette: Props["dette"] }) {
+function Articles({ dette, lus = [] }: { dette: Props["dette"]; lus?: { rubrique: string; titre: string; href: string }[] }) {
   const glisse = useGlisser<HTMLUListElement>();
   return (
     <section className="ax-sec ax-sec-large" id="articles" aria-labelledby="ax-ar-t">
@@ -690,7 +692,7 @@ function Articles({ dette }: { dette: Props["dette"] }) {
 
         <Rev className="ax-na-rail" d={120}>
           <ul className="ax-na-piste" {...glisse}>
-            {FILE_ARTICLES.map((a, i) => {
+            {[...FILE_ARTICLES.slice(0, 1), ...lus, ...FILE_ARTICLES.slice(1)].map((a, i) => {
               const lien = "href" in a ? a.href : undefined;
               const corps = (
                 <>
@@ -946,7 +948,7 @@ export function AnalysesPage(props: Props) {
       <div className="ax-col">
         <Classements donnees={props.donnees} annee={props.annee} />
         <Cartes />
-        <Articles dette={props.dette} />
+        <Articles dette={props.dette} lus={props.articlesDette} />
         <Position />
         <Rev className="ax-presse">
           <PresseCarousel

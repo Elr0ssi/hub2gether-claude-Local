@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useMonnaieArticle } from "@/components/concept/Monnaie";
-import { DeviseArticle } from "@/components/concept/DeviseArticle";
 import { fmtMontant } from "@/lib/montant";
 import { nf } from "@/data/seo/francais";
 import type { Dossier } from "@/data/dettes/dossiers";
@@ -36,7 +35,6 @@ export function ClassementDette({ dossiers }: { dossiers: Dossier[] }) {
           <button key={id} type="button" role="tab" aria-selected={tri === id} className={tri === id ? "on" : ""} onClick={() => setTri(id)}>{lib}</button>
         ))}
       </div>
-      <DeviseArticle className="dd-devise" />
       <ol className="dd-liste">
         {lignes.map((d, i) => {
           const v = tri === "ratio" ? d.p2024 : tri === "montant" ? d.d2024 : d.p2024 - d.p2000;

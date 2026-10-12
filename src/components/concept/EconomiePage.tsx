@@ -190,9 +190,12 @@ const DEPENSES_ECO: { id: string; label: string; parSeconde: number }[] = [
 ];
 
 /** Les articles de la rédaction qui ont déjà leur page. */
-const LIENS_ARTICLES: Record<string, string> = {
+const LIENS_ARTICLES: Record<string, string | undefined> = {
   "dette-publique-france-2025-enjeux": "/france/economie/dette-publique-v2",
 };
+
+/** L'adresse d'un article : la sienne, sinon celle de la table. */
+const lienDe = (a: { slug: string; href?: string }) => a.href ?? LIENS_ARTICLES[a.slug];
 
 function TempsReelEco({ pib, v2 = false }: { pib: PibMonde; v2?: boolean }) {
   const vue = useVu(140);
@@ -906,7 +909,7 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
   const articlesVus = useMemo(() => {
     const q = qArticle.trim().toLowerCase();
     /* Les articles qui ont leur page passent en tête : ce sont les seuls à lire. */
-    const ordre = [...articles].sort((a, b) => Number(Boolean(LIENS_ARTICLES[b.slug])) - Number(Boolean(LIENS_ARTICLES[a.slug])));
+    const ordre = [...articles].sort((a, b) => Number(Boolean(lienDe(b))) - Number(Boolean(lienDe(a))));
     if (!q) return ordre;
     return ordre.filter((a) => `${a.titre} ${a.chapo} ${a.mots ?? ""}`.toLowerCase().includes(q));
   }, [articles, qArticle]);
@@ -1200,8 +1203,8 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
             <div className="cg-arts-l">
               <article
                 className="cg-art cg-art-une"
-                onClick={LIENS_ARTICLES[articlesVus[0].slug] ? () => { window.location.href = LIENS_ARTICLES[articlesVus[0].slug]; } : undefined}
-                style={LIENS_ARTICLES[articlesVus[0].slug] ? { cursor: "pointer" } : undefined}
+                onClick={lienDe(articlesVus[0]) ? () => { window.location.href = lienDe(articlesVus[0])!; } : undefined}
+                style={lienDe(articlesVus[0]) ? { cursor: "pointer" } : undefined}
               >
                 <ImagePlaceholder nom="IMAGE_PNG_ECO_01" ratio="16 / 10" />
                 <span className="cg-rubrique">
@@ -1209,8 +1212,8 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
                 </span>
                 <h3 className="cg-art-t">{articlesVus[0].titre}</h3>
                 <p className="cg-art-c">{articlesVus[0].chapo}</p>
-                {LIENS_ARTICLES[articlesVus[0].slug] && (
-                  <a className="cg-art-lien" href={LIENS_ARTICLES[articlesVus[0].slug]}>Lire le dossier <span aria-hidden="true">→</span></a>
+                {lienDe(articlesVus[0]) && (
+                  <a className="cg-art-lien" href={lienDe(articlesVus[0])}>Lire le dossier <span aria-hidden="true">→</span></a>
                 )}
               </article>
 
@@ -1271,14 +1274,14 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
                   }}
                 >
                   {articlesVus.slice(1).map((a, k) => (
-                    <article key={a.slug} className="cg-art" onClick={LIENS_ARTICLES[a.slug] ? () => { if (!rail2.current?.dataset.mv) window.location.href = LIENS_ARTICLES[a.slug]; } : undefined} style={LIENS_ARTICLES[a.slug] ? { cursor: "pointer" } : undefined}>
+                    <article key={a.slug} className="cg-art" onClick={lienDe(a) ? () => { if (!rail2.current?.dataset.mv) window.location.href = lienDe(a)!; } : undefined} style={lienDe(a) ? { cursor: "pointer" } : undefined}>
                       <ImagePlaceholder nom={`IMAGE_PNG_ECO_0${((k + 1) % 9) + 1}`} ratio="16 / 9" />
                       <span className="cg-rubrique">
                         {a.rubrique} · {a.duree}
                       </span>
                       <h4 className="cg-art-t">{a.titre}</h4>
-                      {LIENS_ARTICLES[a.slug] && (
-                        <a className="cg-art-lien" href={LIENS_ARTICLES[a.slug]}>Lire le dossier <span aria-hidden="true">→</span></a>
+                      {lienDe(a) && (
+                        <a className="cg-art-lien" href={lienDe(a)}>Lire le dossier <span aria-hidden="true">→</span></a>
                       )}
                     </article>
                   ))}

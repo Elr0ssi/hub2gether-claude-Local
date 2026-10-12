@@ -6,6 +6,7 @@ import { donneesPays, reperes } from "@/data/concept/conceptGeo";
 import { FAQ_ACCUEIL } from "@/data/seo/faqAccueil";
 import { JsonLd, schemaFaq } from "@/components/seo/Elements";
 import { pibMonde } from "@/data/concept/conceptEconomie";
+import { articlesDette } from "@/data/dettes/fiches";
 import { compteurDemo } from "@/data/concept/conceptDemographie";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -48,6 +49,7 @@ export default function Accueil() {
     <>
     <JsonLd data={[schemaFaq(FAQ_ACCUEIL)]} />
     <AnalysesPage
+      articlesDette={articlesDette(6).map((a) => ({ rubrique: a.rubrique, titre: a.titre, href: a.href! }))}
       reperes={liste}
       donnees={pays}
       annee={annee}

@@ -12,6 +12,8 @@ import {
   serieRatio,
 } from "@/data/articles/detteFrancaise";
 import { Donnees, Leve, useVu } from "./pieces";
+import { convertirMontant } from "@/data/finance/tauxChange";
+import { mdArticle, monnaieArticle, nombreArticle, uniteArticle } from "@/lib/montant";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LES SCÈNES
@@ -38,9 +40,13 @@ export function Courbe() {
     return ratio.map((p) => ({ annee: p.annee, pct: p.pctPib as number, md: montant.get(p.annee) ?? null }));
   }, []);
 
+  const mon = monnaieArticle();
   const trace = useMemo(() => {
+    /* En montant, chaque année se lit à son propre taux de change. */
+    const val = (p: { annee: number; pct: number; md: number | null }) =>
+      mode === "pct" ? p.pct : p.md === null ? null : (convertirMontant(p.md, "eur", p.annee, mon) ?? p.md);
     const vals = points
-      .map((p) => (mode === "pct" ? p.pct : p.md))
+      .map(val)
       .filter((v): v is number => v !== null);
     if (vals.length < 2) return null;
     const bas = Math.min(...vals);
@@ -51,8 +57,8 @@ export function Courbe() {
     const x = (a: number) => ((a - a0) / (a1 - a0 || 1)) * 100;
     const y = (v: number) => 46 - ((v - bas) / ampl) * 40;
     const m = points
-      .filter((p) => (mode === "pct" ? p.pct : p.md) !== null)
-      .map((p) => ({ ...p, x: x(p.annee), y: y((mode === "pct" ? p.pct : (p.md as number))) }));
+      .filter((p) => val(p) !== null)
+      .map((p) => ({ ...p, x: x(p.annee), y: y(val(p) as number) }));
     return {
       m,
       d: m.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(" "),
@@ -61,7 +67,7 @@ export function Courbe() {
       a0,
       a1,
     };
-  }, [points, mode]);
+  }, [points, mode, mon]);
 
   const vise = useCallback(
     (clientX: number) => {
@@ -91,7 +97,7 @@ export function Courbe() {
         <span>Évolution de la dette publique française</span>
         <span className="dp-bascule" role="group" aria-label="Unité affichée">
           <button type="button" aria-pressed={mode === "md"} onClick={() => setMode("md")}>
-            Md€
+            {uniteArticle()}
           </button>
           <button type="button" aria-pressed={mode === "pct"} onClick={() => setMode("pct")}>
             % du PIB
@@ -105,7 +111,7 @@ export function Courbe() {
             {lu ? (
               <>
                 <b>{lu.annee}</b>
-                <span>{lu.md !== null ? `${nb(lu.md)} Md€` : "montant non publié"}</span>
+                <span>{lu.md !== null ? mdArticle(lu.md, 0, lu.annee) : "montant non publié"}</span>
                 <span>{nb(lu.pct, 1)} % du PIB</span>
               </>
             ) : (
@@ -165,8 +171,8 @@ export function Courbe() {
 
       <Donnees
         titre="Dette publique française, telle que la base l'enregistre"
-        colonnes={["Date", "Dette (Md€)", "Dette / PIB (%)"]}
-        lignes={points.map((p) => [p.annee, p.md !== null ? nb(p.md) : "n.d.", nb(p.pct, 1)])}
+        colonnes={["Date", `Dette (${uniteArticle()})`, "Dette / PIB (%)"]}
+        lignes={points.map((p) => [p.annee, p.md !== null ? nombreArticle(p.md, 0, p.annee) : "n.d.", nb(p.pct, 1)])}
       />
       <p className="dp-fig-s">
         Sources : {SOURCE_SERIE.ratio} pour le ratio ; {SOURCE_SERIE.pib}{" "}
@@ -414,14 +420,15 @@ export function Comparaison() {
 
 /* ── Le contrôle de compréhension ──────────────────────────────────────── */
 
-const QUIZ = [
+const quiz = () => [
   { q: "La dette et le déficit sont-ils la même chose ?", r: false, e: "Le déficit est un écart annuel entre recettes et dépenses. La dette est le stock accumulé." },
-  { q: "La France doit-elle rembourser 3 536 Md€ à une date unique ?", r: false, e: "Les titres arrivent à échéance à des dates échelonnées, de quelques mois à plusieurs décennies." },
+  { q: `La France doit-elle rembourser ${mdArticle(3536, 0)} à une date unique ?`, r: false, e: "Les titres arrivent à échéance à des dates échelonnées, de quelques mois à plusieurs décennies." },
   { q: "Une hausse des taux augmente-t-elle instantanément le coût de toute la dette ?", r: false, e: "Les titres déjà émis gardent leurs conditions. L'effet se diffuse au fil des refinancements." },
   { q: "Toute la dette française est-elle détenue à l'étranger ?", r: false, e: "Au 31 mars 2026, les non-résidents détenaient 55,9 % des titres de dette de long terme des administrations publiques." },
 ];
 
 export function Quiz() {
+  const QUIZ = quiz();
   const [rep, setRep] = useState<(boolean | null)[]>(() => QUIZ.map(() => null));
   const justes = rep.filter((r, i) => r !== null && r === QUIZ[i].r).length;
   const toutes = rep.every((r) => r !== null);

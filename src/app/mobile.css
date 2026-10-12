@@ -71,7 +71,7 @@ img, video, svg, canvas { max-width: 100%; }
   :root .sg-h2 { font-size: clamp(22px, 6.4vw, 30px); }
   :root .sg-grille { grid-template-columns: 1fr 1fr; gap: 10px; }
   :root .sg-carte { padding: 16px 16px; border-radius: 22px; }
-  :root .sg-carte strong { font-size: clamp(20px, 6vw, 26px); overflow-wrap: anywhere; }
+  :root .sg-carte strong { font-size: clamp(17px, 5vw, 21px); overflow-wrap: anywhere; }
   :root .sg-tab { font-size: 13px; }
   :root .sg-tab th, :root .sg-tab td { padding: 10px 10px; }
   :root .sg-duel > div { padding: 18px 18px; }

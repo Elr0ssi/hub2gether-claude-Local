@@ -78,6 +78,8 @@ export interface FicheArticle {
   duree: string;
   /** Tags et titre concaténés, pour rapprocher un article d'un indicateur. */
   mots?: string;
+  /** L'adresse de la page, quand l'article n'est pas dans la table des liens. */
+  href?: string;
 }
 
 const RUBRIQUES: Record<string, string> = {

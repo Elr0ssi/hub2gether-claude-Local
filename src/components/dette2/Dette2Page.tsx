@@ -2,8 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useMonnaieArticle } from "@/components/concept/Monnaie";
-import { DeviseArticle } from "@/components/concept/DeviseArticle";
-import { fmtMontant, valeurConvertie } from "@/lib/montant";
+import { fmtMontant, mdMots, nombreArticle, poserMonnaieArticle, valeurConvertie } from "@/lib/montant";
 import type { Monnaie } from "@/data/finance/tauxChange";
 import type { Sujet } from "@/data/concept/sujets";
 import {
@@ -487,7 +486,7 @@ function Deficit() {
         <Figure
           id="recettes-publiques"
           titre="D'où viennent les recettes publiques"
-          legende={`Répartition des ${nf(rec, 0)} milliards d'euros de recettes des administrations publiques françaises en 2025 : impôts, cotisations sociales, ventes et autres produits.`}
+          legende={`Répartition des ${mdMots(rec, 0)} de recettes des administrations publiques françaises en 2025 : impôts, cotisations sociales, ventes et autres produits.`}
           source={RECETTES_2025}
           voir={[{ href: "#depenses-publiques", label: "Voir les dépenses" }]}
         >
@@ -499,7 +498,7 @@ function Deficit() {
         <Figure
           id="depenses-publiques"
           titre="Où va l'argent public"
-          legende={`Les ${nf(dep, 0)} milliards d'euros de dépenses publiques 2025 lus par nature (salaires, prestations sociales, investissement, intérêts) ou par fonction (protection sociale, santé, éducation, défense).`}
+          legende={`Les ${mdMots(dep, 0)} de dépenses publiques 2025 lus par nature (salaires, prestations sociales, investissement, intérêts) ou par fonction (protection sociale, santé, éducation, défense).`}
           source={DEPENSES_2025}
           voir={[{ href: "#recettes-publiques", label: "Voir les recettes" }]}
         >
@@ -526,7 +525,7 @@ function Deficit() {
         <Figure
           id="qui-cree-le-deficit"
           titre="Qui crée le déficit"
-          legende={`${nf(etat)} des ${nf(solde)} milliards d'euros de déficit public 2025 viennent de l'État ; les collectivités locales et la Sécurité sociale pèsent bien moins.`}
+          legende={`${nombreArticle(etat, 0)} des ${mdMots(solde, 0)} de déficit public 2025 viennent de l'État ; les collectivités locales et la Sécurité sociale pèsent bien moins.`}
           source={DEFICIT_2025}
           voir={[{ href: "#evolution", label: "Voir l'évolution de la dette" }]}
         >
@@ -573,7 +572,8 @@ function Rail({
 export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; sujet?: Sujet }) {
   const [devise] = useMonnaieArticle();
   DEVISE = devise;
-  const hero = valeurConvertie(detteDerniere.valeur, "eur", 2026, devise);
+  poserMonnaieArticle(devise);
+  const hero = valeurConvertie(detteDerniere.valeur, "eur", 2025, devise);
   const solde = Math.abs(DEFICIT_2025.valeur);
   const etat = Math.abs(ACTEURS_2025[0].lignes?.[0].md ?? 0);
   const [autres, setAutres] = useState(false);
@@ -607,7 +607,6 @@ export function Dette2Page({ suggestions, sujet }: { suggestions: Suggestion[]; 
             INSEE ↗
           </a>
         </p>
-        <DeviseArticle className="d2-devise" />
       </header>
 
       <div className="d2-grille">
