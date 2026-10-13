@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { ArrowRight, ChevronDown, Landmark, MessageCircle, Users } from "lucide-react";
-import { EnTete } from "@/components/concept/pieces";
+import { EnTete, Pied } from "@/components/concept/pieces";
 import type { Sujet } from "@/data/concept/sujets";
 import { ChapitresContext } from "./Chapitre";
 import type { ChapitreDef, Suggestion } from "./types";
@@ -216,6 +216,11 @@ export function ArticleLong({ fil, surtitre, chiffre, chapo, chapitres, suggesti
               <a href="/methodologie-donnees">Notre méthode →</a>
             </Rail>
           </aside>
+        </div>
+
+        {/* Le pied de page du site : l'article reste dans l'écosystème. */}
+        <div className="cg dos-pied">
+          <Pied />
         </div>
       </div>
     </ChapitresContext.Provider>

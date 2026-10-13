@@ -2,16 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EnTete, Pied } from "@/components/concept/pieces";
-import { Faq, Fil, JsonLd, Mini, schemaFaq, schemaFil } from "@/components/seo/Elements";
+import { Faq, Fil, JsonLd, schemaFaq, schemaFil } from "@/components/seo/Elements";
+import { CourbeSurvol } from "@/components/seo/CourbeSurvol";
+import { ArticlesPays } from "@/components/seo/ArticlesPays";
+import { articlesDuPays } from "@/data/articles-catalogue";
 import { drapeau } from "@/lib/drapeau";
 import { paysParSlug, paysVedettes, serieDe, slugPaire, tousLesPays, voisinsEco, paysParNom } from "@/data/seo/pays";
-import { tousLesDossiers } from "@/data/dettes/dossiers";
 import { descriptionPays, faqPays, introPays, LIGNES, titrePays } from "@/data/seo/textes";
-import { avec, cap, deNom, fmtHabCourt, fmtMdCourt, nf, rangTexte } from "@/data/seo/francais";
+import { avec, cap, deNom, fmtHabCourt, fmtMdCourt, rangTexte } from "@/data/seo/francais";
 import { SITE_URL, urlAbs } from "@/lib/site";
 import "@/components/concept/concept.css";
 import "@/components/seo/seo.css";
-import { adresseDette } from "@/articles/dette/catalogue";
 
 /* Chaque pays a sa page, construite à la compilation ; une page nouvelle se construit à la première visite. */
 export const revalidate = 2592000;
@@ -45,12 +46,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const pib = serieDe(f, "pib");
   const pop = serieDe(f, "population");
   const url = urlAbs(`/pays/${f.slug}`);
-  const dossierDette = tousLesDossiers().find((x) => x.nom === f.nom);
+  const articles = articlesDuPays(f.slug);
 
   const cartes = LIGNES.flatMap((l, i) => {
     const m = l.get(f);
     if (!m) return [];
-    const rang = l.id === "population" ? f.rangs.population : l.id === "pib" ? f.rangs.pib : l.id === "pibHab" ? f.rangs.pibHab : undefined;
+    const rang = f.rangs[l.id as keyof typeof f.rangs];
     return [{ l, m, rang, vif: i === 0 }];
   });
 
@@ -88,8 +89,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       <main className="sg-page">
         <Fil items={[{ label: "Accueil", href: "/" }, { label: "Pays", href: "/pays" }, { label: f.fr }]} />
         <h1 className="sg-h1">
-          <span className="sg-drap" aria-hidden="true">{drapeau(f.iso2)}</span>
-          {f.fr} : <span>chiffres clés</span>
+          {f.fr}
         </h1>
         <p className="sg-intro">{introPays(f)}</p>
         <div className="sg-cta">
@@ -98,7 +98,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         </div>
 
         <section className="sg-sec" aria-labelledby="sg-cles">
-          <h2 id="sg-cles" className="sg-h2">{f.fr} en chiffres</h2>
+          <h2 id="sg-cles" className="sg-h2">{cap(f.fr)} en chiffres</h2>
           <div className="sg-grille">
             {cartes.map(({ l, m, rang, vif }) => (
               <article key={l.id} className={`sg-carte${vif ? " sg-carte-vif" : ""}`}>
@@ -120,14 +120,14 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
               {pib.length > 1 && (
                 <div className="sg-courbe">
                   <h3>PIB {deNom(f.fr)}</h3>
-                  <Mini points={pib} label={`Évolution du PIB ${deNom(f.fr)} depuis ${pib[0].annee}`} />
+                  <CourbeSurvol format="md" points={pib} label={`Évolution du PIB ${deNom(f.fr)} depuis ${pib[0].annee}`} />
                   <p>{pib[0].annee} : {fmtMdCourt(pib[0].v)} → {pib[pib.length - 1].annee} : {fmtMdCourt(pib[pib.length - 1].v)} (dollars courants)</p>
                 </div>
               )}
               {pop.length > 1 && (
                 <div className="sg-courbe">
                   <h3>Population {deNom(f.fr)}</h3>
-                  <Mini points={pop} couleur="#ff6fa5" label={`Évolution de la population ${deNom(f.fr)} depuis ${pop[0].annee}`} />
+                  <CourbeSurvol format="hab" points={pop} couleur="#ff6fa5" label={`Évolution de la population ${deNom(f.fr)} depuis ${pop[0].annee}`} />
                   <p>{pop[0].annee} : {fmtHabCourt(pop[0].v)} → {pop[pop.length - 1].annee} : {fmtHabCourt(pop[pop.length - 1].v)}</p>
                 </div>
               )}
@@ -135,7 +135,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           </section>
         )}
 
-        <Faq titre={`Questions sur ${avec(f.fr)}`} questions={faq} />
 
         <section className="sg-sec" aria-labelledby="sg-vs">
           <h2 id="sg-vs" className="sg-h2">Comparer {avec(f.fr)} avec…</h2>
@@ -148,15 +147,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           </ul>
         </section>
 
-        {dossierDette && (
-          <section className="sg-sec" aria-labelledby="sg-dette">
-            <h2 id="sg-dette" className="sg-h2">Dette publique</h2>
-            <p className="sg-intro" style={{ marginTop: 0 }}>
-              {cap(avec(f.fr))} : dette de {nf(dossierDette.p2024, 1)} % du PIB en 2024 ({nf(dossierDette.p2000, 1)} % en 2000).{" "}
-              <Link href={adresseDette(dossierDette.slug)}>Lire le dossier : montant, créanciers, inflation →</Link>
-            </p>
-          </section>
-        )}
+        <ArticlesPays articles={articles} titreSection={`Articles sur ${avec(f.fr)}`} lienTous={`/articles?pays=${f.slug}`} />
 
         {voisins.length > 0 && (
           <section className="sg-sec" aria-labelledby="sg-voisins">
@@ -169,9 +160,11 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           </section>
         )}
 
+        <Faq titre={`Questions sur ${avec(f.fr)}`} questions={faq} />
+
         <p className="sg-note">
-          Sources : Banque mondiale (World Development Indicators), FMI, Nations Unies (World Population Prospects 2024). Chaque valeur porte l&apos;année de sa dernière publication ; une grandeur absente des sources n&apos;est pas affichée.
-          La superficie est approchée à partir du fond de carte du site. <Link href="/methodologie-donnees">Notre méthode</Link> · <Link href="/pays">Tous les pays</Link>
+          Sources : Banque mondiale (World Development Indicators), FMI, Nations Unies (World Population Prospects 2024). Chaque valeur porte l’année de sa dernière publication ; une grandeur absente des sources n’est pas affichée.
+          Rangs : 1 = valeur la plus élevée. La superficie est approchée à partir du fond de carte du site. <Link href="/methodologie-donnees">Notre méthode</Link> · <Link href="/pays">Tous les pays</Link>
         </p>
       </main>
       <Pied />

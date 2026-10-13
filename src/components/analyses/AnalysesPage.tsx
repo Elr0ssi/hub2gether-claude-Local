@@ -330,7 +330,7 @@ function Presentation() {
         <Rev as="a" href="/economie" className="ax-bloc ax-bloc-b" d={90}>
           <span className="ax-bloc-i"><Globe size={18} aria-hidden="true" /></span>
           <h3>Des globes interactifs</h3>
-          <p>Plus de 200 pays, de 1960 à aujourd&apos;hui, à tourner, comparer, zoomer.</p>
+          <p>Plus de 200 pays, de 1960 à aujourd’hui, à tourner, comparer, zoomer.</p>
           <span className="ax-bloc-l">Ouvrir les globes <ArrowUpRight size={14} aria-hidden="true" /></span>
         </Rev>
         </Lift>
@@ -338,7 +338,7 @@ function Presentation() {
         <Rev as="a" href="/pays/france/dette-publique" className="ax-bloc ax-bloc-c" d={180}>
           <span className="ax-bloc-i"><BookOpen size={18} aria-hidden="true" /></span>
           <h3>Des articles décortiqués</h3>
-          <p>Le montant d&apos;abord, l&apos;explication ensuite, la source toujours.</p>
+          <p>Le montant d’abord, l’explication ensuite, la source toujours.</p>
           <span className="ax-bloc-l">Lire un dossier <ArrowUpRight size={14} aria-hidden="true" /></span>
         </Rev>
         </Lift>
@@ -711,7 +711,7 @@ function Articles({ dette, lus = [] }: { dette: Props["dette"]; lus?: { rubrique
           </p>
           <p className="ax-dos-s">{nf(dette.ratio)} % du PIB · déficit de {nf(dette.deficit)} Md€ en 2025</p>
           <span className="ax-dos-c">
-            Lire l&apos;analyse <ArrowRight size={15} aria-hidden="true" />
+            Lire l’analyse <ArrowRight size={15} aria-hidden="true" />
           </span>
         </Rev>
         </Lift>
@@ -919,8 +919,8 @@ function Fonctionnement() {
         <span id="ax-fo-t">Notre fonctionnement</span>
       </Rev>
       <Rev as="p" className="ax-sous" d={80}>
-        Rien ne sort qui n&apos;ait été vu par plusieurs sources. Les convergences font la donnée, les
-        divergences font l&apos;article.
+        Rien ne sort qui n’ait été vu par plusieurs sources. Les convergences font la donnée, les
+        divergences font l’article.
       </Rev>
 
       <Defile />

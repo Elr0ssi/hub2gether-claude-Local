@@ -165,8 +165,8 @@ export function ArticleFrance({ suggestions, sujet }: { suggestions: Suggestion[
         titre="Dette de la France : les chiffres clés"
         reponse={
           <>
-            La dette est un <b>stock</b>, le déficit est ce qui l&apos;alimente, les intérêts sont
-            ce qu&apos;elle coûte chaque année.
+            La dette est un <b>stock</b>, le déficit est ce qui l’alimente, les intérêts sont
+            ce qu’elle coûte chaque année.
           </>
         }
       >
@@ -349,16 +349,16 @@ export function ArticleFrance({ suggestions, sujet }: { suggestions: Suggestion[
           />
 
           <button type="button" className="dos-plus" aria-expanded={autres} onClick={() => setAutres(!autres)}>
-            D&apos;autres montants circulent : pourquoi ?
+            D’autres montants circulent : pourquoi ?
             <ChevronDown size={16} aria-hidden="true" className={autres ? "dos-rail-ouv" : undefined} />
           </button>
           <div hidden={!autres} className="dos-plus-c">
             <p>
-              Le budget de l&apos;État est présenté de deux façons. En comptabilité budgétaire, la
-              ligne « Charge de la dette et trésorerie de l&apos;État » vaut{" "}
+              Le budget de l’État est présenté de deux façons. En comptabilité budgétaire, la
+              ligne « Charge de la dette et trésorerie de l’État » vaut{" "}
               <b>{montant(CHARGE_DETTE_PROGRAMME.valeur)}</b>, et la mission « Engagements
-              financiers de l&apos;État », plus large, <b>{montant(ENGAGEMENTS_FINANCIERS.valeur)}</b>. En
-              comptabilité nationale, les intérêts de l&apos;État sont de{" "}
+              financiers de l’État », plus large, <b>{montant(ENGAGEMENTS_FINANCIERS.valeur)}</b>. En
+              comptabilité nationale, les intérêts de l’État sont de{" "}
               <b>{montant(INTERETS_ETAT_2025.valeur)}</b>. Ces montants sont tous exacts : ils ne
               comptent ni les mêmes opérations, ni le même périmètre.
             </p>

@@ -102,7 +102,7 @@ export function EspaceCompte({
             <div className="es-carte">
               <h3 className="es-h3">Mes discussions sur le forum</h3>
               {messages.length === 0 ? (
-                <p className="es-vide">Vous n&apos;avez encore rien écrit. <Link href="/forum">Ouvrir le forum</Link></p>
+                <p className="es-vide">Vous n’avez encore rien écrit. <Link href="/forum">Ouvrir le forum</Link></p>
               ) : (
                 <ul className="es-liste">
                   {messages.map((m) => (
@@ -121,7 +121,7 @@ export function EspaceCompte({
             <div className="es-carte">
               <h3 className="es-h3">Mes articles enregistrés</h3>
               {favoris.length === 0 ? (
-                <p className="es-vide">Rien d&apos;enregistré pour le moment. Les articles que vous gardez apparaîtront ici.</p>
+                <p className="es-vide">Rien d’enregistré pour le moment. Les articles que vous gardez apparaîtront ici.</p>
               ) : (
                 <ul className="es-liste">
                   {favoris.map((f) => (

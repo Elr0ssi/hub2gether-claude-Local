@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
       /* L'espace personnel, les routes techniques et l'aperçu n'ont rien à faire dans un moteur. */
-      disallow: ["/preview", "/compte", "/api/", "/v2-eco"],
+      disallow: ["/compte", "/api/", "/v2-eco"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,

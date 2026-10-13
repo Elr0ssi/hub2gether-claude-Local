@@ -241,7 +241,7 @@ export function ComparerPage({ iso2, apres }: { iso2: Record<string, string>; ap
             {/* ── Tous les indicateurs, par catégorie ──────────────────────── */}
             <section className="cmp-tout" aria-label="Tous les indicateurs">
               <header className="cmp-tout-t">
-                <h2>Tout en un coup d&apos;œil</h2>
+                <h2>Tout en un coup d’œil</h2>
                 <p>En {anneeVue}. Cliquez une carte pour la comparer en grand.</p>
               </header>
               {(["Économie", "Démographie"] as const).map((g) => (
@@ -267,7 +267,7 @@ export function ComparerPage({ iso2, apres }: { iso2: Record<string, string>; ap
                         >
                           <span className="cmp-carte-tete">
                             <span className="cmp-carte-t">{i.label}</span>
-                            {pos.length > 1 && <em>×{ratio(Math.max(...pos), Math.min(...pos))} d&apos;écart</em>}
+                            {pos.length > 1 && <em>×{ratio(Math.max(...pos), Math.min(...pos))} d’écart</em>}
                           </span>
                           <span className="cmp-carte-l">
                             {vals.map((v, j) => (
@@ -296,8 +296,8 @@ export function ComparerPage({ iso2, apres }: { iso2: Record<string, string>; ap
             {/* ── D'autres lectures ─────────────────────────────────────────── */}
             <section className="cmp-plus" aria-label="D'autres lectures">
               <header className="cmp-tout-t">
-                <h2>D&apos;autres lectures</h2>
-                <p>Une vue d&apos;ensemble de vos pays sur plusieurs indicateurs à la fois.</p>
+                <h2>D’autres lectures</h2>
+                <p>Une vue d’ensemble de vos pays sur plusieurs indicateurs à la fois.</p>
               </header>
               <Profil pays={pays} annee={anneeVue} lit={lit} eco={eco} demo={demo} fr={fr} />
             </section>
@@ -305,7 +305,7 @@ export function ComparerPage({ iso2, apres }: { iso2: Record<string, string>; ap
         )}
 
         <p className="cmp-sources">
-          Sources : Banque mondiale (WDI), FMI, Nations Unies (World Population Prospects 2024). Une valeur absente reste absente : elle n&apos;est jamais comptée pour zéro.
+          Sources : Banque mondiale (WDI), FMI, Nations Unies (World Population Prospects 2024). Une valeur absente reste absente : elle n’est jamais comptée pour zéro.
         </p>
       </main>
       {apres}
@@ -368,7 +368,7 @@ function Barres({
       <header className="cmp-sc-t">
         <h2>{indic.label}</h2>
         <span>en {annee}</span>
-        {pos.length > 1 && <em>×{ratio(Math.max(...pos), Math.min(...pos))} d&apos;écart</em>}
+        {pos.length > 1 && <em>×{ratio(Math.max(...pos), Math.min(...pos))} d’écart</em>}
       </header>
       {phrase && (
         <p className="cmp-phrase">
@@ -522,7 +522,7 @@ function Courbe({
       {aide && (
         <div className="cmp-aide2">
           <p><b>Croissance (base 100)</b> : chaque pays part de 100 à la première année. Une courbe à 300 a triplé. On compare la <em>vitesse</em>, pas la taille.</p>
-          <p><b>Échelle log</b> : chaque graduation multiplie par dix au lieu d&apos;ajouter. Les petits pays redeviennent lisibles ; une pente raide veut dire une croissance rapide.</p>
+          <p><b>Échelle log</b> : chaque graduation multiplie par dix au lieu d’ajouter. Les petits pays redeviennent lisibles ; une pente raide veut dire une croissance rapide.</p>
         </div>
       )}
 
@@ -570,7 +570,7 @@ function Courbe({
           </div>
         )}
       </div>
-      <p className="cmp-astuce">Cliquez ou glissez sur la courbe pour changer d&apos;année : les barres suivent.</p>
+      <p className="cmp-astuce">Cliquez ou glissez sur la courbe pour changer d’année : les barres suivent.</p>
     </div>
   );
 }

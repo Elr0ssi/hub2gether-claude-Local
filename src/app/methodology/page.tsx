@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Layout } from "@/components/layout/Layout";
+import { PageConfiance } from "@/components/legal/PageConfiance";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Méthodologie · The Essential Data",
+  title: "Méthodologie · Visualize",
   description:
-    "Découvrez comment The Essential Data collecte, synthétise et vérifie ses données. Transparence totale sur nos sources, notre approche éditoriale et notre conformité EU AI Act.",
+    "Découvrez comment Visualize collecte, synthétise et vérifie ses données. Transparence totale sur nos sources, notre approche éditoriale et notre conformité EU AI Act.",
   alternates: {
     canonical: "/methodology",
   },
@@ -17,7 +17,7 @@ const sections = [
     id: "approche",
     title: "Notre approche éditoriale",
     content: [
-      "The Essential Data est un média de data-journalisme géopolitique. Chaque article publié est une synthèse éditoriale construite à partir de sources primaires et secondaires vérifiées : rapports d'institutions internationales, presse mondiale de référence, recherches académiques et bases de données ouvertes.",
+      "Visualize est un média de data-journalisme géopolitique. Chaque article publié est une synthèse éditoriale construite à partir de sources primaires et secondaires vérifiées : rapports d'institutions internationales, presse mondiale de référence, recherches académiques et bases de données ouvertes.",
       "Notre objectif est d'offrir une vision impartiale et multi-perspectives sur des sujets géopolitiques complexes (économie mondiale, épidémies, empires historiques, conflits militaires). Nous agrégeons délibérément des points de vue issus de médias et institutions de différentes zones géographiques et culturelles pour éviter les biais régionaux.",
     ],
   },
@@ -78,7 +78,7 @@ const sections = [
 
 export default function MethodologyPage() {
   return (
-    <Layout>
+    <PageConfiance>
       <div className="max-w-3xl mx-auto px-6 py-12">
         <Link
           href="/"
@@ -181,13 +181,13 @@ export default function MethodologyPage() {
           style={{ borderTop: "1px solid var(--border)" }}
         >
           <p className="text-xs" style={{ color: "var(--ink-4)" }}>
-            Dernière mise à jour : juin 2025 · The Essential Data ·{" "}
+            Dernière mise à jour : juin 2025 · Visualize ·{" "}
             <Link href="/sources" className="underline underline-offset-2" style={{ color: "var(--ink-3)" }}>
               Voir toutes les sources de données →
             </Link>
           </p>
         </div>
       </div>
-    </Layout>
+    </PageConfiance>
   );
 }

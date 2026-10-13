@@ -195,6 +195,7 @@ const NAV: Onglet[] = [
   { label: "Démographie", href: "/demographie" },
   { label: "Forum", href: "/forum" },
   { label: "Comparer", href: "/comparer" },
+  { label: "Articles", href: "/articles" },
 ];
 
 /** Un onglet. Sans adresse, il se montre sans se laisser cliquer. */
@@ -332,12 +333,16 @@ export function Pied() {
           <a href="/economie">Économie</a>
           <a href="/demographie">Démographie</a>
           <a href="/comparer">Comparer</a>
+          <a href="/articles">Articles</a>
+          <a href="/pays">Pays</a>
           <a href="/forum">Forum</a>
         </nav>
         <div className="cg-pied-bas">
           <span>© Visualize</span>
           <nav aria-label="Informations">
-            <a href="/#fonctionnement">Sources</a>
+            <a href="/a-propos">À propos</a>
+            <a href="/methodologie-donnees">Méthode</a>
+            <a href="/sources">Sources</a>
             <a href="/confidentialite">Confidentialité</a>
             <a href="/cgu">CGU</a>
           </nav>

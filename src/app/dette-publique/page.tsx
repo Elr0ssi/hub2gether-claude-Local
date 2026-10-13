@@ -103,7 +103,7 @@ export default function Page() {
         <Faq titre="Comprendre la dette publique" questions={FAQ} />
 
         <p className="sg-note">
-          Sources : base de dette de Visualize (2000, 2014, 2024, en milliards d&apos;euros). <Link href="/methodologie-donnees">Notre méthode</Link> · <Link href="/pays">Tous les pays</Link>
+          Sources : base de dette de Visualize (2000, 2014, 2024, en milliards d’euros). <Link href="/methodologie-donnees">Notre méthode</Link> · <Link href="/pays">Tous les pays</Link>
         </p>
       </main>
       <Pied />

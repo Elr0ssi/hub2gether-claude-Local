@@ -1152,3 +1152,8 @@ body:has(.dos) { background: #0a0912; }
 @media (prefers-reduced-motion: reduce) {
   .dos-leve { opacity: 1 !important; transform: none !important; }
 }
+
+/* Le pied de page du site, sous l'article : il garde ses propres couleurs (celles du thème). */
+.dos-pied.cg { position: relative; z-index: 2; min-height: 0; background: transparent; }
+.dos-pied.cg::before, .dos-pied.cg::after { display: none; }
+.dos-pied .cg-pied { margin-top: 24px; background: var(--dos-bg); }

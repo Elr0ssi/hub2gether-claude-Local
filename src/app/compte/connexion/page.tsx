@@ -57,7 +57,7 @@ export default async function ConnexionPage({
             <p className="cx-chapo">Un pseudo stable pour écrire dans le forum. Rien de plus ne vous est demandé.</p>
             {erreur === "google" && (
               <p className="cp-erreur" style={{ marginBottom: 12 }}>
-                La connexion avec Google n&apos;a pas abouti. Réessayez, ou utilisez votre adresse et
+                La connexion avec Google n’a pas abouti. Réessayez, ou utilisez votre adresse et
                 votre mot de passe.
               </p>
             )}

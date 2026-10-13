@@ -36,7 +36,7 @@ export interface FichePays {
   natalite?: Mesure;
   mortalite?: Mesure;
   /** Rang mondial à l'année de référence : 1 = la valeur la plus élevée. */
-  rangs: Partial<Record<"pib" | "pibHab" | "population", { r: number; n: number }>>;
+  rangs: Partial<Record<"pib" | "pibHab" | "population" | "superficie" | "densite" | "dette" | "inflation" | "chomage" | "natalite" | "mortalite" | "balance", { r: number; n: number }>>;
   /** Kilomètres carrés, d'après le fond de carte du site : une valeur approchée. */
   superficie?: number;
   densite?: number;
@@ -163,6 +163,25 @@ function construit() {
   rangDe(eco, (n) => idxEco.get(n), "gdp", "pib");
   rangDe(eco, (n) => idxEco.get(n), "gdp_per_capita", "pibHab");
   rangDe(demo, (n) => idxDemo.get(n), "population", "population");
+
+  /* Les autres rangs : à la dernière valeur publiée de chaque pays. 1 = la valeur la plus élevée. */
+  const dernieres: [FichePays["rangs"] extends Partial<Record<infer K, unknown>> ? K : never, (f: FichePays) => number | undefined][] = [
+    ["superficie", (f) => f.superficie],
+    ["densite", (f) => f.densite],
+    ["dette", (f) => f.dette?.v],
+    ["inflation", (f) => f.inflation?.v],
+    ["chomage", (f) => f.chomage?.v],
+    ["natalite", (f) => f.natalite?.v],
+    ["mortalite", (f) => f.mortalite?.v],
+    ["balance", (f) => f.balance?.v],
+  ];
+  for (const [cle, val] of dernieres) {
+    const vals = liste.map((f) => ({ f, v: val(f) })).filter((x): x is { f: FichePays; v: number } => typeof x.v === "number" && Number.isFinite(x.v));
+    vals.sort((a, b) => b.v - a.v);
+    vals.forEach((x, k) => {
+      x.f.rangs[cle] = { r: k + 1, n: vals.length };
+    });
+  }
 
   /* Un slug par pays : en cas de doublon, le nom d'origine départage. */
   const vus = new Set<string>();

@@ -130,7 +130,7 @@ export function ChoixMonnaie({ className }: { className?: string }) {
         aria-expanded={ouvert}
         onClick={() => setOuvert(!ouvert)}
       >
-        <span className="sr-only">Monnaie d&apos;affichage : {f.libelle}</span>
+        <span className="sr-only">Monnaie d’affichage : {f.libelle}</span>
         <span aria-hidden="true">{f.unitaire}</span>
       </button>
       <div className="cg-monnaie-l" role="menu">

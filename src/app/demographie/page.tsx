@@ -100,10 +100,10 @@ export default function Page() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(fil) }} />
 
       <p className="sr-only">
-        Cette page compare la population, le taux de natalité, le taux de mortalité, l&apos;accroissement naturel et
+        Cette page compare la population, le taux de natalité, le taux de mortalité, l’accroissement naturel et
         le solde migratoire pour {socle.pays.length} pays et territoires, de {premiere} à {derniere}. Les données
-        proviennent des Nations Unies, World Population Prospects 2024. Une année qu&apos;une source ne publie pas
-        pour un pays reste absente : le pays sort du classement de cette année-là plutôt que d&apos;être compté pour
+        proviennent des Nations Unies, World Population Prospects 2024. Une année qu’une source ne publie pas
+        pour un pays reste absente : le pays sort du classement de cette année-là plutôt que d’être compté pour
         zéro.
       </p>
 

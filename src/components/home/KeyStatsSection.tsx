@@ -358,7 +358,7 @@ export function KeyStatsSection() {
               >
                 en chiffres,
               </em>{" "}
-              à l&apos;instant
+              à l’instant
             </h2>
           </div>
           <p

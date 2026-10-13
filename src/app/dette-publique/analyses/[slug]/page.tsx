@@ -66,7 +66,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <Fil items={[{ label: "Accueil", href: "/" }, { label: "Dette publique", href: "/dette-publique" }, { label: a.h1.join(" ") }]} />
         <AnalyseDette slug={a.slug} dossiers={dossiers} />
         <p className="sg-note">
-          Sources : base de dette de Visualize (2000, 2014, 2024, en milliards d&apos;euros), Nations Unies (population). Montants publiés en euros, convertibles au taux moyen de chaque année. Aucune projection n&apos;est faite.
+          Sources : base de dette de Visualize (2000, 2014, 2024, en milliards d’euros), Nations Unies (population). Montants publiés en euros, convertibles au taux moyen de chaque année. Aucune projection n’est faite.
         </p>
       </main>
       <Pied />

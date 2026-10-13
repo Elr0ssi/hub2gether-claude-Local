@@ -14,3 +14,39 @@
 .lg-404-l a { padding: 12px 22px; border-radius: 999px; font-size: 14px; font-weight: 700; color: var(--encre); text-decoration: none; background: var(--surface); border: 1px solid var(--bord); transition: transform 0.3s, border-color 0.3s; }
 .lg-404-l a:first-child { color: #fff; border-color: transparent; background: linear-gradient(135deg, #5b2de0, #8a5cff); }
 .lg-404-l a:hover { transform: translateY(-2px); }
+
+/* ── Pages de confiance : les anciens noms de couleur pointent vers ceux du site ── */
+.lg-conf {
+  --ink: var(--encre);
+  --ink-2: var(--encre-2);
+  --ink-3: var(--encre-3);
+  --ink-4: var(--encre-3);
+  --ink-5: var(--encre-3);
+  --border: var(--bord);
+  --border-light: var(--bord-fin);
+  --accent: #8b5cff;
+  --bg: transparent;
+}
+.lg-conf-col { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: clamp(100px, 14vh, 150px) clamp(16px, 4vw, 32px) 70px; }
+.lg-conf .hub { max-width: none; padding: 0; }
+.lg-conf .hub-h1 { margin-top: 10px; font-size: clamp(34px, 5vw, 56px); letter-spacing: -0.05em; line-height: 1.02; }
+.lg-conf .hub-h2 { margin-top: 48px; font-weight: 800; letter-spacing: -0.04em; }
+.lg-conf .hub-chapo { font-size: clamp(16px, 1.4vw, 19px); color: var(--encre-2); }
+.lg-conf .hub-p, .lg-conf .hub-puces li, .lg-conf .hub-def dd { color: var(--encre-2); }
+.lg-conf .hub-chiffres p, .lg-conf .hub-liste a, .lg-conf .hub-liste > li > div, .lg-conf .hub-tab-w { border-radius: 22px; }
+.lg-conf .hub-liste a:hover { border-color: #8b5cff; background: var(--surface); }
+.lg-conf .hub-fil a:hover { color: #8b5cff; }
+.lg-conf h1, .lg-conf h2, .lg-conf h3 { color: var(--encre); }
+
+/* ── Lectures anciennes : une feuille claire avec les couleurs d'origine ── */
+.lg-conf-large { max-width: 980px; }
+.lg-papier {
+  --bg: #FAFAFA; --surface: #FFFFFF; --surface-2: #F5F5F5; --surface-3: #EFEFEF; --border: #E8E8E8; --border-light: #F2F2F2;
+  --ink: #0A0A0A; --ink-2: #3A3A3A; --ink-3: #6B6B6B; --ink-4: #9B9B9B; --ink-5: #C4C4C4;
+  --accent: #39FF88; --accent-dim: rgba(57, 255, 136, 0.12); --accent-glow: rgba(57, 255, 136, 0.28); --accent-border: rgba(57, 255, 136, 0.35);
+  --navbar-height: 0px;
+  overflow: hidden; border-radius: 28px; background: #fff; color: #0a0a0a; font-family: var(--font-inter);
+  box-shadow: 0 30px 80px -40px rgba(0, 0, 0, 0.6);
+}
+.lg-papier article { max-width: 48rem; margin: 0 auto; }
+.lg-papier h1, .lg-papier h2, .lg-papier h3 { color: inherit; }

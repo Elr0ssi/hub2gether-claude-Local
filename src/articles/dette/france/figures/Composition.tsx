@@ -114,7 +114,7 @@ export function BruteNette() {
               <b>{md(3536.1, 1)}</b>dette brute de Maastricht, T1 2026
             </span>
             <span>
-              <b>{md(3301.1, 1)}</b>dette nette sur le même champ d&apos;instruments · 109,7 % du PIB
+              <b>{md(3301.1, 1)}</b>dette nette sur le même champ d’instruments · 109,7 % du PIB
             </span>
           </div>
           <p>

@@ -89,7 +89,7 @@ function Repondre({
       <div className="cg-fo-invite">
         <p className="cg-fo-invite-t">Pour écrire ici, il faut un compte.</p>
         <p className="cg-fo-invite-p">
-          Un pseudo, une adresse, et c&apos;est tout. Vos messages restent attachés à ce pseudo, pas à votre nom.
+          Un pseudo, une adresse, et c’est tout. Vos messages restent attachés à ce pseudo, pas à votre nom.
         </p>
         <div className="cg-fo-invite-actions">
           <Link href="/compte/connexion" className="cg-fo-btn-plein">
@@ -590,7 +590,7 @@ export function ForumPage() {
 
                     <div className="cg-fo-liens">
                       <Link href={fil.id === "dette-france" ? "/pays/france/dette-publique" : `/articles/${fil.article.slug}`} className="cg-lien-fleche">
-                        Lire l&apos;article <span aria-hidden="true">→</span>
+                        Lire l’article <span aria-hidden="true">→</span>
                       </Link>
                       {fil.carte && (
                         <Link href={fil.carte} className="cg-fo-lien-doux">

@@ -399,8 +399,8 @@ export function ComparerDashboard({ catalogue, defaut }: { catalogue: Pays[]; de
       </div>
 
       <p className="db-pied">
-        Les valeurs sont celles publiées par la Banque mondiale pour l&apos;année affichée. Une année
-        qu&apos;une source ne publie pas reste vide : elle n&apos;est ni interpolée, ni remplacée par
+        Les valeurs sont celles publiées par la Banque mondiale pour l’année affichée. Une année
+        qu’une source ne publie pas reste vide : elle n’est ni interpolée, ni remplacée par
         zéro. Votre disposition est enregistrée dans ce navigateur.
       </p>
     </div>

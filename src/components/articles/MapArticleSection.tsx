@@ -276,7 +276,7 @@ function RecommendedCard({
             textDecoration: "none",
           }}
         >
-          Lire l&apos;article <ArrowRight size={10} />
+          Lire l’article <ArrowRight size={10} />
         </Link>
         <BookmarkButton
           saved={saved}

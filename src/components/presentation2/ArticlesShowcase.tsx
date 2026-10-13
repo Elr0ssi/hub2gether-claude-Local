@@ -183,7 +183,7 @@ export function ArticlesShowcase() {
                   href={`/articles/${featured.slug}`}
                   style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: "0.8rem", fontWeight: 700, color: "#fff", textDecoration: "none" }}
                 >
-                  Lire l&apos;article <ArrowRight size={14} />
+                  Lire l’article <ArrowRight size={14} />
                 </Link>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -340,7 +340,7 @@ export function ArticlesShowcase() {
             </div>
             <div>
               <p style={{ fontSize: "0.92rem", fontWeight: 800, color: "#0A0A0A" }}>Brief quotidien</p>
-              <p style={{ fontSize: "0.78rem", color: "#8A8A8A" }}>L&apos;essentiel des faits marquants chaque matin.</p>
+              <p style={{ fontSize: "0.78rem", color: "#8A8A8A" }}>L’essentiel des faits marquants chaque matin.</p>
             </div>
           </div>
 

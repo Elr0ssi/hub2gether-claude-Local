@@ -49,7 +49,7 @@ export function DossierDette({ d }: { d: Dossier }) {
       </header>
 
       <section className="dd-sec" aria-labelledby="dd-ess">
-        <h2 id="dd-ess" className="sg-h2">L&apos;essentiel</h2>
+        <h2 id="dd-ess" className="sg-h2">L’essentiel</h2>
         <div className="dd-cartes">
           <article className="dd-carte dd-carte-vif">
             <span className="dd-i"><Landmark size={18} aria-hidden="true" /></span>
@@ -68,7 +68,7 @@ export function DossierDette({ d }: { d: Dossier }) {
               <span className="dd-i"><Users size={18} aria-hidden="true" /></span>
               <h3>Par habitant</h3>
               <strong>{f.u(parHab, 2024)}</strong>
-              <p>pour {nf(d.pop2024! / 1e6, 1)} millions d&apos;habitants</p>
+              <p>pour {nf(d.pop2024! / 1e6, 1)} millions d’habitants</p>
             </article>
           )}
           <article className="dd-carte">
@@ -127,7 +127,7 @@ export function DossierDette({ d }: { d: Dossier }) {
               <li key={s.label}><i style={{ background: COULEURS[i % COULEURS.length] }} />{s.label} <b>{nf(s.pct, s.pct % 1 ? 1 : 0)} %</b></li>
             ))}
           </ul>
-          <p className="dd-note">Répartition indicative issue de notre base : les proportions sont approximatives et varient d&apos;une année à l&apos;autre.</p>
+          <p className="dd-note">Répartition indicative issue de notre base : les proportions sont approximatives et varient d’une année à l’autre.</p>
         </section>
       )}
 
@@ -145,11 +145,11 @@ export function DossierDette({ d }: { d: Dossier }) {
             <p>{d.inflationPicDate}</p>
           </article>
         </div>
-        <p className="dd-texte">Une inflation élevée allège la valeur réelle d&apos;une dette libellée dans la monnaie du pays, mais elle renchérit le coût des nouveaux emprunts.</p>
+        <p className="dd-texte">Une inflation élevée allège la valeur réelle d’une dette libellée dans la monnaie du pays, mais elle renchérit le coût des nouveaux emprunts.</p>
       </section>
 
       <section className="dd-sec" aria-labelledby="dd-vs">
-        <h2 id="dd-vs" className="sg-h2">Les pays au niveau d&apos;endettement le plus proche</h2>
+        <h2 id="dd-vs" className="sg-h2">Les pays au niveau d’endettement le plus proche</h2>
         <div className="dd-tab-c">
           <table className="sg-tab">
             <caption className="sr-only">Pays dont la dette rapportée au PIB est proche de celle {deNom(d.fr)}</caption>

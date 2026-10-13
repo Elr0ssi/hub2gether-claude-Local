@@ -420,12 +420,12 @@ export function LectureArticle({
                 monde</strong> de la Banque mondiale, à leur dernière date publiée.
               </li>
               <li>
-                Une année qu&apos;une source ne publie pas reste <strong>absente</strong> : elle
-                n&apos;est ni interpolée, ni remplacée par un zéro.
+                Une année qu’une source ne publie pas reste <strong>absente</strong> : elle
+                n’est ni interpolée, ni remplacée par un zéro.
               </li>
               <li>
                 Les comparaisons entre pays portent sur des valeurs nominales, sauf mention
-                contraire — la parité de pouvoir d&apos;achat donne d&apos;autres classements.
+                contraire — la parité de pouvoir d’achat donne d’autres classements.
               </li>
             </ul>
             <Link href="/methodology" className="lx-methode-l">
@@ -455,10 +455,10 @@ export function LectureArticle({
           )}
 
           <section className="lx-relance">
-            <p className="lx-relance-t">Vous n&apos;êtes pas d&apos;accord ?</p>
+            <p className="lx-relance-t">Vous n’êtes pas d’accord ?</p>
             <p className="lx-relance-p">
-              Le forum est ouvert : une objection avec sa source vaut mieux qu&apos;un commentaire
-              sous l&apos;article.
+              Le forum est ouvert : une objection avec sa source vaut mieux qu’un commentaire
+              sous l’article.
             </p>
             <Link href="/forum" className="lx-relance-b">
               Ouvrir le fil →

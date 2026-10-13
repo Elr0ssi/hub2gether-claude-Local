@@ -148,3 +148,9 @@ npm run start -- -p 3300   # puis ouvrir http://localhost:3300/pays/<pays>/dette
 - Le classement mondial et les 11 analyses comparatives sont **générés** : `src/data/dettes/analyses.ts` (textes et tableaux calculés depuis la table de dette). Ils se mettent à jour quand la table change.
 - Les articles « économie » plus anciens sont dans `src/data/economy/articles.ts` (pages `/articles/<slug>`).
 - Le carrousel d'articles de la page Économie se compose dans `src/data/concept/conceptEconomie.ts` (`articlesEco`) et `src/data/dettes/fiches.ts` (articles de dette).
+
+## Ce que le site ajoute autour de l'article
+
+- **Le pied de page du site** est affiché sous chaque article long (`ArticleLong`) : le lecteur reste dans le site. Rien à faire.
+- **La page `/articles`** liste tous les articles du site (articles longs, analyses, dossiers pays, lectures), à ranger par thématique, par pays ou par type, avec recherche. Elle se nourrit de `src/data/articles-catalogue.ts` : un article inscrit dans `catalogue.ts` y apparaît tout seul.
+- **La fiche du pays** (`/pays/<slug>`) montre « Articles sur <pays> » : un carrousel dont le premier article long est l'**article phare**, avec une recherche limitée aux articles de ce pays.

@@ -305,7 +305,7 @@ const FriseDemo = ({
       </div>
 
       <p className="cg-frise-n">
-        Les dates affichées sont celles publiées par la source. Rien n&apos;est interpolé entre deux repères : une
+        Les dates affichées sont celles publiées par la source. Rien n’est interpolé entre deux repères : une
         année absente reste absente.
         {vue === annees[annees.length - 1] && (
           <>

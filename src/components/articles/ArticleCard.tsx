@@ -68,7 +68,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
             className="flex items-center gap-1 text-xs font-semibold transition-all group-hover:gap-2"
             style={{ color: "var(--accent-fg, #0D7A40)" }}
           >
-            Lire l&apos;article
+            Lire l’article
             <ArrowRight size={13} />
           </Link>
         </div>

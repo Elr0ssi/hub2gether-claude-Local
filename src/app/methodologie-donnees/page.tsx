@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import fs from "node:fs";
 import path from "node:path";
-import { Layout } from "@/components/layout/Layout";
+import { PageConfiance } from "@/components/legal/PageConfiance";
 import { jsonLdString } from "@/lib/schema";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -94,7 +94,7 @@ export default function Page() {
   };
 
   return (
-    <Layout>
+    <PageConfiance>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(fil) }} />
       <div className="hub">
         <nav className="hub-fil" aria-label="Fil d'Ariane">
@@ -124,14 +124,14 @@ export default function Page() {
             <b>
               {premiere}&ndash;{derniere}
             </b>
-            <span>années couvertes, selon l&apos;indicateur</span>
+            <span>années couvertes, selon l’indicateur</span>
           </p>
         </div>
 
         <h2 className="hub-h2">Comment la base est rangée</h2>
         <p className="hub-p">
-          Un chemin, une idée. Chaque valeur vit dans un fichier dont l&apos;emplacement dit ce
-          qu&apos;elle mesure et de quel pays elle parle :
+          Un chemin, une idée. Chaque valeur vit dans un fichier dont l’emplacement dit ce
+          qu’elle mesure et de quel pays elle parle :
         </p>
         <pre className="hub-code">data/CATÉGORIE/SOUS-CATÉGORIE/INDICATEUR/&lt;ISO3&gt;.json</pre>
         <p className="hub-p">
@@ -140,49 +140,49 @@ export default function Page() {
           catégories publiées à ce jour sont {categories.join(", ")}.
         </p>
         <p className="hub-p">
-          Chaque dossier d&apos;indicateur porte une fiche, <code>_indicateur.json</code>, qui
+          Chaque dossier d’indicateur porte une fiche, <code>_indicateur.json</code>, qui
           déclare son libellé, son unité, ses sources, les années couvertes, le nombre de pays et
-          la date de mise à jour. C&apos;est cette fiche qui alimente la table ci-dessous : rien
-          n&apos;y est saisi deux fois.
+          la date de mise à jour. C’est cette fiche qui alimente la table ci-dessous : rien
+          n’y est saisi deux fois.
         </p>
 
         <h2 className="hub-h2">La règle qui compte le plus</h2>
         <p className="hub-p">
-          <b>Une année absente reste absente.</b> Lorsqu&apos;une source ne publie pas de valeur
-          pour un pays et une année, rien n&apos;est écrit : ni zéro, ni moyenne, ni valeur
-          reprise de l&apos;année précédente. Le pays sort simplement du classement de cette
+          <b>Une année absente reste absente.</b> Lorsqu’une source ne publie pas de valeur
+          pour un pays et une année, rien n’est écrit : ni zéro, ni moyenne, ni valeur
+          reprise de l’année précédente. Le pays sort simplement du classement de cette
           année-là.
         </p>
         <p className="hub-p">
-          C&apos;est une règle coûteuse, parce qu&apos;elle laisse des trous visibles dans les
-          courbes et des classements dont le nombre de pays varie d&apos;une année à l&apos;autre.
-          Elle est tenue quand même : un zéro inventé est indiscernable d&apos;un zéro mesuré une
-          fois qu&apos;il est dans un graphique, et c&apos;est exactement ce qui fait qu&apos;on
+          C’est une règle coûteuse, parce qu’elle laisse des trous visibles dans les
+          courbes et des classements dont le nombre de pays varie d’une année à l’autre.
+          Elle est tenue quand même : un zéro inventé est indiscernable d’un zéro mesuré une
+          fois qu’il est dans un graphique, et c’est exactement ce qui fait qu’on
           ne peut plus faire confiance à un jeu de données.
         </p>
 
-        <h2 className="hub-h2">Ce qu&apos;une valeur transporte avec elle</h2>
+        <h2 className="hub-h2">Ce qu’une valeur transporte avec elle</h2>
         <p className="hub-p">
           Un montant seul ne veut rien dire. Les valeurs publiées portent, selon les cas, leur
           unité, leur période, leur périmètre, leur base comptable, leur mode de valorisation,
-          leur statut (définitif, provisoire, estimé) et l&apos;adresse de la publication
-          d&apos;origine. C&apos;est ce qui permet de dire pourquoi deux chiffres justes ne
-          disent pas la même chose, plutôt que de laisser croire que l&apos;un des deux est faux.
+          leur statut (définitif, provisoire, estimé) et l’adresse de la publication
+          d’origine. C’est ce qui permet de dire pourquoi deux chiffres justes ne
+          disent pas la même chose, plutôt que de laisser croire que l’un des deux est faux.
         </p>
 
         <h2 className="hub-h2">Les contrôles</h2>
         <ul className="hub-puces">
           <li>
-            <b>Contrôle d&apos;intégrité.</b> Un script relit la base et compare chaque valeur à
-            la source d&apos;origine du projet, fichier par fichier. Une différence, même
-            d&apos;arrondi, arrête la publication.
+            <b>Contrôle d’intégrité.</b> Un script relit la base et compare chaque valeur à
+            la source d’origine du projet, fichier par fichier. Une différence, même
+            d’arrondi, arrête la publication.
           </li>
           <li>
             <b>Contrôle de forme.</b> Code pays valide, années entières, valeurs numériques
-            finies, unité déclarée, fiche d&apos;indicateur présente.
+            finies, unité déclarée, fiche d’indicateur présente.
           </li>
           <li>
-            <b>Aucune donnée n&apos;est supprimée.</b> Les réorganisations de la base sont des
+            <b>Aucune donnée n’est supprimée.</b> Les réorganisations de la base sont des
             déplacements vérifiés, jamais des réécritures : la structure change, les valeurs non.
           </li>
         </ul>
@@ -228,6 +228,6 @@ export default function Page() {
           travail est dit sur la page <Link href="/a-propos">à propos</Link>.
         </p>
       </div>
-    </Layout>
+    </PageConfiance>
   );
 }

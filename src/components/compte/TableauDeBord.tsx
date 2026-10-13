@@ -98,7 +98,7 @@ export function TableauDeBord({
       )}
 
       <form action={action} className="cp-tdb-form">
-        <p className="cp-tdb-choix-t">Choisissez jusqu&apos;à quatre compteurs :</p>
+        <p className="cp-tdb-choix-t">Choisissez jusqu’à quatre compteurs :</p>
         <div className="cp-tdb-choix">
           {catalogue.map((w) => (
             <label key={w.id} className="cp-tdb-case">

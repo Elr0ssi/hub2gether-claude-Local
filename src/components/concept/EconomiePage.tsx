@@ -300,9 +300,9 @@ function TempsReelEco({ pib, v2 = false }: { pib: PibMonde; v2?: boolean }) {
         <p className="sr-only">
           Produit intérieur brut mondial en temps réel, données récentes {pib.annee} : somme des{" "}
           {pib.n} pays du socle, convertie au taux de {pib.annee}, Banque mondiale (WDI). Dépenses
-          militaires mondiales en temps réel, dépenses de santé et dépenses d&apos;éducation dans le
+          militaires mondiales en temps réel, dépenses de santé et dépenses d’éducation dans le
           monde en temps réel : trois compteurs à débit constant depuis le 1<sup>er</sup> janvier
-          2026, pour suivre l&apos;évolution récente de chaque poste seconde après seconde.
+          2026, pour suivre l’évolution récente de chaque poste seconde après seconde.
         </p>
       </div>
     </section>
@@ -511,15 +511,15 @@ const Frise = memo(function Frise({
       </div>
 
       <p className="cg-frise-n">
-        Les dates affichées sont celles publiées par la source. Rien n&apos;est interpolé entre deux
+        Les dates affichées sont celles publiées par la source. Rien n’est interpolé entre deux
         repères : une année absente reste absente.{" "}
         {sansTaux && (
           <>
             {" "}
             <b>
-              Aucun taux de change {piece.libelle.toLowerCase()} n&apos;existe pour {valeur} : les
+              Aucun taux de change {piece.libelle.toLowerCase()} n’existe pour {valeur} : les
               montants de cette date ne sont pas convertibles et les pays sortent du classement.
-              Revenez au dollar, l&apos;unité d&apos;origine de la base, pour les lire.
+              Revenez au dollar, l’unité d’origine de la base, pour les lire.
             </b>
           </>
         )}

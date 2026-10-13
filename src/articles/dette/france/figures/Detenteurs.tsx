@@ -87,7 +87,7 @@ export function Porteurs() {
             <b>{pct(p.pct)}</b>
             {p.info && (
               <button type="button" className="dp-info" aria-expanded={info} onClick={() => setInfo((v) => !v)}>
-                Qu&apos;est-ce qu&apos;un non-résident ?
+                Qu’est-ce qu’un non-résident ?
               </button>
             )}
           </li>
@@ -154,12 +154,12 @@ export function Porteurs() {
       <p className="dp-texte">
         La structure des détenteurs dépend donc aussi du type de titre. Les BTF, titres de court
         terme, sont très majoritairement détenus par des non-résidents au T1 2026, tandis que les
-        obligations indexées sur l&apos;inflation présentent une structure différente.
+        obligations indexées sur l’inflation présentent une structure différente.
       </p>
 
       <div className="dp-garde">
         <p>
-          Cette répartition concerne les titres de la <b>dette négociable de l&apos;État</b>,
+          Cette répartition concerne les titres de la <b>dette négociable de l’État</b>,
           exprimés en valeur de marché. Elle ne correspond pas directement aux {mdMots(3536, 0)}
           de dette publique de Maastricht.
         </p>

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { PageLecture } from "@/components/legal/PageConfiance";
 import { LectureArticle } from "@/components/lecture/LectureArticle";
 import { ARTICLES, getArticleBySlug, getArticlesByTheme } from "@/data/articles";
 import { THEMES } from "@/data/themes";
@@ -21,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const a = getArticleBySlug(slug);
   if (!a) return { title: "Article introuvable" };
   return {
-    title: `${a.title} · Lecture | The Essential Data`,
+    title: `${a.title} · Lecture | Visualize`,
     description: a.excerpt,
     alternates: { canonical: `/lecture/${slug}` },
     /* Un format en essai ne doit pas concurrencer l'article publié dans
@@ -65,18 +64,14 @@ export default async function LecturePage({ params }: Props) {
   }
 
   return (
-    <div style={{ background: "var(--bg)", minHeight: "100vh" }}>
-      <Navbar />
-      <main style={{ paddingTop: "var(--navbar-height)" }}>
-        <LectureArticle
-          article={article}
-          themeLabel={themeLabel}
-          suite={suite}
-          connecte={Boolean(compte)}
-          enregistre={enregistre}
-        />
-      </main>
-      <Footer />
-    </div>
+    <PageLecture>
+      <LectureArticle
+        article={article}
+        themeLabel={themeLabel}
+        suite={suite}
+        connecte={Boolean(compte)}
+        enregistre={enregistre}
+      />
+    </PageLecture>
   );
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Layout } from "@/components/layout/Layout";
+import { PageConfiance } from "@/components/legal/PageConfiance";
 import { jsonLdString } from "@/lib/schema";
 import { CONTACT, EQUIPE } from "@/data/equipe";
 
@@ -73,7 +73,7 @@ export default function Page() {
   };
 
   return (
-    <Layout>
+    <PageConfiance>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(organisation) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(fil) }} />
       <div className="hub">
@@ -86,7 +86,7 @@ export default function Page() {
         <h1 className="hub-h1">À propos</h1>
         <p className="hub-chapo">
           Visualize rend lisibles des données publiques. Pas plus, et pas moins : nous ne
-          produisons aucune mesure, nous reprenons celles d&apos;institutions qui les publient, et
+          produisons aucune mesure, nous reprenons celles d’institutions qui les publient, et
           nous nous rendons responsables de la manière dont elles sont présentées.
         </p>
 
@@ -99,12 +99,12 @@ export default function Page() {
           </li>
           <li>
             <b>Recouper.</b> Quand deux sources divergent, nous ne choisissons pas la plus
-            commode : nous expliquons pourquoi elles divergent, parce que l&apos;écart est presque
+            commode : nous expliquons pourquoi elles divergent, parce que l’écart est presque
             toujours une différence de périmètre, pas une erreur.
           </li>
           <li>
             <b>Rendre traçable.</b> Chaque valeur affichée porte son unité, sa période, son
-            périmètre et l&apos;adresse de la publication d&apos;origine. Le lecteur doit pouvoir
+            périmètre et l’adresse de la publication d’origine. Le lecteur doit pouvoir
             vérifier sans nous croire sur parole.
           </li>
         </ul>
@@ -112,9 +112,9 @@ export default function Page() {
         <h2 className="hub-h2">Ce que nous ne faisons pas</h2>
         <ul className="hub-puces">
           <li>
-            <b>Nous ne comblons pas les trous.</b> Une année qu&apos;une source ne publie pas
+            <b>Nous ne comblons pas les trous.</b> Une année qu’une source ne publie pas
             reste absente. Elle ne devient jamais zéro, ni une moyenne, ni la valeur de
-            l&apos;année précédente.
+            l’année précédente.
           </li>
           <li>
             <b>Nous ne dramatisons pas un chiffre.</b> Les formules qui transforment un montant en
@@ -123,14 +123,14 @@ export default function Page() {
           </li>
           <li>
             <b>Nous ne prétendons pas à la neutralité.</b> Choisir un indicateur, une période, une
-            échelle, c&apos;est déjà un point de vue. Nous rendons ces choix visibles plutôt que
+            échelle, c’est déjà un point de vue. Nous rendons ces choix visibles plutôt que
             de les présenter comme une objectivité de machine.
           </li>
         </ul>
 
-        <h2 className="hub-h2">Le rôle des outils d&apos;intelligence artificielle</h2>
+        <h2 className="hub-h2">Le rôle des outils d’intelligence artificielle</h2>
         <p className="hub-p">
-          Nous nous en servons comme d&apos;une assistance : pour rapprocher des sources, repérer
+          Nous nous en servons comme d’une assistance : pour rapprocher des sources, repérer
           des écarts, harmoniser des terminologies entre publications de langues différentes. Les
           valeurs chiffrées viennent des institutions qui les publient et ne sont jamais générées.
           La responsabilité de ce qui est publié est humaine et ne se délègue pas.
@@ -138,7 +138,7 @@ export default function Page() {
 
         {EQUIPE.length > 0 && (
           <>
-            <h2 className="hub-h2">L&apos;équipe</h2>
+            <h2 className="hub-h2">L’équipe</h2>
             <ul className="hub-liste">
               {EQUIPE.map((m) => (
                 <li key={m.nom}>
@@ -176,9 +176,9 @@ export default function Page() {
         <p className="hub-note">
           Comment la base est construite et contrôlée :{" "}
           <Link href="/methodologie-donnees">méthodologie de la base</Link>. Comment un article
-          s&apos;écrit : <Link href="/methodology">méthodologie éditoriale</Link>.
+          s’écrit : <Link href="/methodology">méthodologie éditoriale</Link>.
         </p>
       </div>
-    </Layout>
+    </PageConfiance>
   );
 }

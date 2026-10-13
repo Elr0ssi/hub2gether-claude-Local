@@ -201,7 +201,7 @@ function EmpiresSummary() {
 
   return (
     <section aria-label="Chronologie empire romain">
-      <h2>Chronologie de l&apos;Empire romain, 500 av. J.-C. à 1453 ap. J.-C.</h2>
+      <h2>Chronologie de l’Empire romain, 500 av. J.-C. à 1453 ap. J.-C.</h2>
       <Table
         headers={["Année", "Période", "Description"]}
         rows={rows}

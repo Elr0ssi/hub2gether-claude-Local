@@ -82,7 +82,7 @@ function Repondre({
       <div className="fo-invite">
         <p className="fo-invite-t">Pour écrire ici, il faut un compte.</p>
         <p className="fo-invite-p">
-          Un pseudo, une adresse, et c&apos;est tout. Vos messages restent attachés à ce pseudo,
+          Un pseudo, une adresse, et c’est tout. Vos messages restent attachés à ce pseudo,
           pas à votre nom.
         </p>
         <div className="fo-invite-actions">
@@ -557,7 +557,7 @@ export function Forum() {
 
                 <div className="fo-liens">
                   <Link href={`/articles/${fil.article.slug}`} className="fo-lien">
-                    Lire l&apos;article →
+                    Lire l’article →
                   </Link>
                   {fil.carte && (
                     <Link href={fil.carte} className="fo-lien fo-lien-doux">

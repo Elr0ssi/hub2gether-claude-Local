@@ -70,8 +70,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <Fil items={[{ label: "Accueil", href: "/" }, { label: "Dette publique", href: "/dette-publique" }, { label: d.fr }]} />
         <DossierDette d={d} />
         <p className="sg-note">
-          Sources : base de dette de Visualize (2000, 2014, 2024, en milliards d&apos;euros), Nations Unies (population). Les montants sont publiés en euros et convertis, au choix, au taux moyen de chaque année (BCE, BRI).
-          PIB implicite = dette ÷ ratio. Les dates et valeurs sont celles de la base ; aucune projection n&apos;est faite.
+          Sources : base de dette de Visualize (2000, 2014, 2024, en milliards d’euros), Nations Unies (population). Les montants sont publiés en euros et convertis, au choix, au taux moyen de chaque année (BCE, BRI).
+          PIB implicite = dette ÷ ratio. Les dates et valeurs sont celles de la base ; aucune projection n’est faite.
         </p>
       </main>
       <Pied />

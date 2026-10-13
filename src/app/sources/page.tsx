@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Layout } from "@/components/layout/Layout";
+import { PageConfiance } from "@/components/legal/PageConfiance";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Sources de données · The Essential Data",
+  title: "Sources de données · Visualize",
   description:
-    "Toutes les sources de données utilisées par The Essential Data : FMI, Banque mondiale, OMS, SIPRI, AWMC et médias internationaux de référence.",
+    "Toutes les sources de données utilisées par Visualize : FMI, Banque mondiale, OMS, SIPRI, AWMC et médias internationaux de référence.",
   alternates: {
     canonical: "/sources",
   },
@@ -242,7 +242,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
 
 export default function SourcesPage() {
   return (
-    <Layout>
+    <PageConfiance>
       <div className="max-w-4xl mx-auto px-6 py-12">
         <Link
           href="/"
@@ -270,7 +270,7 @@ export default function SourcesPage() {
           </h1>
           <p className="text-base leading-relaxed mb-4" style={{ color: "var(--ink-2)", fontSize: "1.0625rem" }}>
             L'ensemble des sources primaires utilisées pour alimenter les visualisations interactives
-            et les synthèses éditoriales de The Essential Data.
+            et les synthèses éditoriales de Visualize.
           </p>
           <p className="text-sm" style={{ color: "var(--ink-3)" }}>
             Conformément à nos engagements de transparence et aux exigences de l'EU AI Act, chaque source
@@ -361,13 +361,13 @@ export default function SourcesPage() {
           style={{ borderTop: "1px solid var(--border)" }}
         >
           <p className="text-xs" style={{ color: "var(--ink-4)" }}>
-            Dernière mise à jour : juin 2025 · The Essential Data ·{" "}
+            Dernière mise à jour : juin 2025 · Visualize ·{" "}
             <Link href="/methodology" className="underline underline-offset-2" style={{ color: "var(--ink-3)" }}>
               Méthodologie →
             </Link>
           </p>
         </div>
       </div>
-    </Layout>
+    </PageConfiance>
   );
 }

@@ -119,9 +119,9 @@ export default function Page() {
         territoires, de {premiere} à {derniere} : produit intérieur brut, PIB par habitant,
         balance commerciale, dette publique rapportée au PIB, montant de la dette publique,
         inflation, taux de chômage, population active, âge de départ à la retraite et nombre
-        d&apos;entreprises. Les données proviennent de la Banque mondiale et du Fonds monétaire
-        international. Une année qu&apos;une source ne publie pas pour un pays reste absente : le
-        pays sort du classement de cette année-là plutôt que d&apos;être compté pour zéro.
+        d’entreprises. Les données proviennent de la Banque mondiale et du Fonds monétaire
+        international. Une année qu’une source ne publie pas pour un pays reste absente : le
+        pays sort du classement de cette année-là plutôt que d’être compté pour zéro.
       </p>
 
       <EconomiePage

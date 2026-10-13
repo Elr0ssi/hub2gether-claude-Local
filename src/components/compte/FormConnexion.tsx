@@ -68,7 +68,7 @@ export function FormConnexion({ mode }: { mode: "connexion" | "inscription" }) {
               autoComplete="username"
               placeholder="celui qui s'affichera sur vos messages"
             />
-            <em>Lettres, chiffres, tiret et souligné. Votre nom réel n&apos;est jamais demandé.</em>
+            <em>Lettres, chiffres, tiret et souligné. Votre nom réel n’est jamais demandé.</em>
           </label>
         )}
 

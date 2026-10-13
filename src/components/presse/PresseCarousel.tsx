@@ -105,7 +105,7 @@ export function PresseCarousel({
       </ul>
       {reels === 0 && (
         <p className="pc-note">
-          Emplacements à renseigner : chaque carte deviendra un lien vers l&apos;article cité, avec
+          Emplacements à renseigner : chaque carte deviendra un lien vers l’article cité, avec
           son média et sa date.
         </p>
       )}

@@ -16,7 +16,7 @@ export default function NotFound() {
       <EnTete />
       <main className="lg-col lg-404">
         <p className="lg-404-n">404</p>
-        <h1 className="lg-h1">Cette page n&apos;existe pas.</h1>
+        <h1 className="lg-h1">Cette page n’existe pas.</h1>
         <p className="lg-404-t">Le lien est peut-être ancien. Voici où aller :</p>
         <div className="lg-404-l">
           <a href="/economie">Économie</a>
