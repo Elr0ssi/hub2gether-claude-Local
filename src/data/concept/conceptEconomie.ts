@@ -134,8 +134,13 @@ export function pibMonde(): { total: number; n: number; annee: number } {
   return { total, n, annee: y.year };
 }
 
+/* L'ancien texte sur la dette de la France est remplacé par l'article long (voir src/articles/dette/) :
+   il n'apparaît plus dans la file, l'article rédigé y figure à sa place (via src/data/dettes/fiches.ts). */
+const REMPLACES_PAR_ARTICLE_LONG = new Set(["dette-publique-france-2025-enjeux"]);
+
 export function articlesEco(n = 9): FicheArticle[] {
   return [...ECONOMY_ARTICLES]
+    .filter((a) => !REMPLACES_PAR_ARTICLE_LONG.has(a.slug))
     .sort((a, b) => {
       const f = Number(Boolean(b.featured)) - Number(Boolean(a.featured));
       return f !== 0 ? f : (b.publishedAt ?? "").localeCompare(a.publishedAt ?? "");

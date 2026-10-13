@@ -589,7 +589,7 @@ export function ForumPage() {
                     <p className="cg-fo-para">{fil.corps[0]}</p>
 
                     <div className="cg-fo-liens">
-                      <Link href={fil.id === "dette-france" ? "/france/economie/dette-publique-v2" : `/articles/${fil.article.slug}`} className="cg-lien-fleche">
+                      <Link href={fil.id === "dette-france" ? "/france/economie/dette-publique" : `/articles/${fil.article.slug}`} className="cg-lien-fleche">
                         Lire l&apos;article <span aria-hidden="true">→</span>
                       </Link>
                       {fil.carte && (

@@ -9,6 +9,7 @@ import { avec, deNom, nf } from "@/data/seo/francais";
 import { ANALYSES } from "@/data/dettes/analyses";
 import { faqDossier, inflationTexte, introDossier } from "@/data/dettes/textes";
 import type { Dossier } from "@/data/dettes/dossiers";
+import { adresseDette } from "@/articles/dette/catalogue";
 import "@/components/seo/seo.css";
 import "./dette-dossier.css";
 
@@ -159,7 +160,7 @@ export function DossierDette({ d }: { d: Dossier }) {
               <tr className="dd-moi"><th scope="row">{d.flag} {d.fr}</th><td>{nf(d.p2024, 1)} %</td><td>—</td></tr>
               {d.voisins.map((v) => (
                 <tr key={v.slug}>
-                  <th scope="row"><Link href={v.slug === "france" ? "/france/economie/dette-publique" : `/dette-publique/${v.slug}`}>{v.flag} {v.fr}</Link></th>
+                  <th scope="row"><Link href={adresseDette(v.slug)}>{v.flag} {v.fr}</Link></th>
                   <td>{nf(v.p2024, 1)} %</td>
                   <td>{v.p2024 >= d.p2024 ? "+" : "−"}{nf(Math.abs(v.p2024 - d.p2024), 1)} pts</td>
                 </tr>

@@ -11,6 +11,7 @@ import { avec, cap, deNom, fmtHabCourt, fmtMdCourt, nf, rangTexte } from "@/data
 import { SITE_URL, urlAbs } from "@/lib/site";
 import "@/components/concept/concept.css";
 import "@/components/seo/seo.css";
+import { adresseDette } from "@/articles/dette/catalogue";
 
 /* Chaque pays a sa page, construite à la compilation ; une page nouvelle se construit à la première visite. */
 export const revalidate = 2592000;
@@ -152,7 +153,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             <h2 id="sg-dette" className="sg-h2">Dette publique</h2>
             <p className="sg-intro" style={{ marginTop: 0 }}>
               {cap(avec(f.fr))} : dette de {nf(dossierDette.p2024, 1)} % du PIB en 2024 ({nf(dossierDette.p2000, 1)} % en 2000).{" "}
-              <Link href={dossierDette.slug === "france" ? "/france/economie/dette-publique" : `/dette-publique/${dossierDette.slug}`}>Lire le dossier : montant, créanciers, inflation →</Link>
+              <Link href={adresseDette(dossierDette.slug)}>Lire le dossier : montant, créanciers, inflation →</Link>
             </p>
           </section>
         )}

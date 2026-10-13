@@ -28,6 +28,9 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/analyses", destination: "/", permanent: true },
+      /* L'ancienne version « v2 » de l'article sur la dette est devenue l'article de référence. */
+      { source: "/france/economie/dette-publique-v2", destination: "/france/economie/dette-publique", permanent: true },
+      { source: "/articles/dette-publique-france-2025-enjeux", destination: "/france/economie/dette-publique", permanent: true },
       { source: "/v2-eco", destination: "/economie", permanent: true },
       { source: "/concept-globe", destination: "/", permanent: true },
       { source: "/concept-globe/economie", destination: "/economie", permanent: true },

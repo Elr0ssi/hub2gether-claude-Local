@@ -1,0 +1,75 @@
+"use client";
+
+import { useState } from "react";
+import { montant, montantAbs, nf } from "./montants";
+
+const COULEURS = [
+  "var(--dos-s0)",
+  "var(--dos-s1)",
+  "var(--dos-s2)",
+  "var(--dos-s3)",
+  "var(--dos-s4)",
+  "var(--dos-s5)",
+  "var(--dos-s6)",
+  "var(--dos-s7)",
+];
+
+/** Une répartition : une barre segmentée, puis la liste des montants et des parts. Au survol d'un
+ *  segment ou d'une ligne, l'autre s'éclaire. Convient aux recettes, aux dépenses, à une dette par
+ *  créancier — tout ce qui se découpe en parts d'un total.
+ *
+ *    <Repartition
+ *      nom="Dette par créancier"                       // décrit le graphique aux lecteurs d'écran
+ *      lignes={[{ nom: "Marchés privés", md: 1800 }, { nom: "FMI", md: 400 }]}   // md : milliards d'euros
+ *    />
+ *
+ *  `negatif` : pour une répartition de déficits, les montants s'écrivent avec un « − ».
+ *  Une ligne dont `md` est négatif s'affiche « en déduction » et ne compte pas dans la barre.
+ */
+export function Repartition({
+  lignes,
+  nom,
+  negatif = false,
+}: {
+  lignes: { nom: string; md: number }[];
+  nom: string;
+  negatif?: boolean;
+}) {
+  const positives = lignes.filter((l) => l.md > 0);
+  const somme = positives.reduce((t, l) => t + l.md, 0);
+  const [actif, setActif] = useState<number | null>(null);
+  return (
+    <div className="dos-rep">
+      <div className="dos-pile-b" role="img" aria-label={nom}>
+        {positives.map((l, i) => (
+          <span
+            key={l.nom}
+            className={actif !== null && actif !== i ? "dos-seg-sombre" : undefined}
+            style={{ flexGrow: l.md, backgroundColor: COULEURS[i % COULEURS.length] }}
+            title={`${l.nom} · ${montantAbs(l.md)}`}
+            onPointerEnter={() => setActif(i)}
+            onPointerLeave={() => setActif(null)}
+          />
+        ))}
+      </div>
+      <ul className="dos-pile-l">
+        {lignes.map((l, i) => (
+          <li
+            key={l.nom}
+            className={`${l.md < 0 ? "dos-pile-neg" : ""}${actif === i && l.md > 0 ? " dos-pile-on" : ""}`}
+            onPointerEnter={() => l.md > 0 && setActif(i)}
+            onPointerLeave={() => setActif(null)}
+          >
+            <i style={{ backgroundColor: l.md > 0 ? COULEURS[i % COULEURS.length] : "var(--dos-s7)" }} aria-hidden="true" />
+            <span>{l.nom}</span>
+            <b className={negatif ? "dos-neg" : undefined}>
+              {negatif || l.md < 0 ? "−" : ""}
+              {montant(Math.abs(l.md), 0)}
+            </b>
+            <em>{l.md > 0 ? `${nf((l.md / somme) * 100)} %` : "en déduction"}</em>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}

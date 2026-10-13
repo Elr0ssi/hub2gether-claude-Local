@@ -6,10 +6,11 @@ import { useMonnaieArticle } from "@/components/concept/Monnaie";
 import { fmtMontant } from "@/lib/montant";
 import { nf } from "@/data/seo/francais";
 import type { Dossier } from "@/data/dettes/dossiers";
+import { adresseDette } from "@/articles/dette/catalogue";
 import "@/components/seo/seo.css";
 import "./dette-dossier.css";
 
-const lien = (d: Dossier) => (d.slug === "france" ? "/france/economie/dette-publique" : `/dette-publique/${d.slug}`);
+const lien = (d: Dossier) => adresseDette(d.slug);
 
 /** Le classement mondial : trois façons de trier, des montants dans la monnaie du lecteur. */
 export function ClassementDette({ dossiers }: { dossiers: Dossier[] }) {

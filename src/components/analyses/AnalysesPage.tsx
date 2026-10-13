@@ -335,7 +335,7 @@ function Presentation() {
         </Rev>
         </Lift>
         <Lift>
-        <Rev as="a" href="/france/economie/dette-publique-v2" className="ax-bloc ax-bloc-c" d={180}>
+        <Rev as="a" href="/france/economie/dette-publique" className="ax-bloc ax-bloc-c" d={180}>
           <span className="ax-bloc-i"><BookOpen size={18} aria-hidden="true" /></span>
           <h3>Des articles décortiqués</h3>
           <p>Le montant d&apos;abord, l&apos;explication ensuite, la source toujours.</p>
@@ -688,7 +688,6 @@ function Cartes() {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const FILE_ARTICLES = [
-  { rubrique: "Économie", titre: "La dette publique pas à pas, en lecture longue", href: "/france/economie/dette-publique" },
   { rubrique: "Économie", titre: "PIB mondial : qui produit quoi" },
   { rubrique: "Démographie", titre: "Naissances et décès dans le monde, depuis le 1er janvier" },
   { rubrique: "Démographie", titre: "Les causes de mortalité, pays par pays" },
@@ -704,7 +703,7 @@ function Articles({ dette, lus = [] }: { dette: Props["dette"]; lus?: { rubrique
       </Rev>
       <div className="ax-na">
         <Lift>
-        <Rev as="a" href="/france/economie/dette-publique-v2" className="ax-dos ax-dos-une ax-na-une" d={0}>
+        <Rev as="a" href="/france/economie/dette-publique" className="ax-dos ax-dos-une ax-na-une" d={0}>
           <span className="ax-dos-e">Dette publique · France</span>
           <p className="ax-dos-v">
             {nf(dette.montant)}
@@ -719,7 +718,7 @@ function Articles({ dette, lus = [] }: { dette: Props["dette"]; lus?: { rubrique
 
         <Rev className="ax-na-rail" d={120}>
           <ul className="ax-na-piste" {...glisse}>
-            {[...FILE_ARTICLES.slice(0, 1), ...lus, ...FILE_ARTICLES.slice(1)].map((a, i) => {
+            {[...lus, ...FILE_ARTICLES].map((a, i) => {
               const lien = "href" in a ? a.href : undefined;
               const corps = (
                 <>

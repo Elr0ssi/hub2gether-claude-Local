@@ -4462,19 +4462,19 @@ body:has(.cg) { background: #05080c; }
    `:where` : il ne pèse rien, et toute règle plus précise (ceux qu'on masque
    volontairement) garde la main.
    ═══════════════════════════════════════════════════════════════════════════ */
-:where(.cg, .d2, .ax) * {
+:where(.cg, .dos, .ax) * {
   scrollbar-width: thin;
   scrollbar-color: rgba(138, 108, 255, 0.45) transparent;
 }
-:where(.cg, .d2, .ax) *::-webkit-scrollbar { width: 8px; height: 8px; }
-:where(.cg, .d2, .ax) *::-webkit-scrollbar-track { background: transparent; }
-:where(.cg, .d2, .ax) *::-webkit-scrollbar-thumb {
+:where(.cg, .dos, .ax) *::-webkit-scrollbar { width: 8px; height: 8px; }
+:where(.cg, .dos, .ax) *::-webkit-scrollbar-track { background: transparent; }
+:where(.cg, .dos, .ax) *::-webkit-scrollbar-thumb {
   background: rgba(138, 108, 255, 0.4);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
-:where(.cg, .d2, .ax) *::-webkit-scrollbar-thumb:hover {
+:where(.cg, .dos, .ax) *::-webkit-scrollbar-thumb:hover {
   background: rgba(138, 108, 255, 0.75);
   background-clip: content-box;
 }

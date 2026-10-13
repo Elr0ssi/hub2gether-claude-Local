@@ -1,5 +1,6 @@
 import "server-only";
 import type { FicheArticle } from "@/data/concept/conceptGeo";
+import { CATALOGUE_DETTE, estRedige } from "@/articles/dette/catalogue";
 import { ANALYSES } from "./analyses";
 import { tousLesDossiers } from "./dossiers";
 
@@ -15,6 +16,16 @@ const RUBRIQUE = "Dette publique";
 
 /** Les analyses, puis les dossiers des pays aux plus grosses dettes. */
 export function articlesDette(nDossiers = 10): FicheArticle[] {
+  /* Les articles écrits à la main d'abord : ce sont les plus riches. */
+  const rediges: FicheArticle[] = CATALOGUE_DETTE.map((a) => ({
+    slug: `dette-article-${a.slug}`,
+    titre: a.titre,
+    chapo: a.accroche,
+    rubrique: RUBRIQUE,
+    duree: "12 min",
+    mots: a.mots,
+    href: a.url,
+  }));
   const analyses: FicheArticle[] = ANALYSES.map((a) => ({
     slug: `dette-analyse-${a.slug}`,
     titre: `${a.h1[0]} ${a.h1[1]}`.replace(/\s+/g, " ").trim(),
@@ -25,7 +36,7 @@ export function articlesDette(nDossiers = 10): FicheArticle[] {
     href: `/dette-publique/analyses/${a.slug}`,
   }));
   const dossiers: FicheArticle[] = tousLesDossiers()
-    .filter((d) => d.slug !== "france")
+    .filter((d) => !estRedige(d.slug))
     .sort((a, b) => b.d2024 - a.d2024)
     .slice(0, nDossiers)
     .map((d) => ({
@@ -37,5 +48,5 @@ export function articlesDette(nDossiers = 10): FicheArticle[] {
       mots: `dette · endettement · ${d.fr}`.toLowerCase(),
       href: `/dette-publique/${d.slug}`,
     }));
-  return [...analyses, ...dossiers];
+  return [...rediges, ...analyses, ...dossiers];
 }

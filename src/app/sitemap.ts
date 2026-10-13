@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { ARTICLES } from "@/data/articles";
+import { CATALOGUE_DETTE, estRedige } from "@/articles/dette/catalogue";
 import { ANALYSES } from "@/data/dettes/analyses";
 import { tousLesDossiers } from "@/data/dettes/dossiers";
 import { pairesVedettes, paysVedettes, slugPaire, tousLesPays } from "@/data/seo/pays";
@@ -8,21 +9,21 @@ import { SITE_URL as siteUrl } from "@/lib/site";
 const LAST_MODIFIED_STATIC = new Date("2025-07-01");
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const articlePages = ARTICLES.map((article) => ({
+  /* « dette-publique-france-2025-enjeux » redirige vers l'article long : il est déclaré par le catalogue. */
+  const articlePages = ARTICLES.filter((a) => a.slug !== "dette-publique-france-2025-enjeux").map((article) => ({
     url: `${siteUrl}/articles/${article.slug}`,
     lastModified: new Date(article.publishedAt),
     changeFrequency: "monthly" as const,
     priority: 0.6,
   }));
 
-  /* L'article « dette publique française » : une page à part entière, donc
-     une entrée à part entière. */
-  const dette = {
-    url: `${siteUrl}/france/economie/dette-publique`,
-    lastModified: new Date("2026-09-21"),
+  /* Les articles de dette écrits à la main : une entrée chacun, à leur adresse canonique. */
+  const articlesDette = CATALOGUE_DETTE.map((a) => ({
+    url: `${siteUrl}${a.url}`,
+    lastModified: new Date(a.modifie),
     changeFrequency: "monthly" as const,
     priority: 0.9,
-  };
+  }));
 
   /* Les pages de rubrique et les pages de confiance. Elles n'étaient pas
      déclarées : deux d'entre elles n'existaient même pas, alors que le fil
@@ -64,7 +65,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const dettes = [
     { url: `${siteUrl}/dette-publique`, priority: 0.85, changeFrequency: "monthly" as const, lastModified: aujourdhui },
     ...ANALYSES.map((a) => ({ url: `${siteUrl}/dette-publique/analyses/${a.slug}`, priority: 0.75, changeFrequency: "monthly" as const, lastModified: aujourdhui })),
-    ...tousLesDossiers().filter((d) => d.slug !== "france").map((d) => ({
+    ...tousLesDossiers().filter((d) => !estRedige(d.slug)).map((d) => ({
       url: `${siteUrl}/dette-publique/${d.slug}`,
       priority: 0.65,
       changeFrequency: "monthly" as const,
@@ -81,7 +82,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...dettes,
     ...pays,
     ...paires,
-    dette,
+    ...articlesDette,
     ...rubriques,
     {
       url: siteUrl,

@@ -6,11 +6,12 @@ import { useMonnaieArticle } from "@/components/concept/Monnaie";
 import { Faq } from "@/components/seo/Elements";
 import { fmtMontant, fmtUnitaire } from "@/lib/montant";
 import { ANALYSES, analyseParSlug } from "@/data/dettes/analyses";
+import { adresseDette } from "@/articles/dette/catalogue";
 import type { Dossier } from "@/data/dettes/dossiers";
 import "@/components/seo/seo.css";
 import "./dette-dossier.css";
 
-const lien = (slug: string) => (slug === "france" ? "/france/economie/dette-publique" : `/dette-publique/${slug}`);
+const lien = adresseDette;
 
 /** Une analyse comparative : les phrases et les tableaux sont recalculés dans la monnaie du lecteur. */
 export function AnalyseDette({ slug, dossiers }: { slug: string; dossiers: Dossier[] }) {

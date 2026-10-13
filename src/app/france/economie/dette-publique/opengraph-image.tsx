@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { detteDerniere, ratioDernier } from "@/data/articles/detteFrancaise";
+import { detteDerniere, ratioDernier } from "@/articles/dette/france/donnees/detteFrancaise";
 
 /* L'image partagée. Elle est composée ici plutôt que dessinée à la main : le
    jour où la dette change dans la base, la vignette change avec elle. */

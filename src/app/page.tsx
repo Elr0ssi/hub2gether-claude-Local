@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { AnalysesPage } from "@/components/analyses/AnalysesPage";
-import { detteDerniere, ratioDernier } from "@/data/articles/detteFrancaise";
-import { DEFICIT_2025 } from "@/data/articles/financesPubliques";
+import { detteDerniere, ratioDernier } from "@/articles/dette/france/donnees/detteFrancaise";
+import { DEFICIT_2025 } from "@/articles/dette/france/donnees/financesPubliques";
 import { donneesPays, reperes } from "@/data/concept/conceptGeo";
 import { FAQ_ACCUEIL } from "@/data/seo/faqAccueil";
 import { JsonLd, schemaFaq } from "@/components/seo/Elements";

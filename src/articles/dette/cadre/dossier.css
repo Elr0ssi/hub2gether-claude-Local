@@ -1,0 +1,1154 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE STYLE DES ARTICLES LONGS (préfixe de classes : `dos-`)
+
+   Une direction néo-média : des cartes très arrondies, un violet électrique,
+   des aplats doux, de gros chiffres et des pastilles qui flottent. Les
+   jetons (`--dos-*`) suivent le thème du site — nuit par défaut, jour quand
+   `data-concept="clair"` est posé sur la racine.
+
+   Utilisé par toutes les briques de `src/articles/dette/cadre/`. Les figures
+   propres à la France (`france/figures/`) gardent leurs classes `dp-*`, dans
+   `figures.css` : on les rhabille ici en remappant leurs jetons (`.dos-reuse`).
+
+   Un besoin propre à un seul pays va dans un fichier CSS du dossier du pays,
+   pas ici.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.dos {
+  --dos-bg: #0a0912;
+  --dos-surface: #14121f;
+  --dos-surface-2: #1c1a2e;
+  --dos-ligne: rgba(255, 255, 255, 0.09);
+  --dos-encre: #f5f3ff;
+  --dos-encre-2: #bdb8da;
+  --dos-encre-3: #8c86ad;
+  --dos-vif: #7c4dff;
+  --dos-vif-2: #a583ff;
+  --dos-vif-doux: rgba(124, 77, 255, 0.16);
+  --dos-menthe: #4be3a8;
+  --dos-corail: #ff7a8a;
+  --dos-ombre: 0 24px 60px -28px rgba(0, 0, 0, 0.7);
+  --dos-lueur-a: rgba(124, 77, 255, 0.32);
+  --dos-lueur-b: rgba(255, 122, 138, 0.14);
+
+  position: relative;
+  background: var(--dos-bg);
+  color: var(--dos-encre);
+  font-variant-numeric: tabular-nums;
+  overflow-x: clip;
+}
+
+:root[data-concept="clair"] .dos {
+  --dos-bg: #f5f2fc;
+  --dos-surface: #ffffff;
+  --dos-surface-2: #efe9fb;
+  --dos-ligne: rgba(30, 20, 80, 0.1);
+  --dos-encre: #15102e;
+  --dos-encre-2: #4b4570;
+  --dos-encre-3: #766f9a;
+  --dos-vif: #5b2de0;
+  --dos-vif-2: #6f45f0;
+  --dos-vif-doux: rgba(91, 45, 224, 0.1);
+  --dos-menthe: #0c8a5c;
+  --dos-corail: #d03a55;
+  --dos-ombre: 0 24px 50px -30px rgba(60, 30, 140, 0.35);
+  --dos-lueur-a: rgba(140, 100, 255, 0.28);
+  --dos-lueur-b: rgba(255, 150, 190, 0.22);
+}
+
+body:has(.dos) { background: #0a0912; }
+:root[data-concept="clair"] body:has(.dos) { background: #f5f2fc; }
+
+/* Le fond : deux lueurs douces, fixes, qui ne coûtent aucun calcul. */
+.dos-fond {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 900px;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 60% at 18% 8%, var(--dos-lueur-a), transparent 70%),
+    radial-gradient(50% 50% at 88% 22%, var(--dos-lueur-b), transparent 70%);
+}
+
+/* ── Progression et sommaire ───────────────────────────────────────────── */
+
+.dos-barre {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 60;
+  background: var(--dos-ligne);
+}
+.dos-barre span {
+  display: block;
+  height: 100%;
+  transform-origin: left;
+  background: linear-gradient(90deg, var(--dos-vif), var(--dos-vif-2), var(--dos-corail));
+}
+
+/* ── Ouverture ─────────────────────────────────────────────────────────── */
+
+.dos-ouv {
+  position: relative;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: clamp(120px, 17vh, 180px) clamp(20px, 5vw, 48px) clamp(40px, 6vh, 64px);
+  text-align: center;
+}
+.dos-fil {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--dos-encre-3);
+}
+.dos-fil a { color: inherit; text-decoration: none; }
+.dos-fil a:hover { color: var(--dos-vif-2); }
+
+.dos-puce {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--dos-vif-2);
+  background: var(--dos-vif-doux);
+  border: 1px solid color-mix(in srgb, var(--dos-vif) 30%, transparent);
+}
+:root[data-concept="clair"] .dos-puce { color: var(--dos-vif); }
+.dos-point {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dos-menthe);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--dos-menthe) 60%, transparent);
+  animation: dos-bat 2.2s ease-out infinite;
+}
+@keyframes dos-bat {
+  70% { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.dos-h1 { margin: 22px 0 0; font-weight: 800; letter-spacing: -0.045em; line-height: 0.96; }
+.dos-h1-s {
+  display: block;
+  font-size: clamp(17px, 2vw, 22px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--dos-encre-2);
+}
+.dos-h1-v {
+  display: block;
+  margin-top: 10px;
+  font-size: clamp(64px, 14vw, 168px);
+  background: linear-gradient(120deg, var(--dos-encre) 20%, var(--dos-vif-2) 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding-bottom: 0.06em;
+}
+.dos-h1-v small {
+  margin-left: 0.14em;
+  font-size: 0.36em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  -webkit-text-fill-color: var(--dos-encre-3);
+}
+
+.dos-chapo {
+  max-width: 54ch;
+  margin: 22px auto 0;
+  font-size: clamp(16px, 1.6vw, 19px);
+  line-height: 1.55;
+  color: var(--dos-encre-2);
+}
+.dos-chapo b { color: var(--dos-encre); }
+.dos .dos-src { display: inline-block; margin-top: 12px; font-size: 12px; }
+
+.dos-puces {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  list-style: none;
+  margin: 34px 0 0;
+  padding: 0;
+}
+.dos-flotte {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dos-encre);
+  text-decoration: none;
+  background: color-mix(in srgb, var(--dos-surface) 86%, transparent);
+  border: 1px solid var(--dos-ligne);
+  box-shadow: var(--dos-ombre);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  animation: dos-flotte 6s ease-in-out infinite;
+  transition: border-color 0.25s, transform 0.25s;
+}
+.dos-flotte svg { color: var(--dos-vif-2); }
+.dos-flotte:hover { border-color: var(--dos-vif); }
+.dos-flotte-b { animation-delay: -2s; }
+.dos-flotte-c { animation-delay: -4s; }
+@keyframes dos-flotte {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ── La grille : sommaire, colonne, rail ───────────────────────────────── */
+
+.dos-grille {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 40px) 120px;
+}
+.dos-col { min-width: 0; }
+
+.dos-som {
+  display: none;
+}
+.dos-rail { display: grid; gap: 14px; align-content: start; }
+
+@media (min-width: 1100px) {
+  .dos-grille { grid-template-columns: minmax(0, 1fr) 280px; }
+  .dos-rail { position: sticky; top: 92px; align-self: start; }
+}
+@media (min-width: 1380px) {
+  .dos-grille { grid-template-columns: 188px minmax(0, 1fr) 290px; }
+  .dos-som {
+    display: block;
+    position: sticky;
+    top: 92px;
+    align-self: start;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .dos-col { grid-column: 2; grid-row: 1; }
+  .dos-rail { grid-column: 3; grid-row: 1; }
+}
+/* Le sommaire est dans l'arbre avant la grille : sur grand écran on le
+   range dans sa colonne, ailleurs il disparaît. */
+.dos-som-t, .dos-rail-t {
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dos-encre-3);
+}
+.dos-som ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.dos-som a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--dos-encre-3);
+  text-decoration: none;
+  transition: background 0.25s, color 0.25s;
+}
+.dos-som a span { font-size: 10.5px; font-weight: 700; opacity: 0.7; }
+.dos-som a:hover { color: var(--dos-encre); }
+.dos-som a.dos-som-on { color: var(--dos-encre); background: var(--dos-vif-doux); }
+.dos-som a.dos-som-on span { color: var(--dos-vif-2); opacity: 1; }
+
+/* ── Les chapitres ─────────────────────────────────────────────────────── */
+
+.dos-chap {
+  position: relative;
+  margin-bottom: 28px;
+  padding: clamp(22px, 3.4vw, 40px);
+  border-radius: 32px;
+  background: var(--dos-surface);
+  border: 1px solid var(--dos-ligne);
+  box-shadow: var(--dos-ombre);
+  scroll-margin-top: 84px;
+}
+.dos-chap-t { margin-bottom: 26px; }
+.dos-chap-n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--dos-vif), var(--dos-vif-2));
+}
+.dos-chap-t h2 {
+  margin: 14px 0 0;
+  font-size: clamp(25px, 3.3vw, 38px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+.dos-chap-r {
+  margin: 14px 0 0;
+  max-width: 62ch;
+  font-size: 16.5px;
+  line-height: 1.55;
+  color: var(--dos-encre-2);
+}
+.dos-chap-r b { color: var(--dos-encre); font-weight: 700; }
+
+.dos-h3 {
+  margin: 38px 0 16px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.dos-h3-r { margin-top: 30px; }
+
+.dos-notule {
+  margin: 18px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--dos-encre-3);
+}
+.dos-notule a { color: var(--dos-vif-2); }
+:root[data-concept="clair"] .dos-notule a { color: var(--dos-vif); }
+
+.dos-pours { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+.dos-pour {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--dos-encre);
+  text-decoration: none;
+  background: var(--dos-surface-2);
+  border: 1px solid var(--dos-ligne);
+  transition: border-color 0.25s, color 0.25s;
+}
+.dos-pour:hover { border-color: var(--dos-vif); color: var(--dos-vif-2); }
+
+/* ── Le bento des six chiffres ─────────────────────────────────────────── */
+
+.dos-bento {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+.dos-carte {
+  position: relative;
+  margin: 0;
+  padding: 22px;
+  border-radius: 24px;
+  background: var(--dos-surface-2);
+  border: 1px solid var(--dos-ligne);
+  overflow: hidden;
+}
+.dos-c-a { grid-column: span 3; grid-row: span 2; }
+.dos-c-b { grid-column: span 3; }
+.dos-c-c { grid-column: span 3; }
+.dos-c-d, .dos-c-e, .dos-c-f { grid-column: span 2; }
+
+.dos-carte-vif {
+  color: #fff;
+  background:
+    radial-gradient(90% 70% at 100% 0%, rgba(255, 255, 255, 0.22), transparent 60%),
+    linear-gradient(145deg, #5b2de0, #8a5cff);
+  border-color: transparent;
+}
+.dos-carte-vif .dos-carte-l,
+.dos-carte-vif .dos-carte-t { color: rgba(255, 255, 255, 0.86); }
+.dos-carte-vif .dos-ico { background: rgba(255, 255, 255, 0.18); color: #fff; }
+
+.dos-ico {
+  box-sizing: content-box;
+  padding: 9px;
+  border-radius: 14px;
+  color: var(--dos-vif-2);
+  background: var(--dos-vif-doux);
+}
+:root[data-concept="clair"] .dos-ico { color: var(--dos-vif); }
+.dos-carte-v {
+  margin: 22px 0 0;
+  white-space: nowrap;
+  font-size: clamp(24px, 2.5vw, 34px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.dos-c-a .dos-carte-v { font-size: clamp(44px, 5vw, 72px); margin-top: 38px; }
+.dos-neg { color: var(--dos-corail); }
+.dos-carte-l { margin: 10px 0 0; font-size: 14.5px; font-weight: 600; color: var(--dos-encre); }
+.dos-carte-t { margin: 8px 0 0; font-size: 13px; line-height: 1.5; color: var(--dos-encre-3); }
+
+@media (max-width: 760px) {
+  .dos-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dos-c-a { grid-column: span 2; grid-row: auto; }
+  .dos-c-b, .dos-c-c { grid-column: span 1; }
+  .dos-c-d, .dos-c-e, .dos-c-f { grid-column: span 1; }
+  .dos-c-f { grid-column: span 2; }
+  .dos-carte { padding: 18px; }
+  .dos-carte-v { font-size: clamp(20px, 5.6vw, 28px); }
+  .dos-c-a .dos-carte-v { font-size: clamp(40px, 12vw, 56px); }
+}
+
+/* ── L'équation recettes − dépenses = déficit ──────────────────────────── */
+
+.dos-equa {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1.2fr);
+  gap: 10px;
+  align-items: stretch;
+}
+.dos-equa-c {
+  position: relative;
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--dos-surface-2);
+  border: 1px solid var(--dos-ligne);
+  overflow: hidden;
+}
+.dos-equa-s {
+  align-self: center;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--dos-encre-3);
+}
+.dos-equa-l { margin: 0; font-size: 13px; font-weight: 600; color: var(--dos-encre-2); }
+.dos-equa-v {
+  margin: 8px 0 0;
+  font-size: clamp(19px, 2.1vw, 28px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  white-space: nowrap;
+}
+.dos-equa-b {
+  display: block;
+  height: 8px;
+  margin-top: 18px;
+  width: var(--p);
+  max-width: 100%;
+  border-radius: 99px;
+  background: var(--dos-menthe);
+}
+.dos-equa-dep .dos-equa-b { background: var(--dos-corail); }
+.dos-equa-def {
+  background: linear-gradient(145deg, rgba(255, 122, 138, 0.14), var(--dos-surface-2));
+  border-color: color-mix(in srgb, var(--dos-corail) 35%, transparent);
+}
+.dos-equa-def .dos-equa-v { color: var(--dos-corail); }
+.dos-equa-def .dos-equa-b { background: var(--dos-corail); }
+
+@media (max-width: 760px) {
+  .dos-equa { grid-template-columns: 1fr; }
+  .dos-equa-s { justify-self: center; line-height: 1; }
+}
+
+/* ── La pile des recettes ──────────────────────────────────────────────── */
+
+.dos { --dos-s0: #7c4dff; --dos-s1: #a583ff; --dos-s2: #4be3a8; --dos-s3: #ffb86b; --dos-s4: #ff7a8a; --dos-s5: #8c86ad; }
+:root[data-concept="clair"] .dos { --dos-s0: #5b2de0; --dos-s1: #8a63f5; --dos-s2: #0c8a5c; --dos-s3: #d98a2b; --dos-s4: #d03a55; }
+
+.dos-pile-b {
+  display: flex;
+  gap: 4px;
+  height: 46px;
+  padding: 4px;
+  border-radius: 18px;
+  background: var(--dos-surface-2);
+  border: 1px solid var(--dos-ligne);
+}
+.dos-pile-b span {
+  min-width: 6px;
+  border-radius: 12px;
+  background: var(--c);
+}
+.dos-pile-b span:nth-child(1) { --c: var(--dos-s0); }
+.dos-pile-b span:nth-child(2) { --c: var(--dos-s1); }
+.dos-pile-b span:nth-child(3) { --c: var(--dos-s2); }
+.dos-pile-b span:nth-child(4) { --c: var(--dos-s3); }
+.dos-pile-b span:nth-child(5) { --c: var(--dos-s4); }
+.dos-pile-l {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.dos-pile-l li {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr) auto 78px;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 4px;
+  border-bottom: 1px solid var(--dos-ligne);
+  font-size: 14.5px;
+}
+.dos-pile-l li:last-child { border-bottom: 0; }
+.dos-pile-l i { width: 12px; height: 12px; border-radius: 4px; background: var(--dos-s5); }
+.dos-pile-l li:nth-child(1) i { background: var(--dos-s0); }
+.dos-pile-l li:nth-child(2) i { background: var(--dos-s1); }
+.dos-pile-l li:nth-child(3) i { background: var(--dos-s2); }
+.dos-pile-l li:nth-child(4) i { background: var(--dos-s3); }
+.dos-pile-l li:nth-child(5) i { background: var(--dos-s4); }
+.dos-pile-l b { font-weight: 700; white-space: nowrap; }
+.dos-pile-l em { font-style: normal; font-size: 12.5px; color: var(--dos-encre-3); text-align: right; }
+.dos-pile-neg b { color: var(--dos-corail); }
+@media (max-width: 560px) {
+  .dos-pile-l li { grid-template-columns: 12px minmax(0, 1fr) auto; }
+  .dos-pile-l em { display: none; }
+}
+
+/* ── Le tableau des administrations ────────────────────────────────────── */
+
+.dos-table-c { margin-top: 20px; overflow-x: auto; border-radius: 20px; border: 1px solid var(--dos-ligne); }
+.dos-table { width: 100%; border-collapse: collapse; font-size: 14px; background: var(--dos-surface-2); }
+.dos-table caption {
+  padding: 14px 18px 0;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dos-encre-3);
+  caption-side: top;
+}
+.dos-table th, .dos-table td { padding: 13px 18px; text-align: right; white-space: nowrap; }
+.dos-table thead th { font-size: 12px; font-weight: 600; color: var(--dos-encre-3); }
+.dos-table tbody th { text-align: left; font-weight: 600; white-space: normal; }
+.dos-table tbody tr + tr > * { border-top: 1px solid var(--dos-ligne); }
+.dos-table thead th:first-child { text-align: left; }
+
+/* ── Les quatre coûts ──────────────────────────────────────────────────── */
+
+.dos-couts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.dos-cout {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px;
+  border-radius: 22px;
+  background: var(--dos-surface-2);
+  border: 1px solid var(--dos-ligne);
+}
+.dos-cout b { white-space: nowrap; font-size: clamp(20px, 2.3vw, 30px); font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+.dos-cout span { font-size: 14px; font-weight: 600; line-height: 1.35; }
+.dos-cout em { font-style: normal; font-size: 12px; color: var(--dos-encre-3); }
+.dos-cout-g {
+  grid-column: span 3;
+  color: #fff;
+  background: linear-gradient(145deg, #5b2de0, #8a5cff);
+  border-color: transparent;
+}
+.dos-cout-g b { font-size: clamp(40px, 5.4vw, 64px); }
+.dos-cout-g em { color: rgba(255, 255, 255, 0.78); }
+@media (max-width: 640px) {
+  .dos-couts { grid-template-columns: 1fr; }
+  .dos-cout-g { grid-column: auto; }
+}
+
+.dos-liste { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 0; }
+.dos-liste li {
+  display: grid;
+  grid-template-columns: minmax(0, 190px) 1fr;
+  align-items: baseline;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--dos-ligne);
+}
+.dos-liste li:last-child { border-bottom: 0; }
+.dos-liste b { font-size: 21px; font-weight: 800; letter-spacing: -0.03em; }
+.dos-liste span { font-size: 14.5px; line-height: 1.45; color: var(--dos-encre-2); }
+@media (max-width: 560px) { .dos-liste li { grid-template-columns: 1fr; gap: 2px; } }
+
+/* ── Le refinancement en trois temps ───────────────────────────────────── */
+
+.dos-flux { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: f; }
+.dos-flux-e {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  column-gap: 16px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: var(--dos-surface-2);
+  border: 1px solid var(--dos-ligne);
+}
+.dos-flux-e span {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--dos-vif), var(--dos-vif-2));
+}
+.dos-flux-e b { font-size: 16.5px; letter-spacing: -0.015em; align-self: end; }
+.dos-flux-e em { font-style: normal; font-size: 14px; line-height: 1.5; color: var(--dos-encre-2); }
+.dos-flux-e strong { color: var(--dos-encre); }
+
+/* ── La FAQ ────────────────────────────────────────────────────────────── */
+
+.dos-faq { display: grid; gap: 10px; }
+.dos-faq details {
+  border-radius: 20px;
+  background: var(--dos-surface-2);
+  border: 1px solid var(--dos-ligne);
+  transition: border-color 0.25s;
+}
+.dos-faq details[open] { border-color: color-mix(in srgb, var(--dos-vif) 45%, transparent); }
+.dos-faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px;
+  font-size: 15.5px;
+  font-weight: 650;
+  line-height: 1.35;
+  cursor: pointer;
+  list-style: none;
+}
+.dos-faq summary::-webkit-details-marker { display: none; }
+.dos-faq summary svg { flex: none; color: var(--dos-vif-2); transition: transform 0.3s; }
+.dos-faq details[open] summary svg { transform: rotate(180deg); }
+.dos-faq p { margin: 0; padding: 0 22px 20px; font-size: 14.5px; line-height: 1.6; color: var(--dos-encre-2); }
+
+/* ── La suite de la lecture ────────────────────────────────────────────── */
+
+.dos-suite { margin-top: 44px; }
+.dos-suite h2 { margin: 0 0 18px; font-size: clamp(24px, 3vw, 32px); font-weight: 800; letter-spacing: -0.035em; }
+.dos-suite-g { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.dos-sug {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 170px;
+  padding: 22px;
+  border-radius: 26px;
+  color: var(--dos-encre);
+  text-decoration: none;
+  background: var(--dos-surface);
+  border: 1px solid var(--dos-ligne);
+  box-shadow: var(--dos-ombre);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s;
+}
+.dos-sug:hover { transform: translateY(-4px); border-color: var(--dos-vif); }
+.dos-sug-r { font-size: 11.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dos-vif-2); }
+.dos-sug-t { font-size: 19px; font-weight: 750; letter-spacing: -0.025em; line-height: 1.22; }
+.dos-sug svg:last-child { margin-top: auto; align-self: flex-end; }
+.dos-sug-vif {
+  grid-column: span 2;
+  color: #fff;
+  background:
+    radial-gradient(80% 90% at 100% 0%, rgba(255, 255, 255, 0.2), transparent 60%),
+    linear-gradient(145deg, #5b2de0, #8a5cff);
+  border-color: transparent;
+}
+.dos-sug-vif .dos-sug-r { color: rgba(255, 255, 255, 0.8); }
+.dos-sug-vif .dos-sug-t { font-size: clamp(22px, 2.6vw, 30px); }
+.dos-sug-forum { grid-column: span 2; min-height: 0; flex-direction: row; align-items: center; background: var(--dos-surface-2); box-shadow: none; }
+.dos-sug-forum .dos-sug-t { font-size: 16.5px; }
+.dos-sug-forum svg:last-child { margin: 0 0 0 auto; }
+@media (max-width: 640px) {
+  .dos-suite-g { grid-template-columns: 1fr; }
+  .dos-sug-vif, .dos-sug-forum { grid-column: auto; }
+}
+
+/* ── Le rail de droite ─────────────────────────────────────────────────── */
+
+.dos-rail-c {
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--dos-surface);
+  border: 1px solid var(--dos-ligne);
+  box-shadow: var(--dos-ombre);
+}
+.dos-rail-c ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.dos-rail-c li a {
+  display: block;
+  padding: 11px 12px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  font-weight: 650;
+  line-height: 1.32;
+  color: var(--dos-encre);
+  text-decoration: none;
+  transition: background 0.25s;
+}
+.dos-rail-c li a:hover { background: var(--dos-vif-doux); }
+.dos-rail-c li a span {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dos-vif-2);
+}
+:root[data-concept="clair"] .dos-rail-c li a span { color: var(--dos-vif); }
+.dos-rail-explore { display: grid; gap: 4px; }
+.dos-rail-explore a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--dos-encre-2);
+  text-decoration: none;
+  transition: background 0.25s, color 0.25s;
+}
+.dos-rail-explore a svg { color: var(--dos-vif-2); flex: none; }
+.dos-rail-explore a:hover { background: var(--dos-vif-doux); color: var(--dos-encre); }
+.dos-rail-src p:not(.dos-rail-t) { margin: 0 0 10px; font-size: 13px; line-height: 1.5; color: var(--dos-encre-3); }
+.dos-rail-src a { font-size: 13px; font-weight: 600; color: var(--dos-vif-2); text-decoration: none; }
+:root[data-concept="clair"] .dos-rail-src a { color: var(--dos-vif); }
+
+/* Sous 1100 px, le rail passe sous le texte, en deux colonnes. */
+@media (max-width: 1099px) {
+  .dos-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dos-rail-c:first-child { grid-column: span 2; }
+}
+@media (max-width: 640px) {
+  .dos-rail { grid-template-columns: 1fr; }
+  .dos-rail-c:first-child { grid-column: auto; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES VISUELS REPRIS DE L'ARTICLE D'ORIGINE
+
+   On ne les réécrit pas : on remappe leurs jetons sur ceux du dossier, et on
+   neutralise le fond nocturne que `.dp` posait sur toute la page.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root .dos .dp.dos-reuse {
+  --nuit: transparent;
+  --nuit-2: transparent;
+  --surface: var(--dos-surface-2);
+  --surface-2: var(--dos-surface);
+  --encre: var(--dos-encre);
+  --encre-2: var(--dos-encre-2);
+  --encre-3: var(--dos-encre-3);
+  --vif: var(--dos-vif-2);
+  --vif-clair: var(--dos-vif-2);
+  --corail: var(--dos-corail);
+  --pousse: var(--dos-menthe);
+  --voile: var(--dos-encre);
+  background: none;
+  color: var(--dos-encre);
+}
+:root[data-concept="clair"] .dos .dp.dos-reuse {
+  --vif: var(--dos-vif);
+  --vif-clair: var(--dos-vif);
+}
+.dos .dos-reuse > * + * { margin-top: 14px; }
+
+/* ── Un peu de retenue pour le mouvement ───────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .dos-flotte, .dos-point { animation: none; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA SECONDE PASSE : figures, onglets, étapes, graphique, rail repliable
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Les jetons du carrousel de presse suivent ceux du dossier. */
+.dos {
+  --pc-carte: var(--dos-surface-2);
+  --pc-ligne: var(--dos-ligne);
+  --pc-vif: var(--dos-vif);
+  --pc-vif-2: var(--dos-vif-2);
+  --pc-doux: var(--dos-vif-doux);
+  --pc-encre-2: var(--dos-encre-2);
+  --pc-encre-3: var(--dos-encre-3);
+}
+.dos-chap-presse { padding-bottom: clamp(16px, 2vw, 24px); }
+
+/* Les périmètres sont retirés : la source suffit. */
+.dos .dos-reuse .dp-perim { display: none; }
+
+/* Le titre, plus épuré. */
+.dos-ouv { padding-bottom: clamp(28px, 5vh, 48px); }
+.dos-h1-v { font-size: clamp(60px, 12.5vw, 150px); }
+.dos-chapo { margin-top: 18px; font-size: clamp(15px, 1.5vw, 18px); }
+.dos-chapo a { color: var(--dos-vif-2); text-decoration: none; font-weight: 600; }
+:root[data-concept="clair"] .dos-chapo a { color: var(--dos-vif); }
+
+/* Les ancres de chapitre. */
+.dos-perma {
+  margin-left: 10px;
+  font-size: 0.6em;
+  font-weight: 600;
+  color: var(--dos-encre-3);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.dos-chap-t h2:hover .dos-perma, .dos-perma:focus-visible { opacity: 1; }
+
+/* ── Les figures ───────────────────────────────────────────────────────── */
+
+.dos-fig { margin: 0; scroll-margin-top: 90px; }
+.dos-fig-corps { display: block; }
+.dos-fig-l {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--dos-ligne);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--dos-encre-3);
+}
+.dos-fig-l p { margin: 0; max-width: 68ch; }
+.dos-fig-l b { color: var(--dos-encre-2); font-weight: 700; }
+.dos-fig-pied { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.dos-source, .dos-ancre, .dos-voir {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--dos-encre-2);
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--dos-ligne);
+  transition: border-color 0.25s, color 0.25s;
+}
+.dos-source:hover, .dos-ancre:hover, .dos-voir:hover { border-color: var(--dos-vif); color: var(--dos-vif-2); }
+:root[data-concept="clair"] .dos-source:hover, :root[data-concept="clair"] .dos-ancre:hover, :root[data-concept="clair"] .dos-voir:hover { color: var(--dos-vif); }
+.dos-voir { background: var(--dos-vif-doux); border-color: transparent; }
+
+/* ── Les onglets recettes / dépenses / déficit ─────────────────────────── */
+
+.dos-onglets {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1.2fr);
+  gap: 10px;
+  align-items: stretch;
+  margin-bottom: 22px;
+}
+.dos-onglets-s { align-self: center; font-size: 26px; font-weight: 700; color: var(--dos-encre-3); }
+.dos-onglet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 18px 20px;
+  border-radius: 24px;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  background: var(--dos-surface-2);
+  border: 1.5px solid var(--dos-ligne);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s, background 0.25s;
+}
+.dos-onglet:hover { transform: translateY(-3px); }
+.dos-onglet span { font-size: 13px; font-weight: 600; color: var(--dos-encre-2); }
+.dos-onglet b { font-size: clamp(19px, 2.1vw, 28px); font-weight: 800; letter-spacing: -0.04em; line-height: 1; white-space: nowrap; }
+.dos-onglet i { display: block; height: 7px; width: var(--p); max-width: 100%; border-radius: 99px; background: var(--dos-menthe); margin-top: 4px; }
+.dos-onglet-dep i { background: var(--dos-corail); }
+.dos-onglet-def i { background: var(--dos-corail); }
+.dos-onglet-def b { color: var(--dos-corail); }
+.dos-onglet[aria-selected="true"] {
+  border-color: var(--dos-vif);
+  background: linear-gradient(160deg, var(--dos-vif-doux), var(--dos-surface-2));
+  box-shadow: 0 0 0 4px var(--dos-vif-doux);
+}
+.dos-panneau { animation: dos-pan 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.dos-panneau[hidden] { display: none; }
+@keyframes dos-pan { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (max-width: 760px) {
+  .dos-onglets { grid-template-columns: 1fr; }
+  .dos-onglets-s { display: none; }
+}
+
+/* ── Le graphique par dates ────────────────────────────────────────────── */
+
+.dos-graphe { padding: 6px 0 0; }
+.dos-graphe-tete { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; min-height: 64px; }
+.dos-graphe-v { margin: 0; font-size: clamp(34px, 4.4vw, 52px); font-weight: 800; letter-spacing: -0.045em; line-height: 1; }
+.dos-graphe-v small { font-size: 0.4em; font-weight: 700; color: var(--dos-encre-3); letter-spacing: -0.01em; }
+.dos-graphe-d { margin: 0; font-size: 14px; font-weight: 600; color: var(--dos-vif-2); }
+:root[data-concept="clair"] .dos-graphe-d { color: var(--dos-vif); }
+.dos-barres { display: flex; align-items: stretch; gap: clamp(6px, 1.4vw, 14px); height: 240px; margin-top: 14px; }
+.dos-barre-c {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0;
+  color: var(--dos-encre-3);
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+.dos-barre-v { font-size: 13px; font-weight: 700; opacity: 0.85; }
+.dos-barre-z { flex: 1 1 0; min-height: 0; width: 100%; display: flex; align-items: flex-end; }
+.dos-barre-b {
+  display: block;
+  width: 100%;
+  min-height: 6px;
+  border-radius: 14px 14px 6px 6px;
+  background: var(--dos-surface-2);
+  border: 1px solid var(--dos-ligne);
+  transform-origin: bottom;
+  animation: dos-pousse 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+  transition: background 0.3s, border-color 0.3s;
+}
+@keyframes dos-pousse { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.dos-barre-a { font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.dos-barre-on .dos-barre-b { background: linear-gradient(180deg, var(--dos-vif-2), var(--dos-vif)); border-color: transparent; }
+.dos-barre-on { color: var(--dos-encre); }
+.dos-barre-on .dos-barre-v { opacity: 1; color: var(--dos-vif-2); }
+:root[data-concept="clair"] .dos-barre-on .dos-barre-v { color: var(--dos-vif); }
+.dos-donnees { margin-top: 18px; font-size: 13px; }
+.dos-donnees summary { cursor: pointer; font-weight: 600; color: var(--dos-encre-2); }
+.dos-donnees table { width: 100%; margin-top: 10px; border-collapse: collapse; }
+.dos-donnees th, .dos-donnees td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--dos-ligne); }
+.dos-donnees th:first-child { text-align: left; }
+
+/* ── Le total qui réconcilie ───────────────────────────────────────────── */
+
+.dos-total {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  margin: 0 0 20px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--dos-encre-2);
+  background: var(--dos-vif-doux);
+}
+.dos-total span { flex: none; font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dos-vif-2); }
+:root[data-concept="clair"] .dos-total span { color: var(--dos-vif); }
+
+/* ── Le dépliant des autres montants ───────────────────────────────────── */
+
+.dos-plus {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 10px 16px;
+  border-radius: 99px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--dos-encre);
+  cursor: pointer;
+  background: var(--dos-surface-2);
+  border: 1px solid var(--dos-ligne);
+}
+.dos-plus svg { transition: transform 0.3s; }
+.dos-plus-c { margin-top: 12px; padding: 16px 18px; border-radius: 18px; font-size: 14px; line-height: 1.6; color: var(--dos-encre-2); background: var(--dos-surface-2); animation: dos-pan 0.4s ease; }
+.dos-plus-c[hidden] { display: none; }
+.dos-plus-c p { margin: 0; }
+.dos-plus-c b { color: var(--dos-encre); }
+
+/* ── Les étapes cliquables ─────────────────────────────────────────────── */
+
+.dos-etapes { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr); gap: 14px; align-items: stretch; }
+.dos-etapes-l { display: grid; gap: 8px; align-content: start; }
+.dos-etapes-l button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  text-align: left;
+  font-size: 14.5px;
+  font-weight: 650;
+  color: var(--dos-encre-2);
+  cursor: pointer;
+  background: var(--dos-surface-2);
+  border: 1.5px solid var(--dos-ligne);
+  transition: border-color 0.25s, color 0.25s, transform 0.3s, background 0.25s;
+}
+.dos-etapes-l button span {
+  display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 10px;
+  font-size: 12px; font-weight: 800; color: var(--dos-encre-3); background: var(--dos-ligne);
+}
+.dos-etapes-l button:hover { color: var(--dos-encre); }
+.dos-etapes-l button.dos-etape-on { color: var(--dos-encre); border-color: var(--dos-vif); background: var(--dos-vif-doux); transform: translateX(6px); }
+.dos-etapes-l button.dos-etape-on span { color: #fff; background: linear-gradient(135deg, var(--dos-vif), var(--dos-vif-2)); }
+.dos-etapes-p {
+  position: relative;
+  padding: clamp(20px, 3vw, 30px);
+  border-radius: 26px;
+  color: #fff;
+  background:
+    radial-gradient(80% 70% at 100% 0%, rgba(255, 255, 255, 0.2), transparent 60%),
+    linear-gradient(150deg, #4a1fd0, #7c4dff);
+}
+.dos-etape-p { animation: dos-pan 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.dos-etape-p[hidden] { display: none; }
+.dos-etape-c { margin: 0 0 14px; font-size: clamp(24px, 3vw, 36px); font-weight: 800; letter-spacing: -0.04em; line-height: 1.05; }
+.dos-etape-p h3 { margin: 0; font-size: 17px; font-weight: 700; opacity: 0.9; }
+.dos-etape-p p:not(.dos-etape-c) { margin: 10px 0 0; font-size: 15px; line-height: 1.6; color: rgba(255, 255, 255, 0.9); }
+@media (max-width: 760px) {
+  .dos-etapes { grid-template-columns: 1fr; }
+  .dos-etapes-l button.dos-etape-on { transform: none; }
+}
+
+/* ── Le rail de droite : défilant et repliable ─────────────────────────── */
+
+@media (min-width: 1100px) {
+  .dos-rail { max-height: calc(100vh - 112px); overflow-y: auto; padding-right: 4px; scrollbar-width: thin; }
+}
+.dos-rail-c { padding: 8px; }
+.dos-rail-b {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dos-encre-3);
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+.dos-rail-b svg { transition: transform 0.3s; }
+.dos-rail-b svg.dos-rail-ouv, .dos-plus svg.dos-rail-ouv { transform: rotate(180deg); }
+.dos-rail-corps { padding: 0 4px 6px; animation: dos-pan 0.35s ease; }
+.dos-rail-corps[hidden] { display: none; }
+.dos-rail-c ul { padding: 0; }
+.dos-rail-explore .dos-rail-corps { display: grid; gap: 4px; }
+.dos-rail-explore a { gap: 12px; }
+.dos-rail-i {
+  display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 10px;
+  color: var(--dos-vif-2); background: var(--dos-vif-doux);
+}
+:root[data-concept="clair"] .dos-rail-i { color: var(--dos-vif); }
+.dos-rail-src .dos-rail-corps { padding: 0 12px 12px; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA TROISIÈME PASSE : tailles resserrées, un seul visuel pour les trois onglets
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.dos-h1-v { font-size: clamp(52px, 10vw, 118px); }
+.dos-chap { padding: clamp(18px, 2.6vw, 32px); }
+.dos-chap-t h2 { font-size: clamp(22px, 2.7vw, 32px); }
+.dos-carte { padding: 18px; border-radius: 22px; }
+.dos-carte-v { font-size: clamp(19px, 1.9vw, 26px); margin-top: 16px; }
+.dos-c-a .dos-carte-v { font-size: clamp(34px, 3.8vw, 52px); margin-top: 28px; }
+.dos-carte-l { font-size: 13.5px; }
+.dos-onglet { padding: 14px 16px; border-radius: 20px; }
+.dos-onglet b { font-size: clamp(17px, 1.8vw, 23px); }
+.dos-cout { padding: 16px; }
+.dos-cout b { font-size: clamp(18px, 1.9vw, 24px); }
+.dos-cout-g b { font-size: clamp(30px, 3.6vw, 46px); }
+.dos-graphe-v { font-size: clamp(28px, 3.4vw, 42px); }
+
+.dos-rep { display: block; }
+.dos-rep .dos-pile-b span { transition: opacity 0.3s ease, filter 0.3s ease; cursor: default; }
+.dos-rep .dos-pile-b span.dos-seg-sombre { opacity: 0.3; }
+.dos-pile-l li { border-radius: 12px; padding-left: 8px; padding-right: 8px; transition: background 0.25s; }
+.dos-pile-l li.dos-pile-on { background: var(--dos-vif-doux); }
+.dos-pile-l i { background: var(--dos-s5); }
+.dos-lectures { display: inline-flex; gap: 4px; margin-bottom: 14px; padding: 4px; border-radius: 999px; background: var(--dos-surface-2); border: 1px solid var(--dos-ligne); }
+.dos-lectures button { padding: 8px 16px; border: 0; border-radius: 999px; font-size: 13px; font-weight: 650; color: var(--dos-encre-2); cursor: pointer; background: none; transition: background 0.25s, color 0.25s; }
+.dos-lectures button.dos-lec-on { color: #fff; background: linear-gradient(135deg, var(--dos-vif), var(--dos-vif-2)); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   QUATRIÈME PASSE : une palette dans nos tons, des onglets plus nets, du survol
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Du violet au rose, en dégradé : plus de vert, de moutarde ni de rouge. */
+.dos { --dos-s0: #5b2de0; --dos-s1: #7c4dff; --dos-s2: #9b78ff; --dos-s3: #b79cff; --dos-s4: #d0a6ff; --dos-s5: #e8a2d8; --dos-s6: #7e8cff; --dos-s7: #8c86ad; }
+:root[data-concept="clair"] .dos { --dos-s0: #4a1fd0; --dos-s1: #6a3df0; --dos-s2: #8a63f5; --dos-s3: #a98bfa; --dos-s4: #c28cf5; --dos-s5: #dc86c4; --dos-s6: #6a78e8; --dos-s7: #766f9a; }
+.dos-pile-b span { background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 70%); }
+.dos-pile-l i { background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0)); }
+
+/* Les trois onglets : sobres au repos, pleins quand ils sont choisis. */
+.dos-onglet { border-width: 1px; box-shadow: none; transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s, border-color 0.3s, color 0.3s; }
+.dos-onglet:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--dos-vif) 45%, transparent); }
+.dos-onglet i,
+.dos-onglet-dep i,
+.dos-onglet-def i { background: linear-gradient(90deg, var(--dos-vif), var(--dos-vif-2)); opacity: 0.7; }
+.dos-onglet-def b { color: var(--dos-encre); }
+.dos-onglet[aria-selected="true"],
+.dos-onglet[aria-selected="true"]:hover {
+  border-color: transparent;
+  color: #fff;
+  background: radial-gradient(90% 80% at 100% 0%, rgba(255, 255, 255, 0.22), transparent 60%), linear-gradient(150deg, #4a1fd0, #7c4dff);
+  box-shadow: 0 18px 34px -20px rgba(124, 77, 255, 0.9);
+}
+.dos-onglet[aria-selected="true"] span,
+.dos-onglet[aria-selected="true"] b { color: #fff; }
+.dos-onglet[aria-selected="true"] i { background: rgba(255, 255, 255, 0.8); opacity: 1; }
+
+/* Du survol sur les rectangles, partout. */
+.dos-carte,
+.dos-cout,
+.dos-flux-e,
+.dos-etapes-l button,
+.dos-rail-c,
+.dos-faq details {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s, box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1), background 0.3s;
+}
+.dos-carte:hover,
+.dos-cout:hover { transform: translateY(-7px); box-shadow: 0 18px 38px var(--dos-ombre, rgba(0, 0, 0, 0.42)); }
+:root[data-concept="clair"] .dos { --dos-ombre: rgba(14, 17, 22, 0.14); }
+.dos-carte-vif:hover { border-color: transparent; }
+.dos-faq details:hover { border-color: color-mix(in srgb, var(--dos-vif) 40%, transparent); }
+
+/* Les visuels repris suivent la même palette. */
+.dos .dp-porteurs { --c0: #7c4dff; --c1: #a98bfa; --c2: #c9a8ff; --c3: #e8a2d8; --c4: #8c86ad; }
+.dos .dp-porteurs-l li:nth-child(1) .dp-porteurs-p { background: var(--c0); }
+
+.dos-rail-pt { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dos-vif-2); margin-bottom: 2px; }
+.dos-rail-explore a { align-items: flex-start; line-height: 1.3; }
+
+/* ── Le lever des blocs (<Leve>) : ils apparaissent en entrant dans l'écran ─── */
+
+.dos-leve {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dos-leve[data-vu="1"] { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .dos-leve { opacity: 1 !important; transform: none !important; }
+}

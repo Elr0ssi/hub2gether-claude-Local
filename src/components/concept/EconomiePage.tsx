@@ -191,7 +191,7 @@ const DEPENSES_ECO: { id: string; label: string; parSeconde: number }[] = [
 
 /** Les articles de la rédaction qui ont déjà leur page. */
 const LIENS_ARTICLES: Record<string, string | undefined> = {
-  "dette-publique-france-2025-enjeux": "/france/economie/dette-publique-v2",
+  "dette-publique-france-2025-enjeux": "/france/economie/dette-publique",
 };
 
 /** L'adresse d'un article : la sienne, sinon celle de la table. */

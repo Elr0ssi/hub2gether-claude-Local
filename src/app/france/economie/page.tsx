@@ -7,7 +7,7 @@ import {
   detteDerniere,
   nonResidents,
   ratioDernier,
-} from "@/data/articles/detteFrancaise";
+} from "@/articles/dette/france/donnees/detteFrancaise";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    /france/economie — LA RUBRIQUE

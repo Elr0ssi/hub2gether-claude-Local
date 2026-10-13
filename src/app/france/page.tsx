@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Layout } from "@/components/layout/Layout";
 import { jsonLdString } from "@/lib/schema";
-import { detteDerniere, ratioDernier, deficit2025 } from "@/data/articles/detteFrancaise";
+import { detteDerniere, ratioDernier, deficit2025 } from "@/articles/dette/france/donnees/detteFrancaise";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    /france — LA TÊTE DE RUBRIQUE
