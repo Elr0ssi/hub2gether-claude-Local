@@ -17,8 +17,8 @@ export const CATALOGUE_DETTE: EntreeCatalogue[] = [
   // entreeItalie,       ← un article de plus = une ligne de plus
 ];
 
-/** L'adresse de la page de dette d'un pays : son article écrit à la main s'il existe,
- *  sinon le dossier généré automatiquement. */
+/** L'adresse de la page de dette d'un pays : son article écrit à la main s'il existe
+ *  (`/pays/<pays>/dette-publique`), sinon le dossier généré automatiquement (`/dette-publique/<pays>`). */
 export const adresseDette = (slug: string) =>
   CATALOGUE_DETTE.find((a) => a.slug === slug)?.url ?? `/dette-publique/${slug}`;
 

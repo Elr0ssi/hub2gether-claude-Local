@@ -48,18 +48,18 @@ Fichiers du site que les articles alimentent **automatiquement** (ne pas les éd
 
 | Ce qui se met à jour seul | Où c'est branché |
 |---|---|
-| La page `/dette-publique/<pays>` | `src/app/dette-publique/[slug]/page.tsx` (lit le registre) |
+| La page `/pays/<pays>/dette-publique` (sur la fiche du pays) | `src/app/pays/[slug]/dette-publique/page.tsx` (lit le registre) |
 | Le plan du site (`sitemap.xml`) | `src/app/sitemap.ts` (lit le catalogue) |
 | Les carrousels d'articles (Économie, accueil) | `src/data/dettes/fiches.ts` (lit le catalogue) |
 | Les liens vers la page d'un pays (classement, fiches pays, dossiers voisins) | `adresseDette(slug)` dans `catalogue.ts` |
-| Le dossier généré automatiquement du même pays | remplacé par l'article rédigé (même `slug`) |
+| Le dossier généré automatiquement du même pays (`/dette-publique/<pays>`) | redirige vers l'article rédigé (même `slug`) |
 
 ## 3. Deux sortes de pages de dette
 
 1. **Les dossiers générés** (88 pays) : `/dette-publique/<pays>`. Construits à partir de la table `src/data/economy/debtData.ts` par le gabarit `src/components/dettes/DossierDette.tsx`. Courts, identiques d'un pays à l'autre.
 2. **Les articles rédigés à la main** : riches, propres à un pays. Ils vivent dans `src/articles/dette/<pays>/`.
 
-Quand un article rédigé existe pour un pays, **il remplace le dossier généré** (même adresse `/dette-publique/<pays>`). La France fait exception : son article garde l'adresse `/france/economie/dette-publique`, et `/dette-publique/france` y redirige.
+Quand un article rédigé existe pour un pays, **il remplace le dossier généré** : il vit sur la fiche du pays, à l'adresse **`/pays/<pays>/dette-publique`** (par exemple `/pays/france/dette-publique`), et `/dette-publique/<pays>` y redirige. Son fil d'Ariane est « Accueil › Pays › <Pays> › Dette publique ».
 
 ## 4. Ajouter l'article d'un pays — pas à pas
 
@@ -68,8 +68,8 @@ Exemple : l'Italie (`slug` = `italie`).
 1. **Copier le gabarit.** Copier le dossier `src/articles/dette/_modele/` vers `src/articles/dette/italie/`.
 2. **Renommer.** Dans les 4 fichiers copiés : `entreeModele` → `entreeItalie`, `articleModele` → `articleItalie`, `ArticleModele` → `ArticleItalie`, « Pays modèle » → « Italie ».
 3. **Écrire les données** (`donnees.ts`) : remplacer les valeurs d'exemple par des chiffres **vérifiés**, chacun avec sa source exacte (organisme, période, adresse de la page). Montants en **milliards d'euros**, ratios en **% du PIB**. Si une donnée n'existe pas, ne pas l'inventer : le chapitre correspondant n'existe pas.
-4. **Écrire l'article** (`Article.tsx`) : définir `CHAPITRES` (le sommaire), puis un `<Chapitre>` par entrée, avec les briques adaptées aux données du pays. Voir la section 5 pour les briques ; `../france/Article.tsx` est l'exemple complet.
-5. **Remplir `catalogue.ts`** : `slug: "italie"`, `pays`, `drapeau`, `titre`, `accroche`, dates, `url: "/dette-publique/italie"`, `mots`.
+4. **Écrire l'article** (`Article.tsx`) : définir `CHAPITRES` (le sommaire), puis un `<Chapitre>` par entrée, avec les briques adaptées aux données du pays. Dans `<ArticleLong fil=…>`, le fil d'Ariane est Accueil › Pays › <Pays> › Dette publique (voir `france/Article.tsx`). Voir la section 5 pour les briques ; `france/Article.tsx` est l'exemple complet.
+5. **Remplir `catalogue.ts`** : `slug: "italie"` (le même que celui de la fiche `/pays/italie`), `pays`, `drapeau`, `titre`, `accroche`, dates, `url: "/pays/italie/dette-publique"`, `mots`.
 6. **Remplir `fiche.tsx`** : métadonnées (titre ≤ 65 caractères environ, description ≤ 160), Open Graph, données structurées (Article, FAQPage, éventuellement un Dataset par figure), résumé pour moteurs de réponse, suggestions de lecture.
 7. **Inscrire l'article** :
    - dans `src/articles/dette/catalogue.ts` : importer `entreeItalie` et l'ajouter à `CATALOGUE_DETTE` ;
@@ -124,13 +124,14 @@ On peut aussi écrire des **figures propres au pays** (comme `france/Deficit.tsx
 
 ```bash
 npm run build          # doit se terminer sans erreur ; la page doit apparaître dans la liste des routes
-npm run start -- -p 3300   # puis ouvrir http://localhost:3300/dette-publique/<pays>
+npm run start -- -p 3300   # puis ouvrir http://localhost:3300/pays/<pays>/dette-publique
 ```
 
 À contrôler à l'écran, en **clair et en sombre**, sur ordinateur et sur **téléphone (390 px)** :
 - aucun débordement horizontal, aucun texte coupé ;
 - changer la monnaie dans le menu (€ → $ → CN¥) : **tous** les montants changent, y compris dans les légendes et les tableaux ;
 - le sommaire suit la lecture ; chaque ancre `#…` fonctionne ;
+- le fil d'Ariane est « Accueil › Pays › <Pays> › Dette publique » et ses liens fonctionnent ;
 - la page apparaît dans `/sitemap.xml` et dans le carrousel d'articles de `/economie`.
 
 ## 9. Pièges connus
@@ -139,7 +140,7 @@ npm run start -- -p 3300   # puis ouvrir http://localhost:3300/dette-publique/<p
 - Oublier l'une des deux inscriptions (catalogue ou registre) fait échouer le démarrage avec un message explicite.
 - Le catalogue ne doit importer **aucun composant** (il est lu partout, il doit rester léger).
 - Les données en milliards d'euros : ne pas saisir des millions ou des unités.
-- `slug` : minuscules, sans accents, tirets (`etats-unis`, `royaume-uni`).
+- `slug` : celui de la fiche du pays (`/pays/<slug>`) — minuscules, sans accents, tirets (`etats-unis`, `royaume-uni`).
 - Ne pas toucher à `cadre/dossier.css` pour un besoin propre à un seul pays : créer un fichier CSS dans le dossier du pays.
 
 ## 10. Ailleurs dans le site (pour information)

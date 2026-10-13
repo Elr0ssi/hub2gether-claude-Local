@@ -78,7 +78,7 @@ export default function Page() {
           {dossiers.length} pays classés selon le poids de leur dette dans la richesse produite en 2024. En tête : {plus.flag} {plus.fr}, à {nf(plus.p2024, 1)} % du PIB. Chaque pays a son dossier : montant, évolution depuis 2000, créanciers, inflation et comparaisons.
         </p>
         <div className="sg-cta">
-          <Link href="/france/economie/dette-publique" className="sg-bouton">Le dossier sur la France</Link>
+          <Link href="/pays/france/dette-publique" className="sg-bouton">Le dossier sur la France</Link>
           <Link href="/comparer" className="sg-bouton sg-bouton-2">Comparer des pays</Link>
         </div>
 

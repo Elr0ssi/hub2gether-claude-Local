@@ -80,7 +80,7 @@ export function AnalyseDette({ slug, dossiers }: { slug: string; dossiers: Dossi
         <ul className="sg-liens">
           <li><Link href="/dette-publique">Classement complet : {dossiers.length} pays <ArrowUpRight size={14} aria-hidden="true" style={{ verticalAlign: "-2px" }} /></Link></li>
           {autres.slice(0, 5).map((a) => <li key={a.slug}><Link href={`/dette-publique/analyses/${a.slug}`}>{a.h1[0]} {a.h1[1]}</Link></li>)}
-          <li><Link href="/france/economie/dette-publique">Le dossier complet sur la dette de la France</Link></li>
+          <li><Link href="/pays/france/dette-publique">Le dossier complet sur la dette de la France</Link></li>
         </ul>
       </section>
     </>

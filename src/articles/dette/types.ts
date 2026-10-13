@@ -29,8 +29,7 @@ export interface EntreeCatalogue {
   /** Dates ISO, `AAAA-MM-JJ`. `modifie` change à chaque mise à jour des chiffres. */
   publie: string;
   modifie: string;
-  /** L'adresse canonique. Par défaut `/dette-publique/<slug>` ; la France garde la sienne
-   *  (`/france/economie/dette-publique`) pour ne pas perdre son référencement. */
+  /** L'adresse canonique : toujours `/pays/<slug>/dette-publique`, sur la fiche du pays. */
   url: string;
   /** Mots-clés qui rapprochent l'article d'un indicateur dans les carrousels (« dette · endettement · italie »). */
   mots: string;

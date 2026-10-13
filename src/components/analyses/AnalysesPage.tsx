@@ -335,7 +335,7 @@ function Presentation() {
         </Rev>
         </Lift>
         <Lift>
-        <Rev as="a" href="/france/economie/dette-publique" className="ax-bloc ax-bloc-c" d={180}>
+        <Rev as="a" href="/pays/france/dette-publique" className="ax-bloc ax-bloc-c" d={180}>
           <span className="ax-bloc-i"><BookOpen size={18} aria-hidden="true" /></span>
           <h3>Des articles décortiqués</h3>
           <p>Le montant d&apos;abord, l&apos;explication ensuite, la source toujours.</p>
@@ -703,7 +703,7 @@ function Articles({ dette, lus = [] }: { dette: Props["dette"]; lus?: { rubrique
       </Rev>
       <div className="ax-na">
         <Lift>
-        <Rev as="a" href="/france/economie/dette-publique" className="ax-dos ax-dos-une ax-na-une" d={0}>
+        <Rev as="a" href="/pays/france/dette-publique" className="ax-dos ax-dos-une ax-na-une" d={0}>
           <span className="ax-dos-e">Dette publique · France</span>
           <p className="ax-dos-v">
             {nf(dette.montant)}

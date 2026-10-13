@@ -14,9 +14,9 @@ import { FAQ, detteDerniere, nonResidents, ratioDernier } from "./donnees/detteF
    son titre pour les moteurs, ses données structurées, ses suggestions.
    C'est le modèle à suivre pour la fiche d'un autre pays (voir `../_modele/fiche.tsx`).
 
-   La France garde l'adresse qu'elle avait avant le chantier des articles :
-   `/france/economie/dette-publique`. Les autres pays vivent sous
-   `/dette-publique/<pays>`.
+   L'article vit sur la fiche du pays : `/pays/france/dette-publique`. (Les anciennes adresses
+   `/france/economie/dette-publique`, `-v2` et `/articles/dette-publique-france-2025-enjeux`
+   y redirigent : voir `next.config.ts`.)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const URL = entreeFrance.url;
@@ -113,8 +113,8 @@ function donneesStructurees(): object[] {
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Accueil", item: SITE_URL },
-        { "@type": "ListItem", position: 2, name: "France", item: `${SITE_URL}/france` },
-        { "@type": "ListItem", position: 3, name: "Économie", item: `${SITE_URL}/france/economie` },
+        { "@type": "ListItem", position: 2, name: "Pays", item: `${SITE_URL}/pays` },
+        { "@type": "ListItem", position: 3, name: "France", item: `${SITE_URL}/pays/france` },
         { "@type": "ListItem", position: 4, name: "Dette publique", item: page },
       ],
     },

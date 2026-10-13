@@ -179,7 +179,7 @@ export function DossierDette({ d }: { d: Dossier }) {
           <li><Link href={`/comparer?pays=${encodeURIComponent(d.nom)},France`}>Comparer {avec(d.fr)} et la France</Link></li>
           <li><Link href="/dette-publique">Classement mondial de la dette publique</Link></li>
           {ANALYSES.slice(0, 3).map((a) => <li key={a.slug}><Link href={`/dette-publique/analyses/${a.slug}`}>{a.h1[0]} {a.h1[1]}</Link></li>)}
-          <li><Link href="/france/economie/dette-publique">Le dossier complet sur la dette de la France <ArrowUpRight size={14} aria-hidden="true" style={{ verticalAlign: "-2px" }} /></Link></li>
+          <li><Link href="/pays/france/dette-publique">Le dossier complet sur la dette de la France <ArrowUpRight size={14} aria-hidden="true" style={{ verticalAlign: "-2px" }} /></Link></li>
         </ul>
       </section>
     </>

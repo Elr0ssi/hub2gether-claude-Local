@@ -135,7 +135,8 @@ export function ArticleFrance({ suggestions, sujet }: { suggestions: Suggestion[
     <ArticleLong
       fil={[
         { label: "Accueil", href: "/" },
-        { label: "France · Économie", href: "/france/economie" },
+        { label: "Pays", href: "/pays" },
+        { label: "France", href: "/pays/france" },
         { label: "Dette publique" },
       ]}
       surtitre="Dette publique de la France"

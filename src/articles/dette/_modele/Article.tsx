@@ -54,7 +54,12 @@ export function ArticleModele({ suggestions }: { suggestions: Suggestion[] }) {
 
   return (
     <ArticleLong
-      fil={[{ label: "Accueil", href: "/" }, { label: "Dette publique", href: "/dette-publique" }, { label: "Pays modèle" }]}
+      fil={[
+        { label: "Accueil", href: "/" },
+        { label: "Pays", href: "/pays" },
+        { label: "Pays modèle", href: "/pays/pays-modele" },
+        { label: "Dette publique" },
+      ]}
       surtitre="Dette publique du Pays modèle"
       chiffre={
         <>

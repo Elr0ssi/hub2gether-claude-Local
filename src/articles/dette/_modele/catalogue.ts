@@ -11,6 +11,6 @@ export const entreeModele: EntreeCatalogue = {
   accroche: "Une à deux phrases : ce que l'article apporte, en des termes que l'on cherche.",
   publie: "2026-01-01",
   modifie: "2026-01-01",
-  url: "/dette-publique/pays-modele", // = `/dette-publique/<slug>` pour tous les pays, sauf la France
+  url: "/pays/pays-modele/dette-publique", // toujours `/pays/<slug>/dette-publique`
   mots: "dette · endettement · pays modèle",
 };

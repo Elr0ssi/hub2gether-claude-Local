@@ -28,9 +28,12 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/analyses", destination: "/", permanent: true },
-      /* L'ancienne version « v2 » de l'article sur la dette est devenue l'article de référence. */
-      { source: "/france/economie/dette-publique-v2", destination: "/france/economie/dette-publique", permanent: true },
-      { source: "/articles/dette-publique-france-2025-enjeux", destination: "/france/economie/dette-publique", permanent: true },
+      /* Les anciennes pages « France » et l'ancien article sur la dette : tout est sur la fiche du pays. */
+      { source: "/france", destination: "/pays/france", permanent: true },
+      { source: "/france/economie", destination: "/pays/france", permanent: true },
+      { source: "/france/economie/dette-publique", destination: "/pays/france/dette-publique", permanent: true },
+      { source: "/france/economie/dette-publique-v2", destination: "/pays/france/dette-publique", permanent: true },
+      { source: "/articles/dette-publique-france-2025-enjeux", destination: "/pays/france/dette-publique", permanent: true },
       { source: "/v2-eco", destination: "/economie", permanent: true },
       { source: "/concept-globe", destination: "/", permanent: true },
       { source: "/concept-globe/economie", destination: "/economie", permanent: true },

@@ -16,9 +16,9 @@ Tu travailles sur le dépôt GitHub **Elr0ssi/hub2gether-claude-Local**, branche
 4. `src/articles/dette/cadre/` — les briques ; chaque fichier commence par un exemple d'usage.
 
 ## Ce que tu dois produire
-- Un dossier `src/articles/dette/<slug>/` copié depuis `_modele/` et renommé (`entreeModele` → `entree<Pays>`, etc.), contenant : `donnees.ts`, `Article.tsx`, `fiche.tsx`, `catalogue.ts`.
+- Un dossier `src/articles/dette/<slug>/` copié depuis `_modele/` (le `<slug>` est celui de la fiche du pays : `/pays/<slug>`) et renommé (`entreeModele` → `entree<Pays>`, etc.), contenant : `donnees.ts`, `Article.tsx`, `fiche.tsx`, `catalogue.ts`.
 - L'inscription de l'article dans `src/articles/dette/catalogue.ts` **et** dans `src/articles/dette/registre.ts` (deux lignes).
-- Rien d'autre : le site se charge de la page `/dette-publique/<slug>`, du plan du site, des carrousels et des liens.
+- Rien d'autre : le site se charge de la page `/pays/<slug>/dette-publique` (sur la fiche du pays), du plan du site, des carrousels et des liens.
 
 ## Règles non négociables
 1. **Aucun chiffre inventé.** Chaque valeur vient d'une source officielle (institut statistique, ministère des finances, agence de la dette, banque centrale, Eurostat, FMI, Banque mondiale, OCDE), avec la période et l'adresse exacte de la page. Ajoute-les dans `donnees.ts`. Si une donnée n'existe pas, le chapitre correspondant n'existe pas.
@@ -35,6 +35,6 @@ Tu travailles sur le dépôt GitHub **Elr0ssi/hub2gether-claude-Local**, branche
 Pars de ceux de la France et garde seulement ceux dont tu as les données : L'essentiel (chiffres clés), Évolution (ratio par date), Qui doit (répartition par émetteur), Qui détient (créanciers), Intérêts, Refinancement/échéances, Comparaison régionale, Questions. Ajoute les chapitres propres au pays (par exemple : dette indexée sur l'inflation, dette en devises étrangères, garanties publiques, régime fédéral, restructurations passées, rôle du FMI), seulement s'ils sont sourcés.
 
 ## Avant de livrer
-- `npm run build` passe sans erreur et la route `/dette-publique/<slug>` apparaît.
+- `npm run build` passe sans erreur et la route `/pays/<slug>/dette-publique` apparaît.
 - Vérifie à l'écran, en clair et en sombre, à 1280 px et à **390 px** : aucun débordement horizontal ; en changeant la monnaie du menu (€ → $ → CN¥), **tous** les montants changent (légendes et tableaux compris).
 - Résume en fin de réponse : les chapitres écrits, les sources utilisées, les chiffres que tu n'as pas pu vérifier, et ce qui reste à faire.

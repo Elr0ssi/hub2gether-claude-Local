@@ -12,7 +12,6 @@ export const entreeFrance: EntreeCatalogue = {
     "Montant, déficit, qui doit et qui détient la dette, intérêts, refinancement : l'article de référence, avec les montants dans la monnaie de votre choix.",
   publie: "2026-09-21",
   modifie: "2026-10-13",
-  /* La France garde l'adresse qu'elle avait : c'est elle qui porte le référencement. */
-  url: "/france/economie/dette-publique",
+  url: "/pays/france/dette-publique",
   mots: "dette · endettement · france · maastricht · déficit",
 };

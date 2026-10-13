@@ -3,9 +3,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { EnTete, Pied } from "@/components/concept/pieces";
 import { Fil, JsonLd, schemaFaq, schemaFil } from "@/components/seo/Elements";
 import { DossierDette } from "@/components/dettes/DossierDette";
-import { PageArticleDette } from "@/articles/dette/rendu";
-import { articleRedige } from "@/articles/dette/registre";
-import { CATALOGUE_DETTE, estRedige } from "@/articles/dette/catalogue";
+import { adresseDette, estRedige } from "@/articles/dette/catalogue";
 import { dossierParSlug, tousLesDossiers } from "@/data/dettes/dossiers";
 import { descriptionDossier, faqDossier, titreDossier } from "@/data/dettes/textes";
 import { nf } from "@/data/seo/francais";
@@ -18,20 +16,16 @@ export const revalidate = 2592000;
 /** Le rendu serveur et les données structurées sont en euros, la monnaie d'origine. */
 const euros = { m: (v: number) => `${nf(v, v >= 100 ? 0 : 1)} Md€`, u: (v: number) => `${nf(v, 0)} €` };
 
-/* Deux sortes de pages sous /dette-publique/<pays> :
-     - l'article écrit à la main, s'il existe (voir src/articles/LISEZ-MOI.md) ;
-     - sinon le dossier généré à partir de la base de dette.
-   Un article dont l'adresse canonique est ailleurs (la France) redirige vers elle. */
+/* Le dossier généré d'un pays, à partir de la base de dette. Quand un article écrit à la main existe
+   pour ce pays (src/articles/), c'est lui qui répond, à l'adresse /pays/<pays>/dette-publique :
+   cette page y redirige. */
 export function generateStaticParams() {
-  const redigesIci = CATALOGUE_DETTE.filter((a) => a.url === `/dette-publique/${a.slug}`).map((a) => ({ slug: a.slug }));
-  const generes = tousLesDossiers().filter((d) => !estRedige(d.slug)).map((d) => ({ slug: d.slug }));
-  return [...redigesIci, ...generes];
+  return tousLesDossiers().filter((d) => !estRedige(d.slug)).map((d) => ({ slug: d.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const redige = articleRedige(slug);
-  if (redige) return redige.url === `/dette-publique/${slug}` ? redige.metadata : {};
+  if (estRedige(slug)) return {};
   const d = dossierParSlug(slug);
   if (!d) return {};
   const url = urlAbs(`/dette-publique/${d.slug}`);
@@ -46,11 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const redige = articleRedige(slug);
-  if (redige) {
-    if (redige.url !== `/dette-publique/${slug}`) permanentRedirect(redige.url);
-    return <PageArticleDette article={redige} />;
-  }
+  if (estRedige(slug)) permanentRedirect(adresseDette(slug));
   const d = dossierParSlug(slug);
   if (!d) notFound();
   const url = urlAbs(`/dette-publique/${d.slug}`);
