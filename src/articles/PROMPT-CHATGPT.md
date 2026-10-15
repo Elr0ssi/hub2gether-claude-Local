@@ -10,6 +10,7 @@ Tu travailles sur le dépôt GitHub **Elr0ssi/hub2gether-claude-Local**, branche
 Écrire **l'article long sur la dette publique de `<PAYS>`** (slug `<slug>`), à la main, avec la même qualité et la même structure que l'article de la France. Un pays n'a pas les mêmes informations qu'un autre : ne remplis pas un formulaire, compose l'article avec les briques existantes et les chapitres dont les données existent vraiment.
 
 ## Commence par lire, dans cet ordre
+0. `src/articles/GUIDE-REDACTION.md` — **le style et la mécanique de rédaction** (ton, structure d'un chapitre, règle du périmètre, règles sur les chiffres). À lire en premier.
 1. `src/articles/LISEZ-MOI.md` — le guide complet : arborescence, pas à pas, briques, règles, vérifications.
 2. `src/articles/dette/france/Article.tsx` — l'article de référence (lis aussi `Deficit.tsx`, `fiche.tsx`, `catalogue.ts`, `donnees/`).
 3. `src/articles/dette/_modele/` — le gabarit à copier (Article.tsx, donnees.ts, fiche.tsx, catalogue.ts).
