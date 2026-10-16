@@ -187,5 +187,5 @@ export const DETAIL_RECETTES: Record<string, Detail> = {
 - Une ligne sans `details` reste une ligne simple.
 - Vérifier les sommes avec un petit script avant de livrer (voir comment `ventilations.ts` est construit : tout est en données, donc testable).
 
-Pour une part, `taux` (facultatif) affiche « Taux : 20 % » sous son nom : le taux ou le barème de l'impôt. Sans source officielle, on ne le renseigne pas.
+Pour une part, `taux` (facultatif) affiche « Taux : 20 % » sous son nom : le taux ou le barème de l'impôt. Sans source officielle, on ne le renseigne pas. `bareme: { titre, lignes: [{ libelle, taux, texte }] }` dessine les taux en barres (tranches d'un barème, taux d'une même taxe) derrière un bouton « Voir les taux » ; voir `france/donnees/ventilations.ts`.
 **Rien de « méta » dans la page** : pas de phrase du genre « la source ne détaille pas cette ligne » ni de commentaire sur les éditions ; si une ligne n'a pas de détail, elle s'ouvre sur son explication seule.

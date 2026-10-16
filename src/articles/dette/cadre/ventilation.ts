@@ -19,6 +19,19 @@
        affiché est la somme et une phrase le dit.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/** Une ligne d'un barème : un libellé, un taux (pour la longueur de la barre) et le texte du taux. */
+export interface Tranche {
+  libelle: string;
+  /** Le taux en %, pour dessiner la barre ; absent si la ligne n'a pas de taux unique. */
+  taux?: number;
+  /** Ce qu'on lit à droite : « 20 % », « de 14 % à 24 % »… */
+  texte: string;
+}
+export interface Bareme {
+  titre?: string;
+  lignes: Tranche[];
+}
+
 export interface Part {
   nom: string;
   /** Milliards d'euros. */
@@ -26,6 +39,8 @@ export interface Part {
   note?: string;
   /** Le taux ou le barème de l'impôt, quand on le connaît : « 20 % » ou « 0,6545 €/litre ». */
   taux?: string;
+  /** Les taux en détail, dessinés en barres : tranches d'un barème, ou taux d'une même taxe. */
+  bareme?: Bareme;
   /** Les « dont » : inclus dans `md`, listés sous la part. */
   enfants?: Part[];
   /** Vrai pour la part calculée « reste ». */

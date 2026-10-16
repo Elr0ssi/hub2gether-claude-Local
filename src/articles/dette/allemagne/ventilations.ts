@@ -1,4 +1,4 @@
-import type { Detail, Part } from "../cadre/ventilation";
+import type { Bareme, Detail, Part } from "../cadre/ventilation";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ALLEMAGNE : CE QUI S'OUVRE SOUS CHAQUE LIGNE DES RECETTES, DES DÉPENSES ET DU DÉFICIT
@@ -34,6 +34,55 @@ export const RECETTES_LIGNES: Part[] = [
   { nom: "Autres recettes", md: AUTRES_RECETTES },
 ];
 
+
+/* ── Les taux des impôts (2025) ─────────────────────────────────────────── */
+
+/* Barème de l'impôt sur le revenu 2025 (§ 32a EStG), personne seule. Les deux tranches
+   intermédiaires sont des formules : on en donne le taux marginal, de la première à la dernière euro de la tranche. */
+const BAREME_IR: Bareme = {
+  titre: "Barème 2025, personne seule (taux sur le dernier euro gagné)",
+  lignes: [
+    { libelle: "Jusqu'à 12 096 €", taux: 0, texte: "0 %" },
+    { libelle: "De 12 097 à 17 443 €", taux: 24, texte: "de 14 % à 24 %" },
+    { libelle: "De 17 444 à 68 480 €", taux: 42, texte: "de 24 % à 42 %" },
+    { libelle: "De 68 481 à 277 825 €", taux: 42, texte: "42 %" },
+    { libelle: "Au-delà de 277 825 €", taux: 45, texte: "45 %" },
+  ],
+};
+const BAREME_TVA: Bareme = {
+  lignes: [
+    { libelle: "Taux normal", taux: 19, texte: "19 %" },
+    { libelle: "Taux réduit", taux: 7, texte: "7 %" },
+  ],
+};
+const BAREME_TABAC: Bareme = {
+  lignes: [
+    { libelle: "Cigarettes : part par cigarette", texte: "11,71 centimes" },
+    { libelle: "Cigarettes : part sur le prix de vente", taux: 19.84, texte: "19,84 %" },
+    { libelle: "Tabac à rouler : part au poids", texte: "57,85 € / kg" },
+    { libelle: "Tabac à rouler : part sur le prix", taux: 17.2, texte: "17,20 %" },
+  ],
+};
+const BAREME_ASSURANCE: Bareme = {
+  lignes: [
+    { libelle: "Cas général", taux: 19, texte: "19 %" },
+    { libelle: "Accident avec remboursement des primes", taux: 3.8, texte: "3,8 %" },
+    { libelle: "Assurance maritime, corps de navire", taux: 3, texte: "3 %" },
+  ],
+};
+const BAREME_CAFE: Bareme = {
+  lignes: [
+    { libelle: "Café torréfié", taux: 2.19, texte: "2,19 € / kg" },
+    { libelle: "Café soluble", taux: 4.78, texte: "4,78 € / kg" },
+  ],
+};
+const BAREME_MOUSSEUX: Bareme = {
+  lignes: [
+    { libelle: "Plus de 6 % vol.", taux: 136, texte: "136 € / hl" },
+    { libelle: "Jusqu'à 6 % vol.", taux: 51, texte: "51 € / hl" },
+  ],
+};
+
 /* Les impôts encaissés (statistiques de caisse, avant redistribution Bund / Länder / communes). */
 export const IMPOTS_ENCAISSES = 989.827;
 
@@ -43,52 +92,52 @@ export const IMPOTS_PARTS: Part[] = [
     md: 746.339,
     note: "Répartis entre le Bund, les Länder et les communes",
     enfants: [
-      { nom: "Impôt sur les salaires (Lohnsteuer)", md: 262.688, note: "net des allocations familiales, selon Destatis" },
-      { nom: "TVA intérieure", md: 236.267 },
-      { nom: "Impôt sur le revenu par déclaration", md: 78.362 },
-      { nom: "TVA à l'importation", md: 73.939 },
-      { nom: "Impôt sur les sociétés", md: 39.164 },
-      { nom: "Impôts sur revenus du capital non établis", md: 31.118 },
-      { nom: "Impôt libératoire sur revenus financiers", md: 24.801 },
+      { nom: "Impôt sur les salaires (Lohnsteuer)", md: 262.688, note: "net des allocations familiales, selon Destatis", taux: "de 0 % à 45 % selon le barème du revenu", bareme: BAREME_IR },
+      { nom: "TVA intérieure", md: 236.267, taux: "19 % (7 % en taux réduit)", bareme: BAREME_TVA },
+      { nom: "Impôt sur le revenu par déclaration", md: 78.362, taux: "de 0 % à 45 % selon le barème du revenu", bareme: BAREME_IR },
+      { nom: "TVA à l'importation", md: 73.939, taux: "19 % ou 7 % selon le produit" },
+      { nom: "Impôt sur les sociétés", md: 39.164, taux: "15 % (taux fédéral)" },
+      { nom: "Impôts sur revenus du capital non établis", md: 31.118, taux: "25 % en général pour les dividendes" },
+      { nom: "Impôt libératoire sur revenus financiers", md: 24.801, taux: "25 %" },
     ],
   },
   {
     nom: "Impôts fédéraux",
     md: 108.813,
     enfants: [
-      { nom: "Taxe sur l'énergie", md: 37.563 },
-      { nom: "Taxe sur les assurances", md: 19.611 },
-      { nom: "Taxe sur le tabac", md: 17.632 },
-      { nom: "Contribution de solidarité", md: 12.878 },
-      { nom: "Taxe sur les véhicules", md: 9.598 },
-      { nom: "Taxe sur l'électricité", md: 5.856 },
-      { nom: "Taxe sur les billets d'avion", md: 2.063 },
-      { nom: "Taxe sur l'alcool", md: 2.05 },
-      { nom: "Taxe sur le café", md: 1.038 },
-      { nom: "Taxe sur les vins mousseux", md: 0.365 },
+      { nom: "Taxe sur l'énergie", md: 37.563, taux: "un tarif par carburant, combustible et usage" },
+      { nom: "Taxe sur les assurances", md: 19.611, taux: "19 % en général", bareme: BAREME_ASSURANCE },
+      { nom: "Taxe sur le tabac", md: 17.632, taux: "une part par unité et une part sur le prix de vente", bareme: BAREME_TABAC },
+      { nom: "Contribution de solidarité", md: 12.878, taux: "5,5 % de l'impôt, au-delà d'une franchise" },
+      { nom: "Taxe sur les véhicules", md: 9.598, taux: "selon la cylindrée, le CO₂ et le carburant" },
+      { nom: "Taxe sur l'électricité", md: 5.856, taux: "20,50 € par MWh" },
+      { nom: "Taxe sur les billets d'avion", md: 2.063, taux: "un tarif par passager, selon la distance" },
+      { nom: "Taxe sur l'alcool", md: 2.05, taux: "1 303 € par hectolitre d'alcool pur" },
+      { nom: "Taxe sur le café", md: 1.038, taux: "2,19 € / kg (torréfié), 4,78 € / kg (soluble)", bareme: BAREME_CAFE },
+      { nom: "Taxe sur les vins mousseux", md: 0.365, taux: "136 € par hectolitre en général", bareme: BAREME_MOUSSEUX },
     ],
   },
   {
     nom: "Impôts communaux",
     md: 94.53,
     enfants: [
-      { nom: "Taxe professionnelle brute", md: 76.444 },
-      { nom: "Taxe foncière B", md: 15.742 },
-      { nom: "Taxe sur les chiens", md: 0.43 },
-      { nom: "Taxe sur les résidences secondaires", md: 0.284 },
+      { nom: "Taxe professionnelle brute", md: 76.444, taux: "3,5 % × coefficient communal (200 % au minimum, soit au moins 7 %)" },
+      { nom: "Taxe foncière B", md: 15.742, taux: "fixé par chaque commune" },
+      { nom: "Taxe sur les chiens", md: 0.43, taux: "tarif communal par chien" },
+      { nom: "Taxe sur les résidences secondaires", md: 0.284, taux: "taux communal" },
     ],
   },
   {
     nom: "Impôts des Länder",
     md: 34.285,
     enfants: [
-      { nom: "Droits de succession", md: 15.412 },
-      { nom: "Droits de mutation immobilière", md: 15.097 },
-      { nom: "Taxe sur les loteries", md: 1.789 },
-      { nom: "Taxe sur les paris sportifs", md: 0.419 },
+      { nom: "Droits de succession", md: 15.412, taux: "de 7 % à 50 % selon la valeur et la parenté, après abattements" },
+      { nom: "Droits de mutation immobilière", md: 15.097, taux: "de 3,5 % à 6,5 % selon le Land" },
+      { nom: "Taxe sur les loteries", md: 1.789, taux: "20 % en général" },
+      { nom: "Taxe sur les paris sportifs", md: 0.419, taux: "5,3 %" },
     ],
   },
-  { nom: "Droits de douane", md: 5.86 },
+  { nom: "Droits de douane", md: 5.86, taux: "tarif douanier commun de l'Union européenne" },
 ];
 
 /* Autre lecture des impôts encaissés : qui les reçoit après partage (arrondis). */

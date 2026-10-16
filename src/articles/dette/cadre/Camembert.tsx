@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { completer, type Part, type Vue } from "./ventilation";
+import { completer, type Bareme as BaremeT, type Part, type Vue } from "./ventilation";
 import { montant, nf } from "./montants";
 
 /** Un camembert qui se lit comme « Qui détient la dette française » : l'anneau à gauche,
@@ -25,6 +25,42 @@ export function avecMontants(texte: string, annee = 2025): string {
   return texte.replace(/\[\[(-?\d+(?:\.\d+)?)(?:\|(\d))?\]\]/g, (_, v: string, d?: string) => montant(Number(v), d === undefined ? 1 : Number(d), annee));
 }
 
+/** Les taux d'un impôt, en barres : plus la barre est longue, plus le taux est haut. */
+function Bareme({ bareme }: { bareme: BaremeT }) {
+  const max = Math.max(...bareme.lignes.map((l) => l.taux ?? 0), 1);
+  return (
+    <div className="dos-bar">
+      {bareme.titre && <p className="dos-bar-t">{bareme.titre}</p>}
+      <ul>
+        {bareme.lignes.map((l) => (
+          <li key={l.libelle}>
+            <span className="dos-bar-l">{l.libelle}</span>
+            <i style={{ width: `${l.taux ? Math.max(3, (l.taux / max) * 100) : 0}%` }} aria-hidden="true" />
+            <b>{l.texte}</b>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** Le bouton « Voir les taux » et son graphique, pour une part ou un « dont ». */
+function Taux({ p }: { p: Part }) {
+  const [vu, setVu] = useState(false);
+  if (!p.taux && !p.bareme) return null;
+  return (
+    <>
+      {p.taux && <small className="dos-cam-taux">Taux : {p.taux}</small>}
+      {p.bareme && (
+        <button type="button" className="dos-cam-voir" aria-expanded={vu} onClick={() => setVu(!vu)}>
+          {vu ? "Masquer les taux" : "Voir les taux"}
+        </button>
+      )}
+      {vu && p.bareme && <Bareme bareme={p.bareme} />}
+    </>
+  );
+}
+
 function Sous({ parts, total, annee }: { parts: Part[]; total: number; annee: number }) {
   const { parts: liste } = completer(parts, total);
   return (
@@ -34,7 +70,7 @@ function Sous({ parts, total, annee }: { parts: Part[]; total: number; annee: nu
           <span>
             {p.nom}
             {p.note && <small>{avecMontants(p.note, annee)}</small>}
-            {p.taux && <small className="dos-cam-taux">Taux : {p.taux}</small>}
+            <Taux p={p} />
           </span>
           <b>{montant(p.md, 1, annee)}</b>
           {p.enfants && p.enfants.length > 0 && <Sous parts={p.enfants} total={p.md} annee={annee} />}
@@ -124,7 +160,7 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
                   <span>{p.nom}</span>
                 )}
                 {p.note && <small>{avecMontants(p.note, annee)}</small>}
-                {p.taux && <small className="dos-cam-taux">Taux : {p.taux}</small>}
+                <Taux p={p} />
                 {estOuvert && p.enfants && <Sous parts={p.enfants} total={p.md} annee={annee} />}
               </div>
               <b>{mdAff(p.md)}</b>
