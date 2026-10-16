@@ -34,6 +34,7 @@ function Sous({ parts, total, annee }: { parts: Part[]; total: number; annee: nu
           <span>
             {p.nom}
             {p.note && <small>{avecMontants(p.note, annee)}</small>}
+            {p.taux && <small className="dos-cam-taux">Taux : {p.taux}</small>}
           </span>
           <b>{montant(p.md, 1, annee)}</b>
           {p.enfants && p.enfants.length > 0 && <Sous parts={p.enfants} total={p.md} annee={annee} />}
@@ -45,7 +46,7 @@ function Sous({ parts, total, annee }: { parts: Part[]; total: number; annee: nu
 
 export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
   const mdAff = (v: number) => montant(v, 1, annee);
-  const { parts, base, exces } = useMemo(() => completer(vue.parts, vue.total, vue.resteNom), [vue]);
+  const { parts, base } = useMemo(() => completer(vue.parts, vue.total, vue.resteNom), [vue]);
   const [actif, setActif] = useState<number | null>(null);
   const [ouvert, setOuvert] = useState<number | null>(null);
   const dec = vue.pctDecimales ?? 1;
@@ -64,6 +65,7 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
 
   return (
     <div className="dos-cam">
+      {vue.legende && <p className="dos-cam-legende">{vue.legende}</p>}
       <div className="dos-cam-anneau">
         <svg viewBox="0 0 100 100" role="img" aria-label={`Répartition : ${parts.map((p) => p.nom).join(", ")}`}>
           {arcs.map(({ i, long, decal }) => (
@@ -122,6 +124,7 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
                   <span>{p.nom}</span>
                 )}
                 {p.note && <small>{avecMontants(p.note, annee)}</small>}
+                {p.taux && <small className="dos-cam-taux">Taux : {p.taux}</small>}
                 {estOuvert && p.enfants && <Sous parts={p.enfants} total={p.md} annee={annee} />}
               </div>
               <b>{mdAff(p.md)}</b>
@@ -131,12 +134,7 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
         })}
       </ul>
 
-      {(vue.precision || exces > 0) && (
-        <p className="dos-cam-precision">
-          {vue.precision && avecMontants(vue.precision, annee)}
-          {exces > 0 && ` Les montants sont arrondis : leur somme (${mdAff(base)}) dépasse de ${mdAff(exces)} le total publié, et les parts se lisent sur cette somme.`}
-        </p>
-      )}
+      {vue.precision && <p className="dos-cam-precision">{avecMontants(vue.precision, annee)}</p>}
     </div>
   );
 }

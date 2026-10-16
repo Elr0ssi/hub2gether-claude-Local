@@ -10,7 +10,6 @@ import {
 } from "@/articles/dette/france/donnees/financesPubliques";
 import {
   DEFICIT_LIGNES,
-  DEFICIT_TOTAL,
   DEPENSES_FONCTION_LIGNES,
   DEPENSES_NATURE_LIGNES,
   DETAIL_DEFICIT,
@@ -94,9 +93,6 @@ export function Deficit() {
           voir={[{ href: "#depenses-publiques", label: "Voir les dépenses" }]}
         >
           <Repartition lignes={RECETTES_LIGNES} nom="Répartition des recettes publiques 2025" details={DETAIL_RECETTES} />
-          <p className="dos-notule">
-            Les quatre lignes font {montant(1561.8)}, soit {montant(0.1)} de plus que le total officiel : écart d'arrondi.
-          </p>
         </Figure>
       </div>
 
@@ -122,7 +118,7 @@ export function Deficit() {
             <>
               <Repartition lignes={DEPENSES_FONCTION_LIGNES} nom="Dépenses publiques 2024 par fonction" details={DETAIL_FONCTION} annee={2024} />
               <p className="dos-notule">
-                Lecture par fonction : année 2024 ({montant(FONCTIONS_TOTAL, 0, 2024)} au total), la dernière série complète. Elle est une autre lecture des mêmes dépenses : on ne l'ajoute pas aux dépenses par nature de 2025.{" "}
+                Lecture par fonction : année 2024 ({montant(FONCTIONS_TOTAL, 0, 2024)} au total), la dernière série complète. C'est une autre lecture des mêmes dépenses, qui ne s'ajoute pas à la lecture par nature.{" "}
                 <a href={SRC.COFOG.url} target="_blank" rel="noopener noreferrer">Insee ↗</a>
               </p>
             </>
@@ -139,9 +135,6 @@ export function Deficit() {
           voir={[{ href: "#evolution", label: "Voir l'évolution de la dette" }]}
         >
           <Repartition lignes={DEFICIT_LIGNES} nom="Déficit public 2025 par administration" negatif details={DETAIL_DEFICIT} />
-          <p className="dos-notule">
-            Total : −{montant(DEFICIT_TOTAL)} (Insee, mai 2026). Les soldes arrondis peuvent ne pas retomber exactement sur ce total.
-          </p>
         </Figure>
       </div>
     </>

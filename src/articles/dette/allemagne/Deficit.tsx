@@ -9,7 +9,6 @@ import {
   DETAIL_FONCTION,
   DETAIL_NATURE,
   DETAIL_RECETTES,
-  ECART_FONCTIONS,
   RECETTES_LIGNES,
   SOMME_FONCTIONS,
   SRC,
@@ -82,7 +81,6 @@ export function Deficit() {
           legende={`Répartition des ${enLettres(rec, 1)} de recettes des administrations allemandes en 2025 (comptes nationaux révisés) : impôts, cotisations sociales et autres recettes. Cliquez sur une ligne pour voir ce qu'elle contient.`}
           source={RECETTES_2025} voir={[{ href: '#depenses-publiques', label: 'Voir les dépenses' }]}>
           <Repartition nom="Recettes publiques allemandes 2025" lignes={RECETTES_LIGNES} details={DETAIL_RECETTES} />
-          <p className="dos-notule">« Autres recettes » est un solde calculé, pas une catégorie publiée par Destatis.</p>
         </Figure>
       </div>
 
@@ -98,14 +96,13 @@ export function Deficit() {
             <>
               <Repartition nom="Dépenses allemandes 2025 par fonction" lignes={DEPENSES_FONCTION_LIGNES} details={DETAIL_FONCTION} />
               <p className="dos-notule">
-                Les dix fonctions font {montant(SOMME_FONCTIONS, 1)}, soit {montant(ECART_FONCTIONS, 1)} de moins que les {montant(dep, 1)} de dépenses totales : cet écart dépasse les arrondis et la série fonctionnelle publiée ne se lit pas comme une répartition exhaustive du total. Chaque fonction, elle, se lit sur son propre total.{' '}
+                Les dix fonctions représentent {montant(SOMME_FONCTIONS, 1)} sur {montant(dep, 1)} de dépenses.{' '}
                 <a href={SRC.COFOG.url} target="_blank" rel="noopener noreferrer">Destatis ↗</a>
               </p>
             </>
           ) : (
             <>
               <Repartition nom="Dépenses allemandes 2025 par nature" lignes={DEPENSES_NATURE_LIGNES} details={DETAIL_NATURE} />
-              <p className="dos-notule">Les cinq postes détaillés sont des « dont » du total ; « Autres dépenses » est le reste calculé, pas une catégorie publiée. C'est une autre lecture des mêmes dépenses que la lecture par fonction : on ne les additionne pas.</p>
             </>
           )}
         </Figure>
@@ -117,7 +114,7 @@ export function Deficit() {
           source={DEFICIT_2025} voir={[{ href: '#evolution', label: "Voir l'évolution de la dette" }]}>
           <Equation rec={rec} dep={dep} solde={Math.abs(solde)} />
           <p className="dos-notule">
-            Qui porte ce déficit ? Le Bund est l'État fédéral, les Länder sont les 16 États fédérés, les Gemeinden sont les communes, et la Sozialversicherung regroupe les organismes de sécurité sociale. La répartition du déficit entre ces administrations n'est pas affichée : les montants d'une édition antérieure ne peuvent pas expliquer le déficit révisé.
+            Qui porte ce déficit ? Le Bund est l'État fédéral, les Länder sont les 16 États fédérés, les Gemeinden sont les communes, et la Sozialversicherung regroupe les organismes de sécurité sociale.
           </p>
         </Figure>
       </div>

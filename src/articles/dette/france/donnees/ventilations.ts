@@ -91,30 +91,19 @@ export const DETAIL_RECETTES: Record<string, Detail> = {
   "Impôts et cotisations sociales": {
     texte:
       "C'est le prélèvement obligatoire : les impôts et les cotisations sociales, y compris les cotisations sociales dites imputées, que les employeurs publics sont réputés verser pour les prestations qu'ils servent eux-mêmes à leurs agents. La CSG et la CRDS sont rangées parmi les impôts courants sur le revenu, pas parmi les cotisations sociales effectives.",
-    vues: [
-      {
-        parts: IMPOTS_PARTS,
-        precision:
-          "Impôts seulement, par catégorie : publication Insee du 28 août 2026 (base 2020). Un parent n'est pas additionné à ses « dont » ; l'impôt sur le revenu et l'impôt sur les sociétés sont publiés avant crédits d'impôt, ce n'est pas leur rendement net. Cette publication est d'une autre édition que le total de la ligne : on ne retire pas ces impôts de la ligne pour en déduire les cotisations.",
-      },
-    ],
-    absent:
-      "Les cotisations sociales ne sont pas ventilées par régime : il faudrait une source comptable de même périmètre, et les tableaux de l'Insee et de la DREES ne s'additionnent pas.",
+    vues: [{ legende: "Les impôts, par catégorie", parts: IMPOTS_PARTS }],
     source: SRC.IMPOTS,
   },
   "Recettes de production": {
     texte: "Ce que les administrations vendent ou facturent pour les biens et les services qu'elles produisent : les recettes de leur activité, hors impôts.",
-    absent: "La source utilisée ne détaille pas cette ligne.",
     source: SRC.APU,
   },
   "Autres transferts": {
     texte: "Les transferts que les administrations reçoivent et qui ne sont ni des impôts ni des cotisations sociales.",
-    absent: "La source utilisée ne détaille pas cette ligne.",
     source: SRC.APU,
   },
   "Revenus de la propriété": {
     texte: "Les revenus que les administrations tirent de leur patrimoine : intérêts, dividendes et autres revenus de la propriété.",
-    absent: "La source utilisée ne détaille pas cette ligne.",
     source: SRC.APU,
   },
 };
@@ -133,9 +122,7 @@ export const DEPENSES_NATURE_TOTAL = 1714.2;
 export const DETAIL_NATURE: Record<string, Detail> = {
   "Prestations sociales en espèces et en nature": {
     texte:
-      "Les pensions, les allocations et les services remboursés : retraites, assurance maladie, famille, chômage, minima sociaux. C'est de loin la première dépense publique par nature.",
-    absent:
-      "Le détail par risque (retraites, santé, famille…) existe, mais dans un autre périmètre, celui de la DREES : il est présenté dans la lecture par fonction, à la ligne « Protection sociale ». Les deux séries ne s'additionnent pas.",
+      "Les pensions, les allocations et les services remboursés : retraites, assurance maladie, famille, chômage, minima sociaux. C'est de loin la première dépense publique par nature. Le détail par risque figure dans la lecture par fonction, à la ligne « Protection sociale ».",
     source: SRC.APU,
   },
   Fonctionnement: {
@@ -147,15 +134,13 @@ export const DETAIL_NATURE: Record<string, Detail> = {
           { nom: "Consommations intermédiaires", md: 164.6 },
         ],
         total: 548.8,
-        resteNom: "Reste du fonctionnement, non détaillé dans la source",
-        precision: "Les deux postes détaillés ne couvrent pas toute la ligne ; les rubriques sont arrondies et certaines relèvent de corrections de comptabilité.",
+        resteNom: "Autres dépenses de fonctionnement",
       },
     ],
     source: SRC.APU,
   },
   "Autres transferts et subventions": {
     texte: "Les transferts versés hors prestations sociales, et les subventions.",
-    absent: "La source utilisée ne détaille pas cette ligne.",
     source: SRC.APU,
   },
   "Acquisitions nettes d'actifs non financiers": {
@@ -164,8 +149,7 @@ export const DETAIL_NATURE: Record<string, Detail> = {
       {
         parts: [{ nom: "Formation brute de capital fixe", md: 132.2 }],
         total: 137.7,
-        resteNom: "Reste, autres acquisitions nettes d'actifs",
-        precision: "La formation brute de capital fixe est incluse dans la ligne ; elle ne s'y ajoute pas.",
+        resteNom: "Autres acquisitions",
       },
     ],
     source: SRC.APU,
@@ -286,8 +270,7 @@ const versParts = (noms: string[], valeurs: number[]): Part[] => noms.map((nom, 
 
 /* L'Insee ne représente que les flux supérieurs à 10 Md€ : une case vide n'est pas un zéro exact, et les
    parts ne se lisent pas au dixième de pourcentage. */
-const PRECISION_FONCTION =
-  "Montants arrondis à l'unité. L'Insee ne représente que les flux supérieurs à 10 Md€ : une part absente n'est pas un zéro exact, et les pourcentages ne se lisent pas au dixième.";
+const PRECISION_FONCTION = "Montants arrondis à l'unité.";
 
 const DREES_RISQUES: Part[] = [
   { nom: "Vieillesse et survie", md: 426.7, note: "Pensions de retraite et pensions de réversion" },
@@ -303,8 +286,8 @@ export const DEPENSES_FONCTION_LIGNES: Part[] = FONCTIONS.map((f) => ({ nom: f.n
 export const DETAIL_FONCTION: Record<string, Detail> = Object.fromEntries(
   FONCTIONS.map((f) => {
     const vues = [
-      { titre: "Par nature de dépense", parts: versParts(NATURE_NOMS, f.nature), total: f.total, pctDecimales: 0, resteNom: "Arrondis et flux non représentés", precision: PRECISION_FONCTION },
-      { titre: "Par administration", parts: versParts(ADMIN_NOMS, f.admin), total: f.total, pctDecimales: 0, resteNom: "Arrondis", precision: "Qui supporte la dépense : le même total, lu par administration." },
+      { titre: "Par nature de dépense", parts: versParts(NATURE_NOMS, f.nature), total: f.total, pctDecimales: 0, resteNom: "Autres", precision: PRECISION_FONCTION },
+      { titre: "Par administration", parts: versParts(ADMIN_NOMS, f.admin), total: f.total, pctDecimales: 0, resteNom: "Autres" },
     ];
     if (f.nom === "Protection sociale") {
       vues.push({
@@ -312,9 +295,8 @@ export const DETAIL_FONCTION: Record<string, Detail> = Object.fromEntries(
         parts: DREES_RISQUES,
         total: 932.5,
         pctDecimales: 1,
-        resteNom: "Arrondis",
-        precision:
-          "Attention, autre périmètre : la DREES mesure l'ensemble des prestations de protection sociale (2024), santé incluse, et non la seule fonction ci-dessus. Les deux séries ne s'additionnent pas.",
+        resteNom: "Autres",
+        precision: "Mesure plus large que la fonction ci-dessus : l'ensemble des prestations de protection sociale (2024), santé incluse.",
       });
     }
     const detail: Detail = {
@@ -351,15 +333,13 @@ export const DETAIL_DEFICIT: Record<string, Detail> = {
           { nom: "Organismes divers d'administration locale", md: 6.2 },
         ],
         total: 15.6,
-        resteNom: "Arrondis",
-        precision: "Les deux soldes sont inclus dans celui des administrations locales ; arrondis à 0,1 près.",
+        resteNom: "Autres",
       },
     ],
     source: SRC.APU,
   },
   "Administrations de sécurité sociale": {
     texte: "Les régimes de sécurité sociale et organismes associés : retraites, assurance maladie, famille, chômage.",
-    notes: ["Une édition plus récente (août 2026) affiche un solde de [[5.8]] pour la sécurité sociale et de [[151.6]] pour l'ensemble : c'est une révision. On ne mélange pas les deux éditions dans un même article."],
     source: SRC.AOUT,
   },
   "Organismes divers d'administration centrale": {

@@ -46,7 +46,6 @@ function Panneau({ detail, annee }: { detail: Detail; annee: number }) {
         </div>
       )}
       {courante && <Camembert key={vue} vue={courante} annee={annee} />}
-      {detail.absent && <p className="dos-det-absent">{t(detail.absent)}</p>}
       {detail.source && (
         <p className="dos-det-source">
           Source : <a href={detail.source.url} target="_blank" rel="noopener noreferrer">{detail.source.nom} ↗</a>

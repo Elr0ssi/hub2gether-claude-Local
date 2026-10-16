@@ -1195,13 +1195,12 @@ body:has(.dos) { background: #0a0912; }
 .dos-det-onglets { display: inline-flex; flex-wrap: wrap; gap: 6px; margin: 0 0 16px; }
 .dos-det-onglets button { padding: 7px 14px; border: 1px solid var(--dos-ligne); border-radius: 999px; background: var(--dos-surface); font: inherit; font-size: 12.5px; font-weight: 650; color: var(--dos-encre-2); cursor: pointer; transition: background 0.25s, color 0.25s; }
 .dos-det-onglets button.dos-det-on { color: #fff; border-color: transparent; background: linear-gradient(135deg, var(--dos-vif), var(--dos-vif-2)); }
-.dos-det-absent { margin: 0; padding: 12px 14px; border-radius: 14px; font-size: 12.5px; line-height: 1.55; color: var(--dos-encre-3); background: var(--dos-surface); border: 1px dashed var(--dos-ligne); }
 .dos-det-source { margin: 14px 0 0; font-size: 11.5px; color: var(--dos-encre-3); }
 .dos-det-source a { color: var(--dos-encre-2); }
 
 /* Le camembert : l'anneau à gauche, la légende à droite, comme « Qui détient la dette ». */
 .dos-cam { display: grid; grid-template-columns: minmax(150px, 210px) minmax(0, 1fr); gap: clamp(16px, 3vw, 32px); align-items: center; min-width: 0; }
-.dos-cam-anneau { position: relative; width: 100%; aspect-ratio: 1; }
+.dos-cam-anneau { position: relative; width: 100%; aspect-ratio: 1; align-self: start; }
 .dos-cam-anneau svg { display: block; width: 100%; height: 100%; }
 .dos-cam-arc { cursor: pointer; transition: opacity 0.25s, stroke-width 0.2s; }
 .dos-cam-arc-sombre { opacity: 0.32; }
@@ -1227,6 +1226,8 @@ body:has(.dos) { background: #0a0912; }
 .dos-cam-sous > li > b { font-weight: 650; white-space: nowrap; color: var(--dos-encre); }
 .dos-cam-sous > li > .dos-cam-sous { flex: 1 1 100%; margin: 4px 0 0; }
 .dos-cam-sous > li.dos-cam-reste { color: var(--dos-encre-3); font-style: italic; }
+.dos-cam-legende { grid-column: 1 / -1; margin: 0; font-size: 12.5px; font-weight: 650; letter-spacing: 0.02em; color: var(--dos-encre-2); }
+.dos-cam-n small.dos-cam-taux { color: var(--dos-vif-2); font-weight: 600; }
 .dos-cam-precision { grid-column: 1 / -1; margin: 4px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--dos-encre-3); }
 @media (max-width: 680px) {
   .dos-cam { grid-template-columns: 1fr; }

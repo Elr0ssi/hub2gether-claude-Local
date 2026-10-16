@@ -24,6 +24,8 @@ export interface Part {
   /** Milliards d'euros. */
   md: number;
   note?: string;
+  /** Le taux ou le barème de l'impôt, quand on le connaît : « 20 % » ou « 0,6545 €/litre ». */
+  taux?: string;
   /** Les « dont » : inclus dans `md`, listés sous la part. */
   enfants?: Part[];
   /** Vrai pour la part calculée « reste ». */
@@ -38,6 +40,8 @@ export interface Vue {
   total?: number;
   /** Le nom de la part « reste ». */
   resteNom?: string;
+  /** Une ligne au-dessus du camembert : ce qu'il montre. */
+  legende?: string;
   /** Une phrase de précaution sous le camembert (périmètre, arrondis, édition). */
   precision?: string;
   /** 1 par défaut ; 0 pour des montants arrondis à l'unité (les parts ne se lisent pas au dixième). */
@@ -48,8 +52,6 @@ export interface Detail {
   /** Ce que c'est, en une ou deux phrases. */
   texte: string;
   vues?: Vue[];
-  /** Quand la source ne détaille pas : on le dit ici, à la place du camembert. */
-  absent?: string;
   /** Des lignes de lecture, sans camembert. */
   notes?: string[];
   source?: { nom: string; url: string };
@@ -65,7 +67,7 @@ export interface PartsCompletees {
 }
 
 /** Complète une liste de parts avec la part « reste » et fixe la base des pourcentages. */
-export function completer(parts: Part[], total?: number, resteNom = "Reste non détaillé dans la source"): PartsCompletees {
+export function completer(parts: Part[], total?: number, resteNom = "Autres"): PartsCompletees {
   const utiles = parts.filter((p) => p.md > 0);
   const somme = utiles.reduce((s, p) => s + p.md, 0);
   if (total === undefined) return { parts: utiles, base: somme, exces: 0 };

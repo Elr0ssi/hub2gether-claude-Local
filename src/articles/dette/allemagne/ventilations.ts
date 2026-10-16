@@ -29,9 +29,9 @@ export const COTISATIONS_SEC = 823.069;
 export const AUTRES_RECETTES = Math.round((RECETTES_TOTAL - IMPOTS_SEC - COTISATIONS_SEC) * 1000) / 1000;
 
 export const RECETTES_LIGNES: Part[] = [
-  { nom: "Impôts", md: IMPOTS_SEC, note: "Comptabilité nationale (SEC)" },
-  { nom: "Cotisations sociales", md: COTISATIONS_SEC, note: "Comptabilité nationale (SEC)" },
-  { nom: "Autres recettes", md: AUTRES_RECETTES, note: "Solde calculé, pas une catégorie publiée" },
+  { nom: "Impôts", md: IMPOTS_SEC },
+  { nom: "Cotisations sociales", md: COTISATIONS_SEC },
+  { nom: "Autres recettes", md: AUTRES_RECETTES },
 ];
 
 /* Les impôts encaissés (statistiques de caisse, avant redistribution Bund / Länder / communes). */
@@ -71,7 +71,6 @@ export const IMPOTS_PARTS: Part[] = [
   {
     nom: "Impôts communaux",
     md: 94.53,
-    note: "Calculé : total encaissé moins les autres lignes",
     enfants: [
       { nom: "Taxe professionnelle brute", md: 76.444 },
       { nom: "Taxe foncière B", md: 15.742 },
@@ -89,7 +88,7 @@ export const IMPOTS_PARTS: Part[] = [
       { nom: "Taxe sur les paris sportifs", md: 0.419 },
     ],
   },
-  { nom: "Droits de douane", md: 5.86, note: "À traiter à part : affectation à l'Union européenne à vérifier" },
+  { nom: "Droits de douane", md: 5.86 },
 ];
 
 /* Autre lecture des impôts encaissés : qui les reçoit après partage (arrondis). */
@@ -103,33 +102,30 @@ export const IMPOTS_APRES_PARTAGE: Part[] = [
 export const DETAIL_RECETTES: Record<string, Detail> = {
   Impôts: {
     texte:
-      "Les impôts tels que la comptabilité nationale (SEC) les enregistre. Le détail ci-dessous porte sur les impôts encaissés, mesurés par les statistiques fiscales de caisse : ce n'est pas le même périmètre, et on ne fusionne pas les deux. Pour mémoire, la TVA totale (TVA intérieure plus TVA à l'importation, calculée) est de [[310.206]].",
+      "Les impôts de l'ensemble des administrations. Le détail ci-dessous porte sur les impôts effectivement encaissés ([[989.827]]), avant leur partage entre l'État fédéral, les Länder et les communes. Au total, la TVA (intérieure et à l'importation) représente [[310.206]].",
     vues: [
       {
         titre: "Par type d'impôt",
         parts: IMPOTS_PARTS,
         total: IMPOTS_ENCAISSES,
-        resteNom: "Reste non détaillé",
-        precision:
-          "Impôts encaissés (statistiques de caisse, avant redistribution entre Bund, Länder et communes) : [[989.827]], différents des [[1031.546]] de la ligne (comptabilité nationale). Un parent n'est pas additionné à ses « dont ». Les impôts communaux sont ici le total encaissé moins les autres lignes ; seules quelques taxes communales sont détaillées en dessous.",
+        legende: "Les impôts encaissés, par type",
+        resteNom: "Autres",
       },
       {
         titre: "Qui les reçoit",
         parts: IMPOTS_APRES_PARTAGE,
-        precision: "Autre lecture des impôts encaissés : leur répartition entre niveaux après partage selon Destatis, en montants arrondis. Elle ne s'ajoute pas au détail par type.",
+        legende: "Qui reçoit les impôts encaissés, après partage",
       },
     ],
     source: SRC.IMPOTS,
   },
   "Cotisations sociales": {
     texte: "Les cotisations versées aux assurances sociales : retraite, maladie, chômage, dépendance et accidents du travail.",
-    absent: "Aucune ventilation officielle par branche n'est vérifiée dans cette version : elle n'est pas affichée plutôt que reconstituée.",
     source: SRC.COMPTES,
   },
   "Autres recettes": {
     texte:
-      "Un solde calculé : les recettes totales ([[2137.94]]) moins les impôts ([[1031.546]]) et les cotisations sociales ([[823.069]]). La source ne publie pas cette ligne comme une catégorie : elle regroupe tout ce qui n'est ni impôt ni cotisation.",
-    absent: "Pas de ventilation publiée pour cette ligne.",
+      "Tout ce qui n'est ni impôt ni cotisation sociale : le reste des recettes publiques.",
     source: SRC.COMPTES,
   },
 };
@@ -152,20 +148,19 @@ export const DEPENSES_NATURE_LIGNES: Part[] = [
   { nom: "Prestations en nature", md: NATURE.prestNat },
   { nom: "Rémunération des agents", md: NATURE.remun },
   { nom: "Achats intermédiaires", md: NATURE.achats },
-  { nom: "Autres dépenses", md: AUTRES_DEPENSES, note: "Reste du total, non détaillé dans la source" },
+  { nom: "Autres dépenses", md: AUTRES_DEPENSES },
   { nom: "Investissement brut", md: NATURE.invest },
 ];
 
 export const DETAIL_NATURE: Record<string, Detail> = {
-  "Prestations monétaires": { texte: "Les sommes versées directement aux ménages : pensions, indemnités, allocations.", absent: "La source utilisée ne détaille pas cette ligne.", source: SRC.COMPTES },
-  "Prestations en nature": { texte: "Les biens et services fournis ou pris en charge pour les ménages, notamment les soins remboursés.", absent: "La source utilisée ne détaille pas cette ligne.", source: SRC.COMPTES },
-  "Rémunération des agents": { texte: "Les salaires et charges des agents des administrations publiques.", absent: "La source utilisée ne détaille pas cette ligne.", source: SRC.COMPTES },
-  "Achats intermédiaires": { texte: "Les achats de biens et de services nécessaires au fonctionnement des administrations.", absent: "La source utilisée ne détaille pas cette ligne.", source: SRC.COMPTES },
-  "Investissement brut": { texte: "Les dépenses d'investissement : bâtiments, infrastructures, équipements.", absent: "La source utilisée ne détaille pas cette ligne.", source: SRC.COMPTES },
+  "Prestations monétaires": { texte: "Les sommes versées directement aux ménages : pensions, indemnités, allocations.", source: SRC.COMPTES },
+  "Prestations en nature": { texte: "Les biens et services fournis ou pris en charge pour les ménages, notamment les soins remboursés.", source: SRC.COMPTES },
+  "Rémunération des agents": { texte: "Les salaires et charges des agents des administrations publiques.", source: SRC.COMPTES },
+  "Achats intermédiaires": { texte: "Les achats de biens et de services nécessaires au fonctionnement des administrations.", source: SRC.COMPTES },
+  "Investissement brut": { texte: "Les dépenses d'investissement : bâtiments, infrastructures, équipements.", source: SRC.COMPTES },
   "Autres dépenses": {
     texte:
-      "Un solde calculé : le total des dépenses moins les cinq postes de cette lecture. Il comprend notamment les intérêts, les subventions et d'autres transferts. Les cinq postes listés sont des « dont » du total, et la liste n'est pas exhaustive.",
-    absent: "Pas de ventilation publiée pour ce reste dans la source utilisée.",
+      "Le reste des dépenses : notamment les intérêts de la dette, les subventions et d'autres transferts.",
     source: SRC.COMPTES,
   },
 };
@@ -337,8 +332,7 @@ export const DETAIL_FONCTION: Record<string, Detail> = Object.fromEntries(
         {
           parts: f.sous.map(([nom, md]) => ({ nom, md })),
           total: f.total,
-          resteNom: "Arrondis",
-          precision: "Sous-fonctions officielles (Destatis, 2025 provisoire). Elles peuvent ne pas rejoindre exactement le total de la fonction par arrondi.",
+          resteNom: "Autres",
         },
       ],
       source: SRC.COFOG,
