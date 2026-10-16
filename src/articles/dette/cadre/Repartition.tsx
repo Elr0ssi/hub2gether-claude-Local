@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { montant, montantAbs, nf } from "./montants";
+import { DetailsPostes } from "./DetailsPostes";
 
 const COULEURS = [
   "var(--dos-s0)",
@@ -30,20 +31,22 @@ export function Repartition({
   lignes,
   nom,
   negatif = false,
+  details,
 }: {
   lignes: { nom: string; md: number }[];
   nom: string;
   negatif?: boolean;
+  details?: Record<string,{texte:string;sous?:{nom:string;md:number}[]}>;
 }) {
   const positives = lignes.filter((l) => l.md > 0);
   const somme = positives.reduce((t, l) => t + l.md, 0);
   const [actif, setActif] = useState<number | null>(null);
+  const [ouvert, setOuvert] = useState<string | null>(null);
   return (
     <div className="dos-rep">
       <div className="dos-pile-b" role="img" aria-label={nom}>
         {positives.map((l, i) => (
           <span
-            key={l.nom}
             className={actif !== null && actif !== i ? "dos-seg-sombre" : undefined}
             style={{ flexGrow: l.md, backgroundColor: COULEURS[i % COULEURS.length] }}
             title={`${l.nom} · ${montantAbs(l.md)}`}
@@ -53,22 +56,20 @@ export function Repartition({
         ))}
       </div>
       <ul className="dos-pile-l">
-        {lignes.map((l, i) => (
-          <li
+        {lignes.map((l, i) => (<div key={l.nom} style={{display:"contents"}}><li
             key={l.nom}
             className={`${l.md < 0 ? "dos-pile-neg" : ""}${actif === i && l.md > 0 ? " dos-pile-on" : ""}`}
             onPointerEnter={() => l.md > 0 && setActif(i)}
             onPointerLeave={() => setActif(null)}
           >
             <i style={{ backgroundColor: l.md > 0 ? COULEURS[i % COULEURS.length] : "var(--dos-s7)" }} aria-hidden="true" />
-            <span>{l.nom}</span>
+            {details?.[l.nom] ? <button type="button" aria-expanded={ouvert===l.nom} onClick={()=>setOuvert(ouvert===l.nom?null:l.nom)} style={{flex:1,textAlign:"left",border:0,background:"transparent",color:"inherit",font:"inherit",cursor:"pointer",padding:0}}>{l.nom} <span aria-hidden="true">{ouvert===l.nom?"−":"⌄"}</span></button> : <span>{l.nom}</span>}
             <b className={negatif ? "dos-neg" : undefined}>
               {negatif || l.md < 0 ? "−" : ""}
               {montant(Math.abs(l.md), 0)}
             </b>
             <em>{l.md > 0 ? `${nf((l.md / somme) * 100)} %` : "en déduction"}</em>
-          </li>
-        ))}
+          </li>{ouvert===l.nom && details?.[l.nom] && <li style={{display:"block",padding:"12px 16px",background:"var(--dos-fond, transparent)"}}><DetailsPostes titre={l.nom} postes={[{nom:l.nom,md:l.md}]} complements={{[l.nom]:details[l.nom]}} ouvertInitial /></li>}</div>))}
       </ul>
     </div>
   );
