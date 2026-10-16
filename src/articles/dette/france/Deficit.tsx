@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { DetailsPostes } from "@/articles/dette/cadre/DetailsPostes";
 import { Figure, Repartition, enLettres, montant, nombre } from "@/articles/dette/cadre";
 import {
   ACTEURS_2025,
@@ -83,8 +82,14 @@ export function Deficit() {
           source={RECETTES_2025}
           voir={[{ href: "#depenses-publiques", label: "Voir les dépenses" }]}
         >
-          <Repartition lignes={RECETTES_DETAIL} nom="Répartition des recettes publiques 2025" />
-          <DetailsPostes titre="Explorer les recettes" postes={RECETTES_DETAIL} complements={{"Impôts": {texte:"Les impôts financent les services publics. Le barème de l’impôt sur le revenu ne concerne qu’un des impôts : les recettes fiscales incluent aussi la TVA, la CSG et les impôts sur les sociétés.",sous:IMPOTS_FAMILLES},"Cotisations sociales effectives":{texte:"Prélèvements versés par salariés et employeurs, notamment pour la retraite, la maladie et les allocations. Il n’existe pas un taux unique : les taux dépendent de la branche, du salaire, du plafond et du statut."},"Ventes et autres recettes de production":{texte:"Produits des services rendus et facturés par des administrations : droits d’inscription, prestations publiques, redevances et autres ventes comptabilisées en production."},"Revenus de la propriété":{texte:"Dividendes des entreprises à participation publique, intérêts reçus et revenus du patrimoine détenu par les administrations."}}} />
+          <Repartition lignes={RECETTES_DETAIL} nom="Répartition des recettes publiques 2025" details={{
+ "Impôts": {texte:"Impôts courants sur les revenus et patrimoines, taxes sur les produits et la production, impôts en capital. Cliquez sur une famille dans le camembert pour voir les principaux impôts.",sous:IMPOTS_FAMILLES.map(p => ({ nom:p.nom, md:p.md, enfants:p.enfants })),source:{nom:"Insee, comptes des administrations publiques",url:"https://www.insee.fr/fr/statistiques/2830166"}},
+ "Cotisations sociales effectives":{texte:"Cotisations versées par les employeurs et salariés pour financer les assurances sociales : retraite, maladie, chômage, famille. Les taux varient selon le régime, la rémunération et les plafonds."},
+ "Ventes et autres recettes de production":{texte:"Services et productions vendus ou facturés par les administrations, notamment redevances et prestations publiques."},
+ "Revenus de la propriété":{texte:"Dividendes, intérêts et revenus du patrimoine public."},
+ "Autres recettes":{texte:"Transferts et autres ressources qui ne relèvent pas des grandes catégories précédentes."},
+ "Impôts et cotisations susceptibles de ne pas être recouvrés":{texte:"Montant déduit pour tenir compte des impôts et cotisations dont le recouvrement est jugé improbable."}
+}} />
         </Figure>
       </div>
 
@@ -105,14 +110,22 @@ export function Deficit() {
             </button>
           </div>
           {lecture === "nature" ? (
-            <><Repartition lignes={DEPENSES_NATURE} nom="Dépenses publiques 2025 par nature" /><DetailsPostes titre="Comprendre les dépenses par nature" postes={DEPENSES_NATURE} complements={{"Fonctionnement":{texte:"Rémunérations des agents en activité, achats de biens et services courants, entretien et informatique. Les pensions des anciens agents sont des prestations de retraite."},"Prestations sociales en espèces et en nature":{texte:"En espèces : sommes versées aux ménages (retraites, allocations, indemnités). En nature : biens et services fournis ou pris en charge pour eux."},"Intérêts":{texte:"Rémunération annuelle des prêteurs de la dette existante ; à distinguer du remboursement du capital."}}} /></>
-          ) : (
-            <>
-              <Repartition lignes={DEPENSES_FONCTION} nom="Dépenses publiques par fonction" />
-              <DetailsPostes titre="Explorer chaque fonction" postes={DEPENSES_FONCTION} complements={{"Protection sociale":{texte:"Retraites, chômage, aides aux familles, handicap, dépendance et exclusion. Les pensions d’anciens enseignants ou soignants relèvent de la protection sociale, pas des salaires des actifs.",sous:[{nom:"Prestations en espèces : pensions, allocations et indemnités",md:556},{nom:"Prestations en nature : biens et services pris en charge",md:45},{nom:"Rémunérations : personnel des services sociaux",md:32},{nom:"Transferts et subventions à d’autres organismes",md:45},{nom:"Achats courants : fonctionnement",md:11},{nom:"Investissements : équipements durables",md:4}]},"Santé":{texte:"Dépenses publiques de soins : financement de services médicaux, personnels, achats, équipements et bâtiments. Les pensions des anciens soignants ne sont pas incluses dans la rémunération des soignants actifs.",sous:[{nom:"Prestations en nature",md:136},{nom:"Rémunérations des personnels actifs",md:70},{nom:"Achats courants",md:34},{nom:"Autres transferts",md:11},{nom:"Investissements",md:10}]},"Enseignement":{texte:"Écoles, universités, personnel en activité, fournitures, bâtiments et équipements ; les retraites des anciens enseignants sont classées en protection sociale.",sous:[{nom:"Rémunérations",md:104},{nom:"Achats courants",md:14},{nom:"Investissements",md:12},{nom:"Transferts",md:9},{nom:"Prestations",md:11}]},"Défense":{texte:"Rémunération des militaires en activité, achats et maintenance d’équipements, investissements et transferts.",sous:[{nom:"Rémunérations",md:22},{nom:"Achats",md:20},{nom:"Investissements",md:11},{nom:"Transferts",md:2}]}}} />
-              <p className="dos-notule">Dernière ventilation par fonction publiée : 2024.</p>
-            </>
-          )}
+            <Repartition lignes={DEPENSES_NATURE} nom="Dépenses publiques 2025 par nature" details={{
+ "Fonctionnement":{texte:"Salaires des agents en activité et achats de fonctionnement ; la différence avec le total inclut d’autres composantes.",sous:[{nom:"Rémunérations des agents",md:370},{nom:"Consommations intermédiaires",md:164.6}],precision:"Ces deux postes ne couvrent pas l’intégralité de la catégorie : ne pas les additionner comme une ventilation exhaustive."},
+ "Prestations sociales en espèces et en nature":{texte:"Espèces : sommes versées aux ménages, dont pensions, indemnités et allocations. Nature : biens et services fournis ou pris en charge. La CAF verse notamment des aides familiales et au logement ; le versement ne signifie pas que toute l’aide relève d’une même fonction COFOG."},
+ "Autres transferts et subventions":{texte:"Financements transférés à d’autres agents économiques, associations, entreprises ou organismes."},
+ "Acquisitions nettes d'actifs non financiers":{texte:"Investissements et achats nets de bâtiments, équipements et autres actifs non financiers. La ligne « dont investissement » est incluse dans le total, elle ne s’y ajoute pas."},
+ "Intérêts":{texte:"Coût des emprunts pendant l’année ; ce n’est pas le remboursement du principal."}
+}} />
+          ) : (<>
+            <Repartition lignes={DEPENSES_FONCTION} nom="Dépenses publiques par fonction" details={{
+ "Protection sociale":{texte:"Retraites, chômage, famille, handicap, dépendance et exclusion. Le camembert classe la dépense par nature économique (2024), pas par organisme : la CAF est un organisme payeur, pas une fonction distincte.",sous:[{nom:"Prestations en espèces : pensions et allocations",md:556},{nom:"Prestations en nature : services financés",md:45},{nom:"Rémunérations des agents actifs",md:32},{nom:"Transferts et subventions",md:45},{nom:"Achats de fonctionnement",md:11},{nom:"Investissements",md:4}],source:{nom:"Insee, dépenses par fonction 2024",url:"https://www.insee.fr/fr/statistiques/4277596"}},
+ "Santé":{texte:"Soins, établissements de santé, personnel en activité, achats et équipements.",sous:[{nom:"Prestations en nature",md:136},{nom:"Rémunérations des personnels",md:70},{nom:"Consommations intermédiaires",md:34},{nom:"Transferts",md:11},{nom:"Investissements",md:10}],source:{nom:"Insee, dépenses par fonction 2024",url:"https://www.insee.fr/fr/statistiques/4277596"}},
+ "Enseignement":{texte:"Écoles, universités, personnels en activité, bâtiments et équipements. Les pensions des anciens enseignants sont comptées dans la protection sociale.",sous:[{nom:"Rémunérations",md:104},{nom:"Achats courants",md:14},{nom:"Investissements",md:12},{nom:"Transferts",md:9},{nom:"Prestations",md:11}],precision:"Montants arrondis : leur somme peut différer du total de la fonction.",source:{nom:"Insee, dépenses par fonction 2024",url:"https://www.insee.fr/fr/statistiques/4277596"}},
+ "Défense":{texte:"Rémunérations des militaires actifs, fonctionnement, achats et investissements.",sous:[{nom:"Rémunérations",md:22},{nom:"Achats",md:20},{nom:"Investissements",md:11},{nom:"Transferts",md:2}],precision:"Montants arrondis : la somme peut différer du total.",source:{nom:"Insee, dépenses par fonction 2024",url:"https://www.insee.fr/fr/statistiques/4277596"}}
+}} />
+            <p className="dos-notule">Ventilation par fonction : 2024 (dernière série disponible ici), à distinguer des dépenses totales 2025.</p>
+          </>)}
         </Figure>
       </div>
 
