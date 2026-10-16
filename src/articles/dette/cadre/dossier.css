@@ -1198,34 +1198,33 @@ body:has(.dos) { background: #0a0912; }
 .dos-det-source { margin: 14px 0 0; font-size: 11.5px; color: var(--dos-encre-3); }
 .dos-det-source a { color: var(--dos-encre-2); }
 
-/* Le camembert : l'anneau à gauche, la légende à droite, comme « Qui détient la dette ». */
-.dos-cam { display: grid; grid-template-columns: minmax(150px, 210px) minmax(0, 1fr); gap: clamp(16px, 3vw, 32px); align-items: center; min-width: 0; }
-.dos-cam-anneau { position: relative; width: 100%; aspect-ratio: 1; align-self: start; }
+/* Le camembert : l'anneau à gauche, la légende à droite, comme « Qui détient la dette ». Petit, sur un seul niveau. */
+.dos-cam { display: grid; grid-template-columns: minmax(130px, 170px) minmax(0, 1fr); gap: clamp(14px, 3vw, 28px); align-items: center; min-width: 0; }
+.dos-cam-anneau { position: relative; width: 100%; aspect-ratio: 1; }
 .dos-cam-anneau svg { display: block; width: 100%; height: 100%; }
 .dos-cam-arc { cursor: pointer; transition: opacity 0.25s, stroke-width 0.2s; }
 .dos-cam-arc-sombre { opacity: 0.32; }
-.dos-cam-centre { position: absolute; inset: 17%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center; pointer-events: none; overflow: hidden; }
-.dos-cam-centre b { font-size: clamp(17px, 2.2vw, 24px); font-weight: 400; letter-spacing: -0.03em; color: var(--dos-encre); }
-.dos-cam-centre small { font-size: 11px; line-height: 1.3; color: var(--dos-encre-3); overflow-wrap: anywhere; }
+.dos-cam-centre { position: absolute; inset: 18%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; text-align: center; pointer-events: none; overflow: hidden; }
+.dos-cam-centre b { font-size: clamp(15px, 1.9vw, 20px); font-weight: 400; letter-spacing: -0.03em; color: var(--dos-encre); }
+.dos-cam-centre small { font-size: 10.5px; line-height: 1.3; color: var(--dos-encre-3); overflow-wrap: anywhere; }
 .dos-cam-leg { list-style: none; margin: 0; padding: 0; min-width: 0; }
 .dos-pile-l .dos-pile-detail .dos-cam-leg > li,
-.dos-cam-leg > li { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto 52px; gap: 10px; align-items: start; padding: 9px 8px; border: 0; border-radius: 12px; font-size: 13px; cursor: default; background: none; transition: background 0.2s; }
+.dos-cam-leg > li { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto 50px; gap: 10px; align-items: baseline; padding: 8px 8px; border: 0; border-radius: 10px; font-size: 13px; cursor: default; background: none; transition: background 0.2s; }
 .dos-cam-leg > li.dos-cam-on { background: color-mix(in srgb, var(--dos-encre) 7%, transparent); }
-.dos-cam-p { width: 10px; height: 10px; margin-top: 4px; border-radius: 3px; }
-.dos-cam-n { min-width: 0; overflow-wrap: anywhere; color: var(--dos-encre-2); }
-.dos-cam-n > button:not(.dos-cam-voir) { display: inline-flex; align-items: center; gap: 8px; padding: 0; border: 0; background: none; font: inherit; color: var(--dos-encre); text-align: left; cursor: pointer; }
-.dos-cam-n > button:not(.dos-cam-voir):hover { color: var(--dos-vif-2); }
-.dos-cam-chev { font-size: 16px; font-weight: 600; line-height: 1; color: var(--dos-vif-2); }
-.dos-cam-n small { display: block; margin-top: 3px; font-size: 11.5px; color: var(--dos-encre-3); }
-.dos-cam-leg > li > b { font-size: 13px; font-weight: 700; white-space: nowrap; color: var(--dos-encre); }
+.dos-cam-p { width: 10px; height: 10px; border-radius: 3px; align-self: center; }
+.dos-cam-n { min-width: 0; color: var(--dos-encre-2); }
+.dos-cam-nom { color: var(--dos-encre); overflow-wrap: anywhere; }
+.dos-cam-nom small { margin-left: 8px; font-size: 11.5px; color: var(--dos-encre-3); }
+.dos-cam-t { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 2px; }
+.dos-cam-leg > li > b { font-size: 13px; font-weight: 700; white-space: nowrap; color: var(--dos-encre); text-align: right; }
 .dos-cam-leg > li > em { font-style: normal; font-size: 12px; text-align: right; color: var(--dos-encre-3); white-space: nowrap; }
-.dos-cam-leg > li.dos-cam-reste .dos-cam-n, .dos-cam-leg > li.dos-cam-reste > b { color: var(--dos-encre-3); font-style: italic; font-weight: 500; }
+.dos-cam-leg > li.dos-cam-reste .dos-cam-nom, .dos-cam-leg > li.dos-cam-reste > b { color: var(--dos-encre-3); font-style: italic; font-weight: 500; }
 .dos-pile-l .dos-pile-detail .dos-cam-legende { grid-column: 1 / -1; margin: 0; font-size: 12.5px; font-weight: 650; letter-spacing: 0.02em; color: var(--dos-encre-2); }
-.dos-cam-precision { grid-column: 1 / -1; margin: 4px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--dos-encre-3); }
+.dos-cam-precision { grid-column: 1 / -1; margin: 2px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--dos-encre-3); }
 @media (max-width: 680px) {
   .dos-cam { grid-template-columns: 1fr; }
-  .dos-cam-anneau { max-width: 190px; margin: 0 auto; }
-  .dos-cam-leg > li, .dos-pile-l .dos-pile-detail .dos-cam-leg > li { grid-template-columns: 10px minmax(0, 1fr) auto auto; gap: 7px; padding: 8px 4px; }
+  .dos-cam-anneau { max-width: 170px; margin: 0 auto; }
+  .dos-cam-leg > li, .dos-pile-l .dos-pile-detail .dos-cam-leg > li { grid-template-columns: 10px minmax(0, 1fr) auto auto; gap: 8px; padding: 8px 4px; }
 }
 @media (prefers-reduced-motion: reduce) { .dos-cam-arc { transition: none; } }
 
@@ -1239,26 +1238,9 @@ body:has(.dos) { background: #0a0912; }
 .dos-eq-def b { color: var(--dos-corail); }
 @media (max-width: 560px) { .dos-eq-l { grid-template-columns: 1fr auto; } .dos-eq-l i { grid-column: 1 / -1; grid-row: 2; } }
 
-/* ── Les « dont » : une liste pleine largeur sous le camembert ───────────── */
-.dos-cam-ouvert { background: color-mix(in srgb, var(--dos-encre) 6%, transparent); }
+/* ── Taux (flèche bleue) et barèmes ───────────────────────────────────────── */
 .dos-taux { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--dos-encre); white-space: normal; }
-.dos-pile-l .dos-pile-detail .dos-taux i { width: auto; height: auto; border-radius: 0; background: none; font-style: normal; font-weight: 800; color: #5aa0ff; }
-.dos-cam-n .dos-taux { display: flex; margin-top: 4px; }
-.dos-cam-dont { grid-column: 1 / -1; margin-top: 4px; padding: 16px 18px 8px; border-radius: 16px; background: var(--dos-surface); border: 1px solid var(--dos-ligne); }
-.dos-cam-dont-t { margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.03em; color: var(--dos-encre-3); }
-.dos-cam-dont-t span { margin-left: 8px; color: var(--dos-encre); }
-.dos-cam-dont ul { list-style: none; margin: 0; padding: 0; }
-.dos-pile-l .dos-pile-detail .dos-cam-dont li.dos-dont,
-.dos-cam-dont li.dos-dont { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) 104px 56px; align-items: baseline; gap: 4px 18px; padding: 11px 0; border: 0; border-top: 1px solid var(--dos-ligne); border-radius: 0; font-size: 13px; background: none; }
-.dos-cam-dont li.dos-dont:first-child { border-top: 0; }
-.dos-dont-n { min-width: 0; color: var(--dos-encre); overflow-wrap: anywhere; }
-.dos-dont-n small { margin-left: 8px; font-size: 11.5px; color: var(--dos-encre-3); }
-.dos-dont-t { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; min-width: 0; }
-.dos-dont > b { font-weight: 700; white-space: nowrap; text-align: right; color: var(--dos-encre); }
-.dos-dont > em { font-style: normal; font-size: 12px; text-align: right; color: var(--dos-encre-3); white-space: nowrap; }
-.dos-dont-reste .dos-dont-n, .dos-dont-reste > b { color: var(--dos-encre-3); font-style: italic; font-weight: 500; }
-.dos-dont-sous .dos-dont-n { padding-left: 16px; color: var(--dos-encre-2); }
-.dos-dont-bar { grid-column: 1 / -1; }
+.dos-pile-l li .dos-taux i, .dos-pile-l .dos-pile-detail .dos-taux i { width: auto; height: auto; border-radius: 0; background: none; font-style: normal; font-weight: 800; color: #5aa0ff; }
 .dos-cam-voir { padding: 2px 10px; border: 1px solid var(--dos-ligne); border-radius: 999px; background: var(--dos-surface-2); font: inherit; font-size: 11px; font-weight: 650; color: #5aa0ff; cursor: pointer; }
 .dos-cam-voir:hover { border-color: #5aa0ff; }
 .dos-bar { margin: 4px 0 8px; padding: 12px 14px; border-radius: 14px; background: var(--dos-surface-2); border: 1px solid var(--dos-ligne); max-width: 520px; }
@@ -1268,13 +1250,6 @@ body:has(.dos) { background: #0a0912; }
 .dos-bar-l { color: var(--dos-encre-2); }
 .dos-bar li > b { font-weight: 700; color: var(--dos-encre); text-align: right; max-width: 52%; }
 .dos-pile-l .dos-pile-detail .dos-bar li > i { grid-column: 1 / -1; grid-row: 2; display: block; height: 7px; border-radius: 4px; background: linear-gradient(90deg, #4a6df0, #5aa0ff); min-width: 0; }
-@media (max-width: 680px) {
-  .dos-cam-dont { padding: 14px 14px 6px; }
-  .dos-pile-l .dos-pile-detail .dos-cam-dont li.dos-dont, .dos-cam-dont li.dos-dont { grid-template-columns: minmax(0, 1fr) auto 46px; gap: 3px 10px; }
-  .dos-dont-t { grid-column: 1 / -1; grid-row: 2; }
-  .dos-dont > b { grid-column: 2; grid-row: 1; }
-  .dos-dont > em { grid-column: 3; grid-row: 1; }
-}
 
 /* ── Le tableau de tous les chiffres (lisible par les moteurs de recherche) ── */
 .dos-tab { margin-top: 18px; }
@@ -1293,4 +1268,13 @@ body:has(.dos) { background: #0a0912; }
 .dos-tab-dont th { font-weight: 450; color: var(--dos-encre-2); }
 .dos-tab-dont th small { color: var(--dos-encre-3); font-weight: 400; }
 .dos-pile-l li[id] { scroll-margin-top: 120px; }
-.dos-cam-dont-p { margin: 4px 0 10px; padding-top: 10px; border-top: 1px solid var(--dos-ligne); font-size: 11.5px; line-height: 1.55; color: var(--dos-encre-3); }
+
+/* ── Les familles de recettes : un code couleur (impôts, cotisations, autres) ── */
+.dos { --fam0: #6d3dff; --fam1: #ff7fb6; --fam2: #5f9bff; }
+:root[data-concept="clair"] .dos { --fam0: #4a1fd0; --fam1: #e0529a; --fam2: #3f7be0; }
+.dos-fam { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 12px; padding: 0; list-style: none; font-size: 12.5px; color: var(--dos-encre-2); }
+.dos-fam li { display: inline-flex; align-items: center; gap: 7px; }
+.dos-fam i { width: 11px; height: 11px; border-radius: 4px; display: block; }
+.dos-pile-l .dos-pile-note { display: block; }
+.dos-pile-taux { margin-left: 10px; }
+.dos-pile-l .dos-pile-taux .dos-taux { font-size: 12px; font-weight: 600; }

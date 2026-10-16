@@ -4,19 +4,18 @@
    Une ligne d'une <Repartition> peut s'ouvrir sur un camembert. Ce fichier dit
    comment on décrit ce camembert, sans aucune mise en page.
 
-     Part     une part : un nom, un montant (Md€), éventuellement ses « dont »
+     Part     une part : un nom, un montant (Md€), éventuellement son taux
      Vue      un camembert : des parts, et le total publié si on le connaît
      Detail   ce qui s'ouvre sous une ligne : l'explication, une ou plusieurs vues
 
    RÈGLES (elles évitent les doubles comptes) :
-     - `enfants` = les « dont » : ils sont inclus dans le montant du parent et ne
-       s'y ajoutent jamais. Ils ne sont pas dessinés dans l'anneau, seulement
-       listés sous leur parent.
+     - UN SEUL NIVEAU : une ligne s'ouvre sur un camembert, et c'est tout. Ce qui est
+       trop fin pour y figurer est regroupé dans « Autres » ou n'est pas montré.
+       Les grandes familles sont des lignes de la barre, pas des camemberts dans des camemberts.
      - Quand les parts ne font pas le total publié, la différence est montrée
-       comme une part grisée « Reste non détaillé dans la source » : jamais
-       cachée, jamais attribuée à un poste.
+       comme une part grisée « Autres » : jamais cachée, jamais attribuée à un poste.
      - Quand la somme des parts dépasse le total publié (arrondis), le total
-       affiché est la somme et une phrase le dit.
+       affiché est la somme.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /** Une ligne d'un barème : un libellé, un taux (pour la longueur de la barre) et le texte du taux. */
@@ -41,10 +40,8 @@ export interface Part {
   taux?: string;
   /** Les taux en détail, dessinés en barres : tranches d'un barème, ou taux d'une même taxe. */
   bareme?: Bareme;
-  /** Une ligne sous la liste des « dont » : d'où viennent les montants quand ils ne sont pas tous de la même comptabilité. */
-  precisionDont?: string;
-  /** Les « dont » : inclus dans `md`, listés sous la part. */
-  enfants?: Part[];
+  /** Pour une ligne de la barre : l'index de sa famille (voir `familles` de <Repartition>), qui donne sa couleur. */
+  famille?: number;
   /** Vrai pour la part calculée « reste ». */
   reste?: boolean;
 }
@@ -114,7 +111,7 @@ export function slug(texte: string): string {
 }
 
 export interface LigneAplatie {
-  /** 0 : la ligne de la barre ; 1 : une part de son camembert ; 2 : un « dont ». */
+  /** 0 : la ligne de la barre ; 1 : une part de son camembert. */
   niveau: number;
   nom: string;
   md: number;
@@ -140,12 +137,6 @@ export function aplatir(lignes: Part[], details?: Record<string, Detail>): Ligne
       for (const p of parts) {
         if (p.reste) continue;
         sortie.push({ niveau: 1, nom: p.nom, md: p.md, base, taux: p.taux, note: p.note, lecture: v.titre ?? v.legende, parent: l.nom });
-        if (p.enfants) {
-          for (const e of completer(p.enfants, p.md).parts) {
-            if (e.reste) continue;
-            sortie.push({ niveau: 2, nom: e.nom, md: e.md, base: p.md, taux: e.taux, note: e.note, lecture: v.titre ?? v.legende, parent: p.nom });
-          }
-        }
       }
     }
   }

@@ -12,7 +12,7 @@ export { ArticleLong } from "./ArticleLong";
 export { Chapitre } from "./Chapitre";
 export { Figure } from "./Figure";
 export { Etapes } from "./Etapes";
-export { Repartition } from "./Repartition";
+export { Repartition, type FamilleRepartition } from "./Repartition";
 export { DeficitPublic, type DeficitPublicProps, type LectureDepenses } from "./DeficitPublic";
 export { Camembert, avecMontants } from "./Camembert";
 export { aplatir, slug, variablesMesurees, type Part, type Vue, type Detail, type Bareme, type Tranche } from "./ventilation";

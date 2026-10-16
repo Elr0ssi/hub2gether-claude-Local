@@ -4,13 +4,12 @@ import { useMemo, useState } from "react";
 import { completer, type Bareme as BaremeT, type Part, type Vue } from "./ventilation";
 import { montant, nf } from "./montants";
 
-/** Un camembert qui se lit comme « Qui détient la dette française » : l'anneau à gauche,
- *  la légende à droite (nom, montant, part), le survol allume la part dans les deux.
+/** Un camembert qui se lit comme « Qui détient la dette française » : l'anneau à gauche, à droite la légende
+ *  (nom, → taux en bleu, montant, part) ; le survol allume la part dans les deux.
  *
  *    <Camembert vue={{ parts: [{ nom: "TVA", md: 208.8, taux: "2,1 à 20 %" }, …], total: 884.9 }} />
  *
- *  Quand une part a des « dont » (`enfants`), un clic ouvre leur liste sous le camembert, sur toute
- *  la largeur : un nom, → son taux en bleu, son montant, sa part. Les « dont » ne sont pas dans l'anneau. */
+ *  Un seul niveau : pas de camembert dans le camembert. */
 
 const TEINTES = ["var(--cam0)", "var(--cam1)", "var(--cam2)", "var(--cam3)", "var(--cam4)", "var(--cam5)", "var(--cam6)", "var(--cam7)", "var(--cam8)", "var(--cam9)"];
 const teinte = (p: Part, i: number) => (p.reste ? "var(--cam-reste)" : TEINTES[i % TEINTES.length]);
@@ -30,7 +29,7 @@ export function avecMontants(texte: string, annee = 2025): string {
 export const mdAuto = (v: number, annee = 2025) => montant(v, Math.abs(v) < 0.1 ? 3 : Math.abs(v) < 1 ? 2 : 1, annee);
 
 /** Le taux, en une courte ligne : une flèche bleue, puis « 20 % ». */
-function Taux({ taux }: { taux: string }) {
+export function Taux({ taux }: { taux: string }) {
   return (
     <span className="dos-taux">
       <i aria-hidden="true">→</i>
@@ -39,8 +38,8 @@ function Taux({ taux }: { taux: string }) {
   );
 }
 
-/** Un barème en barres (tranches de l'impôt sur le revenu…) : plus la barre est longue, plus le taux est haut. */
-function Bareme({ bareme }: { bareme: BaremeT }) {
+/** Un barème (tranches de l'impôt sur le revenu, tarifs d'accise) : en barres quand les lignes ont un taux comparable. */
+export function Bareme({ bareme }: { bareme: BaremeT }) {
   const max = Math.max(...bareme.lignes.map((l) => l.taux ?? 0), 1);
   const avecBarres = bareme.lignes.some((l) => l.taux !== undefined);
   return (
@@ -59,43 +58,39 @@ function Bareme({ bareme }: { bareme: BaremeT }) {
   );
 }
 
-/** Une ligne de la liste des « dont » : nom, → taux, montant, part du parent. */
-function LigneDont({ p, base, annee, niveau = 0 }: { p: Part; base: number; annee: number; niveau?: number }) {
+function LigneLegende({ p, i, base, dec, annee, actif, setActif }: { p: Part; i: number; base: number; dec: number; annee: number; actif: number | null; setActif: (i: number | null) => void }) {
   const [bareme, setBareme] = useState(false);
-  const sous = p.enfants ? completer(p.enfants, p.md).parts : [];
   return (
-    <>
-      <li className={`dos-dont${p.reste ? " dos-dont-reste" : ""}${niveau > 0 ? " dos-dont-sous" : ""}`}>
-        <span className="dos-dont-n">
+    <li className={`${actif === i ? "dos-cam-on" : ""}${p.reste ? " dos-cam-reste" : ""}`} onPointerEnter={() => setActif(i)} onPointerLeave={() => setActif(null)}>
+      <span className="dos-cam-p" style={{ background: teinte(p, i) }} aria-hidden="true" />
+      <div className="dos-cam-n">
+        <span className="dos-cam-nom">
           {p.nom}
           {p.note && <small>{avecMontants(p.note, annee)}</small>}
         </span>
-        <span className="dos-dont-t">
-          {p.taux && <Taux taux={p.taux} />}
-          {p.bareme && (
-            <button type="button" className="dos-cam-voir" aria-expanded={bareme} onClick={() => setBareme(!bareme)}>
-              {bareme ? "masquer" : "barème"}
-            </button>
-          )}
-        </span>
-        <b>{mdAuto(p.md, annee)}</b>
-        <em>{base > 0 ? pct((p.md / base) * 100, 1) : ""}</em>
-        {bareme && p.bareme && <div className="dos-dont-bar"><Bareme bareme={p.bareme} /></div>}
-      </li>
-      {sous.map((e) => (
-        <LigneDont key={e.nom} p={e} base={p.md} annee={annee} niveau={niveau + 1} />
-      ))}
-    </>
+        {(p.taux || p.bareme) && (
+          <span className="dos-cam-t">
+            {p.taux && <Taux taux={p.taux} />}
+            {p.bareme && (
+              <button type="button" className="dos-cam-voir" aria-expanded={bareme} onClick={() => setBareme(!bareme)}>
+                {bareme ? "masquer" : "barème"}
+              </button>
+            )}
+          </span>
+        )}
+        {bareme && p.bareme && <Bareme bareme={p.bareme} />}
+      </div>
+      <b>{mdAuto(p.md, annee)}</b>
+      <em>{pct((p.md / base) * 100, dec)}</em>
+    </li>
   );
 }
 
 export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
   const { parts, base } = useMemo(() => completer(vue.parts, vue.total, vue.resteNom), [vue]);
   const [actif, setActif] = useState<number | null>(null);
-  const [ouvert, setOuvert] = useState<number | null>(null);
   const dec = vue.pctDecimales ?? 1;
   if (parts.length === 0 || base <= 0) return null;
-  const mdAff = (v: number) => mdAuto(v, annee);
 
   const R = 42;
   const C = 2 * Math.PI * R;
@@ -107,8 +102,6 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
     return arc;
   });
   const lu = actif === null ? null : parts[actif];
-  const ouverte = ouvert === null ? null : parts[ouvert];
-  const dont = ouverte?.enfants ? completer(ouverte.enfants, ouverte.md).parts : [];
 
   return (
     <div className="dos-cam">
@@ -123,7 +116,7 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
               r={R}
               fill="none"
               stroke={teinte(parts[i], i)}
-              strokeWidth={actif === i || ouvert === i ? 14 : 11}
+              strokeWidth={actif === i ? 14 : 11}
               strokeDasharray={`${Math.max(0, long - 0.8)} ${C}`}
               strokeDashoffset={decal}
               transform="rotate(-90 50 50)"
@@ -142,7 +135,7 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
             </>
           ) : (
             <>
-              <b>{mdAff(base)}</b>
+              <b>{mdAuto(base, annee)}</b>
               <small>au total</small>
             </>
           )}
@@ -150,49 +143,10 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
       </div>
 
       <ul className="dos-cam-leg">
-        {parts.map((p, i) => {
-          const peutOuvrir = Boolean(p.enfants && p.enfants.length > 0);
-          const estOuvert = ouvert === i;
-          return (
-            <li
-              key={p.nom}
-              className={`${actif === i ? "dos-cam-on" : ""}${p.reste ? " dos-cam-reste" : ""}${estOuvert ? " dos-cam-ouvert" : ""}`}
-              onPointerEnter={() => setActif(i)}
-              onPointerLeave={() => setActif(null)}
-            >
-              <span className="dos-cam-p" style={{ background: teinte(p, i) }} aria-hidden="true" />
-              <div className="dos-cam-n">
-                {peutOuvrir ? (
-                  <button type="button" aria-expanded={estOuvert} onClick={() => setOuvert(estOuvert ? null : i)}>
-                    {p.nom}
-                    <span className="dos-cam-chev" aria-hidden="true">{estOuvert ? "−" : "+"}</span>
-                  </button>
-                ) : (
-                  <span>{p.nom}</span>
-                )}
-                {p.note && <small>{avecMontants(p.note, annee)}</small>}
-                {p.taux && <Taux taux={p.taux} />}
-              </div>
-              <b>{mdAff(p.md)}</b>
-              <em>{pct((p.md / base) * 100, dec)}</em>
-            </li>
-          );
-        })}
+        {parts.map((p, i) => (
+          <LigneLegende key={p.nom} p={p} i={i} base={base} dec={dec} annee={annee} actif={actif} setActif={setActif} />
+        ))}
       </ul>
-
-      {ouverte && dont.length > 0 && (
-        <div className="dos-cam-dont">
-          <p className="dos-cam-dont-t">
-            Dans « {ouverte.nom} » <span>{mdAff(ouverte.md)}</span>
-          </p>
-          <ul>
-            {dont.map((e) => (
-              <LigneDont key={e.nom} p={e} base={ouverte.md} annee={annee} />
-            ))}
-          </ul>
-          {ouverte.precisionDont && <p className="dos-cam-dont-p">{avecMontants(ouverte.precisionDont, annee)}</p>}
-        </div>
-      )}
 
       {vue.precision && <p className="dos-cam-precision">{avecMontants(vue.precision, annee)}</p>}
     </div>

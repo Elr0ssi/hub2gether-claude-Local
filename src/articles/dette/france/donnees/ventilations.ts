@@ -26,17 +26,10 @@ export const SRC = {
 
 /* ── 1. Les recettes (2025) ─────────────────────────────────────────────── */
 
-export const RECETTES_LIGNES: Part[] = [
-  { nom: "Impôts et cotisations sociales", md: 1374.1, note: "Le prélèvement obligatoire, cotisations imputées comprises" },
-  { nom: "Recettes de production", md: 129.2 },
-  { nom: "Autres transferts", md: 35.5 },
-  { nom: "Revenus de la propriété", md: 23.0 },
-];
-export const RECETTES_TOTAL_LIGNES = 1561.8;
+/* Les grandes familles : une couleur chacune sur la barre et sur les lignes. */
+export const FAMILLES_RECETTES = [{ nom: "Impôts" }, { nom: "Cotisations sociales" }, { nom: "Autres recettes" }];
 
-
-/* ── Les taux des impôts (2025) ─────────────────────────────────────────── */
-
+/* Les tarifs, les barèmes : un petit tableau derrière le bouton « barème ». */
 const BAREME_IR: Bareme = {
   titre: "Barème 2025 (revenus 2024), par part de quotient familial",
   lignes: [
@@ -58,9 +51,6 @@ const BAREME_IFI: Bareme = {
     { libelle: "Au-delà de 10 M€", taux: 1.5, texte: "1,5 %" },
   ],
 };
-
-
-/* Les tarifs d'accise : des montants par unité, sans échelle commune, donc affichés sans barres. */
 const TARIFS_ENERGIE: Bareme = {
   titre: "Accise hors TVA, ordre de grandeur (varie selon les régions)",
   lignes: [
@@ -78,7 +68,7 @@ const TARIFS_ALCOOLS: Bareme = {
     { libelle: "Spiritueux", texte: "1 899,18 €/hl d'alcool pur" },
   ],
 };
-const TARIFS_IMMATRICULATION: Bareme = {
+const TARIFS_VEHICULES: Bareme = {
   titre: "Malus à l'immatriculation",
   lignes: [
     { libelle: "Malus CO₂ (depuis mars 2025)", texte: "de 50 € à 70 000 €" },
@@ -86,97 +76,131 @@ const TARIFS_IMMATRICULATION: Bareme = {
   ],
 };
 
-/* Les impôts, tels que la publication Insee du 28 août 2026 les range. Un parent n'est pas
-   additionné à ses « dont ». IRPP et IS sont publiés avant crédits d'impôt. */
-export const IMPOTS_PARTS: Part[] = [
-  {
-    nom: "Impôts courants sur le revenu",
-    md: 383.3,
-    enfants: [
-      { nom: "CSG", md: 156.6, taux: "9,2 % sur l'activité" },
-      { nom: "Impôt sur le revenu des personnes physiques", md: 103.6, note: "avant crédits d'impôt", taux: "0 à 45 %", bareme: BAREME_IR },
-      { nom: "Impôt sur les sociétés", md: 69.5, note: "avant crédits d'impôt", taux: "25 %" },
-      { nom: "CRDS", md: 9.3, taux: "0,5 %" },
-    ],
-  },
-  { nom: "TVA", md: 208.8, note: "Impôt sur les produits", taux: "2,1 à 20 %" },
-  {
-    nom: "Autres impôts sur les produits",
-    md: 128.1,
-    precisionDont:
-      "Hors accises énergie et tabac (Insee), les montants viennent de la DGFiP, du Compte général de l'État et de la Sécurité sociale : d'autres comptabilités, qui donnent l'ordre de grandeur de chaque taxe sans rejoindre exactement les [[128.1]] de la ligne.",
-    enfants: [
-      { nom: "Accises sur les produits énergétiques", md: 30.5, note: "Insee", taux: "selon le produit", bareme: TARIFS_ENERGIE },
-      { nom: "Accises sur les tabacs", md: 13.6, note: "Insee", taux: "prix + quantité" },
-      { nom: "Assurances", md: 12.6, note: "DGFiP", taux: "9 % ou 18 %" },
-      { nom: "Électricité, gaz naturel et charbon", md: 11.8, note: "DGFiP", taux: "électricité 33,70 €/MWh" },
-      { nom: "Complémentaires santé (TSA)", md: 6.558, note: "Sécurité sociale", taux: "13,27 %" },
-      { nom: "Jeux et paris", md: 5.9, note: "DGFiP", taux: "variable" },
-      { nom: "Alcools", md: 4.2, note: "Sécurité sociale", taux: "selon le volume et le degré", bareme: TARIFS_ALCOOLS },
-      { nom: "Transactions financières", md: 2.5, note: "DGFiP", taux: "0,3 % puis 0,4 %" },
-      { nom: "TGAP (pollutions)", md: 1.2, note: "DGFiP", taux: "selon la pollution" },
-      { nom: "Véhicules d'entreprise (CO₂ et polluants)", md: 1.032, note: "Sécurité sociale", taux: "selon les émissions" },
-      { nom: "Taxes additionnelles à l'immatriculation", md: 0.967, note: "Compte général de l'État", taux: "selon CO₂ et poids", bareme: TARIFS_IMMATRICULATION },
-      {
-        nom: "Boissons non alcoolisées",
-        md: 0.9,
-        note: "DGFiP",
-        taux: "boissons sucrées et édulcorées",
-        enfants: [
-          { nom: "Boissons sucrées", md: 0.819, note: "Sécurité sociale", taux: "4, 21 ou 35 €/hl" },
-          { nom: "Boissons édulcorées", md: 0.048, note: "Sécurité sociale, provisoire", taux: "selon les édulcorants" },
-        ],
-      },
-      { nom: "Taxe sur les services numériques", md: 0.9, note: "DGFiP", taux: "3 %" },
-      { nom: "Billets d'avion (contribution de solidarité)", md: 0.793, note: "Compte général de l'État", taux: "selon la destination" },
-      { nom: "Taxe de l'aviation civile", md: 0.569, note: "Compte général de l'État", taux: "selon la destination" },
-    ],
-  },
-  {
-    nom: "Autres impôts sur la production",
-    md: 72.7,
-    enfants: [
-      { nom: "Taxe foncière", md: 44.2, taux: "variable" },
-      { nom: "Cotisation foncière des entreprises", md: 8.1, taux: "variable" },
-      { nom: "Contribution sociale de solidarité des sociétés", md: 5.3, taux: "0,16 % du CA au-delà de 19 M€" },
-      { nom: "Cotisation sur la valeur ajoutée des entreprises", md: 3.7, taux: "0 à 0,19 % du CA" },
-    ],
-  },
-  {
-    nom: "Impôts sur salaires et main-d'œuvre",
-    md: 60.1,
-    enfants: [{ nom: "Taxe sur les salaires", md: 17.6, taux: "4,25 à 13,6 %" }],
-  },
-  {
-    nom: "Impôts en capital",
-    md: 21.7,
-    enfants: [{ nom: "Droits de mutation à titre gratuit", md: 21.1, taux: "5 à 45 %" }],
-  },
-  {
-    nom: "Autres impôts courants",
-    md: 6.6,
-    enfants: [
-      { nom: "Taxe d'habitation", md: 2.9, taux: "variable" },
-      { nom: "Impôt sur la fortune immobilière", md: 2.7, taux: "0 à 1,5 %", bareme: BAREME_IFI },
-    ],
-  },
-  { nom: "Droits et impôts sur les importations", md: 3.6, taux: "selon la marchandise" },
+/* Les impôts, tels que la publication Insee du 28 août 2026 les range. IRPP et IS sont publiés avant crédits d'impôt. */
+const IMPOTS = {
+  revenu: 383.3,
+  tva: 208.8,
+  produits: 128.1,
+  production: 72.7,
+  salaires: 60.1,
+  capital: 21.7,
+  courants: 6.6,
+  importations: 3.6,
+};
+const arrondi = (v: number) => Math.round(v * 10) / 10;
+const DIVERS = arrondi(IMPOTS.capital + IMPOTS.courants + IMPOTS.importations);
+export const IMPOTS_TOTAL = arrondi(IMPOTS.revenu + IMPOTS.tva + IMPOTS.produits + IMPOTS.production + IMPOTS.salaires + DIVERS);
+/* Le prélèvement obligatoire (impôts + cotisations sociales, cotisations imputées comprises) : Insee, comptes APU 2025. */
+const PRELEVEMENT_OBLIGATOIRE = 1374.1;
+export const COTISATIONS = arrondi(PRELEVEMENT_OBLIGATOIRE - IMPOTS_TOTAL);
+
+export const RECETTES_LIGNES: Part[] = [
+  { nom: "Cotisations sociales", md: COTISATIONS, famille: 1, note: "cotisations imputées comprises" },
+  { nom: "Impôts courants sur le revenu", md: IMPOTS.revenu, famille: 0 },
+  { nom: "TVA", md: IMPOTS.tva, famille: 0, taux: "2,1 à 20 %" },
+  { nom: "Recettes de production", md: 129.2, famille: 2 },
+  { nom: "Autres impôts sur les produits", md: IMPOTS.produits, famille: 0 },
+  { nom: "Autres impôts sur la production", md: IMPOTS.production, famille: 0 },
+  { nom: "Impôts sur salaires et main-d'œuvre", md: IMPOTS.salaires, famille: 0 },
+  { nom: "Autres transferts", md: 35.5, famille: 2 },
+  { nom: "Divers impôts", md: DIVERS, famille: 0, note: "capital, patrimoine, importations" },
+  { nom: "Revenus de la propriété", md: 23.0, famille: 2 },
 ];
 
 export const DETAIL_RECETTES: Record<string, Detail> = {
-  "Impôts et cotisations sociales": {
+  "Cotisations sociales": {
     texte:
-      "C'est le prélèvement obligatoire : les impôts et les cotisations sociales, y compris les cotisations sociales dites imputées, que les employeurs publics sont réputés verser pour les prestations qu'ils servent eux-mêmes à leurs agents. La CSG et la CRDS sont rangées parmi les impôts courants sur le revenu, pas parmi les cotisations sociales effectives.",
-    vues: [{ legende: "Les impôts, par catégorie", parts: IMPOTS_PARTS }],
+      "Ce que salariés, employeurs et indépendants versent pour financer les retraites, l'assurance maladie, la famille et le chômage, y compris les cotisations dites imputées que les employeurs publics sont réputés verser pour les prestations servies à leurs agents. Montant : le prélèvement obligatoire total ([[1374.1]]) moins les impôts de cette liste.",
+    source: SRC.APU,
+  },
+  "Impôts courants sur le revenu": {
+    texte: "Les impôts qui frappent les revenus des ménages et les bénéfices des entreprises.",
+    vues: [
+      {
+        parts: [
+          { nom: "CSG", md: 156.6, taux: "9,2 % sur l'activité" },
+          { nom: "Impôt sur le revenu", md: 103.6, note: "avant crédits d'impôt", taux: "0 à 45 %", bareme: BAREME_IR },
+          { nom: "Impôt sur les sociétés", md: 69.5, note: "avant crédits d'impôt", taux: "25 %" },
+          { nom: "CRDS", md: 9.3, taux: "0,5 %" },
+        ],
+        total: IMPOTS.revenu,
+      },
+    ],
+    source: SRC.IMPOTS,
+  },
+  TVA: {
+    texte:
+      "La taxe payée par le consommateur sur la plupart des biens et des services. Quatre taux existent en métropole : 20 % (taux normal), 10 %, 5,5 % et 2,1 %, selon le produit ou le service.",
     source: SRC.IMPOTS,
   },
   "Recettes de production": {
     texte: "Ce que les administrations vendent ou facturent pour les biens et les services qu'elles produisent : les recettes de leur activité, hors impôts.",
     source: SRC.APU,
   },
+  "Autres impôts sur les produits": {
+    texte: "Les taxes sur la consommation de produits particuliers : énergie, tabac, assurances, alcools, jeux, transactions financières, véhicules polluants.",
+    vues: [
+      {
+        parts: [
+          { nom: "Énergie", md: 30.5, taux: "selon le produit", bareme: TARIFS_ENERGIE },
+          { nom: "Tabac", md: 13.6, taux: "prix + quantité" },
+          { nom: "Assurances", md: 12.6, taux: "9 % ou 18 %" },
+          { nom: "Complémentaires santé", md: 6.558, taux: "13,27 %" },
+          { nom: "Jeux et paris", md: 5.9, taux: "variable" },
+          { nom: "Alcools", md: 4.2, taux: "selon le volume et le degré", bareme: TARIFS_ALCOOLS },
+          { nom: "Transactions financières", md: 2.5, taux: "0,3 % puis 0,4 %" },
+          { nom: "Véhicules polluants", md: Math.round((1.032 + 0.967) * 1000) / 1000, taux: "selon CO₂ et poids", bareme: TARIFS_VEHICULES },
+        ],
+        total: IMPOTS.produits,
+        precision:
+          "Énergie et tabac : Insee. Autres taxes : DGFiP, Compte général de l'État et Sécurité sociale, d'autres comptabilités : ce sont des ordres de grandeur.",
+      },
+    ],
+    source: SRC.IMPOTS,
+  },
+  "Autres impôts sur la production": {
+    texte: "Les impôts qui pèsent sur l'activité des entreprises et sur la propriété.",
+    vues: [
+      {
+        parts: [
+          { nom: "Taxe foncière", md: 44.2, taux: "variable" },
+          { nom: "Cotisation foncière des entreprises", md: 8.1, taux: "variable" },
+          { nom: "Contribution sociale de solidarité (C3S)", md: 5.3, taux: "0,16 % du CA au-delà de 19 M€" },
+          { nom: "CVAE", md: 3.7, taux: "0 à 0,19 % du CA" },
+        ],
+        total: IMPOTS.production,
+      },
+    ],
+    source: SRC.IMPOTS,
+  },
+  "Impôts sur salaires et main-d'œuvre": {
+    texte: "Les impôts assis sur la masse salariale, dont la taxe sur les salaires que paient les employeurs peu ou pas soumis à la TVA.",
+    vues: [
+      {
+        parts: [{ nom: "Taxe sur les salaires", md: 17.6, taux: "4,25 à 13,6 %" }],
+        total: IMPOTS.salaires,
+      },
+    ],
+    source: SRC.IMPOTS,
+  },
   "Autres transferts": {
     texte: "Les transferts que les administrations reçoivent et qui ne sont ni des impôts ni des cotisations sociales.",
     source: SRC.APU,
+  },
+  "Divers impôts": {
+    texte: "Les impôts sur le capital et le patrimoine, et les droits perçus sur les importations.",
+    vues: [
+      {
+        parts: [
+          { nom: "Droits de succession et donations", md: 21.1, taux: "5 à 45 %" },
+          { nom: "Droits sur les importations", md: 3.6, taux: "selon la marchandise" },
+          { nom: "Taxe d'habitation", md: 2.9, taux: "variable" },
+          { nom: "Impôt sur la fortune immobilière", md: 2.7, taux: "0 à 1,5 %", bareme: BAREME_IFI },
+        ],
+        total: DIVERS,
+      },
+    ],
+    source: SRC.IMPOTS,
   },
   "Revenus de la propriété": {
     texte: "Les revenus que les administrations tirent de leur patrimoine : intérêts, dividendes et autres revenus de la propriété.",

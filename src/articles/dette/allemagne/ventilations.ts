@@ -25,15 +25,9 @@ export const SRC = {
 export const RECETTES_TOTAL = 2137.94;
 export const IMPOTS_SEC = 1031.546;
 export const COTISATIONS_SEC = 823.069;
-/** Le solde calculé : recettes totales − impôts − cotisations. Ce n'est pas une catégorie publiée. */
-export const AUTRES_RECETTES = Math.round((RECETTES_TOTAL - IMPOTS_SEC - COTISATIONS_SEC) * 1000) / 1000;
 
-export const RECETTES_LIGNES: Part[] = [
-  { nom: "Impôts", md: IMPOTS_SEC },
-  { nom: "Cotisations sociales", md: COTISATIONS_SEC },
-  { nom: "Autres recettes", md: AUTRES_RECETTES },
-];
-
+/* Les grandes familles : une couleur chacune sur la barre et sur les lignes. */
+export const FAMILLES_RECETTES = [{ nom: "Impôts" }, { nom: "Cotisations sociales" }, { nom: "Autres recettes" }];
 
 /* ── Les taux des impôts (2025) ─────────────────────────────────────────── */
 
@@ -52,97 +46,109 @@ const BAREME_IR: Bareme = {
 
 /* Les impôts encaissés (statistiques de caisse, avant redistribution Bund / Länder / communes). */
 export const IMPOTS_ENCAISSES = 989.827;
+const PARTAGES = 746.339;
+const FEDERAUX = 108.813;
+const LANDER = 34.285;
+const DOUANE = 5.86;
+const arrondi3 = (v: number) => Math.round(v * 1000) / 1000;
+/* Les impôts communaux : le total encaissé moins les autres familles. */
+const COMMUNAUX = arrondi3(IMPOTS_ENCAISSES - PARTAGES - FEDERAUX - LANDER - DOUANE);
+/* Le reste des recettes : le total moins les cotisations et les impôts encaissés. */
+export const AUTRES_RECETTES = arrondi3(RECETTES_TOTAL - COTISATIONS_SEC - IMPOTS_ENCAISSES);
+export const ECART_IMPOTS = arrondi3(IMPOTS_SEC - IMPOTS_ENCAISSES);
 
-export const IMPOTS_PARTS: Part[] = [
-  {
-    nom: "Impôts partagés Bund / Länder",
-    md: 746.339,
-    note: "Répartis entre le Bund, les Länder et les communes",
-    enfants: [
-      { nom: "Impôt sur les salaires (Lohnsteuer)", md: 262.688, note: "net des allocations familiales, selon Destatis", taux: "0 à 45 %", bareme: BAREME_IR },
-      { nom: "TVA intérieure", md: 236.267, taux: "7 à 19 %" },
-      { nom: "Impôt sur le revenu par déclaration", md: 78.362, taux: "0 à 45 %", bareme: BAREME_IR },
-      { nom: "TVA à l'importation", md: 73.939, taux: "7 ou 19 %" },
-      { nom: "Impôt sur les sociétés", md: 39.164, taux: "15 %" },
-      { nom: "Impôts sur revenus du capital non établis", md: 31.118, taux: "25 %" },
-      { nom: "Impôt libératoire sur revenus financiers", md: 24.801, taux: "25 %" },
-    ],
-  },
-  {
-    nom: "Impôts fédéraux",
-    md: 108.813,
-    enfants: [
-      { nom: "Taxe sur l'énergie", md: 37.563, taux: "selon le produit" },
-      { nom: "Taxe sur les assurances", md: 19.611, taux: "19 %" },
-      { nom: "Taxe sur le tabac", md: 17.632, taux: "prix + quantité" },
-      { nom: "Contribution de solidarité", md: 12.878, taux: "5,5 % de l'impôt" },
-      { nom: "Taxe sur les véhicules", md: 9.598, taux: "selon le CO₂" },
-      { nom: "Taxe sur l'électricité", md: 5.856, taux: "20,50 €/MWh" },
-      { nom: "Taxe sur les billets d'avion", md: 2.063, taux: "selon la distance" },
-      { nom: "Taxe sur l'alcool", md: 2.05, taux: "1 303 €/hl d'alcool pur" },
-      { nom: "Taxe sur le café", md: 1.038, taux: "2,19 €/kg (torréfié)" },
-      { nom: "Taxe sur les vins mousseux", md: 0.365, taux: "136 €/hl" },
-    ],
-  },
-  {
-    nom: "Impôts communaux",
-    md: 94.53,
-    enfants: [
-      { nom: "Taxe professionnelle brute", md: 76.444, taux: "au moins 7 %" },
-      { nom: "Taxe foncière B", md: 15.742, taux: "variable" },
-      { nom: "Taxe sur les chiens", md: 0.43, taux: "variable" },
-      { nom: "Taxe sur les résidences secondaires", md: 0.284, taux: "variable" },
-    ],
-  },
-  {
-    nom: "Impôts des Länder",
-    md: 34.285,
-    enfants: [
-      { nom: "Droits de succession", md: 15.412, taux: "7 à 50 %" },
-      { nom: "Droits de mutation immobilière", md: 15.097, taux: "3,5 à 6,5 %" },
-      { nom: "Taxe sur les loteries", md: 1.789, taux: "20 %" },
-      { nom: "Taxe sur les paris sportifs", md: 0.419, taux: "5,3 %" },
-    ],
-  },
-  { nom: "Droits de douane", md: 5.86, taux: "tarif de l'UE" },
-];
-
-/* Autre lecture des impôts encaissés : qui les reçoit après partage (arrondis). */
-export const IMPOTS_APRES_PARTAGE: Part[] = [
-  { nom: "Länder", md: 415.3 },
-  { nom: "Bund", md: 388.7 },
-  { nom: "Communes", md: 150.9 },
-  { nom: "Union européenne (transferts)", md: 34.9 },
+export const RECETTES_LIGNES: Part[] = [
+  { nom: "Cotisations sociales", md: COTISATIONS_SEC, famille: 1 },
+  { nom: "Impôts partagés Bund / Länder", md: PARTAGES, famille: 0, note: "répartis entre l'État fédéral, les Länder et les communes" },
+  { nom: "Autres recettes", md: AUTRES_RECETTES, famille: 2 },
+  { nom: "Impôts fédéraux", md: FEDERAUX, famille: 0 },
+  { nom: "Impôts communaux", md: COMMUNAUX, famille: 0 },
+  { nom: "Impôts des Länder", md: LANDER, famille: 0 },
+  { nom: "Droits de douane", md: DOUANE, famille: 0, taux: "tarif de l'UE" },
 ];
 
 export const DETAIL_RECETTES: Record<string, Detail> = {
-  Impôts: {
-    texte:
-      "Les impôts de l'ensemble des administrations. Le détail ci-dessous porte sur les impôts effectivement encaissés ([[989.827]]), avant leur partage entre l'État fédéral, les Länder et les communes. Au total, la TVA (intérieure et à l'importation) représente [[310.206]].",
-    vues: [
-      {
-        titre: "Par type d'impôt",
-        parts: IMPOTS_PARTS,
-        total: IMPOTS_ENCAISSES,
-        legende: "Les impôts encaissés, par type",
-        resteNom: "Autres",
-      },
-      {
-        titre: "Qui les reçoit",
-        parts: IMPOTS_APRES_PARTAGE,
-        legende: "Qui reçoit les impôts encaissés, après partage",
-      },
-    ],
-    source: SRC.IMPOTS,
-  },
   "Cotisations sociales": {
     texte: "Les cotisations versées aux assurances sociales : retraite, maladie, chômage, dépendance et accidents du travail.",
     source: SRC.COMPTES,
   },
+  "Impôts partagés Bund / Länder": {
+    texte: "Les grands impôts dont le produit est partagé entre l'État fédéral, les Länder et les communes : impôt sur les salaires, TVA, impôt sur le revenu, impôt sur les sociétés. La TVA (intérieure et à l'importation) pèse [[310.206]].",
+    vues: [
+      {
+        parts: [
+          { nom: "Impôt sur les salaires (Lohnsteuer)", md: 262.688, note: "net des allocations familiales", taux: "0 à 45 %", bareme: BAREME_IR },
+          { nom: "TVA intérieure", md: 236.267, taux: "7 à 19 %" },
+          { nom: "Impôt sur le revenu par déclaration", md: 78.362, taux: "0 à 45 %", bareme: BAREME_IR },
+          { nom: "TVA à l'importation", md: 73.939, taux: "7 ou 19 %" },
+          { nom: "Impôt sur les sociétés", md: 39.164, taux: "15 %" },
+          { nom: "Impôts sur revenus du capital non établis", md: 31.118, taux: "25 %" },
+          { nom: "Impôt libératoire sur revenus financiers", md: 24.801, taux: "25 %" },
+        ],
+        total: PARTAGES,
+      },
+    ],
+    source: SRC.IMPOTS,
+  },
   "Autres recettes": {
     texte:
-      "Tout ce qui n'est ni impôt ni cotisation sociale : le reste des recettes publiques.",
+      "Le reste des recettes publiques : ce qui n'est ni cotisation sociale ni impôt encaissé. Il comprend l'écart de [[41.719]] entre les impôts de la comptabilité nationale ([[1031.546]]) et les impôts encaissés ([[989.827]]).",
     source: SRC.COMPTES,
+  },
+  "Impôts fédéraux": {
+    texte: "Les impôts dont le produit revient à l'État fédéral : énergie, assurances, tabac, solidarité, véhicules…",
+    vues: [
+      {
+        parts: [
+          { nom: "Taxe sur l'énergie", md: 37.563, taux: "selon le produit" },
+          { nom: "Taxe sur les assurances", md: 19.611, taux: "19 %" },
+          { nom: "Taxe sur le tabac", md: 17.632, taux: "prix + quantité" },
+          { nom: "Contribution de solidarité", md: 12.878, taux: "5,5 % de l'impôt" },
+          { nom: "Taxe sur les véhicules", md: 9.598, taux: "selon le CO₂" },
+          { nom: "Taxe sur l'électricité", md: 5.856, taux: "20,50 €/MWh" },
+          { nom: "Taxe sur les billets d'avion", md: 2.063, taux: "selon la distance" },
+          { nom: "Taxe sur l'alcool", md: 2.05, taux: "1 303 €/hl d'alcool pur" },
+          { nom: "Taxe sur le café", md: 1.038, taux: "2,19 €/kg (torréfié)" },
+          { nom: "Taxe sur les vins mousseux", md: 0.365, taux: "136 €/hl" },
+        ],
+        total: FEDERAUX,
+      },
+    ],
+    source: SRC.IMPOTS,
+  },
+  "Impôts communaux": {
+    texte: "Les impôts des communes, dont la taxe professionnelle (Gewerbesteuer) est de loin la principale. Montant : le total des impôts encaissés moins les autres familles.",
+    vues: [
+      {
+        parts: [
+          { nom: "Taxe professionnelle brute", md: 76.444, taux: "au moins 7 %" },
+          { nom: "Taxe foncière B", md: 15.742, taux: "variable" },
+          { nom: "Taxe sur les chiens", md: 0.43, taux: "variable" },
+          { nom: "Taxe sur les résidences secondaires", md: 0.284, taux: "variable" },
+        ],
+        total: COMMUNAUX,
+      },
+    ],
+    source: SRC.IMPOTS,
+  },
+  "Impôts des Länder": {
+    texte: "Les impôts dont le produit revient aux États fédérés : successions, mutations immobilières, loteries, paris sportifs.",
+    vues: [
+      {
+        parts: [
+          { nom: "Droits de succession", md: 15.412, taux: "7 à 50 %" },
+          { nom: "Droits de mutation immobilière", md: 15.097, taux: "3,5 à 6,5 %" },
+          { nom: "Taxe sur les loteries", md: 1.789, taux: "20 %" },
+          { nom: "Taxe sur les paris sportifs", md: 0.419, taux: "5,3 %" },
+        ],
+        total: LANDER,
+      },
+    ],
+    source: SRC.IMPOTS,
+  },
+  "Droits de douane": {
+    texte: "Les droits perçus sur les importations venant de pays hors Union européenne, selon le tarif douanier commun.",
+    source: SRC.IMPOTS,
   },
 };
 

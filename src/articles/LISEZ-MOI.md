@@ -168,7 +168,7 @@ export const DETAIL_RECETTES: Record<string, Detail> = {
   "Impôts": {
     texte: "Ce que c'est, en une ou deux phrases. Un montant dans un texte s'écrit [[310.2]] (converti dans la monnaie du menu).",
     vues: [                                        // un camembert, ou plusieurs (onglets : « Par type », « Par bénéficiaire »)
-      { titre: "Par type d'impôt", parts: [{ nom: "TVA", md: 208.8 }, { nom: "…", md: 128.1, enfants: [{ nom: "dont accises", md: 30.5 }] }],
+      { titre: "Par type d'impôt", parts: [{ nom: "TVA", md: 208.8 }, { nom: "…", md: 128.1, taux: "2,1 à 20 %" }],
         total: 884.9, precision: "Phrase de précaution : périmètre, édition, arrondis." },
     ],
     absent: "Quand la source ne détaille pas : on le dit, on ne dessine rien.",
@@ -179,7 +179,8 @@ export const DETAIL_RECETTES: Record<string, Detail> = {
 ```
 
 **Règles.**
-- `enfants` = les « dont » : inclus dans le montant de la part, **jamais additionnés** ; ils s'ouvrent sous la part (bouton +), ils ne sont pas dans l'anneau.
+- **Un seul niveau.** Une ligne s'ouvre sur un camembert, jamais sur un camembert dans un camembert. Les grandes familles sont des lignes de la barre (pour la France : « Impôts courants sur le revenu », « TVA », « Autres impôts sur les produits », « Autres impôts sur la production »…) ; ce qui est trop petit va dans « Divers » ou « Autres ». Un montant « dont » n'est jamais additionné à son parent.
+- **Code couleur** : `famille: 0 | 1 | 2` sur une ligne et `familles={[{ nom: "Impôts" }, { nom: "Cotisations sociales" }, { nom: "Autres recettes" }]}` sur la répartition colorent la barre et les lignes par grande famille, avec une légende de pastilles au-dessus.
 - Si les parts ne font pas le `total` publié, la différence apparaît en part grisée « Reste non détaillé dans la source » : jamais cachée, jamais attribuée à un poste.
 - Si la somme des parts dépasse le total (arrondis), le total affiché est la somme, et une phrase le dit.
 - Des montants arrondis à l'unité (COFOG) : `pctDecimales: 0`, et on ne lit pas les parts au dixième.

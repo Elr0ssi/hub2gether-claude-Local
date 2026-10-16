@@ -10,6 +10,7 @@ import {
   DETAIL_FONCTION,
   DETAIL_NATURE,
   DETAIL_RECETTES,
+  FAMILLES_RECETTES,
   FONCTIONS_TOTAL,
   RECETTES_LIGNES,
   SRC,
@@ -32,8 +33,9 @@ export function Deficit() {
         total: rec,
         lignes: RECETTES_LIGNES,
         details: DETAIL_RECETTES,
+        familles: FAMILLES_RECETTES,
         source: RECETTES_2025,
-        resume: `Répartition des ${enLettres(rec, 1)} de recettes des administrations publiques françaises en 2025 : impôts et cotisations sociales, recettes de production, autres transferts et revenus de la propriété.`,
+        resume: `Répartition des ${enLettres(rec, 1)} de recettes des administrations publiques françaises en 2025 : cotisations sociales, impôts (revenu, TVA, produits, production), recettes de production et autres recettes.`,
       }}
       depenses={{
         total: dep,

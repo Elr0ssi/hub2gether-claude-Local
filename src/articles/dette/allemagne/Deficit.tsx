@@ -8,6 +8,7 @@ import {
   DETAIL_FONCTION,
   DETAIL_NATURE,
   DETAIL_RECETTES,
+  FAMILLES_RECETTES,
   RECETTES_LIGNES,
   SOMME_FONCTIONS,
   SRC,
@@ -32,6 +33,7 @@ export function Deficit() {
         total: rec,
         lignes: RECETTES_LIGNES,
         details: DETAIL_RECETTES,
+        familles: FAMILLES_RECETTES,
         source: RECETTES_2025,
         resume: `Répartition des ${enLettres(rec, 1)} de recettes des administrations allemandes en 2025 (comptes nationaux révisés) : impôts, cotisations sociales et autres recettes.`,
       }}

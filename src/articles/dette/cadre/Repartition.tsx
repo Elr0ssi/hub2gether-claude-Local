@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useId, useState } from "react";
-import { Camembert, avecMontants, mdAuto } from "./Camembert";
+import { Camembert, Taux, avecMontants, mdAuto } from "./Camembert";
 import { montant, montantAbs, nf } from "./montants";
 import { aplatir, slug, type Detail, type Part } from "./ventilation";
 
@@ -22,6 +22,12 @@ const COULEURS = [
 ];
 
 export type LigneRepartition = Part;
+
+/** Une grande famille de lignes (impôts, cotisations sociales, autres recettes) : une pastille de couleur. */
+export interface FamilleRepartition {
+  nom: string;
+}
+const couleurDe = (l: Part, i: number) => (l.md <= 0 ? "var(--dos-s7)" : l.famille !== undefined ? `var(--fam${l.famille % 3})` : COULEURS[i % COULEURS.length]);
 
 function Panneau({ detail, annee }: { detail: Detail; annee: number }) {
   const t = (s: string) => avecMontants(s, annee);
@@ -102,6 +108,7 @@ export function Repartition({
   details,
   annee = 2025,
   idBase,
+  familles,
 }: {
   lignes: LigneRepartition[];
   nom: string;
@@ -111,6 +118,8 @@ export function Repartition({
   annee?: number;
   /** Le préfixe des ancres des lignes (`#recettes-tva`). Par défaut, le nom de la répartition. */
   idBase?: string;
+  /** Les grandes familles de lignes (jusqu'à trois) : leur couleur se lit sur la barre et sur chaque ligne (`famille` : 0, 1 ou 2). */
+  familles?: FamilleRepartition[];
 }) {
   const positives = lignes.filter((l) => l.md > 0);
   const somme = positives.reduce((t, l) => t + l.md, 0);
@@ -136,6 +145,16 @@ export function Repartition({
 
   return (
     <div className="dos-rep">
+      {familles && familles.length > 0 && (
+        <ul className="dos-fam" aria-label="Grandes familles">
+          {familles.map((f, k) => (
+            <li key={f.nom}>
+              <i style={{ backgroundColor: `var(--fam${k % 3})` }} aria-hidden="true" />
+              {f.nom}
+            </li>
+          ))}
+        </ul>
+      )}
       <div className="dos-pile-b" role="img" aria-label={nom}>
         {positives.map((l) => {
           const i = lignes.indexOf(l);
@@ -143,7 +162,7 @@ export function Repartition({
             <span
               key={l.nom}
               className={actif !== null && actif !== i ? "dos-seg-sombre" : undefined}
-              style={{ flexGrow: l.md, backgroundColor: COULEURS[i % COULEURS.length] }}
+              style={{ flexGrow: l.md, backgroundColor: couleurDe(l, i) }}
               title={`${l.nom} · ${montantAbs(l.md, 1, annee)}`}
               onPointerEnter={() => setActif(i)}
               onPointerLeave={() => setActif(null)}
@@ -171,10 +190,11 @@ export function Repartition({
                 onPointerEnter={() => l.md > 0 && setActif(i)}
                 onPointerLeave={() => setActif(null)}
               >
-                <i style={{ backgroundColor: l.md > 0 ? COULEURS[i % COULEURS.length] : "var(--dos-s7)" }} aria-hidden="true" />
+                <i style={{ backgroundColor: couleurDe(l, i) }} aria-hidden="true" />
                 <span>
                   {l.nom}
                   {detail && <small className="dos-pile-chevron" aria-hidden="true">{estOuvert ? "−" : "+"}</small>}
+                  {l.taux && !detail && <span className="dos-pile-taux"><Taux taux={l.taux} /></span>}
                   {l.note && <small className="dos-pile-note">{l.note}</small>}
                 </span>
                 <b className={negatif ? "dos-neg" : undefined}>

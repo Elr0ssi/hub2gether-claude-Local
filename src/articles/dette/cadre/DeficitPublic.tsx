@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Figure } from "./Figure";
-import { Repartition } from "./Repartition";
+import { Repartition, type FamilleRepartition } from "./Repartition";
 import { enLettres, montant } from "./montants";
 import type { Detail, Part } from "./ventilation";
 import type { Source } from "./types";
@@ -46,7 +46,7 @@ export interface LectureDepenses {
 export interface DeficitPublicProps {
   pays: string;
   annee?: number;
-  recettes: { total: number; lignes: Part[]; details?: Record<string, Detail>; source: Source; resume: string };
+  recettes: { total: number; lignes: Part[]; details?: Record<string, Detail>; familles?: FamilleRepartition[]; source: Source; resume: string };
   depenses: { total: number; lectures: LectureDepenses[]; source: Source; resume: string };
   deficit: { montant: number; lignes?: Part[]; details?: Record<string, Detail>; source: Source; resume: string; note?: React.ReactNode };
 }
@@ -112,7 +112,7 @@ export function DeficitPublic({ pays, annee = 2025, recettes, depenses, deficit 
           source={recettes.source}
           voir={[{ href: "#depenses-publiques", label: "Voir les dépenses" }]}
         >
-          <Repartition nom={`Recettes publiques ${pays} ${annee}`} idBase="recettes" lignes={recettes.lignes} details={recettes.details} annee={annee} />
+          <Repartition nom={`Recettes publiques ${pays} ${annee}`} idBase="recettes" lignes={recettes.lignes} details={recettes.details} familles={recettes.familles} annee={annee} />
         </Figure>
       </div>
 
