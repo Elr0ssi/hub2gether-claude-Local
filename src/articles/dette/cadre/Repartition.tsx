@@ -69,7 +69,7 @@ export function Repartition({
               {montant(Math.abs(l.md), 0)}
             </b>
             <em>{l.md > 0 ? `${nf((l.md / somme) * 100)} %` : "en déduction"}</em>
-          </li>{ouvert===l.nom && details?.[l.nom] && <li style={{display:"block",padding:"12px 16px",background:"var(--dos-fond, transparent)"}}><DetailsPostes titre={l.nom} postes={[{nom:l.nom,md:l.md}]} complements={{[l.nom]:details[l.nom]}} ouvertInitial /></li>}</div>))}
+          </li>{ouvert===l.nom && details?.[l.nom] && <li style={{display:"block",padding:"12px 16px",background:"var(--dos-fond, transparent)"}}><DetailsPostes titre={l.nom} postes={[{nom:l.nom,md:l.md}]} complements={{[l.nom]:details[l.nom]}} /></li>}</div>))}
       </ul>
     </div>
   );
