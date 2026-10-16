@@ -5,7 +5,7 @@ export const entreeAllemagne: EntreeCatalogue = {
   slug: 'allemagne',
   pays: 'Allemagne',
   drapeau: '🇩🇪',
-  titre: "Dette publique allemande : montant, évolution et détenteurs",
+  titre: "La dette publique de l'Allemagne, en lecture longue",
   accroche: "Dette Maastricht, déficit du Bund et des Länder, investisseurs, intérêts, refinancement et frein à l'endettement, avec chiffres officiels.",
   publie: '2026-10-16',
   modifie: '2026-10-16',
