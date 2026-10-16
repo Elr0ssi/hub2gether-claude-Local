@@ -1,3 +1,4 @@
+import ratioAllemagne from "@/../data/economie/dette/dette-sur-pib/DEU.json";
 /**
  * Allemagne — dette publique : données officielles vérifiées le 16 octobre 2026.
  * Unité des stocks/flux : MILLIARDS D'EUROS ; ratios en %.
@@ -63,6 +64,17 @@ export const DETTE_PAR_ANNEE = [
   { annee: '2026-T1', valeur: 64.4, md: 2902.035 },
 ] as const; // Chacun des points figure au tableau de la Bundesbank du 31/03/2026 (BB).
 
+/** Dates repères de la base du site, comme pour la France, et compléments
+ * Bundesbank/Eurostat. Ne pas interpoler les années absentes.
+ * Les chiffres de la base (saisie manuelle) ne sont pas interchangeables
+ * avec les données officielles trimestrielles ; chaque point conserve sa source. */
+export const DETTE_HISTORIQUE_BASE = Object.entries(ratioAllemagne.data as Record<string,number>)
+  .map(([annee,valeur]) => ({annee:Number(annee),valeur,source:ratioAllemagne.source as string}))
+  .sort((a,b)=>a.annee-b.annee);
+export const DETTE_HISTORIQUE_GRAPHE = [
+  ...DETTE_HISTORIQUE_BASE.filter(p=>p.annee<2019).map(p=>({annee:String(p.annee),valeur:p.valeur,md:null as number|null,source:p.source})),
+  ...DETTE_PAR_ANNEE.map(p=>({annee:String(p.annee),valeur:p.valeur,md:p.md as number|null,source:typeof p.annee==="number"?"Bundesbank":"Eurostat"})),
+];
 export const EUROPE_2026_T1 = [
   { pays: 'Grèce', pct: 143.5 },
   { pays: 'Italie', pct: 138.9 },
