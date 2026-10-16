@@ -9,6 +9,7 @@ import {
 /** Même rail d'onglets et même composant Repartition que France/Deficit.tsx.
  * Les dépenses sont réparties par leur mode de couverture, pas par fonction,
  * faute de tableau COFOG 2025 vérifié : le graphique l'indique explicitement. */
+function Comprendre({titre,children}:{titre:string;children:React.ReactNode}) {return <details className="dos-notule"><summary style={{cursor:'pointer',fontWeight:650}}>{titre} — explication</summary><div style={{paddingTop:8}}>{children}</div></details>}
 export function Deficit() {
   const [onglet, setOnglet] = useState<'recettes' | 'depenses' | 'deficit'>('recettes');
   const rec = RECETTES_2025.valeur;
@@ -39,18 +40,21 @@ export function Deficit() {
         source={RECETTES_2025}>
         <Repartition nom="Recettes des administrations allemandes, 2025, SEC 2010" lignes={[
           { nom: 'Impôts courants', md: IMPOTS_COURANTS_2025.valeur },
-          { nom: 'Autres recettes (différence calculée)', md: rec - IMPOTS_COURANTS_2025.valeur },
+          { nom: 'Autres impôts, cotisations et produits (solde non ventilé)', md: rec - IMPOTS_COURANTS_2025.valeur },
         ]} />
+        <Comprendre titre="Quels impôts ?">L'impôt sur le revenu allemand est progressif : chaque taux marginal concerne seulement une tranche du revenu imposable. Les recettes comprennent aussi la TVA, l'impôt sur les sociétés, la taxe professionnelle communale et les impôts fonciers. Un taux marginal n'est pas le taux moyen payé.</Comprendre>
+        <Comprendre titre="Que financent les cotisations sociales ?">Les cotisations salariales et patronales financent notamment les retraites, la santé, le chômage et la dépendance. Les taux varient selon l'assurance, le revenu, les plafonds et l'année : ne pas les confondre avec la part des cotisations dans les recettes publiques.</Comprendre>
+        <Comprendre titre="Que comprend le solde non ventilé ?">Il s'agit d'une différence comptable calculée, et non d'une catégorie officielle. Elle recouvre notamment d'autres impôts, les cotisations, des services facturés par les administrations, des revenus de patrimoine public et des transferts. <a href="https://ec.europa.eu/eurostat/databrowser/view/gov_10a_taxag/default/table" target="_blank" rel="noopener noreferrer">Ventilation officielle des impôts et cotisations : Eurostat ↗</a>.</Comprendre>
       </Figure>
     </div>
     <div id="de-p-depenses" role="tabpanel" hidden={onglet !== 'depenses'} className="dos-panneau">
-      <Figure id="depenses-publiques" titre="Comment les dépenses publiques ont-elles été financées ?"
-        legende={`En 2025, ${enLettres(dep, 1)} de dépenses SEC 2010 se couvrent par des recettes et un déficit comptable. Ce n'est pas une répartition des dépenses par fonction (santé, défense ou éducation).`}
-        source={DEPENSES_2025}>
-        <Repartition nom="Couverture des dépenses publiques allemandes, 2025" lignes={[
-          { nom: 'Recettes de l’année', md: rec },
-          { nom: 'Déficit de l’année', md: solde },
-        ]} />
+      <Figure id="depenses-publiques" titre="Où va l'argent public allemand ?" legende="Total des dépenses 2025 de toutes les administrations publiques selon Destatis. Les postes ci-dessous sont expliqués sans leur attribuer des montants non vérifiés." source={DEPENSES_2025}>
+        <p>En 2025, les administrations ont dépensé <b>{montant(dep,1)}</b>. Ce total sert à financer les services publics et les transferts aux ménages et entreprises. Ce n'est pas le budget du seul Bund.</p>
+        <Comprendre titre="Retraites et protection sociale">Pensions, chômage, aides aux familles, prestations liées au handicap ou à la dépendance. Les prestations sont des dépenses ; les cotisations sont des recettes.</Comprendre>
+        <Comprendre titre="Santé">Hôpitaux, consultations, médicaments, prévention et prestations des caisses d'assurance maladie. La dépense publique n'inclut pas forcément toutes les dépenses privées de santé.</Comprendre>
+        <Comprendre titre="Éducation, transports et infrastructures">Écoles, universités, enseignants, routes, transports et bâtiments publics. Les Länder jouent un rôle central dans l'éducation ; les communes financent des services locaux.</Comprendre>
+        <Comprendre titre="Défense, intérêts et administration">Armée et équipement, police, justice, services administratifs, aides économiques et intérêts versés aux prêteurs. Les intérêts sont un coût annuel, pas un remboursement du capital.</Comprendre>
+        <p className="dos-notule">Pour les montants et parts exacts par fonction, consulter <a href="https://ec.europa.eu/eurostat/databrowser/view/gov_10a_exp/default/table" target="_blank" rel="noopener noreferrer">Eurostat COFOG, dépenses publiques allemandes ↗</a>. Ne pas présenter les recettes et le déficit comme des catégories de dépenses.</p>
       </Figure>
     </div>
     <div id="de-p-deficit" role="tabpanel" hidden={onglet !== 'deficit'} className="dos-panneau">
@@ -63,6 +67,7 @@ export function Deficit() {
           { nom: 'Länder', md: DEFICIT_LANDER.valeur },
           { nom: 'Assurances sociales', md: DEFICIT_SECU.valeur },
         ]} />
+        <Comprendre titre="Bund, Länder, communes : qui est qui ?">Le Bund est l'État fédéral ; les Länder sont les 16 États fédérés ; les communes sont les collectivités locales. Les assurances sociales gèrent notamment les retraites, la santé et le chômage. Ici, les parts concernent le déficit de l'année, pas la dette totale accumulée.</Comprendre>
       </Figure>
     </div>
   </>;
