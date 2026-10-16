@@ -193,7 +193,7 @@ Pour une part, `taux` (facultatif) affiche « Taux : 20 % » sous son nom : le t
 
 ## La trame du chapitre « Déficit public » (identique pour tous les pays)
 
-Ne réécrivez jamais la mise en page : utilisez `DeficitPublic` (`cadre/DeficitPublic.tsx`). Un pays ne fournit que des données : `france/Deficit.tsx` et `allemagne/Deficit.tsx` sont les deux modèles (quelques dizaines de lignes). Ordre fixe : onglets Recettes − Dépenses = Déficit ; dépenses « Par nature » d'abord, puis « Par fonction » ; chaque ligne s'ouvre sur son explication et son camembert.
+Ne réécrivez jamais la mise en page : utilisez `DeficitPublic` (`cadre/DeficitPublic.tsx`). Un pays ne fournit que des données : `france/Deficit.tsx` et `allemagne/Deficit.tsx` sont les deux modèles (quelques dizaines de lignes). Ordre fixe : onglets Recettes − Dépenses = Déficit ; dépenses « Par fonction » d'abord (c'est la plus parlante), puis « Par nature » ; chaque ligne s'ouvre sur son explication et son camembert.
 
 **Taux** : une courte ligne, jamais une phrase (25 caractères environ) : `taux: "2,1 à 20 %"`, `"0 à 45 %"`, `"variable"`, `"prix + quantité"`, `"0,16 % du CA au-delà de 19 M€"`. Elle s'affiche « → 2,1 à 20 % » (flèche bleue). Un barème en barres (`bareme`) seulement pour un vrai barème par tranches (impôt sur le revenu, IFI). Pas de « voté localement par la commune ou l'intercommunalité » : écrire « variable ».
 

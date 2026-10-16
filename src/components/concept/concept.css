@@ -4479,3 +4479,9 @@ body:has(.cg) { background: #05080c; }
   background-clip: content-box;
 }
 
+
+/* Le nom du pays, dans la fiche d'un globe : un lien vers sa page, dans un nouvel onglet. */
+.ge-nom-lien { display: inline-flex; align-items: center; gap: 7px; color: inherit; text-decoration: none; }
+.ge-nom-lien svg { flex: none; opacity: 0.55; transition: opacity 0.2s, transform 0.25s; }
+.ge-nom-lien:hover, .ge-nom-lien:focus-visible { color: #8b5cff; }
+.ge-nom-lien:hover svg, .ge-nom-lien:focus-visible svg { opacity: 1; transform: translate(2px, -2px); }

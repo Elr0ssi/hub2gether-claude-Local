@@ -40,9 +40,8 @@ export function Deficit() {
       depenses={{
         total: dep,
         source: DEPENSES_2025,
-        resume: `Les ${enLettres(dep, 1)} de dépenses publiques françaises en 2025, lus par nature (prestations sociales, fonctionnement, transferts, investissement, intérêts) ou par fonction (protection sociale, santé, enseignement, défense…).`,
+        resume: `Les ${enLettres(dep, 1)} de dépenses publiques françaises en 2025, lus par fonction (protection sociale, santé, enseignement, défense…) ou par nature (prestations sociales, fonctionnement, transferts, investissement, intérêts).`,
         lectures: [
-          { id: "nature", bouton: "Par nature", nom: "Dépenses publiques françaises 2025 par nature", lignes: DEPENSES_NATURE_LIGNES, details: DETAIL_NATURE },
           {
             id: "fonction",
             bouton: "Par fonction",
@@ -57,6 +56,7 @@ export function Deficit() {
               </>
             ),
           },
+          { id: "nature", bouton: "Par nature", nom: "Dépenses publiques françaises 2025 par nature", lignes: DEPENSES_NATURE_LIGNES, details: DETAIL_NATURE },
         ],
       }}
       deficit={{

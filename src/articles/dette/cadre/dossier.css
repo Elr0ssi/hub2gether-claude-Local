@@ -1084,7 +1084,7 @@ body:has(.dos) { background: #0a0912; }
 .dos-rep .dos-pile-b span { transition: opacity 0.3s ease, filter 0.3s ease; cursor: default; }
 .dos-rep .dos-pile-b span.dos-seg-sombre { opacity: 0.3; }
 .dos-pile-l li { border-radius: 12px; padding-left: 8px; padding-right: 8px; transition: background 0.25s; }
-.dos-pile-l li.dos-pile-on { background: var(--dos-vif-doux); }
+.dos-pile-l li.dos-pile-on { background: color-mix(in srgb, var(--dos-vif) 8%, transparent); }
 .dos-pile-l i { background: var(--dos-s5); }
 .dos-lectures { display: inline-flex; gap: 4px; margin-bottom: 14px; padding: 4px; border-radius: 999px; background: var(--dos-surface-2); border: 1px solid var(--dos-ligne); }
 .dos-lectures button { padding: 8px 16px; border: 0; border-radius: 999px; font-size: 13px; font-weight: 650; color: var(--dos-encre-2); cursor: pointer; background: none; transition: background 0.25s, color 0.25s; }
@@ -1176,9 +1176,9 @@ body:has(.dos) { background: #0a0912; }
 }
 
 .dos-pile-l li.dos-pile-ouvrable { cursor: pointer; }
-.dos-pile-l li.dos-pile-ouvrable:hover { background: var(--dos-vif-doux); }
+.dos-pile-l li.dos-pile-ouvrable:hover { background: color-mix(in srgb, var(--dos-vif) 8%, transparent); }
 .dos-pile-l li.dos-pile-ouvrable:focus-visible { outline: 2px solid var(--dos-vif); outline-offset: -2px; }
-.dos-pile-l li.dos-pile-ouverte { background: var(--dos-vif-doux); border-bottom-color: transparent; }
+.dos-pile-l li.dos-pile-ouverte { background: color-mix(in srgb, var(--dos-vif) 11%, transparent); border-bottom-color: transparent; }
 .dos-pile-chevron { display: inline-block; margin-left: 10px; font-size: 17px; font-weight: 600; line-height: 1; color: var(--dos-vif-2); vertical-align: -1px; }
 .dos-pile-note { display: block; margin-top: 3px; font-size: 12px; font-weight: 400; color: var(--dos-encre-3); }
 
@@ -1278,3 +1278,15 @@ body:has(.dos) { background: #0a0912; }
 .dos-pile-l .dos-pile-note { display: block; }
 .dos-pile-taux { margin-left: 10px; }
 .dos-pile-l .dos-pile-taux .dos-taux { font-size: 12px; font-weight: 600; }
+
+/* ── Lignes compactes : le nom et son taux sur la même ligne tant qu'il y a la place ── */
+.dos-pile-l > li > i { align-self: stretch; width: 8px; height: auto; min-height: 16px; border-radius: 4px; justify-self: center; }
+.dos-pile-l .dos-pile-note { display: inline; margin: 0 0 0 10px; }
+.dos-pile-taux { margin-left: 12px; display: inline-block; }
+.dos-cam-n { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; }
+.dos-cam-n > .dos-bar { flex: 1 0 100%; }
+.dos-cam-t { display: inline-flex; margin: 0; }
+.dos-pile-l .dos-pile-detail .dos-cam-leg > li,
+.dos-cam-leg > li { align-items: start; }
+.dos-cam-leg > li > .dos-cam-p { align-self: stretch; width: 8px; height: auto; min-height: 16px; margin: 2px 0; border-radius: 4px; justify-self: center; }
+.dos-cam-leg > li.dos-cam-on { background: color-mix(in srgb, var(--dos-vif) 8%, transparent); }

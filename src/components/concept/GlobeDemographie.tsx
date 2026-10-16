@@ -1,6 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { ArrowUpRight } from "lucide-react";
+import { slugDe } from "@/data/seo/francais";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "./Theme";
 import { usePretGlobe } from "./ouverture";
@@ -438,7 +440,19 @@ export function GlobeDemographie({
             {fiche && choisi ? (
               <>
                 <div className="ge-tete-fiche">
-                  <h3 className="ge-nom">{nomFr(choisi)}</h3>
+                  <h3 className="ge-nom">
+                  {/* Le nom ouvre la page du pays, dans un nouvel onglet. */}
+                  <a
+                    className="ge-nom-lien"
+                    href={`/pays/${slugDe(nomFr(choisi))}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Page du pays : ${nomFr(choisi)} (nouvel onglet)`}
+                  >
+                    {nomFr(choisi)}
+                    <ArrowUpRight size={16} aria-hidden="true" />
+                  </a>
+                </h3>
                   {famille.id === "mortalite" && (
                     <div className="ge-unites" role="tablist" aria-label="Unité affichée">
                       <button
