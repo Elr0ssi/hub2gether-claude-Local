@@ -33,11 +33,11 @@ function DiagrammeDetail({
   if (base <= 0) return null;
   const somme = postes.reduce((s, p) => s + Math.max(0, p.md), 0);
   const manque = base - somme;
-  const parts = manque > 0.08 && !precision
+  const parts = manque > 0.08
     ? [...postes, { nom: "Autres postes non détaillés (solde)", md: manque }]
     : postes;
   const sommeGraph = parts.reduce((s, p) => s + Math.max(0, p.md), 0);
-  const R = 39; const C = 2 * Math.PI * R;
+  const R = 42; const C = 2 * Math.PI * R;
   let parcours = 0;
   const arcs = parts.map((p, i) => {
     const longueur = (Math.max(0, p.md) / sommeGraph) * C;
@@ -46,13 +46,13 @@ function DiagrammeDetail({
     return arc;
   });
   return <>
-    <div className="dos-detail-grille">
-      <div className="dos-detail-anneau">
-        <svg viewBox="0 0 100 100" role="img" aria-label="Ventilation détaillée en diagramme circulaire">
+    <div className="dp-porteurs dos-detail-porteurs" data-vu="1">
+      <div className="dp-anneau-w">
+        <svg className="dp-anneau-svg" viewBox="0 0 100 100" role="img" aria-label="Ventilation détaillée en diagramme circulaire">
           {arcs.map(({ index, longueur, decalage }) =>
             <circle key={parts[index].nom} cx="50" cy="50" r={R}
               fill="none" stroke={COULEURS[index % COULEURS.length]}
-              strokeWidth={survol === index ? 17 : 14}
+              strokeWidth={survol === index ? 14 : 11}
               strokeDasharray={`${Math.max(0, longueur - .7)} ${C}`}
               strokeDashoffset={decalage}
               transform="rotate(-90 50 50)"
@@ -61,9 +61,9 @@ function DiagrammeDetail({
             />
           )}
         </svg>
-        <div className="dos-detail-centre"><b>{survol === null ? "100 %" : `${nf(parts[survol].md / sommeGraph * 100)} %`}</b><small>{survol === null ? "du détail" : parts[survol].nom}</small></div>
+        <div className="dp-anneau-c"><b>{survol === null ? "100 %" : `${nf(parts[survol].md / sommeGraph * 100)} %`}</b><small>{survol === null ? "du détail" : parts[survol].nom}</small></div>
       </div>
-      <ul className="dos-detail-legende">
+      <ul className="dp-porteurs-l dos-detail-legende">
         {parts.map((p, i) => <li key={p.nom}
           onPointerEnter={() => setSurvol(i)} onPointerLeave={() => setSurvol(null)}>
           <span className="dos-detail-puce" style={{ background: COULEURS[i % COULEURS.length] }} />
@@ -101,14 +101,14 @@ export function Repartition({
     <div className="dos-pile-b" role="img" aria-label={nom}>
       {positives.map((l, i) => <span key={l.nom}
         className={actif !== null && actif !== i ? "dos-seg-sombre" : undefined}
-        style={{ flexGrow: l.md, backgroundColor: COULEURS[i % COULEURS.length] }}
+        style={{ flexGrow: l.md, backgroundColor: COULEURS[lignes.indexOf(l) % COULEURS.length] }}
         title={`${l.nom} · ${montantAbs(l.md)}`}
         onPointerEnter={() => setActif(i)}
         onPointerLeave={() => setActif(null)} />)}
     </div>
     <ul className="dos-pile-l">
       {lignes.map((l, i) => {
-        const detail = details?.[l.nom] ?? (l.enfants?.length ? { texte: l.note || "", sous: l.enfants } : undefined);
+        const detail: DetailRepartition = details?.[l.nom] ?? { texte: l.note || "Cette catégorie n’a pas de ventilation chiffrée supplémentaire dans la source actuelle.", sous: l.enfants?.length ? l.enfants : [{ nom: l.nom, md: Math.abs(l.md) }] };
         const estOuvert = ouvert === l.nom && !!detail;
         const id = `${identifiant}-${i}`;
         return <Fragment key={l.nom}>
