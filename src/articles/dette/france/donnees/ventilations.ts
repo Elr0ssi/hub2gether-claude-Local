@@ -59,6 +59,33 @@ const BAREME_IFI: Bareme = {
   ],
 };
 
+
+/* Les tarifs d'accise : des montants par unité, sans échelle commune, donc affichés sans barres. */
+const TARIFS_ENERGIE: Bareme = {
+  titre: "Accise hors TVA, ordre de grandeur (varie selon les régions)",
+  lignes: [
+    { libelle: "Essence (SP95-E5)", texte: "environ 0,68 €/litre" },
+    { libelle: "Gazole", texte: "environ 0,59 €/litre" },
+    { libelle: "Électricité (ménages, février à juillet)", texte: "33,70 €/MWh" },
+  ],
+};
+const TARIFS_ALCOOLS: Bareme = {
+  titre: "Droits d'accise, hors TVA",
+  lignes: [
+    { libelle: "Bière", texte: "4,05 ou 8,10 €/hl par degré" },
+    { libelle: "Vin tranquille", texte: "4,12 €/hl" },
+    { libelle: "Vin mousseux", texte: "10,20 €/hl" },
+    { libelle: "Spiritueux", texte: "1 899,18 €/hl d'alcool pur" },
+  ],
+};
+const TARIFS_IMMATRICULATION: Bareme = {
+  titre: "Malus à l'immatriculation",
+  lignes: [
+    { libelle: "Malus CO₂ (depuis mars 2025)", texte: "de 50 € à 70 000 €" },
+    { libelle: "Malus au poids, au-delà de 1 600 kg", texte: "10 à 30 €/kg par tranche" },
+  ],
+};
+
 /* Les impôts, tels que la publication Insee du 28 août 2026 les range. Un parent n'est pas
    additionné à ses « dont ». IRPP et IS sont publiés avant crédits d'impôt. */
 export const IMPOTS_PARTS: Part[] = [
@@ -76,9 +103,33 @@ export const IMPOTS_PARTS: Part[] = [
   {
     nom: "Autres impôts sur les produits",
     md: 128.1,
+    precisionDont:
+      "Hors accises énergie et tabac (Insee), les montants viennent de la DGFiP, du Compte général de l'État et de la Sécurité sociale : d'autres comptabilités, qui donnent l'ordre de grandeur de chaque taxe sans rejoindre exactement les [[128.1]] de la ligne.",
     enfants: [
-      { nom: "Accises sur les produits énergétiques", md: 30.5, taux: "selon le produit" },
-      { nom: "Accises sur les tabacs", md: 13.6, taux: "prix + quantité" },
+      { nom: "Accises sur les produits énergétiques", md: 30.5, note: "Insee", taux: "selon le produit", bareme: TARIFS_ENERGIE },
+      { nom: "Accises sur les tabacs", md: 13.6, note: "Insee", taux: "prix + quantité" },
+      { nom: "Assurances", md: 12.6, note: "DGFiP", taux: "9 % ou 18 %" },
+      { nom: "Électricité, gaz naturel et charbon", md: 11.8, note: "DGFiP", taux: "électricité 33,70 €/MWh" },
+      { nom: "Complémentaires santé (TSA)", md: 6.558, note: "Sécurité sociale", taux: "13,27 %" },
+      { nom: "Jeux et paris", md: 5.9, note: "DGFiP", taux: "variable" },
+      { nom: "Alcools", md: 4.2, note: "Sécurité sociale", taux: "selon le volume et le degré", bareme: TARIFS_ALCOOLS },
+      { nom: "Transactions financières", md: 2.5, note: "DGFiP", taux: "0,3 % puis 0,4 %" },
+      { nom: "TGAP (pollutions)", md: 1.2, note: "DGFiP", taux: "selon la pollution" },
+      { nom: "Véhicules d'entreprise (CO₂ et polluants)", md: 1.032, note: "Sécurité sociale", taux: "selon les émissions" },
+      { nom: "Taxes additionnelles à l'immatriculation", md: 0.967, note: "Compte général de l'État", taux: "selon CO₂ et poids", bareme: TARIFS_IMMATRICULATION },
+      {
+        nom: "Boissons non alcoolisées",
+        md: 0.9,
+        note: "DGFiP",
+        taux: "boissons sucrées et édulcorées",
+        enfants: [
+          { nom: "Boissons sucrées", md: 0.819, note: "Sécurité sociale", taux: "4, 21 ou 35 €/hl" },
+          { nom: "Boissons édulcorées", md: 0.048, note: "Sécurité sociale, provisoire", taux: "selon les édulcorants" },
+        ],
+      },
+      { nom: "Taxe sur les services numériques", md: 0.9, note: "DGFiP", taux: "3 %" },
+      { nom: "Billets d'avion (contribution de solidarité)", md: 0.793, note: "Compte général de l'État", taux: "selon la destination" },
+      { nom: "Taxe de l'aviation civile", md: 0.569, note: "Compte général de l'État", taux: "selon la destination" },
     ],
   },
   {

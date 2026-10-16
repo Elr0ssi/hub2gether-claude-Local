@@ -41,6 +41,8 @@ export interface Part {
   taux?: string;
   /** Les taux en détail, dessinés en barres : tranches d'un barème, ou taux d'une même taxe. */
   bareme?: Bareme;
+  /** Une ligne sous la liste des « dont » : d'où viennent les montants quand ils ne sont pas tous de la même comptabilité. */
+  precisionDont?: string;
   /** Les « dont » : inclus dans `md`, listés sous la part. */
   enfants?: Part[];
   /** Vrai pour la part calculée « reste ». */

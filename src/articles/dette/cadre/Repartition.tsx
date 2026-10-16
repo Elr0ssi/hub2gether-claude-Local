@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useId, useState } from "react";
-import { Camembert, avecMontants } from "./Camembert";
+import { Camembert, avecMontants, mdAuto } from "./Camembert";
 import { montant, montantAbs, nf } from "./montants";
 import { aplatir, slug, type Detail, type Part } from "./ventilation";
 
@@ -82,7 +82,7 @@ function TableauChiffres({ nom, lignes, details, annee }: { nom: string; lignes:
                   {r.nom}
                   {r.parent && r.niveau === 1 && <small> dans {r.parent}</small>}
                 </th>
-                <td>{montant(Math.abs(r.md), 1, annee)}</td>
+                <td>{mdAuto(Math.abs(r.md), annee)}</td>
                 <td>{r.base > 0 ? `${nf((Math.abs(r.md) / r.base) * 100)} %` : ""}</td>
                 <td>{r.taux ?? ""}</td>
                 <td>{r.texte ? avecMontants(r.texte, annee) : r.note ? avecMontants(r.note, annee) : ""}</td>

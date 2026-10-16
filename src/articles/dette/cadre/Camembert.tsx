@@ -26,6 +26,9 @@ export function avecMontants(texte: string, annee = 2025): string {
   return texte.replace(/\[\[(-?\d+(?:\.\d+)?)(?:\|(\d))?\]\]/g, (_, v: string, d?: string) => montant(Number(v), d === undefined ? 1 : Number(d), annee));
 }
 
+/** Un montant avec assez de décimales pour ne pas s'afficher « 0,0 » : trois sous 0,1 Md, deux sous 1 Md, une au-delà. */
+export const mdAuto = (v: number, annee = 2025) => montant(v, Math.abs(v) < 0.1 ? 3 : Math.abs(v) < 1 ? 2 : 1, annee);
+
 /** Le taux, en une courte ligne : une flèche bleue, puis « 20 % ». */
 function Taux({ taux }: { taux: string }) {
   return (
@@ -39,6 +42,7 @@ function Taux({ taux }: { taux: string }) {
 /** Un barème en barres (tranches de l'impôt sur le revenu…) : plus la barre est longue, plus le taux est haut. */
 function Bareme({ bareme }: { bareme: BaremeT }) {
   const max = Math.max(...bareme.lignes.map((l) => l.taux ?? 0), 1);
+  const avecBarres = bareme.lignes.some((l) => l.taux !== undefined);
   return (
     <div className="dos-bar">
       {bareme.titre && <p className="dos-bar-t">{bareme.titre}</p>}
@@ -46,7 +50,7 @@ function Bareme({ bareme }: { bareme: BaremeT }) {
         {bareme.lignes.map((l) => (
           <li key={l.libelle}>
             <span className="dos-bar-l">{l.libelle}</span>
-            <i style={{ width: `${l.taux ? Math.max(3, (l.taux / max) * 100) : 0}%` }} aria-hidden="true" />
+            {avecBarres && <i style={{ width: `${l.taux ? Math.max(3, (l.taux / max) * 100) : 0}%` }} aria-hidden="true" />}
             <b>{l.texte}</b>
           </li>
         ))}
@@ -74,7 +78,7 @@ function LigneDont({ p, base, annee, niveau = 0 }: { p: Part; base: number; anne
             </button>
           )}
         </span>
-        <b>{montant(p.md, 1, annee)}</b>
+        <b>{mdAuto(p.md, annee)}</b>
         <em>{base > 0 ? pct((p.md / base) * 100, 1) : ""}</em>
         {bareme && p.bareme && <div className="dos-dont-bar"><Bareme bareme={p.bareme} /></div>}
       </li>
@@ -91,7 +95,7 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
   const [ouvert, setOuvert] = useState<number | null>(null);
   const dec = vue.pctDecimales ?? 1;
   if (parts.length === 0 || base <= 0) return null;
-  const mdAff = (v: number) => montant(v, 1, annee);
+  const mdAff = (v: number) => mdAuto(v, annee);
 
   const R = 42;
   const C = 2 * Math.PI * R;
@@ -186,6 +190,7 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
               <LigneDont key={e.nom} p={e} base={ouverte.md} annee={annee} />
             ))}
           </ul>
+          {ouverte.precisionDont && <p className="dos-cam-dont-p">{avecMontants(ouverte.precisionDont, annee)}</p>}
         </div>
       )}
 
