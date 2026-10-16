@@ -141,6 +141,12 @@ export function Deficit() {
             lignes={DEFICIT_PAR_ACTEUR.map((d) => ({ nom: d.nom, md: Math.abs(d.md) }))}
             nom="Déficit public 2025 par administration"
             negatif
+            details={{
+              "État":{texte:"Déficit de l’État, en comptabilité nationale. Ce solde ne doit pas être confondu avec les dépenses brutes de l’État.",sous:[{nom:"Solde négatif de l’État",md:128.1}]},
+              "Organismes d'administration centrale":{texte:"Organismes nationaux distincts de l’État.",sous:[{nom:"Solde des organismes centraux",md:2.2}]},
+              "Administrations publiques locales":{texte:"Solde des communes, départements, régions et autres organismes locaux.",sous:[{nom:"Solde des administrations locales",md:15.6}]},
+              "Administrations de sécurité sociale":{texte:"Solde des administrations de sécurité sociale en comptabilité nationale.",sous:[{nom:"Solde de la sécurité sociale",md:6.7}]}
+            }}
           />
         </Figure>
       </div>
