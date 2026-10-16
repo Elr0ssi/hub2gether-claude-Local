@@ -1,4 +1,5 @@
 import { entreeFrance } from "./france/catalogue";
+import { entreeAllemagne } from "./allemagne/catalogue";
 import type { EntreeCatalogue } from "./types";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -14,6 +15,7 @@ import type { EntreeCatalogue } from "./types";
 
 export const CATALOGUE_DETTE: EntreeCatalogue[] = [
   entreeFrance,
+  entreeAllemagne,
   // entreeItalie,       ← un article de plus = une ligne de plus
 ];
 
