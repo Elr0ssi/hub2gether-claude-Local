@@ -67,7 +67,12 @@ export function Deficit() {
           { nom: 'Communes', md: DEFICIT_COMMUNES.valeur },
           { nom: 'Länder', md: DEFICIT_LANDER.valeur },
           { nom: 'Assurances sociales', md: DEFICIT_SECU.valeur },
-        ]} />
+        ]} details={{
+          "Bund (administration centrale)":{texte:"Le Bund est l’État fédéral allemand.",sous:[{nom:"Déficit du Bund",md:Math.abs(DEFICIT_BUND.valeur)}]},
+          "Communes":{texte:"Collectivités locales allemandes et services municipaux.",sous:[{nom:"Déficit communal",md:Math.abs(DEFICIT_COMMUNES.valeur)}]},
+          "Länder":{texte:"Les seize États fédérés, notamment chargés de l’enseignement et de la police régionale.",sous:[{nom:"Déficit des Länder",md:Math.abs(DEFICIT_LANDER.valeur)}]},
+          "Assurances sociales":{texte:"Assurance retraite, maladie, chômage et autres organismes de protection sociale.",sous:[{nom:"Déficit des assurances sociales",md:Math.abs(DEFICIT_SECU.valeur)}]}
+        }} />
         <Comprendre titre="Bund, Länder, communes : qui est qui ?">Le Bund est l'État fédéral ; les Länder sont les 16 États fédérés ; les communes sont les collectivités locales. Les assurances sociales gèrent notamment les retraites, la santé et le chômage. Ici, les parts concernent le déficit de l'année, pas la dette totale accumulée.</Comprendre>
       </Figure>
     </div>
