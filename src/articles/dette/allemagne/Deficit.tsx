@@ -1,6 +1,5 @@
 "use client";
 import { useState } from 'react';
-import { DetailsPostes } from '@/articles/dette/cadre/DetailsPostes';
 import { Figure, Repartition, montant, enLettres, nf } from '@/articles/dette/cadre';
 import {
   RECETTES_2025, DEPENSES_2025, DEFICIT_2025, IMPOTS_COURANTS_2025,
@@ -39,22 +38,24 @@ export function Deficit() {
     </div>
     <div id="de-p-recettes" role="tabpanel" hidden={onglet !== 'recettes'} className="dos-panneau">
       <Figure id="recettes-publiques" titre="D'où viennent les recettes publiques allemandes en 2025 ?"
-        legende="Répartition détaillée 2025 d’après Destatis GENESIS 81000-0031 : impôts, cotisations sociales et autres recettes. Le total actualisé est de 2 137,940 Md€, légèrement différent du chiffre provisoire publié précédemment."
+        legende="Répartition des recettes 2025 selon la version révisée des comptes nationaux Destatis. Les principaux impôts encaissés sont présentés séparément dans le détail, car leur classification est différente."
         source={RECETTES_2025}>
-        <Repartition nom="Recettes des administrations allemandes, 2025, SEC 2010" details={{"Impôts (comptes nationaux actualisés)":{texte:"Impôts directs et indirects selon la comptabilité nationale. Le détail par taxe ci-dessous est issu des statistiques de recettes fiscales encaissées et ne s’additionne pas exactement à ce poste SEC.",sous:[{nom:"TVA et TVA à l’importation (statistique fiscale)",md:310.2},{nom:"Impôt sur les salaires (Lohnsteuer)",md:262.7},{nom:"Taxe professionnelle locale (Gewerbesteuer)",md:76.4},{nom:"Taxe sur l’énergie",md:37.6},{nom:"Droits de succession",md:15.4}]},"Cotisations sociales":{texte:"Cotisations retraite, assurance maladie, chômage et dépendance payées par salariés et employeurs. Les taux varient selon les assurances, revenus et plafonds."},"Autres recettes":{texte:"Recettes non fiscales et autres ressources publiques : production, patrimoine, transferts et autres opérations. Solde comptable calculé, non ventilation détaillée."}}} lignes={[
-          { nom: 'Impôts (comptes nationaux actualisés)', md: 1031.546 },
-          { nom: 'Cotisations sociales', md: 823.069 },
-          { nom: 'Autres recettes', md: 283.325 },
-        ]} />
-        <Comprendre titre="Quels impôts ?">L'impôt sur le revenu allemand est progressif : chaque taux marginal concerne seulement une tranche du revenu imposable. Les recettes comprennent aussi la TVA, l'impôt sur les sociétés, la taxe professionnelle communale et les impôts fonciers. Un taux marginal n'est pas le taux moyen payé.</Comprendre>
-        <Comprendre titre="Que financent les cotisations sociales ?">Les cotisations salariales et patronales financent notamment les retraites, la santé, le chômage et la dépendance. Les taux varient selon l'assurance, le revenu, les plafonds et l'année : ne pas les confondre avec la part des cotisations dans les recettes publiques.</Comprendre>
-        <Comprendre titre="Que comprend le solde non ventilé ?">Il s'agit d'une différence comptable calculée, et non d'une catégorie officielle. Elle recouvre notamment d'autres impôts, les cotisations, des services facturés par les administrations, des revenus de patrimoine public et des transferts. <a href="https://ec.europa.eu/eurostat/databrowser/view/gov_10a_taxag/default/table" target="_blank" rel="noopener noreferrer">Ventilation officielle des impôts et cotisations : Eurostat ↗</a>.</Comprendre>
+        <Repartition nom="Recettes publiques allemandes, comptes nationaux révisés 2025" lignes={[
+          {nom:"Impôts",md:1031.546},
+          {nom:"Cotisations sociales",md:823.069},
+          {nom:"Autres recettes non fiscales",md:283.325}
+        ]} details={{
+          "Impôts":{texte:"Impôts directs et indirects, y compris impôts sur la consommation, sur le revenu, sur les bénéfices, taxes locales et douanières. Le camembert présente les principaux encaissements fiscaux publiés, et non une décomposition exhaustive des impôts SEC 2010.",sous:[{"nom":"TVA et TVA à l’importation","md":310.2},{"nom":"Impôt sur les salaires (Lohnsteuer)","md":262.7},{"nom":"Taxe professionnelle locale (Gewerbesteuer)","md":76.4},{"nom":"Taxe sur l’énergie","md":37.6},{"nom":"Droits de succession","md":15.4}],precision:"Attention : montants des recettes fiscales encaissées, classification différente de celle des comptes nationaux. La somme des catégories affichées n'est pas le total SEC 2010.",source:{nom:"Destatis, recettes fiscales / comptes nationaux",url:"https://www.destatis.de/EN/Themes/Government/Public-Finance/Taxes/_node.html"}},
+          "Cotisations sociales":{texte:"Versements aux assurances vieillesse, maladie, chômage et dépendance. La cotisation retraite de droit commun est de 18,6 % du salaire brut soumis à plafond ; maladie 14,6 % de base plus contribution complémentaire variable ; chômage 2,6 % ; dépendance 3,6 % (majorations ou réductions selon la situation). Ce sont des taux de cotisation, pas des montants de recettes par branche.",source:{nom:"Destatis, comptes des administrations publiques",url:"https://www.destatis.de/EN/Themes/Economy/National-Accounts-Domestic-Product/_node.html"}},
+          "Autres recettes non fiscales":{texte:"Recettes de production et ventes publiques, revenus du patrimoine, transferts et autres ressources. Le montant correspond à la différence entre les recettes publiques totales et les deux postes précédents, et non à une sous-ventilation par nature.",source:{nom:"Destatis, comptes des administrations publiques",url:"https://www.destatis.de/EN/Themes/Economy/National-Accounts-Domestic-Product/_node.html"}}
+        }} />
+        <p className="dos-notule">Série révisée 2025 : 2 137,94 Md€ de recettes, à distinguer des 2 140,2 Md€ provisoires figurant encore dans le bandeau général. Les données fiscales encaissées et SEC 2010 ont des périmètres différents.</p>
       </Figure>
     </div>
     <div id="de-p-depenses" role="tabpanel" hidden={onglet !== 'depenses'} className="dos-panneau">
-      <Figure id="depenses-publiques" titre="Où va l'argent public allemand ?" legende="Total des dépenses 2025 de toutes les administrations publiques selon Destatis. Les postes ci-dessous sont expliqués sans leur attribuer des montants non vérifiés." source={DEPENSES_2025}>
+      <Figure id="depenses-publiques" titre="Où va l'argent public allemand ?" legende="Dépenses publiques allemandes par fonction : administration, défense, sécurité, économie, santé, enseignement et protection sociale. Chaque catégorie se déplie sur ses sous-fonctions COFOG." source={DEPENSES_2025}>
         <Repartition nom="Dépenses allemandes par fonction COFOG 2025" lignes={DEPENSES_COF_2025} details={DETAILS_COF_2025} />
-        <p className="dos-notule">Ventilation officielle COFOG 2025 : 2 274,412 Md€ (publication Destatis actualisée). Ce total diffère du total provisoire des comptes 2025 affiché dans les onglets (2 259,3 Md€) : les deux millésimes statistiques ne sont pas directement réconciliables. <a href="https://genesis.destatis.de/datenbank/online/statistic/81000/table/81000-0413" target="_blank" rel="noopener noreferrer">Source Destatis 81000-0413 ↗</a>.</p>
+        <p className="dos-notule">Ventilation COFOG 2025 issue d’une série différente du total provisoire des comptes 2025 affiché dans les onglets : vérifier la concordance des millésimes et du périmètre avant toute comparaison. <a href="https://genesis.destatis.de/datenbank/online/statistic/81000/table/81000-0413" target="_blank" rel="noopener noreferrer">Source Destatis 81000-0413 ↗</a>.</p>
       </Figure>
     </div>
     <div id="de-p-deficit" role="tabpanel" hidden={onglet !== 'deficit'} className="dos-panneau">
