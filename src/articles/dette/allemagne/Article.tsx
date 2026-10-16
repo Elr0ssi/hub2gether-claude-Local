@@ -15,7 +15,7 @@ import {
   DETTE, RATIO, HAUSSE_DETTE, DEFICIT_2025, DEFICIT_RATIO_2025,
   DEPENSES_2025, RECETTES_2025, DEFICIT_S1_2026, RATIO_DEFICIT_S1_2026,
   INTERETS_APU_S1_2026, INTERETS_APU_S1_2025, VARIATION_INTERETS_S1_2026, PART_TITRES_2026_T1, PART_PRETS_2026_T1, PART_DEPOTS_2026_T1,
-  VARIATION_BUND, VARIATION_LANDER, VARIATION_COMMUNES, DETTE_PAR_ANNEE,
+  VARIATION_BUND, VARIATION_LANDER, VARIATION_COMMUNES, DETTE_PAR_ANNEE, DETTE_HISTORIQUE_GRAPHE,
   FONDS_INFRASTRUCTURE, DETTE_SECU_2025, MARGE_LANDER, EUROPE_2026_T1, creerFAQ, SOURCES,
 } from './donnees';
 /* Réemploi STRICT des styles graphiques français : aucun changement de cadre/, de polices ou d'animations. */
@@ -100,17 +100,17 @@ export function ArticleAllemagne({ suggestions }: { suggestions: Suggestion[] })
 
       <Chapitre id="evolution" titre="Évolution de la dette publique allemande"
         reponse={<>
-          Le ratio dette/PIB est passé de <b>{nf(DETTE_PAR_ANNEE[0].valeur)} % en 2019</b> à{' '}
+          Le ratio dette/PIB est passé de <b>{nf(DETTE_HISTORIQUE_GRAPHE[0].valeur)} % en 2000</b> à{' '}
           <b>{nf(RATIO.valeur)} % au premier trimestre 2026</b>. La hausse de 2020 et l'évolution des années suivantes ressortent des relevés officiels.
         </>}>
-        <Figure id="evolution-dette-pib" titre="Dette allemande rapportée au PIB, de 2019 au premier trimestre 2026"
+        <Figure id="evolution-dette-pib" titre="Dette allemande rapportée au PIB, de 2000 au premier trimestre 2026"
           legende="Chaque barre donne le ratio dette/PIB de l'Allemagne aux périodes publiées de 2019 à mars 2026. Les données 2019–2025 proviennent de la Bundesbank ; le point provisoire 2026-T1 vient d'Eurostat. Aucun point intermédiaire n'est interpolé."
           source={{ source: 'Bundesbank (2019–2025), Eurostat (2026-T1)', url: SOURCES.EUROSTAT }} voir={[{ href: '#qui-doit', label: 'Qui porte cette dette ?' }]}>
-          <BarresParDate points={DETTE_PAR_ANNEE.map(p => ({
+          <BarresParDate points={DETTE_HISTORIQUE_GRAPHE.map(p => ({
             cle: String(p.annee), etiquette: String(p.annee), valeur: p.valeur, montantMd: p.md,
-            repere: 'repere' in p ? p.repere : undefined,
+            repere: undefined,
           }))} unite="% du PIB" enteteValeur="Dette / PIB" />
-          <p className="dos-notule">Sources détaillées : <Source href={SOURCES.BB}>Bundesbank, historique 2019–2025</Source> · <Source href={SOURCES.EUROSTAT}>Eurostat, premier trimestre 2026</Source>.</p>
+          <p className="dos-notule">Sources détaillées : <Source href="https://github.com/Elr0ssi/hub2gether-claude-Local/blob/claude/essential-data-presentation-fv21q3/data/economie/dette/dette-sur-pib/DEU.json">Base historique du site (2000–2015)</Source> · <Source href={SOURCES.BB}>Bundesbank, historique 2019–2025</Source> · <Source href={SOURCES.EUROSTAT}>Eurostat, premier trimestre 2026</Source>.</p>
         </Figure>
       </Chapitre>
 
