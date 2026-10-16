@@ -53,7 +53,7 @@ function DiagrammeDetail({
             <circle key={parts[index].nom} cx="50" cy="50" r={R}
               fill="none" stroke={COULEURS[index % COULEURS.length]}
               strokeWidth={survol === index ? 14 : 11}
-              strokeDasharray={`${Math.max(0, longueur - .7)} ${C}`}
+              strokeDasharray={`${Math.max(0, longueur - .8)} ${C}`}
               strokeDashoffset={decalage}
               transform="rotate(-90 50 50)"
               style={{ opacity: survol !== null && survol !== index ? .35 : 1, transition: "opacity .2s,stroke-width .2s" }}
@@ -108,7 +108,7 @@ export function Repartition({
     </div>
     <ul className="dos-pile-l">
       {lignes.map((l, i) => {
-        const detail: DetailRepartition = details?.[l.nom] ?? { texte: l.note || "Cette catégorie n’a pas de ventilation chiffrée supplémentaire dans la source actuelle.", sous: l.enfants?.length ? l.enfants : [{ nom: l.nom, md: Math.abs(l.md) }] };
+        const detail: DetailRepartition = details?.[l.nom] ?? { texte: l.note || "Cette catégorie n’a pas de ventilation chiffrée supplémentaire dans la source actuelle.", sous: l.enfants?.length ? l.enfants : undefined };
         const estOuvert = ouvert === l.nom && !!detail;
         const id = `${identifiant}-${i}`;
         return <Fragment key={l.nom}>
