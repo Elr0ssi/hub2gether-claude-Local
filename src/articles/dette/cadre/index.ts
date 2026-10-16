@@ -13,6 +13,8 @@ export { Chapitre } from "./Chapitre";
 export { Figure } from "./Figure";
 export { Etapes } from "./Etapes";
 export { Repartition } from "./Repartition";
+export { Camembert, avecMontants } from "./Camembert";
+export type { Part, Vue, Detail } from "./ventilation";
 export { BarresParDate, type PointDate } from "./BarresParDate";
 export { ChiffresCles, ChiffresGrille, type CarteChiffre } from "./ChiffresCles";
 export { ListeQuestions } from "./ListeQuestions";

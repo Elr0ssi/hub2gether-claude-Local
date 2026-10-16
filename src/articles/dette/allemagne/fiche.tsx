@@ -32,9 +32,9 @@ const metadata: Metadata = {
 };
 
 const FIGURES: [string, string, string, string][] = [
-  ['recettes-publiques', 'Recettes publiques allemandes, 2025', 'Destatis', '2025'],
-  ['depenses-publiques', 'Financement des dépenses publiques allemandes, 2025', 'Destatis', '2025'],
-  ['qui-cree-le-deficit', 'Déficit des administrations allemandes par secteur, 2025', 'Destatis', '2025'],
+  ['recettes-publiques', 'Recettes publiques allemandes par catégorie et par impôt, 2025', 'Destatis', '2025'],
+  ['depenses-publiques', 'Dépenses publiques allemandes par fonction et sous-fonction, 2025', 'Destatis', '2025'],
+  ['qui-cree-le-deficit', 'Dépenses, recettes et déficit des administrations allemandes, 2025', 'Destatis', '2025'],
   ['evolution-dette-pib', 'Dette Maastricht allemande, 2019 à mars 2026', 'Deutsche Bundesbank / Eurostat', '2019/2026-Q1'],
   ['dette-par-emetteur', 'Variation de dette des administrations allemandes en 2025', 'Deutsche Bundesbank', '2025'],
   ['dette-par-instrument', 'Composition par instrument de la dette publique allemande, T1 2026', 'Eurostat', '2026-Q1'],

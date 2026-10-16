@@ -12,7 +12,7 @@ import { Comparaison } from './figures/Europe';
 import { Deficit } from './Deficit';
 import { PorteursAllemagne } from './figures/PorteursAllemagne';
 import {
-  DETTE, RATIO, HAUSSE_DETTE, DEFICIT_2025, DEFICIT_RATIO_2025,
+  DETTE, RATIO, HAUSSE_DETTE, DEFICIT_2025,
   DEPENSES_2025, RECETTES_2025, DEFICIT_S1_2026, RATIO_DEFICIT_S1_2026,
   INTERETS_APU_S1_2026, INTERETS_APU_S1_2025, VARIATION_INTERETS_S1_2026, PART_TITRES_2026_T1, PART_PRETS_2026_T1, PART_DEPOTS_2026_T1,
   VARIATION_BUND, VARIATION_LANDER, VARIATION_COMMUNES, DETTE_PAR_ANNEE, DETTE_HISTORIQUE_GRAPHE,
@@ -72,7 +72,7 @@ export function ArticleAllemagne({ suggestions }: { suggestions: Suggestion[] })
         <ChiffresCles cartes={[
           { icone: Percent, valeur: `${nf(RATIO.valeur)} %`, libelle: 'de dette rapportée au PIB', texte: 'Au 31 mars 2026, administrations publiques, chiffres provisoires.' },
           { icone: TrendingUp, valeur: `+${montant(HAUSSE_DETTE.valeur, 0)}`, libelle: 'de dette en plus en 2025', texte: 'Variation du stock entre décembre 2024 et décembre 2025.' },
-          { icone: Scale, valeur: `−${montant(DEFICIT_2025.valeur)}`, libelle: 'de déficit public en 2025', texte: `${nf(DEFICIT_RATIO_2025.valeur)} % du PIB, toutes administrations, comptes nationaux.` , negatif: true},
+          { icone: Scale, valeur: `−${montant(DEFICIT_2025.valeur)}`, libelle: 'de déficit public en 2025', texte: 'Dépenses moins recettes, toutes administrations, comptes nationaux révisés de Destatis.', negatif: true},
           { icone: Banknote, valeur: montant(INTERETS_APU_S1_2026.valeur,1,2026), libelle: "d'intérêts au 1er semestre 2026", texte: 'Toutes administrations ; six mois seulement.' },
           { icone: Building2, valeur: montant(FONDS_INFRASTRUCTURE.valeur, 0), libelle: "d'autorisation d'investissement", texte: 'Fonds spécial 2025 ; plafond autorisé, pas dette déjà émise.' },
           { icone: Globe, valeur: montant(DEFICIT_S1_2026.valeur, 1, 2026), libelle: 'de déficit au premier semestre 2026', texte: 'Six premiers mois uniquement ; comptabilité nationale.' },
@@ -88,7 +88,7 @@ export function ArticleAllemagne({ suggestions }: { suggestions: Suggestion[] })
       <Chapitre id="deficit" titre="Déficit public de l'Allemagne"
         reponse={<>
           En 2025, les administrations allemandes ont enregistré {montant(RECETTES_2025.valeur)} de recettes et {montant(DEPENSES_2025.valeur)} de dépenses :{' '}
-          <b>{montant(DEFICIT_2025.valeur)} de déficit, soit {nf(DEFICIT_RATIO_2025.valeur)} % du PIB</b>.
+          <b>{montant(DEFICIT_2025.valeur)} de déficit</b>, selon les comptes nationaux révisés de Destatis.
         </>}>
         <Deficit />
         <p className="dos-notule">Mise à jour distincte : au premier semestre 2026, le déficit SEC 2010 atteint{' '}

@@ -154,3 +154,35 @@ npm run start -- -p 3300   # puis ouvrir http://localhost:3300/pays/<pays>/dette
 - **Le pied de page du site** est affiché sous chaque article long (`ArticleLong`) : le lecteur reste dans le site. Rien à faire.
 - **La page `/articles`** liste tous les articles du site (articles longs, analyses, dossiers pays, lectures), à ranger par thématique, par pays ou par type, avec recherche. Elle se nourrit de `src/data/articles-catalogue.ts` : un article inscrit dans `catalogue.ts` y apparaît tout seul.
 - **La fiche du pays** (`/pays/<slug>`) montre « Articles sur <pays> » : un carrousel dont le premier article long est l'**article phare**, avec une recherche limitée aux articles de ce pays.
+
+## Les lignes qui s'ouvrent sur un camembert (recettes, dépenses, déficit)
+
+Dans un chapitre « Déficit public », chaque ligne d'une `<Repartition>` peut s'ouvrir : un petit panneau apparaît sous la ligne, avec **l'explication** de la ligne, puis **un camembert** (l'anneau à gauche, la légende à droite : nom, montant, part), comme dans « Qui détient la dette ».
+
+Exemples complets : `france/Deficit.tsx` + `france/donnees/ventilations.ts`, et `allemagne/Deficit.tsx` + `allemagne/ventilations.ts`.
+
+**Où vont les chiffres.** Dans un fichier `ventilations.ts` du pays, jamais dans le composant :
+
+```ts
+export const DETAIL_RECETTES: Record<string, Detail> = {
+  "Impôts": {
+    texte: "Ce que c'est, en une ou deux phrases. Un montant dans un texte s'écrit [[310.2]] (converti dans la monnaie du menu).",
+    vues: [                                        // un camembert, ou plusieurs (onglets : « Par type », « Par bénéficiaire »)
+      { titre: "Par type d'impôt", parts: [{ nom: "TVA", md: 208.8 }, { nom: "…", md: 128.1, enfants: [{ nom: "dont accises", md: 30.5 }] }],
+        total: 884.9, precision: "Phrase de précaution : périmètre, édition, arrondis." },
+    ],
+    absent: "Quand la source ne détaille pas : on le dit, on ne dessine rien.",
+    source: { nom: "Insee, …", url: "https://…" },
+  },
+};
+// puis : <Repartition lignes={…} details={DETAIL_RECETTES} annee={2025} />
+```
+
+**Règles.**
+- `enfants` = les « dont » : inclus dans le montant de la part, **jamais additionnés** ; ils s'ouvrent sous la part (bouton +), ils ne sont pas dans l'anneau.
+- Si les parts ne font pas le `total` publié, la différence apparaît en part grisée « Reste non détaillé dans la source » : jamais cachée, jamais attribuée à un poste.
+- Si la somme des parts dépasse le total (arrondis), le total affiché est la somme, et une phrase le dit.
+- Des montants arrondis à l'unité (COFOG) : `pctDecimales: 0`, et on ne lit pas les parts au dixième.
+- Deux éditions d'une même statistique ne se mélangent pas dans un article. Un solde calculé (recettes − impôts − cotisations) se présente comme **calculé**, pas comme une catégorie publiée.
+- Une ligne sans `details` reste une ligne simple.
+- Vérifier les sommes avec un petit script avant de livrer (voir comment `ventilations.ts` est construit : tout est en données, donc testable).

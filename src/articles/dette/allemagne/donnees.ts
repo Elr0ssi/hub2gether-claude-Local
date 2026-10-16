@@ -15,6 +15,7 @@ export interface Mesure {
 }
 const BB = 'https://www.bundesbank.de/en/press/press-releases/deutsche-staatsschulden-992720';
 const DESTATIS = 'https://www.destatis.de/EN/Press/2026/02/PE26_060_813.html';
+const GENESIS_COMPTES = 'https://genesis.destatis.de/datenbank/online/statistic/81000/table/81000-0031';
 const DESTATIS_S1 = 'https://www.destatis.de/DE/Presse/Pressemitteilungen/2026/08/PD26_305_813.html';
 const FINANZ = 'https://www.deutsche-finanzagentur.de/en/federal-funding/debt-statistics/interest-payments';
 const DESTATIS_S1_2025 = 'https://www.destatis.de/EN/Press/2025/08/PE25_311_813.html';
@@ -22,22 +23,16 @@ const INVEST = 'https://www.deutsche-finanzagentur.de/en/federal-funding/governm
 const EUROSTAT = 'https://ec.europa.eu/eurostat/web/products-euro-indicators/w/2-21072026-ap';
 const BUNDESTAG = 'https://dip.bundestag.de/vorgang/gesetz-zur-%C3%A4nderung-des-grundgesetzes-artikel-109-115-und-143h/320784';
 const EMISSIONS = 'https://www.deutsche-finanzagentur.de/en/federal-securities/types-of-federal-securities/overview-federal-securities';
-export const SOURCES = { BB, DESTATIS, DESTATIS_S1, DESTATIS_S1_2025, FINANZ, INVEST, EUROSTAT, BUNDESTAG, EMISSIONS };
+export const SOURCES = { GENESIS_COMPTES, BB, DESTATIS, DESTATIS_S1, DESTATIS_S1_2025, FINANZ, INVEST, EUROSTAT, BUNDESTAG, EMISSIONS };
 const mes = (valeur: number, unite: Mesure['unite'], periode: string, perimetre: string, source: string, url: string): Mesure =>
   ({ valeur, unite, periode, perimetre, source, url });
 
 export const DETTE = mes(2902.035, 'Md EUR', '31 mars 2026', 'Dette brute consolidée des administrations publiques, définition Maastricht (S.13), chiffres trimestriels provisoires, calculée en millions puis exprimée en milliards', 'Eurostat, 21 juillet 2026, données 2026-T1', EUROSTAT);
 export const RATIO = mes(64.4, '% PIB', '31 mars 2026', 'Dette brute consolidée des administrations publiques / somme du PIB nominal des quatre derniers trimestres, valeurs provisoires', 'Eurostat, 21 juillet 2026, données 2026-T1', EUROSTAT);
 export const HAUSSE_DETTE = mes(144, 'Md EUR', 'année 2025', 'Variation annuelle du stock de dette Maastricht (2025 moins 2024)', 'Deutsche Bundesbank, 31 mars 2026', BB);
-export const DEFICIT_2025 = mes(119.1, 'Md EUR', 'année 2025', 'Besoin de financement des administrations publiques, SEC 2010, données provisoires, valeur absolue', 'Destatis, 25 février 2026', DESTATIS);
-export const DEFICIT_RATIO_2025 = mes(2.7, '% PIB', 'année 2025', 'Déficit des administrations publiques SEC 2010 / PIB nominal, données provisoires', 'Destatis, 25 février 2026', DESTATIS);
-export const RECETTES_2025 = mes(2140.2, 'Md EUR', 'année 2025', 'Recettes toutes administrations publiques, comptabilité nationale SEC 2010, données provisoires', 'Destatis, 25 février 2026', DESTATIS);
-export const DEPENSES_2025 = mes(2259.3, 'Md EUR', 'année 2025', 'Dépenses toutes administrations publiques, comptabilité nationale SEC 2010, données provisoires', 'Destatis, 25 février 2026', DESTATIS);
-export const IMPOTS_COURANTS_2025 = mes(1031.5, 'Md EUR', 'année 2025', 'Impôts courants enregistrés en comptabilité nationale (non toutes les taxes et recettes)', 'Destatis, 25 février 2026', DESTATIS);
-export const DEFICIT_BUND = mes(79.6, 'Md EUR', 'année 2025', 'Déficit de l’administration centrale (Bund), SEC 2010, arrondi au dixième', 'Destatis, 25 février 2026', DESTATIS);
-export const DEFICIT_LANDER = mes(9.8, 'Md EUR', 'année 2025', 'Déficit des Länder, SEC 2010, arrondi au dixième', 'Destatis, 25 février 2026', DESTATIS);
-export const DEFICIT_COMMUNES = mes(28.1, 'Md EUR', 'année 2025', 'Déficit des communes, SEC 2010, arrondi au dixième', 'Destatis, 25 février 2026', DESTATIS);
-export const DEFICIT_SECU = mes(1.7, 'Md EUR', 'année 2025', 'Déficit des assurances sociales, SEC 2010, arrondi au dixième', 'Destatis, 25 février 2026', DESTATIS);
+export const DEFICIT_2025 = mes(136.472, 'Md EUR', 'année 2025', 'Besoin de financement des administrations publiques, comptes nationaux révisés (dépenses 2 274,412 moins recettes 2 137,940), données provisoires, valeur absolue', 'Destatis, GENESIS 81000-0031', GENESIS_COMPTES);
+export const RECETTES_2025 = mes(2137.94, 'Md EUR', 'année 2025', 'Recettes toutes administrations publiques, comptes nationaux révisés SEC, données provisoires', 'Destatis, GENESIS 81000-0031', GENESIS_COMPTES);
+export const DEPENSES_2025 = mes(2274.412, 'Md EUR', 'année 2025', 'Dépenses toutes administrations publiques, comptes nationaux révisés SEC, données provisoires', 'Destatis, GENESIS 81000-0031', GENESIS_COMPTES);
 export const DEFICIT_S1_2026 = mes(71.3, 'Md EUR', '1er janvier au 30 juin 2026', 'Déficit de toutes les administrations publiques, SEC 2010, semestre uniquement', 'Destatis, 25 août 2026', DESTATIS_S1);
 export const RATIO_DEFICIT_S1_2026 = mes(3.1, '% PIB', '1er janvier au 30 juin 2026', 'Déficit du semestre / PIB du même semestre, non extrapolable à l’année', 'Destatis, 25 août 2026', DESTATIS_S1);
 export const INTERETS_APU_S1_2026 = mes(27.3, 'Md EUR', '1er janvier au 30 juin 2026', 'Intérêts des administrations publiques, comptabilité nationale, semestre uniquement', 'Destatis, 25 août 2026', DESTATIS_S1);

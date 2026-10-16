@@ -119,3 +119,14 @@ Chaque pays a ses mécanismes. Après les chapitres communs, ajouter ceux qui co
 - Changer la monnaie du menu (€ → $ → CN¥) : **tous** les montants changent (légendes et tableaux compris).
 - Relire chaque chiffre contre sa source : valeur, période, périmètre.
 - Terminer par un résumé : chapitres écrits, sources utilisées, **chiffres non vérifiés**, ce qui reste à faire.
+
+## 12. Les lignes qui s'ouvrent (recettes, dépenses, déficit)
+
+Chaque ligne du chapitre « Déficit public » s'ouvre sur : **ce que c'est** (une ou deux phrases), puis **un camembert** de son contenu, avec sa source. Même ton que le reste : factuel, sans jugement.
+
+- Un « dont » est inclus dans son parent : on ne l'additionne jamais, on l'affiche sous le parent.
+- Ce que la source ne détaille pas n'est **pas reconstitué** : on écrit « La source utilisée ne détaille pas cette ligne » plutôt que d'inventer des parts ou des taux.
+- Un reste (total moins parts connues) est montré comme **reste**, grisé, jamais attribué à un poste.
+- Deux lectures d'une même dépense (par nature, par fonction, par administration) ne s'additionnent pas : on le dit.
+- Une année ou une édition par statistique : on n'affiche pas deux éditions côte à côte comme si elles se complétaient.
+- Les montants dans les phrases s'écrivent `[[valeur]]` pour suivre la monnaie du menu.

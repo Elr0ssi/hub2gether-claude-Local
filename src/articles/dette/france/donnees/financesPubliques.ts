@@ -100,8 +100,8 @@ const apu2025 = (valeur: number, unite: Mesure["unite"] = "MD_EUR"): Mesure => (
 
 /* ═══ 1. L'année 2025, vue d'ensemble ═══════════════════════════════════ */
 
-export const RECETTES_2025 = apu2025(1562);
-export const DEPENSES_2025 = apu2025(1714);
+export const RECETTES_2025 = apu2025(1561.7);
+export const DEPENSES_2025 = apu2025(1714.2);
 export const DEFICIT_2025 = apu2025(-152.5);
 export const DEFICIT_PCT_2025 = apu2025(5.1, "PCT");
 export const DEPENSES_PCT_PIB_2025 = apu2025(57.3, "PCT");

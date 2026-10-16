@@ -1,80 +1,126 @@
-"use client";
-import { useState } from 'react';
-import { Figure, Repartition, montant, enLettres, nf } from '@/articles/dette/cadre';
-import {
-  RECETTES_2025, DEPENSES_2025, DEFICIT_2025, IMPOTS_COURANTS_2025,
-  DEFICIT_BUND, DEFICIT_LANDER, DEFICIT_COMMUNES, DEFICIT_SECU,
-} from './donnees';
+'use client';
 
-/** Même rail d'onglets et même composant Repartition que France/Deficit.tsx.
- * Les dépenses sont réparties par leur mode de couverture, pas par fonction,
- * faute de tableau COFOG 2025 vérifié : le graphique l'indique explicitement. */
-function Comprendre({titre,children}:{titre:string;children:React.ReactNode}) {return <details className="dos-notule"><summary style={{cursor:'pointer',fontWeight:650}}>{titre} — explication</summary><div style={{paddingTop:8}}>{children}</div></details>}
-const DEPENSES_COF_2025 = [{"nom":"Administration générale","md":283.151},{"nom":"Défense","md":68.554},{"nom":"Sécurité et justice","md":74.511},{"nom":"Économie et transports","md":252.065},{"nom":"Environnement","md":24.411},{"nom":"Logement et équipements collectifs","md":20.566},{"nom":"Santé","md":353.305},{"nom":"Culture, sports et loisirs","md":46.537},{"nom":"Enseignement","md":206.743},{"nom":"Protection sociale","md":932.744}];
-const DETAILS_COF_2025 = {"Protection sociale":{texte:"Ventilation COFOG 2025, administrations publiques allemandes, chiffres provisoires Destatis. Les sous-postes relèvent de la même fonction, sans double comptage.",sous:[{nom:"Retraites et vieillesse",md:453.932},{nom:"Maladie et incapacité",md:153.346},{nom:"Pensions de survivants",md:85.513},{nom:"Familles et enfants",md:85.344},{nom:"Chômage",md:77.063},{nom:"Logement",md:21.261},{nom:"Aide sociale et autres",md:56.285}]},"Santé":{texte:"Ventilation COFOG 2025, administrations publiques allemandes, chiffres provisoires Destatis. Les sous-postes relèvent de la même fonction, sans double comptage.",sous:[{nom:"Hôpitaux et soins avec hospitalisation",md:134.979},{nom:"Soins ambulatoires",md:105.623},{nom:"Produits médicaux et équipements",md:81.171},{nom:"Santé publique et prévention",md:3.836},{nom:"Recherche et autres dépenses de santé",md:27.696}]},"Enseignement":{texte:"Ventilation COFOG 2025, administrations publiques allemandes, chiffres provisoires Destatis. Les sous-postes relèvent de la même fonction, sans double comptage.",sous:[{nom:"Préscolaire et primaire",md:69.59},{nom:"Secondaire",md:71.597},{nom:"Supérieur",md:35.331},{nom:"Services auxiliaires",md:20.015},{nom:"Autres niveaux et recherche",md:10.21}]},"Défense":{texte:"Ventilation COFOG 2025, administrations publiques allemandes, chiffres provisoires Destatis. Les sous-postes relèvent de la même fonction, sans double comptage.",sous:[{nom:"Défense militaire",md:50.835},{nom:"Aide militaire à l'étranger",md:15.852},{nom:"Défense civile",md:0.303},{nom:"Recherche et autres",md:1.564}]},"Sécurité et justice":{texte:"Ventilation COFOG 2025, administrations publiques allemandes, chiffres provisoires Destatis. Les sous-postes relèvent de la même fonction, sans double comptage.",sous:[{nom:"Police",md:34.566},{nom:"Pompiers",md:14.307},{nom:"Tribunaux",md:17.059},{nom:"Prisons",md:4.384},{nom:"Autres",md:4.195}]},"Économie et transports":{texte:"Ventilation COFOG 2025, administrations publiques allemandes, chiffres provisoires Destatis. Les sous-postes relèvent de la même fonction, sans double comptage.",sous:[{nom:"Transports",md:136.084},{nom:"Énergie",md:32.804},{nom:"Économie et marché du travail",md:31.084},{nom:"Agriculture",md:8.854},{nom:"Industrie et construction",md:7.441},{nom:"Autres politiques économiques",md:35.798}]}};
+import { useState } from 'react';
+import { Figure, Repartition, enLettres, montant } from '@/articles/dette/cadre';
+import { RECETTES_2025, DEPENSES_2025, DEFICIT_2025 } from './donnees';
+import {
+  DEPENSES_FONCTION_LIGNES,
+  DEPENSES_NATURE_LIGNES,
+  DETAIL_FONCTION,
+  DETAIL_NATURE,
+  DETAIL_RECETTES,
+  ECART_FONCTIONS,
+  RECETTES_LIGNES,
+  SOMME_FONCTIONS,
+  SRC,
+} from './ventilations';
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RECETTES, DÉPENSES, DÉFICIT : LES TROIS ONGLETS DE LA FRANCE, AVEC LES DONNÉES ALLEMANDES
+
+   Même principe que `france/Deficit.tsx` : chaque onglet est une <Figure> ;
+   les lignes s'ouvrent sur leur explication et leur camembert. Les chiffres et
+   les textes sont dans `ventilations.ts`.
+
+   Pas de répartition du déficit par administration : le dossier vérifié n'en
+   porte pas pour la révision 2025 (déficit de 136,472 Md€). Les montants d'une
+   édition antérieure ne s'additionnent pas à un déficit révisé : on ne les affiche pas.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function Equation({ rec, dep, solde }: { rec: number; dep: number; solde: number }) {
+  return (
+    <div className="dos-eq" role="img" aria-label="Dépenses, recettes et déficit">
+      <div className="dos-eq-l">
+        <span>Dépenses</span>
+        <i style={{ '--p': '100%' } as React.CSSProperties} />
+        <b>{montant(dep, 1)}</b>
+      </div>
+      <div className="dos-eq-l">
+        <span>Recettes</span>
+        <i style={{ '--p': `${(rec / dep) * 100}%` } as React.CSSProperties} />
+        <b>{montant(rec, 1)}</b>
+      </div>
+      <div className="dos-eq-l dos-eq-def">
+        <span>Écart : le déficit</span>
+        <i style={{ '--p': `${(solde / dep) * 100}%` } as React.CSSProperties} />
+        <b>−{montant(solde, 1)}</b>
+      </div>
+    </div>
+  );
+}
+
 export function Deficit() {
   const [onglet, setOnglet] = useState<'recettes' | 'depenses' | 'deficit'>('recettes');
+  const [lecture, setLecture] = useState<'fonction' | 'nature'>('fonction');
   const rec = RECETTES_2025.valeur;
   const dep = DEPENSES_2025.valeur;
   const solde = DEFICIT_2025.valeur;
-  return <>
-    <div className="dos-onglets" role="tablist" aria-label="Recettes, dépenses ou déficit">
-      <button type="button" role="tab" aria-selected={onglet === 'recettes'} aria-controls="de-p-recettes"
-        className="dos-onglet dos-onglet-rec" onClick={() => setOnglet('recettes')}>
-        <span>Recettes</span><b>{montant(rec, 1)}</b>
-        <i style={{ '--p': `${(rec / dep) * 100}%` } as React.CSSProperties} />
-      </button>
-      <span className="dos-onglets-s" aria-hidden="true">−</span>
-      <button type="button" role="tab" aria-selected={onglet === 'depenses'} aria-controls="de-p-depenses"
-        className="dos-onglet dos-onglet-dep" onClick={() => setOnglet('depenses')}>
-        <span>Dépenses</span><b>{montant(dep, 1)}</b><i style={{ '--p': '100%' } as React.CSSProperties} />
-      </button>
-      <span className="dos-onglets-s" aria-hidden="true">=</span>
-      <button type="button" role="tab" aria-selected={onglet === 'deficit'} aria-controls="de-p-deficit"
-        className="dos-onglet dos-onglet-def" onClick={() => setOnglet('deficit')}>
-        <span>Déficit</span><b>−{montant(solde)}</b>
-        <i style={{ '--p': `${(solde / dep) * 400}%` } as React.CSSProperties} />
-      </button>
-    </div>
-    <div id="de-p-recettes" role="tabpanel" hidden={onglet !== 'recettes'} className="dos-panneau">
-      <Figure id="recettes-publiques" titre="D'où viennent les recettes publiques allemandes en 2025 ?"
-        legende="Répartition des recettes 2025 selon la version révisée des comptes nationaux Destatis. Les principaux impôts encaissés sont présentés séparément dans le détail, car leur classification est différente."
-        source={RECETTES_2025}>
-        <Repartition nom="Recettes publiques allemandes, comptes nationaux révisés 2025" lignes={[
-          {nom:"Impôts",md:1031.546},
-          {nom:"Cotisations sociales",md:823.069},
-          {nom:"Autres recettes non fiscales",md:283.325}
-        ]} details={{
-          "Impôts":{texte:"Impôts directs et indirects, y compris impôts sur la consommation, sur le revenu, sur les bénéfices, taxes locales et douanières. Le camembert présente les principaux encaissements fiscaux publiés, et non une décomposition exhaustive des impôts SEC 2010.",sous:[{"nom":"TVA et TVA à l’importation","md":310.2},{"nom":"Impôt sur les salaires (Lohnsteuer)","md":262.7},{"nom":"Taxe professionnelle locale (Gewerbesteuer)","md":76.4},{"nom":"Taxe sur l’énergie","md":37.6},{"nom":"Droits de succession","md":15.4}],precision:"Attention : montants des recettes fiscales encaissées, classification différente de celle des comptes nationaux. La somme des catégories affichées n'est pas le total SEC 2010.",source:{nom:"Destatis, recettes fiscales / comptes nationaux",url:"https://www.destatis.de/EN/Themes/Government/Public-Finance/Taxes/_node.html"}},
-          "Cotisations sociales":{texte:"Versements aux assurances vieillesse, maladie, chômage et dépendance. La cotisation retraite de droit commun est de 18,6 % du salaire brut soumis à plafond ; maladie 14,6 % de base plus contribution complémentaire variable ; chômage 2,6 % ; dépendance 3,6 % (majorations ou réductions selon la situation). Ce sont des taux de cotisation, pas des montants de recettes par branche.",source:{nom:"Destatis, comptes des administrations publiques",url:"https://www.destatis.de/EN/Themes/Economy/National-Accounts-Domestic-Product/_node.html"}},
-          "Autres recettes non fiscales":{texte:"Recettes de production et ventes publiques, revenus du patrimoine, transferts et autres ressources. Le montant correspond à la différence entre les recettes publiques totales et les deux postes précédents, et non à une sous-ventilation par nature.",source:{nom:"Destatis, comptes des administrations publiques",url:"https://www.destatis.de/EN/Themes/Economy/National-Accounts-Domestic-Product/_node.html"}}
-        }} />
-        <p className="dos-notule">Série révisée 2025 : 2 137,94 Md€ de recettes, à distinguer des 2 140,2 Md€ provisoires figurant encore dans le bandeau général. Les données fiscales encaissées et SEC 2010 ont des périmètres différents.</p>
-      </Figure>
-    </div>
-    <div id="de-p-depenses" role="tabpanel" hidden={onglet !== 'depenses'} className="dos-panneau">
-      <Figure id="depenses-publiques" titre="Où va l'argent public allemand ?" legende="Dépenses publiques allemandes par fonction : administration, défense, sécurité, économie, santé, enseignement et protection sociale. Chaque catégorie se déplie sur ses sous-fonctions COFOG." source={DEPENSES_2025}>
-        <Repartition nom="Dépenses allemandes par fonction COFOG 2025" lignes={DEPENSES_COF_2025} details={DETAILS_COF_2025} />
-        <p className="dos-notule">Ventilation COFOG 2025 issue d’une série différente du total provisoire des comptes 2025 affiché dans les onglets : vérifier la concordance des millésimes et du périmètre avant toute comparaison. <a href="https://genesis.destatis.de/datenbank/online/statistic/81000/table/81000-0413" target="_blank" rel="noopener noreferrer">Source Destatis 81000-0413 ↗</a>.</p>
-      </Figure>
-    </div>
-    <div id="de-p-deficit" role="tabpanel" hidden={onglet !== 'deficit'} className="dos-panneau">
-      <Figure id="qui-cree-le-deficit" titre="Qui crée le déficit public allemand en 2025 ?"
-        legende={`Répartition du déficit SEC 2010 de 2025 entre Bund, communes, Länder et sécurité sociale. Les chiffres sont publiés au dixième de milliard ; leur somme (${nf(DEFICIT_BUND.valeur + DEFICIT_COMMUNES.valeur + DEFICIT_LANDER.valeur + DEFICIT_SECU.valeur)}) peut différer de ${nf(solde)} en raison des arrondis.`}
-        source={DEFICIT_2025}>
-        <Repartition nom="Déficit des administrations allemandes en 2025" negatif lignes={[
-          { nom: 'Bund (administration centrale)', md: DEFICIT_BUND.valeur },
-          { nom: 'Communes', md: DEFICIT_COMMUNES.valeur },
-          { nom: 'Länder', md: DEFICIT_LANDER.valeur },
-          { nom: 'Assurances sociales', md: DEFICIT_SECU.valeur },
-        ]} details={{
-          "Bund (administration centrale)":{texte:"Le Bund est l’État fédéral allemand.",sous:[{nom:"Déficit du Bund",md:Math.abs(DEFICIT_BUND.valeur)}]},
-          "Communes":{texte:"Collectivités locales allemandes et services municipaux.",sous:[{nom:"Déficit communal",md:Math.abs(DEFICIT_COMMUNES.valeur)}]},
-          "Länder":{texte:"Les seize États fédérés, notamment chargés de l’enseignement et de la police régionale.",sous:[{nom:"Déficit des Länder",md:Math.abs(DEFICIT_LANDER.valeur)}]},
-          "Assurances sociales":{texte:"Assurance retraite, maladie, chômage et autres organismes de protection sociale.",sous:[{nom:"Déficit des assurances sociales",md:Math.abs(DEFICIT_SECU.valeur)}]}
-        }} />
-        <Comprendre titre="Bund, Länder, communes : qui est qui ?">Le Bund est l'État fédéral ; les Länder sont les 16 États fédérés ; les communes sont les collectivités locales. Les assurances sociales gèrent notamment les retraites, la santé et le chômage. Ici, les parts concernent le déficit de l'année, pas la dette totale accumulée.</Comprendre>
-      </Figure>
-    </div>
-  </>;
+
+  return (
+    <>
+      <div className="dos-onglets" role="tablist" aria-label="Recettes, dépenses ou déficit">
+        <button type="button" role="tab" aria-selected={onglet === 'recettes'} aria-controls="de-p-recettes"
+          className="dos-onglet dos-onglet-rec" onClick={() => setOnglet('recettes')}>
+          <span>Recettes</span><b>{montant(rec, 1)}</b>
+          <i style={{ '--p': `${(rec / dep) * 100}%` } as React.CSSProperties} />
+        </button>
+        <span className="dos-onglets-s" aria-hidden="true">−</span>
+        <button type="button" role="tab" aria-selected={onglet === 'depenses'} aria-controls="de-p-depenses"
+          className="dos-onglet dos-onglet-dep" onClick={() => setOnglet('depenses')}>
+          <span>Dépenses</span><b>{montant(dep, 1)}</b><i style={{ '--p': '100%' } as React.CSSProperties} />
+        </button>
+        <span className="dos-onglets-s" aria-hidden="true">=</span>
+        <button type="button" role="tab" aria-selected={onglet === 'deficit'} aria-controls="de-p-deficit"
+          className="dos-onglet dos-onglet-def" onClick={() => setOnglet('deficit')}>
+          <span>Déficit</span><b>−{montant(solde, 1)}</b>
+          <i style={{ '--p': `${(solde / dep) * 400}%` } as React.CSSProperties} />
+        </button>
+      </div>
+
+      <div id="de-p-recettes" role="tabpanel" hidden={onglet !== 'recettes'} className="dos-panneau">
+        <Figure id="recettes-publiques" titre="D'où viennent les recettes publiques allemandes"
+          legende={`Répartition des ${enLettres(rec, 1)} de recettes des administrations allemandes en 2025 (comptes nationaux révisés) : impôts, cotisations sociales et autres recettes. Cliquez sur une ligne pour voir ce qu'elle contient.`}
+          source={RECETTES_2025} voir={[{ href: '#depenses-publiques', label: 'Voir les dépenses' }]}>
+          <Repartition nom="Recettes publiques allemandes 2025" lignes={RECETTES_LIGNES} details={DETAIL_RECETTES} />
+          <p className="dos-notule">« Autres recettes » est un solde calculé, pas une catégorie publiée par Destatis.</p>
+        </Figure>
+      </div>
+
+      <div id="de-p-depenses" role="tabpanel" hidden={onglet !== 'depenses'} className="dos-panneau">
+        <Figure id="depenses-publiques" titre="Où va l'argent public allemand"
+          legende={`Les ${enLettres(dep, 1)} de dépenses des administrations allemandes en 2025, lus par fonction (protection sociale, santé, enseignement, défense…) ou par nature (prestations, rémunérations, achats, investissement). Cliquez sur une ligne pour voir ce qu'elle contient.`}
+          source={DEPENSES_2025} voir={[{ href: '#recettes-publiques', label: 'Voir les recettes' }]}>
+          <div className="dos-lectures" role="group" aria-label="Lecture des dépenses">
+            <button type="button" className={lecture === 'fonction' ? 'dos-lec-on' : undefined} onClick={() => setLecture('fonction')}>Par fonction</button>
+            <button type="button" className={lecture === 'nature' ? 'dos-lec-on' : undefined} onClick={() => setLecture('nature')}>Par nature</button>
+          </div>
+          {lecture === 'fonction' ? (
+            <>
+              <Repartition nom="Dépenses allemandes 2025 par fonction" lignes={DEPENSES_FONCTION_LIGNES} details={DETAIL_FONCTION} />
+              <p className="dos-notule">
+                Les dix fonctions font {montant(SOMME_FONCTIONS, 1)}, soit {montant(ECART_FONCTIONS, 1)} de moins que les {montant(dep, 1)} de dépenses totales : cet écart dépasse les arrondis et la série fonctionnelle publiée ne se lit pas comme une répartition exhaustive du total. Chaque fonction, elle, se lit sur son propre total.{' '}
+                <a href={SRC.COFOG.url} target="_blank" rel="noopener noreferrer">Destatis ↗</a>
+              </p>
+            </>
+          ) : (
+            <>
+              <Repartition nom="Dépenses allemandes 2025 par nature" lignes={DEPENSES_NATURE_LIGNES} details={DETAIL_NATURE} />
+              <p className="dos-notule">Les cinq postes détaillés sont des « dont » du total ; « Autres dépenses » est le reste calculé, pas une catégorie publiée. C'est une autre lecture des mêmes dépenses que la lecture par fonction : on ne les additionne pas.</p>
+            </>
+          )}
+        </Figure>
+      </div>
+
+      <div id="de-p-deficit" role="tabpanel" hidden={onglet !== 'deficit'} className="dos-panneau">
+        <Figure id="qui-cree-le-deficit" titre="Comment se forme le déficit public allemand"
+          legende={`Les dépenses (${enLettres(dep, 1)}) dépassent les recettes (${enLettres(rec, 1)}) de ${enLettres(Math.abs(solde), 1)} en 2025, selon les comptes nationaux révisés de Destatis.`}
+          source={DEFICIT_2025} voir={[{ href: '#evolution', label: "Voir l'évolution de la dette" }]}>
+          <Equation rec={rec} dep={dep} solde={Math.abs(solde)} />
+          <p className="dos-notule">
+            Qui porte ce déficit ? Le Bund est l'État fédéral, les Länder sont les 16 États fédérés, les Gemeinden sont les communes, et la Sozialversicherung regroupe les organismes de sécurité sociale. La répartition du déficit entre ces administrations n'est pas affichée : les montants d'une édition antérieure ne peuvent pas expliquer le déficit révisé.
+          </p>
+        </Figure>
+      </div>
+    </>
+  );
 }
