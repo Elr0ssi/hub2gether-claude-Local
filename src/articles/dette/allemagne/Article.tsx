@@ -115,9 +115,9 @@ export function ArticleAllemagne({ suggestions }: { suggestions: Suggestion[] })
 
       <Chapitre id="qui-doit" titre="Qui doit la dette publique allemande ?"
         reponse={<>
-          Le <b>Bund</b>, les <b>Länder</b>, les <b>communes</b> et les administrations de sécurité sociale portent la dette publique. Les prêts entre administrations sont retirés du total consolidé de Maastricht.
+          L'<b>État fédéral (Bund)</b>, les <b>16 États fédérés (Länder)</b>, les <b>communes</b> et les administrations de sécurité sociale portent la dette publique. Les prêts entre administrations sont retirés du total consolidé de Maastricht.
         </>}>
-        <Figure id="dette-par-emetteur" titre="Qui a augmenté son endettement en 2025 ?"
+        <Figure id="dette-par-emetteur" titre="Comment se répartit la dette entre les administrations ?"
           legende="Ces chiffres sont des variations annuelles des dettes par sous-secteur, et non les stocks respectifs des administrations. Ils ne s'additionnent pas pour reconstituer le stock consolidé, notamment à cause des opérations entre administrations."
           source={{ source: 'Deutsche Bundesbank, variations 2025', url: SOURCES.BB }} voir={[{ href: '#qui-detient', label: 'Qui détient les titres ?' }]}>
           <ChiffresGrille items={[
@@ -141,9 +141,9 @@ export function ArticleAllemagne({ suggestions }: { suggestions: Suggestion[] })
 
       <Chapitre id="qui-detient" titre="Qui détient les obligations de l'État allemand ?"
         reponse={<>
-          Les titres du <b>Bund</b> circulent entre banques, assureurs, fonds, banques centrales et investisseurs internationaux. Leur détenteur individuel n'est pas enregistré en continu : la répartition publiée par la Finanzagentur repose sur une méthode de reconstitution des transactions.
+          Les obligations de l'<b>État fédéral (Bund)</b> circulent entre banques, assureurs, fonds, banques centrales et investisseurs internationaux. Leur détenteur individuel n'est pas enregistré en continu : la répartition publiée par la Finanzagentur repose sur une méthode de reconstitution des transactions.
         </>}>
-        <Figure id="detenteurs-dette" titre="Qui sont les investisseurs en titres fédéraux ?"
+        <Figure id="detenteurs-dette" titre="Qui possède les obligations allemandes ?"
           legende="Catégories décrites par l'agence allemande de la dette. Sans chiffre exhaustif et homogène pour tous les détenteurs de l'ensemble de la dette Maastricht, aucun camembert artificiel n'est dessiné."
           source={{ source: 'Deutsche Finanzagentur, structure des investisseurs, juin 2026', url: SOURCES.INVEST }}
           voir={[{ href: '#interets', label: 'Le coût des intérêts' }]}>
@@ -174,8 +174,8 @@ export function ArticleAllemagne({ suggestions }: { suggestions: Suggestion[] })
         </Figure>
       </Chapitre>
 
-      <Chapitre id="budget" titre="Qui vote le budget de l'État allemand ?"
-        reponse="Le Bundestag adopte le budget fédéral par une loi. Le Bundesrat participe à la procédure législative ; la Cour fédérale des comptes contrôle l'exécution des comptes.">
+      <Chapitre id="budget" titre="Comment l'Allemagne décide-t-elle de son budget ?"
+        reponse="Le Bundestag (Parlement fédéral élu) adopte le budget national. Le Bundesrat (chambre représentant les 16 Länder) intervient dans la procédure législative. La Cour fédérale des comptes contrôle ensuite l'utilisation de l'argent public.">
         <Etapes nom="budget-de" etapes={[
           { titre: 'Le gouvernement prépare', texte: 'Le gouvernement fédéral soumet un projet de loi de finances (Haushaltsgesetz) et les crédits demandés par les ministères.' },
           { titre: 'Le Bundestag adopte', texte: 'Les députés débattent, amendent et votent les crédits et recettes du budget fédéral. Ce vote est distinct du vote des budgets des Länder.' },
