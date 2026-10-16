@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DetailsPostes } from "@/articles/dette/cadre/DetailsPostes";
 import { Figure, Repartition, enLettres, montant, nombre } from "@/articles/dette/cadre";
 import {
   ACTEURS_2025,
@@ -11,6 +12,7 @@ import {
   DEPENSES_NATURE,
   RECETTES_2025,
   RECETTES_DETAIL,
+  IMPOTS_FAMILLES,
 } from "@/articles/dette/france/donnees/financesPubliques";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -82,6 +84,7 @@ export function Deficit() {
           voir={[{ href: "#depenses-publiques", label: "Voir les dépenses" }]}
         >
           <Repartition lignes={RECETTES_DETAIL} nom="Répartition des recettes publiques 2025" />
+          <DetailsPostes titre="Explorer les recettes" postes={RECETTES_DETAIL} complements={{"Impôts": {texte:"Les impôts financent les services publics. Le barème de l’impôt sur le revenu ne concerne qu’un des impôts : les recettes fiscales incluent aussi la TVA, la CSG et les impôts sur les sociétés.",sous:IMPOTS_FAMILLES},"Cotisations sociales effectives":{texte:"Prélèvements versés par salariés et employeurs, notamment pour la retraite, la maladie et les allocations. Il n’existe pas un taux unique : les taux dépendent de la branche, du salaire, du plafond et du statut."},"Ventes et autres recettes de production":{texte:"Produits des services rendus et facturés par des administrations : droits d’inscription, prestations publiques, redevances et autres ventes comptabilisées en production."},"Revenus de la propriété":{texte:"Dividendes des entreprises à participation publique, intérêts reçus et revenus du patrimoine détenu par les administrations."}}} />
         </Figure>
       </div>
 
@@ -102,10 +105,11 @@ export function Deficit() {
             </button>
           </div>
           {lecture === "nature" ? (
-            <Repartition lignes={DEPENSES_NATURE} nom="Dépenses publiques 2025 par nature" />
+            <><Repartition lignes={DEPENSES_NATURE} nom="Dépenses publiques 2025 par nature" /><DetailsPostes titre="Comprendre les dépenses par nature" postes={DEPENSES_NATURE} complements={{"Fonctionnement":{texte:"Rémunérations des agents en activité, achats de biens et services courants, entretien et informatique. Les pensions des anciens agents sont des prestations de retraite."},"Prestations sociales en espèces et en nature":{texte:"En espèces : sommes versées aux ménages (retraites, allocations, indemnités). En nature : biens et services fournis ou pris en charge pour eux."},"Intérêts":{texte:"Rémunération annuelle des prêteurs de la dette existante ; à distinguer du remboursement du capital."}}} /></>
           ) : (
             <>
               <Repartition lignes={DEPENSES_FONCTION} nom="Dépenses publiques par fonction" />
+              <DetailsPostes titre="Explorer chaque fonction" postes={DEPENSES_FONCTION} complements={{"Protection sociale":{texte:"Retraites, chômage, aides aux familles, handicap, dépendance et exclusion. Les pensions d’anciens enseignants ou soignants relèvent de la protection sociale, pas des salaires des actifs.",sous:[{nom:"Prestations en espèces : pensions, allocations et indemnités",md:556},{nom:"Prestations en nature : biens et services pris en charge",md:45},{nom:"Rémunérations : personnel des services sociaux",md:32},{nom:"Transferts et subventions à d’autres organismes",md:45},{nom:"Achats courants : fonctionnement",md:11},{nom:"Investissements : équipements durables",md:4}]},"Santé":{texte:"Dépenses publiques de soins : financement de services médicaux, personnels, achats, équipements et bâtiments. Les pensions des anciens soignants ne sont pas incluses dans la rémunération des soignants actifs.",sous:[{nom:"Prestations en nature",md:136},{nom:"Rémunérations des personnels actifs",md:70},{nom:"Achats courants",md:34},{nom:"Autres transferts",md:11},{nom:"Investissements",md:10}]},"Enseignement":{texte:"Écoles, universités, personnel en activité, fournitures, bâtiments et équipements ; les retraites des anciens enseignants sont classées en protection sociale.",sous:[{nom:"Rémunérations",md:104},{nom:"Achats courants",md:14},{nom:"Investissements",md:12},{nom:"Transferts",md:9},{nom:"Prestations",md:11}]},"Défense":{texte:"Rémunération des militaires en activité, achats et maintenance d’équipements, investissements et transferts.",sous:[{nom:"Rémunérations",md:22},{nom:"Achats",md:20},{nom:"Investissements",md:11},{nom:"Transferts",md:2}]}}} />
               <p className="dos-notule">Dernière ventilation par fonction publiée : 2024.</p>
             </>
           )}
