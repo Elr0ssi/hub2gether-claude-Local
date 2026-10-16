@@ -1,5 +1,6 @@
 import { CATALOGUE_DETTE } from "./catalogue";
 import { articleFrance } from "./france/fiche";
+import { articleAllemagne } from "./allemagne/fiche";
 import type { ArticleDette, RenduArticle } from "./types";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -17,6 +18,7 @@ import type { ArticleDette, RenduArticle } from "./types";
 
 const FICHES: Record<string, RenduArticle> = {
   france: articleFrance,
+  allemagne: articleAllemagne,
   // italie: articleItalie,     ← la fiche de l'article, sous le même slug que son entrée de catalogue
 };
 
