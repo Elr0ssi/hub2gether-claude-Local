@@ -92,3 +92,72 @@ export function completer(parts: Part[], total?: number, resteNom = "Autres"): P
   }
   return { parts: utiles, base: total, exces: 0 };
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES RÉFÉRENCES : rendre chaque ligne retrouvable
+   Un moteur de recherche lit le HTML, pas les panneaux fermés. Ces fonctions
+   mettent à plat toutes les lignes (et leurs « dont ») pour en faire un tableau
+   lisible dans la page et des données structurées. Rien à écrire à la main :
+   tout part des mêmes données que les camemberts.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** « Rémunérations des salariés » → « remunerations-des-salaries » (pour les ancres). */
+export function slug(texte: string): string {
+  return texte
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export interface LigneAplatie {
+  /** 0 : la ligne de la barre ; 1 : une part de son camembert ; 2 : un « dont ». */
+  niveau: number;
+  nom: string;
+  md: number;
+  /** La base du pourcentage : le total de la ligne ou du camembert où elle figure. */
+  base: number;
+  taux?: string;
+  note?: string;
+  /** L'explication, sur les lignes de niveau 0. */
+  texte?: string;
+  /** Le nom de la lecture, quand une ligne en propose plusieurs. */
+  lecture?: string;
+  parent?: string;
+}
+
+export function aplatir(lignes: Part[], details?: Record<string, Detail>): LigneAplatie[] {
+  const sortie: LigneAplatie[] = [];
+  const somme = lignes.filter((l) => l.md > 0).reduce((t, l) => t + l.md, 0);
+  for (const l of lignes) {
+    const d = details?.[l.nom];
+    sortie.push({ niveau: 0, nom: l.nom, md: l.md, base: somme, note: l.note, taux: l.taux, texte: d?.texte });
+    for (const v of d?.vues ?? []) {
+      const { parts, base } = completer(v.parts, v.total, v.resteNom);
+      for (const p of parts) {
+        if (p.reste) continue;
+        sortie.push({ niveau: 1, nom: p.nom, md: p.md, base, taux: p.taux, note: p.note, lecture: v.titre ?? v.legende, parent: l.nom });
+        if (p.enfants) {
+          for (const e of completer(p.enfants, p.md).parts) {
+            if (e.reste) continue;
+            sortie.push({ niveau: 2, nom: e.nom, md: e.md, base: p.md, taux: e.taux, note: e.note, lecture: v.titre ?? v.legende, parent: p.nom });
+          }
+        }
+      }
+    }
+  }
+  return sortie;
+}
+
+/** Pour les données structurées (schema.org) : une mesure par ligne, avec le chemin pour la retrouver. */
+export function variablesMesurees(lignes: Part[], details?: Record<string, Detail>, annee = "2025") {
+  return aplatir(lignes, details).map((l) => ({
+    "@type": "PropertyValue",
+    name: l.nom,
+    value: Math.round(l.md * 1000) / 1000,
+    unitText: "milliards d'euros",
+    measurementTechnique: l.taux ? `Taux : ${l.taux}` : undefined,
+    description: [l.parent ? `Dans : ${l.parent}` : undefined, l.lecture, l.note, `Année ${annee}`].filter(Boolean).join(" · "),
+  }));
+}

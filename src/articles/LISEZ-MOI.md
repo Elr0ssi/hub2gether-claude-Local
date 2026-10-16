@@ -189,3 +189,15 @@ export const DETAIL_RECETTES: Record<string, Detail> = {
 
 Pour une part, `taux` (facultatif) affiche « Taux : 20 % » sous son nom : le taux ou le barème de l'impôt. Sans source officielle, on ne le renseigne pas. `bareme: { titre, lignes: [{ libelle, taux, texte }] }` dessine les taux en barres (tranches d'un barème, taux d'une même taxe) derrière un bouton « Voir les taux » ; voir `france/donnees/ventilations.ts`.
 **Rien de « méta » dans la page** : pas de phrase du genre « la source ne détaille pas cette ligne » ni de commentaire sur les éditions ; si une ligne n'a pas de détail, elle s'ouvre sur son explication seule.
+
+## La trame du chapitre « Déficit public » (identique pour tous les pays)
+
+Ne réécrivez jamais la mise en page : utilisez `DeficitPublic` (`cadre/DeficitPublic.tsx`). Un pays ne fournit que des données : `france/Deficit.tsx` et `allemagne/Deficit.tsx` sont les deux modèles (quelques dizaines de lignes). Ordre fixe : onglets Recettes − Dépenses = Déficit ; dépenses « Par nature » d'abord, puis « Par fonction » ; chaque ligne s'ouvre sur son explication et son camembert.
+
+**Taux** : une courte ligne, jamais une phrase (25 caractères environ) : `taux: "2,1 à 20 %"`, `"0 à 45 %"`, `"variable"`, `"prix + quantité"`, `"0,16 % du CA au-delà de 19 M€"`. Elle s'affiche « → 2,1 à 20 % » (flèche bleue). Un barème en barres (`bareme`) seulement pour un vrai barème par tranches (impôt sur le revenu, IFI). Pas de « voté localement par la commune ou l'intercommunalité » : écrire « variable ».
+
+**Références (SEO), automatiques** : tout vient des mêmes données, rien à écrire en plus.
+- chaque ligne a une ancre (`#recettes-impots-et-cotisations-sociales`) qui ouvre la ligne ;
+- sous chaque répartition, un tableau « Voir tous les chiffres en tableau » contient chaque poste et chaque « dont » avec montant, part, taux et explication, dans le HTML même quand les panneaux sont fermés (c'est ce que lit un moteur de recherche : « rémunérations des salariés », « taxe sur l'énergie »…) ;
+- dans `fiche.tsx`, `variablesMesurees(lignes, details, année)` ajoute chaque ligne comme mesure du jeu de données (`variableMeasured`) ; voir `france/fiche.tsx` (const `MESURES`) ;
+- ajouter des mots-clés précis dans `keywords` : « recettes publiques <pays> », « impôts <pays> montant par impôt », etc.

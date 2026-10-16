@@ -6,6 +6,17 @@ import { entreeFrance } from "./catalogue";
 import type { Suggestion } from "../cadre";
 import { ArticleFrance } from "./Article";
 import { FAQ, detteDerniere, nonResidents, ratioDernier } from "./donnees/detteFrancaise";
+import { variablesMesurees } from "../cadre/ventilation";
+import {
+  DEFICIT_LIGNES,
+  DEPENSES_FONCTION_LIGNES,
+  DEPENSES_NATURE_LIGNES,
+  DETAIL_DEFICIT,
+  DETAIL_FONCTION,
+  DETAIL_NATURE,
+  DETAIL_RECETTES,
+  RECETTES_LIGNES,
+} from "./donnees/ventilations";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA FICHE DE L'ARTICLE « DETTE PUBLIQUE DE LA FRANCE »
@@ -49,6 +60,12 @@ const metadata: Metadata = {
     "dette de Maastricht",
     "charge de la dette",
     "OAT France",
+    "recettes publiques France",
+    "dépenses publiques France",
+    "rémunérations des salariés des administrations publiques",
+    "impôts France montant par impôt",
+    "taux TVA France",
+    "déficit public France",
   ],
   alternates: { canonical: URL },
   openGraph: {
@@ -80,6 +97,17 @@ const FIGURES: [string, string, string, string][] = [
   ["interets-dette", "Intérêts de la dette publique française, 2025", "INSEE", "2025"],
   ["dette-europe", "Dette publique en pourcentage du PIB en Europe, fin 2025", "Eurostat", "2025-Q4"],
 ];
+
+/* Chaque ligne des figures « recettes », « dépenses » et « déficit » est une mesure du jeu de données :
+   « rémunérations des salariés », « TVA », « protection sociale »… se retrouvent par leur nom. */
+const MESURES: Record<string, object[]> = {
+  "recettes-publiques": variablesMesurees(RECETTES_LIGNES, DETAIL_RECETTES, "2025"),
+  "depenses-publiques": [
+    ...variablesMesurees(DEPENSES_NATURE_LIGNES, DETAIL_NATURE, "2025"),
+    ...variablesMesurees(DEPENSES_FONCTION_LIGNES, DETAIL_FONCTION, "2024"),
+  ],
+  "qui-cree-le-deficit": variablesMesurees(DEFICIT_LIGNES, DETAIL_DEFICIT, "2025"),
+};
 
 function donneesStructurees(): object[] {
   const page = `${SITE_URL}${URL}`;
@@ -137,6 +165,7 @@ function donneesStructurees(): object[] {
       spatialCoverage: "France",
       isAccessibleForFree: true,
       isPartOf: { "@type": "Article", "@id": page },
+      ...(MESURES[id] ? { variableMeasured: MESURES[id] } : {}),
     })),
   ];
 }

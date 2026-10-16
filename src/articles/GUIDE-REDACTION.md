@@ -130,3 +130,5 @@ Chaque ligne du chapitre « Déficit public » s'ouvre sur : **ce que c'est** (u
 - Deux lectures d'une même dépense (par nature, par fonction, par administration) ne s'additionnent pas : on le dit.
 - Une année ou une édition par statistique : on n'affiche pas deux éditions côte à côte comme si elles se complétaient.
 - Les montants dans les phrases s'écrivent `[[valeur]]` pour suivre la monnaie du menu.
+- Les taux s'écrivent en **une courte ligne** (≈ 25 caractères) : « 2,1 à 20 % », « 0 à 45 % », « variable », « prix + quantité ». Pas de phrase, pas de « voté par la commune ou l'intercommunalité ». Un barème détaillé seulement pour l'impôt sur le revenu ou un équivalent.
+- Chaque poste porte le nom que les gens cherchent (« Rémunérations des salariés », « Taxe sur l'énergie ») : c'est ce nom qui sert à référencer la page.

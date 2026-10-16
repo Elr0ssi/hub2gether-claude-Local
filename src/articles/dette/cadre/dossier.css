@@ -1220,23 +1220,7 @@ body:has(.dos) { background: #0a0912; }
 .dos-cam-leg > li > b { font-size: 13px; font-weight: 700; white-space: nowrap; color: var(--dos-encre); }
 .dos-cam-leg > li > em { font-style: normal; font-size: 12px; text-align: right; color: var(--dos-encre-3); white-space: nowrap; }
 .dos-cam-leg > li.dos-cam-reste .dos-cam-n, .dos-cam-leg > li.dos-cam-reste > b { color: var(--dos-encre-3); font-style: italic; font-weight: 500; }
-.dos-cam-sous { list-style: none; margin: 10px 0 2px; padding: 0 0 0 12px; border-left: 2px solid var(--dos-ligne); display: grid; gap: 6px; }
-.dos-pile-l .dos-pile-detail .dos-cam-sous > li, .dos-cam-sous > li { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 2px 12px; font-size: 12px; color: var(--dos-encre-2); }
-.dos-cam-sous > li > span { flex: 1 1 140px; min-width: 0; }
-.dos-cam-sous > li > b { font-weight: 650; white-space: nowrap; color: var(--dos-encre); }
-.dos-cam-sous > li > .dos-cam-sous { flex: 1 1 100%; margin: 4px 0 0; }
-.dos-cam-sous > li.dos-cam-reste { color: var(--dos-encre-3); font-style: italic; }
-.dos-cam-legende { grid-column: 1 / -1; margin: 0; font-size: 12.5px; font-weight: 650; letter-spacing: 0.02em; color: var(--dos-encre-2); }
-.dos-cam-voir { display: inline-block; margin-top: 6px; padding: 3px 10px; border: 1px solid var(--dos-ligne); border-radius: 999px; background: var(--dos-surface); font: inherit; font-size: 11px; font-weight: 650; color: var(--dos-vif-2); cursor: pointer; }
-.dos-cam-voir:hover { border-color: var(--dos-vif-2); }
-.dos-bar { margin: 8px 0 4px; padding: 12px 14px; border-radius: 14px; background: var(--dos-surface); border: 1px solid var(--dos-ligne); }
-.dos-bar-t { margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: var(--dos-encre-3); }
-.dos-bar ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.dos-pile-l .dos-pile-detail .dos-bar li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; align-items: center; padding: 0; font-size: 11.5px; }
-.dos-bar-l { color: var(--dos-encre-2); }
-.dos-bar li > b { font-weight: 700; color: var(--dos-encre); text-align: right; max-width: 52%; }
-.dos-bar li > i { grid-column: 1 / -1; grid-row: 2; display: block; height: 7px; border-radius: 4px; background: linear-gradient(90deg, var(--dos-vif), var(--dos-vif-2)); min-width: 0; }
-.dos-cam-n small.dos-cam-taux { color: var(--dos-vif-2); font-weight: 600; }
+.dos-pile-l .dos-pile-detail .dos-cam-legende { grid-column: 1 / -1; margin: 0; font-size: 12.5px; font-weight: 650; letter-spacing: 0.02em; color: var(--dos-encre-2); }
 .dos-cam-precision { grid-column: 1 / -1; margin: 4px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--dos-encre-3); }
 @media (max-width: 680px) {
   .dos-cam { grid-template-columns: 1fr; }
@@ -1254,3 +1238,58 @@ body:has(.dos) { background: #0a0912; }
 .dos-eq-def i { background: linear-gradient(90deg, #ff6fa5, #ff9ac8); }
 .dos-eq-def b { color: var(--dos-corail); }
 @media (max-width: 560px) { .dos-eq-l { grid-template-columns: 1fr auto; } .dos-eq-l i { grid-column: 1 / -1; grid-row: 2; } }
+
+/* ── Les « dont » : une liste pleine largeur sous le camembert ───────────── */
+.dos-cam-ouvert { background: color-mix(in srgb, var(--dos-encre) 6%, transparent); }
+.dos-taux { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--dos-encre); white-space: normal; }
+.dos-pile-l .dos-pile-detail .dos-taux i { width: auto; height: auto; border-radius: 0; background: none; font-style: normal; font-weight: 800; color: #5aa0ff; }
+.dos-cam-n .dos-taux { display: flex; margin-top: 4px; }
+.dos-cam-dont { grid-column: 1 / -1; margin-top: 4px; padding: 16px 18px 8px; border-radius: 16px; background: var(--dos-surface); border: 1px solid var(--dos-ligne); }
+.dos-cam-dont-t { margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.03em; color: var(--dos-encre-3); }
+.dos-cam-dont-t span { margin-left: 8px; color: var(--dos-encre); }
+.dos-cam-dont ul { list-style: none; margin: 0; padding: 0; }
+.dos-pile-l .dos-pile-detail .dos-cam-dont li.dos-dont,
+.dos-cam-dont li.dos-dont { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) 104px 56px; align-items: baseline; gap: 4px 18px; padding: 11px 0; border: 0; border-top: 1px solid var(--dos-ligne); border-radius: 0; font-size: 13px; background: none; }
+.dos-cam-dont li.dos-dont:first-child { border-top: 0; }
+.dos-dont-n { min-width: 0; color: var(--dos-encre); overflow-wrap: anywhere; }
+.dos-dont-n small { margin-left: 8px; font-size: 11.5px; color: var(--dos-encre-3); }
+.dos-dont-t { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; min-width: 0; }
+.dos-dont > b { font-weight: 700; white-space: nowrap; text-align: right; color: var(--dos-encre); }
+.dos-dont > em { font-style: normal; font-size: 12px; text-align: right; color: var(--dos-encre-3); white-space: nowrap; }
+.dos-dont-reste .dos-dont-n, .dos-dont-reste > b { color: var(--dos-encre-3); font-style: italic; font-weight: 500; }
+.dos-dont-sous .dos-dont-n { padding-left: 16px; color: var(--dos-encre-2); }
+.dos-dont-bar { grid-column: 1 / -1; }
+.dos-cam-voir { padding: 2px 10px; border: 1px solid var(--dos-ligne); border-radius: 999px; background: var(--dos-surface-2); font: inherit; font-size: 11px; font-weight: 650; color: #5aa0ff; cursor: pointer; }
+.dos-cam-voir:hover { border-color: #5aa0ff; }
+.dos-bar { margin: 4px 0 8px; padding: 12px 14px; border-radius: 14px; background: var(--dos-surface-2); border: 1px solid var(--dos-ligne); max-width: 520px; }
+.dos-bar-t { margin: 0 0 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: var(--dos-encre-3); }
+.dos-bar ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.dos-pile-l .dos-pile-detail .dos-bar li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; align-items: center; padding: 0; border: 0; font-size: 11.5px; }
+.dos-bar-l { color: var(--dos-encre-2); }
+.dos-bar li > b { font-weight: 700; color: var(--dos-encre); text-align: right; max-width: 52%; }
+.dos-pile-l .dos-pile-detail .dos-bar li > i { grid-column: 1 / -1; grid-row: 2; display: block; height: 7px; border-radius: 4px; background: linear-gradient(90deg, #4a6df0, #5aa0ff); min-width: 0; }
+@media (max-width: 680px) {
+  .dos-cam-dont { padding: 14px 14px 6px; }
+  .dos-pile-l .dos-pile-detail .dos-cam-dont li.dos-dont, .dos-cam-dont li.dos-dont { grid-template-columns: minmax(0, 1fr) auto 46px; gap: 3px 10px; }
+  .dos-dont-t { grid-column: 1 / -1; grid-row: 2; }
+  .dos-dont > b { grid-column: 2; grid-row: 1; }
+  .dos-dont > em { grid-column: 3; grid-row: 1; }
+}
+
+/* ── Le tableau de tous les chiffres (lisible par les moteurs de recherche) ── */
+.dos-tab { margin-top: 18px; }
+.dos-tab > summary { display: inline-block; padding: 7px 14px; border: 1px solid var(--dos-ligne); border-radius: 999px; font-size: 12.5px; font-weight: 650; color: var(--dos-encre-2); cursor: pointer; list-style: none; background: var(--dos-surface); }
+.dos-tab > summary::-webkit-details-marker { display: none; }
+.dos-tab[open] > summary { color: var(--dos-encre); border-color: var(--dos-vif-2); }
+.dos-tab-c { margin-top: 12px; overflow-x: auto; border: 1px solid var(--dos-ligne); border-radius: 16px; }
+.dos-tab table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 620px; }
+.dos-tab caption { padding: 12px 14px 4px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dos-encre-3); }
+.dos-tab th, .dos-tab td { padding: 8px 14px; text-align: left; vertical-align: top; border-top: 1px solid var(--dos-ligne); }
+.dos-tab thead th { font-size: 11px; color: var(--dos-encre-3); font-weight: 700; }
+.dos-tab tbody th { font-weight: 650; color: var(--dos-encre); }
+.dos-tab td { color: var(--dos-encre-2); }
+.dos-tab td:nth-child(2) { white-space: nowrap; color: var(--dos-encre); font-weight: 650; }
+.dos-tab td:nth-child(3) { white-space: nowrap; }
+.dos-tab-dont th { font-weight: 450; color: var(--dos-encre-2); }
+.dos-tab-dont th small { color: var(--dos-encre-3); font-weight: 400; }
+.dos-pile-l li[id] { scroll-margin-top: 120px; }

@@ -7,9 +7,10 @@ import { montant, nf } from "./montants";
 /** Un camembert qui se lit comme « Qui détient la dette française » : l'anneau à gauche,
  *  la légende à droite (nom, montant, part), le survol allume la part dans les deux.
  *
- *    <Camembert vue={{ parts: [{ nom: "TVA", md: 208.8 }, …], total: 884.9 }} />
+ *    <Camembert vue={{ parts: [{ nom: "TVA", md: 208.8, taux: "2,1 à 20 %" }, …], total: 884.9 }} />
  *
- *  Les « dont » (`enfants`) s'ouvrent sous leur part ; ils ne sont pas dans l'anneau. */
+ *  Quand une part a des « dont » (`enfants`), un clic ouvre leur liste sous le camembert, sur toute
+ *  la largeur : un nom, → son taux en bleu, son montant, sa part. Les « dont » ne sont pas dans l'anneau. */
 
 const TEINTES = ["var(--cam0)", "var(--cam1)", "var(--cam2)", "var(--cam3)", "var(--cam4)", "var(--cam5)", "var(--cam6)", "var(--cam7)", "var(--cam8)", "var(--cam9)"];
 const teinte = (p: Part, i: number) => (p.reste ? "var(--cam-reste)" : TEINTES[i % TEINTES.length]);
@@ -25,7 +26,17 @@ export function avecMontants(texte: string, annee = 2025): string {
   return texte.replace(/\[\[(-?\d+(?:\.\d+)?)(?:\|(\d))?\]\]/g, (_, v: string, d?: string) => montant(Number(v), d === undefined ? 1 : Number(d), annee));
 }
 
-/** Les taux d'un impôt, en barres : plus la barre est longue, plus le taux est haut. */
+/** Le taux, en une courte ligne : une flèche bleue, puis « 20 % ». */
+function Taux({ taux }: { taux: string }) {
+  return (
+    <span className="dos-taux">
+      <i aria-hidden="true">→</i>
+      {taux}
+    </span>
+  );
+}
+
+/** Un barème en barres (tranches de l'impôt sur le revenu…) : plus la barre est longue, plus le taux est haut. */
 function Bareme({ bareme }: { bareme: BaremeT }) {
   const max = Math.max(...bareme.lignes.map((l) => l.taux ?? 0), 1);
   return (
@@ -44,49 +55,43 @@ function Bareme({ bareme }: { bareme: BaremeT }) {
   );
 }
 
-/** Le bouton « Voir les taux » et son graphique, pour une part ou un « dont ». */
-function Taux({ p }: { p: Part }) {
-  const [vu, setVu] = useState(false);
-  if (!p.taux && !p.bareme) return null;
+/** Une ligne de la liste des « dont » : nom, → taux, montant, part du parent. */
+function LigneDont({ p, base, annee, niveau = 0 }: { p: Part; base: number; annee: number; niveau?: number }) {
+  const [bareme, setBareme] = useState(false);
+  const sous = p.enfants ? completer(p.enfants, p.md).parts : [];
   return (
     <>
-      {p.taux && <small className="dos-cam-taux">Taux : {p.taux}</small>}
-      {p.bareme && (
-        <button type="button" className="dos-cam-voir" aria-expanded={vu} onClick={() => setVu(!vu)}>
-          {vu ? "Masquer les taux" : "Voir les taux"}
-        </button>
-      )}
-      {vu && p.bareme && <Bareme bareme={p.bareme} />}
+      <li className={`dos-dont${p.reste ? " dos-dont-reste" : ""}${niveau > 0 ? " dos-dont-sous" : ""}`}>
+        <span className="dos-dont-n">
+          {p.nom}
+          {p.note && <small>{avecMontants(p.note, annee)}</small>}
+        </span>
+        <span className="dos-dont-t">
+          {p.taux && <Taux taux={p.taux} />}
+          {p.bareme && (
+            <button type="button" className="dos-cam-voir" aria-expanded={bareme} onClick={() => setBareme(!bareme)}>
+              {bareme ? "masquer" : "barème"}
+            </button>
+          )}
+        </span>
+        <b>{montant(p.md, 1, annee)}</b>
+        <em>{base > 0 ? pct((p.md / base) * 100, 1) : ""}</em>
+        {bareme && p.bareme && <div className="dos-dont-bar"><Bareme bareme={p.bareme} /></div>}
+      </li>
+      {sous.map((e) => (
+        <LigneDont key={e.nom} p={e} base={p.md} annee={annee} niveau={niveau + 1} />
+      ))}
     </>
   );
 }
 
-function Sous({ parts, total, annee }: { parts: Part[]; total: number; annee: number }) {
-  const { parts: liste } = completer(parts, total);
-  return (
-    <ul className="dos-cam-sous">
-      {liste.map((p) => (
-        <li key={p.nom} className={p.reste ? "dos-cam-reste" : undefined}>
-          <span>
-            {p.nom}
-            {p.note && <small>{avecMontants(p.note, annee)}</small>}
-            <Taux p={p} />
-          </span>
-          <b>{montant(p.md, 1, annee)}</b>
-          {p.enfants && p.enfants.length > 0 && <Sous parts={p.enfants} total={p.md} annee={annee} />}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
-  const mdAff = (v: number) => montant(v, 1, annee);
   const { parts, base } = useMemo(() => completer(vue.parts, vue.total, vue.resteNom), [vue]);
   const [actif, setActif] = useState<number | null>(null);
   const [ouvert, setOuvert] = useState<number | null>(null);
   const dec = vue.pctDecimales ?? 1;
   if (parts.length === 0 || base <= 0) return null;
+  const mdAff = (v: number) => montant(v, 1, annee);
 
   const R = 42;
   const C = 2 * Math.PI * R;
@@ -98,6 +103,8 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
     return arc;
   });
   const lu = actif === null ? null : parts[actif];
+  const ouverte = ouvert === null ? null : parts[ouvert];
+  const dont = ouverte?.enfants ? completer(ouverte.enfants, ouverte.md).parts : [];
 
   return (
     <div className="dos-cam">
@@ -112,7 +119,7 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
               r={R}
               fill="none"
               stroke={teinte(parts[i], i)}
-              strokeWidth={actif === i ? 14 : 11}
+              strokeWidth={actif === i || ouvert === i ? 14 : 11}
               strokeDasharray={`${Math.max(0, long - 0.8)} ${C}`}
               strokeDashoffset={decal}
               transform="rotate(-90 50 50)"
@@ -145,7 +152,7 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
           return (
             <li
               key={p.nom}
-              className={`${actif === i ? "dos-cam-on" : ""}${p.reste ? " dos-cam-reste" : ""}`}
+              className={`${actif === i ? "dos-cam-on" : ""}${p.reste ? " dos-cam-reste" : ""}${estOuvert ? " dos-cam-ouvert" : ""}`}
               onPointerEnter={() => setActif(i)}
               onPointerLeave={() => setActif(null)}
             >
@@ -160,8 +167,7 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
                   <span>{p.nom}</span>
                 )}
                 {p.note && <small>{avecMontants(p.note, annee)}</small>}
-                <Taux p={p} />
-                {estOuvert && p.enfants && <Sous parts={p.enfants} total={p.md} annee={annee} />}
+                {p.taux && <Taux taux={p.taux} />}
               </div>
               <b>{mdAff(p.md)}</b>
               <em>{pct((p.md / base) * 100, dec)}</em>
@@ -169,6 +175,19 @@ export function Camembert({ vue, annee = 2025 }: { vue: Vue; annee?: number }) {
           );
         })}
       </ul>
+
+      {ouverte && dont.length > 0 && (
+        <div className="dos-cam-dont">
+          <p className="dos-cam-dont-t">
+            Dans « {ouverte.nom} » <span>{mdAff(ouverte.md)}</span>
+          </p>
+          <ul>
+            {dont.map((e) => (
+              <LigneDont key={e.nom} p={e} base={ouverte.md} annee={annee} />
+            ))}
+          </ul>
+        </div>
+      )}
 
       {vue.precision && <p className="dos-cam-precision">{avecMontants(vue.precision, annee)}</p>}
     </div>

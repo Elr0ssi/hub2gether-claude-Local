@@ -37,23 +37,6 @@ export const RECETTES_TOTAL_LIGNES = 1561.8;
 
 /* ── Les taux des impôts (2025) ─────────────────────────────────────────── */
 
-const BAREME_TVA: Bareme = {
-  titre: "TVA en métropole",
-  lignes: [
-    { libelle: "Taux normal", taux: 20, texte: "20 %" },
-    { libelle: "Taux intermédiaire", taux: 10, texte: "10 %" },
-    { libelle: "Taux réduit", taux: 5.5, texte: "5,5 %" },
-    { libelle: "Taux particulier", taux: 2.1, texte: "2,1 %" },
-  ],
-};
-const BAREME_CSG: Bareme = {
-  titre: "CSG selon le type de revenu",
-  lignes: [
-    { libelle: "Revenus d'activité et du patrimoine", taux: 9.2, texte: "9,2 %" },
-    { libelle: "Allocations chômage", taux: 6.2, texte: "6,2 % ou 3,8 %" },
-    { libelle: "Pensions de retraite", taux: 8.3, texte: "0 %, 3,8 %, 6,6 % ou 8,3 %" },
-  ],
-};
 const BAREME_IR: Bareme = {
   titre: "Barème 2025 (revenus 2024), par part de quotient familial",
   lignes: [
@@ -62,20 +45,6 @@ const BAREME_IR: Bareme = {
     { libelle: "De 29 315 à 83 823 €", taux: 30, texte: "30 %" },
     { libelle: "De 83 823 à 180 294 €", taux: 41, texte: "41 %" },
     { libelle: "Au-delà de 180 294 €", taux: 45, texte: "45 %" },
-  ],
-};
-const BAREME_IS: Bareme = {
-  lignes: [
-    { libelle: "Taux normal", taux: 25, texte: "25 %" },
-    { libelle: "PME éligibles : premiers 42 500 € de bénéfice", taux: 15, texte: "15 %" },
-  ],
-};
-const BAREME_SALAIRES: Bareme = {
-  titre: "Taxe sur les salaires, par tranche de rémunération (métropole)",
-  lignes: [
-    { libelle: "1re tranche", taux: 4.25, texte: "4,25 %" },
-    { libelle: "2e tranche", taux: 8.5, texte: "8,5 %" },
-    { libelle: "3e tranche", taux: 13.6, texte: "13,6 %" },
   ],
 };
 const BAREME_IFI: Bareme = {
@@ -97,50 +66,50 @@ export const IMPOTS_PARTS: Part[] = [
     nom: "Impôts courants sur le revenu",
     md: 383.3,
     enfants: [
-      { nom: "CSG", md: 156.6, taux: "9,2 % sur l'activité et le patrimoine", bareme: BAREME_CSG },
-      { nom: "Impôt sur le revenu des personnes physiques", md: 103.6, note: "avant crédits d'impôt", taux: "de 0 % à 45 % par tranche", bareme: BAREME_IR },
-      { nom: "Impôt sur les sociétés", md: 69.5, note: "avant crédits d'impôt", taux: "25 % (15 % pour les petits bénéfices des PME)", bareme: BAREME_IS },
+      { nom: "CSG", md: 156.6, taux: "9,2 % sur l'activité" },
+      { nom: "Impôt sur le revenu des personnes physiques", md: 103.6, note: "avant crédits d'impôt", taux: "0 à 45 %", bareme: BAREME_IR },
+      { nom: "Impôt sur les sociétés", md: 69.5, note: "avant crédits d'impôt", taux: "25 %" },
       { nom: "CRDS", md: 9.3, taux: "0,5 %" },
     ],
   },
-  { nom: "TVA", md: 208.8, note: "Impôt sur les produits", taux: "20 % en taux normal", bareme: BAREME_TVA },
+  { nom: "TVA", md: 208.8, note: "Impôt sur les produits", taux: "2,1 à 20 %" },
   {
     nom: "Autres impôts sur les produits",
     md: 128.1,
     enfants: [
-      { nom: "Accises sur les produits énergétiques", md: 30.5, taux: "un tarif par produit et par usage" },
-      { nom: "Accises sur les tabacs", md: 13.6, taux: "une part proportionnelle au prix et une part par quantité" },
+      { nom: "Accises sur les produits énergétiques", md: 30.5, taux: "selon le produit" },
+      { nom: "Accises sur les tabacs", md: 13.6, taux: "prix + quantité" },
     ],
   },
   {
     nom: "Autres impôts sur la production",
     md: 72.7,
     enfants: [
-      { nom: "Taxe foncière", md: 44.2, taux: "voté localement" },
-      { nom: "Cotisation foncière des entreprises", md: 8.1, taux: "voté par la commune ou l'intercommunalité" },
-      { nom: "Contribution sociale de solidarité des sociétés", md: 5.3, taux: "0,16 % du chiffre d'affaires, au-delà de 19 M€" },
-      { nom: "Cotisation sur la valeur ajoutée des entreprises", md: 3.7, taux: "de 0 % à 0,19 % selon le chiffre d'affaires" },
+      { nom: "Taxe foncière", md: 44.2, taux: "variable" },
+      { nom: "Cotisation foncière des entreprises", md: 8.1, taux: "variable" },
+      { nom: "Contribution sociale de solidarité des sociétés", md: 5.3, taux: "0,16 % du CA au-delà de 19 M€" },
+      { nom: "Cotisation sur la valeur ajoutée des entreprises", md: 3.7, taux: "0 à 0,19 % du CA" },
     ],
   },
   {
     nom: "Impôts sur salaires et main-d'œuvre",
     md: 60.1,
-    enfants: [{ nom: "Taxe sur les salaires", md: 17.6, taux: "4,25 %, 8,5 % ou 13,6 % selon la tranche", bareme: BAREME_SALAIRES }],
+    enfants: [{ nom: "Taxe sur les salaires", md: 17.6, taux: "4,25 à 13,6 %" }],
   },
   {
     nom: "Impôts en capital",
     md: 21.7,
-    enfants: [{ nom: "Droits de mutation à titre gratuit", md: 21.1, taux: "de 5 % à 45 % en ligne directe, après abattements" }],
+    enfants: [{ nom: "Droits de mutation à titre gratuit", md: 21.1, taux: "5 à 45 %" }],
   },
   {
     nom: "Autres impôts courants",
     md: 6.6,
     enfants: [
-      { nom: "Taxe d'habitation", md: 2.9, taux: "voté localement ; résidence principale exonérée" },
-      { nom: "Impôt sur la fortune immobilière", md: 2.7, taux: "de 0 % à 1,5 % par tranche", bareme: BAREME_IFI },
+      { nom: "Taxe d'habitation", md: 2.9, taux: "variable" },
+      { nom: "Impôt sur la fortune immobilière", md: 2.7, taux: "0 à 1,5 %", bareme: BAREME_IFI },
     ],
   },
-  { nom: "Droits et impôts sur les importations", md: 3.6, note: "Selon la marchandise et son origine" },
+  { nom: "Droits et impôts sur les importations", md: 3.6, taux: "selon la marchandise" },
 ];
 
 export const DETAIL_RECETTES: Record<string, Detail> = {

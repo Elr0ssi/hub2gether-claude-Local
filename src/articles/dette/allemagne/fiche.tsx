@@ -5,6 +5,10 @@ import type { Suggestion } from '../cadre';
 import { ArticleAllemagne } from './Article';
 import { entreeAllemagne } from './catalogue';
 import { DETTE, RATIO, DEFICIT_2025, FAQ, SOURCES } from './donnees';
+import { variablesMesurees } from '../cadre/ventilation';
+import {
+  DEPENSES_FONCTION_LIGNES, DEPENSES_NATURE_LIGNES, DETAIL_FONCTION, DETAIL_NATURE, DETAIL_RECETTES, RECETTES_LIGNES,
+} from './ventilations';
 
 const URL = entreeAllemagne.url;
 const PUBLIE = entreeAllemagne.publie;
@@ -20,7 +24,7 @@ const SUGGESTIONS: Suggestion[] = [
 const metadata: Metadata = {
   title: { absolute: "Dette publique allemande : montant, déficit et détenteurs | Visualize" },
   description: "Dette publique allemande : montant et dette/PIB, déficit, Bund et Länder, intérêts, investisseurs, refinancement et frein à l'endettement. Sources officielles.",
-  keywords: ['dette Allemagne', 'dette publique allemande', 'dette PIB Allemagne', 'Bund dette', 'Länder dette', 'frein à l’endettement', 'obligations allemandes'],
+  keywords: ['dette Allemagne', 'dette publique allemande', 'dette PIB Allemagne', 'Bund dette', 'Länder dette', 'frein à l’endettement', 'obligations allemandes', 'recettes publiques Allemagne', 'dépenses publiques Allemagne', 'impôts Allemagne montant par impôt', 'déficit public Allemagne'],
   alternates: { canonical: URL },
   openGraph: {
     type: 'article', url: PAGE,
@@ -43,6 +47,16 @@ const FIGURES: [string, string, string, string][] = [
   ['dette-europe', 'Dette publique brute en Europe, premier trimestre 2026', 'Eurostat', '2026-Q1'],
   ['frein-endettement', "Réforme du frein à l'endettement allemand", 'Deutscher Bundestag', '2025'],
 ];
+
+/* Chaque ligne des figures « recettes » et « dépenses » est une mesure du jeu de données :
+   « Lohnsteuer », « taxe sur l'énergie », « protection sociale »… se retrouvent par leur nom. */
+const MESURES: Record<string, object[]> = {
+  'recettes-publiques': variablesMesurees(RECETTES_LIGNES, DETAIL_RECETTES, '2025'),
+  'depenses-publiques': [
+    ...variablesMesurees(DEPENSES_NATURE_LIGNES, DETAIL_NATURE, '2025'),
+    ...variablesMesurees(DEPENSES_FONCTION_LIGNES, DETAIL_FONCTION, '2025'),
+  ],
+};
 
 function donneesStructurees(): object[] {
   return [
@@ -77,6 +91,7 @@ function donneesStructurees(): object[] {
       temporalCoverage: periode, spatialCoverage: 'Allemagne',
       isAccessibleForFree: true,
       isPartOf: { '@type': 'Article', '@id': PAGE },
+      ...(MESURES[id] ? { variableMeasured: MESURES[id] } : {}),
     })),
   ];
 }

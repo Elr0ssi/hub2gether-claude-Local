@@ -1,9 +1,9 @@
 "use client";
 
-import { Fragment, useId, useState } from "react";
+import { Fragment, useEffect, useId, useState } from "react";
 import { Camembert, avecMontants } from "./Camembert";
 import { montant, montantAbs, nf } from "./montants";
-import type { Detail, Part } from "./ventilation";
+import { aplatir, slug, type Detail, type Part } from "./ventilation";
 
 /** La barre segmentée et ses lignes ; chaque ligne qui a un `details` s'ouvre sur un petit
  *  panneau : l'explication, puis le camembert de son contenu (comme « Qui détient la dette »).
@@ -55,12 +55,53 @@ function Panneau({ detail, annee }: { detail: Detail; annee: number }) {
   );
 }
 
+/** Tous les chiffres de la répartition dans un vrai tableau : lu par les moteurs de recherche et les lecteurs d'écran
+ *  même quand les panneaux sont fermés. Il vient des mêmes données que les camemberts : rien à écrire en plus. */
+function TableauChiffres({ nom, lignes, details, annee }: { nom: string; lignes: Part[]; details?: Record<string, Detail>; annee: number }) {
+  const rangs = aplatir(lignes, details);
+  return (
+    <details className="dos-tab">
+      <summary>Voir tous les chiffres en tableau</summary>
+      <div className="dos-tab-c">
+        <table>
+          <caption>{nom}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Poste</th>
+              <th scope="col">Montant</th>
+              <th scope="col">Part</th>
+              <th scope="col">Taux</th>
+              <th scope="col">Ce que c'est</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rangs.map((r, i) => (
+              <tr key={`${i}-${r.nom}`} className={r.niveau > 0 ? "dos-tab-dont" : "dos-tab-poste"}>
+                <th scope="row">
+                  {r.niveau > 0 && <span aria-hidden="true">{r.niveau > 1 ? "↳ ↳ " : "↳ "}</span>}
+                  {r.nom}
+                  {r.parent && r.niveau === 1 && <small> dans {r.parent}</small>}
+                </th>
+                <td>{montant(Math.abs(r.md), 1, annee)}</td>
+                <td>{r.base > 0 ? `${nf((Math.abs(r.md) / r.base) * 100)} %` : ""}</td>
+                <td>{r.taux ?? ""}</td>
+                <td>{r.texte ? avecMontants(r.texte, annee) : r.note ? avecMontants(r.note, annee) : ""}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </details>
+  );
+}
+
 export function Repartition({
   lignes,
   nom,
   negatif = false,
   details,
   annee = 2025,
+  idBase,
 }: {
   lignes: LigneRepartition[];
   nom: string;
@@ -68,12 +109,30 @@ export function Repartition({
   details?: Record<string, Detail>;
   /** L'année des montants : c'est le taux de change de cette année qui les convertit. */
   annee?: number;
+  /** Le préfixe des ancres des lignes (`#recettes-tva`). Par défaut, le nom de la répartition. */
+  idBase?: string;
 }) {
   const positives = lignes.filter((l) => l.md > 0);
   const somme = positives.reduce((t, l) => t + l.md, 0);
   const [actif, setActif] = useState<number | null>(null);
   const [ouvert, setOuvert] = useState<string | null>(null);
   const identifiant = useId();
+  const base = idBase ?? slug(nom);
+
+  /* Une adresse comme `#recettes-publiques-tva` ouvre la ligne et y amène le lecteur. */
+  useEffect(() => {
+    const ouvre = () => {
+      const h = decodeURIComponent(window.location.hash.slice(1));
+      const ligne = lignes.find((l) => `${base}-${slug(l.nom)}` === h);
+      if (!ligne || !details?.[ligne.nom]) return;
+      setOuvert(ligne.nom);
+      window.setTimeout(() => document.getElementById(h)?.scrollIntoView({ behavior: "smooth", block: "center" }), 120);
+    };
+    ouvre();
+    window.addEventListener("hashchange", ouvre);
+    return () => window.removeEventListener("hashchange", ouvre);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="dos-rep">
@@ -101,6 +160,7 @@ export function Repartition({
           return (
             <Fragment key={l.nom}>
               <li
+                id={`${base}-${slug(l.nom)}`}
                 className={`${l.md < 0 ? "dos-pile-neg" : ""}${actif === i && l.md > 0 ? " dos-pile-on" : ""}${detail ? " dos-pile-ouvrable" : ""}${estOuvert ? " dos-pile-ouverte" : ""}`}
                 role={detail ? "button" : undefined}
                 tabIndex={detail ? 0 : undefined}
@@ -132,6 +192,7 @@ export function Repartition({
           );
         })}
       </ul>
+      <TableauChiffres nom={nom} lignes={lignes} details={details} annee={annee} />
     </div>
   );
 }
