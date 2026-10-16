@@ -10,6 +10,7 @@ import { poserMonnaieArticle, valeurConvertie } from '@/lib/montant';
 import { useMonnaieArticle } from '@/components/concept/Monnaie';
 import { Comparaison } from './figures/Europe';
 import { Deficit } from './Deficit';
+import { PorteursAllemagne } from './figures/PorteursAllemagne';
 import {
   DETTE, RATIO, HAUSSE_DETTE, DEFICIT_2025, DEFICIT_RATIO_2025,
   DEPENSES_2025, RECETTES_2025, DEFICIT_S1_2026, RATIO_DEFICIT_S1_2026,
@@ -147,12 +148,7 @@ export function ArticleAllemagne({ suggestions }: { suggestions: Suggestion[] })
           legende="Catégories décrites par l'agence allemande de la dette. Sans chiffre exhaustif et homogène pour tous les détenteurs de l'ensemble de la dette Maastricht, aucun camembert artificiel n'est dessiné."
           source={{ source: 'Deutsche Finanzagentur, structure des investisseurs, juin 2026', url: SOURCES.INVEST }}
           voir={[{ href: '#interets', label: 'Le coût des intérêts' }]}>
-          <Etapes nom="detenteurs-de" etapes={[
-            { titre: 'Banques et intermédiaires', texte: 'Les banques et les courtiers peuvent conserver des titres fédéraux et contribuer à leur échange sur le marché secondaire.' },
-            { titre: 'Gestionnaires, fonds et assureurs', texte: 'Les investisseurs institutionnels détiennent des Bunds selon leurs objectifs de placement et de liquidité.' },
-            { titre: 'Banques centrales', texte: 'Les banques centrales peuvent détenir des titres fédéraux, notamment dans leurs portefeuilles de réserves ou liés aux opérations monétaires.' },
-            { titre: 'Investisseurs internationaux', texte: 'L’agence distingue des zones géographiques, mais précise que les pourcentages de ses tableaux relèvent d’une estimation de détention, non d’un registre exhaustif.' },
-          ]} />
+          <PorteursAllemagne />
           <p className="dos-notule">Périmètre : titres négociables du Bund ; ne pas extrapoler cette structure à toute la dette brute des administrations publiques. <Source href={SOURCES.INVEST}>Méthodologie de la Finanzagentur</Source>.</p>
         </Figure>
       </Chapitre>
