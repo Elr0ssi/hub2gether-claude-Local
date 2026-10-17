@@ -66,6 +66,8 @@ export interface Detail {
   /** Ce que c'est, en une ou deux phrases. */
   texte: string;
   vues?: Vue[];
+  /** Des barèmes dessinés en barres (tranches d'un impôt), quand il n'y a pas de camembert à montrer. */
+  baremes?: Bareme[];
   /** Des lignes de lecture, sans camembert. */
   notes?: string[];
   source?: { nom: string; url: string };

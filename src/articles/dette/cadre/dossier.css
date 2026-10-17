@@ -1290,3 +1290,14 @@ body:has(.dos) { background: #0a0912; }
 .dos-cam-leg > li { align-items: start; }
 .dos-cam-leg > li > .dos-cam-p { align-self: stretch; width: 8px; height: auto; min-height: 16px; margin: 2px 0; border-radius: 4px; justify-self: center; }
 .dos-cam-leg > li.dos-cam-on { background: color-mix(in srgb, var(--dos-vif) 8%, transparent); }
+
+/* Un petit tableau en barres sous le texte d'un panneau (barème d'un impôt) : même largeur que le camembert. */
+.dos-det-texte + .dos-bar, .dos-bar + .dos-bar { margin-top: 0; margin-bottom: 14px; }
+/* Les administrations débitrices : étiquette plus large, consolidations en corail, totaux en gras. */
+.dos-eq-ad .dos-eq-l { grid-template-columns: minmax(140px, 250px) minmax(0, 1fr) auto; }
+.dos-eq-ad .dos-eq-l i { background: linear-gradient(90deg, #4a1fd0, #7c4dff); }
+.dos-eq-ad .dos-eq-neg i { background: linear-gradient(90deg, #ff6fa5, #ff9ac8); }
+.dos-eq-ad .dos-eq-neg b { color: var(--dos-corail); }
+.dos-eq-ad .dos-eq-total span, .dos-eq-ad .dos-eq-total b { font-weight: 800; color: var(--dos-encre); }
+.dos-eq-ad .dos-eq-total { padding-top: 10px; border-top: 1px solid var(--dos-ligne); }
+@media (max-width: 560px) { .dos-eq-ad .dos-eq-l { grid-template-columns: 1fr auto; } }

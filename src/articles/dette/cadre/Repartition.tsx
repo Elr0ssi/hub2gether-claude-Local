@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useId, useState } from "react";
-import { Camembert, Taux, avecMontants, mdAuto } from "./Camembert";
+import { Bareme, Camembert, Taux, avecMontants, mdAuto } from "./Camembert";
 import { montant, montantAbs, nf } from "./montants";
 import { aplatir, slug, type Detail, type Part } from "./ventilation";
 
@@ -51,6 +51,7 @@ function Panneau({ detail, annee }: { detail: Detail; annee: number }) {
           ))}
         </div>
       )}
+      {detail.baremes?.map((b) => <Bareme key={b.titre ?? b.lignes[0].libelle} bareme={b} />)}
       {courante && <Camembert key={vue} vue={courante} annee={annee} />}
       {detail.source && (
         <p className="dos-det-source">
@@ -194,7 +195,7 @@ export function Repartition({
                 <span>
                   {l.nom}
                   {detail && <small className="dos-pile-chevron" aria-hidden="true">{estOuvert ? "−" : "+"}</small>}
-                  {l.taux && !detail && <span className="dos-pile-taux"><Taux taux={l.taux} /></span>}
+                  {l.taux && <span className="dos-pile-taux"><Taux taux={l.taux} /></span>}
                   {l.note && <small className="dos-pile-note">{l.note}</small>}
                 </span>
                 <b className={negatif ? "dos-neg" : undefined}>

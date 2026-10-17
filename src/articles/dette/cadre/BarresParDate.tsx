@@ -14,6 +14,8 @@ export interface PointDate {
   montantMd?: number | null;
   /** Un événement daté à rappeler (« crise financière »), facultatif. */
   repere?: string;
+  /** En mode « montant » : la dette rapportée au PIB à cette date (en %), quand on la connaît. */
+  ratio?: number | null;
 }
 
 /** Des barres, une par date : on lit en cliquant (ou en survolant) une barre. Pas de courbe tracée
@@ -30,11 +32,15 @@ export function BarresParDate({
   unite = "% du PIB",
   enteteValeur = "Dette / PIB",
   enteteMontant = "Montant",
+  mode = "ratio",
 }: {
   points: PointDate[];
   unite?: string;
   enteteValeur?: string;
   enteteMontant?: string;
+  /** « ratio » (par défaut) : les barres sont des % du PIB. « montant » : les barres sont des milliards d'euros
+   *  (`valeur`), convertis dans la monnaie du lecteur ; le ratio, s'il existe, s'écrit à côté. */
+  mode?: "ratio" | "montant";
 }) {
   const [sel, setSel] = useState(points.length - 1);
   const max = Math.max(...points.map((p) => p.valeur));
@@ -44,11 +50,18 @@ export function BarresParDate({
     <div className="dos-graphe">
       <div className="dos-graphe-tete">
         <p className="dos-graphe-v">
-          {nf(p.valeur)} <small>{unite}</small>
+          {mode === "montant" ? (
+            montant(p.valeur, 1)
+          ) : (
+            <>
+              {nf(p.valeur)} <small>{unite}</small>
+            </>
+          )}
         </p>
         <p className="dos-graphe-d">
           {p.etiquette}
-          {p.montantMd != null ? ` · ${montant(p.montantMd)}` : ""}
+          {mode === "montant" && p.ratio != null ? ` · ${nf(p.ratio)} % du PIB` : ""}
+          {mode === "ratio" && p.montantMd != null ? ` · ${montant(p.montantMd)}` : ""}
           {p.repere ? ` · ${p.repere}` : ""}
         </p>
       </div>
@@ -62,9 +75,9 @@ export function BarresParDate({
             onClick={() => setSel(i)}
             onMouseEnter={() => setSel(i)}
             onFocus={() => setSel(i)}
-            aria-label={`${pt.etiquette} : ${nf(pt.valeur)} ${unite}`}
+            aria-label={mode === "montant" ? `${pt.etiquette} : ${montant(pt.valeur, 1)}` : `${pt.etiquette} : ${nf(pt.valeur)} ${unite}`}
           >
-            <span className="dos-barre-v">{nf(pt.valeur, Number.isInteger(pt.valeur) ? 0 : 1)}</span>
+            <span className="dos-barre-v">{mode === "montant" ? "" : nf(pt.valeur, Number.isInteger(pt.valeur) ? 0 : 1)}</span>
             <span className="dos-barre-z">
               <span className="dos-barre-b" style={{ height: `${(pt.valeur / max) * 100}%`, "--i": i } as React.CSSProperties} />
             </span>
@@ -79,17 +92,15 @@ export function BarresParDate({
             <tr>
               <th scope="col">Date</th>
               <th scope="col">{enteteValeur}</th>
-              <th scope="col">{enteteMontant}</th>
+              <th scope="col">{mode === "montant" ? "Dette / PIB" : enteteMontant}</th>
             </tr>
           </thead>
           <tbody>
             {points.map((pt) => (
               <tr key={pt.cle}>
                 <th scope="row">{pt.etiquette}</th>
-                <td>
-                  {nf(pt.valeur)} {unite.startsWith("%") ? "%" : unite}
-                </td>
-                <td>{pt.montantMd != null ? montant(pt.montantMd) : "—"}</td>
+                <td>{mode === "montant" ? montant(pt.valeur, 1) : `${nf(pt.valeur)} ${unite.startsWith("%") ? "%" : unite}`}</td>
+                <td>{mode === "montant" ? (pt.ratio != null ? `${nf(pt.ratio)} %` : "—") : pt.montantMd != null ? montant(pt.montantMd) : "—"}</td>
               </tr>
             ))}
           </tbody>
