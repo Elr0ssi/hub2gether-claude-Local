@@ -1,0 +1,28 @@
+{
+  "country": "HUN",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Hongrie",
+  "iso2": "HU",
+  "data": {
+    "2000": 56,
+    "2005": 61,
+    "2010": 80,
+    "2015": 74,
+    "2020": 80,
+    "2023": 73,
+    "2025": 74
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 56.2,
+        "2014": 76.8,
+        "2024": 73
+      }
+    }
+  ]
+}

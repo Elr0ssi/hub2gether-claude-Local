@@ -14,7 +14,7 @@ export function DetailSection({ entry, prev, next }: DetailSectionProps) {
   const datasetSchema = {
     "@context": "https://schema.org",
     "@type": "Dataset",
-    name: `Roman Empire — ${formatYear(entry.year)}`,
+    name: `Roman Empire · ${formatYear(entry.year)}`,
     description: entry.description,
     keywords: ["Roman Empire", "Historical Map", "Ancient History", entry.era],
     temporalCoverage: String(entry.year),
@@ -30,7 +30,7 @@ export function DetailSection({ entry, prev, next }: DetailSectionProps) {
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: "/" },
       { "@type": "ListItem", position: 2, name: "Empires", item: "/map/empires" },
-      { "@type": "ListItem", position: 3, name: `Roman Empire — ${formatYear(entry.year)}` },
+      { "@type": "ListItem", position: 3, name: `Roman Empire · ${formatYear(entry.year)}` },
     ],
   };
 
@@ -67,7 +67,7 @@ export function DetailSection({ entry, prev, next }: DetailSectionProps) {
         </div>
 
         <h1 className="text-heading-1 mb-3" style={{ color: "var(--ink)", fontSize: "2.25rem", letterSpacing: "-0.03em" }}>
-          Empire romain — {entry.label}
+          Empire romain · {entry.label}
           <br />
           <span style={{ color: "var(--accent)" }}>{formatYear(entry.year)}</span>
         </h1>
@@ -158,7 +158,7 @@ export function DetailSection({ entry, prev, next }: DetailSectionProps) {
               <span className="block text-xs" style={{ color: "var(--ink-4)" }}>
                 Précédent
               </span>
-              {formatYear(prev.year)} — {prev.label}
+              {formatYear(prev.year)}, {prev.label}
             </span>
           </Link>
         ) : (
@@ -174,7 +174,7 @@ export function DetailSection({ entry, prev, next }: DetailSectionProps) {
               <span className="block text-xs" style={{ color: "var(--ink-4)" }}>
                 Suivant
               </span>
-              {formatYear(next.year)} — {next.label}
+              {formatYear(next.year)} · {next.label}
             </span>
             <ArrowRight size={14} />
           </Link>

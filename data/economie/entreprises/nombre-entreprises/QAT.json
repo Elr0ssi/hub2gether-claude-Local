@@ -1,0 +1,17 @@
+{
+  "country": "QAT",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Qatar",
+  "iso2": "QA",
+  "data": {
+    "2000": 70,
+    "2005": 90,
+    "2010": 110,
+    "2015": 125,
+    "2020": 135,
+    "2023": 140,
+    "2025": 430
+  }
+}

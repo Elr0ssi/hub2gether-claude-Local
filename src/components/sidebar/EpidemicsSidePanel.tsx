@@ -1,5 +1,6 @@
 "use client";
 
+import { countryFr } from "@/data/countryNamesFr";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Users, Skull, AlertTriangle, MapPin } from "lucide-react";
 import { formatNumber } from "@/lib/utils";
@@ -14,7 +15,7 @@ interface EpidemicsSidePanelProps {
 }
 
 function mortalityRate(infected: number, deaths: number): string {
-  if (infected === 0) return "–";
+  if (infected === 0) return "-";
   return ((deaths / infected) * 100).toFixed(1) + "%";
 }
 
@@ -43,7 +44,7 @@ export function EpidemicsSidePanel({ disease, countryName, open, onClose, isYtd 
             <div>
               <span className="accent-badge text-xs mb-2 inline-flex">Épidémies</span>
               <h2 className="text-heading-2" style={{ color: "var(--ink)" }}>
-                {countryName ?? "Sélectionnez un pays"}
+                {countryName ? countryFr(countryName) : "Sélectionnez un pays"}
               </h2>
               {countryName && (
                 <p className="text-caption mt-0.5" style={{ color: "var(--ink-3)" }}>

@@ -1,0 +1,207 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE TÉLÉPHONE, D'ABORD
+
+   Des zones qu'un pouce atteint sans viser : 44 px au moins pour tout ce qui se
+   touche, des marges qui laissent respirer, rien qui déborde. Ces règles ne
+   s'appliquent qu'aux écrans tactiles ou étroits.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+img, video, svg, canvas { max-width: 100%; }
+
+/* Du texte pour les lecteurs d'écran et les moteurs : présent, jamais vu. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (pointer: coarse), (max-width: 900px) {
+  /* Le pied de page : des liens qu'on peut toucher. */
+  :root .cg-pied-nav a, :root .cg-pied-bas a { display: inline-flex; align-items: center; min-height: 44px; }
+  :root .cg-pied-in { gap: 12px; }
+  :root .cg-pied-nav { gap: 0 18px; }
+  :root .cg-pied-nav a { font-size: 14.5px; }
+  :root .cg-pied { padding-top: 28px; }
+  :root .cg-pied .cg-wrap { padding-left: 20px; padding-right: 20px; }
+
+  /* Le fil d'Ariane et les liens de texte courts. */
+  :root .sg-fil a, :root .sg-fil span { display: inline-flex; align-items: center; min-height: 40px; }
+  :root .sg-fil ol { gap: 0 6px; }
+  :root .sg-liens a { padding: 12px 18px; min-height: 44px; display: inline-flex; align-items: center; }
+  :root .sg-index a { display: inline-flex; align-items: center; min-height: 44px; }
+  :root .sg-index li { margin: 0; }
+  :root .sg-bouton { min-height: 48px; justify-content: center; }
+  :root .sg-cta { gap: 10px; }
+  :root .sg-cta .sg-bouton { flex: 1 1 auto; }
+  :root .sg-faq summary { min-height: 52px; }
+
+  /* La frise : une zone de toucher plus large que le chiffre. */
+  :root .cg-frise2-b { position: relative; }
+  :root .cg-frise2-b::after, :root .cg-frise2-direct::after { content: ""; position: absolute; inset: -14px -10px; }
+
+  /* Les boutons de vote du forum, de retrait d'un pays, des chips. */
+  :root .cg-fo-fleche { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  :root .cmp-x { width: 40px; height: 40px; }
+  :root .cmp-presets button, :root .cmp-lentille button, :root .cmp-groupe button { min-height: 40px; }
+  :root .chp-b { min-height: 44px; }
+  :root .chp-l li { min-height: 44px; }
+  :root .es-onglets button, :root .es-wb-perso, :root .es-w-b, :root .es-seg button { min-height: 40px; }
+  :root .es-w-b { width: 40px; height: 40px; }
+  :root .dv button { min-height: 44px; min-width: 48px; }
+  :root .dd-tri button { min-height: 44px; }
+  :root .cg-nav a, :root .cg-bout a, :root .cg-bout button { min-height: 44px; }
+
+  /* Du texte qu'on lit sans zoomer. */
+  :root .sg-note, :root .cmp-sources { font-size: 13px; }
+  :root input, :root select, :root textarea { font-size: 16px; }
+}
+
+@media (max-width: 600px) {
+  /* Des marges latérales régulières, partout. */
+  :root .sg-page, :root .cmp-page, :root .es { padding-left: 16px; padding-right: 16px; }
+  :root .sg-h1 { font-size: clamp(30px, 9vw, 44px); line-height: 1.04; }
+  :root .sg-h2 { font-size: clamp(22px, 6.4vw, 30px); }
+  :root .sg-grille { grid-template-columns: 1fr 1fr; gap: 10px; }
+  :root .sg-carte { padding: 16px 16px; border-radius: 22px; }
+  :root .sg-carte strong { font-size: clamp(17px, 5vw, 21px); overflow-wrap: anywhere; }
+  :root .sg-tab { font-size: 13px; }
+  :root .sg-tab th, :root .sg-tab td { padding: 10px 10px; }
+  :root .sg-duel > div { padding: 18px 18px; }
+  :root .sg-index { columns: 2 150px; }
+}
+
+/* Les liens d'un sous-titre restent dans la teinte du site. */
+:root .cg-ts-s a { color: var(--mn-vif-2, #a78bfa); text-decoration: underline; text-underline-offset: 3px; }
+
+@media (max-width: 600px) {
+  /* Le pas « en temps réel » sort de la ligne : posé à son extrémité, il
+     débordait de l'écran. Il passe au-dessus, aligné à droite. */
+  :root .cg-frise2 { margin-top: 44px; }
+  :root .cg-frise2-direct { left: auto !important; right: 0; transform: none; margin: 0; min-height: 30px; padding: 4px 11px 4px 9px; font-size: 11px; }
+}
+
+@media (max-width: 760px) {
+  /* L'ouverture : le nom et sa phrase, puis le globe dessous, en pleine
+     largeur. Même alignement qu'à l'ordinateur : à gauche. */
+  :root .ax .ax-ouv { padding: 96px 0 28px; align-items: flex-start; }
+  :root .ax .ax-ouv-g { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  :root .ax .ax-ouv-s { max-width: 26ch; }
+  :root .ax .ax-globe-zone { width: 100%; max-width: 440px; margin: 22px auto 0; }
+  :root .cg-frise2-direct { top: -34px !important; bottom: auto !important; }
+
+  /* Le globe d'abord : le titre de section, puis les onglets et la sphère.
+     La ligne de sources (descriptive) passe après le globe et sa fiche. */
+  :root .cg-v2 .cg-section.cg-eco-globe { padding-top: 8px; }
+  :root .cg-v2 .cg-section.cg-eco-globe > .cg-wrap { display: flex; flex-direction: column; }
+  :root .cg-v2 .cg-eco-globe .v2-tete { display: contents; }
+  :root .cg-v2 .cg-eco-globe .v2-h2 { order: 0; margin-bottom: 14px; }
+  :root .cg-v2 .cg-eco-globe .ge { order: 1; }
+  :root .cg-v2 .cg-eco-globe .v2-sous { order: 2; margin: 18px 0 0; font-size: 13px; }
+  :root .cg-v2 .cg-tr { padding-bottom: 8px; }
+}
+
+/* Les articles des pages Économie et Démographie : une colonne, comme les autres rubriques. */
+@media (max-width: 1080px) {
+  :root .cg-v2 .cg-arts-l { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
+  :root .cg-v2 .cg-art-une, :root .cg-v2 .cg-debats, :root .cg-v2 .cg-arts-c { grid-column: 1; grid-row: auto; }
+  :root .cg-v2 .cg-art-une { height: auto; }
+}
+
+@media (pointer: coarse), (max-width: 900px) {
+  :root button.cmp-x { width: 40px; height: 40px; min-width: 40px; }
+  :root .dd-tab-c a { display: inline-flex; align-items: center; min-height: 40px; }
+  :root .cg-ts-s a, :root .sg-note a, :root .dd-note a, :root .cmp-sources a { padding: 10px 2px; margin: -10px 0; display: inline-block; }
+}
+
+/* Le globe d'ouverture : une sphère de repos pendant que la scène 3D se prépare,
+   pour que la page ne s'ouvre pas sur un trou. Elle est recouverte par la vraie. */
+.ax-globe-c::before {
+  content: "";
+  position: absolute;
+  inset: 6.5%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle at 36% 30%, #2b2354, #15102c 68%);
+  box-shadow: 0 0 60px rgba(124, 77, 255, 0.18);
+}
+:root[data-concept="clair"] .ax-globe-c::before { background: radial-gradient(circle at 36% 30%, #f4f0ff, #e1d9fa 70%); }
+
+@media (max-width: 760px) {
+  /* Les classements : la carte reste dans l'écran (la liste de rubriques, sur
+     une ligne, élargissait toute la grille). Les rubriques passent en grille. */
+  :root .ax-cl2-g { grid-template-columns: minmax(0, 1fr); }
+  :root .ax-cl2-gauche, :root .ax-cl2-carte { min-width: 0; max-width: 100%; justify-self: stretch; }
+  :root .ax-cl2-carte { padding: 18px 16px; border-radius: 26px; }
+  /* Les rubriques : un rail. L'active au centre, les voisines estompées. */
+  :root .ax-rail-c { overflow: hidden; margin: 14px -20px 0; padding: 6px 0; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24%, #000 76%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 24%, #000 76%, transparent 100%); }
+  :root .ax-cl2-liste, :root .ax-cles-liste { position: relative; display: flex; flex-wrap: nowrap; width: max-content; gap: 8px; margin: 0; overflow: visible; transform: translateX(var(--dx, 0px)); transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+  :root .ax-cl2-liste li, :root .ax-cles-liste li { flex: none; min-width: 0; white-space: nowrap; font-size: 17px; font-weight: 700; opacity: 0.32; transform: scale(0.92); transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+  :root .ax-cl2-liste li.ax-cl2-on, :root .ax-cles-liste li:has(.ax-cles-on) { opacity: 1; transform: scale(1); }
+  :root .ax-cl2-liste li.ax-cl2-on { transform: scale(1); }
+  :root .ax-cles-liste button { width: auto; white-space: nowrap; padding: 10px 16px; font-size: 17px; font-weight: 700; transform: none; }
+  :root .ax-cl2-liste li.ax-cl2-fait { opacity: 0.32; }
+  :root .ax-cl2-colle { padding-top: 74px; align-items: flex-start; }
+  :root .ax-pod2-1 { min-height: 150px; }
+  :root .ax-pod2-2 { min-height: 122px; }
+  :root .ax-pod2-3 { min-height: 100px; }
+  :root .ax-cl2-carte li { padding-top: 8px; padding-bottom: 8px; }
+  :root .ax-cl2-carte ol { gap: 4px; }
+  :root .ax-pod2 { gap: 6px; }
+  :root .ax-pod2-c { padding: 12px 10px 14px; border-radius: 18px; min-width: 0; }
+  :root .ax-pod2-n { font-size: 12.5px; }
+  :root .ax-pod2-v { font-size: clamp(14px, 4.2vw, 17px); white-space: nowrap; }
+  :root .ax-cl2-pied { gap: 10px; }
+}
+
+@media (max-width: 760px) {
+  /* « Pourquoi Visualize ? » : le schéma se lit de haut en bas — les sources,
+     le site au milieu, ce qu'il en sort — au lieu d'être écrasé sur la gauche. */
+  :root .ax .ax-flux { aspect-ratio: auto; display: grid; justify-items: stretch; gap: 0; margin-top: 24px; }
+  :root .ax .ax-flux-svg { display: none; }
+  :root .ax .ax-flux-g, :root .ax .ax-flux-v, :root .ax .ax-flux-s { position: static; width: 100%; translate: none; inset: auto; }
+  :root .ax .ax-flux-g { display: grid; grid-template-rows: none; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  :root .ax .ax-flux-grp { padding: 14px 16px; gap: 10px; border-radius: 20px; }
+  :root .ax .ax-flux-grp b { font-size: 12px; }
+  :root .ax .ax-flux-grp i { font-size: 13px; padding: 5px 12px; display: inline-block; }
+  :root .ax .ax-flux-grp i:nth-child(n + 3) { display: inline-block; }
+  :root .ax .ax-flux-v { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 34px 0; position: relative; }
+  :root .ax .ax-flux-v::before, :root .ax .ax-flux-v::after { content: ""; position: absolute; left: 50%; width: 0; height: 26px; border-left: 2px dashed var(--ax-vif-2); opacity: 0.8; }
+  :root .ax .ax-flux-v::before { top: 4px; }
+  :root .ax .ax-flux-v::after { bottom: 4px; }
+  :root .ax .ax-flux-halo { top: 34px; }
+  :root .ax .ax-flux-logo { width: 56px; }
+  :root .ax .ax-flux-halo { width: 56px; }
+  :root .ax .ax-flux-v strong { font-size: 17px; }
+  :root .ax .ax-flux-s { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  :root .ax .ax-flux-s span { padding: 14px 16px; font-size: 15px; border-radius: 16px; }
+}
+
+@media (max-width: 760px) {
+  /* Des respirations plus courtes entre les sections de l'accueil. */
+  :root .ax .ax-sec { padding-top: 40px; }
+  :root .ax .ax-sec-large { padding-top: 44px; padding-bottom: 6px; }
+  :root .ax .ax-presse { padding-bottom: 28px; }
+  :root .ax .ax-sec-ligne, :root .ax .ax-sous-ligne { margin-top: 10px; }
+}
+
+@media (max-width: 900px) {
+  /* Le menu ouvert : la monnaie et le thème côte à côte, du même côté. */
+  :root .cg-bout { justify-content: flex-start; gap: 10px; }
+}
+
+@media (max-width: 600px) {
+  /* « En temps réel » descend sous la frise : il ne gêne plus le glissé sur ses côtés. */
+  :root .cg-frise2 { margin-top: 28px; margin-bottom: 8px; }
+  :root .cg-frise2-piste { padding-bottom: 40px; }
+  :root .cg-frise2-direct { top: calc(100% + 32px) !important; bottom: auto !important; right: auto; left: 0 !important; }
+}
+
+/* La zone sûre des iPhone : le fond court jusqu'en haut, le menu reste dessous. */
+:root .cg-header { top: calc(14px + env(safe-area-inset-top, 0px)); }

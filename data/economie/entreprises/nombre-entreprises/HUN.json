@@ -1,0 +1,17 @@
+{
+  "country": "HUN",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Hongrie",
+  "iso2": "HU",
+  "data": {
+    "2000": 480,
+    "2005": 540,
+    "2010": 580,
+    "2015": 620,
+    "2020": 660,
+    "2023": 680,
+    "2025": 560
+  }
+}

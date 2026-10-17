@@ -1,0 +1,17 @@
+{
+  "country": "CIV",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Côte d'Ivoire",
+  "iso2": "CI",
+  "data": {
+    "2000": 16,
+    "2005": 18.6,
+    "2010": 20.7,
+    "2015": 23,
+    "2020": 26.4,
+    "2023": 29.4,
+    "2025": 30.4
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "DZA",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Algérie",
+  "iso2": "DZ",
+  "data": {
+    "2000": 430,
+    "2005": 560,
+    "2010": 680,
+    "2015": 760,
+    "2020": 820,
+    "2023": 850,
+    "2025": 580
+  }
+}

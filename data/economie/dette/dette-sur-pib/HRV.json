@@ -1,0 +1,27 @@
+{
+  "country": "HRV",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Croatie",
+  "iso2": "HR",
+  "data": {
+    "2000": 38,
+    "2005": 39,
+    "2010": 58,
+    "2015": 84,
+    "2020": 88,
+    "2023": 63
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 34.1,
+        "2014": 85.8,
+        "2024": 63
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "country": "AUT",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Autriche",
+  "iso2": "AT",
+  "data": {
+    "2000": 550,
+    "2005": 600,
+    "2010": 620,
+    "2015": 640,
+    "2020": 650,
+    "2023": 670,
+    "2025": 700
+  }
+}

@@ -193,7 +193,7 @@ export function MilitaryMapView() {
             <span style={{ color: "var(--ink-4)", fontSize: "0.62rem" }}>Élevé</span>
           </div>
           <p style={{ color: "var(--ink-4)", fontSize: "0.6rem" }}>
-            Sources : SIPRI, IISS Military Balance, Global Firepower — à titre indicatif
+            Sources : SIPRI, IISS Military Balance, Global Firepower · à titre indicatif
           </p>
         </div>
       </div>

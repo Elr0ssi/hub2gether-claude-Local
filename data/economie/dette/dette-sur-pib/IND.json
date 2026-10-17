@@ -1,0 +1,28 @@
+{
+  "country": "IND",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Inde",
+  "iso2": "IN",
+  "data": {
+    "2000": 73,
+    "2005": 81,
+    "2010": 67,
+    "2015": 70,
+    "2020": 90,
+    "2023": 83,
+    "2025": 84
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 47.2,
+        "2014": 67.1,
+        "2024": 82
+      }
+    }
+  ]
+}

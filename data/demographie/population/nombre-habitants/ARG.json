@@ -1,0 +1,17 @@
+{
+  "country": "ARG",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Argentine",
+  "iso2": "AR",
+  "data": {
+    "2000": 37.1,
+    "2005": 38.9,
+    "2010": 41.1,
+    "2015": 43.1,
+    "2020": 45.4,
+    "2023": 45.8,
+    "2025": 46
+  }
+}

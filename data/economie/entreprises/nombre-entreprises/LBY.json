@@ -1,0 +1,17 @@
+{
+  "country": "LBY",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Libye",
+  "iso2": "LY",
+  "data": {
+    "2000": 160,
+    "2005": 170,
+    "2010": 200,
+    "2015": 170,
+    "2020": 175,
+    "2023": 180,
+    "2025": 190
+  }
+}

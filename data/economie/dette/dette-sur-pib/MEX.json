@@ -1,0 +1,28 @@
+{
+  "country": "MEX",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Mexique",
+  "iso2": "MX",
+  "data": {
+    "2000": 44,
+    "2005": 40,
+    "2010": 43,
+    "2015": 53,
+    "2020": 60,
+    "2023": 54,
+    "2025": 59
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 23.2,
+        "2014": 45.1,
+        "2024": 57
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "country": "UKR",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Ukraine",
+  "iso2": "UA",
+  "data": {
+    "2000": 60,
+    "2005": 17,
+    "2010": 40,
+    "2015": 79,
+    "2020": 60,
+    "2023": 87,
+    "2025": 90
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 61,
+        "2014": 70,
+        "2024": 90
+      }
+    }
+  ]
+}

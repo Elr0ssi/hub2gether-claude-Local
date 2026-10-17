@@ -1,0 +1,17 @@
+{
+  "country": "BOL",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Bolivie",
+  "iso2": "BO",
+  "data": {
+    "2000": 8.4,
+    "2005": 9.2,
+    "2010": 9.9,
+    "2015": 10.7,
+    "2020": 11.6,
+    "2023": 12.2,
+    "2025": 12.4
+  }
+}
