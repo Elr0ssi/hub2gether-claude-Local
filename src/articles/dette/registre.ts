@@ -2,6 +2,7 @@ import { CATALOGUE_DETTE } from "./catalogue";
 import { articleFrance } from "./france/fiche";
 import { articleAllemagne } from "./allemagne/fiche";
 import { articleEspagne } from "./espagne/fiche";
+import { articleItalie } from "./italie/fiche";
 import type { ArticleDette, RenduArticle } from "./types";
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -21,6 +22,7 @@ const FICHES: Record<string, RenduArticle> = {
   france: articleFrance,
   allemagne: articleAllemagne,
   espagne: articleEspagne,
+  italie: articleItalie,
   // italie: articleItalie,     ← la fiche de l'article, sous le même slug que son entrée de catalogue
 };
 

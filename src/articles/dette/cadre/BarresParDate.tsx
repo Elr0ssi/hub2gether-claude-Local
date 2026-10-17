@@ -16,6 +16,8 @@ export interface PointDate {
   repere?: string;
   /** En mode « montant » : la dette rapportée au PIB à cette date (en %), quand on la connaît. */
   ratio?: number | null;
+  /** Une étiquette plus courte sous la barre, quand « 2025 T4 » ne tient pas à l'écran, facultatif. */
+  court?: string;
 }
 
 /** Des barres, une par date : on lit en cliquant (ou en survolant) une barre. Pas de courbe tracée
@@ -33,6 +35,8 @@ export function BarresParDate({
   enteteValeur = "Dette / PIB",
   enteteMontant = "Montant",
   mode = "ratio",
+  ratioLibelle = "du PIB",
+  enteteRatio = "Dette / PIB",
 }: {
   points: PointDate[];
   unite?: string;
@@ -41,6 +45,10 @@ export function BarresParDate({
   /** « ratio » (par défaut) : les barres sont des % du PIB. « montant » : les barres sont des milliards d'euros
    *  (`valeur`), convertis dans la monnaie du lecteur ; le ratio, s'il existe, s'écrit à côté. */
   mode?: "ratio" | "montant";
+  /** En mode « montant » : ce que le ratio rapporte (« du PIB » par défaut, « de la dette » pour une part d'un stock). */
+  ratioLibelle?: string;
+  /** En mode « montant » : l'en-tête de la colonne du ratio dans le tableau. */
+  enteteRatio?: string;
 }) {
   const [sel, setSel] = useState(points.length - 1);
   const max = Math.max(...points.map((p) => p.valeur));
@@ -60,7 +68,7 @@ export function BarresParDate({
         </p>
         <p className="dos-graphe-d">
           {p.etiquette}
-          {mode === "montant" && p.ratio != null ? ` · ${nf(p.ratio)} % du PIB` : ""}
+          {mode === "montant" && p.ratio != null ? ` · ${nf(p.ratio)} % ${ratioLibelle}` : ""}
           {mode === "ratio" && p.montantMd != null ? ` · ${montant(p.montantMd)}` : ""}
           {p.repere ? ` · ${p.repere}` : ""}
         </p>
@@ -81,7 +89,7 @@ export function BarresParDate({
             <span className="dos-barre-z">
               <span className="dos-barre-b" style={{ height: `${(pt.valeur / max) * 100}%`, "--i": i } as React.CSSProperties} />
             </span>
-            <span className="dos-barre-a">{pt.etiquette}</span>
+            <span className="dos-barre-a">{pt.court ?? pt.etiquette}</span>
           </button>
         ))}
       </div>
@@ -92,7 +100,7 @@ export function BarresParDate({
             <tr>
               <th scope="col">Date</th>
               <th scope="col">{enteteValeur}</th>
-              <th scope="col">{mode === "montant" ? "Dette / PIB" : enteteMontant}</th>
+              <th scope="col">{mode === "montant" ? enteteRatio : enteteMontant}</th>
             </tr>
           </thead>
           <tbody>
