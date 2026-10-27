@@ -18,9 +18,9 @@ import { COUCHE, type Repere, type Riviere } from "@/data/explorer/couches";
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const DEG = Math.PI / 180;
-const ELEV = 0.012;
-const SURF = 1.02;
-const LIGNE = 1.014;
+const ELEV = 0.032;
+const SURF = 1.05;
+const LIGNE = 1.038;
 
 function versXYZ(lat: number, lon: number, r: number, out = new THREE.Vector3()) {
   const la = lat * DEG;
@@ -87,8 +87,8 @@ function peindre(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: string | n
   const H = toile.height;
   const ctx = toile.getContext("2d")!;
   const c = nuit
-    ? { mer: "#0e1527", terre: "#2a3352", bord: "rgba(160,175,235,0.28)" }
-    : { mer: "#e3e9f5", terre: "#f8f7fc", bord: "rgba(110,98,170,0.30)" };
+    ? { mer: "#141a30", terre: "#2b3454", bord: "rgba(170,185,255,0.16)" }
+    : { mer: "#f1f3fa", terre: "#fbfbfe", bord: "rgba(120,110,175,0.16)" };
   ctx.fillStyle = c.mer;
   ctx.fillRect(0, 0, W, H);
   const trace = (f: GeoJSON.Feature) => {
@@ -108,7 +108,7 @@ function peindre(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: string | n
   };
   ctx.fillStyle = c.terre;
   ctx.strokeStyle = c.bord;
-  ctx.lineWidth = 0.9;
+  ctx.lineWidth = 0.7;
   ctx.lineJoin = "round";
   for (const f of geo.features) {
     trace(f);
@@ -119,10 +119,10 @@ function peindre(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: string | n
     for (const f of geo.features) {
       if ((f.properties as { name: string }).name !== pays) continue;
       trace(f);
-      ctx.fillStyle = nuit ? "rgba(140,110,255,0.42)" : "rgba(124,77,255,0.26)";
+      ctx.fillStyle = nuit ? "rgba(140,110,255,0.34)" : "rgba(104,72,240,0.16)";
       ctx.fill("evenodd");
-      ctx.strokeStyle = nuit ? "#b9a6ff" : "#6a3df0";
-      ctx.lineWidth = 2.2;
+      ctx.strokeStyle = nuit ? "#b9a6ff" : "#5b3df0";
+      ctx.lineWidth = 1.6;
       ctx.stroke();
     }
   }
@@ -146,13 +146,17 @@ interface Props {
   survol: string | null;
   choisi: string | null;
   cartes: string[];
+  /** Vue du monde : les repères se regroupent en hexagones, seuls ceux qui portent une carte restent des points. */
+  monde: boolean;
+  /** Des liens courbes entre deux repères (identifiants). */
+  arcs: [string, string][];
   onSurvol: (id: string | null) => void;
   onChoix: (id: string) => void;
   onPays: (nom: string | null) => void;
 }
 
 export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function GlobeExplorer(props, ref) {
-  const { geo, nuit, reperes, rivieres, rivieresVives, pays, survol, choisi, cartes } = props;
+  const { geo, nuit, reperes, rivieres, rivieresVives, pays, survol, choisi, cartes, monde, arcs } = props;
   const hote = useRef<HTMLDivElement>(null);
   const cartesEls = useRef<Map<string, HTMLDivElement>>(new Map());
   /* Tout ce que la boucle de dessin lit, sans qu'un changement de props la relance. */
@@ -166,6 +170,8 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     recentrer: () => void;
     majReperes: () => void;
     majLignes: () => void;
+    majHex: () => void;
+    majArcs: () => void;
   } | null>(null);
   const geoPays = useRef<PaysGeo[]>([]);
 
@@ -196,15 +202,15 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     texture.anisotropy = 4;
     const relief = new THREE.TextureLoader().load("/geo/earth-topology.png");
     const matiere = new THREE.MeshStandardMaterial({
-      map: texture, bumpMap: relief, bumpScale: 2.2, displacementMap: relief, displacementScale: ELEV, roughness: 0.92, metalness: 0,
+      map: texture, bumpMap: relief, bumpScale: 5, displacementMap: relief, displacementScale: ELEV, roughness: 0.92, metalness: 0,
     });
     const globe = new THREE.Group();
-    const boule = new THREE.Mesh(new THREE.SphereGeometry(1, 256, 128), matiere);
+    const boule = new THREE.Mesh(new THREE.SphereGeometry(1, 384, 192), matiere);
     globe.add(boule);
     sc.add(globe);
 
-    const soleil = new THREE.DirectionalLight(0xffffff, nuit ? 1.6 : 1.7);
-    soleil.position.set(-3, 2.4, 4);
+    const soleil = new THREE.DirectionalLight(0xffffff, nuit ? 1.7 : 1.9);
+    soleil.position.set(-4, 3.2, 2.4);
     const ambiance = new THREE.AmbientLight(0xffffff, nuit ? 0.6 : 1.6);
     sc.add(soleil, ambiance);
 
@@ -213,7 +219,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       new THREE.SphereGeometry(1.1, 64, 48),
       new THREE.ShaderMaterial({
         transparent: true, side: THREE.BackSide, depthWrite: false,
-        uniforms: { couleur: { value: new THREE.Color(nuit ? "#6d7dff" : "#8f7dff") }, force: { value: nuit ? 0.9 : 0.7 } },
+        uniforms: { couleur: { value: new THREE.Color(nuit ? "#6d7dff" : "#8f7dff") }, force: { value: nuit ? 0.9 : 0.5 } },
         vertexShader: "varying vec3 n; void main(){ n = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
         fragmentShader: "varying vec3 n; uniform vec3 couleur; uniform float force; void main(){ float i = pow(max(0.0, 0.72 - dot(n, vec3(0.0,0.0,1.0))), 3.0); gl_FragColor = vec4(couleur, clamp(i * force, 0.0, 1.0)); }",
       }),
@@ -239,18 +245,50 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     const lignes = new THREE.Group();
     globe.add(lignes);
 
-    const tout = { rx: 0.35, ry: -Math.PI / 2 + 0.3, d: 4.5, trx: 0.35, try_: -Math.PI / 2 + 0.3, td: 4.5, vit: 0, glisse: false, dernierGeste: 0 };
+    /* Les hexagones : la densité des repères, par case, quand on regarde le monde entier. */
+    const hexGeo = new THREE.CircleGeometry(1, 6);
+    const hexMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false });
+    let hexMesh: THREE.InstancedMesh | null = null;
+
+    /* Les liens : des courbes qui s'élèvent au-dessus du globe, et un point qui les parcourt. */
+    const arcsGroupe = new THREE.Group();
+    globe.add(arcsGroupe);
+    let arcsPts: THREE.Vector3[][] = [];
+    const pastille = (() => {
+      const c = document.createElement("canvas");
+      c.width = c.height = 64;
+      const x = c.getContext("2d")!;
+      x.fillStyle = "#fff";
+      x.beginPath();
+      x.arc(32, 32, 30, 0, 7);
+      x.fill();
+      x.fillStyle = "#5b3df0";
+      x.beginPath();
+      x.arc(32, 32, 20, 0, 7);
+      x.fill();
+      return new THREE.CanvasTexture(c);
+    })();
+    const pulseGeo = new THREE.BufferGeometry();
+    const pulse = new THREE.Points(pulseGeo, new THREE.PointsMaterial({ size: 11, sizeAttenuation: false, map: pastille, transparent: true, depthWrite: false }));
+    pulse.frustumCulled = false;
+    globe.add(pulse);
+
+    const tout = { rx: 0.35, ry: -Math.PI / 2 + 0.3, d: 4.25, trx: 0.35, try_: -Math.PI / 2 + 0.3, td: 4.25, vit: 0, glisse: false, dernierGeste: 0 };
     const ecran = () => {
       const w = el.clientWidth || 1;
       const h = el.clientHeight || 1;
       return { w, h, fit: Math.max(1, h / w) };
     };
-    const distMonde = () => 4.5 * ecran().fit;
+    const distMonde = () => 4.25 * ecran().fit;
 
     const majTaille = () => {
       const { w, h } = ecran();
       renderer.setSize(w, h, false);
       cam.aspect = w / h;
+      /* Sur grand écran, le panneau de gauche prend de la place : le globe se décale vers la droite. */
+      const dx = w > 1000 ? 0.03 : 0;
+      const dy = w <= 700 ? 0.07 : 0;
+      cam.setViewOffset(w, h, -w * dx, h * dy, w, h);
       cam.updateProjectionMatrix();
       if (!etat.current.props.pays) tout.td = Math.max(tout.td, distMonde());
     };
@@ -275,8 +313,8 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
         peindre(p.geo, p.nuit, p.pays, toile);
         texture.needsUpdate = true;
         (halo.material as THREE.ShaderMaterial).uniforms.couleur.value.set(p.nuit ? "#6d7dff" : "#8f7dff");
-        (halo.material as THREE.ShaderMaterial).uniforms.force.value = p.nuit ? 0.9 : 0.7;
-        soleil.intensity = p.nuit ? 1.6 : 1.7;
+        (halo.material as THREE.ShaderMaterial).uniforms.force.value = p.nuit ? 0.9 : 0.5;
+        soleil.intensity = p.nuit ? 1.7 : 1.9;
         ambiance.intensity = p.nuit ? 0.6 : 1.6;
         majLignes();
       },
@@ -322,6 +360,82 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       majLignes: () => {
         majLignes();
       },
+      majHex: () => majHex(),
+      majArcs: () => majArcs(),
+    };
+
+    const majHex = () => {
+      if (hexMesh) {
+        globe.remove(hexMesh);
+        hexMesh.dispose();
+        hexMesh = null;
+      }
+      const e = etat.current;
+      if (!e.props.monde) return;
+      const pas = 4.6;
+      const cases = new Map<string, { lat: number; lon: number; n: number; par: Record<string, number> }>();
+      for (const r of e.reperes) {
+        const ligne = Math.round(r.lat / pas);
+        const lat = ligne * pas;
+        const pasLon = pas / Math.max(0.25, Math.cos(lat * DEG));
+        const col = Math.round(r.lon / pasLon - (ligne % 2 ? 0.5 : 0));
+        const lon = (col + (ligne % 2 ? 0.5 : 0)) * pasLon;
+        const k = `${ligne}:${col}`;
+        const c = cases.get(k) ?? { lat, lon, n: 0, par: {} };
+        c.n++;
+        c.par[r.couche] = (c.par[r.couche] ?? 0) + 1;
+        cases.set(k, c);
+      }
+      const liste = [...cases.values()];
+      if (!liste.length) return;
+      const max = Math.max(...liste.map((c) => c.n));
+      hexMesh = new THREE.InstancedMesh(hexGeo, hexMat, liste.length);
+      const m = new THREE.Matrix4();
+      const q = new THREE.Quaternion();
+      const z = new THREE.Vector3(0, 0, 1);
+      const col = new THREE.Color();
+      const blanc = new THREE.Color("#ffffff");
+      liste.forEach((c, i) => {
+        const n = versXYZ(c.lat, c.lon, 1);
+        q.setFromUnitVectors(z, n);
+        const t = c.n / max;
+        const rayon = pas * DEG * (0.34 + 0.2 * Math.sqrt(t));
+        m.compose(n.clone().multiplyScalar(SURF - 0.004), q, new THREE.Vector3(rayon, rayon, rayon));
+        hexMesh!.setMatrixAt(i, m);
+        const dom = Object.entries(c.par).sort((a, b) => b[1] - a[1])[0][0] as keyof typeof COUCHE;
+        col.set(COUCHE[dom].couleur).lerp(blanc, 0.5 - 0.42 * t);
+        hexMesh!.setColorAt(i, col);
+      });
+      hexMesh.frustumCulled = false;
+      globe.add(hexMesh);
+    };
+
+    const majArcs = () => {
+      while (arcsGroupe.children.length) {
+        const o = arcsGroupe.children.pop() as THREE.Line;
+        o.geometry.dispose();
+        (o.material as THREE.Material).dispose();
+      }
+      arcsPts = [];
+      const e = etat.current;
+      const par = new Map(e.reperes.map((r) => [r.id, r]));
+      for (const [a, b] of e.props.arcs) {
+        const ra = par.get(a);
+        const rb = par.get(b);
+        if (!ra || !rb) continue;
+        const va = versXYZ(ra.lat, ra.lon, 1);
+        const vb = versXYZ(rb.lat, rb.lon, 1);
+        const ang = va.angleTo(vb);
+        const pts: THREE.Vector3[] = [];
+        for (let i = 0; i <= 56; i++) {
+          const t = i / 56;
+          const base = new THREE.Vector3().copy(va).lerp(vb, t).normalize();
+          pts.push(base.multiplyScalar(SURF + Math.sin(Math.PI * t) * (0.03 + ang * 0.22)));
+        }
+        arcsPts.push(pts);
+        const g = new THREE.BufferGeometry().setFromPoints(pts);
+        arcsGroupe.add(new THREE.Line(g, new THREE.LineBasicMaterial({ color: e.props.nuit ? "#9d8cff" : "#4f3be0", transparent: true, opacity: 0.85 })));
+      }
     };
 
     const majLignes = () => {
@@ -355,6 +469,8 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     scene.current = api;
     api.majReperes();
     api.majLignes();
+    api.majHex();
+    api.majArcs();
     api.cadrer();
 
     /* ── Gestes : glisser, pincer, molette ───────────────────────────────── */
@@ -501,7 +617,8 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       for (let i = 0; i < n; i++) {
         v.copy(positions[i]).applyMatrix4(globe.matrixWorld);
         const face = v.clone().normalize().dot(camDir);
-        const vu = face > 0.2;
+        const cache = e.props.monde && !e.cartes.includes(e.reperes[i]?.id ?? "");
+        const vu = face > 0.2 && !cache;
         v.project(cam);
         proj[i] = { x: (v.x * 0.5 + 0.5) * w, y: (-v.y * 0.5 + 0.5) * h, vu };
       }
@@ -510,13 +627,28 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
         const act = e.survol ?? null;
         for (let i = 0; i < n; i++) {
           const id = e.reperes[i]?.id;
-          const grand = id === e.choisi ? 17 : id === act ? 15 : 9;
+          const grand = id === e.choisi ? 17 : id === act ? 15 : e.props.monde && !e.cartes.includes(id ?? "") ? 0 : 9;
           if (tai.array[i] !== grand) {
             (tai.array as Float32Array)[i] = grand;
             tai.needsUpdate = true;
           }
         }
       }
+      /* Les hexagones s'effacent quand on s'approche ; les points de lumière parcourent les liens. */
+      const proche = Math.min(1, Math.max(0, (tout.d - 2.3) / 1.1));
+      hexMat.opacity = 0.92 * proche;
+      if (hexMesh) hexMesh.visible = proche > 0.02;
+      if (arcsPts.length) {
+        const arr = new Float32Array(arcsPts.length * 3);
+        const tt = performance.now() * 0.00035;
+        arcsPts.forEach((pts, i) => {
+          const f = (tt + i * 0.37) % 1;
+          const k = Math.min(pts.length - 1, Math.floor(f * (pts.length - 1)));
+          arr.set([pts[k].x, pts[k].y, pts[k].z], i * 3);
+        });
+        pulseGeo.setAttribute("position", new THREE.BufferAttribute(arr, 3));
+        pulse.visible = true;
+      } else pulse.visible = false;
       /* Le survol : le repère le plus proche du pointeur. */
       if (surPointeur.dans && !tout.glisse) {
         const id = plusProche(surPointeur.x, surPointeur.y, 14);
@@ -537,7 +669,10 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
           return;
         }
         div.style.opacity = "1";
-        div.style.transform = `translate(${p.x}px, ${p.y}px) translate(-50%, calc(-100% - 14px))`;
+        /* La carte reste dans la scène, même quand son repère est près du bord. */
+        const demi = div.offsetWidth / 2 + 8;
+        const x = Math.min(w - demi, Math.max(demi, p.x));
+        div.style.transform = `translate(${x}px, ${p.y}px) translate(-50%, calc(-100% - 14px))`;
         div.style.zIndex = id === e.choisi || id === e.survol ? "5" : "3";
       });
       renderer.render(sc, cam);
@@ -559,6 +694,10 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       relief.dispose();
       ptsGeo.dispose();
       ptsMat.dispose();
+      hexGeo.dispose();
+      hexMat.dispose();
+      pulseGeo.dispose();
+      pastille.dispose();
       if (el.contains(renderer.domElement)) el.removeChild(renderer.domElement);
       scene.current = null;
     };
@@ -568,7 +707,12 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
 
   useEffect(() => scene.current?.peindre(), [nuit, pays, geo]);
   useEffect(() => scene.current?.cadrer(), [pays]);
-  useEffect(() => scene.current?.majReperes(), [reperes]);
+  useEffect(() => {
+    scene.current?.majReperes();
+    scene.current?.majHex();
+    scene.current?.majArcs();
+  }, [reperes, monde, nuit]);
+  useEffect(() => scene.current?.majArcs(), [arcs]);
   useEffect(() => scene.current?.majLignes(), [rivieres, rivieresVives]);
 
   const aCarte = reperes.filter((r) => cartes.includes(r.id));
@@ -590,8 +734,8 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
             >
               <span className="xp-carte-i"><Icone size={14} aria-hidden="true" /></span>
               <span className="xp-carte-t">
-                <b>{r.nom}</b>
-                <small>{r.detail}</small>
+                <small>{r.nom}</small>
+                <b>{r.detail}</b>
               </span>
               {c.exemple && <i className="xp-carte-ex">exemple</i>}
             </div>
