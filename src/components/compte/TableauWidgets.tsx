@@ -204,7 +204,8 @@ export function TableauWidgets({
   const defaut = useMemo<Item[]>(() => {
     const c = (widgetsInitial.length ? widgetsInitial : ["pib", "population"]).filter((id) => compteurs.some((x) => x.id === id));
     return [
-      ...c.map((id) => ({ id, t: 2 as Taille, x: "m" as Texte })),
+      /* Les compteurs se partagent la largeur : un seul prend toute la ligne, deux la moitié chacun, trois le tiers. */
+      ...c.map((id) => ({ id, t: (c.length === 1 ? 6 : c.length === 3 ? 2 : 3) as Taille, x: "m" as Texte })),
       { id: "globe", t: 6 as Taille },
       { id: "comparateur", t: 6 as Taille },
     ];

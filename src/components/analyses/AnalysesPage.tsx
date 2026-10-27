@@ -294,6 +294,11 @@ function Ouverture({ reperes, donnees, annee, dette }: Props) {
                     : "0 12px 28px rgba(60,30,140,0.22), 0 0 0 1px rgba(91,45,224,0.18)"
                 }
                 iconColor={sombre ? "#cdbcff" : "#5b2de0"}
+                carte={
+                  sombre
+                    ? undefined
+                    : { fond: "rgba(255,255,255,0.82)", bord: "rgba(91,45,224,0.16)", ombre: "0 12px 28px rgba(60,30,140,0.2)", chiffre: "#17112e", label: "rgba(23,17,46,0.62)" }
+                }
                 markerSize="clamp(30px, 3.4vw, 40px)"
               />
             )}

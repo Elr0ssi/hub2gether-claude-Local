@@ -16,7 +16,7 @@ import { SITE_URL as siteUrl } from "@/lib/site";
 /* L'écran entier : le fond de la page passe sous l'encoche et l'heure, comme sur une app. */
 export const viewport: Viewport = {
   viewportFit: "cover",
-  themeColor: "#05080c",
+  themeColor: "#f6f5f2",
 };
 
 export const metadata: Metadata = {
@@ -99,18 +99,18 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="fr" suppressHydrationWarning className={inter.variable}>
+    <html lang="fr" suppressHydrationWarning className={inter.variable} data-concept="clair">
       <head>
-        <meta name="theme-color" content="#FAFAFA" />
-        {/* Le thème des pages Visualize, posé avant le premier rendu. Sans
-            ce passage, une page choisie en clair apparaîtrait noire le temps
-            d'une image, puis basculerait : c'est le défaut que tout le monde
-            connaît et que personne ne pardonne. Il ne fait rien d'autre que
-            relire un choix déjà pris, et se tait si le stockage est fermé. */}
+        <meta name="theme-color" content="#f6f5f2" />
+        {/* Le thème des pages Visualize, posé avant le premier rendu. Le défaut
+            est le clair ; seul un choix explicite de la nuit le remplace. Sans
+            ce passage, une page choisie en nuit apparaîtrait claire le temps
+            d'une image, puis basculerait. Il ne fait rien d'autre que relire
+            un choix déjà pris, et se tait si le stockage est fermé. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'try{if(localStorage.getItem("visualize-theme")==="clair")document.documentElement.dataset.concept="clair"}catch(e){}',
+              'try{if(localStorage.getItem("visualize-theme")==="nuit")delete document.documentElement.dataset.concept}catch(e){}',
           }}
         />
         <script

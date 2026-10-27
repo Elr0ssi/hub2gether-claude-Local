@@ -131,7 +131,11 @@ export interface InteractiveGlobeIconsProps {
   iconColor?: string;
   /** Body of the sphere. Defaults to the near-white used on the home page. */
   sphereColor?: string;
+  /** Les cartes de chiffres posées sur la sphère : par défaut du verre sombre à texte blanc ; en thème clair, du verre blanc à texte sombre. */
+  carte?: { fond: string; bord: string; ombre: string; chiffre: string; label: string };
 }
+
+const CARTE_SOMBRE = { fond: "rgba(10,16,24,0.42)", bord: "rgba(255,255,255,0.14)", ombre: "0 12px 28px rgba(0,0,0,0.3)", chiffre: "#fff", label: "rgba(255,255,255,0.62)" };
 
 export default function InteractiveGlobeIcons({
   markers = DEFAULT_MARKERS,
@@ -142,6 +146,7 @@ export default function InteractiveGlobeIcons({
   badgeShadow = "0 8px 22px rgba(16,24,20,0.16), 0 0 0 1px rgba(16,24,20,0.04)",
   iconColor,
   sphereColor = "#f6f8f7",
+  carte = CARTE_SOMBRE,
 }: InteractiveGlobeIconsProps = {}) {
   const mountRef = useRef<HTMLDivElement>(null);
   const markerElsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -519,20 +524,20 @@ export default function InteractiveGlobeIcons({
                 width: "clamp(98px, 13vw, 152px)",
                 padding: "clamp(9px, 2.6vw, 12px) clamp(11px, 3vw, 15px)",
                 borderRadius: 13,
-                border: "1px solid rgba(255,255,255,0.14)",
-                background: "rgba(10,16,24,0.42)",
+                border: `1px solid ${carte.bord}`,
+                background: carte.fond,
                 backdropFilter: "blur(9px)",
                 WebkitBackdropFilter: "blur(9px)",
-                boxShadow: "0 12px 28px rgba(0,0,0,0.3)",
+                boxShadow: carte.ombre,
                 pointerEvents: "none",
                 opacity: 0,
                 willChange: "transform, opacity",
               }}
             >
-              <div style={{ fontSize: "clamp(15px, 4.4vw, 19px)", fontWeight: 400, color: "#fff", letterSpacing: "-0.01em", whiteSpace: "nowrap" }}>
+              <div style={{ fontSize: "clamp(15px, 4.4vw, 19px)", fontWeight: 400, color: carte.chiffre, letterSpacing: "-0.01em", whiteSpace: "nowrap" }}>
                 {marker.texte.chiffre}
               </div>
-              <div style={{ fontSize: 10.5, color: "rgba(255,255,255,0.62)", marginTop: 2 }}>
+              <div style={{ fontSize: 10.5, color: carte.label, marginTop: 2 }}>
                 {marker.texte.label}
               </div>
             </div>

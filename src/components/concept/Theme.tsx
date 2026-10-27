@@ -5,7 +5,9 @@ import { useEffect, useState } from "react";
 /* ═══════════════════════════════════════════════════════════════════════════
    LE JOUR ET LA NUIT
 
-   Un attribut sur la racine du document, et toute la feuille du concept
+   Le thème par défaut est le CLAIR. Un attribut sur la racine du document
+   (`data-concept="clair"`, posé dans le gabarit, retiré par le petit script
+   si le visiteur a choisi la nuit), et toute la feuille du concept
    bascule : les jetons de couleur changent, rien n'est redessiné.
 
    La racine plutôt que le conteneur, pour deux raisons. Le fond de la page
@@ -26,7 +28,7 @@ const CLE = "visualize-theme";
    l'apprenait jamais : il gardait sa palette de nuit sur une page devenue
    claire. Le thème est donc tenu une seule fois, ici, et tout le monde y est
    abonné. */
-let COURANT: Theme = "nuit";
+let COURANT: Theme = "clair";
 const ABONNES = new Set<(t: Theme) => void>();
 
 function diffuse(t: Theme) {
@@ -41,7 +43,7 @@ export function useTheme(): [Theme, (t: Theme) => void] {
   useEffect(() => {
     /* Le premier crochet monté relit la racine : c'est le script du gabarit
        qui y a posé le choix, avant tout rendu. */
-    const lu: Theme = document.documentElement.dataset.concept === "clair" ? "clair" : "nuit";
+    const lu: Theme = document.documentElement.dataset.concept === "nuit" || !document.documentElement.dataset.concept ? "nuit" : "clair";
     if (lu !== COURANT) diffuse(lu);
     poser(COURANT);
 
@@ -49,7 +51,7 @@ export function useTheme(): [Theme, (t: Theme) => void] {
     /* Deux onglets ouverts restent d'accord entre eux. */
     const sync = (e: StorageEvent) => {
       if (e.key !== CLE) return;
-      const t: Theme = e.newValue === "clair" ? "clair" : "nuit";
+      const t: Theme = e.newValue === "nuit" ? "nuit" : "clair";
       appliquer(t);
       diffuse(t);
     };

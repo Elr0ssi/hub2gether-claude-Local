@@ -222,3 +222,61 @@
 .es-gp-pills button:hover { translate: 0 -2px; color: var(--encre); }
 .es-gp-pills button.on { color: #fff; border-color: transparent; background: linear-gradient(135deg, #4a1fd0, #7c4dff); box-shadow: 0 12px 26px -14px rgba(124, 77, 255, 0.9); }
 .es-gp-pills i { font-style: normal; padding: 1px 7px; border-radius: 99px; font-size: 10.5px; font-weight: 800; background: rgba(255, 255, 255, 0.16); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LISIBILITÉ ET RESPONSIVITÉ DE L'ESPACE MEMBRE (thème clair par défaut)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* La bannière : identité à gauche, chiffres et sortie regroupés, jamais coupés. */
+.es-b-id { flex: 1 1 240px; }
+.es-b-id p { overflow-wrap: anywhere; }
+.es-banniere form { margin: 0; }
+
+/* Les cartes du tableau : une surface lisible en clair comme en nuit. */
+.es-carte, .es-w, .es-onglets { box-shadow: 0 1px 2px rgba(20, 16, 40, 0.04), 0 10px 30px -18px rgba(20, 16, 40, 0.18); }
+:root:not([data-concept="clair"]) .es-carte, :root:not([data-concept="clair"]) .es-w, :root:not([data-concept="clair"]) .es-onglets { box-shadow: none; }
+
+/* Les compteurs : le chiffre en grand, sans trou en dessous. */
+.es-w-cpt { min-height: 0; justify-content: flex-start; }
+.es-w-cpt p { margin-top: 10px; }
+.es .es-w-v { overflow-wrap: anywhere; }
+
+/* Le comparateur : le nom à gauche, la valeur et l'écart ensemble à droite. */
+.es-barre { justify-content: flex-start; gap: 6px 10px; padding: 8px 12px; }
+.es-barre b { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.es-barre em, .es-barre u { flex: none; }
+.es-barre u { margin-left: 0; }
+
+/* La fiche du globe : plus de blanc sous la courbe. */
+.es-gw-zone, .es-ge .ge-scene { min-width: 0; }
+.es-ge .ge-panneau { height: auto; min-height: 0; }
+.es-ge .ge-corps { align-items: stretch; }
+
+@media (max-width: 900px) {
+  .es { padding-top: 84px; }
+  .es-banniere { border-radius: 26px; gap: 14px; }
+  .es-b-stats { width: 100%; }
+  .es-b-stats span { flex: 1; }
+  .es-banniere form, .es-sortie { width: 100%; }
+  .es-sortie { text-align: center; }
+  .es-corps { grid-template-columns: minmax(0, 1fr); }
+  .es-corps > * { min-width: 0; }
+  .es-onglets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; }
+  .es-onglets button { white-space: normal; justify-content: flex-start; padding: 11px 12px; font-size: 13.5px; }
+  .es-onglets button:hover { translate: none; }
+  .es-w, .es-carte { border-radius: 22px; }
+  .es-wb-barre { flex-wrap: wrap; }
+  .es-w-t { margin-bottom: 10px; }
+}
+@media (max-width: 520px) {
+  .es { padding-inline: 14px; }
+  .es-b-id h1 { font-size: 28px; }
+  .es-b-stats { gap: 8px; }
+  .es-b-stats span { padding: 9px 12px; }
+  .es-gw-zone { min-height: 260px; }
+  .es .cp-tdb-live { grid-template-columns: 1fr; }
+  .es-cp-ligne > span { min-width: 100%; }
+  .es-gp-groupe > span { min-width: 100%; }
+  .es-barre u { font-size: 10.5px; }
+  .es-liste li { padding: 12px 14px; }
+}
