@@ -193,6 +193,7 @@ interface Onglet {
 const NAV: Onglet[] = [
   { label: "Économie", href: "/economie" },
   { label: "Démographie", href: "/demographie" },
+  { label: "Explorer", href: "/explorer" },
   { label: "Forum", href: "/forum" },
   { label: "Comparer", href: "/comparer" },
   { label: "Articles", href: "/articles" },
@@ -332,6 +333,7 @@ export function Pied() {
         <nav className="cg-pied-nav" aria-label="Rubriques">
           <a href="/economie">Économie</a>
           <a href="/demographie">Démographie</a>
+          <a href="/explorer">Explorer</a>
           <a href="/comparer">Comparer</a>
           <a href="/articles">Articles</a>
           <a href="/pays">Pays</a>
