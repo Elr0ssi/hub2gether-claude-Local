@@ -232,17 +232,42 @@ export function EnTete({ actif }: { actif?: string }) {
      Elle tient aussi au clic, sinon un écran tactile n'y accède jamais. */
   const [ouvert, setOuvert] = useState(false);
   const barre = useRef<HTMLElement>(null);
+  /* En haut de la page, sur grand écran, la pilule reste dépliée ; dès qu'on descend, elle se replie
+     (avec la même animation que la fermeture) et ne se redéplie qu'au survol, ou en remontant tout en haut.
+     Sous 900 px, c'est un panneau : il ne s'ouvre qu'au toucher, jamais tout seul. */
+  const [enHaut, setEnHaut] = useState(false);
+  useEffect(() => {
+    const large = window.matchMedia("(min-width: 901px)");
+    let haut = false;
+    const lire = () => {
+      /* Deux seuils : on ne bascule pas à chaque pixel autour de la limite. */
+      const y = window.scrollY;
+      const suite = large.matches && (haut ? y < 40 : y < 8);
+      if (suite !== haut) {
+        haut = suite;
+        setEnHaut(suite);
+      }
+    };
+    lire();
+    window.addEventListener("scroll", lire, { passive: true });
+    large.addEventListener("change", lire);
+    return () => {
+      window.removeEventListener("scroll", lire);
+      large.removeEventListener("change", lire);
+    };
+  }, []);
+  const deplie = ouvert || enHaut;
   /* Vrai quand l'ouverture est terminée : le corps cesse alors de rogner son
      contenu, pour laisser la liste des monnaies déborder. */
   const [fini, setFini] = useState(false);
   useEffect(() => {
-    if (!ouvert) {
+    if (!deplie) {
       setFini(false);
       return;
     }
     const t = window.setTimeout(() => setFini(true), 720);
     return () => window.clearTimeout(t);
-  }, [ouvert]);
+  }, [deplie]);
   /* L'état du menu au moment où le doigt se pose : sur un écran tactile, la
      prise de focus l'ouvre avant que le clic n'arrive, et le clic, voyant un
      menu déjà ouvert, suivait le lien. On retient donc l'état d'avant. */
@@ -266,7 +291,7 @@ export function EnTete({ actif }: { actif?: string }) {
   return (
     <header
       ref={barre}
-      className={`cg-header${ouvert ? " cg-header-ouvert" : ""}${fini ? " cg-header-fini" : ""}`}
+      className={`cg-header${deplie ? " cg-header-ouvert" : ""}${fini ? " cg-header-fini" : ""}`}
       onPointerEnter={(e) => e.pointerType === "mouse" && setOuvert(true)}
       onPointerLeave={(e) => e.pointerType === "mouse" && setOuvert(false)}
       onFocus={() => setOuvert(true)}
@@ -276,7 +301,7 @@ export function EnTete({ actif }: { actif?: string }) {
           href="/"
           className="cg-logo"
           onPointerDownCapture={() => {
-            avant.current = ouvert;
+            avant.current = deplie;
           }}
           onClick={(e) => {
             if (!avant.current) {
