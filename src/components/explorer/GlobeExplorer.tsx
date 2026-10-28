@@ -18,10 +18,10 @@ import { COUCHE, type Repere, type Riviere } from "@/data/explorer/couches";
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const DEG = Math.PI / 180;
-const ELEV = 0.032;
+const ELEV = 0.02;
 const SURF = 1.05;
-const LIGNE = 1.043;
-const PATCH = 1.037;
+const LIGNE = 1.03;
+const BORD = 1.03;
 
 function versXYZ(lat: number, lon: number, r: number, out = new THREE.Vector3()) {
   const la = lat * DEG;
@@ -83,208 +83,15 @@ export function cadrage(geo: GeoJSON.FeatureCollection, nom: string): { lat: num
   return { lat: (b[1] + b[3]) / 2, lon: (b[0] + b[2]) / 2, envergure: Math.max(b[2] - b[0], (b[3] - b[1]) * 1.2), largeur: b[2] - b[0], hauteur: b[3] - b[1] };
 }
 
-/** La boîte d'un pays (sa plus grande île ou masse continentale), élargie d'une marge, en degrés. */
-function boite(geo: GeoJSON.FeatureCollection, nom: string): { lat0: number; lat1: number; lon0: number; lon1: number } | null {
-  const p = lirePays(geo).find((x) => x.nom === nom);
-  if (!p) return null;
-  let k = 0;
-  let max = -1;
-  p.boites.forEach((b, i) => {
-    const a = (b[2] - b[0]) * (b[3] - b[1]);
-    if (a > max) {
-      max = a;
-      k = i;
-    }
-  });
-  const b = p.boites[k];
-  const mx = Math.max(2, (b[2] - b[0]) * 0.32);
-  const my = Math.max(2, (b[3] - b[1]) * 0.32);
-  return { lon0: Math.max(-180, b[0] - mx), lon1: Math.min(180, b[2] + mx), lat0: Math.max(-84, b[1] - my), lat1: Math.min(84, b[3] + my) };
-}
-
-type Boite = { lat0: number; lat1: number; lon0: number; lon1: number };
-
-/** Le relief fin d'une zone, peint en blanc ombré sur fond d'eau bleutée : chaque pixel vient d'une altitude réelle. */
-async function peindreRelief(
-  b: Boite,
-  geo: GeoJSON.FeatureCollection,
-  pays: string | null,
-  nuit: boolean,
-  tuile: (z: number, x: number, y: number) => Promise<ImageBitmap | null>,
-): Promise<HTMLCanvasElement | null> {
-  const lonSpan = b.lon1 - b.lon0;
-  const latSpan = b.lat1 - b.lat0;
-  const mercY = (lat: number, z: number) => ((1 - Math.asinh(Math.tan(lat * DEG)) / Math.PI) / 2) * 2 ** z * 256;
-  const mercX = (lon: number, z: number) => ((lon + 180) / 360) * 2 ** z * 256;
-  /* Le plus fin niveau qui tient dans une mosaïque raisonnable. */
-  let z = 3;
-  for (let t = 9; t >= 3; t--) {
-    const nx = Math.floor(mercX(b.lon1, t) / 256) - Math.floor(mercX(b.lon0, t) / 256) + 1;
-    const ny = Math.floor(mercY(b.lat0, t) / 256) - Math.floor(mercY(b.lat1, t) / 256) + 1;
-    if (nx * ny <= 100 && mercX(b.lon1, t) - mercX(b.lon0, t) <= 3000) {
-      z = t;
-      break;
-    }
-  }
-  const x0 = Math.floor(mercX(b.lon0, z) / 256);
-  const x1 = Math.floor(mercX(b.lon1, z) / 256);
-  const y0 = Math.floor(mercY(b.lat1, z) / 256);
-  const y1 = Math.floor(mercY(b.lat0, z) / 256);
-  const nx = x1 - x0 + 1;
-  const ny = y1 - y0 + 1;
-  const jobs: Promise<ImageBitmap | null>[] = [];
-  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) jobs.push(tuile(z, x, y));
-  const images = await Promise.all(jobs);
-  const mos = document.createElement("canvas");
-  mos.width = nx * 256;
-  mos.height = ny * 256;
-  const mc = mos.getContext("2d", { willReadFrequently: true })!;
-  images.forEach((im, i) => im && mc.drawImage(im, (i % nx) * 256, Math.floor(i / nx) * 256));
-  const src = mc.getImageData(0, 0, mos.width, mos.height).data;
-  const alt = (px: number, py: number) => {
-    const x = Math.min(mos.width - 2, Math.max(0, px));
-    const y = Math.min(mos.height - 2, Math.max(0, py));
-    const ix = Math.floor(x);
-    const iy = Math.floor(y);
-    const fx = x - ix;
-    const fy = y - iy;
-    const h = (i: number) => src[i] * 256 + src[i + 1] + src[i + 2] / 256 - 32768;
-    const i0 = (iy * mos.width + ix) * 4;
-    const i1 = i0 + 4;
-    const i2 = i0 + mos.width * 4;
-    const i3 = i2 + 4;
-    return (h(i0) * (1 - fx) + h(i1) * fx) * (1 - fy) + (h(i2) * (1 - fx) + h(i3) * fx) * fy;
-  };
-
-  const W = Math.min(2048, Math.max(768, Math.round(mercX(b.lon1, z) - mercX(b.lon0, z))));
-  const H = Math.max(256, Math.min(2048, Math.round((W * latSpan) / lonSpan)));
-  const hauteurs = new Float32Array(W * H);
-  const ox = x0 * 256;
-  const oy = y0 * 256;
-  for (let j = 0; j < H; j++) {
-    const lat = b.lat1 - (j / (H - 1)) * latSpan;
-    const py = mercY(lat, z) - oy;
-    for (let i = 0; i < W; i++) {
-      const lon = b.lon0 + (i / (W - 1)) * lonSpan;
-      hauteurs[j * W + i] = alt(mercX(lon, z) - ox, py);
-    }
-  }
-
-  /* L'ombrage : la lumière vient du nord-ouest, le relief est exagéré pour qu'on le lise de loin. */
-  const toile = document.createElement("canvas");
-  toile.width = W;
-  toile.height = H;
-  const ctx = toile.getContext("2d")!;
-  const img = ctx.createImageData(W, H);
-  const pal = nuit
-    ? { terre: [112, 122, 168], mer: [24, 31, 56], fond: [10, 14, 30] }
-    : { terre: [252, 251, 255], mer: [206, 220, 242], fond: [188, 204, 232] };
-  const mPx = (lonSpan / W) * 111320;
-  const mPy = (latSpan / H) * 110540;
-  const az = (315 * DEG);
-  const al = 42 * DEG;
-  const exag = 3.2;
-  for (let j = 0; j < H; j++) {
-    const lat = b.lat1 - (j / (H - 1)) * latSpan;
-    const dx = mPx * Math.max(0.15, Math.cos(lat * DEG));
-    for (let i = 0; i < W; i++) {
-      const k = j * W + i;
-      const h = hauteurs[k];
-      const o = k * 4;
-      let r: number, g: number, bl: number;
-      if (h <= 0) {
-        /* L'eau : un aplat bleuté, un peu plus profond au large. */
-        const t = Math.min(1, -h / 3500);
-        r = pal.mer[0] + (pal.fond[0] - pal.mer[0]) * t;
-        g = pal.mer[1] + (pal.fond[1] - pal.mer[1]) * t;
-        bl = pal.mer[2] + (pal.fond[2] - pal.mer[2]) * t;
-      } else {
-        const hx = hauteurs[j * W + Math.min(W - 1, i + 1)] - hauteurs[j * W + Math.max(0, i - 1)];
-        const hy = hauteurs[Math.min(H - 1, j + 1) * W + i] - hauteurs[Math.max(0, j - 1) * W + i];
-        const dzdx = (hx / (2 * dx)) * exag;
-        const dzdy = (hy / (2 * mPy)) * exag;
-        const pente = Math.atan(Math.hypot(dzdx, dzdy));
-        const expo = Math.atan2(dzdy, -dzdx);
-        const ombre = Math.cos(Math.PI / 2 - al) * Math.cos(pente) + Math.sin(Math.PI / 2 - al) * Math.sin(pente) * Math.cos(az - expo);
-        /* Plat = presque blanc ; une pente tournée vers l'ombre s'assombrit franchement. */
-        const c = Math.max(0.42, Math.min(1, 0.93 + (ombre - 0.67) * 1.05));
-        /* Un peu plus gris vers les sommets, pour séparer les plaines des massifs. */
-        const e = Math.min(1, h / 4200) * 0.1;
-        const k2 = c * (1 - e);
-        r = pal.terre[0] * k2;
-        g = pal.terre[1] * k2;
-        bl = pal.terre[2] * Math.min(1, k2 * 1.02);
-      }
-      img.data[o] = r;
-      img.data[o + 1] = g;
-      img.data[o + 2] = bl;
-      img.data[o + 3] = 255;
-    }
-  }
-  ctx.putImageData(img, 0, 0);
-
-  /* Les frontières, tracées en vecteur à la résolution de la zone, et le pays choisi. */
-  const px = (lon: number) => ((lon - b.lon0) / lonSpan) * W;
-  const py = (lat: number) => ((b.lat1 - lat) / latSpan) * H;
-  const trace = (f: GeoJSON.Feature) => {
-    const g = f.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon;
-    const polys = (g.type === "MultiPolygon" ? g.coordinates : [g.coordinates]) as Anneau[][];
-    ctx.beginPath();
-    for (const p of polys)
-      for (const ring of p) {
-        ring.forEach(([lon, lat], i) => (i === 0 ? ctx.moveTo(px(lon), py(lat)) : ctx.lineTo(px(lon), py(lat))));
-        ctx.closePath();
-      }
-  };
-  ctx.lineJoin = "round";
-  ctx.strokeStyle = nuit ? "rgba(190,200,255,0.4)" : "rgba(76,64,160,0.42)";
-  ctx.lineWidth = Math.max(1.2, W / 1100);
-  for (const f of geo.features) {
-    trace(f);
-    ctx.stroke();
-  }
-  if (pays) {
-    const f = geo.features.find((x) => (x.properties as { name: string }).name === pays);
-    if (f) {
-      trace(f);
-      ctx.fillStyle = nuit ? "rgba(140,110,255,0.22)" : "rgba(104,72,240,0.1)";
-      ctx.fill("evenodd");
-      ctx.strokeStyle = nuit ? "#b9a6ff" : "#5b3df0";
-      ctx.lineWidth = Math.max(2.4, W / 560);
-      ctx.stroke();
-    }
-  }
-
-  /* Les bords se fondent dans le globe : l'opacité décroît sur les derniers pourcents. */
-  const masque = document.createElement("canvas");
-  masque.width = W;
-  masque.height = H;
-  const mk = masque.getContext("2d")!;
-  const mi = mk.createImageData(W, H);
-  const f = Math.max(8, Math.min(W, H) * 0.12);
-  for (let j = 0; j < H; j++)
-    for (let i = 0; i < W; i++) {
-      const d = Math.min(i, W - 1 - i, j, H - 1 - j);
-      const t = Math.min(1, d / f);
-      mi.data[(j * W + i) * 4 + 3] = 255 * (t * t * (3 - 2 * t));
-    }
-  mk.putImageData(mi, 0, 0);
-  ctx.globalCompositeOperation = "destination-in";
-  ctx.drawImage(masque, 0, 0);
-  ctx.globalCompositeOperation = "source-over";
-  return toile;
-}
-
-function peindre(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: string | null, toile: HTMLCanvasElement) {
+/** Le pays choisi : un voile violet sur le globe. Les frontières sont des lignes vectorielles (toujours nettes), pas de la texture. */
+function peindreSelection(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: string | null, toile: HTMLCanvasElement) {
   const W = toile.width;
   const H = toile.height;
   const ctx = toile.getContext("2d")!;
-  const c = nuit
-    ? { mer: "#141a30", terre: "#2b3454", bord: "rgba(170,185,255,0.16)" }
-    : { mer: "#dbe4f3", terre: "#fcfcff", bord: "rgba(120,110,175,0.2)" };
-  ctx.fillStyle = c.mer;
-  ctx.fillRect(0, 0, W, H);
-  const trace = (f: GeoJSON.Feature) => {
+  ctx.clearRect(0, 0, W, H);
+  if (!pays) return;
+  for (const f of geo.features) {
+    if ((f.properties as { name: string }).name !== pays) continue;
     const g = f.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon;
     const polys = (g.type === "MultiPolygon" ? g.coordinates : [g.coordinates]) as Anneau[][];
     ctx.beginPath();
@@ -298,27 +105,33 @@ function peindre(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: string | n
         });
         ctx.closePath();
       }
-  };
-  ctx.fillStyle = c.terre;
-  ctx.strokeStyle = c.bord;
-  ctx.lineWidth = 1.1;
-  ctx.lineJoin = "round";
-  for (const f of geo.features) {
-    trace(f);
+    ctx.fillStyle = nuit ? "rgba(140,110,255,0.3)" : "rgba(104,72,240,0.14)";
     ctx.fill("evenodd");
-    ctx.stroke();
   }
-  if (pays) {
-    for (const f of geo.features) {
-      if ((f.properties as { name: string }).name !== pays) continue;
-      trace(f);
-      ctx.fillStyle = nuit ? "rgba(140,110,255,0.34)" : "rgba(104,72,240,0.16)";
-      ctx.fill("evenodd");
-      ctx.strokeStyle = nuit ? "#b9a6ff" : "#5b3df0";
-      ctx.lineWidth = 2.8;
-      ctx.stroke();
-    }
+}
+
+/** Les lignes d'un ensemble de pays : une seule géométrie de segments. `decalage` (en degrés) épaissit le trait en le dessinant plusieurs fois. */
+function lignesPays(geo: GeoJSON.FeatureCollection, nom: string | null, r: number, decalage = 0): THREE.BufferGeometry {
+  const v: number[] = [];
+  const t = new THREE.Vector3();
+  const decs: [number, number][] = decalage ? [[0, 0], [decalage, 0], [-decalage, 0], [0, decalage], [0, -decalage]] : [[0, 0]];
+  for (const f of geo.features) {
+    if (nom !== null && (f.properties as { name: string }).name !== nom) continue;
+    const g = f.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon;
+    const polys = (g.type === "MultiPolygon" ? g.coordinates : [g.coordinates]) as Anneau[][];
+    for (const p of polys)
+      for (const ring of p)
+        for (let i = 0; i + 1 < ring.length; i++)
+          for (const [dx, dy] of decs) {
+            versXYZ(ring[i][1] + dy, ring[i][0] + dx, r, t);
+            v.push(t.x, t.y, t.z);
+            versXYZ(ring[i + 1][1] + dy, ring[i + 1][0] + dx, r, t);
+            v.push(t.x, t.y, t.z);
+          }
   }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(v, 3));
+  return g;
 }
 
 export interface GlobeExplorerHandle {
@@ -385,39 +198,103 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     const cam = new THREE.PerspectiveCamera(32, 1, 0.1, 50);
     const sc = new THREE.Scene();
 
-    const toile = document.createElement("canvas");
-    toile.width = 4096;
-    toile.height = 2048;
-    peindre(geo, nuit, pays, toile);
-    const texture = new THREE.CanvasTexture(toile);
+    /* Le globe : une image de relief déjà ombrée (peinte à partir de vraies altitudes, voir scripts/explorer/relief.js).
+       Trois définitions se succèdent sans qu'on le voie : le globe est net dès qu'elle arrivent, et ne recharge plus rien ensuite. */
+    const maxTex = renderer.capabilities.maxTextureSize;
+    const gros = maxTex >= 16384 && !window.matchMedia("(pointer: coarse)").matches && ((navigator as unknown as { deviceMemory?: number }).deviceMemory ?? 0) >= 8;
+    const definitions = ["/explorer/relief-4k.jpg", ...(maxTex >= 8192 ? ["/explorer/relief-8k.jpg"] : []), ...(gros ? ["/explorer/relief-16k.jpg"] : [])];
+    const attente = document.createElement("canvas");
+    attente.width = 256;
+    attente.height = 128;
+    {
+      const c = attente.getContext("2d")!;
+      c.fillStyle = "#e3ebf8";
+      c.fillRect(0, 0, 256, 128);
+    }
+    const texture = new THREE.CanvasTexture(attente);
     texture.colorSpace = THREE.SRGBColorSpace;
-    texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-    /* Le relief : la carte d'altitude du site, agrandie et adoucie pour effacer l'escalier des 256 niveaux de gris. */
+    /* L'altitude grossière sert seulement au contour du globe (le bord un peu relevé des continents). */
     const reliefToile = document.createElement("canvas");
-    reliefToile.width = 4096;
-    reliefToile.height = 2048;
+    reliefToile.width = 2048;
+    reliefToile.height = 1024;
     const relief = new THREE.CanvasTexture(reliefToile);
-    relief.anisotropy = renderer.capabilities.getMaxAnisotropy();
-    const img = new Image();
-    img.onload = () => {
-      const rc = reliefToile.getContext("2d")!;
-      rc.imageSmoothingQuality = "high";
-      rc.filter = "blur(1.6px)";
-      rc.drawImage(img, 0, 0, reliefToile.width, reliefToile.height);
-      relief.needsUpdate = true;
-    };
-    img.src = "/geo/earth-topology.png";
-    const matiere = new THREE.MeshStandardMaterial({
-      map: texture, bumpMap: relief, bumpScale: 3.2, displacementMap: relief, displacementScale: ELEV, roughness: 0.92, metalness: 0,
-    });
+    {
+      const img = new Image();
+      img.onload = () => {
+        const rc = reliefToile.getContext("2d")!;
+        rc.imageSmoothingQuality = "high";
+        rc.filter = "blur(1.2px)";
+        rc.drawImage(img, 0, 0, reliefToile.width, reliefToile.height);
+        relief.needsUpdate = true;
+      };
+      img.src = "/geo/earth-topology.png";
+    }
+    const matiere = new THREE.MeshStandardMaterial({ map: texture, displacementMap: relief, displacementScale: ELEV, roughness: 0.95, metalness: 0 });
+    matiere.color.set(nuit ? "#7a83b4" : "#ffffff");
     const globe = new THREE.Group();
-    const boule = new THREE.Mesh(new THREE.SphereGeometry(1, 384, 192), matiere);
+    const geoBoule = new THREE.SphereGeometry(1, 384, 192);
+    const boule = new THREE.Mesh(geoBoule, matiere);
     globe.add(boule);
     sc.add(globe);
+    let actifs = true;
+    let texturesPosees: THREE.Texture[] = [];
+    (async () => {
+      for (const url of definitions) {
+        if (!actifs) return;
+        try {
+          const tex = await new Promise<THREE.Texture>((ok, ko) => new THREE.TextureLoader().load(url, ok, undefined, ko));
+          if (!actifs) {
+            tex.dispose();
+            return;
+          }
+          tex.colorSpace = THREE.SRGBColorSpace;
+          tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+          matiere.map = tex;
+          matiere.needsUpdate = true;
+          texturesPosees.forEach((t) => t.dispose());
+          texturesPosees = [tex];
+        } catch {
+          /* Une définition qui manque : on garde la précédente. */
+        }
+      }
+    })();
 
-    const soleil = new THREE.DirectionalLight(0xffffff, nuit ? 1.7 : 1.35);
+    /* Le voile du pays choisi, posé sur le globe (même relief que lui, juste au-dessus). */
+    const voileToile = document.createElement("canvas");
+    voileToile.width = 2048;
+    voileToile.height = 1024;
+    peindreSelection(geo, nuit, pays, voileToile);
+    const voileTex = new THREE.CanvasTexture(voileToile);
+    voileTex.colorSpace = THREE.SRGBColorSpace;
+    const voileGeo = new THREE.SphereGeometry(1 + ELEV + 0.002, 192, 96);
+    const voile = new THREE.Mesh(voileGeo, new THREE.MeshBasicMaterial({ map: voileTex, transparent: true, depthWrite: false }));
+    voile.renderOrder = 1;
+    globe.add(voile);
+
+    /* Les frontières et le contour du pays choisi : des lignes, donc nettes à tous les zooms. */
+    const bordsMat = new THREE.LineBasicMaterial({ color: nuit ? "#aab4ff" : "#5b4bb0", transparent: true, opacity: nuit ? 0.3 : 0.24 });
+    const bords = new THREE.LineSegments(lignesPays(geo, null, BORD), bordsMat);
+    bords.frustumCulled = false;
+    globe.add(bords);
+    const contourMat = new THREE.LineBasicMaterial({ color: nuit ? "#b9a6ff" : "#5b3df0" });
+    let contour: THREE.LineSegments | null = null;
+    const majContour = () => {
+      if (contour) {
+        globe.remove(contour);
+        contour.geometry.dispose();
+        contour = null;
+      }
+      const p = etat.current.props;
+      if (!p.pays) return;
+      contour = new THREE.LineSegments(lignesPays(p.geo, p.pays, BORD + 0.001, 0.018), contourMat);
+      contour.frustumCulled = false;
+      globe.add(contour);
+    };
+    majContour();
+
+    const soleil = new THREE.DirectionalLight(0xffffff, nuit ? 1.7 : 0.9);
     soleil.position.set(-4, 3.2, 2.4);
-    const ambiance = new THREE.AmbientLight(0xffffff, nuit ? 0.6 : 2.0);
+    const ambiance = new THREE.AmbientLight(0xffffff, nuit ? 0.9 : 3.0);
     sc.add(soleil, ambiance);
 
     /* L'atmosphère : un halo violet pâle sur le bord. */
@@ -507,89 +384,27 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       tout.try_ = a;
     };
 
-    /* ── Le relief fin : une zone peinte à partir de vraies altitudes, posée sur le globe ───────── */
-    let patch: THREE.Mesh | null = null;
-    let patchBoite: Boite | null = null;
-    let jeton = 0;
-    const tuiles = new Map<string, Promise<ImageBitmap | null>>();
-    const tuile = (z: number, x: number, y: number) => {
-      const k = `${z}/${x}/${y}`;
-      let p = tuiles.get(k);
-      if (!p) {
-        if (tuiles.size > 320) tuiles.clear();
-        p = fetch(`/api/relief/${z}/${x}/${y}`)
-          .then((r) => (r.ok ? r.blob() : Promise.reject(new Error("tuile"))))
-          .then((b) => createImageBitmap(b))
-          .catch(() => null);
-        tuiles.set(k, p);
-      }
-      return p;
-    };
-    const retirerPatch = () => {
-      if (!patch) return;
-      globe.remove(patch);
-      patch.geometry.dispose();
-      (patch.material as THREE.MeshBasicMaterial).map?.dispose();
-      (patch.material as THREE.Material).dispose();
-      patch = null;
-      patchBoite = null;
-    };
-    const poserPatch = async (b: Boite) => {
-      const mon = ++jeton;
-      const p = etat.current.props;
-      const toile = await peindreRelief(b, p.geo, p.pays, p.nuit, tuile);
-      if (mon !== jeton || !toile) return;
-      const n = 120;
-      const pos = new Float32Array((n + 1) * (n + 1) * 3);
-      const uv = new Float32Array((n + 1) * (n + 1) * 2);
-      const v = new THREE.Vector3();
-      for (let j = 0; j <= n; j++)
-        for (let i = 0; i <= n; i++) {
-          const k = j * (n + 1) + i;
-          versXYZ(b.lat1 - (j / n) * (b.lat1 - b.lat0), b.lon0 + (i / n) * (b.lon1 - b.lon0), PATCH, v);
-          pos.set([v.x, v.y, v.z], k * 3);
-          uv.set([i / n, 1 - j / n], k * 2);
-        }
-      const idx: number[] = [];
-      for (let j = 0; j < n; j++)
-        for (let i = 0; i < n; i++) {
-          const a = j * (n + 1) + i;
-          idx.push(a, a + n + 1, a + 1, a + 1, a + n + 1, a + n + 2);
-        }
-      const g = new THREE.BufferGeometry();
-      g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-      g.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
-      g.setIndex(idx);
-      const tex = new THREE.CanvasTexture(toile);
-      tex.colorSpace = THREE.SRGBColorSpace;
-      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-      const mesh = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.FrontSide }));
-      mesh.renderOrder = 1;
-      retirerPatch();
-      globe.add(mesh);
-      patch = mesh;
-      patchBoite = b;
-    };
-
     const api = {
       maj: () => {},
       peindre: () => {
         const p = etat.current.props;
-        peindre(p.geo, p.nuit, p.pays, toile);
-        texture.needsUpdate = true;
+        peindreSelection(p.geo, p.nuit, p.pays, voileToile);
+        voileTex.needsUpdate = true;
+        matiere.color.set(p.nuit ? "#7a83b4" : "#ffffff");
+        bordsMat.color.set(p.nuit ? "#aab4ff" : "#5b4bb0");
+        bordsMat.opacity = p.nuit ? 0.3 : 0.24;
+        contourMat.color.set(p.nuit ? "#b9a6ff" : "#5b3df0");
+        majContour();
         (halo.material as THREE.ShaderMaterial).uniforms.couleur.value.set(p.nuit ? "#6d7dff" : "#8f7dff");
         (halo.material as THREE.ShaderMaterial).uniforms.force.value = p.nuit ? 0.8 : 0.28;
-        soleil.intensity = p.nuit ? 1.7 : 1.35;
-        ambiance.intensity = p.nuit ? 0.6 : 2.0;
+        soleil.intensity = p.nuit ? 1.7 : 0.9;
+        ambiance.intensity = p.nuit ? 0.9 : 3.0;
         majLignes();
-        const bp = patchBoite;
-        if (bp) void poserPatch(bp);
       },
       cadrer: () => {
         const p = etat.current.props;
         if (!p.pays) {
           tout.td = distMonde();
-          retirerPatch();
           return;
         }
         const c = cadrage(p.geo, p.pays);
@@ -599,8 +414,6 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
         const { w, h } = ecran();
         const visible = Math.max(c.hauteur * 1.95, (c.largeur * 1.85) / Math.max(0.8, Math.min(1.6, w / h)));
         tout.td = Math.min(distMonde(), Math.max(1.16, 1 + (visible * DEG) / (2 * Math.tan(16 * DEG))));
-        const bx = boite(p.geo, p.pays);
-        if (bx) void poserPatch(bx);
       },
       zoomer: (f: number) => {
         tout.td = Math.min(5.2, Math.max(1.1, tout.td * f));
@@ -810,8 +623,6 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       return best;
     };
 
-    /* Sans pays choisi : quand on s'approche et qu'on s'arrête, la zone regardée reçoit son relief fin. */
-    let calmeDepuis = 0;
     const reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let dernierSurvol: string | null = null;
     let brut = 0;
@@ -836,25 +647,6 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
         }
       }
       tout.d += (tout.td - tout.d) * doux;
-      if (!e.props.pays) {
-        const calme = !tout.glisse && Math.abs(tout.try_ - tout.ry) < 0.003 && Math.abs(tout.trx - tout.rx) < 0.003 && Math.abs(tout.td - tout.d) < 0.02;
-        const maintenant = performance.now();
-        if (tout.d > 3.4 && patch) retirerPatch();
-        else if (calme && tout.d < 2.6) {
-          if (!calmeDepuis) calmeDepuis = maintenant;
-          else if (calmeDepuis > 0 && maintenant - calmeDepuis > 500) {
-            calmeDepuis = -1;
-            const lat = tout.rx / DEG;
-            let lon = (-Math.PI / 2 - tout.ry) / DEG;
-            lon = ((((lon + 180) % 360) + 360) % 360) - 180;
-            const dedans = patchBoite && lat > patchBoite.lat0 + (patchBoite.lat1 - patchBoite.lat0) * 0.3 && lat < patchBoite.lat1 - (patchBoite.lat1 - patchBoite.lat0) * 0.3 && lon > patchBoite.lon0 + (patchBoite.lon1 - patchBoite.lon0) * 0.3 && lon < patchBoite.lon1 - (patchBoite.lon1 - patchBoite.lon0) * 0.3;
-            if (!dedans) {
-              const demi = Math.min(26, 8 + 15 * (tout.d - 1.2));
-              void poserPatch({ lat0: Math.max(-84, lat - demi), lat1: Math.min(84, lat + demi), lon0: Math.max(-180, lon - demi * 1.3), lon1: Math.min(180, lon + demi * 1.3) });
-            }
-          }
-        } else if (!calme) calmeDepuis = 0;
-      }
       globe.rotation.set(tout.rx, tout.ry, 0);
       cam.position.set(0, 0, tout.d);
       cam.lookAt(0, 0, 0);
@@ -936,9 +728,16 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       renderer.domElement.removeEventListener("pointerleave", quitte);
       renderer.domElement.removeEventListener("wheel", roue);
       renderer.dispose();
+      actifs = false;
       matiere.dispose();
       texture.dispose();
+      texturesPosees.forEach((t) => t.dispose());
       relief.dispose();
+      voileTex.dispose();
+      bordsMat.dispose();
+      contourMat.dispose();
+      geoBoule.dispose();
+      voileGeo.dispose();
       ptsGeo.dispose();
       ptsMat.dispose();
       pulseGeo.dispose();
