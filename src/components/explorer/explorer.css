@@ -139,3 +139,8 @@
   .xp-carte-t small, .xp-carte-t b { max-width: 130px; }
 }
 @media (prefers-reduced-motion: reduce) { .xp-attente span { animation: none; } .xp-rail button { transition: none; } }
+
+/* Le nom du pays sous le curseur */
+.xp-survol { position: absolute; z-index: 6; translate: 14px 16px; padding: 6px 12px; border-radius: 99px; pointer-events: none; white-space: nowrap; font-size: 13px; font-weight: 650; color: var(--xp-encre); background: var(--verre); border: 1px solid var(--verre-bord); box-shadow: var(--verre-ombre); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.xp-zoom button.on { color: #fff; background: var(--xp-vif); }
+.xp-scene canvas:focus-visible { outline: 2px solid var(--xp-vif) !important; outline-offset: -3px; border-radius: 28px; }

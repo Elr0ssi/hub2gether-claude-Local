@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowUpRight, List, Minus, Plus, RotateCcw, Search, X } from "lucide-react";
+import { ArrowUpRight, List, Minus, Mountain, Plus, RotateCcw, Search, X } from "lucide-react";
 import { COUCHE, COUCHES, lireRepères, type CoucheId, type Repere, type Riviere } from "@/data/explorer/couches";
 import { countryFr } from "@/data/countryNamesFr";
 import { slugDe } from "@/data/seo/francais";
@@ -40,6 +40,8 @@ export function ExplorerPage() {
   const [survol, setSurvol] = useState<string | null>(null);
   const [choisi, setChoisi] = useState<string | null>(null);
   const [tiroir, setTiroir] = useState(false);
+  const [relief3D, setRelief3D] = useState(false);
+  const [survolPays, setSurvolPays] = useState<{ nom: string; x: number; y: number } | null>(null);
   const globe = useRef<GlobeExplorerHandle>(null);
 
   useEffect(() => {
@@ -172,6 +174,8 @@ export function ExplorerPage() {
             cartes={cartes}
             monde={monde}
             arcs={arcs}
+            relief3D={relief3D}
+            onPaysSurvol={setSurvolPays}
             onSurvol={setSurvol}
             onChoix={surChoix}
             onPays={(n) => choisirPays(n)}
@@ -267,7 +271,14 @@ export function ExplorerPage() {
         )}
       </div>
 
+      {survolPays && (
+        <div className="xp-survol" style={{ left: survolPays.x, top: survolPays.y }} aria-hidden="true">
+          {countryFr(survolPays.nom)}
+        </div>
+      )}
+
       <div className="xp-zoom">
+        <button type="button" onClick={() => setRelief3D((v) => !v)} aria-label="Relief en volume" aria-pressed={relief3D} className={relief3D ? "on" : ""} title="Relief en volume"><Mountain size={16} /></button>
         <button type="button" onClick={() => globe.current?.zoomer(0.8)} aria-label="Zoomer"><Plus size={16} /></button>
         <button type="button" onClick={() => globe.current?.zoomer(1.25)} aria-label="Dézoomer"><Minus size={16} /></button>
         <button type="button" onClick={() => { choisirPays(null); globe.current?.recentrer(); }} aria-label="Revenir au monde entier"><RotateCcw size={15} /></button>

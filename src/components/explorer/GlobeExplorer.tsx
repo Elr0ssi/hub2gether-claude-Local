@@ -18,10 +18,11 @@ import { COUCHE, type Repere, type Riviere } from "@/data/explorer/couches";
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const DEG = Math.PI / 180;
-const ELEV = 0.02;
-const SURF = 1.05;
-const LIGNE = 1.03;
-const BORD = 1.03;
+const ELEV = 0.028;
+const SURF = 1.075;
+const LIGNE = 1.048;
+const BORD = 1.048;
+/* Le relief en volume peut monter jusqu'à ELEV * 1.7 : tout ce qu'on pose dessus reste au-dessus. */
 
 function versXYZ(lat: number, lon: number, r: number, out = new THREE.Vector3()) {
   const la = lat * DEG;
@@ -84,7 +85,7 @@ export function cadrage(geo: GeoJSON.FeatureCollection, nom: string): { lat: num
 }
 
 /** Le pays choisi : un voile violet sur le globe. Les frontières sont des lignes vectorielles (toujours nettes), pas de la texture. */
-function peindreSelection(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: string | null, toile: HTMLCanvasElement) {
+function peindreSelection(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: string | null, toile: HTMLCanvasElement, force = 1) {
   const W = toile.width;
   const H = toile.height;
   const ctx = toile.getContext("2d")!;
@@ -105,7 +106,7 @@ function peindreSelection(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: s
         });
         ctx.closePath();
       }
-    ctx.fillStyle = nuit ? "rgba(140,110,255,0.3)" : "rgba(104,72,240,0.14)";
+    ctx.fillStyle = nuit ? `rgba(140,110,255,${0.3 * force})` : `rgba(104,72,240,${0.14 * force})`;
     ctx.fill("evenodd");
   }
 }
@@ -154,6 +155,10 @@ interface Props {
   cartes: string[];
   /** Vue du monde : de tout petits points rouges, rien d'autre. Dans un pays : les repères complets. */
   monde: boolean;
+  /** Le relief en volume : la caméra s'incline et les montagnes se dressent. */
+  relief3D: boolean;
+  /** Le pays sous le curseur (nom anglais et position à l'écran), ou null. */
+  onPaysSurvol: (info: { nom: string; x: number; y: number } | null) => void;
   /** Des liens courbes entre deux repères (identifiants). */
   arcs: [string, string][];
   onSurvol: (id: string | null) => void;
@@ -201,7 +206,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     /* Le globe : une image de relief déjà ombrée (peinte à partir de vraies altitudes, voir scripts/explorer/relief.js).
        Trois définitions se succèdent sans qu'on le voie : le globe est net dès qu'elle arrivent, et ne recharge plus rien ensuite. */
     const maxTex = renderer.capabilities.maxTextureSize;
-    const gros = maxTex >= 16384 && !window.matchMedia("(pointer: coarse)").matches && ((navigator as unknown as { deviceMemory?: number }).deviceMemory ?? 0) >= 8;
+    const gros = maxTex >= 16384 && !window.matchMedia("(pointer: coarse)").matches && ((navigator as unknown as { deviceMemory?: number }).deviceMemory ?? 8) >= 8;
     const definitions = ["/explorer/relief-4k.jpg", ...(maxTex >= 8192 ? ["/explorer/relief-8k.jpg"] : []), ...(gros ? ["/explorer/relief-16k.jpg"] : [])];
     const attente = document.createElement("canvas");
     attente.width = 256;
@@ -213,26 +218,13 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     }
     const texture = new THREE.CanvasTexture(attente);
     texture.colorSpace = THREE.SRGBColorSpace;
-    /* L'altitude grossière sert seulement au contour du globe (le bord un peu relevé des continents). */
-    const reliefToile = document.createElement("canvas");
-    reliefToile.width = 2048;
-    reliefToile.height = 1024;
-    const relief = new THREE.CanvasTexture(reliefToile);
-    {
-      const img = new Image();
-      img.onload = () => {
-        const rc = reliefToile.getContext("2d")!;
-        rc.imageSmoothingQuality = "high";
-        rc.filter = "blur(1.2px)";
-        rc.drawImage(img, 0, 0, reliefToile.width, reliefToile.height);
-        relief.needsUpdate = true;
-      };
-      img.src = "/geo/earth-topology.png";
-    }
+    /* Les hauteurs : racine carrée de l'altitude, 4096 x 2048 (voir scripts/explorer/relief.js). */
+    const relief = new THREE.TextureLoader().load("/explorer/relief-h.jpg");
+    relief.anisotropy = renderer.capabilities.getMaxAnisotropy();
     const matiere = new THREE.MeshStandardMaterial({ map: texture, displacementMap: relief, displacementScale: ELEV, roughness: 0.95, metalness: 0 });
     matiere.color.set(nuit ? "#7a83b4" : "#ffffff");
     const globe = new THREE.Group();
-    const geoBoule = new THREE.SphereGeometry(1, 384, 192);
+    const geoBoule = new THREE.SphereGeometry(1, 512, 256);
     const boule = new THREE.Mesh(geoBoule, matiere);
     globe.add(boule);
     sc.add(globe);
@@ -266,15 +258,49 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     peindreSelection(geo, nuit, pays, voileToile);
     const voileTex = new THREE.CanvasTexture(voileToile);
     voileTex.colorSpace = THREE.SRGBColorSpace;
-    const voileGeo = new THREE.SphereGeometry(1 + ELEV + 0.002, 192, 96);
+    const voileGeo = new THREE.SphereGeometry(1 + ELEV * 1.7 + 0.002, 192, 96);
     const voile = new THREE.Mesh(voileGeo, new THREE.MeshBasicMaterial({ map: voileTex, transparent: true, depthWrite: false }));
     voile.renderOrder = 1;
     globe.add(voile);
+
+    /* Le pays sous le curseur : un voile plus léger et un trait fin. */
+    const survolToile = document.createElement("canvas");
+    survolToile.width = 2048;
+    survolToile.height = 1024;
+    const survolTex = new THREE.CanvasTexture(survolToile);
+    survolTex.colorSpace = THREE.SRGBColorSpace;
+    const survolVoile = new THREE.Mesh(voileGeo, new THREE.MeshBasicMaterial({ map: survolTex, transparent: true, depthWrite: false }));
+    survolVoile.renderOrder = 1;
+    survolVoile.visible = false;
+    globe.add(survolVoile);
+    const survolMat = new THREE.LineBasicMaterial({ color: nuit ? "#c9bfff" : "#7c6cf0", transparent: true, opacity: 0.9 });
+    let survolLigne: THREE.LineSegments | null = null;
+    let survolPays: string | null = null;
+    const majSurvolPays = () => {
+      if (survolLigne) {
+        globe.remove(survolLigne);
+        survolLigne.geometry.dispose();
+        survolLigne = null;
+      }
+      const p = etat.current.props;
+      if (!survolPays || survolPays === p.pays) {
+        survolVoile.visible = false;
+        return;
+      }
+      peindreSelection(p.geo, p.nuit, survolPays, survolToile, 0.7);
+      survolTex.needsUpdate = true;
+      survolVoile.visible = true;
+      survolLigne = new THREE.LineSegments(lignesPays(p.geo, survolPays, BORD + 0.0005), survolMat);
+      survolLigne.frustumCulled = false;
+      survolLigne.renderOrder = 2;
+      globe.add(survolLigne);
+    };
 
     /* Les frontières et le contour du pays choisi : des lignes, donc nettes à tous les zooms. */
     const bordsMat = new THREE.LineBasicMaterial({ color: nuit ? "#aab4ff" : "#5b4bb0", transparent: true, opacity: nuit ? 0.3 : 0.24 });
     const bords = new THREE.LineSegments(lignesPays(geo, null, BORD), bordsMat);
     bords.frustumCulled = false;
+    bords.renderOrder = 2;
     globe.add(bords);
     const contourMat = new THREE.LineBasicMaterial({ color: nuit ? "#b9a6ff" : "#5b3df0" });
     let contour: THREE.LineSegments | null = null;
@@ -288,6 +314,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       if (!p.pays) return;
       contour = new THREE.LineSegments(lignesPays(p.geo, p.pays, BORD + 0.001, 0.018), contourMat);
       contour.frustumCulled = false;
+      contour.renderOrder = 3;
       globe.add(contour);
     };
     majContour();
@@ -315,7 +342,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       transparent: true,
       uniforms: { echelle: { value: renderer.getPixelRatio() } },
       vertexShader:
-        "attribute float taille; attribute vec3 teinte; varying vec3 t; varying float s; uniform float echelle; void main(){ t = teinte; s = taille; gl_PointSize = taille * echelle; vec3 w = (modelMatrix * vec4(position,1.0)).xyz; float face = dot(normalize(w), normalize(cameraPosition)); gl_Position = face < 0.3 ? vec4(2.0, 2.0, 2.0, 1.0) : projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
+        "attribute float taille; attribute vec3 teinte; varying vec3 t; varying float s; uniform float echelle; void main(){ t = teinte; s = taille; gl_PointSize = taille * echelle; vec3 w = (modelMatrix * vec4(position,1.0)).xyz; float face = dot(normalize(w), normalize(cameraPosition - w)); gl_Position = face < 0.16 ? vec4(2.0, 2.0, 2.0, 1.0) : projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
       fragmentShader:
         "varying vec3 t; varying float s; void main(){ float d = length(gl_PointCoord - 0.5); if (d > 0.5) discard; vec3 c = (d > 0.36 && s > 6.0) ? vec3(1.0) : t; gl_FragColor = vec4(c, 1.0); }",
     });
@@ -351,7 +378,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     pulse.frustumCulled = false;
     globe.add(pulse);
 
-    const tout = { rx: 0.35, ry: -Math.PI / 2 + 0.3, d: 4.25, trx: 0.35, try_: -Math.PI / 2 + 0.3, td: 4.25, vit: 0, glisse: false, dernierGeste: 0 };
+    const tout = { rx: 0.35, ry: -Math.PI / 2 + 0.3, d: 4.25, trx: 0.35, try_: -Math.PI / 2 + 0.3, td: 4.25, vit: 0, glisse: false, dernierGeste: 0, incl: 0, tincl: 0 };
     const ecran = () => {
       const w = el.clientWidth || 1;
       const h = el.clientHeight || 1;
@@ -413,10 +440,10 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
         /* Le pays doit remplir la scène : on cherche la hauteur d'image qui contient sa hauteur et sa largeur. */
         const { w, h } = ecran();
         const visible = Math.max(c.hauteur * 1.95, (c.largeur * 1.85) / Math.max(0.8, Math.min(1.6, w / h)));
-        tout.td = Math.min(distMonde(), Math.max(1.16, 1 + (visible * DEG) / (2 * Math.tan(16 * DEG))));
+        tout.td = Math.min(distMonde(), Math.max(1.5, 1 + (visible * DEG) / (2 * Math.tan(16 * DEG))));
       },
       zoomer: (f: number) => {
-        tout.td = Math.min(5.2, Math.max(1.1, tout.td * f));
+        tout.td = Math.min(5.2, Math.max(1.28, tout.td * f));
       },
       recentrer: () => {
         tout.dernierGeste = 0;
@@ -424,7 +451,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       },
       majReperes: () => {
         const r = etat.current.reperes;
-        positions = r.map((x) => versXYZ(x.lat, x.lon, etat.current.props.monde ? 1.012 : SURF));
+        positions = r.map((x) => versXYZ(x.lat, x.lon, etat.current.props.monde ? 1.04 : SURF));
         const pos = new Float32Array(r.length * 3);
         const col = new Float32Array(r.length * 3);
         const tai = new Float32Array(r.length);
@@ -538,7 +565,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
         doigts.set(e.pointerId, { x: e.clientX, y: e.clientY });
         const [a, b] = [...doigts.values()];
         const n = Math.hypot(a.x - b.x, a.y - b.y);
-        if (pincement > 0) tout.td = Math.min(5.2, Math.max(1.1, tout.td * (pincement / n)));
+        if (pincement > 0) tout.td = Math.min(5.2, Math.max(1.28, tout.td * (pincement / n)));
         pincement = n;
         return;
       }
@@ -570,10 +597,25 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     };
     const roue = (e: WheelEvent) => {
       e.preventDefault();
-      tout.td = Math.min(5.2, Math.max(1.1, tout.td * Math.exp(e.deltaY * 0.0012)));
+      tout.td = Math.min(5.2, Math.max(1.28, tout.td * Math.exp(e.deltaY * 0.0012)));
     };
 
     const rayon = new THREE.Raycaster();
+    /* Le point du globe sous un pixel : l'intersection du rayon avec la sphère, sans parcourir ses triangles. */
+    const pointSurGlobe = (x: number, y: number): { lat: number; lon: number } | null => {
+      const r = renderer.domElement.getBoundingClientRect();
+      rayon.setFromCamera(new THREE.Vector2((x / r.width) * 2 - 1, -(y / r.height) * 2 + 1), cam);
+      const o = rayon.ray.origin;
+      const d = rayon.ray.direction;
+      const b = o.dot(d);
+      const disc = b * b - (o.dot(o) - 1);
+      if (disc < 0) return null;
+      const t = -b - Math.sqrt(disc);
+      if (t < 0) return null;
+      const hit = o.clone().addScaledVector(d, t);
+      const l = globe.worldToLocal(hit).normalize();
+      return { lat: Math.asin(l.y) / DEG, lon: Math.atan2(-l.z, l.x) / DEG };
+    };
     const cliquer = (e: PointerEvent) => {
       const r = renderer.domElement.getBoundingClientRect();
       const x = e.clientX - r.left;
@@ -583,16 +625,12 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
         etat.current.props.onChoix(proche);
         return;
       }
-      const ndc = new THREE.Vector2((x / r.width) * 2 - 1, -(y / r.height) * 2 + 1);
-      rayon.setFromCamera(ndc, cam);
-      const hit = rayon.intersectObject(boule, false)[0];
-      if (!hit) {
+      const pt = pointSurGlobe(x, y);
+      if (!pt) {
         etat.current.props.onPays(null);
         return;
       }
-      const l = globe.worldToLocal(hit.point.clone()).normalize();
-      const lat = Math.asin(l.y) / DEG;
-      const lon = Math.atan2(-l.z, l.x) / DEG;
+      const { lat, lon } = pt;
       etat.current.props.onPays(paysEn(geoPays.current, lat, lon));
     };
 
@@ -602,10 +640,30 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     renderer.domElement.addEventListener("pointercancel", haut);
     renderer.domElement.addEventListener("pointerleave", quitte);
     renderer.domElement.addEventListener("wheel", roue, { passive: false });
+    /* Au clavier : flèches pour tourner, + et - pour zoomer, Échap pour revenir au monde. */
+    renderer.domElement.tabIndex = 0;
+    renderer.domElement.setAttribute("aria-label", "Globe interactif : flèches pour tourner, plus et moins pour zoomer");
+    renderer.domElement.style.outline = "none";
+    const touche = (e: KeyboardEvent) => {
+      const pas = 0.05 + ((tout.d - 1) / 3) * 0.12;
+      tout.dernierGeste = performance.now();
+      if (e.key === "ArrowLeft") tout.try_ += pas;
+      else if (e.key === "ArrowRight") tout.try_ -= pas;
+      else if (e.key === "ArrowUp") tout.trx = Math.min(1.35, tout.trx + pas);
+      else if (e.key === "ArrowDown") tout.trx = Math.max(-1.35, tout.trx - pas);
+      else if (e.key === "+" || e.key === "=") tout.td = Math.max(1.28, tout.td * 0.85);
+      else if (e.key === "-") tout.td = Math.min(5.2, tout.td * 1.18);
+      else if (e.key === "Escape") etat.current.props.onPays(null);
+      else return;
+      e.preventDefault();
+    };
+    renderer.domElement.addEventListener("keydown", touche);
 
     /* ── La boucle ────────────────────────────────────────────────────────── */
     const v = new THREE.Vector3();
-    const camDir = new THREE.Vector3();
+    const lumiereCible = new THREE.Vector3();
+    const tmpDir = new THREE.Vector3();
+    const tmpN = new THREE.Vector3();
     const proj: { x: number; y: number; vu: boolean }[] = [];
     const plusProche = (x: number, y: number, rayonPx: number): string | null => {
       let best: string | null = null;
@@ -625,6 +683,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
 
     const reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let dernierSurvol: string | null = null;
+    let dernierPays = 0;
     let brut = 0;
     let avant = performance.now();
     const boucle = () => {
@@ -648,18 +707,34 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       }
       tout.d += (tout.td - tout.d) * doux;
       globe.rotation.set(tout.rx, tout.ry, 0);
-      cam.position.set(0, 0, tout.d);
-      cam.lookAt(0, 0, 0);
+      /* Le relief en volume : la caméra descend vers le sud et regarde le point visé, les montagnes se dressent. */
+      tout.tincl = e.props.relief3D ? 1 : 0;
+      if (tout.tincl > 0.5 && tout.td < 1.6) tout.td = 1.6;
+      tout.incl += (tout.tincl - tout.incl) * doux;
+      const incl = Math.abs(tout.tincl - tout.incl) < 0.001 ? tout.tincl : tout.incl;
+      const ang = incl * 58 * DEG;
+      /* La caméra reste à la même hauteur au-dessus du point visé, mais glisse vers le sud le long de la surface. */
+      const L = tout.d - 1;
+      cam.position.set(0, -Math.sin(ang) * L, 1 + Math.cos(ang) * L);
+      cam.lookAt(0, 0, 1);
+      matiere.displacementScale = ELEV * (1 + 0.7 * incl);
+      {
+        const { w: ww, h: hh } = ecran();
+        const px = surPointeur.dans ? surPointeur.x / ww : 0.35;
+        const py = surPointeur.dans ? surPointeur.y / hh : 0.3;
+        lumiereCible.set(-4 + (px - 0.5) * 2.4, 3.2 + (0.5 - py) * 1.6, 2.4);
+        soleil.position.lerp(lumiereCible, doux * 0.6);
+      }
       globe.updateMatrixWorld(true);
       cam.updateMatrixWorld(true);
 
       const { w, h } = ecran();
-      camDir.copy(cam.position).normalize();
       const n = positions.length;
       const tai = ptsGeo.getAttribute("taille") as THREE.BufferAttribute | undefined;
       for (let i = 0; i < n; i++) {
         v.copy(positions[i]).applyMatrix4(globe.matrixWorld);
-        const face = v.clone().normalize().dot(camDir);
+        tmpDir.copy(cam.position).sub(v).normalize();
+        const face = tmpN.copy(v).normalize().dot(tmpDir);
         const vu = face > 0.2 && !e.props.monde;
         v.project(cam);
         proj[i] = { x: (v.x * 0.5 + 0.5) * w, y: (-v.y * 0.5 + 0.5) * h, vu };
@@ -689,6 +764,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
         pulse.visible = true;
       } else pulse.visible = false;
       /* Le survol : le repère le plus proche du pointeur. */
+      const maintenantPays = performance.now();
       if (surPointeur.dans && !tout.glisse) {
         const id = plusProche(surPointeur.x, surPointeur.y, 14);
         renderer.domElement.style.cursor = id ? "pointer" : "grab";
@@ -696,6 +772,22 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
           dernierSurvol = id;
           e.props.onSurvol(id);
         }
+        /* Le pays sous le curseur, quand aucun repère n'est survolé. */
+        if (maintenantPays - dernierPays > 80) {
+          dernierPays = maintenantPays;
+          const pt = id ? null : pointSurGlobe(surPointeur.x, surPointeur.y);
+          const nom = pt ? paysEn(geoPays.current, pt.lat, pt.lon) : null;
+          if (nom !== survolPays) {
+            survolPays = nom;
+            majSurvolPays();
+          }
+          e.props.onPaysSurvol(nom ? { nom, x: surPointeur.x, y: surPointeur.y } : null);
+          if (!id) renderer.domElement.style.cursor = nom ? "pointer" : "grab";
+        }
+      } else if (survolPays) {
+        survolPays = null;
+        majSurvolPays();
+        e.props.onPaysSurvol(null);
       }
       /* Les cartes suivent leur repère. */
       const idx = new Map(e.reperes.map((x, i) => [x.id, i]));
@@ -727,6 +819,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       renderer.domElement.removeEventListener("pointercancel", haut);
       renderer.domElement.removeEventListener("pointerleave", quitte);
       renderer.domElement.removeEventListener("wheel", roue);
+      renderer.domElement.removeEventListener("keydown", touche);
       renderer.dispose();
       actifs = false;
       matiere.dispose();
@@ -734,6 +827,8 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       texturesPosees.forEach((t) => t.dispose());
       relief.dispose();
       voileTex.dispose();
+      survolTex.dispose();
+      survolMat.dispose();
       bordsMat.dispose();
       contourMat.dispose();
       geoBoule.dispose();
