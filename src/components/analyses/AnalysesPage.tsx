@@ -53,7 +53,7 @@ export interface Props {
 }
 
 const fmtPib = (v: number) =>
-  Math.abs(v) >= 1000 ? `${(v / 1000).toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} T$` : `${Math.round(v).toLocaleString("fr-FR")} Md$`;
+  Math.abs(v) >= 1000 ? `${(v / 1000).toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}\u00a0T$` : `${Math.round(v).toLocaleString("fr-FR")}\u00a0Md$`;
 
 const nf = (v: number, d = 1) =>
   v.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -103,6 +103,150 @@ function useApparitions(racine: React.RefObject<HTMLElement | null>) {
       window.removeEventListener("resize", plan);
     };
   }, [racine]);
+}
+
+/* ── Le fond qui se trace : des courbes qui traversent la page ─────────────────────
+   Trois courbes parcourent la page de haut en bas, d'un bord à l'autre. Elles se dessinent au fil du défilement,
+   jusqu'à la ligne que le lecteur regarde, avec un point lumineux à leur pointe et des jalons qui s'allument
+   au passage. Un seul SVG derrière le contenu ; ses courbes sont recalculées aux dimensions réelles de la page,
+   pour que le trait garde la même épaisseur partout. */
+const COURBES = [
+  { d: "M 900 40 C 900 330, 130 330, 130 700 S 880 1060, 860 1450 S 130 1790, 150 2200 S 860 2540, 760 2960", classe: "a" },
+  { d: "M 120 120 C 120 460, 860 440, 880 820 S 150 1200, 170 1580 S 850 1930, 830 2330 S 220 2680, 300 2970", classe: "b" },
+  { d: "M 500 20 C 640 300, 360 520, 520 840 S 700 1300, 480 1560 S 330 2000, 520 2260 S 690 2700, 500 2990", classe: "c" },
+] as const;
+const REF_L = 1000;
+const REF_H = 3000;
+
+/** Les points d'un tracé écrit dans le repère 1000 x 3000, ramenés aux dimensions de la page. */
+const mise = (d: string, w: number, h: number) =>
+  d.replace(/(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)/g, (_, x: string, y: string) => `${((+x / REF_L) * w).toFixed(1)} ${((+y / REF_H) * h).toFixed(1)}`);
+
+function FondCourbes({ racine }: { racine: React.RefObject<HTMLElement | null> }) {
+  const chemins = useRef<(SVGPathElement | null)[]>([]);
+  const lueurs = useRef<(SVGPathElement | null)[]>([]);
+  const pointes = useRef<(HTMLSpanElement | null)[]>([]);
+  const [taille, setTaille] = useState({ w: 0, h: 0 });
+  const [jalons, setJalons] = useState<{ c: number; x: number; y: number }[]>([]);
+  const jalonsEls = useRef<(HTMLSpanElement | null)[]>([]);
+
+  /* Les dimensions réelles de la page. */
+  useEffect(() => {
+    const zone = racine.current;
+    if (!zone) return;
+    const lire = () => {
+      const r = zone.getBoundingClientRect();
+      setTaille((t) => (Math.abs(t.w - r.width) < 2 && Math.abs(t.h - r.height) < 24 ? t : { w: Math.round(r.width), h: Math.round(r.height) }));
+    };
+    lire();
+    const ro = new ResizeObserver(lire);
+    ro.observe(zone);
+    return () => ro.disconnect();
+  }, [racine]);
+
+  /* Les jalons : quelques points posés le long de chaque courbe. */
+  useEffect(() => {
+    if (!taille.w) return;
+    const liste: { c: number; x: number; y: number }[] = [];
+    chemins.current.forEach((p, c) => {
+      if (!p) return;
+      const L = p.getTotalLength();
+      for (let k = 1; k <= 7; k++) {
+        const q = p.getPointAtLength((L * k) / 8);
+        liste.push({ c, x: q.x, y: q.y });
+      }
+    });
+    setJalons(liste);
+  }, [taille]);
+
+  /* Le tracé suit le défilement. */
+  useEffect(() => {
+    const zone = racine.current;
+    if (!zone || !taille.w) return;
+    const tables = chemins.current.map((p) => {
+      if (!p) return null;
+      const L = p.getTotalLength();
+      const t: number[] = [];
+      for (let i = 0; i <= 240; i++) t.push(p.getPointAtLength((L * i) / 240).y);
+      return { L, t };
+    });
+    const reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let plan = false;
+    const dessine = () => {
+      plan = false;
+      const haut = zone.getBoundingClientRect();
+      /* La ligne regardée : aux deux tiers de l'écran. */
+      const regard = reduit ? haut.height : Math.min(haut.height, Math.max(0, -haut.top + window.innerHeight * 0.68));
+      tables.forEach((tb, c) => {
+        const p = chemins.current[c];
+        if (!tb || !p) return;
+        /* La fraction de la courbe dont la hauteur ne dépasse pas la ligne regardée (recherche dichotomique). */
+        let lo = 0;
+        let hi = tb.t.length - 1;
+        while (lo < hi) {
+          const m = (lo + hi + 1) >> 1;
+          if (tb.t[m] <= regard) lo = m;
+          else hi = m - 1;
+        }
+        const f = lo / (tb.t.length - 1);
+        p.style.strokeDashoffset = String(1 - f);
+        const g = lueurs.current[c];
+        if (g) g.style.strokeDashoffset = String(1 - f);
+        const pt = p.getPointAtLength(tb.L * f);
+        const tip = pointes.current[c];
+        if (tip) {
+          tip.style.left = `${pt.x}px`;
+          tip.style.top = `${pt.y}px`;
+          tip.style.opacity = f > 0.004 && f < 0.996 ? "1" : "0";
+        }
+      });
+      jalonsEls.current.forEach((j) => {
+        if (!j) return;
+        const on = Number(j.dataset.y) <= regard ? "1" : "0";
+        if (j.dataset.on !== on) j.dataset.on = on;
+      });
+    };
+    const demande = () => {
+      if (!plan) {
+        plan = true;
+        requestAnimationFrame(dessine);
+      }
+    };
+    dessine();
+    window.addEventListener("scroll", demande, { passive: true });
+    return () => window.removeEventListener("scroll", demande);
+  }, [racine, taille, jalons.length]);
+
+  if (!taille.w) return <div className="ax-courbes" aria-hidden="true" />;
+  return (
+    <div className="ax-courbes" aria-hidden="true">
+      <svg viewBox={`0 0 ${taille.w} ${taille.h}`} width={taille.w} height={taille.h}>
+        {COURBES.map((c, i) => {
+          const d = mise(c.d, taille.w, taille.h);
+          return (
+            <g key={c.classe} className={`ax-co ax-co-${c.classe}`}>
+              <path d={d} pathLength={1} className="ax-co-fond" />
+              <path d={d} pathLength={1} className="ax-co-lueur" ref={(el) => { lueurs.current[i] = el; }} />
+              <path d={d} pathLength={1} className="ax-co-trait" ref={(el) => { chemins.current[i] = el; }} />
+            </g>
+          );
+        })}
+      </svg>
+      {COURBES.map((c, i) => (
+        <span key={c.classe} className={`ax-co-pointe ax-co-${c.classe}`} ref={(el) => { pointes.current[i] = el; }} />
+      ))}
+      {jalons.map((p, k) => (
+        <span
+          key={`${taille.w}-${k}`}
+          className={`ax-co-jalon ax-co-${COURBES[p.c].classe}`}
+          data-y={p.y}
+          data-on="0"
+          ref={(el) => { jalonsEls.current[k] = el; }}
+          style={{ left: p.x, top: p.y }}
+        />
+      ))}
+    </div>
+  );
 }
 
 /** Un bloc qui se lève. `d` est le retard, en millisecondes. */
@@ -520,9 +664,10 @@ const INDICS = [
 ] as const;
 
 function fmt(v: number, u: (typeof INDICS)[number]["unite"]) {
-  if (u === "hab") return `${nf(v, v >= 100 ? 0 : 1)} M`;
-  if (u === "pct") return `${nf(v)} %`;
-  if (u === "usd") return `${Math.round(v).toLocaleString("fr-FR")} $`;
+  /* Espaces insécables : un compteur ne doit jamais passer sur deux lignes pendant qu'il roule. */
+  if (u === "hab") return `${nf(v, v >= 100 ? 0 : 1)}\u00a0M`;
+  if (u === "pct") return `${nf(v)}\u00a0%`;
+  if (u === "usd") return `${Math.round(v).toLocaleString("fr-FR")}\u00a0$`;
   return fmtPib(v);
 }
 
@@ -737,7 +882,11 @@ function Articles({ dette, lus = [] }: { dette: Props["dette"]; lus?: { rubrique
                 </>
               );
               return (
-                <li key={a.titre} className={`ax-na-c ax-na-c${i % 4}`}>
+                <li
+                  key={a.titre}
+                  className={`ax-na-c ax-na-c${i % 4}`}
+                  style={{ "--i": i, "--v": `${Math.round(Math.sin(i * 0.85) * 34)}px` } as React.CSSProperties}
+                >
                   {lien ? <a href={lien}>{corps}</a> : <div className="ax-na-attente">{corps}</div>}
                 </li>
               );
@@ -969,6 +1118,7 @@ export function AnalysesPage(props: Props) {
     <div className="cg ax" ref={racine}>
       <EnTete />
       <div className="ax-fond" aria-hidden="true" />
+      <FondCourbes racine={racine} />
 
       <Ouverture {...props} />
       <div className="ax-col ax-col-haut">
