@@ -39,9 +39,9 @@
 }
 
 :root[data-concept="clair"] .dos {
-  --dos-bg: #f5f2fc;
+  --dos-bg: #fcfbff;
   --dos-surface: #ffffff;
-  --dos-surface-2: #efe9fb;
+  --dos-surface-2: #f6f2fd;
   --dos-ligne: rgba(30, 20, 80, 0.1);
   --dos-encre: #15102e;
   --dos-encre-2: #4b4570;
@@ -52,12 +52,12 @@
   --dos-menthe: #0c8a5c;
   --dos-corail: #d03a55;
   --dos-ombre: 0 24px 50px -30px rgba(60, 30, 140, 0.35);
-  --dos-lueur-a: rgba(140, 100, 255, 0.28);
-  --dos-lueur-b: rgba(255, 150, 190, 0.22);
+  --dos-lueur-a: rgba(140, 100, 255, 0.15);
+  --dos-lueur-b: rgba(255, 150, 190, 0.11);
 }
 
 body:has(.dos) { background: #0a0912; }
-:root[data-concept="clair"] body:has(.dos) { background: #f5f2fc; }
+:root[data-concept="clair"] body:has(.dos) { background: #fcfbff; }
 
 /* Le fond : deux lueurs douces, fixes, qui ne coûtent aucun calcul. */
 .dos-fond {

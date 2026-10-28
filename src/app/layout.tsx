@@ -16,7 +16,7 @@ import { SITE_URL as siteUrl } from "@/lib/site";
 /* L'écran entier : le fond de la page passe sous l'encoche et l'heure, comme sur une app. */
 export const viewport: Viewport = {
   viewportFit: "cover",
-  themeColor: "#f6f5f2",
+  themeColor: "#fdfdfe",
 };
 
 export const metadata: Metadata = {
@@ -101,7 +101,7 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning className={inter.variable} data-concept="clair">
       <head>
-        <meta name="theme-color" content="#f6f5f2" />
+        <meta name="theme-color" content="#fdfdfe" />
         {/* Le thème des pages Visualize, posé avant le premier rendu. Le défaut
             est le clair ; seul un choix explicite de la nuit le remplace. Sans
             ce passage, une page choisie en nuit apparaîtrait claire le temps

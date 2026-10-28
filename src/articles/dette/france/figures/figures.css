@@ -501,10 +501,10 @@ body:has(.dp) { background: var(--nuit); }
    blanche.
    ═══════════════════════════════════════════════════════════════════════════ */
 :root[data-concept="clair"] .dp {
-  --nuit: #f6f5f2;
-  --nuit-2: #eeece7;
+  --nuit: #fdfdfe;
+  --nuit-2: #f6f7fa;
   --surface: #ffffff;
-  --surface-2: #f2f0eb;
+  --surface-2: #f4f5f8;
   --encre: #0e1116;
   --encre-2: #3f474f;
   --encre-3: #6b737b;

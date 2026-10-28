@@ -13,7 +13,7 @@
    ne s'applique qu'aux pages qui portent un `.cg` : aucune page existante
    n'est touchée. */
 body:has(.cg) { background: #05080c; }
-:root[data-concept="clair"] body:has(.cg) { background: #f6f5f2; }
+:root[data-concept="clair"] body:has(.cg) { background: #fdfdfe; }
 
 .cg {
   --fond: #05080c;
@@ -81,11 +81,11 @@ body:has(.cg) { background: #05080c; }
    les mêmes teintes, pas les mêmes valeurs.
    ═══════════════════════════════════════════════════════════════════════════ */
 :root[data-concept="clair"] .cg {
-  --fond: #f6f5f2;
-  --fond-2: #eeece7;
-  --fond-3: #f1efeb;
+  --fond: #fdfdfe;
+  --fond-2: #f6f7fa;
+  --fond-3: #fafbfc;
   --surface: #ffffff;
-  --surface-2: #f2f0eb;
+  --surface-2: #f4f5f8;
   --encre: #0e1116;
   --encre-2: #3f474f;
   --encre-3: #6b737b;
@@ -99,9 +99,9 @@ body:has(.cg) { background: #05080c; }
 /* De jour, la lumière vient du haut. */
 :root[data-concept="clair"] .cg::before {
   background:
-    radial-gradient(ellipse 70% 50% at 62% 18%, rgba(47, 111, 138, 0.07), transparent 62%),
-    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(154, 101, 50, 0.05), transparent 66%),
-    linear-gradient(180deg, #faf9f7 0%, #f2f0ec 46%, #f6f5f2 100%);
+    radial-gradient(ellipse 70% 50% at 62% 18%, rgba(47, 111, 138, 0.04), transparent 62%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(154, 101, 50, 0.025), transparent 66%),
+    linear-gradient(180deg, #ffffff 0%, #fafbfc 46%, #fdfdfe 100%);
 }
 
 .cg-wrap {
@@ -207,16 +207,50 @@ body:has(.cg) { background: #05080c; }
   opacity: 0;
   pointer-events: none;
   white-space: nowrap;
-  transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+  will-change: width, opacity;
+  /* À la fermeture : le contenu s'efface d'abord, puis la pilule se resserre. */
+  transition: width 0.75s cubic-bezier(0.32, 0.72, 0, 1) 0.08s, opacity 0.3s ease 0s;
 }
-.cg-header-ouvert .cg-pill-corps { width: auto; opacity: 1; pointer-events: auto; }
+.cg-header-ouvert .cg-pill-corps {
+  width: auto;
+  opacity: 1;
+  pointer-events: auto;
+  transition: width 0.85s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.45s ease 0.05s;
+}
 /* Une fois ouvert, plus rien n'est rogné : la liste des monnaies déborde. */
 .cg-header-fini .cg-pill-corps { overflow: visible; }
 
-.cg-nav { display: flex; gap: 2px; }
+/* La pilule elle-même respire : son ombre s'élargit à l'ouverture. */
+.cg-pill { transition: box-shadow 0.6s cubic-bezier(0.32, 0.72, 0, 1), background 0.4s ease; }
+.cg-header-ouvert .cg-pill { box-shadow: 0 22px 60px -22px var(--ombre-portee); }
+
+.cg-nav { position: relative; display: flex; gap: 2px; }
 .cg-nav { margin-left: 4px; }
+
+/* Le glisseur : une pastille qui voyage d'un onglet à l'autre. Elle s'étire en route (la largeur et la position
+   n'ont pas la même courbe), et dépasse un peu sa cible avant de se poser. */
+.cg-glisse {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 0;
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--mn-vif) 15%, transparent), color-mix(in srgb, var(--mn-vif-2) 10%, transparent));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mn-vif) 20%, transparent), 0 8px 20px -12px color-mix(in srgb, var(--mn-vif) 70%, transparent);
+  transition: opacity 0.25s ease;
+}
+.cg-glisse-anime {
+  transition: transform 0.55s cubic-bezier(0.34, 1.45, 0.5, 1), width 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+}
+.cg-glisse-on { opacity: 1; }
+
 .cg-nav a,
 .cg-nav-bientot {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -228,19 +262,26 @@ body:has(.cg) { background: #05080c; }
   text-decoration: none;
   white-space: nowrap;
   opacity: 0;
-  transform: translateY(-5px);
-  transition: opacity 0.3s ease, transform 0.3s ease, color 0.25s, background 0.25s;
+  transform: translateY(-6px);
+  /* À la fermeture, les onglets s'effacent en sens inverse, vite. */
+  transition: opacity 0.2s ease calc((6 - var(--i, 0)) * 18ms), transform 0.3s ease calc((6 - var(--i, 0)) * 18ms), color 0.25s;
 }
 .cg-header-ouvert .cg-nav a,
 .cg-header-ouvert .cg-nav-bientot {
   opacity: 1;
   transform: none;
-  transition: opacity 0.55s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), color 0.25s, background 0.25s;
-  transition-delay: calc(var(--i, 0) * 40ms + 140ms), calc(var(--i, 0) * 40ms + 140ms), 0s, 0s;
+  transition: opacity 0.6s ease calc(var(--i, 0) * 45ms + 160ms), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--i, 0) * 45ms + 160ms), color 0.25s;
 }
-.cg-header-ouvert .cg-nav a:hover { color: var(--encre); background: color-mix(in srgb, var(--voile) 10%, transparent); transition-delay: 0s; }
+/* Au survol, le texte se soulève d'un souffle et prend toute son encre. */
+.cg-header-ouvert .cg-nav a:hover,
+.cg-header-ouvert .cg-nav a:focus-visible {
+  color: var(--encre);
+  transform: translateY(-1px);
+  transition: opacity 0s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s;
+  outline: none;
+}
 .cg-header .cg-nav a.cg-nav-on,
-.cg-header .cg-nav a.cg-nav-on:hover { color: #fff; background: linear-gradient(135deg, var(--mn-vif), var(--mn-vif-2)); }
+.cg-header .cg-nav a.cg-nav-on:hover { color: #fff; background: linear-gradient(135deg, var(--mn-vif), var(--mn-vif-2)); box-shadow: 0 10px 22px -12px var(--mn-vif); }
 .cg-nav-bientot { color: var(--encre-3); cursor: default; }
 .cg-nav-bientot em {
   font-style: normal;
@@ -350,13 +391,14 @@ body:has(.cg) { background: #05080c; }
     transition-delay: 0s;
   }
   .cg-nav { flex-direction: column; gap: 2px; margin-left: 0; }
+  .cg-glisse { display: none; }
   .cg-nav a, .cg-nav-bientot { padding: 12px 14px; font-size: 15px; }
   .cg-sep { width: auto; height: 1px; margin: 6px 4px; }
   .cg-bout { justify-content: space-between; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cg-pill-corps, .cg-nav a, .cg-nav-bientot, .cg-logo-m i, .cg-pill .cg-cnx { animation: none !important; transition: none !important; }
+  .cg-pill-corps, .cg-nav a, .cg-nav-bientot, .cg-logo-m i, .cg-pill .cg-cnx, .cg-glisse { animation: none !important; transition: none !important; }
 }
 
 

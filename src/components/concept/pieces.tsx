@@ -257,6 +257,23 @@ export function EnTete({ actif }: { actif?: string }) {
     };
   }, []);
   const deplie = ouvert || enHaut;
+
+  /* Le glisseur : une pastille qui suit l'onglet survolé en s'étirant d'un onglet à l'autre. */
+  const nav = useRef<HTMLElement>(null);
+  const [glisse, setGlisse] = useState<{ x: number; w: number; vu: boolean; anime: boolean }>({ x: 0, w: 0, vu: false, anime: false });
+  const versLien = (cible: EventTarget | null) => {
+    const a = (cible as HTMLElement | null)?.closest?.("a");
+    const n = nav.current;
+    if (!a || !n || !n.contains(a)) return;
+    const x = a.offsetLeft;
+    const w = a.offsetWidth;
+    setGlisse((g) => {
+      if (g.vu) return { x, w, vu: true, anime: true };
+      /* Première entrée : la pastille apparaît sur l'onglet sans voyager depuis l'ancien. */
+      requestAnimationFrame(() => setGlisse((h) => ({ ...h, vu: true, anime: true })));
+      return { x, w, vu: false, anime: false };
+    });
+  };
   /* Vrai quand l'ouverture est terminée : le corps cesse alors de rogner son
      contenu, pour laisser la liste des monnaies déborder. */
   const [fini, setFini] = useState(false);
@@ -319,7 +336,20 @@ export function EnTete({ actif }: { actif?: string }) {
         </a>
 
         <div className="cg-pill-corps">
-          <nav className="cg-nav" aria-label="Rubriques">
+          <nav
+            ref={nav}
+            className="cg-nav"
+            aria-label="Rubriques"
+            onPointerOver={(e) => e.pointerType === "mouse" && versLien(e.target)}
+            onFocus={(e) => versLien(e.target)}
+            onPointerLeave={() => setGlisse((g) => ({ ...g, vu: false }))}
+            onBlur={() => setGlisse((g) => ({ ...g, vu: false }))}
+          >
+            <span
+              className={`cg-glisse${glisse.vu ? " cg-glisse-on" : ""}${glisse.anime ? " cg-glisse-anime" : ""}`}
+              style={{ transform: `translateX(${glisse.x}px)`, width: glisse.w }}
+              aria-hidden="true"
+            />
             {NAV.map((n, i) => (
               <Lien key={n.label} n={n} actif={actif} rang={i} />
             ))}

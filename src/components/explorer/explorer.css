@@ -12,7 +12,7 @@
   --xp-encre-3: rgba(21, 17, 43, 0.42);
   --xp-vif: #5b3df0;
   position: relative; z-index: 1; height: 100svh; min-height: 640px; overflow: hidden; color: var(--xp-encre);
-  background: radial-gradient(70% 70% at 53% 48%, #ffffff 0%, #f4f5fb 55%, #e9ebf6 100%);
+  background: radial-gradient(70% 70% at 53% 48%, #ffffff 0%, #fafbfe 55%, #f2f4fa 100%);
 }
 :root:not([data-concept="clair"]) .xp {
   --verre: rgba(20, 24, 46, 0.6);

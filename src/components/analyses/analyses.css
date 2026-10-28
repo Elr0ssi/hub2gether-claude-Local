@@ -31,15 +31,15 @@
   --ax-vif-2: #6f45f0;
   --ax-doux: rgba(91, 45, 224, 0.1);
   --ax-carte: #ffffff;
-  --ax-carte-2: #efe9fb;
+  --ax-carte-2: #f6f2fd;
   --ax-ligne: rgba(30, 20, 80, 0.1);
   --ax-menthe: #0c8a5c;
   --ax-corail: #d03a55;
   --ax-ombre: 0 26px 50px -32px rgba(60, 30, 140, 0.4);
-  background: #f5f2fc;
+  background: #fcfbff;
 }
 body:has(.ax) { background: #08070e; }
-:root[data-concept="clair"] body:has(.ax) { background: #f5f2fc; }
+:root[data-concept="clair"] body:has(.ax) { background: #fcfbff; }
 .ax::before { display: none; }
 
 .ax-fond {
@@ -53,8 +53,8 @@ body:has(.ax) { background: #08070e; }
 }
 :root[data-concept="clair"] .ax-fond {
   background:
-    radial-gradient(55% 45% at 12% 0%, rgba(140, 100, 255, 0.28), transparent 70%),
-    radial-gradient(45% 40% at 95% 18%, rgba(255, 150, 190, 0.24), transparent 70%);
+    radial-gradient(55% 45% at 12% 0%, rgba(140, 100, 255, 0.15), transparent 70%),
+    radial-gradient(45% 40% at 95% 18%, rgba(255, 150, 190, 0.11), transparent 70%);
 }
 .ax { display: block; }
 .ax > .ax-ouv, .ax > .ax-cles, .ax > .ax-col, .ax > .cg-pied { position: relative; z-index: 1; }
