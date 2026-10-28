@@ -643,6 +643,7 @@ function Ouverture({ reperes, donnees, annee, dette }: Props) {
                     : { fond: "rgba(255,255,255,0.82)", bord: "rgba(91,45,224,0.16)", ombre: "0 12px 28px rgba(60,30,140,0.2)", chiffre: "#17112e", label: "rgba(23,17,46,0.62)" }
                 }
                 markerSize="clamp(30px, 3.4vw, 40px)"
+                atmosphere={false}
               />
             )}
           </div>

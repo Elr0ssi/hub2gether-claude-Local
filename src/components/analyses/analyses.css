@@ -997,3 +997,6 @@ a.ax-dos:hover { border-color: var(--ax-ligne); }
 .ax-co-jalon[data-on="1"] { opacity: 0.5; transform: none; }
 @media (max-width: 700px) { .ax-co-trait { stroke-width: 1.6; } .ax-co-lueur { stroke-width: 12; } .ax-co-jalon { display: none; } .ax-co-c { display: none; } }
 @media (prefers-reduced-motion: reduce) { .ax-co-jalon, .ax-co-pointe { transition: none; } }
+
+/* Plus de grands cercles violets sous le globe d'accueil : la sphère se détache d'elle-même. */
+.ax-globe-halo { display: none; }

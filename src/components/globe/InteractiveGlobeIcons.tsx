@@ -132,6 +132,8 @@ export interface InteractiveGlobeIconsProps {
   /** Body of the sphere. Defaults to the near-white used on the home page. */
   sphereColor?: string;
   /** Les cartes de chiffres posées sur la sphère : par défaut du verre sombre à texte blanc ; en thème clair, du verre blanc à texte sombre. */
+  /** Le halo diffus autour de la sphère (vrai par défaut). */
+  atmosphere?: boolean;
   carte?: { fond: string; bord: string; ombre: string; chiffre: string; label: string };
 }
 
@@ -147,6 +149,7 @@ export default function InteractiveGlobeIcons({
   iconColor,
   sphereColor = "#f6f8f7",
   carte = CARTE_SOMBRE,
+  atmosphere = true,
 }: InteractiveGlobeIconsProps = {}) {
   const mountRef = useRef<HTMLDivElement>(null);
   const markerElsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -223,7 +226,7 @@ export default function InteractiveGlobeIcons({
       opacity: 0.06 * Math.min(1, 620 / W),
       side: THREE.BackSide,
     });
-    globeGroup.add(new THREE.Mesh(atmosGeom, atmosMat));
+    if (atmosphere) globeGroup.add(new THREE.Mesh(atmosGeom, atmosMat));
 
     // --- Land dot matrix (filled in once geo data is ready) ---
     const dotsMat = new THREE.PointsMaterial({
