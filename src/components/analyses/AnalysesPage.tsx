@@ -136,6 +136,22 @@ function ellipse(cx: number, cy: number, rx: number, ry: number, rot: number, se
   return { x: cx + ex * c - ey * s, y: cy + ex * s + ey * c, tx: tx * c - ty * s, ty: tx * s + ty * c };
 }
 
+/** Comment chaque courbe se comporte dans chaque partie de la page : des repères (hauteur dans la partie, de 0 à 1 ; position horizontale, de 0 à 1).
+ *  Ce sont les parties qui dictent le mouvement : des rails le long des marges quand la partie est dense, un croisement quand
+ *  elle est aérée, une convergence vers le centre devant deux cartes, une diagonale devant une file qui défile. */
+const PROFILS: { sel: string; courbes: [number, number][][] }[] = [
+  { sel: "#presentation", courbes: [[[0.05, 0.1], [0.5, 0.93], [0.95, 0.12]], [[0.05, 0.9], [0.5, 0.5], [0.95, 0.88]], [[0.05, 0.5], [0.5, 0.06], [0.95, 0.5]]] },
+  { sel: "#direct", courbes: [[[0, 0.05], [0.5, 0.075], [1, 0.05]], [[0, 0.5], [0.5, 0.5], [1, 0.5]], [[0, 0.955], [0.5, 0.93], [1, 0.955]]] },
+  { sel: "#classements", courbes: [[[0, 0.1], [0.35, 0.03], [0.7, 0.14], [1, 0.06]], [[0, 0.46], [0.3, 0.3], [0.65, 0.6], [1, 0.4]], [[0, 0.96], [0.5, 0.985], [1, 0.95]]] },
+  { sel: "#cartes", courbes: [[[0, 0.18], [0.5, 0.49], [1, 0.16]], [[0, 0.82], [0.5, 0.51], [1, 0.84]], [[0, 0.5], [0.5, 0.5], [1, 0.5]]] },
+  { sel: "#articles", courbes: [[[0, 0.02], [0.5, 0.3], [1, 0.72]], [[0, 0.22], [0.5, 0.58], [1, 0.97]], [[0, 0.5], [0.5, 0.78], [1, 0.3]]] },
+  { sel: "#position", courbes: [[[0, 0.92], [0.5, 0.08], [1, 0.9]], [[0, 0.08], [0.5, 0.92], [1, 0.14]], [[0, 0.5], [0.5, 0.5], [1, 0.5]]] },
+  { sel: ".ax-presse", courbes: [[[0, 0.1], [1, 0.88]], [[0, 0.9], [1, 0.12]], [[0, 0.5], [1, 0.5]]] },
+  { sel: "#fonctionnement", courbes: [[[0, 0.04], [0.5, 0.12], [1, 0.04]], [[0, 0.96], [0.5, 0.88], [1, 0.96]], [[0, 0.5], [0.5, 0.28], [1, 0.62]]] },
+  { sel: ".ax-faq", courbes: [[[0, 0.04], [1, 0.05]], [[0, 0.96], [1, 0.95]], [[0, 0.5], [0.5, 0.97], [1, 0.5]]] },
+  { sel: ".ax-fin", courbes: [[[0, 0.1], [1, 0.46]], [[0, 0.9], [1, 0.54]], [[0, 0.5], [1, 0.5]]] },
+];
+
 function construireCourbes(zone: HTMLElement): GeoCourbe[] | null {
   const zr = zone.getBoundingClientRect();
   const W = zr.width;
@@ -168,13 +184,31 @@ function construireCourbes(zone: HTMLElement): GeoCourbe[] | null {
   return profils.map((pf, c) => {
     const rx1 = R * pf.k1[0];
     const ry1 = R * pf.k1[1];
-    /* Les étapes de la traversée, d'un bord à l'autre. */
-    const A = etroit ? pf.A * 0.8 : pf.A;
     const jal: [number, number][] = [];
     const etapes: [number, number][] = [];
-    for (let k = 0; k < n; k++) {
-      const u = k / (n - 1);
-      etapes.push([(0.5 + A * Math.sin(pf.ph + k * pf.om)) * W, yDebut + (yFin - yDebut) * u]);
+    /* Les repères viennent des parties de la page, à leurs vraies positions. */
+    for (const pr of PROFILS) {
+      const el = zone.querySelector<HTMLElement>(pr.sel);
+      if (!el) continue;
+      const r = el.getBoundingClientRect();
+      const top = r.top - zr.top;
+      if (top + r.height < yDebut || top > yFin) continue;
+      for (const [u, x] of pr.courbes[c]) {
+        const y = top + r.height * u;
+        if (y < yDebut + 40 || y > yFin - 20) continue;
+        /* Sur petit écran, tout se rapproche du centre : les marges n'existent plus. */
+        etapes.push([(etroit ? 0.5 + (x - 0.5) * 0.7 : x) * W, y]);
+      }
+    }
+    etapes.sort((p, q) => p[1] - q[1]);
+    /* Deux repères trop proches en hauteur feraient une boucle : on garde le premier. */
+    for (let i = etapes.length - 1; i > 0; i--) if (etapes[i][1] - etapes[i - 1][1] < 70) etapes.splice(i, 1);
+    if (etapes.length < 2) {
+      etapes.length = 0;
+      for (let k = 0; k < n; k++) {
+        const u = k / (n - 1);
+        etapes.push([(0.5 + 0.35 * Math.sin(pf.ph + k * pf.om)) * W, yDebut + (yFin - yDebut) * u]);
+      }
     }
     /* Le point de sortie de l'orbite du globe : celui dont la tangente vise la première étape. */
     let t1 = DEUX_PI + 0.4;
@@ -844,7 +878,7 @@ function EnDirect({ pib, population }: { pib: Props["pib"]; population: Props["p
           </ol>
           </div>
         </div>
-        <div className="ax-cles-rail" aria-hidden="true">
+        <div className="ax-cles-rail" aria-hidden="true" style={{ opacity: p > 0.985 ? 0 : 1 }}>
           <span style={{ transform: `scaleX(${p})` }} />
         </div>
       </div>

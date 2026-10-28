@@ -1000,3 +1000,8 @@ a.ax-dos:hover { border-color: var(--ax-ligne); }
 
 /* Plus de grands cercles violets sous le globe d'accueil : la sphère se détache d'elle-même. */
 .ax-globe-halo { display: none; }
+
+/* Le rail de progression s'efface en fin de partie : plus de trait plein avant les classements. */
+.ax-cles-rail { transition: opacity 0.4s ease; }
+/* Plus de lueur floue derrière les courbes : elle faisait un halo violet autour du globe d'accueil. */
+.ax-co-lueur { display: none; }
