@@ -728,9 +728,9 @@ a.ax-dos:hover { transform: translateY(-5px); border-color: var(--ax-vif); }
 .ax-na-rail { grid-column: span 7; min-width: 0; }
 .ax-na-piste {
   list-style: none; margin: -14px -20px -26px 0; padding: 14px 72px 26px 0; display: flex; gap: 14px; overflow-x: auto;
-  scroll-snap-type: x proximity; mask-image: linear-gradient(90deg, #000 calc(100% - 72px), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - 72px), transparent); overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch;
 }
-.ax-na-c { flex: 0 0 clamp(210px, 19vw, 262px); scroll-snap-align: start; }
+.ax-na-c { flex: 0 0 clamp(210px, 19vw, 262px); }
 .ax-na-c a, .ax-na-attente {
   position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; min-height: 260px; height: 100%;
   padding: 20px; border-radius: 26px; color: #fff; text-decoration: none; overflow: hidden; background: var(--cv);
@@ -806,7 +806,7 @@ a.ax-dos:hover { border-color: var(--ax-ligne); }
 
 /* La file se fait glisser à la souris. */
 .ax-na-piste { cursor: grab; user-select: none; -webkit-user-select: none; }
-.ax-na-piste[data-glisse] { cursor: grabbing; scroll-snap-type: none; }
+.ax-na-piste[data-glisse] { cursor: grabbing; }
 .ax-na-piste[data-glisse] a { pointer-events: none; }
 .ax-na-piste a { -webkit-user-drag: none; }
 
@@ -950,16 +950,17 @@ a.ax-dos:hover { border-color: var(--ax-ligne); }
 /* ═══════════════════════════════════════════════════════════════════════════
    LES ARTICLES ARRIVENT EN VAGUE, une seule fois, quand la section entre à l'écran
    ═══════════════════════════════════════════════════════════════════════════ */
-.ax[data-js] .ax-na-rail[data-vu="1"] .ax-na-c {
-  animation: ax-vague 1.05s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-  animation-delay: calc(var(--i, 0) * 90ms + 180ms);
+.ax[data-js] .ax-na-piste[data-vague="1"] .ax-na-c {
+  animation: ax-vague 1s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  /* Toutes les vignettes arrivent d'un coup de vague : au-delà de la septième, elles suivent la septième. */
+  animation-delay: calc(min(var(--i, 0), 6) * 80ms + 80ms);
 }
 @keyframes ax-vague {
   0% { opacity: 0; transform: translate(-90px, var(--v, 0px)) scale(0.9) rotate(-3deg); }
   55% { opacity: 1; }
   100% { opacity: 1; transform: none; }
 }
-@media (prefers-reduced-motion: reduce) { .ax[data-js] .ax-na-rail[data-vu="1"] .ax-na-c { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .ax[data-js] .ax-na-piste[data-vague="1"] .ax-na-c { animation: none; } }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE FOND QUI SE TRACE : des courbes qui traversent la page au fil du défilement
@@ -973,26 +974,26 @@ a.ax-dos:hover { border-color: var(--ax-ligne); }
 .ax-co { fill: none; stroke-linecap: round; }
 .ax-co path { fill: none; }
 /* Le tracé à venir : un filet à peine visible, pour qu'on devine où la courbe ira. */
-.ax-co-fond { stroke: var(--co); stroke-width: 1; stroke-dasharray: 3 9; opacity: 0.1; }
+.ax-co-fond { stroke: var(--co); stroke-width: 1; stroke-dasharray: 2 10; opacity: 0.06; }
 /* Le tracé déjà fait : plein, avec une lueur diffuse dessous. */
 .ax-co-trait, .ax-co-lueur { stroke: var(--co); stroke-dasharray: 1 1; stroke-dashoffset: 1; }
-.ax-co-trait { stroke-width: 2.2; opacity: 0.7; }
-.ax-co-lueur { stroke-width: 22; opacity: 0.1; filter: blur(9px); }
-.ax-co-b .ax-co-trait { stroke-width: 1.6; opacity: 0.55; }
-.ax-co-c .ax-co-trait { stroke-width: 1.4; opacity: 0.5; }
-.ax-co-b .ax-co-lueur, .ax-co-c .ax-co-lueur { stroke-width: 16; opacity: 0.07; }
+.ax-co-trait { stroke-width: 1.8; opacity: 0.36; }
+.ax-co-lueur { stroke-width: 20; opacity: 0.045; filter: blur(10px); }
+.ax-co-b .ax-co-trait { stroke-width: 1.4; opacity: 0.3; }
+.ax-co-c .ax-co-trait { stroke-width: 1.2; opacity: 0.26; }
+.ax-co-b .ax-co-lueur, .ax-co-c .ax-co-lueur { stroke-width: 14; opacity: 0.035; }
 /* La pointe : un point qui brille là où la courbe se trace. */
 .ax-co-pointe {
-  position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; opacity: 0;
-  background: var(--co); box-shadow: 0 0 0 5px color-mix(in srgb, var(--co) 20%, transparent), 0 0 26px 6px color-mix(in srgb, var(--co) 55%, transparent);
-  transition: opacity 0.3s;
+  position: absolute; left: 0; top: 0; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; opacity: 0; will-change: transform;
+  background: var(--co); box-shadow: 0 0 0 4px color-mix(in srgb, var(--co) 12%, transparent), 0 0 20px 4px color-mix(in srgb, var(--co) 32%, transparent);
+  transition: opacity 0.4s;
 }
 /* Les jalons : de petits points qui s'allument quand le tracé les atteint. */
 .ax-co-jalon {
-  position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--ax-carte, #fff);
+  position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: var(--ax-carte, #fff);
   border: 2px solid var(--co); opacity: 0; transform: scale(0.2);
   transition: opacity 0.5s ease, transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.ax-co-jalon[data-on="1"] { opacity: 0.85; transform: none; }
+.ax-co-jalon[data-on="1"] { opacity: 0.5; transform: none; }
 @media (max-width: 700px) { .ax-co-trait { stroke-width: 1.6; } .ax-co-lueur { stroke-width: 12; } .ax-co-jalon { display: none; } .ax-co-c { display: none; } }
 @media (prefers-reduced-motion: reduce) { .ax-co-jalon, .ax-co-pointe { transition: none; } }

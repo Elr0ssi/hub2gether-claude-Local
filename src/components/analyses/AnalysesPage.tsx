@@ -105,32 +105,182 @@ function useApparitions(racine: React.RefObject<HTMLElement | null>) {
   }, [racine]);
 }
 
-/* ── Le fond qui se trace : des courbes qui traversent la page ─────────────────────
-   Trois courbes parcourent la page de haut en bas, d'un bord à l'autre. Elles se dessinent au fil du défilement,
-   jusqu'à la ligne que le lecteur regarde, avec un point lumineux à leur pointe et des jalons qui s'allument
-   au passage. Un seul SVG derrière le contenu ; ses courbes sont recalculées aux dimensions réelles de la page,
-   pour que le trait garde la même épaisseur partout. */
-const COURBES = [
-  { d: "M 900 40 C 900 330, 130 330, 130 700 S 880 1060, 860 1450 S 130 1790, 150 2200 S 860 2540, 760 2960", classe: "a" },
-  { d: "M 120 120 C 120 460, 860 440, 880 820 S 150 1200, 170 1580 S 850 1930, 830 2330 S 220 2680, 300 2970", classe: "b" },
-  { d: "M 500 20 C 640 300, 360 520, 520 840 S 700 1300, 480 1560 S 330 2000, 520 2260 S 690 2700, 500 2990", classe: "c" },
-] as const;
-const REF_L = 1000;
-const REF_H = 3000;
+/* ── Le fond de courbes : elles tournent autour du globe, nous suivent, puis tournent autour de l'horizon ──────────
+   Trois courbes. Au départ, chacune fait des tours autour du globe de l'accueil (un point lumineux la parcourt).
+   Au défilement, elle se déroule et traverse la page en nous suivant, puis, arrivée en bas, s'enroule en orbite autour
+   de l'horizon final, sur les mêmes ellipses que ses satellites. Le tracé est lissé dans le temps (il glisse au lieu
+   de sauter), et recalculé aux dimensions et aux positions réelles des deux globes. */
+interface GeoCourbe {
+  d: string;
+  /** Où la courbe quitte l'orbite du globe, et où elle rejoint celle de l'horizon. */
+  sortie: [number, number];
+  arrivee: [number, number];
+  jalons: [number, number][];
+}
 
-/** Les points d'un tracé écrit dans le repère 1000 x 3000, ramenés aux dimensions de la page. */
-const mise = (d: string, w: number, h: number) =>
-  d.replace(/(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)/g, (_, x: string, y: string) => `${((+x / REF_L) * w).toFixed(1)} ${((+y / REF_H) * h).toFixed(1)}`);
+const DEUX_PI = Math.PI * 2;
+const norme = (x: number, y: number) => {
+  const n = Math.hypot(x, y) || 1;
+  return [x / n, y / n] as const;
+};
+
+/** Un point d'une ellipse inclinée, et sa tangente (dans le sens `sens`). */
+function ellipse(cx: number, cy: number, rx: number, ry: number, rot: number, sens: 1 | -1, t: number) {
+  const th = sens * t;
+  const ex = rx * Math.cos(th);
+  const ey = ry * Math.sin(th);
+  const tx = -sens * rx * Math.sin(th);
+  const ty = sens * ry * Math.cos(th);
+  const c = Math.cos(rot);
+  const s = Math.sin(rot);
+  return { x: cx + ex * c - ey * s, y: cy + ex * s + ey * c, tx: tx * c - ty * s, ty: tx * s + ty * c };
+}
+
+function construireCourbes(zone: HTMLElement): GeoCourbe[] | null {
+  const zr = zone.getBoundingClientRect();
+  const W = zr.width;
+  const H = zr.height;
+  const globe = zone.querySelector<HTMLElement>(".ax-globe-c");
+  const orb = zone.querySelector<HTMLElement>(".ax-hz-orbite-1");
+  if (!globe || !orb || W < 10) return null;
+  const gr = globe.getBoundingClientRect();
+  const or = orb.getBoundingClientRect();
+  const cx1 = gr.left - zr.left + gr.width / 2;
+  const cy1 = gr.top - zr.top + gr.height / 2;
+  const R = Math.max(60, gr.width / 2);
+  const cx2 = or.left - zr.left + or.width / 2;
+  const cy2 = or.top - zr.top + or.height / 2;
+  const rx2 = orb.offsetWidth / 2;
+  const ry2 = orb.offsetHeight / 2;
+  const etroit = W < 700;
+
+  /* Les trois courbes : inclinaison de l'orbite du globe, sens, et profil de la traversée. */
+  const profils = [
+    { rot1: (-24 * Math.PI) / 180, k1: [1.2, 0.46], sens: 1 as const, t0: -0.6, A: 0.4, ph: 0, om: 1.9, k2: [1, 1], rot2: (-6 * Math.PI) / 180 },
+    { rot1: (18 * Math.PI) / 180, k1: [1.34, 0.52], sens: -1 as const, t0: 2.2, A: 0.4, ph: Math.PI, om: 1.9, k2: [0.8, 0.72], rot2: (5 * Math.PI) / 180 },
+    { rot1: (64 * Math.PI) / 180, k1: [1.1, 0.4], sens: 1 as const, t0: 4.1, A: 0.2, ph: 1.2, om: 2.3, k2: [0.62, 0.52], rot2: (-2 * Math.PI) / 180 },
+  ];
+
+  const yDebut = cy1 + R * 1.05;
+  const yFin = cy2 - ry2 * 1.7;
+  const n = Math.max(6, Math.min(20, Math.round((yFin - yDebut) / 650)));
+
+  return profils.map((pf, c) => {
+    const rx1 = R * pf.k1[0];
+    const ry1 = R * pf.k1[1];
+    /* Les étapes de la traversée, d'un bord à l'autre. */
+    const A = etroit ? pf.A * 0.8 : pf.A;
+    const jal: [number, number][] = [];
+    const etapes: [number, number][] = [];
+    for (let k = 0; k < n; k++) {
+      const u = k / (n - 1);
+      etapes.push([(0.5 + A * Math.sin(pf.ph + k * pf.om)) * W, yDebut + (yFin - yDebut) * u]);
+    }
+    /* Le point de sortie de l'orbite du globe : celui dont la tangente vise la première étape. */
+    let t1 = DEUX_PI + 0.4;
+    let meilleur = -2;
+    for (let t = DEUX_PI + 0.3; t < 2 * DEUX_PI; t += 0.04) {
+      const e = ellipse(cx1, cy1, rx1, ry1, pf.rot1, pf.sens, pf.t0 + t);
+      const [tx, ty] = norme(e.tx, e.ty);
+      const [dx, dy] = norme(etapes[0][0] - e.x, etapes[0][1] - e.y);
+      const sc = tx * dx + ty * dy;
+      if (sc > meilleur) {
+        meilleur = sc;
+        t1 = t;
+      }
+    }
+    const orbite1: [number, number][] = [];
+    for (let t = 0; t <= t1; t += 0.07) {
+      const e = ellipse(cx1, cy1, rx1, ry1, pf.rot1, pf.sens, pf.t0 + t);
+      orbite1.push([e.x, e.y]);
+    }
+    const sE = ellipse(cx1, cy1, rx1, ry1, pf.rot1, pf.sens, pf.t0 + t1);
+    orbite1.push([sE.x, sE.y]);
+
+    /* Le point d'arrivée sur l'orbite de l'horizon : celui dont la tangente prolonge la dernière étape. */
+    const sens2: 1 | -1 = pf.sens === 1 ? -1 : 1;
+    const dern = etapes[etapes.length - 1];
+    let psi = 0;
+    let m2 = -2;
+    const rx = rx2 * pf.k2[0];
+    const ry = ry2 * pf.k2[1];
+    for (let t = 0; t < DEUX_PI; t += 0.04) {
+      const e = ellipse(cx2, cy2, rx, ry, pf.rot2, sens2, t);
+      const [tx, ty] = norme(e.tx, e.ty);
+      const [dx, dy] = norme(e.x - dern[0], e.y - dern[1]);
+      const sc = tx * dx + ty * dy;
+      if (sc > m2) {
+        m2 = sc;
+        psi = t;
+      }
+    }
+    const aE = ellipse(cx2, cy2, rx, ry, pf.rot2, sens2, psi);
+    const orbite2: [number, number][] = [];
+    for (let t = 0.07; t <= DEUX_PI * 1.15; t += 0.07) {
+      const e = ellipse(cx2, cy2, rx, ry, pf.rot2, sens2, psi + t);
+      orbite2.push([e.x, e.y]);
+    }
+
+    /* La traversée : une courbe de Hermite qui part tangente à l'orbite et arrive tangente à l'autre. */
+    const ctrl: [number, number][] = [[sE.x, sE.y], ...etapes, [aE.x, aE.y]];
+    const m: [number, number][] = ctrl.map((p, i) => {
+      if (i === 0) {
+        const [tx, ty] = norme(sE.tx, sE.ty);
+        const L = Math.hypot(ctrl[1][0] - p[0], ctrl[1][1] - p[1]);
+        return [tx * L, ty * L];
+      }
+      if (i === ctrl.length - 1) {
+        const [tx, ty] = norme(aE.tx, aE.ty);
+        const L = Math.hypot(p[0] - ctrl[i - 1][0], p[1] - ctrl[i - 1][1]);
+        return [tx * L, ty * L];
+      }
+      return [(ctrl[i + 1][0] - ctrl[i - 1][0]) / 2, (ctrl[i + 1][1] - ctrl[i - 1][1]) / 2];
+    });
+    const trav: [number, number][] = [];
+    for (let i = 0; i < ctrl.length - 1; i++) {
+      const p0 = ctrl[i];
+      const p1 = ctrl[i + 1];
+      const pas = Math.max(6, Math.ceil(Math.hypot(p1[0] - p0[0], p1[1] - p0[1]) / 26));
+      for (let j = 0; j < pas; j++) {
+        const u = j / pas;
+        const u2 = u * u;
+        const u3 = u2 * u;
+        const h00 = 2 * u3 - 3 * u2 + 1;
+        const h10 = u3 - 2 * u2 + u;
+        const h01 = -2 * u3 + 3 * u2;
+        const h11 = u3 - u2;
+        trav.push([h00 * p0[0] + h10 * m[i][0] + h01 * p1[0] + h11 * m[i + 1][0], h00 * p0[1] + h10 * m[i][1] + h01 * p1[1] + h11 * m[i + 1][1]]);
+      }
+    }
+    trav.push([aE.x, aE.y]);
+    for (let k = 1; k <= 7; k++) jal.push(trav[Math.round(((trav.length - 1) * k) / 8)]);
+
+    /* Tout le tracé, lissé en courbes de Bézier. */
+    const pts = [...orbite1, ...trav.slice(1), ...orbite2];
+    let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+      d += ` C ${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(1)} ${(p1[1] + (p2[1] - p0[1]) / 6).toFixed(1)}, ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(1)} ${(p2[1] - (p3[1] - p1[1]) / 6).toFixed(1)}, ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+    }
+    void H;
+    return { d, sortie: [sE.x, sE.y] as [number, number], arrivee: [aE.x, aE.y] as [number, number], jalons: jal };
+  });
+}
+
+const CLASSES_COURBES = ["a", "b", "c"] as const;
 
 function FondCourbes({ racine }: { racine: React.RefObject<HTMLElement | null> }) {
   const chemins = useRef<(SVGPathElement | null)[]>([]);
   const lueurs = useRef<(SVGPathElement | null)[]>([]);
   const pointes = useRef<(HTMLSpanElement | null)[]>([]);
-  const [taille, setTaille] = useState({ w: 0, h: 0 });
-  const [jalons, setJalons] = useState<{ c: number; x: number; y: number }[]>([]);
   const jalonsEls = useRef<(HTMLSpanElement | null)[]>([]);
+  const [taille, setTaille] = useState({ w: 0, h: 0 });
+  const [geo, setGeo] = useState<GeoCourbe[] | null>(null);
 
-  /* Les dimensions réelles de la page. */
+  /* Les dimensions de la page, et la géométrie qui en découle (après le chargement des polices et des globes). */
   useEffect(() => {
     const zone = racine.current;
     if (!zone) return;
@@ -141,63 +291,118 @@ function FondCourbes({ racine }: { racine: React.RefObject<HTMLElement | null> }
     lire();
     const ro = new ResizeObserver(lire);
     ro.observe(zone);
-    return () => ro.disconnect();
+    const tard = window.setTimeout(lire, 1200);
+    return () => {
+      ro.disconnect();
+      window.clearTimeout(tard);
+    };
   }, [racine]);
 
-  /* Les jalons : quelques points posés le long de chaque courbe. */
-  useEffect(() => {
-    if (!taille.w) return;
-    const liste: { c: number; x: number; y: number }[] = [];
-    chemins.current.forEach((p, c) => {
-      if (!p) return;
-      const L = p.getTotalLength();
-      for (let k = 1; k <= 7; k++) {
-        const q = p.getPointAtLength((L * k) / 8);
-        liste.push({ c, x: q.x, y: q.y });
-      }
-    });
-    setJalons(liste);
-  }, [taille]);
-
-  /* Le tracé suit le défilement. */
   useEffect(() => {
     const zone = racine.current;
     if (!zone || !taille.w) return;
-    const tables = chemins.current.map((p) => {
+    setGeo(construireCourbes(zone));
+  }, [racine, taille]);
+
+  /* Le mouvement : une boucle légère, lissée dans le temps. */
+  useEffect(() => {
+    const zone = racine.current;
+    if (!zone || !geo) return;
+    const SAMPLES = 900;
+    const tables = geo.map((g, c) => {
+      const p = chemins.current[c];
       if (!p) return null;
       const L = p.getTotalLength();
-      const t: number[] = [];
-      for (let i = 0; i <= 240; i++) t.push(p.getPointAtLength((L * i) / 240).y);
-      return { L, t };
+      const pts: { x: number; y: number }[] = [];
+      for (let i = 0; i <= SAMPLES; i++) {
+        const q = p.getPointAtLength((L * i) / SAMPLES);
+        pts.push({ x: q.x, y: q.y });
+      }
+      /* La fraction du tracé qui correspond à un point connu (le plus proche, parmi les échantillons du bon voisinage). */
+      const frac = (cible: [number, number], depuis: number) => {
+        let best = depuis;
+        let dmin = Infinity;
+        for (let i = Math.floor(depuis * SAMPLES); i <= SAMPLES; i++) {
+          const dd = Math.hypot(pts[i].x - cible[0], pts[i].y - cible[1]);
+          if (dd < dmin) {
+            dmin = dd;
+            best = i / SAMPLES;
+          }
+          if (dd > dmin + 80 && dmin < 8) break;
+        }
+        return best;
+      };
+      const f1 = frac(g.sortie, 0.05);
+      const f2 = frac(g.arrivee, f1 + 0.02);
+      return { L, pts, f1, f2 };
     });
     const reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let plan = false;
-    const dessine = () => {
-      plan = false;
+    const courant = geo.map(() => ({ f: 0, dot: 0 }));
+    let id = 0;
+    let avant = performance.now();
+    let immobile = 0;
+    const boucle = (maintenant: number) => {
+      id = requestAnimationFrame(boucle);
+      if (document.hidden) {
+        avant = maintenant;
+        return;
+      }
+      const dt = Math.min(100, maintenant - avant);
+      avant = maintenant;
       const haut = zone.getBoundingClientRect();
-      /* La ligne regardée : aux deux tiers de l'écran. */
-      const regard = reduit ? haut.height : Math.min(haut.height, Math.max(0, -haut.top + window.innerHeight * 0.68));
-      tables.forEach((tb, c) => {
+      const H = haut.height;
+      const regard = Math.min(H, Math.max(0, -haut.top + window.innerHeight * 0.68));
+      const lisse = 1 - Math.exp(-dt / 170);
+      geo.forEach((g, c) => {
+        const tb = tables[c];
         const p = chemins.current[c];
         if (!tb || !p) return;
-        /* La fraction de la courbe dont la hauteur ne dépasse pas la ligne regardée (recherche dichotomique). */
-        let lo = 0;
-        let hi = tb.t.length - 1;
-        while (lo < hi) {
-          const m = (lo + hi + 1) >> 1;
-          if (tb.t[m] <= regard) lo = m;
-          else hi = m - 1;
+        const ya = g.sortie[1];
+        const yb = g.arrivee[1];
+        /* Où le tracé doit être arrivé : tout le premier tour tant qu'on est en haut, puis la traversée au rythme du regard, puis le dernier tour. */
+        let cible: number;
+        let phase: "haut" | "traverse" | "bas";
+        if (regard <= ya) {
+          cible = tb.f1;
+          phase = "haut";
+        } else if (regard < yb) {
+          let k = Math.floor(tb.f1 * SAMPLES);
+          const kmax = Math.ceil(tb.f2 * SAMPLES);
+          let dernier = k;
+          for (; k <= kmax; k++) if (tb.pts[k].y <= regard) dernier = k;
+          cible = Math.min(tb.f2, Math.max(tb.f1, dernier / SAMPLES));
+          phase = "traverse";
+        } else {
+          const u = Math.min(1, (regard - yb) / Math.max(40, H - yb));
+          const e = u * u * (3 - 2 * u);
+          cible = tb.f2 + (1 - tb.f2) * e;
+          phase = "bas";
         }
-        const f = lo / (tb.t.length - 1);
+        if (reduit) {
+          courant[c].f = 1;
+        } else {
+          /* Au tout début, le premier tour se dessine de lui-même ; ensuite le tracé glisse vers sa cible. */
+          const v = courant[c].f + (cible - courant[c].f) * (courant[c].f < tb.f1 * 0.98 && phase === "haut" ? 1 - Math.exp(-dt / 520) : lisse);
+          courant[c].f = Math.abs(cible - v) < 0.00005 ? cible : v;
+        }
+        const f = courant[c].f;
         p.style.strokeDashoffset = String(1 - f);
-        const g = lueurs.current[c];
-        if (g) g.style.strokeDashoffset = String(1 - f);
-        const pt = p.getPointAtLength(tb.L * f);
+        const g2 = lueurs.current[c];
+        if (g2) g2.style.strokeDashoffset = String(1 - f);
+
+        /* La pointe : elle tourne seule autour du globe en haut, suit le tracé au milieu, tourne autour de l'horizon en bas. */
+        let pos = f;
+        if (!reduit) {
+          const tour = ((maintenant / 9000 + c * 0.31) % 1);
+          if (phase === "haut" && f >= tb.f1 * 0.98) pos = tour * tb.f1;
+          else if (phase === "bas" && f >= 0.985) pos = tb.f2 + tour * (1 - tb.f2);
+        }
+        courant[c].dot = pos;
+        const q = p.getPointAtLength(tb.L * pos);
         const tip = pointes.current[c];
         if (tip) {
-          tip.style.left = `${pt.x}px`;
-          tip.style.top = `${pt.y}px`;
-          tip.style.opacity = f > 0.004 && f < 0.996 ? "1" : "0";
+          tip.style.transform = `translate(${q.x}px, ${q.y}px)`;
+          tip.style.opacity = reduit ? "0" : f > 0.003 ? "1" : "0";
         }
       });
       jalonsEls.current.forEach((j) => {
@@ -205,46 +410,40 @@ function FondCourbes({ racine }: { racine: React.RefObject<HTMLElement | null> }
         const on = Number(j.dataset.y) <= regard ? "1" : "0";
         if (j.dataset.on !== on) j.dataset.on = on;
       });
+      immobile = 0;
+      void immobile;
     };
-    const demande = () => {
-      if (!plan) {
-        plan = true;
-        requestAnimationFrame(dessine);
-      }
-    };
-    dessine();
-    window.addEventListener("scroll", demande, { passive: true });
-    return () => window.removeEventListener("scroll", demande);
-  }, [racine, taille, jalons.length]);
+    id = requestAnimationFrame(boucle);
+    return () => cancelAnimationFrame(id);
+  }, [racine, geo]);
 
-  if (!taille.w) return <div className="ax-courbes" aria-hidden="true" />;
+  if (!taille.w || !geo) return <div className="ax-courbes" aria-hidden="true" />;
   return (
     <div className="ax-courbes" aria-hidden="true">
       <svg viewBox={`0 0 ${taille.w} ${taille.h}`} width={taille.w} height={taille.h}>
-        {COURBES.map((c, i) => {
-          const d = mise(c.d, taille.w, taille.h);
-          return (
-            <g key={c.classe} className={`ax-co ax-co-${c.classe}`}>
-              <path d={d} pathLength={1} className="ax-co-fond" />
-              <path d={d} pathLength={1} className="ax-co-lueur" ref={(el) => { lueurs.current[i] = el; }} />
-              <path d={d} pathLength={1} className="ax-co-trait" ref={(el) => { chemins.current[i] = el; }} />
-            </g>
-          );
-        })}
+        {geo.map((g, i) => (
+          <g key={CLASSES_COURBES[i]} className={`ax-co ax-co-${CLASSES_COURBES[i]}`}>
+            <path d={g.d} pathLength={1} className="ax-co-fond" />
+            <path d={g.d} pathLength={1} className="ax-co-lueur" ref={(el) => { lueurs.current[i] = el; }} />
+            <path d={g.d} pathLength={1} className="ax-co-trait" ref={(el) => { chemins.current[i] = el; }} />
+          </g>
+        ))}
       </svg>
-      {COURBES.map((c, i) => (
-        <span key={c.classe} className={`ax-co-pointe ax-co-${c.classe}`} ref={(el) => { pointes.current[i] = el; }} />
+      {geo.map((g, i) => (
+        <span key={CLASSES_COURBES[i]} className={`ax-co-pointe ax-co-${CLASSES_COURBES[i]}`} ref={(el) => { pointes.current[i] = el; }} />
       ))}
-      {jalons.map((p, k) => (
-        <span
-          key={`${taille.w}-${k}`}
-          className={`ax-co-jalon ax-co-${COURBES[p.c].classe}`}
-          data-y={p.y}
-          data-on="0"
-          ref={(el) => { jalonsEls.current[k] = el; }}
-          style={{ left: p.x, top: p.y }}
-        />
-      ))}
+      {geo.flatMap((g, c) =>
+        g.jalons.map((p, k) => (
+          <span
+            key={`${c}-${k}`}
+            className={`ax-co-jalon ax-co-${CLASSES_COURBES[c]}`}
+            data-y={p[1]}
+            data-on="0"
+            ref={(el) => { jalonsEls.current[c * 8 + k] = el; }}
+            style={{ left: p[0], top: p[1] }}
+          />
+        )),
+      )}
     </div>
   );
 }
@@ -846,6 +1045,27 @@ const FILE_ARTICLES = [
 
 function Articles({ dette, lus = [] }: { dette: Props["dette"]; lus?: { rubrique: string; titre: string; href: string }[] }) {
   const glisse = useGlisser<HTMLUListElement>();
+  /* La vague se rejoue à chaque retour sur la section (elle se réarme quand la file sort de l'écran), jamais quand on la fait défiler. */
+  useEffect(() => {
+    const el = glisse.ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting && e.intersectionRatio >= 0.35) {
+          if (el.dataset.vague === "1") return;
+          el.dataset.vague = "0";
+          void el.offsetWidth; // relance l'animation depuis le début
+          el.dataset.vague = "1";
+        } else if (!e.isIntersecting) {
+          delete el.dataset.vague;
+        }
+      },
+      { threshold: [0, 0.35] },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <section className="ax-sec ax-sec-large" id="articles" aria-labelledby="ax-ar-t">
       <Rev as="h2" className="ax-h2">
