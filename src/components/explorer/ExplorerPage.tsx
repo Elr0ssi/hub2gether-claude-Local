@@ -290,7 +290,7 @@ export function ExplorerPage() {
         </div>
       )}
 
-      {!monde && <p className="xp-note">Les couches « exemple » contiennent des données fictives, en attendant des sources vérifiées.</p>}
+      {!monde && <p className="xp-note">Les couches « exemple » contiennent des données fictives, en attendant des sources vérifiées. Relief : SRTM, GMTED et autres, via AWS Terrain Tiles.</p>}
     </section>
   );
 }
