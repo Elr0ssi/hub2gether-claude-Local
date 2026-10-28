@@ -88,7 +88,7 @@ function peindre(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: string | n
   const ctx = toile.getContext("2d")!;
   const c = nuit
     ? { mer: "#141a30", terre: "#2b3454", bord: "rgba(170,185,255,0.16)" }
-    : { mer: "#f1f3fa", terre: "#fbfbfe", bord: "rgba(120,110,175,0.16)" };
+    : { mer: "#f1f3fa", terre: "#fbfbfe", bord: "rgba(120,110,175,0.2)" };
   ctx.fillStyle = c.mer;
   ctx.fillRect(0, 0, W, H);
   const trace = (f: GeoJSON.Feature) => {
@@ -108,7 +108,7 @@ function peindre(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: string | n
   };
   ctx.fillStyle = c.terre;
   ctx.strokeStyle = c.bord;
-  ctx.lineWidth = 0.7;
+  ctx.lineWidth = 1.1;
   ctx.lineJoin = "round";
   for (const f of geo.features) {
     trace(f);
@@ -122,7 +122,7 @@ function peindre(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: string | n
       ctx.fillStyle = nuit ? "rgba(140,110,255,0.34)" : "rgba(104,72,240,0.16)";
       ctx.fill("evenodd");
       ctx.strokeStyle = nuit ? "#b9a6ff" : "#5b3df0";
-      ctx.lineWidth = 1.6;
+      ctx.lineWidth = 2.8;
       ctx.stroke();
     }
   }
@@ -146,7 +146,7 @@ interface Props {
   survol: string | null;
   choisi: string | null;
   cartes: string[];
-  /** Vue du monde : les repères se regroupent en hexagones, seuls ceux qui portent une carte restent des points. */
+  /** Vue du monde : de tout petits points rouges, rien d'autre. Dans un pays : les repères complets. */
   monde: boolean;
   /** Des liens courbes entre deux repères (identifiants). */
   arcs: [string, string][];
@@ -170,7 +170,6 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     recentrer: () => void;
     majReperes: () => void;
     majLignes: () => void;
-    majHex: () => void;
     majArcs: () => void;
   } | null>(null);
   const geoPays = useRef<PaysGeo[]>([]);
@@ -194,24 +193,38 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     const sc = new THREE.Scene();
 
     const toile = document.createElement("canvas");
-    toile.width = 2048;
-    toile.height = 1024;
+    toile.width = 4096;
+    toile.height = 2048;
     peindre(geo, nuit, pays, toile);
     const texture = new THREE.CanvasTexture(toile);
     texture.colorSpace = THREE.SRGBColorSpace;
-    texture.anisotropy = 4;
-    const relief = new THREE.TextureLoader().load("/geo/earth-topology.png");
+    texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    /* Le relief : la carte d'altitude du site, agrandie et adoucie pour effacer l'escalier des 256 niveaux de gris. */
+    const reliefToile = document.createElement("canvas");
+    reliefToile.width = 4096;
+    reliefToile.height = 2048;
+    const relief = new THREE.CanvasTexture(reliefToile);
+    relief.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    const img = new Image();
+    img.onload = () => {
+      const rc = reliefToile.getContext("2d")!;
+      rc.imageSmoothingQuality = "high";
+      rc.filter = "blur(1.6px)";
+      rc.drawImage(img, 0, 0, reliefToile.width, reliefToile.height);
+      relief.needsUpdate = true;
+    };
+    img.src = "/geo/earth-topology.png";
     const matiere = new THREE.MeshStandardMaterial({
-      map: texture, bumpMap: relief, bumpScale: 5, displacementMap: relief, displacementScale: ELEV, roughness: 0.92, metalness: 0,
+      map: texture, bumpMap: relief, bumpScale: 3.2, displacementMap: relief, displacementScale: ELEV, roughness: 0.92, metalness: 0,
     });
     const globe = new THREE.Group();
     const boule = new THREE.Mesh(new THREE.SphereGeometry(1, 384, 192), matiere);
     globe.add(boule);
     sc.add(globe);
 
-    const soleil = new THREE.DirectionalLight(0xffffff, nuit ? 1.7 : 1.9);
+    const soleil = new THREE.DirectionalLight(0xffffff, nuit ? 1.7 : 1.35);
     soleil.position.set(-4, 3.2, 2.4);
-    const ambiance = new THREE.AmbientLight(0xffffff, nuit ? 0.6 : 1.6);
+    const ambiance = new THREE.AmbientLight(0xffffff, nuit ? 0.6 : 2.0);
     sc.add(soleil, ambiance);
 
     /* L'atmosphère : un halo violet pâle sur le bord. */
@@ -219,7 +232,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       new THREE.SphereGeometry(1.1, 64, 48),
       new THREE.ShaderMaterial({
         transparent: true, side: THREE.BackSide, depthWrite: false,
-        uniforms: { couleur: { value: new THREE.Color(nuit ? "#6d7dff" : "#8f7dff") }, force: { value: nuit ? 0.9 : 0.5 } },
+        uniforms: { couleur: { value: new THREE.Color(nuit ? "#6d7dff" : "#8f7dff") }, force: { value: nuit ? 0.8 : 0.28 } },
         vertexShader: "varying vec3 n; void main(){ n = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
         fragmentShader: "varying vec3 n; uniform vec3 couleur; uniform float force; void main(){ float i = pow(max(0.0, 0.72 - dot(n, vec3(0.0,0.0,1.0))), 3.0); gl_FragColor = vec4(couleur, clamp(i * force, 0.0, 1.0)); }",
       }),
@@ -232,9 +245,9 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       transparent: true,
       uniforms: { echelle: { value: renderer.getPixelRatio() } },
       vertexShader:
-        "attribute float taille; attribute vec3 teinte; varying vec3 t; uniform float echelle; void main(){ t = teinte; gl_PointSize = taille * echelle; vec3 w = (modelMatrix * vec4(position,1.0)).xyz; float face = dot(normalize(w), normalize(cameraPosition)); gl_Position = face < 0.2 ? vec4(2.0, 2.0, 2.0, 1.0) : projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
+        "attribute float taille; attribute vec3 teinte; varying vec3 t; varying float s; uniform float echelle; void main(){ t = teinte; s = taille; gl_PointSize = taille * echelle; vec3 w = (modelMatrix * vec4(position,1.0)).xyz; float face = dot(normalize(w), normalize(cameraPosition)); gl_Position = face < 0.3 ? vec4(2.0, 2.0, 2.0, 1.0) : projectionMatrix * modelViewMatrix * vec4(position,1.0); }",
       fragmentShader:
-        "varying vec3 t; void main(){ float d = length(gl_PointCoord - 0.5); if (d > 0.5) discard; vec3 c = d > 0.36 ? vec3(1.0) : t; gl_FragColor = vec4(c, 1.0); }",
+        "varying vec3 t; varying float s; void main(){ float d = length(gl_PointCoord - 0.5); if (d > 0.5) discard; vec3 c = (d > 0.36 && s > 6.0) ? vec3(1.0) : t; gl_FragColor = vec4(c, 1.0); }",
     });
     const points = new THREE.Points(ptsGeo, ptsMat);
     points.frustumCulled = false;
@@ -244,11 +257,6 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     /* Les tracés. */
     const lignes = new THREE.Group();
     globe.add(lignes);
-
-    /* Les hexagones : la densité des repères, par case, quand on regarde le monde entier. */
-    const hexGeo = new THREE.CircleGeometry(1, 6);
-    const hexMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.92, side: THREE.DoubleSide, depthWrite: false });
-    let hexMesh: THREE.InstancedMesh | null = null;
 
     /* Les liens : des courbes qui s'élèvent au-dessus du globe, et un point qui les parcourt. */
     const arcsGroupe = new THREE.Group();
@@ -313,9 +321,9 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
         peindre(p.geo, p.nuit, p.pays, toile);
         texture.needsUpdate = true;
         (halo.material as THREE.ShaderMaterial).uniforms.couleur.value.set(p.nuit ? "#6d7dff" : "#8f7dff");
-        (halo.material as THREE.ShaderMaterial).uniforms.force.value = p.nuit ? 0.9 : 0.5;
-        soleil.intensity = p.nuit ? 1.7 : 1.9;
-        ambiance.intensity = p.nuit ? 0.6 : 1.6;
+        (halo.material as THREE.ShaderMaterial).uniforms.force.value = p.nuit ? 0.8 : 0.28;
+        soleil.intensity = p.nuit ? 1.7 : 1.35;
+        ambiance.intensity = p.nuit ? 0.6 : 2.0;
         majLignes();
       },
       cadrer: () => {
@@ -339,18 +347,18 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       },
       majReperes: () => {
         const r = etat.current.reperes;
-        positions = r.map((x) => versXYZ(x.lat, x.lon, SURF));
+        positions = r.map((x) => versXYZ(x.lat, x.lon, etat.current.props.monde ? 1.012 : SURF));
         const pos = new Float32Array(r.length * 3);
         const col = new Float32Array(r.length * 3);
         const tai = new Float32Array(r.length);
         const c = new THREE.Color();
         r.forEach((x, i) => {
           pos.set([positions[i].x, positions[i].y, positions[i].z], i * 3);
-          c.set(COUCHE[x.couche].couleur);
+          c.set(etat.current.props.monde ? "#e11d48" : COUCHE[x.couche].couleur);
           /* Le nuage de points n'est pas converti en sortie : on lui donne les valeurs sRGB brutes. */
           const srgb = c.getRGB({ r: 0, g: 0, b: 0 } as THREE.RGB, THREE.SRGBColorSpace);
           col.set([srgb.r, srgb.g, srgb.b], i * 3);
-          tai[i] = 9;
+          tai[i] = etat.current.props.monde ? 3.6 : 9;
         });
         ptsGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
         ptsGeo.setAttribute("teinte", new THREE.BufferAttribute(col, 3));
@@ -360,54 +368,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       majLignes: () => {
         majLignes();
       },
-      majHex: () => majHex(),
       majArcs: () => majArcs(),
-    };
-
-    const majHex = () => {
-      if (hexMesh) {
-        globe.remove(hexMesh);
-        hexMesh.dispose();
-        hexMesh = null;
-      }
-      const e = etat.current;
-      if (!e.props.monde) return;
-      const pas = 4.6;
-      const cases = new Map<string, { lat: number; lon: number; n: number; par: Record<string, number> }>();
-      for (const r of e.reperes) {
-        const ligne = Math.round(r.lat / pas);
-        const lat = ligne * pas;
-        const pasLon = pas / Math.max(0.25, Math.cos(lat * DEG));
-        const col = Math.round(r.lon / pasLon - (ligne % 2 ? 0.5 : 0));
-        const lon = (col + (ligne % 2 ? 0.5 : 0)) * pasLon;
-        const k = `${ligne}:${col}`;
-        const c = cases.get(k) ?? { lat, lon, n: 0, par: {} };
-        c.n++;
-        c.par[r.couche] = (c.par[r.couche] ?? 0) + 1;
-        cases.set(k, c);
-      }
-      const liste = [...cases.values()];
-      if (!liste.length) return;
-      const max = Math.max(...liste.map((c) => c.n));
-      hexMesh = new THREE.InstancedMesh(hexGeo, hexMat, liste.length);
-      const m = new THREE.Matrix4();
-      const q = new THREE.Quaternion();
-      const z = new THREE.Vector3(0, 0, 1);
-      const col = new THREE.Color();
-      const blanc = new THREE.Color("#ffffff");
-      liste.forEach((c, i) => {
-        const n = versXYZ(c.lat, c.lon, 1);
-        q.setFromUnitVectors(z, n);
-        const t = c.n / max;
-        const rayon = pas * DEG * (0.34 + 0.2 * Math.sqrt(t));
-        m.compose(n.clone().multiplyScalar(SURF - 0.004), q, new THREE.Vector3(rayon, rayon, rayon));
-        hexMesh!.setMatrixAt(i, m);
-        const dom = Object.entries(c.par).sort((a, b) => b[1] - a[1])[0][0] as keyof typeof COUCHE;
-        col.set(COUCHE[dom].couleur).lerp(blanc, 0.5 - 0.42 * t);
-        hexMesh!.setColorAt(i, col);
-      });
-      hexMesh.frustumCulled = false;
-      globe.add(hexMesh);
     };
 
     const majArcs = () => {
@@ -469,7 +430,6 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     scene.current = api;
     api.majReperes();
     api.majLignes();
-    api.majHex();
     api.majArcs();
     api.cadrer();
 
@@ -617,8 +577,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       for (let i = 0; i < n; i++) {
         v.copy(positions[i]).applyMatrix4(globe.matrixWorld);
         const face = v.clone().normalize().dot(camDir);
-        const cache = e.props.monde && !e.cartes.includes(e.reperes[i]?.id ?? "");
-        const vu = face > 0.2 && !cache;
+        const vu = face > 0.2 && !e.props.monde;
         v.project(cam);
         proj[i] = { x: (v.x * 0.5 + 0.5) * w, y: (-v.y * 0.5 + 0.5) * h, vu };
       }
@@ -627,17 +586,14 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
         const act = e.survol ?? null;
         for (let i = 0; i < n; i++) {
           const id = e.reperes[i]?.id;
-          const grand = id === e.choisi ? 17 : id === act ? 15 : e.props.monde && !e.cartes.includes(id ?? "") ? 0 : 9;
+          const grand = id === e.choisi ? 17 : id === act ? 15 : e.props.monde ? 3.6 : 9;
           if (tai.array[i] !== grand) {
             (tai.array as Float32Array)[i] = grand;
             tai.needsUpdate = true;
           }
         }
       }
-      /* Les hexagones s'effacent quand on s'approche ; les points de lumière parcourent les liens. */
-      const proche = Math.min(1, Math.max(0, (tout.d - 2.3) / 1.1));
-      hexMat.opacity = 0.92 * proche;
-      if (hexMesh) hexMesh.visible = proche > 0.02;
+      /* Les points de lumière parcourent les liens. */
       if (arcsPts.length) {
         const arr = new Float32Array(arcsPts.length * 3);
         const tt = performance.now() * 0.00035;
@@ -694,8 +650,6 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       relief.dispose();
       ptsGeo.dispose();
       ptsMat.dispose();
-      hexGeo.dispose();
-      hexMat.dispose();
       pulseGeo.dispose();
       pastille.dispose();
       if (el.contains(renderer.domElement)) el.removeChild(renderer.domElement);
@@ -709,7 +663,6 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
   useEffect(() => scene.current?.cadrer(), [pays]);
   useEffect(() => {
     scene.current?.majReperes();
-    scene.current?.majHex();
     scene.current?.majArcs();
   }, [reperes, monde, nuit]);
   useEffect(() => scene.current?.majArcs(), [arcs]);

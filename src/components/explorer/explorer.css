@@ -23,14 +23,6 @@
 }
 .xp button { font: inherit; }
 
-/* Les anneaux derrière le globe, avec leurs graduations */
-.xp-anneaux { position: absolute; left: 53%; top: 50%; width: 0; height: 0; pointer-events: none; }
-.xp-anneaux i { position: absolute; left: 50%; top: 50%; border-radius: 50%; translate: -50% -50%; border: 1px solid rgba(91, 61, 240, 0.12); }
-.xp-anneaux i:nth-child(1) { width: 96svh; height: 96svh; }
-.xp-anneaux i:nth-child(2) { width: 118svh; height: 118svh; border-style: dashed; border-color: rgba(91, 61, 240, 0.09); }
-.xp-anneaux i:nth-child(3) { width: 140svh; height: 140svh; border: 0; background: repeating-conic-gradient(from 0deg, rgba(91, 61, 240, 0.28) 0 0.35deg, transparent 0.35deg 2.5deg); -webkit-mask: radial-gradient(farthest-side, transparent 98.6%, #000 99%); mask: radial-gradient(farthest-side, transparent 98.6%, #000 99%); }
-:root:not([data-concept="clair"]) .xp-anneaux i { border-color: rgba(157, 140, 255, 0.16); }
-
 .xp-scene { position: absolute; inset: 0; }
 .xp-globe { position: absolute; inset: 0; }
 .xp-attente { position: absolute; inset: 0; display: grid; place-items: center; }
@@ -39,7 +31,7 @@
 .xp-erreur { position: absolute; left: 50%; top: 50%; translate: -50% -50%; z-index: 6; margin: 0; padding: 10px 16px; border-radius: 14px; background: var(--verre); color: var(--xp-encre); font-size: 14px; }
 
 /* Le verre : un panneau, un rail, une carte */
-.xp-rail, .xp-table, .xp-droite .xp-stat, .xp-recherche, .xp-pays-on, .xp-zoom, .xp-bas > *, .xp-tiroir, .xp-liste-pays {
+.xp-rail, .xp-recherche, .xp-pays-on, .xp-zoom, .xp-bas > *, .xp-tiroir, .xp-liste-pays {
   background: var(--verre); border: 1px solid var(--verre-bord); box-shadow: var(--verre-ombre);
   -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3);
 }
@@ -53,24 +45,12 @@
 .xp-rail button:hover .xp-bulle, .xp-rail button:focus-visible .xp-bulle { opacity: 1; }
 
 /* Le grand chiffre */
-.xp-tete { position: absolute; z-index: 4; left: 96px; top: 100px; width: 380px; }
+.xp-tete { position: absolute; z-index: 4; left: 96px; top: 100px; width: 340px; }
 .xp-sur { margin: 0; font-size: 13px; font-weight: 600; color: var(--xp-encre-3); letter-spacing: 0.02em; }
-.xp-h1 { margin: 2px 0 0; font-size: 18px; font-weight: 600; letter-spacing: -0.02em; color: var(--xp-encre-2); }
-.xp-chiffre { margin: 14px 0 0; font-size: clamp(54px, 6.4vw, 92px); font-weight: 500; letter-spacing: -0.055em; line-height: 0.95; font-variant-numeric: tabular-nums; color: var(--xp-encre); }
-.xp-chiffre-l { margin: 8px 0 0; font-size: 12.5px; color: var(--xp-encre-3); }
-.xp-table { list-style: none; margin: 22px 0 0; padding: 8px; display: grid; gap: 2px; border-radius: 20px; }
-.xp-table button { display: grid; grid-template-columns: 16px minmax(0, 1fr) 40px 40px; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border: 0; border-radius: 12px; background: none; color: var(--xp-encre-3); text-align: left; font-size: 12.5px; cursor: pointer; transition: background 0.2s, color 0.2s; }
-.xp-table button:hover { background: rgba(91, 61, 240, 0.07); }
-.xp-table button.on { color: var(--xp-encre); }
-.xp-table button svg { color: var(--c); opacity: 0.55; }
-.xp-table button.on svg { opacity: 1; }
-.xp-table span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
-.xp-table em, .xp-tiroir h2 em { margin-left: 6px; padding: 1px 6px; border-radius: 99px; font-size: 9.5px; font-style: normal; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase; color: #b45309; background: rgba(245, 158, 11, 0.18); }
-.xp-table i { height: 4px; border-radius: 4px; background: rgba(91, 61, 240, 0.1); overflow: hidden; }
-.xp-table i b { display: block; height: 100%; border-radius: 4px; background: var(--c); opacity: 0.35; transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
-.xp-table button.on i b { opacity: 1; }
-.xp-table strong { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
-
+.xp-h1 { margin: 2px 0 0; font-size: 22px; font-weight: 650; letter-spacing: -0.02em; color: var(--xp-encre-2); }
+.xp-chiffre { margin: 10px 0 0; font-size: clamp(44px, 5vw, 68px); font-weight: 500; letter-spacing: -0.055em; line-height: 0.95; font-variant-numeric: tabular-nums; color: var(--xp-encre); }
+.xp-chiffre small { font-size: 14px; letter-spacing: 0; font-weight: 500; color: var(--xp-encre-3); }
+.xp-chapo { margin: 8px 0 0; font-size: 13.5px; color: var(--xp-encre-3); }
 /* La colonne de droite : le choix du pays, les repères chiffrés, la liste */
 .xp-colonne { position: absolute; z-index: 6; right: 88px; top: 100px; bottom: 36px; width: 280px; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
 .xp-colonne > * { pointer-events: auto; }
@@ -86,22 +66,12 @@
 .xp-fiche { display: inline-flex; align-items: center; gap: 3px; padding: 6px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; color: #fff; text-decoration: none; background: var(--xp-vif); }
 .xp-pays-on button { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 50%; color: var(--xp-encre-2); background: rgba(91, 61, 240, 0.1); cursor: pointer; }
 
-.xp-droite { flex: none; display: grid; gap: 8px; }
-.xp-stat { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 11px 16px 11px 18px; border-radius: 18px; text-align: right; color: var(--xp-encre); cursor: pointer; transition: translate 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
-.xp-stat:disabled { cursor: default; }
-.xp-stat:not(:disabled):hover { translate: -3px 0; }
-.xp-stat-g { display: grid; gap: 1px; min-width: 0; text-align: left; }
-.xp-stat-g small { font-size: 11.5px; color: var(--xp-encre-3); }
-.xp-stat-g span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; color: var(--xp-encre-2); }
-.xp-stat b { flex: none; font-size: 24px; font-weight: 500; letter-spacing: -0.035em; font-variant-numeric: tabular-nums; line-height: 1.1; }
-
 .xp-zoom { position: absolute; z-index: 5; right: 24px; top: 100px; display: grid; gap: 4px; padding: 6px; border-radius: 18px; }
 .xp-zoom button { display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 12px; color: var(--xp-encre-2); background: none; cursor: pointer; transition: background 0.2s, color 0.2s; }
 .xp-zoom button:hover { color: var(--xp-encre); background: rgba(91, 61, 240, 0.1); }
 
 /* La carte du bas */
 .xp-bas { position: absolute; z-index: 5; left: 96px; bottom: 36px; display: grid; gap: 10px; width: 330px; justify-items: start; }
-.xp-invite { margin: 0; padding: 12px 18px; border-radius: 99px; font-size: 13px; color: var(--xp-encre-2); }
 .xp-detail { position: relative; width: 100%; box-sizing: border-box; padding: 16px 18px; border-radius: 24px; }
 .xp-detail-c { margin: 0; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c); }
 .xp-detail h2 { margin: 4px 0 2px; padding-right: 26px; font-size: 18px; font-weight: 650; letter-spacing: -0.02em; }
@@ -114,6 +84,7 @@
 .xp-tiroir { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 14px 14px 10px; border-radius: 24px; display: grid; gap: 14px; align-content: start; scrollbar-width: thin; }
 .xp-tiroir section { padding-left: 10px; border-left: 3px solid var(--c); }
 .xp-tiroir h2 { margin: 0 0 6px; font-size: 13px; font-weight: 700; }
+.xp-tiroir h2 em { margin-left: 6px; padding: 1px 6px; border-radius: 99px; font-size: 9.5px; font-style: normal; font-weight: 750; letter-spacing: 0.05em; text-transform: uppercase; color: #b45309; background: rgba(245, 158, 11, 0.18); }
 .xp-tiroir h2 span { margin-left: 4px; font-weight: 500; color: var(--xp-encre-3); }
 .xp-tiroir ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
 .xp-tiroir li button { display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding: 6px 8px; border: 0; border-radius: 9px; background: none; text-align: left; color: var(--xp-encre); cursor: pointer; }
@@ -148,22 +119,15 @@
 /* Petit écran : le globe prend la page ; les couches passent en bas, les repères de droite disparaissent. */
 @media (max-width: 1000px) {
   .xp { min-height: 680px; }
-  .xp-anneaux { left: 50%; top: 42%; }
-  .xp-anneaux i:nth-child(1) { width: 78svw; height: 78svw; }
-  .xp-anneaux i:nth-child(2) { width: 100svw; height: 100svw; }
-  .xp-anneaux i:nth-child(3) { width: 124svw; height: 124svw; }
   .xp-rail { left: 12px; right: 12px; top: auto; bottom: 40px; grid-auto-flow: column; justify-content: space-evenly; border-radius: 26px; }
   .xp-rail button:hover { translate: 0 -2px; }
   .xp-bulle { display: none; }
   .xp-tete { left: 16px; right: 16px; top: 86px; width: auto; }
   .xp-h1 { font-size: 15px; }
-  .xp-chiffre { margin-top: 6px; font-size: 56px; }
-  .xp-chiffre-l { margin-top: 4px; }
-  .xp-table { display: none; }
+  .xp-chiffre { margin-top: 4px; font-size: 44px; }
   .xp-colonne { left: 16px; right: auto; top: auto; bottom: 120px; width: min(320px, calc(100% - 32px)); display: block; pointer-events: none; }
   .xp-choix { pointer-events: auto; }
   .xp-liste-pays { top: auto; bottom: calc(100% + 8px); }
-  .xp-droite { display: none; }
   .xp-zoom { right: 12px; top: 92px; }
   .xp-bas { left: 12px; right: 12px; bottom: 176px; width: auto; }
   .xp-detail { width: 100%; }
@@ -174,4 +138,4 @@
   .xp-carte-ex { font-size: 8px; padding: 1px 5px; }
   .xp-carte-t small, .xp-carte-t b { max-width: 130px; }
 }
-@media (prefers-reduced-motion: reduce) { .xp-attente span { animation: none; } .xp-rail button, .xp-stat, .xp-table i b { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .xp-attente span { animation: none; } .xp-rail button { transition: none; } }

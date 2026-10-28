@@ -110,7 +110,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'try{if(localStorage.getItem("visualize-theme")==="nuit")delete document.documentElement.dataset.concept}catch(e){}',
+              'try{if(localStorage.getItem("visualize-theme-v2")==="nuit")delete document.documentElement.dataset.concept}catch(e){}',
           }}
         />
         <script
