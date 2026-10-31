@@ -20,8 +20,8 @@ import { COUCHE, type Repere, type Riviere } from "@/data/explorer/couches";
 const DEG = Math.PI / 180;
 const ELEV = 0.028;
 const SURF = 1.075;
-const LIGNE = 1.048;
-const BORD = 1.048;
+const LIGNE = 1;
+const BORD = 1;
 /* Le relief en volume peut monter jusqu'à ELEV * 1.7 : tout ce qu'on pose dessus reste au-dessus. */
 
 function versXYZ(lat: number, lon: number, r: number, out = new THREE.Vector3()) {
@@ -111,9 +111,68 @@ function peindreSelection(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: s
   }
 }
 
+/* ── Le relief lu en JavaScript, pour que tout ce qu'on pose sur le globe épouse sa surface ───────────────────────
+   Les hauteurs (la même image que celle qui soulève la sphère) sont lues une fois. `altitude(lat, lon)` rend de 0 à 1 ;
+   les lignes en tirent un attribut par sommet, et leur matière recalcule la distance au centre à chaque image avec
+   l'échelle du relief du moment : frontières, contour du pays et rivières suivent donc les montagnes, y compris quand
+   on incline le globe. */
+const HAUT: { w: number; h: number; d: Uint8ClampedArray | null; attente: (() => void)[] } = { w: 0, h: 0, d: null, attente: [] };
+function chargerHauteurs(quand: () => void) {
+  if (HAUT.d) return quand();
+  HAUT.attente.push(quand);
+  if (HAUT.attente.length > 1) return;
+  const img = new Image();
+  img.onload = () => {
+    const w = 2048;
+    const h = 1024;
+    const c = document.createElement("canvas");
+    c.width = w;
+    c.height = h;
+    const ctx = c.getContext("2d", { willReadFrequently: true })!;
+    ctx.drawImage(img, 0, 0, w, h);
+    const px = ctx.getImageData(0, 0, w, h).data;
+    const g = new Uint8ClampedArray(w * h);
+    for (let i = 0; i < g.length; i++) g[i] = px[i * 4];
+    HAUT.w = w;
+    HAUT.h = h;
+    HAUT.d = g;
+    const f = HAUT.attente.splice(0);
+    f.forEach((q) => q());
+  };
+  img.src = "/explorer/relief-h.jpg";
+}
+function altitude(lat: number, lon: number): number {
+  const d = HAUT.d;
+  if (!d) return 0;
+  const x = (((lon + 180) / 360) * HAUT.w) % HAUT.w;
+  const y = Math.min(HAUT.h - 1.001, Math.max(0, ((90 - lat) / 180) * HAUT.h));
+  const x0 = Math.floor(x);
+  const y0 = Math.floor(y);
+  const fx = x - x0;
+  const fy = y - y0;
+  const x1 = (x0 + 1) % HAUT.w;
+  const a = d[y0 * HAUT.w + x0] * (1 - fx) + d[y0 * HAUT.w + x1] * fx;
+  const b = d[(y0 + 1) * HAUT.w + x0] * (1 - fx) + d[(y0 + 1) * HAUT.w + x1] * fx;
+  return (a * (1 - fy) + b * fy) / 255;
+}
+
+/** Une matière de ligne qui épouse le relief : le sommet est ramené sur la sphère puis poussé de `altitude * échelle + décalage`. */
+function drapee(mat: THREE.LineBasicMaterial, echelle: { value: number }, decalage: number) {
+  mat.onBeforeCompile = (sh) => {
+    sh.uniforms.uEl = echelle;
+    sh.uniforms.uOff = { value: decalage };
+    sh.vertexShader = sh.vertexShader
+      .replace("#include <common>", "#include <common>\nattribute float alt;\nuniform float uEl;\nuniform float uOff;")
+      .replace("#include <begin_vertex>", "vec3 transformed = normalize(position) * (1.0 + alt * uEl + uOff);");
+  };
+  mat.needsUpdate = true;
+  return mat;
+}
+
 /** Les lignes d'un ensemble de pays : une seule géométrie de segments. `decalage` (en degrés) épaissit le trait en le dessinant plusieurs fois. */
 function lignesPays(geo: GeoJSON.FeatureCollection, nom: string | null, r: number, decalage = 0): THREE.BufferGeometry {
   const v: number[] = [];
+  const al: number[] = [];
   const t = new THREE.Vector3();
   const decs: [number, number][] = decalage ? [[0, 0], [decalage, 0], [-decalage, 0], [0, decalage], [0, -decalage]] : [[0, 0]];
   for (const f of geo.features) {
@@ -126,12 +185,15 @@ function lignesPays(geo: GeoJSON.FeatureCollection, nom: string | null, r: numbe
           for (const [dx, dy] of decs) {
             versXYZ(ring[i][1] + dy, ring[i][0] + dx, r, t);
             v.push(t.x, t.y, t.z);
+            al.push(altitude(ring[i][1], ring[i][0]));
             versXYZ(ring[i + 1][1] + dy, ring[i + 1][0] + dx, r, t);
             v.push(t.x, t.y, t.z);
+            al.push(altitude(ring[i + 1][1], ring[i + 1][0]));
           }
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute("position", new THREE.Float32BufferAttribute(v, 3));
+  g.setAttribute("alt", new THREE.Float32BufferAttribute(al, 1));
   return g;
 }
 
@@ -258,8 +320,12 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     peindreSelection(geo, nuit, pays, voileToile);
     const voileTex = new THREE.CanvasTexture(voileToile);
     voileTex.colorSpace = THREE.SRGBColorSpace;
-    const voileGeo = new THREE.SphereGeometry(1 + ELEV * 1.7 + 0.002, 192, 96);
-    const voile = new THREE.Mesh(voileGeo, new THREE.MeshBasicMaterial({ map: voileTex, transparent: true, depthWrite: false }));
+    /* Le voile est la même sphère, avec les mêmes hauteurs : il épouse chaque montagne au lieu de flotter au-dessus. */
+    const voileGeo = geoBoule;
+    const voileMat = (carte: THREE.Texture) =>
+      new THREE.MeshStandardMaterial({ map: carte, transparent: true, depthWrite: false, displacementMap: relief, displacementScale: ELEV, roughness: 0.95, metalness: 0, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    const voileM = voileMat(voileTex);
+    const voile = new THREE.Mesh(voileGeo, voileM);
     voile.renderOrder = 1;
     globe.add(voile);
 
@@ -269,11 +335,13 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     survolToile.height = 1024;
     const survolTex = new THREE.CanvasTexture(survolToile);
     survolTex.colorSpace = THREE.SRGBColorSpace;
-    const survolVoile = new THREE.Mesh(voileGeo, new THREE.MeshBasicMaterial({ map: survolTex, transparent: true, depthWrite: false }));
+    const survolM = voileMat(survolTex);
+    const survolVoile = new THREE.Mesh(voileGeo, survolM);
     survolVoile.renderOrder = 1;
     survolVoile.visible = false;
     globe.add(survolVoile);
-    const survolMat = new THREE.LineBasicMaterial({ color: nuit ? "#c9bfff" : "#7c6cf0", transparent: true, opacity: 0.9 });
+    const echelleRelief = { value: ELEV };
+    const survolMat = drapee(new THREE.LineBasicMaterial({ color: nuit ? "#c9bfff" : "#7c6cf0", transparent: true, opacity: 0.9 }), echelleRelief, 0.0045);
     let survolLigne: THREE.LineSegments | null = null;
     let survolPays: string | null = null;
     const majSurvolPays = () => {
@@ -290,19 +358,19 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       peindreSelection(p.geo, p.nuit, survolPays, survolToile, 0.7);
       survolTex.needsUpdate = true;
       survolVoile.visible = true;
-      survolLigne = new THREE.LineSegments(lignesPays(p.geo, survolPays, BORD + 0.0005), survolMat);
+      survolLigne = new THREE.LineSegments(lignesPays(p.geo, survolPays, BORD), survolMat);
       survolLigne.frustumCulled = false;
       survolLigne.renderOrder = 2;
       globe.add(survolLigne);
     };
 
     /* Les frontières et le contour du pays choisi : des lignes, donc nettes à tous les zooms. */
-    const bordsMat = new THREE.LineBasicMaterial({ color: nuit ? "#aab4ff" : "#5b4bb0", transparent: true, opacity: nuit ? 0.3 : 0.24 });
+    const bordsMat = drapee(new THREE.LineBasicMaterial({ color: nuit ? "#aab4ff" : "#5b4bb0", transparent: true, opacity: nuit ? 0.3 : 0.24 }), echelleRelief, 0.004);
     const bords = new THREE.LineSegments(lignesPays(geo, null, BORD), bordsMat);
     bords.frustumCulled = false;
     bords.renderOrder = 2;
     globe.add(bords);
-    const contourMat = new THREE.LineBasicMaterial({ color: nuit ? "#b9a6ff" : "#5b3df0" });
+    const contourMat = drapee(new THREE.LineBasicMaterial({ color: nuit ? "#b9a6ff" : "#5b3df0" }), echelleRelief, 0.0055);
     let contour: THREE.LineSegments | null = null;
     const majContour = () => {
       if (contour) {
@@ -312,7 +380,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       }
       const p = etat.current.props;
       if (!p.pays) return;
-      contour = new THREE.LineSegments(lignesPays(p.geo, p.pays, BORD + 0.001, 0.018), contourMat);
+      contour = new THREE.LineSegments(lignesPays(p.geo, p.pays, BORD, 0.018), contourMat);
       contour.frustumCulled = false;
       contour.renderOrder = 3;
       globe.add(contour);
@@ -512,19 +580,23 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       const p = etat.current.props;
       const faire = (liste: Riviere[], couleur: string, opacite: number) => {
         const v: number[] = [];
+        const al: number[] = [];
         const t = new THREE.Vector3();
         for (const riv of liste)
           for (const l of riv.l)
             for (let i = 0; i + 1 < l.length; i++) {
               versXYZ(l[i][1], l[i][0], LIGNE, t);
               v.push(t.x, t.y, t.z);
+              al.push(altitude(l[i][1], l[i][0]));
               versXYZ(l[i + 1][1], l[i + 1][0], LIGNE, t);
               v.push(t.x, t.y, t.z);
+              al.push(altitude(l[i + 1][1], l[i + 1][0]));
             }
         if (!v.length) return;
         const g = new THREE.BufferGeometry();
         g.setAttribute("position", new THREE.Float32BufferAttribute(v, 3));
-        lignes.add(new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: couleur, transparent: true, opacity: opacite })));
+        g.setAttribute("alt", new THREE.Float32BufferAttribute(al, 1));
+        lignes.add(new THREE.LineSegments(g, drapee(new THREE.LineBasicMaterial({ color: couleur, transparent: true, opacity: opacite }), echelleRelief, 0.0035)));
       };
       const vives = p.rivieresVives;
       const bleu = COUCHE.rivieres.couleur;
@@ -534,6 +606,16 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     scene.current = api;
     api.majReperes();
     api.majLignes();
+    /* Dès que les hauteurs sont lues, toutes les lignes sont refaites pour épouser le relief. */
+    let vivant = true;
+    chargerHauteurs(() => {
+      if (!vivant) return;
+      bords.geometry.dispose();
+      bords.geometry = lignesPays(geo, null, BORD);
+      majContour();
+      majSurvolPays();
+      majLignes();
+    });
     api.majArcs();
     api.cadrer();
 
@@ -718,6 +800,9 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       cam.position.set(0, -Math.sin(ang) * L, 1 + Math.cos(ang) * L);
       cam.lookAt(0, 0, 1);
       matiere.displacementScale = ELEV * (1 + 0.7 * incl);
+      voileM.displacementScale = matiere.displacementScale;
+      survolM.displacementScale = matiere.displacementScale;
+      echelleRelief.value = matiere.displacementScale;
       {
         const { w: ww, h: hh } = ecran();
         const px = surPointeur.dans ? surPointeur.x / ww : 0.35;
@@ -822,6 +907,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       renderer.domElement.removeEventListener("keydown", touche);
       renderer.dispose();
       actifs = false;
+      vivant = false;
       matiere.dispose();
       texture.dispose();
       texturesPosees.forEach((t) => t.dispose());
@@ -832,7 +918,8 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       bordsMat.dispose();
       contourMat.dispose();
       geoBoule.dispose();
-      voileGeo.dispose();
+      voileM.dispose();
+      survolM.dispose();
       ptsGeo.dispose();
       ptsMat.dispose();
       pulseGeo.dispose();
