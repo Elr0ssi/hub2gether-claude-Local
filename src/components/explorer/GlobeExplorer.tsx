@@ -85,12 +85,37 @@ export function cadrage(geo: GeoJSON.FeatureCollection, nom: string): { lat: num
 }
 
 /** Le pays choisi : un voile violet sur le globe. Les frontières sont des lignes vectorielles (toujours nettes), pas de la texture. */
-function peindreSelection(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: string | null, toile: HTMLCanvasElement, force = 1) {
+function peindreSelection(geo: GeoJSON.FeatureCollection, nuit: boolean, pays: string | null, toile: HTMLCanvasElement, force = 1, colorations: Coloration[] = []) {
   const W = toile.width;
   const H = toile.height;
   const ctx = toile.getContext("2d")!;
   ctx.clearRect(0, 0, W, H);
-  if (!pays) return;
+  /* Les pays colorés d'abord : le pays choisi, s'il y en a un, se peint par-dessus. */
+  if (colorations.length) {
+    const par = new Map(colorations.map((c) => [c.nom, c]));
+    for (const f of geo.features) {
+      const c = par.get((f.properties as { name: string }).name);
+      if (!c) continue;
+      const g = f.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon;
+      const polys = (g.type === "MultiPolygon" ? g.coordinates : [g.coordinates]) as Anneau[][];
+      ctx.beginPath();
+      for (const pl of polys)
+        for (const ring of pl) {
+          ring.forEach(([lon, lat], i) => {
+            const x = ((lon + 180) / 360) * W;
+            const y = ((90 - lat) / 180) * H;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          });
+          ctx.closePath();
+        }
+      ctx.globalAlpha = c.opacite ?? 0.5;
+      ctx.fillStyle = c.couleur;
+      ctx.fill("evenodd");
+    }
+    ctx.globalAlpha = 1;
+  }
+  if (!pays || colorations.length) return;
   for (const f of geo.features) {
     if ((f.properties as { name: string }).name !== pays) continue;
     const g = f.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon;
@@ -170,13 +195,14 @@ function drapee(mat: THREE.LineBasicMaterial, echelle: { value: number }, decala
 }
 
 /** Les lignes d'un ensemble de pays : une seule géométrie de segments. `decalage` (en degrés) épaissit le trait en le dessinant plusieurs fois. */
-function lignesPays(geo: GeoJSON.FeatureCollection, nom: string | null, r: number, decalage = 0): THREE.BufferGeometry {
+function lignesPays(geo: GeoJSON.FeatureCollection, nom: string | string[] | null, r: number, decalage = 0): THREE.BufferGeometry {
+  const noms = nom === null ? null : new Set(Array.isArray(nom) ? nom : [nom]);
   const v: number[] = [];
   const al: number[] = [];
   const t = new THREE.Vector3();
   const decs: [number, number][] = decalage ? [[0, 0], [decalage, 0], [-decalage, 0], [0, decalage], [0, -decalage]] : [[0, 0]];
   for (const f of geo.features) {
-    if (nom !== null && (f.properties as { name: string }).name !== nom) continue;
+    if (noms !== null && !noms.has((f.properties as { name: string }).name)) continue;
     const g = f.geometry as GeoJSON.Polygon | GeoJSON.MultiPolygon;
     const polys = (g.type === "MultiPolygon" ? g.coordinates : [g.coordinates]) as Anneau[][];
     for (const p of polys)
@@ -195,6 +221,23 @@ function lignesPays(geo: GeoJSON.FeatureCollection, nom: string | null, r: numbe
   g.setAttribute("position", new THREE.Float32BufferAttribute(v, 3));
   g.setAttribute("alt", new THREE.Float32BufferAttribute(al, 1));
   return g;
+}
+
+/** Un pays peint d'une couleur sur le globe (la page Conflits colore ainsi les pays concernés). */
+export interface Coloration {
+  /** Le nom anglais du pays (clé de la géométrie). */
+  nom: string;
+  couleur: string;
+  /** De 0 à 1 (0,5 par défaut). */
+  opacite?: number;
+}
+
+/** Un cadrage demandé de l'extérieur : un centre, et la taille de ce qu'on veut voir (en degrés). */
+export interface VueGlobe {
+  lat: number;
+  lon: number;
+  largeur: number;
+  hauteur: number;
 }
 
 export interface GlobeExplorerHandle {
@@ -221,6 +264,14 @@ interface Props {
   relief3D: boolean;
   /** Le pays sous le curseur (nom anglais et position à l'écran), ou null. */
   onPaysSurvol: (info: { nom: string; x: number; y: number } | null) => void;
+  /** Mode compact (la page Conflits) : définition d'image plafonnée, sphère un peu moins détaillée. */
+  compact?: boolean;
+  /** Des pays peints d'une couleur, sous le contour du pays choisi. */
+  colorations?: Coloration[];
+  /** Des pays dont on trace le contour, en plus du pays choisi. */
+  contours?: string[];
+  /** Un cadrage imposé quand aucun pays n'est choisi (une région, plusieurs pays) ; le globe n'y tourne plus seul. */
+  vue?: VueGlobe | null;
   /** Des liens courbes entre deux repères (identifiants). */
   arcs: [string, string][];
   onSurvol: (id: string | null) => void;
@@ -229,7 +280,7 @@ interface Props {
 }
 
 export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function GlobeExplorer(props, ref) {
-  const { geo, nuit, reperes, rivieres, rivieresVives, pays, survol, choisi, cartes, monde, arcs } = props;
+  const { geo, nuit, reperes, rivieres, rivieresVives, pays, survol, choisi, cartes, monde, arcs, compact, colorations, contours, vue } = props;
   const hote = useRef<HTMLDivElement>(null);
   const cartesEls = useRef<Map<string, HTMLDivElement>>(new Map());
   /* Tout ce que la boucle de dessin lit, sans qu'un changement de props la relance. */
@@ -268,7 +319,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     /* Le globe : une image de relief déjà ombrée (peinte à partir de vraies altitudes, voir scripts/explorer/relief.js).
        Trois définitions se succèdent sans qu'on le voie : le globe est net dès qu'elle arrivent, et ne recharge plus rien ensuite. */
     const maxTex = renderer.capabilities.maxTextureSize;
-    const gros = maxTex >= 16384 && !window.matchMedia("(pointer: coarse)").matches && ((navigator as unknown as { deviceMemory?: number }).deviceMemory ?? 8) >= 8;
+    const gros = !compact && maxTex >= 16384 && !window.matchMedia("(pointer: coarse)").matches && ((navigator as unknown as { deviceMemory?: number }).deviceMemory ?? 8) >= 8;
     const definitions = ["/explorer/relief-4k.jpg", ...(maxTex >= 8192 ? ["/explorer/relief-8k.jpg"] : []), ...(gros ? ["/explorer/relief-16k.jpg"] : [])];
     const attente = document.createElement("canvas");
     attente.width = 256;
@@ -286,7 +337,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     const matiere = new THREE.MeshStandardMaterial({ map: texture, displacementMap: relief, displacementScale: ELEV, roughness: 0.95, metalness: 0 });
     matiere.color.set(nuit ? "#7a83b4" : "#ffffff");
     const globe = new THREE.Group();
-    const geoBoule = new THREE.SphereGeometry(1, 512, 256);
+    const geoBoule = new THREE.SphereGeometry(1, compact ? 384 : 512, compact ? 192 : 256);
     const boule = new THREE.Mesh(geoBoule, matiere);
     globe.add(boule);
     sc.add(globe);
@@ -317,7 +368,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     const voileToile = document.createElement("canvas");
     voileToile.width = 2048;
     voileToile.height = 1024;
-    peindreSelection(geo, nuit, pays, voileToile);
+    peindreSelection(geo, nuit, pays, voileToile, 1, colorations);
     const voileTex = new THREE.CanvasTexture(voileToile);
     voileTex.colorSpace = THREE.SRGBColorSpace;
     /* Le voile est la même sphère, avec les mêmes hauteurs : il épouse chaque montagne au lieu de flotter au-dessus. */
@@ -379,8 +430,9 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
         contour = null;
       }
       const p = etat.current.props;
-      if (!p.pays) return;
-      contour = new THREE.LineSegments(lignesPays(p.geo, p.pays, BORD, 0.018), contourMat);
+      const noms = [...(p.pays ? [p.pays] : []), ...(p.contours ?? [])];
+      if (!noms.length) return;
+      contour = new THREE.LineSegments(lignesPays(p.geo, noms, BORD, 0.018), contourMat);
       contour.frustumCulled = false;
       contour.renderOrder = 3;
       globe.add(contour);
@@ -483,7 +535,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       maj: () => {},
       peindre: () => {
         const p = etat.current.props;
-        peindreSelection(p.geo, p.nuit, p.pays, voileToile);
+        peindreSelection(p.geo, p.nuit, p.pays, voileToile, 1, p.colorations);
         voileTex.needsUpdate = true;
         matiere.color.set(p.nuit ? "#7a83b4" : "#ffffff");
         bordsMat.color.set(p.nuit ? "#aab4ff" : "#5b4bb0");
@@ -498,6 +550,13 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       },
       cadrer: () => {
         const p = etat.current.props;
+        if (!p.pays && p.vue) {
+          poserCap(p.vue.lat, p.vue.lon);
+          const { w, h } = ecran();
+          const visible = Math.max(p.vue.hauteur * 1.95, (p.vue.largeur * 1.85) / Math.max(0.8, Math.min(1.6, w / h)));
+          tout.td = Math.min(distMonde(), Math.max(1.5, 1 + (visible * DEG) / (2 * Math.tan(16 * DEG))));
+          return;
+        }
         if (!p.pays) {
           tout.td = distMonde();
           return;
@@ -777,7 +836,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       const doux = 1 - Math.exp(-dt / 170);
       const e = etat.current;
       /* Le globe tourne tout seul tant qu'on ne l'a pas touché et qu'aucun pays n'est choisi. */
-      if (!tout.glisse && !e.props.pays && !reduit && performance.now() - tout.dernierGeste > 2500) tout.try_ -= 0.00007 * dt;
+      if (!tout.glisse && !e.props.pays && !e.props.vue && !reduit && performance.now() - tout.dernierGeste > 2500) tout.try_ -= 0.00007 * dt;
       if (!tout.glisse) {
         tout.ry += (tout.try_ - tout.ry) * doux;
         tout.rx += (tout.trx - tout.rx) * doux;
@@ -931,8 +990,8 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geo]);
 
-  useEffect(() => scene.current?.peindre(), [nuit, pays, geo]);
-  useEffect(() => scene.current?.cadrer(), [pays]);
+  useEffect(() => scene.current?.peindre(), [nuit, pays, geo, colorations, contours]);
+  useEffect(() => scene.current?.cadrer(), [pays, vue]);
   useEffect(() => {
     scene.current?.majReperes();
     scene.current?.majArcs();

@@ -1,0 +1,168 @@
+/* Page Conflits — tout est limité à .cg-conflits : Économie et Explorer ne bougent pas. */
+
+/* ── Le grand rectangle : globe ~55 % / panneau ~45 % ─────────────────────── */
+.cg-conflits .ge-corps.cf-corps {
+  --ge-h: clamp(520px, 72vh, 700px);
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 18px;
+}
+@media (max-width: 1080px) {
+  .cg-conflits .ge-corps.cf-corps { grid-template-columns: minmax(0, 1fr); gap: 14px; --ge-h: clamp(380px, 60vh, 520px); }
+  .cg-conflits .cf-panneau { height: auto; max-height: none; min-height: 320px; }
+}
+.cg-conflits .cf-scene { overflow: hidden; }
+.cg-conflits .cf-panneau { overflow-y: auto; overflow-x: hidden; padding: 20px 22px 22px; scrollbar-width: thin; }
+.cg-conflits .cf-panneau .ge-nom { font-size: clamp(20px, 2vw, 26px); }
+
+/* Entrée douce à chaque changement de vue (synthèse / pays / fiche) */
+.cg-conflits .cf-vue { animation: cf-entree 0.42s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes cf-entree { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .cg-conflits .cf-vue { animation: none; } }
+
+/* ── Filtres ──────────────────────────────────────────────────────────────── */
+.cg-conflits .cf-barre { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.cg-conflits .cf-barre .ge-metriques { margin-bottom: 0; }
+.cg-conflits .ge-metrique { display: inline-flex; align-items: center; gap: 7px; }
+.cg-conflits .cf-pt { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 0%, transparent); }
+.cg-conflits .cf-recherche {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-width: min(260px, 100%); padding: 8px 12px;
+  border: 1px solid var(--v2-ligne, var(--bord-fin)); border-radius: 999px;
+  background: var(--v2-carte, var(--surface)); color: var(--encre-3);
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.cg-conflits .cf-recherche:focus-within { border-color: var(--v2-vif, #7c4dff); box-shadow: 0 0 0 3px color-mix(in srgb, var(--v2-vif, #7c4dff) 20%, transparent); }
+.cg-conflits .cf-recherche input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: 13px; color: var(--encre); }
+.cg-conflits .cf-recherche input::placeholder { color: var(--encre-3); }
+.cg-conflits .cf-recherche button { display: grid; place-items: center; border: 0; background: transparent; color: var(--encre-3); cursor: pointer; padding: 2px; }
+.cg-conflits .cf-recherche button:hover { color: var(--encre); }
+
+/* ── Globe : infobulle et légende ─────────────────────────────────────────── */
+.cg-conflits .cf-tip {
+  position: absolute; z-index: 5; pointer-events: none;
+  transform: translate(14px, -50%);
+  display: flex; flex-direction: column; gap: 2px; max-width: 240px;
+  padding: 8px 11px; border-radius: 11px;
+  background: rgba(14, 12, 28, 0.92); color: #fff;
+  box-shadow: 0 10px 28px -10px rgba(0, 0, 0, 0.5);
+  font-size: 12px; line-height: 1.3;
+}
+.cg-conflits .cf-tip-g { transform: translate(calc(-100% - 14px), -50%); }
+.cg-conflits .cf-tip b { font-weight: 700; }
+.cg-conflits .cf-tip span { color: rgba(255, 255, 255, 0.75); font-size: 11px; }
+.cg-conflits .cf-legende { align-items: flex-start; gap: 5px; left: 16px; right: auto; padding: 9px 11px; border-radius: 11px; background: color-mix(in srgb, var(--v2-carte, var(--surface)) 82%, transparent); backdrop-filter: blur(8px); }
+.cg-conflits .cf-legende span { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; color: var(--encre-2); }
+.cg-conflits .cf-legende i { width: 9px; height: 9px; border-radius: 50%; }
+.cg-conflits .cf-legende em { font-style: normal; font-size: 10px; color: var(--encre-3); margin-top: 2px; }
+
+/* ── Synthèse ─────────────────────────────────────────────────────────────── */
+.cg-conflits .cf-cats-liste { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-top: 10px; }
+.cg-conflits .cf-cat { flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 6px; }
+.cg-conflits .cf-cat .ge-autre-l { display: inline-flex; align-items: center; gap: 6px; white-space: normal; text-transform: none; letter-spacing: 0; font-size: 11.5px; line-height: 1.2; }
+.cg-conflits .cf-cat b { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; color: var(--encre); font-variant-numeric: tabular-nums; }
+@media (max-width: 520px) { .cg-conflits .cf-cats-liste { grid-template-columns: 1fr; } .cg-conflits .cf-cat { flex-direction: row; align-items: center; } }
+.cg-conflits .cf-st { margin: 18px 0 8px; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--encre-3); font-weight: 600; }
+.cg-conflits .cf-regions { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.cg-conflits .cf-regions button {
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) 28px; align-items: center; gap: 10px; width: 100%;
+  padding: 7px 10px; border: 1px solid transparent; border-radius: 10px; background: transparent;
+  font: inherit; font-size: 12.5px; color: var(--encre-2); cursor: pointer; text-align: left;
+  transition: background 0.25s, border-color 0.25s;
+}
+.cg-conflits .cf-regions button:hover { background: color-mix(in srgb, var(--v2-vif, #7c4dff) 8%, transparent); }
+.cg-conflits .cf-regions button.on { border-color: color-mix(in srgb, var(--v2-vif, #7c4dff) 50%, transparent); background: color-mix(in srgb, var(--v2-vif, #7c4dff) 10%, transparent); color: var(--encre); }
+.cg-conflits .cf-regions i { display: block; height: 6px; border-radius: 99px; background: color-mix(in srgb, var(--encre) 8%, transparent); overflow: hidden; }
+.cg-conflits .cf-regions i b { display: block; height: 100%; border-radius: 99px; background: var(--v2-vif, #7c4dff); transition: width 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.cg-conflits .cf-regions strong { text-align: right; font-weight: 700; color: var(--encre); font-variant-numeric: tabular-nums; }
+.cg-conflits .cf-aide { margin-top: 14px; }
+
+/* ── Retour, pays ─────────────────────────────────────────────────────────── */
+.cg-conflits .cf-retour {
+  display: inline-flex; align-items: center; gap: 6px; margin: 0 0 12px; padding: 6px 12px 6px 9px;
+  border: 1px solid var(--v2-ligne, var(--bord-fin)); border-radius: 999px; background: transparent;
+  font: inherit; font-size: 12px; color: var(--encre-2); cursor: pointer;
+  transition: color 0.25s, border-color 0.25s, transform 0.25s;
+}
+.cg-conflits .cf-retour:hover { color: var(--encre); border-color: var(--v2-vif, #7c4dff); transform: translateX(-2px); }
+.cg-conflits .ge-nom-lien { display: inline-flex; align-items: center; gap: 6px; color: inherit; text-decoration: none; }
+.cg-conflits .ge-nom-lien:hover { color: var(--v2-vif, #7c4dff); }
+.cg-conflits .cf-sous { margin: 8px 0 0; font-size: 13px; line-height: 1.5; color: var(--encre-2); }
+.cg-conflits .cf-fiches { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+.cg-conflits .cf-fiches button {
+  display: grid; grid-template-columns: 12px minmax(0, 1fr) 16px; align-items: center; gap: 11px; width: 100%;
+  padding: 12px 14px; border: 1px solid var(--v2-ligne, var(--bord-fin)); border-radius: 14px;
+  background: var(--surface-2, transparent); font: inherit; text-align: left; color: var(--encre-3); cursor: pointer;
+  transition: transform 0.25s, border-color 0.25s, background 0.25s;
+}
+.cg-conflits .cf-fiches button:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--v2-vif, #7c4dff) 50%, transparent); }
+.cg-conflits .cf-fiches b { display: block; font-size: 14px; font-weight: 700; color: var(--encre); line-height: 1.25; }
+.cg-conflits .cf-fiches small { display: block; margin-top: 3px; font-size: 11.5px; color: var(--encre-3); line-height: 1.35; }
+
+/* ── Fiche détaillée ──────────────────────────────────────────────────────── */
+.cg-conflits .cf-fiche { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.cg-conflits .cf-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+.cg-conflits .cf-badge {
+  display: inline-flex; align-items: center; gap: 7px; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--v2-ligne, var(--bord-fin)); font-size: 11.5px; font-weight: 600; color: var(--encre);
+}
+.cg-conflits .cf-badge-n { font-weight: 500; color: var(--encre-2); }
+.cg-conflits .cf-titre { margin: 0; font-size: clamp(20px, 2vw, 26px); line-height: 1.12; overflow-wrap: anywhere; }
+.cg-conflits .cf-titre-p { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; color: var(--encre); }
+.cg-conflits .cf-situation { margin: 0; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--v2-vif, #7c4dff) 8%, transparent); font-size: 13px; line-height: 1.45; color: var(--encre); }
+.cg-conflits .cf-situation span { display: block; margin-bottom: 3px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--encre-3); }
+.cg-conflits .cf-desc { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--encre-2); }
+.cg-conflits .cf-champs { margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.cg-conflits .cf-champs dt { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--encre-3); margin-bottom: 5px; }
+.cg-conflits .cf-champs dd { margin: 0; font-size: 13px; line-height: 1.5; color: var(--encre); overflow-wrap: anywhere; }
+.cg-conflits .cf-puces { display: flex; flex-wrap: wrap; gap: 6px; }
+.cg-conflits .cf-puces button {
+  padding: 4px 11px; border-radius: 999px; border: 1px solid var(--v2-ligne, var(--bord-fin)); background: transparent;
+  font: inherit; font-size: 12px; color: var(--encre); cursor: pointer; text-align: left;
+  transition: border-color 0.25s, background 0.25s, color 0.25s;
+}
+.cg-conflits .cf-puces button:hover { border-color: var(--v2-vif, #7c4dff); background: color-mix(in srgb, var(--v2-vif, #7c4dff) 9%, transparent); }
+.cg-conflits .cf-puces-l { flex-direction: column; align-items: flex-start; }
+.cg-conflits .cf-zones { display: block; margin-top: 7px; font-size: 12.5px; color: var(--encre-2); }
+.cg-conflits .cf-zones small { display: block; margin-top: 2px; font-size: 11px; color: var(--encre-3); }
+.cg-conflits .cf-source { display: flex; flex-direction: column; gap: 3px; padding-top: 12px; border-top: 1px solid var(--v2-ligne, var(--bord-fin)); }
+.cg-conflits .cf-source a { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--v2-vif, #7c4dff); text-decoration: none; overflow-wrap: anywhere; }
+.cg-conflits .cf-source a:hover { text-decoration: underline; }
+.cg-conflits .cf-source small { font-size: 11px; line-height: 1.4; color: var(--encre-3); }
+
+/* ── Liste des 68 fiches ──────────────────────────────────────────────────── */
+.cg-conflits .cf-liste-section { padding-top: clamp(40px, 6vh, 72px); padding-bottom: clamp(48px, 8vh, 96px); }
+.cg-conflits .cf-liste { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.cg-conflits .cf-item { border: 1px solid var(--v2-ligne, var(--bord-fin)); border-radius: 18px; background: var(--v2-carte, var(--surface)); overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s; }
+.cg-conflits .cf-item:hover { border-color: color-mix(in srgb, var(--v2-vif, #7c4dff) 40%, transparent); }
+.cg-conflits .cf-item-on { border-color: color-mix(in srgb, var(--v2-vif, #7c4dff) 60%, transparent); box-shadow: 0 18px 40px -24px rgba(124, 77, 255, 0.5); }
+.cg-conflits .cf-item-t {
+  display: grid; grid-template-columns: 12px minmax(0, 1fr) 150px 190px 18px; align-items: center; gap: 14px; width: 100%;
+  padding: 14px 18px; border: 0; background: transparent; font: inherit; text-align: left; cursor: pointer; color: var(--encre-2);
+}
+.cg-conflits .cf-item-n { min-width: 0; }
+.cg-conflits .cf-item-n b { display: block; font-size: 14.5px; font-weight: 700; color: var(--encre); line-height: 1.25; }
+.cg-conflits .cf-item-n small { display: block; margin-top: 2px; font-size: 11.5px; color: var(--encre-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cg-conflits .cf-item-c, .cg-conflits .cf-item-r { font-size: 12px; color: var(--encre-2); }
+.cg-conflits .cf-item-f { transition: transform 0.3s; color: var(--encre-3); }
+.cg-conflits .cf-item-on .cf-item-f { transform: rotate(180deg); }
+.cg-conflits .cf-item-corps { padding: 4px 18px 18px 44px; animation: cf-entree 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.cg-conflits .cf-item-corps .cf-fiche { max-width: 760px; }
+.cg-conflits .cf-lien-globe {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 7px 14px; border-radius: 999px;
+  border: 1px solid var(--v2-ligne, var(--bord-fin)); background: transparent; font: inherit; font-size: 12px; color: var(--encre); cursor: pointer;
+  transition: border-color 0.25s, color 0.25s;
+}
+.cg-conflits .cf-lien-globe:hover { border-color: var(--v2-vif, #7c4dff); color: var(--v2-vif, #7c4dff); }
+.cg-conflits .cf-vide { padding: 28px; text-align: center; color: var(--encre-3); font-size: 14px; }
+@media (max-width: 860px) {
+  .cg-conflits .cf-item-t { grid-template-columns: 12px minmax(0, 1fr) 18px; row-gap: 4px; padding: 13px 14px; }
+  .cg-conflits .cf-item-c, .cg-conflits .cf-item-r { grid-column: 2; font-size: 11.5px; }
+  .cg-conflits .cf-item-f { grid-column: 3; grid-row: 1; }
+  .cg-conflits .cf-item-corps { padding: 2px 14px 16px; }
+}
+
+/* ── Notes sur les données ────────────────────────────────────────────────── */
+.cg-conflits .cf-notes { margin-top: 28px; padding: 20px 22px; border-radius: 18px; border: 1px dashed var(--v2-ligne, var(--bord-fin)); }
+.cg-conflits .cf-notes h3 { margin: 0 0 10px; font-size: 14px; font-weight: 800; color: var(--encre); }
+.cg-conflits .cf-notes ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; line-height: 1.55; color: var(--encre-2); }
+.cg-conflits .cf-notes a { color: var(--v2-vif, #7c4dff); }
