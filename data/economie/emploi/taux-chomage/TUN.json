@@ -1,0 +1,17 @@
+{
+  "country": "TUN",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Tunisie",
+  "iso2": "TN",
+  "data": {
+    "2000": 15.2,
+    "2005": 14.2,
+    "2010": 13,
+    "2015": 15.4,
+    "2020": 16,
+    "2023": 15.3,
+    "2025": 15
+  }
+}

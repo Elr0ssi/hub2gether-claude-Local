@@ -1,0 +1,16 @@
+{
+  "country": "HRV",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Croatie",
+  "iso2": "HR",
+  "data": {
+    "2000": 190,
+    "2005": 220,
+    "2010": 240,
+    "2015": 240,
+    "2020": 250,
+    "2023": 260
+  }
+}

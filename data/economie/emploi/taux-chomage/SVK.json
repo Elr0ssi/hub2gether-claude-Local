@@ -1,0 +1,16 @@
+{
+  "country": "SVK",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Slovaquie",
+  "iso2": "SK",
+  "data": {
+    "2000": 18.8,
+    "2005": 16.3,
+    "2010": 14.4,
+    "2015": 11.5,
+    "2020": 6.8,
+    "2023": 5.9
+  }
+}

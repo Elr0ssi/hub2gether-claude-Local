@@ -1,0 +1,28 @@
+{
+  "country": "BRA",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Brésil",
+  "iso2": "BR",
+  "data": {
+    "2000": 65,
+    "2005": 69,
+    "2010": 65,
+    "2015": 73,
+    "2020": 98,
+    "2023": 88,
+    "2025": 90
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 49.3,
+        "2014": 57.2,
+        "2024": 88.4
+      }
+    }
+  ]
+}

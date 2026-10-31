@@ -1,5 +1,6 @@
 "use client";
 
+import { countryFr } from "@/data/countryNamesFr";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Vote, Calendar, Flag, User } from "lucide-react";
 import type { PoliticalPeriod } from "@/data/politics/politics";
@@ -29,7 +30,7 @@ export function PoliticsSidePanel({ countryName, period, year, open, onClose }: 
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 sticky top-0" style={{ borderBottom: "1px solid var(--border)", background: "var(--surface)", zIndex: 10 }}>
               <span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
-                {countryName ?? "Sélection"}
+                {countryName ? countryFr(countryName) : "Sélection"}
               </span>
               <button onClick={onClose} className="btn-ghost p-1.5 rounded-lg"><X size={14} /></button>
             </div>
@@ -116,7 +117,7 @@ export function PoliticsSidePanel({ countryName, period, year, open, onClose }: 
                 <div className="rounded-xl px-3 py-2.5" style={{ background: "var(--surface-2)", border: "1px solid var(--border)" }}>
                   <p style={{ color: "var(--ink-3)", fontSize: "0.6rem", textTransform: "uppercase", fontWeight: 700 }}>Période historique</p>
                   <p className="text-xs font-semibold mt-0.5" style={{ color: "var(--ink-2)" }}>
-                    {period.from} — {period.to === 9999 ? "présent" : period.to}
+                    {period.from}, {period.to === 9999 ? "présent" : period.to}
                   </p>
                 </div>
               </div>

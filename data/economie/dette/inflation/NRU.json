@@ -1,0 +1,12 @@
+{
+  "country": "NRU",
+  "indicator": "INFLATION",
+  "unit": "PCT",
+  "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+  "name": "Nauru",
+  "iso2": "NR",
+  "data": {
+    "2011": 0.3003003003003,
+    "2012": -0.124750499001971
+  }
+}

@@ -1,0 +1,528 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   DETTE PUBLIQUE FRANÇAISE — LE MODE LECTURE
+
+   La direction artistique du projet : une nuit bleue, du bleu électrique pour
+   ce qui compte, du blanc pour le texte, et quelques accents tièdes. La
+   couleur n'arrive pas par des aplats mais par des traits et des lueurs.
+
+   Toutes les animations sont en CSS. Rien n'attend une bibliothèque, et rien
+   ne se déclenche avant d'être à l'écran. Le mouvement se coupe entièrement
+   quand il est demandé.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.dp {
+  --nuit: #04070d;
+  --nuit-2: #070d18;
+  --surface: #0f1722;
+  --surface-2: #16202d;
+  --encre: #f4f6f8;
+  --encre-2: #b6c0ca;
+  --encre-3: #7d8894;
+  --vif: #5aa5ff;
+  --vif-clair: #9ccbff;
+  --tiede: #d6a77a;
+  --bord: color-mix(in srgb, var(--voile) 14%, transparent);
+  --bord-fin: color-mix(in srgb, var(--voile) 8%, transparent);
+  /* Même jeton que la feuille du concept, même raison : un voile blanc ne se
+     voit pas sur une page blanche. */
+  --voile: #ffffff;
+  --corail: #ff8b8b;
+  --pousse: #5fe0a2;
+
+  position: relative;
+  background: var(--nuit);
+  color: var(--encre);
+  font-variant-numeric: tabular-nums;
+}
+body:has(.dp) { background: var(--nuit); }
+
+/* ── Progression et sommaire ───────────────────────────────────────────── */
+
+/* Le sommaire est posé par rapport à la colonne de lecture, pas par rapport
+   à l'écran : il se tient toujours à vingt-huit pixels de son bord gauche, et
+   ne peut donc jamais passer par-dessus le texte. */
+/* Il faut 1 180 px de colonne plus deux fois la largeur du sommaire et sa
+   gouttière : en deçà, il n'y a pas la place, et seule la barre de
+   progression reste. */
+
+/* ── Ouverture ─────────────────────────────────────────────────────────── */
+/* Un seul titre : le surtitre nomme le sujet pour un moteur, la suite pose la
+   question au lecteur. */
+/* La source sur sa ligne, le bouton sur la sienne : côte à côte, le lien
+   discret se lisait comme une étiquette du bouton. Le sélecteur est plus
+   spécifique que `.dp-src`, qui est déclarée plus bas en inline-block. */
+
+/* ── Sections ──────────────────────────────────────────────────────────── */
+/* Le titre de partie reprend l'enseigne du site : un numéro en pastille, le
+   libellé en petites capitales, un filet qui court jusqu'au bord. Plus de
+   tiret cadratin, plus de numérotation collée au texte. */
+/* La réponse courte et factuelle qui ouvre chaque section : c'est elle qu'un
+   moteur ou un lecteur pressé emporte. */
+.dp-texte {
+  margin: 30px 0 0;
+  max-width: 62ch;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--encre-2);
+}
+.dp-note { margin: 12px 0 0; font-size: 11.5px; line-height: 1.6; color: var(--encre-3); }
+.dp-garde {
+  margin: 20px 0 0;
+  max-width: 60ch;
+  padding: 14px 18px;
+  border-left: 2px solid var(--tiede);
+  background: rgba(214, 167, 122, 0.06);
+  font-size: 13.5px;
+  line-height: 1.62;
+  color: var(--encre-2);
+}
+
+/* ── Sources ───────────────────────────────────────────────────────────── */
+
+/* ── Le chiffre géant ──────────────────────────────────────────────────── */
+
+/* ── Les quatre cartes ─────────────────────────────────────────────────── */
+
+/* ── Recettes / dépenses ───────────────────────────────────────────────── */
+
+/* ── Duo texte / scène ─────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  /* `1fr` vaut `minmax(auto, 1fr)` : la piste grandit jusqu'au contenu, et un
+     défilement horizontal placé dedans la faisait déborder de l'écran. En
+     bornant le minimum à zéro, la piste reste dans la colonne et c'est le
+     conteneur qui défile — ce pour quoi il est fait. */
+}
+
+/* ── Le graphique ──────────────────────────────────────────────────────── */
+
+.dp-fig {
+  margin: clamp(38px, 6vh, 70px) 0 0;
+  padding: 22px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.dp-fig-s { margin: 16px 0 0; font-size: 11px; line-height: 1.55; color: var(--encre-3); }
+.dp-fig-s a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--bord-fin); }
+.dp-fig-s a:hover { color: var(--vif-clair); }
+
+/* ── Voir les données ──────────────────────────────────────────────────── */
+
+.dp-donnees { margin-top: 18px; }
+.dp-donnees summary {
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+  cursor: pointer;
+}
+.dp-donnees summary:hover { color: var(--vif-clair); }
+.dp-donnees table { width: 100%; margin-top: 14px; border-collapse: collapse; font-size: 12px; }
+.dp-donnees caption { caption-side: top; text-align: left; padding-bottom: 10px; font-size: 11px; color: var(--encre-3); }
+.dp-donnees th, .dp-donnees td { padding: 7px 12px 7px 0; text-align: left; border-bottom: 1px solid var(--bord-fin); }
+.dp-donnees thead th { font-size: 10px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--encre-3); }
+.dp-donnees tbody th { font-weight: 400; color: var(--encre); }
+.dp-donnees tbody td { color: var(--encre-2); }
+
+/* ── Ratios, flux, listes ──────────────────────────────────────────────── */
+
+/* ── Les administrations ───────────────────────────────────────────────── */
+
+/* ── La consolidation ──────────────────────────────────────────────────── */
+.dp-bouton {
+  margin-top: 14px;
+  padding: 9px 16px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  color: var(--encre);
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s;
+}
+.dp-bouton:hover { border-color: var(--vif); background: rgba(90, 165, 255, 0.1); }
+
+/* ── Les détenteurs ────────────────────────────────────────────────────── */
+
+.dp-rail {
+  display: flex;
+  gap: 12px;
+  margin: clamp(30px, 4vh, 48px) 0 0;
+  padding: 12px 0 22px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  cursor: grab;
+}
+.dp-rail::-webkit-scrollbar { display: none; }
+.dp-rail:active { cursor: grabbing; }
+.dp-det {
+  flex: none;
+  width: clamp(215px, 22vw, 270px);
+  padding: 18px 20px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 13px;
+  background: linear-gradient(155deg, rgba(90, 165, 255, 0.07), color-mix(in srgb, var(--voile) 1.5%, transparent));
+  transition: border-color 0.3s, transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dp-det:hover { border-color: rgba(90, 165, 255, 0.45); transform: translateY(-6px); }
+.dp-det h3 { margin: 0; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--vif-clair); }
+.dp-det p { margin: 12px 0 0; font-size: 13px; line-height: 1.62; color: var(--encre-2); }
+
+/* ── Le coût ───────────────────────────────────────────────────────────── */
+
+/* ── Les échéances ─────────────────────────────────────────────────────── */
+
+/* ── Les tuyaux ────────────────────────────────────────────────────────── */
+
+/* ── Les quatre facteurs ───────────────────────────────────────────────── */
+
+/* ── La comparaison ────────────────────────────────────────────────────── */
+
+.dp-comp { display: grid; gap: 8px; }
+.dp-comp-l {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) 72px;
+  align-items: center;
+  gap: 14px;
+}
+.dp-comp-n { font-size: 13px; color: var(--encre-2); }
+.dp-comp-b {
+  height: 14px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, rgba(90, 165, 255, 0.5), rgba(90, 165, 255, 0.85));
+  transform: scaleX(0);
+  transform-origin: left;
+  width: var(--p);
+  transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--i) * 90ms);
+}
+.dp-comp[data-vu="1"] .dp-comp-b { transform: scaleX(1); }
+.dp-comp-v { font-size: 12.5px; color: var(--encre-2); text-align: right; }
+.dp-comp-fr .dp-comp-n { color: var(--encre); }
+.dp-comp-fr .dp-comp-b { background: linear-gradient(90deg, var(--vif), #a8d4ff); box-shadow: 0 0 18px rgba(90, 165, 255, 0.45); }
+.dp-comp-fr .dp-comp-v { color: var(--vif-clair); }
+.dp-comp-ag .dp-comp-b { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--voile) 18%, transparent) 0 5px, color-mix(in srgb, var(--voile) 6%, transparent) 5px 10px); }
+.dp-comp-ag .dp-comp-n { color: var(--encre-3); font-style: italic; }
+@media (max-width: 620px) { .dp-comp-l { grid-template-columns: 110px minmax(0, 1fr) 60px; gap: 10px; } }
+
+/* ── Conclusion ────────────────────────────────────────────────────────── */
+
+/* ── Le contrôle ───────────────────────────────────────────────────────── */
+
+/* ── FAQ ───────────────────────────────────────────────────────────────── */
+
+/* ── Mouvement réduit ──────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .dp *,
+  .dp *::before,
+  .dp *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .dp-comp-b { transform: scaleX(1) !important; }
+}
+
+/* Le résumé réservé aux lecteurs d'écran et aux moteurs : présent dans le
+   document, hors de l'écran, jamais masqué par display:none — un contenu
+   retiré du flux d'accessibilité ne serait plus lu par personne. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Le menu du site ───────────────────────────────────────────────────── */
+
+/* Le conteneur `.cg` apporte les couleurs dont l'en-tête a besoin, mais il
+   pose aussi un voile fixe sur toute la page : on le neutralise, on ne garde
+   que les variables. */
+.dp-menu {
+  position: relative;
+  z-index: 46;
+  /* Le conteneur du prototype réserve un écran entier de hauteur : ici il ne
+     sert qu'à porter les couleurs de l'en-tête, qui est lui-même fixe. On le
+     ramène donc à rien. */
+  min-height: 0 !important;
+  height: 0;
+}
+.dp-menu::before { display: none !important; }
+
+/* ── L'ancienne barre de l'article, conservée pour mémoire ─────────────── */
+/* La barre de progression passe au-dessus de l'en-tête collant. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES FINANCES PUBLIQUES, PAR PALIERS
+
+   Rien de neuf visuellement : les mêmes matières que le reste de l'article,
+   au service de blocs qui s'ouvrent. Ce qui est fermé n'occupe qu'une ligne.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* L'étiquette de périmètre : discrète, jamais absente. */
+.dp-perim {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 16px 0 0;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+.dp-perim span { border-left: 2px solid var(--bord-fin); padding-left: 8px; }
+.dp-perim-d { color: var(--vif-clair); }
+
+/* ── L'année 2025 ──────────────────────────────────────────────────────── */
+
+/* ── Les blocs qui s'ouvrent ───────────────────────────────────────────── */
+@keyframes dp-deplie { from { opacity: 0; transform: translateY(-8px); } }
+
+/* ── Les listes de postes ──────────────────────────────────────────────── */
+
+.dp-postes { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 10px; }
+.dp-postes > li {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 6px 18px;
+  padding: 12px 14px 12px 16px;
+  border-radius: 10px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.dp-poste-b {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--p);
+  background: linear-gradient(90deg, rgba(90, 165, 255, 0.22), rgba(90, 165, 255, 0.05));
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: dp-barre 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes dp-barre { to { transform: scaleX(1); } }
+.dp-poste-n { position: relative; font-size: 13.5px; }
+.dp-poste-v { position: relative; display: grid; justify-items: end; gap: 2px; font-size: 15px; white-space: nowrap; }
+.dp-poste-v i { font-style: normal; font-size: 10.5px; color: var(--encre-3); }
+.dp-sous {
+  grid-column: 1 / -1;
+  position: relative;
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0 0 0 14px;
+  border-left: 1px solid var(--bord-fin);
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--encre-3);
+}
+.dp-sous b { font-weight: 400; color: var(--encre-2); }
+
+/* ── Les impôts ────────────────────────────────────────────────────────── */
+
+/* ── Les cartes dépliables ─────────────────────────────────────────────── */
+
+.dp-carte-x { margin: 18px 0 0; border: 1px solid var(--bord-fin); border-radius: 12px; overflow: hidden; }
+.dp-carte-x > button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  width: 100%;
+  padding: 16px 20px;
+  border: 0;
+  background: var(--surface);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--encre);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.dp-carte-x > button:hover { background: var(--surface-2); }
+.dp-carte-x > button span { flex: none; font-size: 18px; color: var(--vif-clair); }
+.dp-carte-xr { padding: 4px 20px 20px; animation: dp-deplie 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+.dp-carte-xr p { margin: 14px 0 0; font-size: 13.5px; line-height: 1.68; color: var(--encre-2); }
+.dp-vs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+.dp-vs > span {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--bord-fin);
+  border-radius: 10px;
+  background: var(--nuit-2);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--encre-3);
+}
+.dp-vs b { font-size: clamp(17px, 2vw, 23px); font-weight: 400; letter-spacing: -0.02em; color: var(--encre); }
+@media (max-width: 680px) { .dp-vs { grid-template-columns: 1fr; } }
+
+/* ── Où va l'argent ────────────────────────────────────────────────────── */
+.dp-vues { display: inline-flex; flex-wrap: wrap; gap: 6px; padding: 5px; border: 1px solid var(--bord-fin); border-radius: 999px; }
+.dp-vues button {
+  padding: 9px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--encre-3);
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+.dp-vues button[aria-selected="true"] { background: rgba(90, 165, 255, 0.16); color: var(--vif-clair); }
+.dp-ouva-t { margin: 0 0 4px; font-size: clamp(16px, 1.8vw, 21px); font-weight: 400; }
+
+/* ── La chaîne du budget de l'État ─────────────────────────────────────── */
+
+/* ── Le waterfall du déficit ───────────────────────────────────────────── */
+
+/* ── La composition de la dette ────────────────────────────────────────── */
+
+.dp-compo { margin: clamp(26px, 4vh, 44px) 0 0; }
+
+/* ── Les détenteurs ────────────────────────────────────────────────────── */
+
+.dp-porteurs {
+  --c0: #5aa5ff;
+  --c1: #9ccbff;
+  --c2: #4a7fc4;
+  --c3: #d6a77a;
+  --c4: #7d8894;
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 44px);
+  align-items: start;
+  margin: clamp(26px, 4vh, 44px) 0 0;
+}
+.dp-anneau-w { position: relative; width: 100%; aspect-ratio: 1; }
+.dp-porteurs[data-vu="1"] .dp-anneau-c { opacity: 1; }
+.dp-anneau-c {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s ease 0.35s;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 2px;
+  font-size: 10.5px;
+  color: var(--encre-3);
+  pointer-events: none;
+}
+.dp-anneau-c b { font-size: 28px; font-weight: 400; letter-spacing: -0.03em; color: var(--encre); }
+.dp-porteurs-l { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+.dp-porteurs-l li {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--bord-fin);
+}
+.dp-porteurs-p { width: 10px; height: 10px; border-radius: 3px; background: var(--c0); }
+.dp-porteurs-l li:nth-child(2) .dp-porteurs-p { background: var(--c1); }
+.dp-porteurs-l li:nth-child(3) .dp-porteurs-p { background: var(--c2); }
+.dp-porteurs-l li:nth-child(4) .dp-porteurs-p { background: var(--c3); }
+.dp-porteurs-l li:nth-child(5) .dp-porteurs-p { background: var(--c4); }
+.dp-porteurs-n { font-size: 13.5px; color: var(--encre-2); }
+.dp-porteurs-l b { font-size: 16px; font-weight: 400; letter-spacing: -0.02em; }
+.dp-info {
+  grid-column: 2 / -1;
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 11px;
+  color: var(--vif-clair);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.dp-porteurs > .dp-bouton,
+.dp-porteurs > .dp-garde,
+.dp-porteurs > .dp-serie,
+.dp-porteurs > .dp-ouva-t,
+.dp-porteurs > .dp-matrice,
+.dp-porteurs > .dp-texte,
+.dp-porteurs > .dp-perim { grid-column: 1 / -1; }
+@media (max-width: 800px) {
+  .dp-porteurs { grid-template-columns: 1fr; }
+  .dp-anneau-w { max-width: 220px; margin-inline: auto; }
+}
+
+.dp-serie { margin: 20px 0 0; padding: 18px; border: 1px solid var(--bord-fin); border-radius: 12px; background: var(--surface); }
+.dp-serie figcaption { font-size: 13px; color: var(--encre-2); margin-bottom: 12px; }
+.dp-serie svg { display: block; width: 100%; height: 130px; overflow: visible; }
+.dp-serie-x { display: flex; justify-content: space-between; gap: 18px; margin-top: 8px; font-size: 10.5px; color: var(--encre-3); }
+
+.dp-matrice { width: 100%; margin-top: 14px; border-collapse: collapse; font-size: 13px; }
+.dp-matrice caption { caption-side: top; text-align: left; padding-bottom: 10px; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--encre-3); }
+.dp-matrice th, .dp-matrice td { padding: 11px 14px 11px 0; text-align: left; border-bottom: 1px solid var(--bord-fin); }
+.dp-matrice thead th { font-size: 10px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; color: var(--encre-3); }
+.dp-matrice tbody th { font-weight: 400; color: var(--encre); }
+.dp-matrice tbody th i { display: block; font-style: normal; font-size: 10.5px; color: var(--encre-3); }
+.dp-matrice td { color: var(--encre-2); font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  .dp-poste-b { transform: scaleX(1) !important; animation: none !important; }
+  .dp-anneau-c { opacity: 1 !important; transform: none !important; }
+}
+
+/* Un panneau replié reste dans le document : il est retiré de l'écran et de
+   l'arbre d'accessibilité, mais le HTML livré le contient. C'est ce qui
+   permet d'offrir des paliers de lecture sans rien cacher aux moteurs ni aux
+   outils de lecture. La règle est explicite parce que `display: grid` ou
+   `flex` l'emporteraient sinon sur l'attribut. */
+.dp [hidden] { display: none !important; }
+
+/* Les quatre mesures du coût, côte à côte : c'est en les voyant ensemble,
+   chacune avec son périmètre, qu'on comprend pourquoi elles diffèrent. */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ARTICLE, DE JOUR
+
+   Même bascule que la feuille du concept : seuls les jetons changent. Les
+   accents sont assombris, parce qu'un corail et un vert d'eau qui se lisent
+   sur une page noire passent sous le seuil de contraste sur une page
+   blanche.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root[data-concept="clair"] .dp {
+  --nuit: #fdfdfe;
+  --nuit-2: #f6f7fa;
+  --surface: #ffffff;
+  --surface-2: #f4f5f8;
+  --encre: #0e1116;
+  --encre-2: #3f474f;
+  --encre-3: #6b737b;
+  --vif: #1f5fa8;
+  --vif-clair: #2f6f8a;
+  --tiede: #9a6532;
+  --corail: #c1354a;
+  --pousse: #0d7a52;
+  --voile: #0b0f14;
+}
+
+
+/* L'anneau des détenteurs, interactif : l'arc survolé s'épaissit, les autres
+   s'estompent, et la ligne correspondante de la légende s'allume. */
+.dp-anneau-svg { display: block; width: 100%; height: 100%; opacity: 0; transform: rotate(-12deg) scale(0.94); transition: opacity 0.7s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1); }
+.dp-porteurs[data-vu="1"] .dp-anneau-svg { opacity: 1; transform: none; }
+.dp-arc { cursor: pointer; transition: stroke-width 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease; }
+.dp-arc-sombre { opacity: 0.35; }
+.dp-anneau-c b { transition: color 0.3s; }
+.dp-porteurs-l li { transition: background 0.25s, padding 0.3s; border-radius: 10px; }
+.dp-porteurs-l li.dp-porteurs-on { background: color-mix(in srgb, var(--voile) 7%, transparent); }

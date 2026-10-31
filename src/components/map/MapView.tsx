@@ -103,7 +103,7 @@ export function MapView({ theme, initialYear = 117 }: MapViewProps) {
                   key={empire.id}
                   onClick={() => handleEmpireChange(empire.id)}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 shrink-0"
-                  title={`${empire.name} — ${empire.period}`}
+                  title={`${empire.name} · ${empire.period}`}
                   style={
                     isActive
                       ? {

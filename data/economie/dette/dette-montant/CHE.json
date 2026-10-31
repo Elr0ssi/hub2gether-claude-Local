@@ -1,0 +1,13 @@
+{
+  "country": "CHE",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Suisse",
+  "iso2": "CH",
+  "data": {
+    "2000": 145,
+    "2014": 145,
+    "2024": 155
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "AUT",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Autriche",
+  "iso2": "AT",
+  "data": {
+    "2000": 3.7,
+    "2005": 5.2,
+    "2010": 4.4,
+    "2015": 5.7,
+    "2020": 6,
+    "2023": 4.8,
+    "2025": 5
+  }
+}

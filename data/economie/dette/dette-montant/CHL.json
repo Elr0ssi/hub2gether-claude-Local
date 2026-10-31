@@ -1,0 +1,13 @@
+{
+  "country": "CHL",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Chili",
+  "iso2": "CL",
+  "data": {
+    "2000": 35,
+    "2014": 180,
+    "2024": 325
+  }
+}

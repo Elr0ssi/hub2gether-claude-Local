@@ -24,7 +24,7 @@ export const THEMES: Theme[] = [
     id: "politics",
     label: "Politique",
     description:
-      "Visualisez les régimes politiques de chaque pays depuis 1900 — démocraties, dictatures, monarchies. Explorez les orientations politiques et les transitions historiques sur une frise chronologique.",
+      "Visualisez les régimes politiques de chaque pays depuis 1900, démocraties, dictatures, monarchies. Explorez les orientations politiques et les transitions historiques sur une frise chronologique.",
     slug: "politics",
     available: true,
     icon: "Vote",

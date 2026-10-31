@@ -1,0 +1,16 @@
+{
+  "country": "BGR",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Bulgarie",
+  "iso2": "BG",
+  "data": {
+    "2000": 16.4,
+    "2005": 10.1,
+    "2010": 10.3,
+    "2015": 9.2,
+    "2020": 5.1,
+    "2023": 4.4
+  }
+}
