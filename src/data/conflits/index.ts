@@ -68,7 +68,8 @@ export function filtrer(liste: Conflit[], f: Filtre, nomPays: (en: string) => st
       norm(c.nom).includes(q) ||
       norm(c.zone).includes(q) ||
       norm(c.acteurs).includes(q) ||
-      c.pays.some((p) => norm(nomPays(p)).includes(q) || norm(p).includes(q))
+      c.pays.some((p) => norm(nomPays(p)).includes(q) || norm(p).includes(q)) ||
+      c.paysRattaches.some((p) => norm(nomPays(p)).includes(q) || norm(p).includes(q))
     );
   });
 }

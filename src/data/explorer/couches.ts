@@ -50,6 +50,9 @@ export interface Repere {
   detail: string;
   /** Un nombre pour ranger les repères d'une même couche (le plus grand d'abord). */
   poids: number;
+  /** Une couleur et une icône propres, quand le repère ne suit pas celles de sa couche (la page Conflits). */
+  couleur?: string;
+  icone?: LucideIcon;
 }
 
 export interface Riviere {

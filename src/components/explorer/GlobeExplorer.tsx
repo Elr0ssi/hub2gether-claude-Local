@@ -274,13 +274,15 @@ interface Props {
   vue?: VueGlobe | null;
   /** Des liens courbes entre deux repères (identifiants). */
   arcs: [string, string][];
+  /** Des liens entre deux coordonnées [lat, lon, lat, lon], sans repère à chaque bout. */
+  arcsLL?: [number, number, number, number][];
   onSurvol: (id: string | null) => void;
   onChoix: (id: string) => void;
   onPays: (nom: string | null) => void;
 }
 
 export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function GlobeExplorer(props, ref) {
-  const { geo, nuit, reperes, rivieres, rivieresVives, pays, survol, choisi, cartes, monde, arcs, compact, colorations, contours, vue } = props;
+  const { geo, nuit, reperes, rivieres, rivieresVives, pays, survol, choisi, cartes, monde, arcs, arcsLL, compact, colorations, contours, vue } = props;
   const hote = useRef<HTMLDivElement>(null);
   const cartesEls = useRef<Map<string, HTMLDivElement>>(new Map());
   /* Tout ce que la boucle de dessin lit, sans qu'un changement de props la relance. */
@@ -585,7 +587,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
         const c = new THREE.Color();
         r.forEach((x, i) => {
           pos.set([positions[i].x, positions[i].y, positions[i].z], i * 3);
-          c.set(etat.current.props.monde ? "#e11d48" : COUCHE[x.couche].couleur);
+          c.set(etat.current.props.monde ? "#e11d48" : x.couleur ?? COUCHE[x.couche].couleur);
           /* Le nuage de points n'est pas converti en sortie : on lui donne les valeurs sRGB brutes. */
           const srgb = c.getRGB({ r: 0, g: 0, b: 0 } as THREE.RGB, THREE.SRGBColorSpace);
           col.set([srgb.r, srgb.g, srgb.b], i * 3);
@@ -611,12 +613,16 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       arcsPts = [];
       const e = etat.current;
       const par = new Map(e.reperes.map((r) => [r.id, r]));
+      const liens: [number, number, number, number][] = [];
       for (const [a, b] of e.props.arcs) {
         const ra = par.get(a);
         const rb = par.get(b);
-        if (!ra || !rb) continue;
-        const va = versXYZ(ra.lat, ra.lon, 1);
-        const vb = versXYZ(rb.lat, rb.lon, 1);
+        if (ra && rb) liens.push([ra.lat, ra.lon, rb.lat, rb.lon]);
+      }
+      for (const l of e.props.arcsLL ?? []) liens.push(l);
+      for (const [la, oa, lb, ob] of liens) {
+        const va = versXYZ(la, oa, 1);
+        const vb = versXYZ(lb, ob, 1);
         const ang = va.angleTo(vb);
         const pts: THREE.Vector3[] = [];
         for (let i = 0; i <= 56; i++) {
@@ -996,7 +1002,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     scene.current?.majReperes();
     scene.current?.majArcs();
   }, [reperes, monde, nuit]);
-  useEffect(() => scene.current?.majArcs(), [arcs]);
+  useEffect(() => scene.current?.majArcs(), [arcs, arcsLL]);
   useEffect(() => scene.current?.majLignes(), [rivieres, rivieresVives]);
 
   const aCarte = reperes.filter((r) => cartes.includes(r.id));
@@ -1004,7 +1010,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     <div ref={hote} className="xp-globe">
       <div className="xp-cartes" aria-hidden="true">
         {aCarte.map((r) => {
-          const c = COUCHE[r.couche];
+          const c = { ...COUCHE[r.couche], couleur: r.couleur ?? COUCHE[r.couche].couleur, icone: r.icone ?? COUCHE[r.couche].icone };
           const Icone = c.icone;
           return (
             <div
