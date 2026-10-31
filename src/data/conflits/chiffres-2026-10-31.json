@@ -1,0 +1,49 @@
+{
+  "date_compilation": "2026-10-31",
+  "dossiers": {
+    "VIZ-C-005": {
+      "periode": { "debut": "2026-02-28", "fin": null, "statut": "Cessez-le-feu du 8 avril, frappes reprises en juillet et en septembre" },
+      "chiffres": [
+        { "valeur": "3 468", "libelle": "morts en Iran", "detail": "28 février – 8 avril 2026 · bilan du ministère iranien de la Santé, non vérifié de façon indépendante", "fiabilite": "revendiqué", "source": "ARY News", "source_url": "https://arynews.tv/iran-reports-3468-dead-war-us-israel" },
+        { "valeur": "650", "libelle": "missiles tirés sur Israël", "detail": "avant le cessez-le-feu du 8 avril", "fiabilite": "estimé", "source": "Wikipédia", "source_url": "https://en.wikipedia.org/wiki/2026_Iranian_strikes_on_Israel" }
+      ]
+    },
+    "VIZ-C-008": {
+      "periode": { "debut": "2026-03-02", "fin": null, "statut": "Cessez-le-feu du 17 avril, frappes israéliennes quotidiennes malgré tout" },
+      "chiffres": [
+        { "valeur": "3 020", "libelle": "morts au Liban", "detail": "2 mars – mi-mai 2026 · ministère libanais de la Santé, dont 211 enfants", "fiabilite": "revendiqué", "source": "CP24 (agence)", "source_url": "https://www.cp24.com/news/world/2026/05/18/lebanon-death-toll-reaches-3000-in-fighting-between-israel-and-hezbollah/" }
+      ]
+    },
+    "VIZ-C-010": {
+      "periode": { "debut": "2023-11", "fin": null, "statut": "Suspension houthie fin 2025, attaques reprises mi-2026" },
+      "chiffres": [
+        { "valeur": "100+", "libelle": "navires marchands visés depuis 2023", "detail": "dont 4 coulés, 1 saisi, au moins 8 marins tués", "fiabilite": "estimé", "source": "Marine Insight", "source_url": "https://www.marineinsight.com/suez-canal-2026-will-global-shipping-return-to-the-red-sea/" },
+        { "valeur": "−60 %", "libelle": "trafic du canal de Suez", "detail": "début janvier 2026, par rapport à la même semaine de 2023", "fiabilite": "estimé", "source": "gCaptain", "source_url": "https://gcaptain.com/suez-canal-traffic-stalls-at-60-below-normal-despite-100-days-without-houthi-attacks/" },
+        { "valeur": "7 Md$", "libelle": "perte annuelle estimée pour l'Égypte", "detail": "chiffre du président Sissi, mars 2025", "fiabilite": "revendiqué", "source": "FreshPlaza", "source_url": "https://www.freshplaza.com/africa/article/9875552/red-sea-tensions-renew-shipping-risks-for-egypt-s-suez-canal/" }
+      ]
+    },
+    "VIZ-C-001": {
+      "periode": { "debut": "2022-02-24", "fin": null, "statut": "Invasion à grande échelle ; conflit commencé en 2014" },
+      "chiffres": [
+        { "valeur": "16 431", "libelle": "civils tués, vérifiés par l'ONU", "detail": "24 février 2022 – juin 2026 · un minimum, pas un bilan complet", "fiabilite": "vérifié", "source": "Euronews (mission de l'ONU)", "source_url": "https://www.euronews.com/2026/07/15/june-was-deadliest-month-for-ukraine-civilians-in-over-four-years-un-monitors-say" },
+        { "valeur": "293", "libelle": "civils tués en juin 2026", "detail": "le mois le plus meurtrier depuis plus de quatre ans", "fiabilite": "vérifié", "source": "Euronews (mission de l'ONU)", "source_url": "https://www.euronews.com/2026/07/15/june-was-deadliest-month-for-ukraine-civilians-in-over-four-years-un-monitors-say" },
+        { "valeur": "1 396", "libelle": "civils tués au 1er semestre 2026", "detail": "+ 37 % par rapport au 1er semestre 2025", "fiabilite": "vérifié", "source": "Euronews (mission de l'ONU)", "source_url": "https://www.euronews.com/2026/07/15/june-was-deadliest-month-for-ukraine-civilians-in-over-four-years-un-monitors-say" }
+      ]
+    },
+    "VIZ-C-020": {
+      "periode": { "debut": "2023-04-15", "fin": null, "statut": "Pas de bilan global officiel des morts" },
+      "chiffres": [
+        { "valeur": "9,3 M", "libelle": "déplacés dans le pays", "detail": "janvier 2026 (1 000 jours de guerre) · plus 4,3 millions de réfugiés à l'étranger", "fiabilite": "estimé", "source": "ONU via AllAfrica", "source_url": "https://allafrica.com/stories/202601090213.html" },
+        { "valeur": "24,6 M", "libelle": "personnes en faim aiguë", "detail": "selon le Programme alimentaire mondial ; famine confirmée à El Fasher et Kadugli", "fiabilite": "estimé", "source": "ONU via AllAfrica", "source_url": "https://allafrica.com/stories/202601110122.html" },
+        { "valeur": "≈ 700", "libelle": "civils tués par des drones depuis janvier", "detail": "bilan ONU d'avril 2026", "fiabilite": "estimé", "source": "Africanews", "source_url": "https://www.africanews.com/2026/04/15/700-killed-in-sudan-drone-strikes-as-humanitarian-crisis-deepens-un/" }
+      ]
+    },
+    "VIZ-C-028": {
+      "periode": { "debut": "2021-11", "fin": null, "statut": "Reprise du M23 fin 2021 ; offensives majeures début 2025" },
+      "chiffres": [
+        { "valeur": "6,9 M", "libelle": "déplacés en RDC", "detail": "un record, selon l'OIM", "fiabilite": "estimé", "source": "ThePrint (OIM)", "source_url": "https://theprint.in/world/conflict-uproots-record-6-9-million-people-in-congo-iom/1825203" },
+        { "valeur": "500 000+", "libelle": "déplacés en une semaine", "detail": "offensive du Sud-Kivu, 2025", "fiabilite": "estimé", "source": "DevelopmentAid (ONU)", "source_url": "https://www.developmentaid.org/news-stream/post/202836/dr-congo-m23-violence-500000-displaced-un-humanitarian-crisis" }
+      ]
+    }
+  }
+}

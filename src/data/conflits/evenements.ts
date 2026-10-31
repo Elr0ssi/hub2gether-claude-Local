@@ -31,6 +31,8 @@ export interface Evenement {
   auteurPays: string | null;
   date: string;
   detail: string;
+  /** Un chiffre direct pour ce point (morts, frappes…), tel que la source le donne. */
+  chiffre?: { valeur: string; libelle: string };
   source: string;
   source_url: string;
 }

@@ -16,6 +16,7 @@ import {
   type Categorie, type Conflit,
 } from "@/data/conflits";
 import { ORIGINES, TYPES, evenementsDuFichier, evenementsDuPays, type Evenement, type TypeEvenement } from "@/data/conflits/evenements";
+import { dossiersDuFichier, periodeTexte, type DossierConflit } from "@/data/conflits/chiffres";
 import type { Repere } from "@/data/explorer/couches";
 import type { Coloration, GlobeExplorerHandle, VueGlobe } from "@/components/explorer/GlobeExplorer";
 import "@/components/concept/concept.css";
@@ -100,6 +101,7 @@ export function ConflitsPage() {
   const { inventaire, conflits } = useMemo(() => conflitsDuFichier(), []);
   const parId = useMemo(() => new Map(conflits.map((c) => [c.id, c])), [conflits]);
   const ensemble = useMemo(() => evenementsDuFichier(), []);
+  const dossiers = useMemo(() => dossiersDuFichier(), []);
 
   const [categorie, setCategorie] = useState<Cat>("Tous");
   const [recherche, setRecherche] = useState("");
@@ -490,6 +492,7 @@ export function ConflitsPage() {
                       nomPays={nomPays}
                       evts={parConflit.get(choisi.id) ?? []}
                       onEvt={choisirEvt}
+                      dossier={dossiers.get(choisi.id)}
                     />
                   ) : pays ? (
                     <PanneauPays
@@ -500,6 +503,7 @@ export function ConflitsPage() {
                       onFiche={choisirFiche}
                       evts={evtsVisibles}
                       onEvt={choisirEvt}
+                      dossiers={dossiers}
                     />
                   ) : (
                     <Synthese
@@ -560,6 +564,7 @@ export function ConflitsPage() {
                         onPays={(p) => surPays(p)}
                         evts={parConflit.get(c.id) ?? []}
                         onEvt={(e) => { choisirEvt(e); versGlobe(); }}
+                        dossier={dossiers.get(c.id)}
                       />
                       <button type="button" className="cf-lien-globe" onClick={versGlobe}>
                         Voir sur le globe <ArrowUpRight size={13} aria-hidden="true" />
@@ -657,6 +662,34 @@ function Synthese({
   );
 }
 
+/* ── Un chiffre clé, puis deux autres ────────────────────────────────────── */
+
+function Chiffres({ d }: { d: DossierConflit | undefined }) {
+  if (!d || !d.chiffres.length) return null;
+  const [h, ...autres] = d.chiffres;
+  return (
+    <div className="cf-chiffres">
+      <div className="cf-chiffre cf-chiffre-h">
+        <b>{h.valeur}</b>
+        <span>{h.libelle}</span>
+        <small>{h.detail} · <a href={h.source_url} target="_blank" rel="noopener noreferrer">{h.source}</a></small>
+        <em className={`cf-fiab cf-fiab-${h.fiabilite.slice(0, 3)}`}>{h.fiabilite}</em>
+      </div>
+      {autres.length > 0 && (
+        <div className="cf-chiffres-s">
+          {autres.map((c) => (
+            <div key={c.libelle} className="cf-chiffre">
+              <b>{c.valeur}</b>
+              <span>{c.libelle}</span>
+              <small>{c.detail} · <a href={c.source_url} target="_blank" rel="noopener noreferrer">{c.source}</a></small>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── Un point : date, lieu, acteur, source ───────────────────────────────── */
 
 function PointLigne({ e, onEvt }: { e: Evenement; onEvt: (e: Evenement) => void }) {
@@ -666,10 +699,10 @@ function PointLigne({ e, onEvt }: { e: Evenement; onEvt: (e: Evenement) => void 
       <button type="button" onClick={() => onEvt(e)}>
         <i className="cf-pin" style={{ background: TYPES[e.type].couleur }}><Icone size={11} aria-hidden="true" /></i>
         <span>
-          <b>{e.titre}</b>
-          <small>{e.lieu} · {e.date}</small>
+          <b>{e.lieu}</b>
+          <small>{e.date}</small>
         </span>
-        <ArrowUpRight size={15} aria-hidden="true" />
+        {e.chiffre ? <em className="cf-pt-n"><strong>{e.chiffre.valeur}</strong> {e.chiffre.libelle}</em> : <ArrowUpRight size={15} aria-hidden="true" />}
       </button>
     </li>
   );
@@ -685,7 +718,6 @@ function PointsParPays({ evts, nomPays, onEvt }: { evts: Evenement[]; nomPays: (
   }
   return (
     <div className="cf-points">
-      <h4 className="cf-st">{evts.length > 1 ? `${evts.length} points documentés` : "1 point documenté"}</h4>
       {[...groupes.entries()].map(([k, l]) => (
         <div key={k} className="cf-groupe">
           <h5>{k === "mer" ? "En mer" : nomPays(k)}<span>{l.length}</span></h5>
@@ -701,7 +733,7 @@ function PointsParPays({ evts, nomPays, onEvt }: { evts: Evenement[]; nomPays: (
 /* ── Le panneau : un pays ────────────────────────────────────────────────── */
 
 function PanneauPays({
-  pays, fiches, nomPays, onRetour, onFiche, evts, onEvt,
+  pays, fiches, nomPays, onRetour, onFiche, evts, onEvt, dossiers,
 }: {
   pays: string;
   fiches: Conflit[];
@@ -710,13 +742,13 @@ function PanneauPays({
   onFiche: (c: Conflit) => void;
   evts: Evenement[];
   onEvt: (e: Evenement) => void;
+  dossiers: Map<string, DossierConflit>;
 }) {
   const g = evenementsDuPays(evts, pays, new Set(fiches.map((c) => c.id)));
-  const bloc = (titre: string, note: string, l: Evenement[]) =>
+  const bloc = (titre: string, l: Evenement[]) =>
     l.length > 0 && (
       <div className="cf-groupe">
         <h5>{titre}<span>{l.length}</span></h5>
-        <p className="cf-sous cf-sous-p">{note}</p>
         <ul className="cf-fiches cf-fiches-p">
           {l.map((e) => <PointLigne key={e.id} e={e} onEvt={onEvt} />)}
         </ul>
@@ -733,32 +765,34 @@ function PanneauPays({
       </h3>
       {fiches.length ? (
         <>
-          <p className="cf-sous">{fiches.length === 1 ? "1 fiche" : `${fiches.length} fiches distinctes`} dans l’inventaire. Elles ne sont ni fusionnées ni additionnées.</p>
+          <p className="cf-sous">{fiches.length === 1 ? "1 fiche" : `${fiches.length} fiches distinctes, non additionnées`}</p>
           <ul className="cf-fiches">
-            {fiches.map((c) => (
-              <li key={c.id}>
-                <button type="button" onClick={() => onFiche(c)}>
-                  <i className="cf-pt" style={{ background: COULEUR[c.categorie] }} aria-hidden="true" />
-                  <span>
-                    <b>{c.nom}</b>
-                    <small>{c.categorie} · {c.situation}{c.pays.length === 0 ? " · rattachée à une autre fiche" : ""}</small>
-                  </span>
-                  <ArrowUpRight size={15} aria-hidden="true" />
-                </button>
-              </li>
-            ))}
+            {fiches.map((c) => {
+              const d = dossiers.get(c.id);
+              return (
+                <li key={c.id}>
+                  <button type="button" onClick={() => onFiche(c)}>
+                    <i className="cf-pt" style={{ background: COULEUR[c.categorie] }} aria-hidden="true" />
+                    <span>
+                      <b>{c.nom}</b>
+                      <small>{c.categorie}{d ? ` · ${periodeTexte(d.periode)}` : ""}</small>
+                    </span>
+                    <ArrowUpRight size={15} aria-hidden="true" />
+                  </button>
+                </li>
+              );
+            })}
           </ul>
           {(g.sur.length > 0 || g.menes.length > 0 || g.autres.length > 0) && (
             <div className="cf-points">
-              <h4 className="cf-st">Points sur le globe</h4>
-              {bloc(`Sur le territoire : ${nomPays(pays)}`, "Lieux situés dans ce pays.", g.sur)}
-              {bloc(`Menés depuis ${nomPays(pays)}`, "Lieux frappés ou attaqués par un acteur de ce pays, dans un autre pays ou en mer.", g.menes)}
-              {bloc("Autres points des mêmes conflits", "Lieux des fiches de ce pays situés ailleurs.", g.autres)}
+              {bloc("Sur son sol", g.sur)}
+              {bloc(`Menés depuis ${nomPays(pays)}`, g.menes)}
+              {bloc("Autres points liés", g.autres)}
             </div>
           )}
         </>
       ) : (
-        <p className="cf-sous">Aucune fiche pour ce pays dans cette sélection de l’inventaire. Ce n’est pas une affirmation sur la situation du pays : l’inventaire n’est pas exhaustif.</p>
+        <p className="cf-sous">Aucune fiche pour ce pays dans cette sélection. L’inventaire n’est pas exhaustif.</p>
       )}
     </>
   );
@@ -776,16 +810,17 @@ function FicheConflit(props: {
   nomPays: (n: string) => string;
   evts: Evenement[];
   onEvt: (e: Evenement) => void;
+  dossier?: DossierConflit;
 }) {
   return (
     <>
       <button type="button" className="cf-retour" onClick={props.onRetour}><ArrowLeft size={14} aria-hidden="true" /> {props.retour}</button>
-      <FicheCorps c={props.c} parId={props.parId} nomPays={props.nomPays} onFiche={props.onFiche} onPays={props.onPays} evts={props.evts} onEvt={props.onEvt} titre />
+      <FicheCorps c={props.c} parId={props.parId} nomPays={props.nomPays} onFiche={props.onFiche} onPays={props.onPays} evts={props.evts} onEvt={props.onEvt} dossier={props.dossier} titre />
     </>
   );
 }
 
-/** Un point : ce qui s'y est passé, qui, où, d'où ça vient. */
+/** Un point : le chiffre, le lieu, une phrase, la source. */
 function FichePoint({
   e, fiche, retour, nomPays, onRetour, onFiche, onPays,
 }: {
@@ -807,53 +842,42 @@ function FichePoint({
           <span className="cf-badge cf-badge-n">{e.date}</span>
         </div>
         <h3 className="ge-nom cf-titre">{e.titre}</h3>
-        <p className="cf-situation">
-          <span>Lieu</span>
+        <p className="cf-lieu">
+          <MapPin size={13} aria-hidden="true" />
           {e.lieu}{e.pays ? ` · ${nomPays(e.pays)}` : " · en mer"}
-          {e.precision === "zone" && <small className="cf-approx">Position approximative : le point marque le centre de la zone nommée, pas un site exact.</small>}
+          {e.precision === "zone" && <i title="Le point marque le centre de la zone nommée, pas un site exact">≈ zone</i>}
         </p>
+        {e.chiffre && (
+          <div className="cf-chiffres">
+            <div className="cf-chiffre cf-chiffre-h"><b>{e.chiffre.valeur}</b><span>{e.chiffre.libelle}</span></div>
+          </div>
+        )}
         <p className="cf-desc">{e.detail}</p>
-        <dl className="cf-champs">
-          {e.auteur && (
-            <div>
-              <dt>Auteur indiqué par la source</dt>
-              <dd>
-                {e.auteur}
-                {e.auteurPays && e.pays && e.auteurPays !== e.pays && (
-                  <span className="cf-puces">
-                    <button type="button" onClick={() => onPays(e.auteurPays as string)}>{nomPays(e.auteurPays)}</button>
-                    <span className="cf-fleche">→</span>
-                    <button type="button" onClick={() => onPays(e.pays as string)}>{nomPays(e.pays)}</button>
-                  </span>
-                )}
-              </dd>
-            </div>
-          )}
-          {fiche && (
-            <div>
-              <dt>Fiche de l’inventaire</dt>
-              <dd>
-                <span className="cf-puces cf-puces-l">
-                  <button type="button" onClick={() => onFiche(fiche)}>{fiche.nom}</button>
-                </span>
-              </dd>
-            </div>
-          )}
-        </dl>
+        <div className="cf-puces">
+          {e.auteurPays && e.pays && e.auteurPays !== e.pays ? (
+            <>
+              <button type="button" onClick={() => onPays(e.auteurPays as string)}>{nomPays(e.auteurPays)}</button>
+              <span className="cf-fleche">→</span>
+              <button type="button" onClick={() => onPays(e.pays as string)}>{nomPays(e.pays)}</button>
+            </>
+          ) : e.auteur ? (
+            <span className="cf-auteur">{e.auteur}</span>
+          ) : null}
+          {fiche && <button type="button" onClick={() => onFiche(fiche)}>Voir le conflit</button>}
+        </div>
         <div className="cf-source">
           <a href={e.source_url} target="_blank" rel="noopener noreferrer">
             Source : {e.source} <ExternalLink size={12} aria-hidden="true" />
           </a>
-          <small>Les chiffres et attributions sont ceux de la source ; les revendications d’un camp ne sont pas confirmées de façon indépendante.</small>
         </div>
       </div>
     </>
   );
 }
 
-/** Le contenu d'une fiche : le même dans le panneau et dans la liste. */
+/** Le contenu d'une fiche, dans l'ordre où on le lit : quand, le chiffre, les pays, les points. Le reste est replié. */
 function FicheCorps({
-  c, parId, nomPays, onFiche, onPays, titre, evts, onEvt,
+  c, parId, nomPays, onFiche, onPays, titre, evts, onEvt, dossier,
 }: {
   c: Conflit;
   parId: Map<string, Conflit>;
@@ -863,80 +887,67 @@ function FicheCorps({
   titre?: boolean;
   evts: Evenement[];
   onEvt: (e: Evenement) => void;
+  dossier?: DossierConflit;
 }) {
   const parent = c.parent ? parId.get(c.parent) : null;
   const enfants = c.enfants.map((e) => parId.get(e)).filter(Boolean) as Conflit[];
   const Titre = titre ? "h3" : "h4";
-  /* Ce que chaque pays de la fiche a, dans les points documentés : des sites touchés chez lui, des actions menées depuis lui. */
   const bilan = (p: string) => {
     const sur = evts.filter((e) => e.pays === p).length;
     const menes = evts.filter((e) => e.auteurPays === p && e.pays !== p).length;
-    return [sur ? `${sur} ${sur > 1 ? "sites" : "site"} sur son sol` : "", menes ? `${menes} ${menes > 1 ? "actions menées" : "action menée"} hors de ses frontières` : ""].filter(Boolean).join(" · ");
+    return [sur ? `${sur} sur son sol` : "", menes ? `${menes} menés depuis` : ""].filter(Boolean).join(" · ");
   };
   const paysDeLaFiche = [...new Set([...c.pays, ...evts.flatMap((e) => (e.auteurPays && !c.pays.includes(e.auteurPays) ? [e.auteurPays] : []))])];
   return (
     <div className="cf-fiche">
       <div className="cf-badges">
         <span className="cf-badge"><i className="cf-pt" style={{ background: COULEUR[c.categorie] }} aria-hidden="true" />{c.categorie}</span>
-        <span className="cf-badge cf-badge-n">{c.region}</span>
+        {dossier && <span className="cf-badge cf-badge-n">{periodeTexte(dossier.periode)}</span>}
       </div>
       <Titre className={titre ? "ge-nom cf-titre" : "cf-titre cf-titre-p"}>{c.nom}</Titre>
-      <p className="cf-situation"><span>Situation documentée</span>{c.situation}</p>
       <p className="cf-desc">{c.description}</p>
+      {dossier?.periode.statut && <p className="cf-statut">{dossier.periode.statut}</p>}
 
-      <dl className="cf-champs">
-        <div>
-          <dt>Pays et zones concernés</dt>
-          <dd>
-            {paysDeLaFiche.length > 0 && (
-              <span className="cf-pays-l">
-                {paysDeLaFiche.map((p) => (
-                  <button key={p} type="button" onClick={() => onPays(p)}>
-                    <b>{nomPays(p)}</b>
-                    {bilan(p) && <small>{bilan(p)}</small>}
-                  </button>
-                ))}
-              </span>
-            )}
-            {c.zonesNonPositionnees.length > 0 && (
-              <span className="cf-zones">
-                {c.zonesNonPositionnees.join(" · ")}
-                <small>zones citées dans la fiche, non colorées : l’inventaire ne donne pas de coordonnées</small>
-              </span>
-            )}
-            {c.pays.length === 0 && c.paysRattaches.length > 0 && (
-              <small className="cf-zones">Se rattache à {c.paysRattaches.map(nomPays).join(", ")}</small>
-            )}
-          </dd>
+      <Chiffres d={dossier} />
+
+      {paysDeLaFiche.length > 0 && (
+        <div className="cf-pays-l">
+          {paysDeLaFiche.map((p) => (
+            <button key={p} type="button" onClick={() => onPays(p)}>
+              <b>{nomPays(p)}</b>
+              {bilan(p) && <small>{bilan(p)}</small>}
+            </button>
+          ))}
         </div>
-        <div>
-          <dt>Principaux acteurs</dt>
-          <dd>{c.acteurs}</dd>
-        </div>
-        {(parent || enfants.length > 0) && (
-          <div>
-            <dt>Fiches liées</dt>
-            <dd>
-              <span className="cf-puces cf-puces-l">
-                {parent && <button type="button" onClick={() => onFiche(parent)}>↑ {parent.nom}</button>}
-                {enfants.map((e) => (
-                  <button key={e.id} type="button" onClick={() => onFiche(e)}>↳ {e.nom}</button>
-                ))}
-              </span>
-              <small className="cf-zones">Fiches reliées : elles ne s’additionnent pas.</small>
-            </dd>
-          </div>
-        )}
-      </dl>
+      )}
 
       <PointsParPays evts={evts} nomPays={nomPays} onEvt={onEvt} />
+
+      <details className="cf-plus">
+        <summary>Acteurs, zones, fiches liées</summary>
+        <dl className="cf-champs">
+          <div><dt>Situation</dt><dd>{c.situation} · {c.region}</dd></div>
+          <div><dt>Acteurs</dt><dd>{c.acteurs}</dd></div>
+          {c.zonesNonPositionnees.length > 0 && <div><dt>Zones citées, non placées</dt><dd>{c.zonesNonPositionnees.join(" · ")}</dd></div>}
+          {(parent || enfants.length > 0) && (
+            <div>
+              <dt>Fiches liées (non additionnées)</dt>
+              <dd>
+                <span className="cf-puces cf-puces-l">
+                  {parent && <button type="button" onClick={() => onFiche(parent)}>↑ {parent.nom}</button>}
+                  {enfants.map((e) => <button key={e.id} type="button" onClick={() => onFiche(e)}>↳ {e.nom}</button>)}
+                </span>
+              </dd>
+            </div>
+          )}
+        </dl>
+      </details>
 
       <div className="cf-source">
         <a href={c.source_url} target="_blank" rel="noopener noreferrer">
           Source : {c.source} <ExternalLink size={12} aria-hidden="true" />
         </a>
-        <small>{c.verification}</small>
-        <small>Inventaire compilé le {DATE(c.date_inventaire)} · {c.id}</small>
+        <small>{c.verification} · inventaire du {DATE(c.date_inventaire)} · {c.id}</small>
       </div>
     </div>
   );
