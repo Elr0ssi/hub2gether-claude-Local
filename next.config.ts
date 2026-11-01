@@ -27,6 +27,9 @@ const nextConfig: NextConfig = {
      les liens déjà partagés et l'autorité acquise suivent. */
   async redirects() {
     return [
+      /* L'onglet Explorer est retiré du site ; son code (globe, couches, données) reste dans le dépôt : le globe sert Conflits et Ressources.
+         Redirection TEMPORAIRE, pour pouvoir rouvrir l'onglet sans traîner une redirection permanente dans les navigateurs. */
+      { source: "/explorer", destination: "/", permanent: false },
       { source: "/analyses", destination: "/", permanent: true },
       /* Les anciennes pages « France » et l'ancien article sur la dette : tout est sur la fiche du pays. */
       { source: "/france", destination: "/pays/france", permanent: true },

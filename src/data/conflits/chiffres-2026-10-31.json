@@ -454,6 +454,427 @@
           "points": [
             "EV-034"
           ]
+        },
+        {
+          "date": "2025-07-19",
+          "titre": "Déclaration de principes M23–Kinshasa à Doha",
+          "texte": "Engagement à cesser les combats et à conclure un accord global.",
+          "source": "KT Press",
+          "source_url": "https://www.ktpress.rw/2025/07/dr-congo-m23-rebels-sign-landmark-deal-in-qatar-to-end-eastern-conflict/",
+          "precision": "jour",
+          "fiabilite": "vérifié"
+        },
+        {
+          "date": "2025-10",
+          "titre": "Le M23 avance malgré les accords de Washington",
+          "texte": "Avancées de la ligne de front d'octobre à décembre 2025, selon IPIS.",
+          "source": "IPIS",
+          "source_url": "https://ipisresearch.be/publication/shifting-frontlines-in-october-november-and-december-limits-of-diplomacy-afc-m23-advances-after-washington-accords/",
+          "precision": "mois",
+          "fiabilite": "vérifié"
+        },
+        {
+          "date": "2025-11-15",
+          "titre": "Feuille de route de paix signée à Doha",
+          "texte": "Kinshasa n'avait pas envoyé de délégation à la signature prévue le 11 novembre ; une date limite d'août avait déjà été manquée.",
+          "source": "Citizen Digital",
+          "source_url": "https://citizen.digital/article/m23-dr-congo-ink-fresh-roadmap-to-peace-in-doha-n373093",
+          "precision": "jour",
+          "fiabilite": "vérifié"
+        }
+      ]
+    },
+    "VIZ-C-006": {
+      "periode": {
+        "debut": "2023-10-07",
+        "fin": null,
+        "statut": "Cessez-le-feu en vigueur depuis octobre 2025 (les sources donnent le 10 ou le 11) ; des frappes israéliennes meurtrières se poursuivent"
+      },
+      "resume": "La guerre à Gaza, commencée en octobre 2023, a fait au moins 73 388 morts selon le ministère de la Santé de Gaza. Un cessez-le-feu soutenu par les États-Unis est entré en vigueur en octobre 2025 ; le ministère recense pourtant plus de 1 200 morts dans des attaques israéliennes depuis cette date.",
+      "chiffres": [
+        {
+          "valeur": "73 388",
+          "libelle": "morts depuis octobre 2023",
+          "detail": "Gaza · depuis oct. 2023 · au moins ; le ministère de la Santé de Gaza (autorité de Hamas) ne distingue pas civils et combattants ; l'ONU juge ses chiffres fiables. Date de la dépêche non indiquée.",
+          "fiabilite": "revendiqué",
+          "nature": "morts",
+          "theme": "humaines",
+          "portee": "cumulé",
+          "source": "L'Orient-Le Jour",
+          "source_url": "https://today.lorientlejour.com/article/1544300/gaza-death-toll-rises-to-at-least-73-388.html",
+          "perimetre": "Bande de Gaza"
+        },
+        {
+          "valeur": "1 259",
+          "libelle": "morts depuis le cessez-le-feu",
+          "detail": "Gaza · depuis oct. 2025 · attaques israéliennes, selon le ministère de la Santé de Gaza ; 4 148 blessés. Date de la dépêche non indiquée.",
+          "fiabilite": "revendiqué",
+          "nature": "morts",
+          "theme": "humaines",
+          "portee": "cumulé",
+          "source": "L'Orient-Le Jour",
+          "source_url": "https://today.lorientlejour.com/article/1544300/gaza-death-toll-rises-to-at-least-73-388.html",
+          "perimetre": "Bande de Gaza"
+        },
+        {
+          "valeur": "174 259",
+          "libelle": "blessés depuis octobre 2023",
+          "detail": "Gaza · depuis oct. 2023 · selon le ministère de la Santé de Gaza. Date de la dépêche non indiquée.",
+          "fiabilite": "revendiqué",
+          "nature": "blesses",
+          "theme": "humaines",
+          "portee": "cumulé",
+          "source": "L'Orient-Le Jour",
+          "source_url": "https://today.lorientlejour.com/article/1544300/gaza-death-toll-rises-to-at-least-73-388.html",
+          "perimetre": "Bande de Gaza"
+        }
+      ],
+      "chronologie": [
+        {
+          "date": "2025-10",
+          "titre": "Cessez-le-feu à Gaza",
+          "texte": "Trêve soutenue par les États-Unis ; le début est daté du 10 ou du 11 octobre selon les sources.",
+          "source": "OPB (agence)",
+          "source_url": "https://www.opb.org/article/2026/06/18/over-1000-people-killed-during-gaza-ceasefire-palestinian-authorities-say/",
+          "precision": "mois",
+          "fiabilite": "vérifié"
+        },
+        {
+          "date": "2026-06",
+          "titre": "Plus de 1 000 morts depuis le cessez-le-feu",
+          "texte": "Seuil franchi, selon les autorités palestiniennes.",
+          "source": "OPB (agence)",
+          "source_url": "https://www.opb.org/article/2026/06/18/over-1000-people-killed-during-gaza-ceasefire-palestinian-authorities-say/",
+          "precision": "mois",
+          "fiabilite": "revendiqué"
+        }
+      ]
+    },
+    "VIZ-C-007": {
+      "resume": "En Cisjordanie occupée, la violence des colons atteint en 2026 un niveau sans précédent selon l'OCHA : plus de 1 000 attaques ayant causé des victimes ou des dégâts au 11 juin, touchant plus de 230 communautés. Au 10 août, 76 Palestiniens avaient été tués par les forces israéliennes ou des colons depuis le début de l'année, dont 18 enfants.",
+      "chiffres": [
+        {
+          "valeur": "76",
+          "libelle": "Palestiniens tués en 2026",
+          "detail": "Cisjordanie · 1er janv. → 10 août 2026 · par les forces israéliennes ou des colons, dont 18 enfants",
+          "fiabilite": "vérifié",
+          "nature": "morts",
+          "theme": "humaines",
+          "portee": "récent",
+          "source": "UNSCO (ONU)",
+          "source_url": "https://unsco.unmissions.org/en/node/136471",
+          "perimetre": "Cisjordanie",
+          "date_donnee": "2026-08-10"
+        },
+        {
+          "valeur": "1 000+",
+          "libelle": "attaques de colons avec victimes ou dégâts",
+          "detail": "Cisjordanie · 2026 jusqu'au 11 juin · plus de 230 communautés touchées ; rythme le plus élevé jamais enregistré",
+          "fiabilite": "vérifié",
+          "nature": "frappes",
+          "theme": "militaires",
+          "portee": "récent",
+          "source": "OCHA (ONU)",
+          "source_url": "https://www.un.org/unispal/document/ocha-un-reports-pace-of-settler-violence-highest-on-record/",
+          "perimetre": "Cisjordanie",
+          "date_donnee": "2026-06-11"
+        },
+        {
+          "valeur": "42 322",
+          "libelle": "déplacés",
+          "detail": "Cisjordanie · janv. 2025 → sept. 2026 · violences de colons et restrictions d'accès ; cumul de deux ans, la part de 2026 seule n'est pas isolée",
+          "fiabilite": "vérifié",
+          "nature": "deplaces",
+          "theme": "humaines",
+          "portee": "cumulé",
+          "source": "OCHA (ONU)",
+          "source_url": "https://www.ochaopt.org/sites/default/files/West%20Bank_info-graphic_21_October_2026_version_3.pdf",
+          "perimetre": "Cisjordanie",
+          "date_donnee": "2026-10-21"
+        }
+      ],
+      "chronologie": [
+        {
+          "date": "2026-03",
+          "titre": "Six Palestiniens tués par des colons en un mois",
+          "texte": "Le deuxième bilan mensuel le plus élevé depuis 2005, selon l'OCHA.",
+          "source": "OCHA (ONU)",
+          "source_url": "https://reliefweb.int/report/occupied-palestinian-territory/opt-humanitarian-situation-report-2-april-2026",
+          "precision": "mois",
+          "fiabilite": "vérifié"
+        },
+        {
+          "date": "2026-06",
+          "titre": "Plus de 1 000 attaques de colons depuis janvier",
+          "texte": "Le rythme le plus élevé jamais enregistré, selon l'OCHA.",
+          "source": "OCHA (ONU)",
+          "source_url": "https://www.un.org/unispal/document/ocha-un-reports-pace-of-settler-violence-highest-on-record/",
+          "precision": "mois",
+          "fiabilite": "vérifié"
+        }
+      ]
+    },
+    "VIZ-C-012": {
+      "chiffres": [
+        {
+          "valeur": "≈ 30 000",
+          "libelle": "déplacés",
+          "detail": "Alep et environs · janv. 2026 · combats entre le gouvernement de transition et les FDS, estimation de l'OCHA",
+          "fiabilite": "estimé",
+          "nature": "deplaces",
+          "theme": "humaines",
+          "portee": "récent",
+          "source": "DevelopmentAid (OCHA)",
+          "source_url": "https://www.developmentaid.org/news-stream/post/203429/syria-aleppo-fighting-civilian-deaths-displacement-2026",
+          "perimetre": "Alep et environs"
+        }
+      ],
+      "chronologie": [
+        {
+          "date": "2026-01",
+          "titre": "Combats entre le gouvernement de transition et les FDS",
+          "texte": "Les affrontements à Alep déplacent environ 30 000 personnes.",
+          "source": "DevelopmentAid (OCHA)",
+          "source_url": "https://www.developmentaid.org/news-stream/post/203429/syria-aleppo-fighting-civilian-deaths-displacement-2026",
+          "precision": "mois",
+          "fiabilite": "vérifié"
+        }
+      ]
+    },
+    "VIZ-C-013": {
+      "resume": "En juillet 2025, des affrontements à Soueïda, dans le sud de la Syrie, ont fait au moins 1 707 morts, en majorité des civils druzes. Une commission d'enquête de l'ONU a conclu en mars 2026 à de possibles crimes de guerre de la part des forces gouvernementales, de combattants tribaux et de groupes armés druzes.",
+      "chiffres": [
+        {
+          "valeur": "1 707",
+          "libelle": "morts",
+          "detail": "Soueïda · juillet 2025 · au moins, en majorité des civils druzes ; rapport de la commission d'enquête de l'ONU de mars 2026",
+          "fiabilite": "vérifié",
+          "nature": "morts",
+          "theme": "humaines",
+          "portee": "récent",
+          "source": "The National (commission d'enquête de l'ONU)",
+          "source_url": "https://thenationalnews.com/news/mena/2026/03/28/un-report-more-than-1700-deaths-and-possible-war-crimes-during-clashes-in-syrias-sweida-province-last-year",
+          "perimetre": "Province de Soueïda",
+          "date_donnee": "2026-03-28"
+        },
+        {
+          "valeur": "≤ 155 000",
+          "libelle": "déplacés",
+          "detail": "Soueïda · estimation de mars 2026 · jusqu'à 155 000 personnes toujours déplacées ; un chiffre antérieur de l'ONU donnait au moins 176 000",
+          "fiabilite": "estimé",
+          "nature": "deplaces",
+          "theme": "humaines",
+          "portee": "cumulé",
+          "source": "The National (commission d'enquête de l'ONU)",
+          "source_url": "https://thenationalnews.com/news/mena/2026/03/28/un-report-more-than-1700-deaths-and-possible-war-crimes-during-clashes-in-syrias-sweida-province-last-year",
+          "perimetre": "Province de Soueïda",
+          "date_donnee": "2026-03-28"
+        }
+      ],
+      "chronologie": [
+        {
+          "date": "2025-07",
+          "titre": "Affrontements à Soueïda",
+          "texte": "Au moins 1 707 morts, en majorité des civils druzes.",
+          "source": "The National (ONU)",
+          "source_url": "https://thenationalnews.com/news/mena/2026/03/28/un-report-more-than-1700-deaths-and-possible-war-crimes-during-clashes-in-syrias-sweida-province-last-year",
+          "precision": "mois",
+          "fiabilite": "vérifié"
+        },
+        {
+          "date": "2026-03",
+          "titre": "Rapport de la commission d'enquête de l'ONU",
+          "texte": "Possibles crimes de guerre des forces gouvernementales, de combattants tribaux et de groupes armés druzes.",
+          "source": "The National (ONU)",
+          "source_url": "https://thenationalnews.com/news/mena/2026/03/28/un-report-more-than-1700-deaths-and-possible-war-crimes-during-clashes-in-syrias-sweida-province-last-year",
+          "precision": "mois",
+          "fiabilite": "vérifié"
+        }
+      ]
+    },
+    "VIZ-C-022": {
+      "resume": "L'accord de Pretoria de novembre 2022 a mis fin à la guerre du Tigré, mais il n'a jamais été pleinement appliqué et le TPLF reste interdit. Les combats ont repris en 2026 : en septembre, des combattants tigréens ont pénétré en Afar et pris la ville d'Erebti, sur la route de Djibouti par où passe presque tout le commerce extérieur éthiopien. L'armée accuse l'Égypte, l'Érythrée et le Soudan de soutenir des groupes armés.",
+      "chiffres": [
+        {
+          "valeur": "≥ 150 000",
+          "libelle": "déplacés en Afar",
+          "detail": "Afar · sept. 2026 · estimation rapportée avec la reprise des combats ; la source exacte du chiffre n'est pas précisée dans l'article",
+          "fiabilite": "estimé",
+          "nature": "deplaces",
+          "theme": "humaines",
+          "portee": "récent",
+          "source": "Euronews",
+          "source_url": "https://www.euronews.com/2026/09/28/tigray-rebels-push-into-afar-as-ethiopia-blames-neighbours",
+          "perimetre": "Région Afar",
+          "date_donnee": "2026-09-28"
+        }
+      ],
+      "acteurs": [
+        {
+          "nom": "TPLF",
+          "role": "Mouvement tigréen interdit ; ses combattants ont pris Erebti, en Afar, en septembre 2026.",
+          "verification": "documente"
+        },
+        {
+          "nom": "Gouvernement fédéral éthiopien",
+          "role": "Dit que le TPLF prépare une offensive ; son chef d'état-major accuse l'Égypte, l'Érythrée et le Soudan de soutenir des groupes armés (accusation, non démontrée).",
+          "pays": "Ethiopia",
+          "verification": "documente"
+        }
+      ],
+      "chronologie": [
+        {
+          "date": "2026-01",
+          "titre": "Vols suspendus vers le Tigré",
+          "texte": "Des affrontements éclatent ; les vols vers la région sont suspendus.",
+          "source": "Arab News",
+          "source_url": "https://www.arabnews.pk/node/2631036",
+          "precision": "mois",
+          "fiabilite": "vérifié"
+        },
+        {
+          "date": "2026-06",
+          "titre": "Addis-Abeba affirme que le TPLF prépare une offensive",
+          "texte": "Le gouvernement fédéral accuse aussi le TPLF de se rapprocher de l'Érythrée, ce que le TPLF dément.",
+          "source": "Africanews",
+          "source_url": "https://www.africanews.com/amp/2026/06/12/tigrayan-forces-preparing-offensive-against-federal-gov-addis-ababa-warns/",
+          "precision": "mois",
+          "fiabilite": "revendiqué"
+        },
+        {
+          "date": "2026-09",
+          "titre": "Le TPLF pénètre en Afar et prend Erebti",
+          "texte": "Après un tir d'artillerie lourde ; l'axe vers Djibouti est menacé.",
+          "source": "Euronews",
+          "source_url": "https://www.euronews.com/2026/09/28/tigray-rebels-push-into-afar-as-ethiopia-blames-neighbours",
+          "precision": "mois",
+          "fiabilite": "vérifié"
+        }
+      ]
+    },
+    "VIZ-C-026": {
+      "chiffres": [
+        {
+          "valeur": "2 364",
+          "libelle": "déplacés",
+          "detail": "Basse-Chébéli · 9 mars 2026 · combats entre l'armée somalienne et les Shabaab dans deux villages (Mubarak, Darusalaam) ; un seul épisode, pas un total national",
+          "fiabilite": "vérifié",
+          "nature": "deplaces",
+          "theme": "humaines",
+          "portee": "ponctuel",
+          "source": "UNHCR (réseau de suivi de la protection, via ReliefWeb)",
+          "source_url": "https://reliefweb.int/report/somalia/protection-and-solutions-monitoring-flash-alert-9-march-2026-clashes-between-somali-national-armed-forces-and-al-shabaab-mubarak-and-darusalaam-villages-lower-shabelle-displace-nearly-2400-civilians",
+          "perimetre": "Deux villages de Basse-Chébéli",
+          "date_donnee": "2026-03-09"
+        },
+        {
+          "valeur": "7",
+          "libelle": "morts",
+          "detail": "Basse-Chébéli · 9 mars 2026 · même épisode ; 5 blessés",
+          "fiabilite": "vérifié",
+          "nature": "morts",
+          "theme": "humaines",
+          "portee": "ponctuel",
+          "source": "UNHCR (réseau de suivi de la protection, via ReliefWeb)",
+          "source_url": "https://reliefweb.int/report/somalia/protection-and-solutions-monitoring-flash-alert-9-march-2026-clashes-between-somali-national-armed-forces-and-al-shabaab-mubarak-and-darusalaam-villages-lower-shabelle-displace-nearly-2400-civilians",
+          "perimetre": "Deux villages de Basse-Chébéli",
+          "date_donnee": "2026-03-09"
+        }
+      ],
+      "chronologie": [
+        {
+          "date": "2026-01",
+          "titre": "Opération conjointe en Basse-Chébéli",
+          "texte": "L'AUSSOM annonce plus de 30 combattants shabaab mis hors de combat (bilan de la partie, non vérifié).",
+          "source": "Capital FM",
+          "source_url": "https://www.capitalfm.co.ke/news/2026/01/somalia-alshabaab-killed-bulunagaad-au-operation/",
+          "precision": "mois",
+          "fiabilite": "revendiqué"
+        },
+        {
+          "date": "2026-03",
+          "titre": "L'armée somalienne annonce la prise de positions shabaab dans le sud",
+          "texte": "Avec des alliés, dont des troupes ougandaises de l'AUSSOM, selon le ministère de la Défense.",
+          "source": "Horseed Media",
+          "source_url": "https://horseedmedia.net/somali-army-allies-seize-key-al-shabaab-strongholds-in-south-in-fresh-offensive/419330/",
+          "precision": "mois",
+          "fiabilite": "revendiqué"
+        }
+      ]
+    },
+    "VIZ-C-032": {
+      "resume": "Le 25 avril 2026, le JNIM et des séparatistes touareg du FLA lancent des attaques coordonnées contre Bamako, Kati, Gao, Sévaré, Mopti et Kidal ; le ministre de la Défense, le général Sadio Camara, est tué à Kati dans un attentat à la voiture piégée. Le 27 avril, l'Africa Corps russe annonce son retrait de Kidal ; le 28, le JNIM proclame un « siège total » de Bamako. Selon Human Rights Watch, toutes les parties ont attaqué illégalement des civils.",
+      "chiffres": [
+        {
+          "valeur": "13",
+          "libelle": "civils tués",
+          "detail": "Gao et Kidal · 25 avril 2026 · plus de 25 blessés ; combats du jour des attaques coordonnées, pas un total pour le Mali",
+          "fiabilite": "vérifié",
+          "nature": "morts",
+          "theme": "humaines",
+          "portee": "ponctuel",
+          "source": "Human Rights Watch",
+          "source_url": "https://www.hrw.org/news/2026/06/29/mali-grave-abuses-amid-renewed-fighting",
+          "perimetre": "Gao et Kidal",
+          "date_donnee": "2026-04-25"
+        }
+      ],
+      "acteurs": [
+        {
+          "nom": "JNIM",
+          "role": "Mouvement jihadiste lié à Al-Qaïda ; a mené les attaques du 25 avril et proclamé un siège de Bamako.",
+          "verification": "documente"
+        },
+        {
+          "nom": "FLA (séparatistes touareg)",
+          "role": "Allié du JNIM dans les attaques coordonnées, notamment à Kidal.",
+          "verification": "documente"
+        },
+        {
+          "nom": "Africa Corps (Russie)",
+          "role": "Soutient l'armée malienne ; annonce son retrait de Kidal le 27 avril 2026.",
+          "pays": "Russia",
+          "verification": "documente"
+        },
+        {
+          "nom": "Armée malienne",
+          "role": "Défend le pouvoir militaire ; escorte des convois de carburant vers Bamako avec l'Africa Corps.",
+          "pays": "Mali",
+          "verification": "documente"
+        }
+      ],
+      "chronologie": [
+        {
+          "date": "2026-04-25",
+          "titre": "Attaques coordonnées du JNIM et du FLA",
+          "texte": "Bamako, Kati, Gao, Sévaré, Mopti et Kidal sont visées ; le ministre de la Défense est tué à Kati.",
+          "source": "NPR (HPPR)",
+          "source_url": "https://www.hppr.org/npr-news/2026-04-25/mali-hit-by-wave-of-coordinated-attacks-from-armed-groups",
+          "precision": "jour",
+          "fiabilite": "vérifié",
+          "points": [
+            "EV-037",
+            "EV-038",
+            "EV-039"
+          ]
+        },
+        {
+          "date": "2026-04-27",
+          "titre": "L'Africa Corps annonce son retrait de Kidal",
+          "texte": "Après des combats avec le JNIM et le FLA.",
+          "source": "Drop Site News",
+          "source_url": "https://www.dropsitenews.com/p/mali-attacks-jnim-tuareg-france-bamako-kati-kidal",
+          "precision": "jour",
+          "fiabilite": "vérifié"
+        },
+        {
+          "date": "2026-04-28",
+          "titre": "Le JNIM proclame un « siège total » de Bamako",
+          "texte": "Le blocus est jugé partiel par certaines sources : en mai, 700 camions-citernes sont arrivés sous escorte.",
+          "source": "Africanews",
+          "source_url": "https://www.africanews.com/2026/04/29/mali-jihadists-threaten-to-impose-blockade-on-bamako/",
+          "precision": "jour",
+          "fiabilite": "revendiqué"
         }
       ]
     }

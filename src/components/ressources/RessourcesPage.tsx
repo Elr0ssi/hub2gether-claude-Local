@@ -46,6 +46,12 @@ const TITRES_CLASSEMENT: Record<string, string> = { production: "Principaux prod
 /** Une évolution en %, sans « -0 % » : une variation qui s'arrondit à zéro s'écrit 0 %. */
 const pct = (x: number) => { const r = Math.round(x); return r === 0 ? "0 %" : `${r > 0 ? "+" : ""}${r.toLocaleString("fr-FR")} %`; };
 
+const AUCUN_REPERE: never[] = [];
+const AUCUN_ENSEMBLE = new Set<never>();
+const AUCUN_ARC: [string, string][] = [];
+const AUCUNE_CARTE: string[] = [];
+const AUCUN_CONTOUR: string[] = [];
+const RIEN = () => {};
 const nf = (v: number) => v.toLocaleString("fr-FR");
 
 function nomZone(z: Zone) {
@@ -150,6 +156,8 @@ export function RessourcesPage() {
       return { nom, couleur: RAMPE[classeDe(v, seuil)], opacite: horsZone ? 0.22 : base };
     });
   }, [geo, valeurParNe, ix, zone, seuil, neSel]);
+
+  const contours = useMemo(() => (neSel ? [neSel] : AUCUN_CONTOUR), [neSel]);
 
   const vue = useMemo<VueGlobe | null>(() => {
     if (!geo) return null;
@@ -300,21 +308,21 @@ export function RessourcesPage() {
                       compact
                       geo={geo}
                       nuit={theme === "nuit"}
-                      reperes={[]}
-                      rivieres={[]}
-                      rivieresVives={new Set()}
+                      reperes={AUCUN_REPERE}
+                      rivieres={AUCUN_REPERE}
+                      rivieresVives={AUCUN_ENSEMBLE}
                       pays={null}
                       survol={null}
                       choisi={null}
-                      cartes={[]}
+                      cartes={AUCUNE_CARTE}
                       monde={false}
-                      arcs={[]}
+                      arcs={AUCUN_ARC}
                       relief3D={false}
                       colorations={colorations}
-                      contours={neSel ? [neSel] : []}
+                      contours={contours}
                       vue={vue}
-                      onSurvol={() => {}}
-                      onChoix={() => {}}
+                      onSurvol={RIEN}
+                      onChoix={RIEN}
                       onPays={surPays}
                       onPaysSurvol={setSurvol}
                     />

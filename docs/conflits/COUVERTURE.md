@@ -5,15 +5,15 @@ Généré par `npm run conflits:couverture` à partir de l'enrichissement du 31 
 
 | Mesure | Fiches |
 |---|---|
-| Résumé documenté sur une source consultée | 10 / 68 |
-| Au moins un chiffre sourcé | 9 / 68 |
-| Au moins 3 chiffres sourcés | 3 / 68 |
-| Chronologie d'au moins 5 étapes | 3 / 68 |
-| Au moins un point cartographique | 6 / 68 |
-| Au moins une source précise (hors lien générique) | 13 / 68 |
-| Statut « sources à vérifier » | 10 / 68 |
-| Statut « brouillon » | 58 / 68 |
-| Risque éditorial élevé (≤ 1 section sur 7 complète) | 60 / 68 |
+| Résumé documenté sur une source consultée | 14 / 68 |
+| Au moins un chiffre sourcé | 16 / 68 |
+| Au moins 3 chiffres sourcés | 5 / 68 |
+| Chronologie d'au moins 5 étapes | 5 / 68 |
+| Au moins un point cartographique | 7 / 68 |
+| Au moins une source précise (hors lien générique) | 19 / 68 |
+| Statut « sources à vérifier » | 16 / 68 |
+| Statut « brouillon » | 52 / 68 |
+| Risque éditorial élevé (≤ 1 section sur 7 complète) | 57 / 68 |
 
 Sections comptées : résumé, causes (toutes documentées), acteurs (tous avec un rôle), chronologie (≥ 5), chiffres (≥ 3), conséquences, cartographie (≥ 5 points).
 Sources génériques (tableau de bord) dans l'enrichissement : 29 — à remplacer par des URL précises.
@@ -25,14 +25,14 @@ Sources génériques (tableau de bord) dans l'enrichissement : 29 — à remplac
 | VIZ-C-003 | Serbie – Kosovo | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
 | VIZ-C-004 | Abkhazie et Ossétie du Sud | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
 | VIZ-C-005 | Iran – Israël – États-Unis | documenté | 0/2 | 4/7 | 25 | 2 | 21 | 15 | 4/7 | sources_a_verifier | faible |
-| VIZ-C-006 | Gaza | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
-| VIZ-C-007 | Cisjordanie | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
+| VIZ-C-006 | Gaza | documenté | 0/2 | 0/3 | 2 | 3 | 0 | 2 | 2/7 | sources_a_verifier | moyen |
+| VIZ-C-007 | Cisjordanie | documenté | 0/2 | 0/3 | 2 | 3 | 0 | 4 | 2/7 | sources_a_verifier | moyen |
 | VIZ-C-008 | Israël – Hezbollah | documenté | 0/2 | 2/5 | 2 | 1 | 1 | 2 | 1/7 | sources_a_verifier | élevé |
 | VIZ-C-009 | Guerre au Yémen | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
 | VIZ-C-010 | Mer Rouge | documenté | 0/2 | 2/5 | 4 | 3 | 2 | 6 | 3/7 | sources_a_verifier | moyen |
 | VIZ-C-011 | Syrie | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
-| VIZ-C-012 | Nord-est syrien | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
-| VIZ-C-013 | Soueïda | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
+| VIZ-C-012 | Nord-est syrien | à vérifier | 0/2 | 0/3 | 1 | 1 | 0 | 1 | 0/7 | sources_a_verifier | élevé |
+| VIZ-C-013 | Soueïda | documenté | 0/2 | 0/3 | 2 | 2 | 0 | 1 | 1/7 | sources_a_verifier | élevé |
 | VIZ-C-014 | Israël – Syrie | à vérifier | 0/2 | 0/2 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
 | VIZ-C-015 | Irak : EI et milices | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
 | VIZ-C-016 | Turquie – PKK | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
@@ -41,17 +41,17 @@ Sources génériques (tableau de bord) dans l'enrichissement : 29 — à remplac
 | VIZ-C-019 | Sistan-et-Baloutchistan | à vérifier | 0/2 | 0/2 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
 | VIZ-C-020 | Soudan | documenté | 2/2 | 4/5 | 8 | 5 | 4 | 9 | 5/7 | sources_a_verifier | faible |
 | VIZ-C-021 | Soudan du Sud | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
-| VIZ-C-022 | Tigré | documenté | 2/2 | 0/3 | 1 | 0 | 0 | 1 | 2/7 | sources_a_verifier | moyen |
+| VIZ-C-022 | Tigré | documenté | 2/2 | 2/5 | 4 | 1 | 0 | 4 | 2/7 | sources_a_verifier | moyen |
 | VIZ-C-023 | Amhara | à vérifier | 2/2 | 0/2 | 0 | 0 | 0 | 1 | 1/7 | brouillon | élevé |
 | VIZ-C-024 | Oromia | à vérifier | 2/2 | 0/2 | 0 | 0 | 0 | 1 | 1/7 | brouillon | élevé |
 | VIZ-C-025 | Éthiopie – Érythrée | à vérifier | 2/2 | 0/2 | 0 | 0 | 0 | 1 | 1/7 | brouillon | élevé |
-| VIZ-C-026 | Somalie – Al-Shabaab | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
+| VIZ-C-026 | Somalie – Al-Shabaab | à vérifier | 0/2 | 0/3 | 2 | 2 | 0 | 3 | 0/7 | sources_a_verifier | élevé |
 | VIZ-C-027 | Puntland – EI | à vérifier | 0/2 | 0/2 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
-| VIZ-C-028 | RDC – M23 | documenté | 2/2 | 0/3 | 4 | 2 | 2 | 6 | 2/7 | sources_a_verifier | moyen |
+| VIZ-C-028 | RDC – M23 | documenté | 2/2 | 0/3 | 7 | 2 | 2 | 9 | 3/7 | sources_a_verifier | moyen |
 | VIZ-C-029 | RDC – ADF | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
 | VIZ-C-030 | RDC – Ituri | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
 | VIZ-C-031 | Centrafrique | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
-| VIZ-C-032 | Mali | à vérifier | 0/2 | 0/4 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
+| VIZ-C-032 | Mali | documenté | 0/2 | 4/8 | 6 | 1 | 3 | 4 | 2/7 | sources_a_verifier | moyen |
 | VIZ-C-033 | Burkina Faso | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
 | VIZ-C-034 | Niger | à vérifier | 0/2 | 0/4 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |
 | VIZ-C-035 | Nigeria – Boko Haram / ISWAP | à vérifier | 0/2 | 0/3 | 0 | 0 | 0 | 0 | 0/7 | brouillon | élevé |

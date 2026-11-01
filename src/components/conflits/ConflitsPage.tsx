@@ -32,6 +32,9 @@ const GlobeExplorer = dynamic(() => import("@/components/explorer/GlobeExplorer"
   loading: () => <div className="xp-attente" aria-hidden="true"><span /></div>,
 });
 
+const AUCUNE_RIVIERE: never[] = [];
+const AUCUN_ENSEMBLE = new Set<never>();
+const AUCUN_ARC: [string, string][] = [];
 const DATE = (iso: string) => new Date(iso + "T12:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 const nf = (v: number) => v.toLocaleString("fr-FR");
 
@@ -419,14 +422,14 @@ export function ConflitsPage() {
                       geo={geo}
                       nuit={theme === "nuit"}
                       reperes={reperes}
-                      rivieres={[]}
-                      rivieresVives={new Set()}
+                      rivieres={AUCUNE_RIVIERE}
+                      rivieresVives={AUCUN_ENSEMBLE}
                       pays={null}
                       survol={survolEvt}
                       choisi={evt}
                       cartes={cartes}
                       monde={false}
-                      arcs={[]}
+                      arcs={AUCUN_ARC}
                       arcsLL={arcsLL}
                       relief3D={false}
                       colorations={colorations}

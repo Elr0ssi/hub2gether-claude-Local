@@ -195,7 +195,6 @@ const NAV: Onglet[] = [
   { label: "Démographie", href: "/demographie" },
   { label: "Conflits", href: "/conflits" },
   { label: "Ressources", href: "/ressources" },
-  { label: "Explorer", href: "/explorer" },
   { label: "Forum", href: "/forum" },
   { label: "Comparer", href: "/comparer" },
   { label: "Articles", href: "/articles" },
@@ -392,7 +391,6 @@ export function Pied() {
           <a href="/demographie">Démographie</a>
           <a href="/conflits">Conflits</a>
           <a href="/ressources">Ressources</a>
-          <a href="/explorer">Explorer</a>
           <a href="/comparer">Comparer</a>
           <a href="/articles">Articles</a>
           <a href="/pays">Pays</a>

@@ -281,6 +281,17 @@ interface Props {
   onPays: (nom: string | null) => void;
 }
 
+/* Les pages passent souvent des tableaux recréés à chaque rendu (`[]`, `new Set()`, un tableau de contours) : sans précaution, chaque survol d'un
+   pays relançait le repeint de 231 polygones, le recalcul des contours et des lignes. On ne réagit qu'à un changement de CONTENU. */
+function useStable<T>(v: T, egal: (a: T, b: T) => boolean): T {
+  const r = useRef(v);
+  if (r.current !== v && !egal(r.current, v)) r.current = v;
+  return r.current;
+}
+const egalListe = <T,>(a: T[], b: T[], f: (x: T, y: T) => boolean) => a.length === b.length && a.every((x, i) => f(x, b[i]));
+const egalColorations = (a?: Coloration[], b?: Coloration[]) => (a ?? []) === (b ?? []) || egalListe(a ?? [], b ?? [], (x, y) => x.nom === y.nom && x.couleur === y.couleur && x.opacite === y.opacite);
+const egalTexte = (a?: string[], b?: string[]) => egalListe(a ?? [], b ?? [], (x, y) => x === y);
+
 export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function GlobeExplorer(props, ref) {
   const { geo, nuit, reperes, rivieres, rivieresVives, pays, survol, choisi, cartes, monde, arcs, arcsLL, compact, colorations, contours, vue } = props;
   const hote = useRef<HTMLDivElement>(null);
@@ -833,8 +844,13 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     let dernierPays = 0;
     let brut = 0;
     let avant = performance.now();
+    /* Hors de l'écran ou onglet masqué : plus aucune image. Le globe d'une page longue ne consomme rien pendant qu'on lit la liste en dessous. */
+    let visible = true;
+    const observateur = new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible) avant = performance.now(); }, { rootMargin: "160px" });
+    observateur.observe(el);
     const boucle = () => {
       brut = requestAnimationFrame(boucle);
+      if (!visible || document.hidden) { avant = performance.now(); return; }
       /* Les mouvements suivent le temps, pas le nombre d'images : sur un appareil lent, le globe arrive au même moment. */
       const nowT = performance.now();
       const dt = Math.min(120, nowT - avant);
@@ -962,6 +978,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
 
     return () => {
       cancelAnimationFrame(brut);
+      observateur.disconnect();
       ro.disconnect();
       renderer.domElement.removeEventListener("pointerdown", bas);
       renderer.domElement.removeEventListener("pointermove", bouge);
@@ -971,6 +988,8 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       renderer.domElement.removeEventListener("wheel", roue);
       renderer.domElement.removeEventListener("keydown", touche);
       renderer.dispose();
+      /* Libère le contexte WebGL tout de suite : un navigateur n'en accepte qu'une quinzaine, et les pages qui montent et démontent des globes en épuisaient. */
+      renderer.forceContextLoss();
       actifs = false;
       vivant = false;
       matiere.dispose();
@@ -996,14 +1015,23 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geo]);
 
-  useEffect(() => scene.current?.peindre(), [nuit, pays, geo, colorations, contours]);
-  useEffect(() => scene.current?.cadrer(), [pays, vue]);
+  const colorationsS = useStable(colorations, egalColorations);
+  const contoursS = useStable(contours, egalTexte);
+  const vueS = useStable(vue, (a, b) => a === b || (!!a && !!b && a.lat === b.lat && a.lon === b.lon && a.largeur === b.largeur && a.hauteur === b.hauteur));
+  const reperesS = useStable(reperes, (a, b) => egalListe(a, b, (x, y) => x.id === y.id && x.lat === y.lat && x.lon === y.lon && x.couleur === y.couleur));
+  const arcsS = useStable(arcs, (a, b) => egalListe(a, b, (x, y) => x[0] === y[0] && x[1] === y[1]));
+  const arcsLLS = useStable(arcsLL, (a, b) => egalListe(a ?? [], b ?? [], (x, y) => x.every((n, i) => n === y[i])));
+  const rivieresS = useStable(rivieres, (a, b) => egalListe(a, b, (x, y) => x === y));
+  const vivesS = useStable(rivieresVives, (a, b) => a.size === b.size && [...a].every((x) => b.has(x)));
+
+  useEffect(() => scene.current?.peindre(), [nuit, pays, geo, colorationsS, contoursS]);
+  useEffect(() => scene.current?.cadrer(), [pays, vueS]);
   useEffect(() => {
     scene.current?.majReperes();
     scene.current?.majArcs();
-  }, [reperes, monde, nuit]);
-  useEffect(() => scene.current?.majArcs(), [arcs, arcsLL]);
-  useEffect(() => scene.current?.majLignes(), [rivieres, rivieresVives]);
+  }, [reperesS, monde, nuit]);
+  useEffect(() => scene.current?.majArcs(), [arcsS, arcsLLS]);
+  useEffect(() => scene.current?.majLignes(), [rivieresS, vivesS]);
 
   const aCarte = reperes.filter((r) => cartes.includes(r.id));
   return (
