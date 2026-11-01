@@ -6,8 +6,9 @@ import {
 } from "lucide-react";
 import { COULEUR, type Conflit } from "@/data/conflits";
 import { analyserZone } from "@/data/conflits/pays";
-import { dateCourte, periodeTexte, titreCourt, type ChiffreCle, type DossierConflit, type Theme } from "@/data/conflits/chiffres";
+import { dateCourte, periodeTexte, titreCourt, type Acteur, type ChiffreCle, type DossierConflit, type Theme } from "@/data/conflits/chiffres";
 import { dateIso, type Evenement } from "@/data/conflits/evenements";
+import { ETATS_FICHE, SOURCES, dossierFusionne } from "@/data/conflits/fusion";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA FICHE D'UN CONFLIT
@@ -34,7 +35,18 @@ const THEMES: { id: Theme; titre: string }[] = [
   { id: "militaires", titre: "Militaires" },
 ];
 
-const TYPES_CAUSE = { structurelle: "Cause de fond", declencheur: "Déclencheur", aggravant: "Facteur aggravant" } as const;
+const TYPES_CAUSE = { structurelle: "Cause de fond", declencheur: "Déclencheur", aggravant: "Facteur aggravant", enjeu: "Enjeu" } as const;
+const LIENS_LIBELLE: Record<string, string> = {
+  connexite_non_hierarchique: "Crise connexe, distincte",
+  sous_dossier_potentiel: "Sous-dossier potentiel, à valider",
+};
+const SOURCE_PAR_URL = new Map(Object.values(SOURCES).map((s) => [s.url, s]));
+
+/** Un contenu rattaché à une source consultée, ou une synthèse éditoriale qui reste à recouper. */
+function Etat({ v }: { v?: "documente" | "a_verifier" }) {
+  if (!v) return null;
+  return <span className={`cf-etat cf-etat-${v}`} title={v === "documente" ? "Rattaché à une source consultée" : "Synthèse éditoriale à recouper avec la source exacte avant publication"}>{v === "documente" ? "Documenté" : "À vérifier"}</span>;
+}
 
 type RubriqueId = "causes" | "acteurs" | "chronologie" | "consequences" | "sources";
 
@@ -135,19 +147,22 @@ function etapes(c: Conflit, d: DossierConflit | undefined, evts: Evenement[]): E
 /* ── Les sources, rattachées à ce qu'elles justifient ─────────────────────── */
 
 function sourcesDe(c: Conflit, d: DossierConflit | undefined, evts: Evenement[]) {
-  const m = new Map<string, { nom: string; url: string; concerne: string[] }>();
+  const m = new Map<string, { nom: string; url: string; concerne: string[]; publication: string | null; generique: boolean; nature: string | null }>();
   const ajoute = (nom: string | undefined, url: string | undefined, concerne: string) => {
     if (!nom || !url) return;
-    const s = m.get(url) ?? { nom, url, concerne: [] };
+    const ref = SOURCE_PAR_URL.get(url);
+    const s = m.get(url) ?? { nom: ref?.titre ?? nom, url, concerne: [], publication: ref?.date_publication ?? null, generique: ref?.generique ?? false, nature: ref?.nature ?? null };
     if (!s.concerne.includes(concerne)) s.concerne.push(concerne);
     m.set(url, s);
   };
   ajoute(c.source, c.source_url, "Fiche de l’inventaire : catégorie, zone, acteurs");
   d?.chiffres.forEach((x) => ajoute(x.source, x.source_url, `Chiffre : ${x.valeur} ${x.libelle}`));
-  d?.causes?.forEach((x) => ajoute(x.source, x.source_url, `Cause : ${x.titre}`));
+  d?.causes?.forEach((x) => ajoute(x.source, x.source_url, `Cause : ${x.titre || x.texte.slice(0, 48) + "…"}`));
   d?.chronologie?.forEach((x) => ajoute(x.source, x.source_url, `Jalon : ${x.titre}`));
   d?.consequences?.forEach((x) => ajoute(x.source, x.source_url, "Conséquence"));
   evts.forEach((e) => ajoute(e.source, e.source_url, `Point : ${e.lieu}`));
+  /* Les pistes de la fiche qui ne justifient encore aucun fait précis : listées comme telles. */
+  d?.sourceIds?.forEach((id) => { const r = SOURCES[id]; if (r) ajoute(r.titre, r.url, r.nature === "piste_source_inventaire_original" ? "Piste de l’inventaire, non vérifiée fait par fait" : "Source consultée pour la fiche"); });
   return [...m.values()];
 }
 
@@ -164,13 +179,25 @@ export function FicheDetail({ c, parId, nomPays, dossier, evts, onEvt, onFiche, 
   const Titre = titre ? "h3" : "h4";
   const ind = dossier?.chiffres.slice(0, 3) ?? [];
   const resume = dossier?.resume ?? c.description;
-  const parent = c.parent ? parId.get(c.parent) : null;
-  const enfants = c.enfants.map((e) => parId.get(e)).filter(Boolean) as Conflit[];
+  /* Les liens entre fiches viennent de l'enrichissement (type et justification) ; à défaut, du libellé de parenté de l'inventaire. */
+  const liens = useMemo(() => {
+    const out: { id: string; type: string; justification: string | null; sens: "emis" | "recu"; fiche: Conflit }[] = [];
+    for (const l of dossier?.liens ?? []) { const f = parId.get(l.id); if (f) out.push({ ...l, sens: "emis", fiche: f }); }
+    for (const [id, f] of parId) {
+      if (id === c.id) continue;
+      for (const l of dossierFusionne(id)?.liens ?? []) if (l.id === c.id && !out.some((o) => o.id === id)) out.push({ ...l, id, sens: "recu", fiche: f });
+    }
+    if (!dossier?.liens) {
+      const p = c.parent ? parId.get(c.parent) : null;
+      if (p) out.push({ id: p.id, type: "sous_dossier_potentiel", justification: null, sens: "emis", fiche: p });
+    }
+    return out;
+  }, [c, dossier, parId]);
 
   const chrono = useMemo(() => etapes(c, dossier, evts), [c, dossier, evts]);
   const sources = useMemo(() => sourcesDe(c, dossier, evts), [c, dossier, evts]);
-  const acteurs = useMemo(() => {
-    if (dossier?.acteurs?.length) return dossier.acteurs;
+  const acteurs = useMemo<Acteur[]>(() => {
+    if (dossier?.acteurs?.length) return dossier.acteurs.map((a) => ({ ...a, pays: a.pays ?? analyserZone(a.nom).pays[0] }));
     return c.acteurs.split(";").map((n) => n.trim()).filter(Boolean).map((nom) => ({ nom, role: "", pays: analyserZone(nom).pays[0] }));
   }, [c, dossier]);
   const consequences = useMemo(() => {
@@ -204,28 +231,36 @@ export function FicheDetail({ c, parId, nomPays, dossier, evts, onEvt, onFiche, 
         )}
       </div>
       <p className="cf-fd-meta">
-        {dossier && <span><CalendarDays size={14} aria-hidden="true" />{periodeTexte(dossier.periode)}</span>}
+        {dossier?.periode && <span><CalendarDays size={14} aria-hidden="true" />{periodeTexte(dossier.periode)}</span>}
         <span><MapPin size={14} aria-hidden="true" />{c.zone.split(";").map((z) => z.trim()).join(" · ")}</span>
       </p>
-      {dossier?.periode.statut && <p className="cf-statut">{dossier.periode.statut}</p>}
+      {dossier?.periode?.statut && <p className="cf-statut">{dossier.periode.statut}</p>}
+      {dossier?.etat && ETATS_FICHE[dossier.etat.niveau] && (
+        <p className="cf-statut cf-statut-v">
+          <span className={`cf-fiche-etat cf-fiche-etat-${ETATS_FICHE[dossier.etat.niveau].ton}`}>{ETATS_FICHE[dossier.etat.niveau].libelle}</span>
+          {dossier.etat.derniere_verification && <> · contrôle du {new Date(dossier.etat.derniere_verification + "T12:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</>}
+          {dossier.etat.manque.length > 0 && <> · {dossier.etat.manque.length} vérification{dossier.etat.manque.length > 1 ? "s" : ""} en attente</>}
+        </p>
+      )}
 
       <div className={`cf-inds cf-inds-${Math.max(1, ind.length)}`}>
         {ind.length ? ind.map((i) => <Indicateur key={i.libelle} i={i} />) : <div className="cf-ind cf-ind-vide"><b>—</b><span className="cf-ind-l">Donnée indisponible</span><small>Aucun chiffre sourcé pour cette fiche.</small></div>}
       </div>
 
       <section className="cf-resume">
-        <h4>Résumé</h4>
+        <h4>Résumé <Etat v={dossier?.resumeVerification} /></h4>
         <p>{resume}</p>
+        {dossier?.resumeVerification === "a_verifier" && dossier.resumeLimite && <small>{dossier.resumeLimite}</small>}
       </section>
 
       <div className="cf-rubs">
         {dossier?.causes?.length ? (
           <Rubrique id="causes" titre="Causes" Icone={Target} ouverte={ouv === "causes"} onBascule={() => bascule("causes")}>
             <ul className="cf-causes">
-              {dossier.causes.map((x) => (
-                <li key={x.titre}>
-                  <em>{TYPES_CAUSE[x.type]}</em>
-                  <b>{x.titre}</b>
+              {dossier.causes.map((x, i) => (
+                <li key={`${i}-${x.texte.slice(0, 20)}`}>
+                  <em>{TYPES_CAUSE[x.type]} <Etat v={x.verification} /></em>
+                  {x.titre && <b>{x.titre}</b>}
                   <p>{x.texte}</p>
                   {x.source_url && <a href={x.source_url} target="_blank" rel="noopener noreferrer">{x.source} <ExternalLink size={10} aria-hidden="true" /></a>}
                 </li>
@@ -240,8 +275,9 @@ export function FicheDetail({ c, parId, nomPays, dossier, evts, onEvt, onFiche, 
               {acteurs.map((a) => (
                 <li key={a.nom}>
                   {a.pays ? <button type="button" onClick={() => onPays(a.pays as string)}>{a.nom}</button> : <b>{a.nom}</b>}
+                  <Etat v={a.verification} />
                   {a.role && <p>{a.role}</p>}
-                  {"objectifs" in a && a.objectifs && <p className="cf-acteur-o">{a.objectifs}</p>}
+                  {a.objectifs && <p className="cf-acteur-o">{a.objectifs}</p>}
                 </li>
               ))}
             </ul>
@@ -255,11 +291,14 @@ export function FicheDetail({ c, parId, nomPays, dossier, evts, onEvt, onFiche, 
                 ))}
               </div>
             )}
-            {(parent || enfants.length > 0) && (
+            {liens.length > 0 && (
               <div className="cf-lies">
-                <small>Fiches liées, non additionnées</small>
-                {parent && <button type="button" onClick={() => onFiche(parent)}>↑ {parent.nom}</button>}
-                {enfants.map((e) => <button key={e.id} type="button" onClick={() => onFiche(e)}>↳ {e.nom}</button>)}
+                <small>Autres fiches liées : elles ne s’additionnent pas</small>
+                {liens.map((l) => (
+                  <button key={`${l.id}-${l.sens}`} type="button" onClick={() => onFiche(l.fiche)} title={l.justification ?? undefined}>
+                    {l.fiche.nom}<em>{LIENS_LIBELLE[l.type] ?? l.type}{l.sens === "recu" ? " · vue depuis l’autre fiche" : ""}</em>
+                  </button>
+                ))}
               </div>
             )}
           </Rubrique>
@@ -328,7 +367,8 @@ export function FicheDetail({ c, parId, nomPays, dossier, evts, onEvt, onFiche, 
             {sources.map((s) => (
               <li key={s.url}>
                 <a href={s.url} target="_blank" rel="noopener noreferrer"><b>{s.nom}</b> <ExternalLink size={11} aria-hidden="true" /></a>
-                <small>{s.concerne.join(" · ")}</small>
+                <small>{s.publication ? `Publié le ${new Date(s.publication + "T12:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} · ` : ""}{s.concerne.join(" · ")}</small>
+                {s.generique && <span className="cf-etat cf-etat-a_verifier" title="Page d’accueil ou tableau de bord : ne prouve aucun chiffre précis">Lien générique : source précise à trouver</span>}
               </li>
             ))}
           </ul>

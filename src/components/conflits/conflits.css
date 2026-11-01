@@ -367,3 +367,20 @@ h4.cf-fd-titre { font-size: 19px; }
 .cg-conflits .cf-zoom button { display: grid; place-items: center; width: 38px; height: 38px; border: 0; background: transparent; color: var(--encre); cursor: pointer; transition: background 0.2s; }
 .cg-conflits .cf-zoom button + button { border-top: 1px solid var(--v2-ligne, var(--bord-fin)); }
 .cg-conflits .cf-zoom button:hover { background: color-mix(in srgb, var(--v2-vif, #7c4dff) 10%, transparent); }
+
+/* ── États de vérification ───────────────────────────────────────────────── */
+.cg-conflits .cf-etat { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; font-style: normal; font-size: 9.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; vertical-align: 1px; cursor: help; }
+.cg-conflits .cf-etat-documente { background: rgba(22, 163, 74, 0.14); color: #15803d; }
+.cg-conflits .cf-etat-a_verifier { background: rgba(240, 138, 36, 0.17); color: #b45309; }
+.cg-conflits .cf-statut-v { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.cg-conflits .cf-fiche-etat { padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.cg-conflits .cf-fiche-etat-partiel { background: rgba(124, 77, 255, 0.13); color: #5b3df0; }
+.cg-conflits .cf-fiche-etat-brouillon { background: rgba(240, 138, 36, 0.17); color: #b45309; }
+.cg-conflits .cf-fiche-etat-ok { background: rgba(22, 163, 74, 0.14); color: #15803d; }
+.cg-conflits .cf-resume small { display: block; margin-top: 6px; font-size: 11px; line-height: 1.4; color: var(--encre-3); }
+.cg-conflits .cf-resume h4 { display: flex; align-items: center; gap: 8px; }
+.cg-conflits .cf-resume h4 .cf-etat { margin-left: 0; }
+.cg-conflits .cf-lies button { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+.cg-conflits .cf-lies button em { font-style: normal; font-size: 10.5px; color: var(--encre-3); }
+.cg-conflits .cf-srcs li > .cf-etat { align-self: flex-start; margin: 3px 0 0; }
+.cg-conflits .cf-acteurs .cf-etat { margin-left: 8px; }

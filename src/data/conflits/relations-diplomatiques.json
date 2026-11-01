@@ -1,0 +1,6 @@
+{
+  "schema": 1,
+  "avertissement": "Aucune relation n'est renseignée : les relations diplomatiques (accords, sanctions, médiations, ruptures, soutiens militaires documentés, votes ONU) sont à importer depuis des sources précises, une par une. Une absence de donnée ne signifie jamais une absence de relation.",
+  "types": ["alliance_traite", "differend_territorial", "sanction", "mediation", "rupture_relations", "normalisation", "soutien_militaire_documente", "vote_onu"],
+  "relations": []
+}

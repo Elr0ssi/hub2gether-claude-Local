@@ -34,14 +34,24 @@ export interface ChiffreCle {
   portee?: "cumulé" | "récent" | "annuel" | "ponctuel";
   source: string;
   source_url: string;
+  /** Le périmètre exact du chiffre (« Afghanistan uniquement », « Ukraine ») et ce qu'il compte. */
+  perimetre?: string;
+  min?: number | null;
+  max?: number | null;
+  /** La date de la donnée (publication ou arrêté), pour ordonner les chiffres qui se recouvrent. */
+  date_donnee?: string | null;
 }
 
+/** L'état de vérification d'un contenu. « documente » : rattaché à une source consultée. « a_verifier » : synthèse éditoriale non recoupée. */
+export type Verification = "documente" | "a_verifier";
+
 export interface Cause {
-  type: "structurelle" | "declencheur" | "aggravant";
+  type: "structurelle" | "declencheur" | "aggravant" | "enjeu";
   titre: string;
   texte: string;
   source?: string;
   source_url?: string;
+  verification?: Verification;
 }
 
 export interface Acteur {
@@ -50,6 +60,7 @@ export interface Acteur {
   objectifs?: string;
   /** Le nom Natural Earth du pays, pour ouvrir sa fiche sur le globe. */
   pays?: string;
+  verification?: Verification;
 }
 
 export interface Jalon {
@@ -60,6 +71,9 @@ export interface Jalon {
   source_url?: string;
   /** Les points (EV-…) à montrer sur la carte quand on choisit ce jalon. */
   points?: string[];
+  /** « jour », « mois » ou « annee » : la précision réelle de la date, jamais transformée en jour artificiel. */
+  precision?: string;
+  fiabilite?: Fiabilite;
 }
 
 export interface Consequence {
@@ -76,10 +90,29 @@ export interface Intensite {
 }
 
 /** Tout est facultatif sauf la période : une rubrique sans données n'est pas affichée, jamais remplie à la place. */
+export interface LienCrise {
+  id: string;
+  type: string;
+  justification: string | null;
+  validation: string | null;
+}
+
+export interface EtatFiche {
+  niveau: string;
+  derniere_verification: string | null;
+  manque: string[];
+}
+
 export interface DossierConflit {
   titre_court?: string;
-  periode: Periode;
+  periode?: Periode;
   resume?: string;
+  resumeVerification?: Verification;
+  resumeLimite?: string | null;
+  liens?: LienCrise[];
+  etat?: EtatFiche;
+  /** Les identifiants des sources de la fiche (voir fusion.ts) : la rubrique Sources les détaille. */
+  sourceIds?: string[];
   intensite?: Intensite;
   chiffres: ChiffreCle[];
   causes?: Cause[];

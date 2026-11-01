@@ -16,7 +16,15 @@
     "base:cache": "node scripts/base/cache-globe.mjs",
     "base:socle": "node scripts/base/socle-site.mjs",
     "ressources:importer": "node scripts/ressources/importer-faostat.mjs",
-    "ressources:valider": "node scripts/ressources/valider.mjs"
+    "ressources:valider": "node scripts/ressources/valider.mjs",
+    "conflits:importer": "node scripts/conflits/importer-enrichissement.mjs",
+    "conflits:valider": "node scripts/conflits/valider.mjs",
+    "conflits:couverture": "node scripts/conflits/rapport-couverture.mjs",
+    "conflits:ucdp": "node scripts/conflits/importer-ucdp.mjs",
+    "conflits:tester-connecteurs": "node scripts/conflits/tester-connecteurs.mjs",
+    "conflits:tester-fusion": "tsx scripts/conflits/tester-fusion.ts",
+    "conflits:tout": "npm run conflits:importer && npm run conflits:valider && npm run conflits:tester-connecteurs && npm run conflits:tester-fusion && npm run conflits:couverture",
+    "conflits:tester-navigation": "node scripts/conflits/test-navigation.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.2",
@@ -51,6 +59,7 @@
     "eslint-config-next": "^16.2.6",
     "postcss": "^8",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "world-atlas": "^2.0.2"
   }

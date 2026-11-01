@@ -17,7 +17,8 @@ import {
 } from "@/data/conflits";
 import { ORIGINES, TYPES, evenementsDuFichier, evenementsDuPays, type Evenement, type TypeEvenement } from "@/data/conflits/evenements";
 import { FicheDetail } from "./FicheDetail";
-import { dossiersDuFichier, periodeTexte, type DossierConflit } from "@/data/conflits/chiffres";
+import { periodeTexte, titreCourt, type DossierConflit } from "@/data/conflits/chiffres";
+import { dossierFusionne } from "@/data/conflits/fusion";
 import type { Repere } from "@/data/explorer/couches";
 import type { Coloration, GlobeExplorerHandle, VueGlobe } from "@/components/explorer/GlobeExplorer";
 import { boiteDe, vueDePays } from "@/components/explorer/vues";
@@ -71,7 +72,7 @@ export function ConflitsPage() {
   const { inventaire, conflits } = useMemo(() => conflitsDuFichier(), []);
   const parId = useMemo(() => new Map(conflits.map((c) => [c.id, c])), [conflits]);
   const ensemble = useMemo(() => evenementsDuFichier(), []);
-  const dossiers = useMemo(() => dossiersDuFichier(), []);
+  const dossiers = useMemo(() => ({ get: (id: string) => dossierFusionne(id) }) as unknown as Map<string, DossierConflit>, []);
 
   const [categorie, setCategorie] = useState<Cat>("Tous");
   const [recherche, setRecherche] = useState("");
@@ -280,7 +281,8 @@ export function ConflitsPage() {
     setEvt(null);
     setId(c.id);
     const p = c.pays.length ? c.pays : c.paysRattaches;
-    setPays(p.length === 1 ? p[0] : null);
+    /* Venu de la liste d'un pays que la fiche concerne : on garde ce pays, pour que « Retour » y ramène. */
+    setPays((cur) => (cur && p.includes(cur) ? cur : p.length === 1 ? p[0] : null));
   }, []);
 
   const choisirEvt = useCallback(
@@ -305,6 +307,33 @@ export function ConflitsPage() {
     },
     [ensemble, choisirEvt],
   );
+
+  /* L'adresse garde la sélection : ?conflit=VIZ-C-046 ou ?pays=Iran, avec &point=EV-… ; elle se lit à l'arrivée et s'écrit à chaque choix. */
+  const [urlPrete, setUrlPrete] = useState(false);
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const c = q.get("conflit");
+    const p = q.get("pays");
+    const e = q.get("point");
+    const fiche = c ? parId.get(c) : null;
+    if (fiche) {
+      choisirFiche(fiche);
+      const pt = e ? ensemble.evenements.find((x) => x.id === e && x.conflit === fiche.id) : null;
+      if (pt) choisirEvt(pt);
+    } else if (p) setPays(p);
+    setUrlPrete(true);
+    // lecture unique, au montage
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    if (!urlPrete) return;
+    const q = new URLSearchParams();
+    if (id) q.set("conflit", id);
+    else if (pays) q.set("pays", pays);
+    if (id && evt) q.set("point", evt);
+    const s = q.toString();
+    window.history.replaceState(null, "", s ? `?${s}` : window.location.pathname);
+  }, [urlPrete, id, pays, evt]);
 
   const versGlobe = useCallback(() => rectangle.current?.scrollIntoView({ behavior: "smooth", block: "center" }), []);
 
@@ -704,8 +733,8 @@ function PanneauPays({
                   <button type="button" onClick={() => onFiche(c)}>
                     <i className="cf-pt" style={{ background: COULEUR[c.categorie] }} aria-hidden="true" />
                     <span>
-                      <b>{c.nom}</b>
-                      <small>{c.categorie}{d ? ` · ${periodeTexte(d.periode)}` : ""}</small>
+                      <b title={c.nom}>{titreCourt(c.nom, d)}</b>
+                      <small>{c.categorie}{d?.periode ? ` · ${periodeTexte(d.periode)}` : ""}</small>
                     </span>
                     <ArrowUpRight size={15} aria-hidden="true" />
                   </button>
