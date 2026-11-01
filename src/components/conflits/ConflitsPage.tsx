@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowUpRight, ChevronDown, Crosshair, ExternalLink, MapPin, Search, Ship, Swords, X, type LucideIcon } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, ChevronDown, Crosshair, ExternalLink, MapPin, Minus, Plus, Search, Ship, Swords, X, type LucideIcon } from "lucide-react";
 import { EnTete, Pied, TitreSection } from "@/components/concept/pieces";
 import { Jetons, Dessin } from "@/components/concept/Jetons";
 import { Loupe } from "@/components/concept/Loupe";
@@ -16,6 +16,7 @@ import {
   type Categorie, type Conflit,
 } from "@/data/conflits";
 import { ORIGINES, TYPES, evenementsDuFichier, evenementsDuPays, type Evenement, type TypeEvenement } from "@/data/conflits/evenements";
+import { FicheDetail } from "./FicheDetail";
 import { dossiersDuFichier, periodeTexte, type DossierConflit } from "@/data/conflits/chiffres";
 import type { Repere } from "@/data/explorer/couches";
 import type { Coloration, GlobeExplorerHandle, VueGlobe } from "@/components/explorer/GlobeExplorer";
@@ -108,6 +109,7 @@ export function ConflitsPage() {
   const [pays, setPays] = useState<string | null>(null);
   const [id, setId] = useState<string | null>(null);
   const [evt, setEvt] = useState<string | null>(null);
+  const [rubrique, setRubrique] = useState<string | null>(null);
   const [survolEvt, setSurvolEvt] = useState<string | null>(null);
   const [survol, setSurvol] = useState<{ nom: string; x: number; y: number } | null>(null);
   const [geo, setGeo] = useState<GeoJSON.FeatureCollection | null>(null);
@@ -158,6 +160,9 @@ export function ConflitsPage() {
   }, [idsVisibles, parPays, id, pays]);
 
   const nomPays = countryFr;
+
+  /* Une autre fiche s'ouvre repliée. */
+  useEffect(() => setRubrique(null), [id]);
 
   /* Les points affichés sur le globe : ceux de la fiche choisie, sinon ceux du pays choisi. Rien sur la vue du monde. */
   const points = useMemo<Evenement[]>(() => {
@@ -437,6 +442,10 @@ export function ConflitsPage() {
                   ) : (
                     <div className="xp-attente" aria-hidden="true"><span /></div>
                   )}
+                  <div className="cf-zoom">
+                    <button type="button" aria-label="Zoomer" onClick={() => globe.current?.zoomer(0.78)}><Plus size={16} aria-hidden="true" /></button>
+                    <button type="button" aria-label="Dézoomer" onClick={() => globe.current?.zoomer(1.28)}><Minus size={16} aria-hidden="true" /></button>
+                  </div>
                   {intro === "joue" && (
                     <div className="cf-onde" aria-hidden="true">
                       <i /><i /><i />
@@ -485,7 +494,7 @@ export function ConflitsPage() {
                     <FicheConflit
                       c={choisi}
                       parId={parId}
-                      retour={pays ? `Retour · ${nomPays(pays)}` : "Retour à la synthèse"}
+                      retour={pays ? `Retour aux conflits · ${nomPays(pays)}` : "Retour à la synthèse"}
                       onRetour={revenir}
                       onFiche={(c) => choisirFiche(c)}
                       onPays={surPays}
@@ -493,6 +502,8 @@ export function ConflitsPage() {
                       evts={parConflit.get(choisi.id) ?? []}
                       onEvt={choisirEvt}
                       dossier={dossiers.get(choisi.id)}
+                      ouverte={rubrique}
+                      onOuvrir={setRubrique}
                     />
                   ) : pays ? (
                     <PanneauPays
@@ -556,7 +567,7 @@ export function ConflitsPage() {
                   </button>
                   {est && (
                     <div className="cf-item-corps">
-                      <FicheCorps
+                      <FicheDetail
                         c={c}
                         parId={parId}
                         nomPays={nomPays}
@@ -662,34 +673,6 @@ function Synthese({
   );
 }
 
-/* ── Un chiffre clé, puis deux autres ────────────────────────────────────── */
-
-function Chiffres({ d }: { d: DossierConflit | undefined }) {
-  if (!d || !d.chiffres.length) return null;
-  const [h, ...autres] = d.chiffres;
-  return (
-    <div className="cf-chiffres">
-      <div className="cf-chiffre cf-chiffre-h">
-        <b>{h.valeur}</b>
-        <span>{h.libelle}</span>
-        <small>{h.detail} · <a href={h.source_url} target="_blank" rel="noopener noreferrer">{h.source}</a></small>
-        <em className={`cf-fiab cf-fiab-${h.fiabilite.slice(0, 3)}`}>{h.fiabilite}</em>
-      </div>
-      {autres.length > 0 && (
-        <div className="cf-chiffres-s">
-          {autres.map((c) => (
-            <div key={c.libelle} className="cf-chiffre">
-              <b>{c.valeur}</b>
-              <span>{c.libelle}</span>
-              <small>{c.detail} · <a href={c.source_url} target="_blank" rel="noopener noreferrer">{c.source}</a></small>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 /* ── Un point : date, lieu, acteur, source ───────────────────────────────── */
 
 function PointLigne({ e, onEvt }: { e: Evenement; onEvt: (e: Evenement) => void }) {
@@ -705,28 +688,6 @@ function PointLigne({ e, onEvt }: { e: Evenement; onEvt: (e: Evenement) => void 
         {e.chiffre ? <em className="cf-pt-n"><strong>{e.chiffre.valeur}</strong> {e.chiffre.libelle}</em> : <ArrowUpRight size={15} aria-hidden="true" />}
       </button>
     </li>
-  );
-}
-
-/** Les points d'une fiche, groupés par pays où ils se trouvent : la distinction entre les pays d'un même conflit. */
-function PointsParPays({ evts, nomPays, onEvt }: { evts: Evenement[]; nomPays: (n: string) => string; onEvt: (e: Evenement) => void }) {
-  if (!evts.length) return null;
-  const groupes = new Map<string, Evenement[]>();
-  for (const e of evts) {
-    const k = e.pays ?? "mer";
-    groupes.set(k, [...(groupes.get(k) ?? []), e]);
-  }
-  return (
-    <div className="cf-points">
-      {[...groupes.entries()].map(([k, l]) => (
-        <div key={k} className="cf-groupe">
-          <h5>{k === "mer" ? "En mer" : nomPays(k)}<span>{l.length}</span></h5>
-          <ul className="cf-fiches cf-fiches-p">
-            {l.map((e) => <PointLigne key={e.id} e={e} onEvt={onEvt} />)}
-          </ul>
-        </div>
-      ))}
-    </div>
   );
 }
 
@@ -811,11 +772,13 @@ function FicheConflit(props: {
   evts: Evenement[];
   onEvt: (e: Evenement) => void;
   dossier?: DossierConflit;
+  ouverte: string | null;
+  onOuvrir: (r: string | null) => void;
 }) {
   return (
     <>
       <button type="button" className="cf-retour" onClick={props.onRetour}><ArrowLeft size={14} aria-hidden="true" /> {props.retour}</button>
-      <FicheCorps c={props.c} parId={props.parId} nomPays={props.nomPays} onFiche={props.onFiche} onPays={props.onPays} evts={props.evts} onEvt={props.onEvt} dossier={props.dossier} titre />
+      <FicheDetail c={props.c} parId={props.parId} nomPays={props.nomPays} onFiche={props.onFiche} onPays={props.onPays} evts={props.evts} onEvt={props.onEvt} dossier={props.dossier} ouverte={props.ouverte} onOuvrir={props.onOuvrir} titre />
     </>
   );
 }
@@ -872,83 +835,5 @@ function FichePoint({
         </div>
       </div>
     </>
-  );
-}
-
-/** Le contenu d'une fiche, dans l'ordre où on le lit : quand, le chiffre, les pays, les points. Le reste est replié. */
-function FicheCorps({
-  c, parId, nomPays, onFiche, onPays, titre, evts, onEvt, dossier,
-}: {
-  c: Conflit;
-  parId: Map<string, Conflit>;
-  nomPays: (n: string) => string;
-  onFiche: (c: Conflit) => void;
-  onPays: (p: string) => void;
-  titre?: boolean;
-  evts: Evenement[];
-  onEvt: (e: Evenement) => void;
-  dossier?: DossierConflit;
-}) {
-  const parent = c.parent ? parId.get(c.parent) : null;
-  const enfants = c.enfants.map((e) => parId.get(e)).filter(Boolean) as Conflit[];
-  const Titre = titre ? "h3" : "h4";
-  const bilan = (p: string) => {
-    const sur = evts.filter((e) => e.pays === p).length;
-    const menes = evts.filter((e) => e.auteurPays === p && e.pays !== p).length;
-    return [sur ? `${sur} sur son sol` : "", menes ? `${menes} menés depuis` : ""].filter(Boolean).join(" · ");
-  };
-  const paysDeLaFiche = [...new Set([...c.pays, ...evts.flatMap((e) => (e.auteurPays && !c.pays.includes(e.auteurPays) ? [e.auteurPays] : []))])];
-  return (
-    <div className="cf-fiche">
-      <div className="cf-badges">
-        <span className="cf-badge"><i className="cf-pt" style={{ background: COULEUR[c.categorie] }} aria-hidden="true" />{c.categorie}</span>
-        {dossier && <span className="cf-badge cf-badge-n">{periodeTexte(dossier.periode)}</span>}
-      </div>
-      <Titre className={titre ? "ge-nom cf-titre" : "cf-titre cf-titre-p"}>{c.nom}</Titre>
-      <p className="cf-desc">{c.description}</p>
-      {dossier?.periode.statut && <p className="cf-statut">{dossier.periode.statut}</p>}
-
-      <Chiffres d={dossier} />
-
-      {paysDeLaFiche.length > 0 && (
-        <div className="cf-pays-l">
-          {paysDeLaFiche.map((p) => (
-            <button key={p} type="button" onClick={() => onPays(p)}>
-              <b>{nomPays(p)}</b>
-              {bilan(p) && <small>{bilan(p)}</small>}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <PointsParPays evts={evts} nomPays={nomPays} onEvt={onEvt} />
-
-      <details className="cf-plus">
-        <summary>Acteurs, zones, fiches liées</summary>
-        <dl className="cf-champs">
-          <div><dt>Situation</dt><dd>{c.situation} · {c.region}</dd></div>
-          <div><dt>Acteurs</dt><dd>{c.acteurs}</dd></div>
-          {c.zonesNonPositionnees.length > 0 && <div><dt>Zones citées, non placées</dt><dd>{c.zonesNonPositionnees.join(" · ")}</dd></div>}
-          {(parent || enfants.length > 0) && (
-            <div>
-              <dt>Fiches liées (non additionnées)</dt>
-              <dd>
-                <span className="cf-puces cf-puces-l">
-                  {parent && <button type="button" onClick={() => onFiche(parent)}>↑ {parent.nom}</button>}
-                  {enfants.map((e) => <button key={e.id} type="button" onClick={() => onFiche(e)}>↳ {e.nom}</button>)}
-                </span>
-              </dd>
-            </div>
-          )}
-        </dl>
-      </details>
-
-      <div className="cf-source">
-        <a href={c.source_url} target="_blank" rel="noopener noreferrer">
-          Source : {c.source} <ExternalLink size={12} aria-hidden="true" />
-        </a>
-        <small>{c.verification} · inventaire du {DATE(c.date_inventaire)} · {c.id}</small>
-      </div>
-    </div>
   );
 }

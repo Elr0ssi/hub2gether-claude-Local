@@ -75,3 +75,17 @@ export function evenementsDuPays(evts: Evenement[], pays: string, idsFiches: Set
   }
   return { sur, menes, autres };
 }
+
+const MOIS_FR = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+
+/** Une date écrite en français → « AAAA-MM-JJ », « AAAA-MM » ou « AAAA », pour ranger dans le temps. Le texte d'origine reste affiché. */
+export function dateIso(texte: string): string {
+  const t = texte.toLowerCase();
+  const a = t.match(/(\d{4})/);
+  if (!a) return "9999";
+  const pos = MOIS_FR.map((x, i) => ({ i, p: t.indexOf(x) })).filter((x) => x.p >= 0).sort((x, y) => x.p - y.p)[0];
+  if (!pos) return a[1];
+  const mm = String(pos.i + 1).padStart(2, "0");
+  const j = t.slice(0, pos.p).match(/(\d{1,2})(?:er)?(?:\s*[-–]\s*\d{1,2})?\s*$/);
+  return j ? `${a[1]}-${mm}-${String(Number(j[1])).padStart(2, "0")}` : `${a[1]}-${mm}`;
+}

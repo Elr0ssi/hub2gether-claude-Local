@@ -2,47 +2,459 @@
   "date_compilation": "2026-10-31",
   "dossiers": {
     "VIZ-C-005": {
-      "periode": { "debut": "2026-02-28", "fin": null, "statut": "Cessez-le-feu du 8 avril, frappes reprises en juillet et en septembre" },
+      "periode": {
+        "debut": "2026-02-28",
+        "fin": null,
+        "statut": "Cessez-le-feu du 8 avril, frappes reprises en juillet et en septembre"
+      },
       "chiffres": [
-        { "valeur": "3 468", "libelle": "morts en Iran", "detail": "28 février – 8 avril 2026 · bilan du ministère iranien de la Santé, non vérifié de façon indépendante", "fiabilite": "revendiqué", "source": "ARY News", "source_url": "https://arynews.tv/iran-reports-3468-dead-war-us-israel" },
-        { "valeur": "650", "libelle": "missiles tirés sur Israël", "detail": "avant le cessez-le-feu du 8 avril", "fiabilite": "estimé", "source": "Wikipédia", "source_url": "https://en.wikipedia.org/wiki/2026_Iranian_strikes_on_Israel" }
+        {
+          "valeur": "3 468",
+          "libelle": "morts en Iran",
+          "detail": "28 février – 8 avril 2026 · bilan du ministère iranien de la Santé, non vérifié de façon indépendante",
+          "fiabilite": "revendiqué",
+          "source": "ARY News",
+          "source_url": "https://arynews.tv/iran-reports-3468-dead-war-us-israel",
+          "nature": "morts",
+          "theme": "humaines",
+          "portee": "cumulé"
+        },
+        {
+          "valeur": "650",
+          "libelle": "missiles tirés sur Israël",
+          "detail": "avant le cessez-le-feu du 8 avril",
+          "fiabilite": "estimé",
+          "source": "Wikipédia",
+          "source_url": "https://en.wikipedia.org/wiki/2026_Iranian_strikes_on_Israel",
+          "nature": "frappes",
+          "theme": "militaires",
+          "portee": "cumulé"
+        }
+      ],
+      "titre_court": "États-Unis – Israël – Iran",
+      "resume": "Le 28 février 2026, des frappes américaines et israéliennes visent l'Iran, qui riposte contre Israël et contre des bases américaines du Golfe. Un cessez-le-feu intervient le 8 avril, mais les États-Unis reprennent leurs frappes sur le sud de l'Iran en juillet puis en septembre.",
+      "causes": [
+        {
+          "type": "declencheur",
+          "titre": "Échec des pourparlers nucléaires",
+          "texte": "Les frappes du 28 février suivent des semaines de négociations américano-iraniennes sur le nucléaire qui n'ont pas abouti.",
+          "source": "Alhurra",
+          "source_url": "https://alhurra.com/en/14516"
+        }
+      ],
+      "acteurs": [
+        {
+          "nom": "Iran",
+          "role": "Cible des frappes américaines et israéliennes ; tire sur Israël et sur des bases américaines du Golfe.",
+          "pays": "Iran"
+        },
+        {
+          "nom": "États-Unis",
+          "role": "Frappes sur le sud de l'Iran en juillet et septembre ; leurs bases du Golfe sont visées.",
+          "pays": "United States of America"
+        },
+        {
+          "nom": "Israël",
+          "role": "Frappes sur l'Iran ; cible d'environ 650 missiles iraniens avant le 8 avril.",
+          "pays": "Israel"
+        },
+        {
+          "nom": "Gardiens de la révolution",
+          "role": "Revendiquent des frappes sur des bases américaines au Koweït, à Bahreïn et en Jordanie."
+        }
+      ],
+      "chronologie": [
+        {
+          "date": "2026-02-28",
+          "titre": "Frappes américaines et israéliennes sur l'Iran",
+          "texte": "L'Iran riposte contre des bases et ambassades américaines aux Émirats, en Arabie saoudite, au Qatar, au Koweït, à Bahreïn, en Irak, à Oman et en Jordanie.",
+          "source": "Boston Globe",
+          "source_url": "https://www.bostonglobe.com/2026/02/28/world/iran-targets-us-bases-in-gulf-in-retaliation-for-airstrikes"
+        },
+        {
+          "date": "2026-04-08",
+          "titre": "Cessez-le-feu",
+          "texte": "Environ 650 missiles ont été tirés sur Israël avant la trêve.",
+          "source": "Wikipédia",
+          "source_url": "https://en.wikipedia.org/wiki/2026_Iranian_strikes_on_Israel"
+        },
+        {
+          "date": "2026-07",
+          "titre": "Effondrement de la trêve, frappes américaines",
+          "texte": "Les États-Unis frappent des cibles des Gardiens de la révolution ; l'Iran tire sur des États du Golfe.",
+          "source": "Al Jazeera",
+          "source_url": "https://www.aljazeera.com/amp/news/2026/7/17/gulf-states-come-under-iranian-fire-as-us-strikes-intensify"
+        },
+        {
+          "date": "2026-09",
+          "titre": "Nouvelle vague sur le sud de l'Iran",
+          "texte": "Sirik, Konarak, Bandar Abbas, Jask, Asaluyeh, Ahvaz et l'île de Qeshm sont visés.",
+          "source": "Wikipédia",
+          "source_url": "https://en.wikipedia.org/wiki/September_2026_United_States_strikes_on_Iran"
+        }
+      ],
+      "consequences": [
+        {
+          "theme": "geopolitiques",
+          "texte": "Des frappes iraniennes touchent huit pays de la région : Émirats, Arabie saoudite, Qatar, Koweït, Bahreïn, Irak, Oman et Jordanie.",
+          "source": "Wikipédia",
+          "source_url": "https://en.wikipedia.org/wiki/2026_Iranian_strikes_on_Arab_countries"
+        }
       ]
     },
     "VIZ-C-008": {
-      "periode": { "debut": "2026-03-02", "fin": null, "statut": "Cessez-le-feu du 17 avril, frappes israéliennes quotidiennes malgré tout" },
+      "periode": {
+        "debut": "2026-03-02",
+        "fin": null,
+        "statut": "Cessez-le-feu du 17 avril, frappes israéliennes quotidiennes malgré tout"
+      },
       "chiffres": [
-        { "valeur": "3 020", "libelle": "morts au Liban", "detail": "2 mars – mi-mai 2026 · ministère libanais de la Santé, dont 211 enfants", "fiabilite": "revendiqué", "source": "CP24 (agence)", "source_url": "https://www.cp24.com/news/world/2026/05/18/lebanon-death-toll-reaches-3000-in-fighting-between-israel-and-hezbollah/" }
+        {
+          "valeur": "3 020",
+          "libelle": "morts au Liban",
+          "detail": "2 mars – mi-mai 2026 · ministère libanais de la Santé, dont 211 enfants",
+          "fiabilite": "revendiqué",
+          "source": "CP24 (agence)",
+          "source_url": "https://www.cp24.com/news/world/2026/05/18/lebanon-death-toll-reaches-3000-in-fighting-between-israel-and-hezbollah/",
+          "nature": "morts",
+          "theme": "humaines",
+          "portee": "cumulé"
+        }
+      ],
+      "titre_court": "Israël – Hezbollah (Liban)",
+      "resume": "Le 2 mars 2026, le Hezbollah tire sur Israël, deux jours après l'attaque américano-israélienne contre l'Iran. Israël frappe le Liban, dont la banlieue sud de Beyrouth. Un cessez-le-feu fragile n'a pas fait cesser les frappes.",
+      "causes": [
+        {
+          "type": "declencheur",
+          "titre": "Lien avec la guerre contre l'Iran",
+          "texte": "Le Hezbollah ouvre le feu sur Israël le 2 mars, deux jours après les frappes américano-israéliennes sur l'Iran.",
+          "source": "CP24 (agence)",
+          "source_url": "https://www.cp24.com/news/world/2026/05/18/lebanon-death-toll-reaches-3000-in-fighting-between-israel-and-hezbollah/"
+        }
+      ],
+      "acteurs": [
+        {
+          "nom": "Israël",
+          "role": "Frappes sur le Liban, dont la banlieue sud de Beyrouth.",
+          "pays": "Israel"
+        },
+        {
+          "nom": "Hezbollah",
+          "role": "Tire sur Israël et sur des bases israéliennes."
+        }
+      ],
+      "chronologie": [
+        {
+          "date": "2026-03-02",
+          "titre": "Le Hezbollah ouvre le feu sur Israël",
+          "texte": "Début de la guerre actuelle au Liban.",
+          "source": "CP24 (agence)",
+          "source_url": "https://www.cp24.com/news/world/2026/05/18/lebanon-death-toll-reaches-3000-in-fighting-between-israel-and-hezbollah/"
+        }
       ]
     },
     "VIZ-C-010": {
-      "periode": { "debut": "2023-11", "fin": null, "statut": "Suspension houthie fin 2025, attaques reprises mi-2026" },
+      "periode": {
+        "debut": "2023-11",
+        "fin": null,
+        "statut": "Suspension houthie fin 2025, attaques reprises mi-2026"
+      },
       "chiffres": [
-        { "valeur": "100+", "libelle": "navires marchands visés depuis 2023", "detail": "dont 4 coulés, 1 saisi, au moins 8 marins tués", "fiabilite": "estimé", "source": "Marine Insight", "source_url": "https://www.marineinsight.com/suez-canal-2026-will-global-shipping-return-to-the-red-sea/" },
-        { "valeur": "−60 %", "libelle": "trafic du canal de Suez", "detail": "début janvier 2026, par rapport à la même semaine de 2023", "fiabilite": "estimé", "source": "gCaptain", "source_url": "https://gcaptain.com/suez-canal-traffic-stalls-at-60-below-normal-despite-100-days-without-houthi-attacks/" },
-        { "valeur": "7 Md$", "libelle": "perte annuelle estimée pour l'Égypte", "detail": "chiffre du président Sissi, mars 2025", "fiabilite": "revendiqué", "source": "FreshPlaza", "source_url": "https://www.freshplaza.com/africa/article/9875552/red-sea-tensions-renew-shipping-risks-for-egypt-s-suez-canal/" }
+        {
+          "valeur": "100+",
+          "libelle": "navires marchands visés depuis 2023",
+          "detail": "dont 4 coulés, 1 saisi, au moins 8 marins tués",
+          "fiabilite": "estimé",
+          "source": "Marine Insight",
+          "source_url": "https://www.marineinsight.com/suez-canal-2026-will-global-shipping-return-to-the-red-sea/",
+          "nature": "navires",
+          "theme": "economiques",
+          "portee": "cumulé"
+        },
+        {
+          "valeur": "−60 %",
+          "libelle": "trafic du canal de Suez",
+          "detail": "début janvier 2026, par rapport à la même semaine de 2023",
+          "fiabilite": "estimé",
+          "source": "gCaptain",
+          "source_url": "https://gcaptain.com/suez-canal-traffic-stalls-at-60-below-normal-despite-100-days-without-houthi-attacks/",
+          "nature": "economie",
+          "theme": "economiques",
+          "portee": "ponctuel"
+        },
+        {
+          "valeur": "7 Md$",
+          "libelle": "perte annuelle estimée pour l'Égypte",
+          "detail": "chiffre du président Sissi, mars 2025",
+          "fiabilite": "revendiqué",
+          "source": "FreshPlaza",
+          "source_url": "https://www.freshplaza.com/africa/article/9875552/red-sea-tensions-renew-shipping-risks-for-egypt-s-suez-canal/",
+          "nature": "economie",
+          "theme": "economiques",
+          "portee": "annuel"
+        }
+      ],
+      "titre_court": "Mer Rouge – Bab el-Mandeb",
+      "resume": "Les houthis du Yémen attaquent des navires marchands en mer Rouge et dans le détroit de Bab el-Mandeb. Les attaques, suspendues fin 2025, ont repris à la mi-2026, avec un embargo déclaré sur l'Arabie saoudite le 20 juillet. Le trafic du canal de Suez reste très inférieur à celui de 2023.",
+      "causes": [
+        {
+          "type": "declencheur",
+          "titre": "Embargo houthi sur l'Arabie saoudite",
+          "texte": "Le 20 juillet 2026, les houthis déclarent un embargo maritime sur l'Arabie saoudite, après des frappes transfrontalières près de Sanaa.",
+          "source": "CNBC",
+          "source_url": "https://www.cnbc.com/2026/07/22/houthis-red-sea-bab-el-mandeb-saudi-oil-iran.html"
+        }
+      ],
+      "acteurs": [
+        {
+          "nom": "Houthis",
+          "role": "Attaquent des navires avec des missiles et des drones.",
+          "pays": "Yemen"
+        },
+        {
+          "nom": "Arabie saoudite",
+          "role": "Visée par l'embargo houthi ; ses côtes voient des pétroliers touchés.",
+          "pays": "Saudi Arabia"
+        }
+      ],
+      "chronologie": [
+        {
+          "date": "2025-11-11",
+          "titre": "Les houthis suspendent leurs attaques",
+          "texte": "Suspension conditionnelle.",
+          "source": "Marine Insight",
+          "source_url": "https://www.marineinsight.com/suez-canal-2026-will-global-shipping-return-to-the-red-sea/"
+        },
+        {
+          "date": "2026-07-20",
+          "titre": "Embargo houthi sur l'Arabie saoudite",
+          "texte": "Les attaques contre la navigation reprennent dans le sud de la mer Rouge.",
+          "source": "CNBC",
+          "source_url": "https://www.cnbc.com/2026/07/22/houthis-red-sea-bab-el-mandeb-saudi-oil-iran.html"
+        }
+      ],
+      "consequences": [
+        {
+          "theme": "economiques",
+          "texte": "Fin février 2026, Maersk détourne de nouveau certains services par le cap de Bonne-Espérance.",
+          "source": "gCaptain",
+          "source_url": "https://gcaptain.com/red-sea-comeback-falters-as-maersk-diverts-ships-back-around-cape"
+        }
       ]
     },
     "VIZ-C-001": {
-      "periode": { "debut": "2022-02-24", "fin": null, "statut": "Invasion à grande échelle ; conflit commencé en 2014" },
+      "periode": {
+        "debut": "2022-02-24",
+        "fin": null,
+        "statut": "Invasion à grande échelle ; conflit commencé en 2014"
+      },
       "chiffres": [
-        { "valeur": "16 431", "libelle": "civils tués, vérifiés par l'ONU", "detail": "24 février 2022 – juin 2026 · un minimum, pas un bilan complet", "fiabilite": "vérifié", "source": "Euronews (mission de l'ONU)", "source_url": "https://www.euronews.com/2026/07/15/june-was-deadliest-month-for-ukraine-civilians-in-over-four-years-un-monitors-say" },
-        { "valeur": "293", "libelle": "civils tués en juin 2026", "detail": "le mois le plus meurtrier depuis plus de quatre ans", "fiabilite": "vérifié", "source": "Euronews (mission de l'ONU)", "source_url": "https://www.euronews.com/2026/07/15/june-was-deadliest-month-for-ukraine-civilians-in-over-four-years-un-monitors-say" },
-        { "valeur": "1 396", "libelle": "civils tués au 1er semestre 2026", "detail": "+ 37 % par rapport au 1er semestre 2025", "fiabilite": "vérifié", "source": "Euronews (mission de l'ONU)", "source_url": "https://www.euronews.com/2026/07/15/june-was-deadliest-month-for-ukraine-civilians-in-over-four-years-un-monitors-say" }
+        {
+          "valeur": "16 431",
+          "libelle": "civils tués, vérifiés par l'ONU",
+          "detail": "24 février 2022 – juin 2026 · un minimum, pas un bilan complet",
+          "fiabilite": "vérifié",
+          "source": "Euronews (mission de l'ONU)",
+          "source_url": "https://www.euronews.com/2026/07/15/june-was-deadliest-month-for-ukraine-civilians-in-over-four-years-un-monitors-say",
+          "nature": "morts",
+          "theme": "humaines",
+          "portee": "cumulé"
+        },
+        {
+          "valeur": "293",
+          "libelle": "civils tués en juin 2026",
+          "detail": "le mois le plus meurtrier depuis plus de quatre ans",
+          "fiabilite": "vérifié",
+          "source": "Euronews (mission de l'ONU)",
+          "source_url": "https://www.euronews.com/2026/07/15/june-was-deadliest-month-for-ukraine-civilians-in-over-four-years-un-monitors-say",
+          "nature": "morts",
+          "theme": "humaines",
+          "portee": "récent"
+        },
+        {
+          "valeur": "1 396",
+          "libelle": "civils tués au 1er semestre 2026",
+          "detail": "+ 37 % par rapport au 1er semestre 2025",
+          "fiabilite": "vérifié",
+          "source": "Euronews (mission de l'ONU)",
+          "source_url": "https://www.euronews.com/2026/07/15/june-was-deadliest-month-for-ukraine-civilians-in-over-four-years-un-monitors-say",
+          "nature": "morts",
+          "theme": "humaines",
+          "portee": "récent"
+        }
+      ],
+      "titre_court": "Russie – Ukraine",
+      "resume": "La Russie mène depuis le 24 février 2022 une invasion à grande échelle de l'Ukraine. En octobre 2026, les combats les plus intenses se concentrent autour de Kostiantynivka, Pokrovsk et Huliaipole, tandis que des frappes touchent Kharkiv et la région de Zaporijjia. Juin 2026 a été le mois le plus meurtrier pour les civils depuis plus de quatre ans.",
+      "acteurs": [
+        {
+          "nom": "Russie",
+          "role": "Mène l'offensive et les frappes sur les villes ukrainiennes.",
+          "pays": "Russia"
+        },
+        {
+          "nom": "Ukraine",
+          "role": "Défend son territoire ; contre-offensive dans la région de Zaporijjia en février 2026.",
+          "pays": "Ukraine"
+        }
+      ],
+      "chronologie": [
+        {
+          "date": "2026-02",
+          "titre": "Contre-offensive ukrainienne à Zaporijjia",
+          "texte": "L'Ukraine reprend environ 260 km² dans la province.",
+          "source": "Council on Foreign Relations",
+          "source_url": "https://www.cfr.org/global-conflict-tracker/conflict/conflict-ukraine"
+        },
+        {
+          "date": "2026-06",
+          "titre": "Mois le plus meurtrier pour les civils depuis plus de quatre ans",
+          "texte": "293 civils tués selon la mission de l'ONU.",
+          "source": "Euronews",
+          "source_url": "https://www.euronews.com/2026/07/15/june-was-deadliest-month-for-ukraine-civilians-in-over-four-years-un-monitors-say"
+        }
+      ],
+      "consequences": [
+        {
+          "theme": "territoriales",
+          "texte": "Février 2026 : l'Ukraine reprend environ 260 km² dans la province de Zaporijjia.",
+          "source": "Council on Foreign Relations",
+          "source_url": "https://www.cfr.org/global-conflict-tracker/conflict/conflict-ukraine"
+        }
       ]
     },
     "VIZ-C-020": {
-      "periode": { "debut": "2023-04-15", "fin": null, "statut": "Pas de bilan global officiel des morts" },
+      "periode": {
+        "debut": "2023-04-15",
+        "fin": null,
+        "statut": "Pas de bilan global officiel des morts"
+      },
       "chiffres": [
-        { "valeur": "9,3 M", "libelle": "déplacés dans le pays", "detail": "janvier 2026 (1 000 jours de guerre) · plus 4,3 millions de réfugiés à l'étranger", "fiabilite": "estimé", "source": "ONU via AllAfrica", "source_url": "https://allafrica.com/stories/202601090213.html" },
-        { "valeur": "24,6 M", "libelle": "personnes en faim aiguë", "detail": "selon le Programme alimentaire mondial ; famine confirmée à El Fasher et Kadugli", "fiabilite": "estimé", "source": "ONU via AllAfrica", "source_url": "https://allafrica.com/stories/202601110122.html" },
-        { "valeur": "≈ 700", "libelle": "civils tués par des drones depuis janvier", "detail": "bilan ONU d'avril 2026", "fiabilite": "estimé", "source": "Africanews", "source_url": "https://www.africanews.com/2026/04/15/700-killed-in-sudan-drone-strikes-as-humanitarian-crisis-deepens-un/" }
+        {
+          "valeur": "9,3 M",
+          "libelle": "déplacés dans le pays",
+          "detail": "janvier 2026 (1 000 jours de guerre) · plus 4,3 millions de réfugiés à l'étranger",
+          "fiabilite": "estimé",
+          "source": "ONU via AllAfrica",
+          "source_url": "https://allafrica.com/stories/202601090213.html",
+          "nature": "deplaces",
+          "theme": "humaines",
+          "portee": "cumulé"
+        },
+        {
+          "valeur": "24,6 M",
+          "libelle": "personnes en faim aiguë",
+          "detail": "selon le Programme alimentaire mondial ; famine confirmée à El Fasher et Kadugli",
+          "fiabilite": "estimé",
+          "source": "ONU via AllAfrica",
+          "source_url": "https://allafrica.com/stories/202601110122.html",
+          "nature": "faim",
+          "theme": "humaines",
+          "portee": "cumulé"
+        },
+        {
+          "valeur": "≈ 700",
+          "libelle": "civils tués par des drones depuis janvier",
+          "detail": "bilan ONU d'avril 2026",
+          "fiabilite": "estimé",
+          "source": "Africanews",
+          "source_url": "https://www.africanews.com/2026/04/15/700-killed-in-sudan-drone-strikes-as-humanitarian-crisis-deepens-un/",
+          "nature": "morts",
+          "theme": "humaines",
+          "portee": "récent"
+        }
+      ],
+      "titre_court": "Soudan : armée – FSR",
+      "resume": "Depuis le 15 avril 2023, l'armée soudanaise et les Forces de soutien rapide (FSR) se font la guerre. Les FSR ont pris El Fasher après plus d'un an de siège, puis Babanusa et le champ pétrolier de Heglig. Les combats se concentrent au Kordofan, où El Obeid est visée par des drones. Il n'existe pas de bilan global officiel des morts.",
+      "acteurs": [
+        {
+          "nom": "Armée soudanaise (SAF)",
+          "role": "Tient notamment El Obeid ; a brisé le siège de la ville selon une source récente."
+        },
+        {
+          "nom": "Forces de soutien rapide (FSR)",
+          "role": "Ont pris El Fasher, Babanusa et Heglig."
+        }
+      ],
+      "chronologie": [
+        {
+          "date": "2025-10",
+          "titre": "Les FSR prennent El Fasher",
+          "texte": "Après plus d'un an de siège ; des centaines de morts.",
+          "source": "Fides",
+          "source_url": "https://fides.org/en/news/77004-AFRICA_SUDAN_The_conflict_moves_to_Kordofan",
+          "points": [
+            "EV-030"
+          ]
+        },
+        {
+          "date": "2025-12-08",
+          "titre": "Les FSR prennent le champ pétrolier de Heglig",
+          "texte": "Le plus grand du pays ; l'armée se replie au Soudan du Sud.",
+          "source": "Arab News",
+          "source_url": "https://www.arabnews.pk/node/2624799",
+          "points": [
+            "EV-032"
+          ]
+        }
+      ],
+      "consequences": [
+        {
+          "theme": "territoriales",
+          "texte": "Les FSR contrôlent El Fasher, Babanusa et le champ pétrolier de Heglig.",
+          "source": "Fides / Arab News",
+          "source_url": "https://fides.org/en/news/77004-AFRICA_SUDAN_The_conflict_moves_to_Kordofan"
+        },
+        {
+          "theme": "humaines",
+          "texte": "Famine confirmée à El Fasher et Kadugli ; au moins 20 districts supplémentaires menacés au Darfour et au Kordofan.",
+          "source": "ONU via AllAfrica",
+          "source_url": "https://allafrica.com/stories/202601110122.html"
+        }
       ]
     },
     "VIZ-C-028": {
-      "periode": { "debut": "2021-11", "fin": null, "statut": "Reprise du M23 fin 2021 ; offensives majeures début 2025" },
+      "periode": {
+        "debut": "2021-11",
+        "fin": null,
+        "statut": "Reprise du M23 fin 2021 ; offensives majeures début 2025"
+      },
       "chiffres": [
-        { "valeur": "6,9 M", "libelle": "déplacés en RDC", "detail": "un record, selon l'OIM", "fiabilite": "estimé", "source": "ThePrint (OIM)", "source_url": "https://theprint.in/world/conflict-uproots-record-6-9-million-people-in-congo-iom/1825203" },
-        { "valeur": "500 000+", "libelle": "déplacés en une semaine", "detail": "offensive du Sud-Kivu, 2025", "fiabilite": "estimé", "source": "DevelopmentAid (ONU)", "source_url": "https://www.developmentaid.org/news-stream/post/202836/dr-congo-m23-violence-500000-displaced-un-humanitarian-crisis" }
+        {
+          "valeur": "6,9 M",
+          "libelle": "déplacés en RDC",
+          "detail": "un record, selon l'OIM",
+          "fiabilite": "estimé",
+          "source": "ThePrint (OIM)",
+          "source_url": "https://theprint.in/world/conflict-uproots-record-6-9-million-people-in-congo-iom/1825203",
+          "nature": "deplaces",
+          "theme": "humaines",
+          "portee": "cumulé"
+        },
+        {
+          "valeur": "500 000+",
+          "libelle": "déplacés en une semaine",
+          "detail": "offensive du Sud-Kivu, 2025",
+          "fiabilite": "estimé",
+          "source": "DevelopmentAid (ONU)",
+          "source_url": "https://www.developmentaid.org/news-stream/post/202836/dr-congo-m23-violence-500000-displaced-un-humanitarian-crisis",
+          "nature": "deplaces",
+          "theme": "humaines",
+          "portee": "récent"
+        }
+      ],
+      "titre_court": "RDC : M23 à l'Est",
+      "resume": "Dans l'est de la RDC, le M23 affronte l'armée congolaise et les combattants wazalendo, avec des offensives majeures début 2025. Uvira est prise en décembre 2025 puis évacuée en janvier 2026. Les combats s'étendent au-delà des Kivus selon l'ONU.",
+      "chronologie": [
+        {
+          "date": "2025-12-10",
+          "titre": "Le M23 revendique Uvira",
+          "texte": "Il se retire ensuite ; l'armée reprend la ville avant le 21 janvier 2026.",
+          "source": "Critical Threats",
+          "source_url": "https://www.criticalthreats.org/briefs/congo-war-security-review/december-10-2025",
+          "points": [
+            "EV-034"
+          ]
+        }
       ]
     }
   }

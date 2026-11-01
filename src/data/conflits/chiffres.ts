@@ -19,18 +19,80 @@ export interface Periode {
   statut?: string;
 }
 
+export type Theme = "humaines" | "economiques" | "geopolitiques" | "territoriales" | "militaires";
+
 export interface ChiffreCle {
   valeur: string;
   libelle: string;
+  /** La période de référence et la précision sur la mesure. */
   detail: string;
   fiabilite: Fiabilite;
+  /** « morts », « deplaces », « economie », « navires », « faim », « frappes » : choisit l'icône. */
+  nature?: string;
+  theme?: Theme;
+  /** Cumulé depuis le début, récent, annuel ou ponctuel : on ne mélange pas un stock et un flux. */
+  portee?: "cumulé" | "récent" | "annuel" | "ponctuel";
   source: string;
   source_url: string;
 }
 
+export interface Cause {
+  type: "structurelle" | "declencheur" | "aggravant";
+  titre: string;
+  texte: string;
+  source?: string;
+  source_url?: string;
+}
+
+export interface Acteur {
+  nom: string;
+  role: string;
+  objectifs?: string;
+  /** Le nom Natural Earth du pays, pour ouvrir sa fiche sur le globe. */
+  pays?: string;
+}
+
+export interface Jalon {
+  date: string;
+  titre: string;
+  texte: string;
+  source?: string;
+  source_url?: string;
+  /** Les points (EV-…) à montrer sur la carte quand on choisit ce jalon. */
+  points?: string[];
+}
+
+export interface Consequence {
+  theme: Theme;
+  texte: string;
+  source?: string;
+  source_url?: string;
+}
+
+export interface Intensite {
+  niveau: "Faible" | "Modérée" | "Élevée" | "Très élevée";
+  source: string;
+  source_url: string;
+}
+
+/** Tout est facultatif sauf la période : une rubrique sans données n'est pas affichée, jamais remplie à la place. */
 export interface DossierConflit {
+  titre_court?: string;
   periode: Periode;
+  resume?: string;
+  intensite?: Intensite;
   chiffres: ChiffreCle[];
+  causes?: Cause[];
+  acteurs?: Acteur[];
+  chronologie?: Jalon[];
+  consequences?: Consequence[];
+}
+
+/** Un nom court pour le titre : celui du dossier, sinon le nom de la fiche coupé avant « : » quand il est long. */
+export function titreCourt(nom: string, d?: DossierConflit): string {
+  if (d?.titre_court) return d.titre_court;
+  const i = nom.indexOf(" : ");
+  return nom.length > 44 && i > 6 ? nom.slice(0, i) : nom;
 }
 
 export function dossiersDuFichier(): Map<string, DossierConflit> {
