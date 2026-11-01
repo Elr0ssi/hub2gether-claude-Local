@@ -1,0 +1,855 @@
+{
+ "004": {
+  "continent": "Asie",
+  "ne": "Afghanistan",
+  "nom": "Afghanistan",
+  "type": "pays"
+ },
+ "008": {
+  "continent": "Europe",
+  "ne": "Albania",
+  "nom": "Albania",
+  "type": "pays"
+ },
+ "012": {
+  "continent": "Afrique",
+  "ne": "Algeria",
+  "nom": "Algeria",
+  "type": "pays"
+ },
+ "024": {
+  "continent": "Afrique",
+  "ne": "Angola",
+  "nom": "Angola",
+  "type": "pays"
+ },
+ "031": {
+  "continent": "Asie",
+  "ne": "Azerbaijan",
+  "nom": "Azerbaijan",
+  "type": "pays"
+ },
+ "032": {
+  "continent": "Amériques",
+  "ne": "Argentina",
+  "nom": "Argentina",
+  "type": "pays"
+ },
+ "036": {
+  "continent": "Océanie",
+  "ne": "Australia",
+  "nom": "Australia",
+  "type": "pays"
+ },
+ "040": {
+  "continent": "Europe",
+  "ne": "Austria",
+  "nom": "Austria",
+  "type": "pays"
+ },
+ "050": {
+  "continent": "Asie",
+  "ne": "Bangladesh",
+  "nom": "Bangladesh",
+  "type": "pays"
+ },
+ "051": {
+  "continent": "Asie",
+  "ne": "Armenia",
+  "nom": "Armenia",
+  "type": "pays"
+ },
+ "056": {
+  "continent": "Europe",
+  "ne": "Belgium",
+  "nom": "Belgium",
+  "type": "pays"
+ },
+ "058": {
+  "continent": "Europe",
+  "ne": null,
+  "nom": "Belgium-Luxembourg",
+  "note": "Série réunie de la Belgique et du Luxembourg jusqu'en 1999.",
+  "successeurs": [
+   "056",
+   "442"
+  ],
+  "type": "historique"
+ },
+ "064": {
+  "continent": "Asie",
+  "ne": "Bhutan",
+  "nom": "Bhutan",
+  "type": "pays"
+ },
+ "068": {
+  "continent": "Amériques",
+  "ne": "Bolivia",
+  "nom": "Bolivia (Plurinational State of)",
+  "type": "pays"
+ },
+ "070": {
+  "continent": "Europe",
+  "ne": "Bosnia and Herz.",
+  "nom": "Bosnia and Herzegovina",
+  "type": "pays"
+ },
+ "072": {
+  "continent": "Afrique",
+  "ne": "Botswana",
+  "nom": "Botswana",
+  "type": "pays"
+ },
+ "076": {
+  "continent": "Amériques",
+  "ne": "Brazil",
+  "nom": "Brazil",
+  "type": "pays"
+ },
+ "100": {
+  "continent": "Europe",
+  "ne": "Bulgaria",
+  "nom": "Bulgaria",
+  "type": "pays"
+ },
+ "104": {
+  "continent": "Asie",
+  "ne": "Myanmar",
+  "nom": "Myanmar",
+  "type": "pays"
+ },
+ "108": {
+  "continent": "Afrique",
+  "ne": "Burundi",
+  "nom": "Burundi",
+  "type": "pays"
+ },
+ "112": {
+  "continent": "Europe",
+  "ne": "Belarus",
+  "nom": "Belarus",
+  "type": "pays"
+ },
+ "120": {
+  "continent": "Afrique",
+  "ne": "Cameroon",
+  "nom": "Cameroon",
+  "type": "pays"
+ },
+ "124": {
+  "continent": "Amériques",
+  "ne": "Canada",
+  "nom": "Canada",
+  "type": "pays"
+ },
+ "148": {
+  "continent": "Afrique",
+  "ne": "Chad",
+  "nom": "Chad",
+  "type": "pays"
+ },
+ "152": {
+  "continent": "Amériques",
+  "ne": "Chile",
+  "nom": "Chile",
+  "type": "pays"
+ },
+ "156": {
+  "continent": "Asie",
+  "ne": "China",
+  "nom": "China, mainland",
+  "type": "pays"
+ },
+ "158": {
+  "continent": "Asie",
+  "ne": "Taiwan",
+  "nom": "China, Taiwan Province of",
+  "type": "pays"
+ },
+ "159": {
+  "contient": [
+   "156",
+   "158"
+  ],
+  "continent": "Asie",
+  "ne": null,
+  "nom": "China",
+  "note": "Agrégat FAOSTAT : Chine continentale, Taïwan, Hong Kong et Macao. Recoupe les séries 156 et 158 : jamais additionné avec elles.",
+  "type": "agregat"
+ },
+ "170": {
+  "continent": "Amériques",
+  "ne": "Colombia",
+  "nom": "Colombia",
+  "type": "pays"
+ },
+ "180": {
+  "continent": "Afrique",
+  "ne": "Dem. Rep. Congo",
+  "nom": "Democratic Republic of the Congo",
+  "type": "pays"
+ },
+ "191": {
+  "continent": "Europe",
+  "ne": "Croatia",
+  "nom": "Croatia",
+  "type": "pays"
+ },
+ "196": {
+  "continent": "Asie",
+  "ne": "Cyprus",
+  "nom": "Cyprus",
+  "type": "pays"
+ },
+ "200": {
+  "continent": "Europe",
+  "ne": null,
+  "nom": "Czechoslovakia",
+  "note": "Entité dissoute fin 1992 (Tchéquie, Slovaquie).",
+  "successeurs": [
+   "203",
+   "703"
+  ],
+  "type": "historique"
+ },
+ "203": {
+  "continent": "Europe",
+  "ne": "Czechia",
+  "nom": "Czechia",
+  "type": "pays"
+ },
+ "208": {
+  "continent": "Europe",
+  "ne": "Denmark",
+  "nom": "Denmark",
+  "type": "pays"
+ },
+ "218": {
+  "continent": "Amériques",
+  "ne": "Ecuador",
+  "nom": "Ecuador",
+  "type": "pays"
+ },
+ "230": {
+  "continent": "Afrique",
+  "ne": null,
+  "nom": "Ethiopia PDR",
+  "note": "Éthiopie avant la sécession de l'Érythrée (1993).",
+  "successeurs": [
+   "231",
+   "232"
+  ],
+  "type": "historique"
+ },
+ "231": {
+  "continent": "Afrique",
+  "ne": "Ethiopia",
+  "nom": "Ethiopia",
+  "type": "pays"
+ },
+ "232": {
+  "continent": "Afrique",
+  "ne": "Eritrea",
+  "nom": "Eritrea",
+  "type": "pays"
+ },
+ "233": {
+  "continent": "Europe",
+  "ne": "Estonia",
+  "nom": "Estonia",
+  "type": "pays"
+ },
+ "246": {
+  "continent": "Europe",
+  "ne": "Finland",
+  "nom": "Finland",
+  "type": "pays"
+ },
+ "250": {
+  "continent": "Europe",
+  "ne": "France",
+  "nom": "France",
+  "type": "pays"
+ },
+ "268": {
+  "continent": "Asie",
+  "ne": "Georgia",
+  "nom": "Georgia",
+  "type": "pays"
+ },
+ "275": {
+  "continent": "Asie",
+  "ne": "Palestine",
+  "nom": "Palestine",
+  "type": "pays"
+ },
+ "276": {
+  "continent": "Europe",
+  "ne": "Germany",
+  "nom": "Germany",
+  "type": "pays"
+ },
+ "300": {
+  "continent": "Europe",
+  "ne": "Greece",
+  "nom": "Greece",
+  "type": "pays"
+ },
+ "320": {
+  "continent": "Amériques",
+  "ne": "Guatemala",
+  "nom": "Guatemala",
+  "type": "pays"
+ },
+ "340": {
+  "continent": "Amériques",
+  "ne": "Honduras",
+  "nom": "Honduras",
+  "type": "pays"
+ },
+ "348": {
+  "continent": "Europe",
+  "ne": "Hungary",
+  "nom": "Hungary",
+  "type": "pays"
+ },
+ "356": {
+  "continent": "Asie",
+  "ne": "India",
+  "nom": "India",
+  "type": "pays"
+ },
+ "364": {
+  "continent": "Asie",
+  "ne": "Iran",
+  "nom": "Iran (Islamic Republic of)",
+  "type": "pays"
+ },
+ "368": {
+  "continent": "Asie",
+  "ne": "Iraq",
+  "nom": "Iraq",
+  "type": "pays"
+ },
+ "372": {
+  "continent": "Europe",
+  "ne": "Ireland",
+  "nom": "Ireland",
+  "type": "pays"
+ },
+ "376": {
+  "continent": "Asie",
+  "ne": "Israel",
+  "nom": "Israel",
+  "type": "pays"
+ },
+ "380": {
+  "continent": "Europe",
+  "ne": "Italy",
+  "nom": "Italy",
+  "type": "pays"
+ },
+ "392": {
+  "continent": "Asie",
+  "ne": "Japan",
+  "nom": "Japan",
+  "type": "pays"
+ },
+ "398": {
+  "continent": "Asie",
+  "ne": "Kazakhstan",
+  "nom": "Kazakhstan",
+  "type": "pays"
+ },
+ "400": {
+  "continent": "Asie",
+  "ne": "Jordan",
+  "nom": "Jordan",
+  "type": "pays"
+ },
+ "404": {
+  "continent": "Afrique",
+  "ne": "Kenya",
+  "nom": "Kenya",
+  "type": "pays"
+ },
+ "408": {
+  "continent": "Asie",
+  "ne": "North Korea",
+  "nom": "Democratic People's Republic of Korea",
+  "type": "pays"
+ },
+ "410": {
+  "continent": "Asie",
+  "ne": "South Korea",
+  "nom": "Republic of Korea",
+  "type": "pays"
+ },
+ "414": {
+  "continent": "Asie",
+  "ne": "Kuwait",
+  "nom": "Kuwait",
+  "type": "pays"
+ },
+ "417": {
+  "continent": "Asie",
+  "ne": "Kyrgyzstan",
+  "nom": "Kyrgyzstan",
+  "type": "pays"
+ },
+ "422": {
+  "continent": "Asie",
+  "ne": "Lebanon",
+  "nom": "Lebanon",
+  "type": "pays"
+ },
+ "426": {
+  "continent": "Afrique",
+  "ne": "Lesotho",
+  "nom": "Lesotho",
+  "type": "pays"
+ },
+ "428": {
+  "continent": "Europe",
+  "ne": "Latvia",
+  "nom": "Latvia",
+  "type": "pays"
+ },
+ "434": {
+  "continent": "Afrique",
+  "ne": "Libya",
+  "nom": "Libya",
+  "type": "pays"
+ },
+ "440": {
+  "continent": "Europe",
+  "ne": "Lithuania",
+  "nom": "Lithuania",
+  "type": "pays"
+ },
+ "442": {
+  "continent": "Europe",
+  "ne": "Luxembourg",
+  "nom": "Luxembourg",
+  "type": "pays"
+ },
+ "450": {
+  "continent": "Afrique",
+  "ne": "Madagascar",
+  "nom": "Madagascar",
+  "type": "pays"
+ },
+ "454": {
+  "continent": "Afrique",
+  "ne": "Malawi",
+  "nom": "Malawi",
+  "type": "pays"
+ },
+ "466": {
+  "continent": "Afrique",
+  "ne": "Mali",
+  "nom": "Mali",
+  "type": "pays"
+ },
+ "470": {
+  "continent": "Europe",
+  "ne": "Malta",
+  "nom": "Malta",
+  "type": "pays"
+ },
+ "478": {
+  "continent": "Afrique",
+  "ne": "Mauritania",
+  "nom": "Mauritania",
+  "type": "pays"
+ },
+ "484": {
+  "continent": "Amériques",
+  "ne": "Mexico",
+  "nom": "Mexico",
+  "type": "pays"
+ },
+ "496": {
+  "continent": "Asie",
+  "ne": "Mongolia",
+  "nom": "Mongolia",
+  "type": "pays"
+ },
+ "498": {
+  "continent": "Europe",
+  "ne": "Moldova",
+  "nom": "Republic of Moldova",
+  "type": "pays"
+ },
+ "499": {
+  "continent": "Europe",
+  "ne": "Montenegro",
+  "nom": "Montenegro",
+  "type": "pays"
+ },
+ "504": {
+  "continent": "Afrique",
+  "ne": "Morocco",
+  "nom": "Morocco",
+  "type": "pays"
+ },
+ "508": {
+  "continent": "Afrique",
+  "ne": "Mozambique",
+  "nom": "Mozambique",
+  "type": "pays"
+ },
+ "512": {
+  "continent": "Asie",
+  "ne": "Oman",
+  "nom": "Oman",
+  "type": "pays"
+ },
+ "516": {
+  "continent": "Afrique",
+  "ne": "Namibia",
+  "nom": "Namibia",
+  "type": "pays"
+ },
+ "524": {
+  "continent": "Asie",
+  "ne": "Nepal",
+  "nom": "Nepal",
+  "type": "pays"
+ },
+ "528": {
+  "continent": "Europe",
+  "ne": "Netherlands",
+  "nom": "Netherlands (Kingdom of the)",
+  "type": "pays"
+ },
+ "540": {
+  "continent": "Océanie",
+  "ne": "New Caledonia",
+  "nom": "New Caledonia",
+  "type": "pays"
+ },
+ "554": {
+  "continent": "Océanie",
+  "ne": "New Zealand",
+  "nom": "New Zealand",
+  "type": "pays"
+ },
+ "562": {
+  "continent": "Afrique",
+  "ne": "Niger",
+  "nom": "Niger",
+  "type": "pays"
+ },
+ "566": {
+  "continent": "Afrique",
+  "ne": "Nigeria",
+  "nom": "Nigeria",
+  "type": "pays"
+ },
+ "578": {
+  "continent": "Europe",
+  "ne": "Norway",
+  "nom": "Norway",
+  "type": "pays"
+ },
+ "586": {
+  "continent": "Asie",
+  "ne": "Pakistan",
+  "nom": "Pakistan",
+  "type": "pays"
+ },
+ "600": {
+  "continent": "Amériques",
+  "ne": "Paraguay",
+  "nom": "Paraguay",
+  "type": "pays"
+ },
+ "604": {
+  "continent": "Amériques",
+  "ne": "Peru",
+  "nom": "Peru",
+  "type": "pays"
+ },
+ "616": {
+  "continent": "Europe",
+  "ne": "Poland",
+  "nom": "Poland",
+  "type": "pays"
+ },
+ "620": {
+  "continent": "Europe",
+  "ne": "Portugal",
+  "nom": "Portugal",
+  "type": "pays"
+ },
+ "634": {
+  "continent": "Asie",
+  "ne": "Qatar",
+  "nom": "Qatar",
+  "type": "pays"
+ },
+ "642": {
+  "continent": "Europe",
+  "ne": "Romania",
+  "nom": "Romania",
+  "type": "pays"
+ },
+ "643": {
+  "continent": "Europe",
+  "ne": "Russia",
+  "nom": "Russian Federation",
+  "type": "pays"
+ },
+ "646": {
+  "continent": "Afrique",
+  "ne": "Rwanda",
+  "nom": "Rwanda",
+  "type": "pays"
+ },
+ "682": {
+  "continent": "Asie",
+  "ne": "Saudi Arabia",
+  "nom": "Saudi Arabia",
+  "type": "pays"
+ },
+ "688": {
+  "continent": "Europe",
+  "ne": "Serbia",
+  "nom": "Serbia",
+  "type": "pays"
+ },
+ "703": {
+  "continent": "Europe",
+  "ne": "Slovakia",
+  "nom": "Slovakia",
+  "type": "pays"
+ },
+ "705": {
+  "continent": "Europe",
+  "ne": "Slovenia",
+  "nom": "Slovenia",
+  "type": "pays"
+ },
+ "706": {
+  "continent": "Afrique",
+  "ne": "Somalia",
+  "nom": "Somalia",
+  "type": "pays"
+ },
+ "710": {
+  "continent": "Afrique",
+  "ne": "South Africa",
+  "nom": "South Africa",
+  "type": "pays"
+ },
+ "716": {
+  "continent": "Afrique",
+  "ne": "Zimbabwe",
+  "nom": "Zimbabwe",
+  "type": "pays"
+ },
+ "724": {
+  "continent": "Europe",
+  "ne": "Spain",
+  "nom": "Spain",
+  "type": "pays"
+ },
+ "729": {
+  "continent": "Afrique",
+  "ne": "Sudan",
+  "nom": "Sudan",
+  "type": "pays"
+ },
+ "736": {
+  "continent": "Afrique",
+  "ne": null,
+  "nom": "Sudan (former)",
+  "note": "Soudan avant la sécession du Soudan du Sud (2011) : frontières différentes de l'actuel.",
+  "successeurs": [
+   "729"
+  ],
+  "type": "historique"
+ },
+ "748": {
+  "continent": "Afrique",
+  "ne": "eSwatini",
+  "nom": "Eswatini",
+  "type": "pays"
+ },
+ "752": {
+  "continent": "Europe",
+  "ne": "Sweden",
+  "nom": "Sweden",
+  "type": "pays"
+ },
+ "756": {
+  "continent": "Europe",
+  "ne": "Switzerland",
+  "nom": "Switzerland",
+  "type": "pays"
+ },
+ "760": {
+  "continent": "Asie",
+  "ne": "Syria",
+  "nom": "Syrian Arab Republic",
+  "type": "pays"
+ },
+ "762": {
+  "continent": "Asie",
+  "ne": "Tajikistan",
+  "nom": "Tajikistan",
+  "type": "pays"
+ },
+ "764": {
+  "continent": "Asie",
+  "ne": "Thailand",
+  "nom": "Thailand",
+  "type": "pays"
+ },
+ "784": {
+  "continent": "Asie",
+  "ne": "United Arab Emirates",
+  "nom": "United Arab Emirates",
+  "type": "pays"
+ },
+ "788": {
+  "continent": "Afrique",
+  "ne": "Tunisia",
+  "nom": "Tunisia",
+  "type": "pays"
+ },
+ "792": {
+  "continent": "Asie",
+  "ne": "Turkey",
+  "nom": "Türkiye",
+  "type": "pays"
+ },
+ "795": {
+  "continent": "Asie",
+  "ne": "Turkmenistan",
+  "nom": "Turkmenistan",
+  "type": "pays"
+ },
+ "800": {
+  "continent": "Afrique",
+  "ne": "Uganda",
+  "nom": "Uganda",
+  "type": "pays"
+ },
+ "804": {
+  "continent": "Europe",
+  "ne": "Ukraine",
+  "nom": "Ukraine",
+  "type": "pays"
+ },
+ "807": {
+  "continent": "Europe",
+  "ne": "North Macedonia",
+  "nom": "North Macedonia",
+  "type": "pays"
+ },
+ "810": {
+  "continent": "Europe",
+  "ne": null,
+  "nom": "USSR",
+  "note": "Union soviétique, jusqu'en 1991 : ne correspond à aucune géométrie actuelle.",
+  "successeurs": [
+   "643",
+   "804",
+   "112",
+   "498",
+   "233",
+   "428",
+   "440",
+   "051",
+   "031",
+   "268",
+   "398",
+   "417",
+   "762",
+   "795",
+   "860"
+  ],
+  "type": "historique"
+ },
+ "818": {
+  "continent": "Afrique",
+  "ne": "Egypt",
+  "nom": "Egypt",
+  "type": "pays"
+ },
+ "826": {
+  "continent": "Europe",
+  "ne": "United Kingdom",
+  "nom": "United Kingdom of Great Britain and Northern Ireland",
+  "type": "pays"
+ },
+ "834": {
+  "continent": "Afrique",
+  "ne": "Tanzania",
+  "nom": "United Republic of Tanzania",
+  "type": "pays"
+ },
+ "840": {
+  "continent": "Amériques",
+  "ne": "United States of America",
+  "nom": "United States of America",
+  "type": "pays"
+ },
+ "858": {
+  "continent": "Amériques",
+  "ne": "Uruguay",
+  "nom": "Uruguay",
+  "type": "pays"
+ },
+ "860": {
+  "continent": "Asie",
+  "ne": "Uzbekistan",
+  "nom": "Uzbekistan",
+  "type": "pays"
+ },
+ "862": {
+  "continent": "Amériques",
+  "ne": "Venezuela",
+  "nom": "Venezuela (Bolivarian Republic of)",
+  "type": "pays"
+ },
+ "887": {
+  "continent": "Asie",
+  "ne": "Yemen",
+  "nom": "Yemen",
+  "type": "pays"
+ },
+ "890": {
+  "continent": "Europe",
+  "ne": null,
+  "nom": "Yugoslav SFR",
+  "note": "Yougoslavie fédérale, jusqu'en 1991.",
+  "successeurs": [
+   "070",
+   "191",
+   "705",
+   "807",
+   "891"
+  ],
+  "type": "historique"
+ },
+ "891": {
+  "continent": "Europe",
+  "ne": null,
+  "nom": "Serbia and Montenegro",
+  "note": "Serbie-et-Monténégro, 1992-2005.",
+  "successeurs": [
+   "688",
+   "499"
+  ],
+  "type": "historique"
+ },
+ "894": {
+  "continent": "Afrique",
+  "ne": "Zambia",
+  "nom": "Zambia",
+  "type": "pays"
+ }
+}

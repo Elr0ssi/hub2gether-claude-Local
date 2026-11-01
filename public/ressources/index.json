@@ -1,0 +1,22 @@
+{
+ "schema": 1,
+ "ressources": [
+  {
+   "id": "qcl-wheat",
+   "nom_fao": "Wheat",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "surface",
+    "rendement",
+    "production"
+   ],
+   "zones": 133,
+   "importe_le": "2026-11-01",
+   "date_export": "2026-11-01"
+  }
+ ]
+}

@@ -14,7 +14,9 @@
     "base:migrer": "node scripts/base/migrer.mjs",
     "base:verifier": "node scripts/base/verifier.mjs",
     "base:cache": "node scripts/base/cache-globe.mjs",
-    "base:socle": "node scripts/base/socle-site.mjs"
+    "base:socle": "node scripts/base/socle-site.mjs",
+    "ressources:importer": "node scripts/ressources/importer-faostat.mjs",
+    "ressources:valider": "node scripts/ressources/valider.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.2",
