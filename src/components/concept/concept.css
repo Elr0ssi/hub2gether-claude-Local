@@ -4533,3 +4533,27 @@ body:has(.cg) { background: #05080c; }
 .ge-nom-lien svg { flex: none; opacity: 0.55; transition: opacity 0.2s, transform 0.25s; }
 .ge-nom-lien:hover, .ge-nom-lien:focus-visible { color: #8b5cff; }
 .ge-nom-lien:hover svg, .ge-nom-lien:focus-visible svg { opacity: 1; transform: translate(2px, -2px); }
+
+/* ── L'évolution du panneau (EvolutionCourbe) : pixels réels, trait lissé, points posés sur la ligne ───────────── */
+.cg .ge-evo.ge-evo2 svg, .cg-v2 .ge-evo.ge-evo2 svg { height: 96px; margin-top: 4px; overflow: visible; }
+.ge-evo2 .ge-evo-c { position: relative; touch-action: pan-y; cursor: crosshair; }
+.ge-evo2 .ge-evo-h { min-height: 40px; }
+.ge-evo2-trait { fill: none; stroke: var(--froid); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: ge-evo2-dessin 0.9s cubic-bezier(0.3, 0.7, 0.2, 1) forwards; }
+@keyframes ge-evo2-dessin { to { stroke-dashoffset: 0; } }
+.ge-evo2-base { stroke: var(--bord-fin); stroke-width: 1; }
+.ge-evo2-tick { stroke: var(--bord); stroke-width: 1; }
+.ge-evo2-an { font-size: 9.5px; fill: var(--encre-3); font-variant-numeric: tabular-nums; }
+.ge-evo2-plage { fill: color-mix(in srgb, var(--froid) 12%, transparent); }
+.ge-evo2-borne { stroke: var(--froid); stroke-width: 1; stroke-dasharray: 3 3; }
+.ge-evo2-guide { stroke: var(--bord); stroke-width: 1; }
+.ge-evo2-pt { fill: var(--surface, #fff); stroke: var(--froid); stroke-width: 2; }
+.ge-evo2-pt-f { fill: var(--froid); stroke: color-mix(in srgb, var(--froid) 30%, transparent); stroke-width: 4; paint-order: stroke; }
+.ge-evo2-pt-e { fill: var(--froid); stroke: var(--surface, #fff); stroke-width: 2; }
+.ge-evo2-pt-l { fill: var(--encre); stroke: var(--surface, #fff); stroke-width: 2; }
+.ge-evo2-halo { fill: color-mix(in srgb, var(--froid) 24%, transparent); }
+.ge-evo2-lu { transition: transform 0.16s cubic-bezier(0.2, 0.7, 0.2, 1); pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .ge-evo2-trait { animation: none; stroke-dashoffset: 0; } .ge-evo2-lu { transition: none; } }
+
+/* Une ligne retrouvée par la recherche : le rang reste celui du classement complet, la ligne s'allume. */
+.cg-tab tr.cg-tab-trouve { background: color-mix(in srgb, var(--froid) 20%, transparent) !important; box-shadow: inset 3px 0 0 var(--froid); }
+.cg-tab tr.cg-tab-trouve .cg-tab-p { font-weight: 700; }

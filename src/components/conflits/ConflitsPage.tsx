@@ -1,12 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowUpRight, ChevronDown, Crosshair, ExternalLink, MapPin, Minus, Plus, Search, Ship, Swords, X, type LucideIcon } from "lucide-react";
-import { EnTete, Pied, TitreSection } from "@/components/concept/pieces";
+import { ArrowLeft, ArrowUpRight, Crosshair, ExternalLink, MapPin, Search, Shield, Ship, Swords, X, type LucideIcon } from "lucide-react";
+import { EnTete, ImagePlaceholder, Pied, TitreSection } from "@/components/concept/pieces";
+import { TempsReelBloc } from "@/components/concept/TempsReelBloc";
+import type { FicheArticle } from "@/data/concept/conceptGeo";
+import type { FicheDebat } from "@/data/concept/conceptEconomie";
+import { ClassementConflits, type LignePays } from "./ClassementConflits";
 import { Jetons, Dessin } from "@/components/concept/Jetons";
 import { Loupe } from "@/components/concept/Loupe";
 import { Odometre } from "@/components/concept/Roulement";
-import { Titre, usePret, useProgression } from "@/components/concept/ouverture";
+import { Titre, usePret, useProgression, useVu } from "@/components/concept/ouverture";
 import { useTheme } from "@/components/concept/Theme";
 import { countryFr } from "@/data/countryNamesFr";
 import { slugDe } from "@/data/seo/francais";
@@ -52,7 +56,7 @@ function vueDePoints(pts: { lat: number; lon: number }[]): VueGlobe | null {
   return { lon: (a + c) / 2, lat: (b + d) / 2, largeur: Math.max(9, (c - a) * 1.5), hauteur: Math.max(7, (d - b) * 1.7) };
 }
 
-export function ConflitsPage() {
+export function ConflitsPage({ articles, debats }: { articles: FicheArticle[]; debats: FicheDebat[] }) {
   const [theme] = useTheme();
   const { inventaire, conflits } = useMemo(() => conflitsDuFichier(), []);
   const parId = useMemo(() => new Map(conflits.map((c) => [c.id, c])), [conflits]);
@@ -67,9 +71,12 @@ export function ConflitsPage() {
   const [rubrique, setRubrique] = useState<string | null>(null);
   const [survolEvt, setSurvolEvt] = useState<string | null>(null);
   const [geo, setGeo] = useState<GeoJSON.FeatureCollection | null>(null);
-  const [ouvert, setOuvert] = useState<string | null>(null);
   const globe = useRef<GlobeExplorerHandle>(null);
   const rectangle = useRef<HTMLDivElement>(null);
+  const railDebats = useRef<HTMLDivElement>(null);
+  const priseDebats = useRef<{ x: number; g: number } | null>(null);
+  const railArts = useRef<HTMLDivElement>(null);
+  const priseArts = useRef<{ x: number; g: number } | null>(null);
 
   const ouverture = useProgression();
   const pret = usePret();
@@ -155,12 +162,15 @@ export function ConflitsPage() {
     const direct = new Map<string, Conflit[]>();
     for (const c of visibles) for (const p of c.pays) direct.set(p, [...(direct.get(p) ?? []), c]);
     const cibles = choisi ? new Set(choisi.pays) : pays ? new Set([pays]) : null;
-    return [...direct.entries()].map(([nom, l]) => ({
+    /* Les mêmes teintes que sur Ressources : un pays hors sujet est ce gris translucide, un pays coloré a la même opacité. */
+    const base: Coloration[] = geo ? geo.features.filter((f) => !direct.has((f.properties as { name: string }).name)).map((f) => ({ nom: (f.properties as { name: string }).name, couleur: "#8b8fa3", opacite: 0.15 })) : [];
+    const colorees = [...direct.entries()].map(([nom, l]) => ({
       nom,
       couleur: COULEUR[categorieDominante(l)],
-      opacite: cibles ? (cibles.has(nom) ? 0.68 : 0.16) : 0.5,
+      opacite: cibles ? (cibles.has(nom) ? 0.92 : 0.5) : 0.82,
     }));
-  }, [visibles, choisi, pays]);
+    return [...base, ...colorees];
+  }, [visibles, choisi, pays, geo]);
 
   const contours = useMemo(() => (choisi ? choisi.pays : pays ? [pays] : []), [choisi, pays]);
 
@@ -255,6 +265,36 @@ export function ConflitsPage() {
     },
     [parPays, nomPays],
   );
+
+  /* Le classement et les chiffres clés lisent tout l'inventaire, pas les filtres du globe : un rang ne change pas parce qu'on regarde une catégorie. */
+  const lignesPays = useMemo<LignePays[]>(() => {
+    const parP = indexerParPays(conflits);
+    const pointsPar = new Map<string, number>();
+    for (const e of ensemble.evenements) if (e.pays) pointsPar.set(e.pays, (pointsPar.get(e.pays) ?? 0) + 1);
+    return [...parP.entries()].map(([nom, l]) => ({
+      nom,
+      fr: countryFr(nom),
+      total: l.length,
+      parCat: Object.fromEntries(CATEGORIES.map((c) => [c.id, l.filter((x) => x.categorie === c.id).length])) as LignePays["parCat"],
+      points: pointsPar.get(nom) ?? 0,
+    }));
+  }, [conflits, ensemble]);
+  const chiffres = useMemo(() => {
+    const st = compter(conflits);
+    return [
+      { id: "fiches", label: "Fiches suivies", valeur: conflits.length, note: "Conflits armés, violences armées et tensions géopolitiques.", icone: Swords },
+      { id: "armes", label: "Conflits armés", valeur: st.parCategorie["Conflit armé"], note: "Les fiches de la catégorie la plus grave de l’inventaire.", icone: Shield },
+      { id: "pays", label: "Pays nommés", valeur: lignesPays.length, note: "Pays cités par au moins une fiche.", icone: MapPin },
+      { id: "points", label: "Points précis", valeur: ensemble.evenements.length, note: `Répartis sur ${new Set(ensemble.evenements.map((e) => e.conflit)).size} fiches, chacun avec sa source.`, icone: Crosshair },
+    ];
+  }, [conflits, lignesPays, ensemble]);
+  const compteursTR = useMemo(
+    () => [{
+      id: "militaires", label: "Dépenses militaires mondiales", base: 0, parSeconde: 55_160, depuisMs: Date.UTC(2026, 0, 1), dec: 0, unite: " $", mot: "dollars", icone: Shield,
+      note: "Débit constant fixé depuis le 1er janvier 2026, le même que sur la page Économie.",
+    }],
+    [],
+  );
   const typesPresents = useMemo(() => [...new Set(points.map((e) => e.type))], [points]);
 
   return (
@@ -285,6 +325,13 @@ export function ConflitsPage() {
           <span className="cg-arc-point" />
         </div>
       </section>
+
+      <TempsReelBloc
+        id="temps-reel-conflits"
+        sous={<>Depuis le 1<sup>er</sup> janvier 2026</>}
+        compteurs={compteursTR}
+        sources={<>Les dépenses militaires sont un débit constant, pas une mesure à la seconde. Pour les conflits eux-mêmes, aucune source ne publie de compteur en direct : les fiches ci-dessous sont un inventaire daté, à recouper avec <a href="https://ucdp.uu.se/downloads/" target="_blank" rel="noopener noreferrer">UCDP</a> et <a href="https://acleddata.com/" target="_blank" rel="noopener noreferrer">ACLED</a>.</>}
+      />
 
       {/* ── Le rectangle ──────────────────────────────────────────────────── */}
       <section id="globe" className="cg-section cg-eco-globe">
@@ -422,62 +469,100 @@ export function ConflitsPage() {
         </div>
       </section>
 
-      {/* ── La liste des fiches ───────────────────────────────────────────── */}
-      <section id="liste" className="cg-section cf-liste-section">
+      {/* ── Les chiffres clés ───────────────────────────────────────────────── */}
+      <section className="cg-section cg-tr cg-cles" id="chiffres-cles">
         <div className="cg-wrap">
-          <TitreSection
-            titre="Toutes les fiches"
-            sous={`${nf(visibles.length)} sur ${nf(conflits.length)} · ${categorie === "Tous" ? "toutes catégories" : categorie}`}
-          />
-          <ul className="cf-liste">
-            {visibles.map((c) => {
-              const est = ouvert === c.id;
-              const n = parConflit.get(c.id)?.length ?? 0;
-              return (
-                <li key={c.id} className={est ? "cf-item cf-item-on" : "cf-item"}>
-                  <button
-                    type="button"
-                    className="cf-item-t"
-                    aria-expanded={est}
-                    onClick={() => {
-                      setOuvert(est ? null : c.id);
-                      if (!est) choisirFiche(c);
-                    }}
-                  >
-                    <i className="cf-pt" style={{ background: COULEUR[c.categorie] }} aria-hidden="true" />
-                    <span className="cf-item-n">
-                      <b>{c.nom}{n > 0 && <em className="cf-item-pts"><MapPin size={11} aria-hidden="true" />{n} {n > 1 ? "points" : "point"}</em>}</b>
-                      <small>{c.zone.split(";").map((z) => z.trim()).join(" · ")}</small>
-                    </span>
-                    <span className="cf-item-c">{c.categorie}</span>
-                    <span className="cf-item-r">{c.region}</span>
-                    <ChevronDown size={16} aria-hidden="true" className="cf-item-f" />
-                  </button>
-                  {est && (
-                    <div className="cf-item-corps">
-                      <FicheDetail
-                        c={c}
-                        parId={parId}
-                        nomPays={nomPays}
-                        onFiche={(x) => { setOuvert(x.id); choisirFiche(x); }}
-                        onPays={(p) => surPays(p)}
-                        evts={parConflit.get(c.id) ?? []}
-                        onEvt={(e) => { choisirEvt(e); versGlobe(); }}
-                        dossier={dossiers.get(c.id)}
-                      />
-                      <button type="button" className="cf-lien-globe" onClick={versGlobe}>
-                        Voir sur le globe <ArrowUpRight size={13} aria-hidden="true" />
-                      </button>
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-            {visibles.length === 0 && <li className="cf-vide">Aucune fiche ne correspond à ces filtres.</li>}
-          </ul>
+          <header className="v2-tete">
+            <h2 className="v2-h2">Les chiffres clés</h2>
+            <p className="v2-sous">{`Inventaire du ${DATE(inventaire.date_inventaire)}`}</p>
+          </header>
+          <div className="cg-cpt-l" style={{ gridTemplateColumns: `repeat(${chiffres.length}, minmax(0, 1fr))` }}>
+            {chiffres.map((c, k) => (
+              <div key={c.id} className={`cg-cpt v2-cpt v2-cpt-${c.id}`} style={{ "--i": k } as React.CSSProperties}>
+                <span className="v2-cpt-i" aria-hidden="true"><c.icone size={18} /></span>
+                <span className="cg-cpt-l2">{c.label}</span>
+                <Odometre className="cg-cpt-v" valeur={c.valeur} dec={0} duree={1100} tours={1} />
+                <span className="cg-cpt-note">{c.note}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
+      {/* ── Le classement ────────────────────────────────────────────────────── */}
+      <ClassementConflits lignes={lignesPays} choisi={pays} onChoisi={(n) => { surPays(n); versGlobe(); }} nombreFiches={conflits.length} />
+
+      {/* ── Les articles et les débats ──────────────────────────────────────── */}
+      {articles.length > 0 && (
+        <section className="cg-section cg-lectures">
+          <div className="cg-wrap">
+            <div className="cg-arts-tete">
+              <h2 className="cg-arts-h">Articles</h2>
+            </div>
+            <div className="cg-arts-l">
+              <article className="cg-art cg-art-une" onClick={articles[0].href ? () => { window.location.href = articles[0].href!; } : undefined} style={articles[0].href ? { cursor: "pointer" } : undefined}>
+                <ImagePlaceholder nom="IMAGE_PNG_CONF_01" ratio="16 / 10" />
+                <span className="cg-rubrique">{articles[0].rubrique} · {articles[0].duree}</span>
+                <h3 className="cg-art-t">{articles[0].titre}</h3>
+                <p className="cg-art-c">{articles[0].chapo}</p>
+                {articles[0].href && <a className="cg-art-lien" href={articles[0].href}>Lire le dossier <span aria-hidden="true">→</span></a>}
+              </article>
+              {debats.length > 0 && (
+                <div className="cg-debats">
+                  <div className="cg-debats-t">
+                    <span className="cg-debats-st">Nos plus gros débats</span>
+                    <span className="cg-debats-n">{debats.length} en cours</span>
+                  </div>
+                  <div
+                    ref={railDebats}
+                    className="cg-debats-l"
+                    onPointerDown={(e) => { delete e.currentTarget.dataset.mv; priseDebats.current = { x: e.clientX, g: e.currentTarget.scrollLeft }; e.currentTarget.setPointerCapture(e.pointerId); }}
+                    onPointerMove={(e) => { if (!priseDebats.current || !railDebats.current) return; if (Math.abs(e.clientX - priseDebats.current.x) > 5) railDebats.current.dataset.mv = "1"; railDebats.current.scrollLeft = priseDebats.current.g - (e.clientX - priseDebats.current.x); }}
+                    onPointerUp={() => { priseDebats.current = null; }}
+                    onPointerCancel={() => { priseDebats.current = null; }}
+                    onDragStart={(e) => e.preventDefault()}
+                    onClickCapture={(e) => { if (railDebats.current?.dataset.mv) { e.preventDefault(); e.stopPropagation(); } }}
+                  >
+                    {debats.map((d) => (
+                      <a key={d.id} href="/forum" className="cg-debat">
+                        <span className="cg-debat-q">{d.question}</span>
+                        <span className="cg-debat-a">{d.ancre}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="cg-arts-c">
+                <h3 className="cg-arts-st">Nos articles</h3>
+                <div
+                  ref={railArts}
+                  className="cg-arts"
+                  onPointerDown={(e) => { delete e.currentTarget.dataset.mv; priseArts.current = { x: e.clientX, g: e.currentTarget.scrollLeft }; e.currentTarget.setPointerCapture(e.pointerId); }}
+                  onPointerMove={(e) => { if (!priseArts.current || !railArts.current) return; if (Math.abs(e.clientX - priseArts.current.x) > 5) railArts.current.dataset.mv = "1"; railArts.current.scrollLeft = priseArts.current.g - (e.clientX - priseArts.current.x); }}
+                  onPointerUp={() => { priseArts.current = null; }}
+                  onPointerCancel={() => { priseArts.current = null; }}
+                >
+                  {articles.slice(1).map((a, k) => (
+                    <article key={a.slug} className="cg-art" onClick={a.href ? () => { if (!railArts.current?.dataset.mv) window.location.href = a.href!; } : undefined} style={a.href ? { cursor: "pointer" } : undefined}>
+                      <ImagePlaceholder nom={`IMAGE_PNG_CONF_0${((k + 1) % 9) + 1}`} ratio="16 / 9" />
+                      <span className="cg-rubrique">{a.rubrique} · {a.duree}</span>
+                      <h4 className="cg-art-t">{a.titre}</h4>
+                      {a.href && <a className="cg-art-lien" href={a.href}>Lire le dossier <span aria-hidden="true">→</span></a>}
+                    </article>
+                  ))}
+                </div>
+                <div className="cg-arts-f" aria-hidden="true" />
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Méthodologie et sources ─────────────────────────────────────────── */}
+      <section id="sources" className="cg-section cf-liste-section">
+        <div className="cg-wrap">
+          <TitreSection titre="Méthodologie et sources" sous="Lire ces données" />
           <div className="cf-notes">
-            <h3>Lire ces données</h3>
             <ul>
               {inventaire.avertissements.map((a) => (
                 <li key={a}>{a}</li>

@@ -12,6 +12,7 @@ import { monnaieCourante, useMonnaie } from "./Monnaie";
 import { convertir, fiche } from "@/data/finance/tauxChange";
 import { Loupe } from "./Loupe";
 import { EnTete, ImagePlaceholder, LENT, Monte, Pied, TitreSection } from "./pieces";
+import { useRechercheTableau } from "./rechercheTableau";
 import { gelerOdometres, Odometre } from "./Roulement";
 import { Lettres, MOT_MONNAIE } from "./Lettres";
 import { GlobeEco, familleDe, TOUTES } from "./GlobeEco";
@@ -544,6 +545,8 @@ const Frise = memo(function Frise({
    défilement reste juste. */
 const MARGE = 8;
 
+const nomFr = (r: { fr: string }) => r.fr;
+
 const Tableau = memo(function Tableau({
   lignes,
   colonnes,
@@ -552,7 +555,9 @@ const Tableau = memo(function Tableau({
   choisi,
   onChoisi,
   onTrier,
+  recherche,
 }: {
+  recherche: string;
   lignes: Rang[];
   colonnes: { id: Col; label: string; unite: Unite; famille: string }[];
   col: Col;
@@ -595,6 +600,7 @@ const Tableau = memo(function Tableau({
   useEffect(() => {
     cadre.current?.scrollTo({ top: 0 });
   }, [col, sens, lignes]);
+  const trouvees = useRechercheTableau(cadre, lignes, nomFr, recherche, haut);
 
   const a = Math.min(fen.a, Math.max(0, lignes.length - 1));
   const b = Math.min(fen.b, lignes.length);
@@ -653,7 +659,7 @@ const Tableau = memo(function Tableau({
             <tr
               key={r.nom}
               data-pays={r.nom}
-              className={choisi === r.nom ? "cg-tab-on" : undefined}
+              className={`${choisi === r.nom ? "cg-tab-on" : ""}${trouvees?.has(r.fr) ? " cg-tab-trouve" : ""}` || undefined}
               onClick={() => onChoisi(r.nom)}
             >
               <td className="cg-tab-r">{String(a + i + 1).padStart(2, "0")}</td>
@@ -825,9 +831,7 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
   /* Un pays sans valeur pour la colonne triée passe à la fin, jamais au
      rang le plus bas : ne pas savoir n'est pas être dernier. */
   const tries = useMemo(() => {
-    const q = filtre.trim().toLowerCase();
-    const base = q ? rangs.filter((r) => r.fr.toLowerCase().includes(q)) : rangs;
-    return [...base].sort((a, b) => {
+    return [...rangs].sort((a, b) => {
       const x = a[col];
       const y = b[col];
       if (x === null && y === null) return a.fr.localeCompare(b.fr);
@@ -837,7 +841,7 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
          pris dans l'ordre naturel puis retourné, pas l'inverse. */
       return (x - y) * sens;
     });
-  }, [rangs, col, sens, filtre]);
+  }, [rangs, col, sens]);
 
   /* L'année remise au format de la base : le globe du site lit un EconomyYear,
      et on le reconstruit depuis le format compact plutôt que d'expédier au
@@ -1153,10 +1157,10 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
             <input
               className="cg-filtre cg-filtre-clair"
               type="search"
-              placeholder="Filtrer un pays"
+              placeholder="Trouver un pays"
               value={filtre}
               onChange={(e) => setFiltre(e.target.value)}
-              aria-label="Filtrer un pays"
+              aria-label="Trouver un pays dans le classement"
             />
           </div>
         </div>
@@ -1170,9 +1174,10 @@ export function EconomiePage({ socle: socleLeger, socleUrl, pibMonde, sources, a
             choisi={choisi}
             onChoisi={setChoisi}
             onTrier={trier}
+            recherche={filtre}
           />
           <p className="cg-bande-n">
-            {tries.length} pays affichés · « n.d. » signale une valeur que la source ne publie pas
+            {filtre.trim() ? `${tries.filter((r) => r.fr.toLowerCase().includes(filtre.trim().toLowerCase())).length} correspondance(s) · ` : `${tries.length} pays · `}« n.d. » signale une valeur que la source ne publie pas
             pour ce pays cette année-là ; ces pays passent en fin de tri, ils ne sont pas classés
             derniers. Cliquez une ligne pour la retrouver sur le globe.
           </p>

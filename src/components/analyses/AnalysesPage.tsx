@@ -224,7 +224,8 @@ function construireCourbes(zone: HTMLElement): GeoCourbe[] | null {
       }
     }
     const orbite1: [number, number][] = [];
-    for (let t = 0; t <= t1; t += 0.07) {
+    /* Plus de tours autour du globe : un court départ, la courbe se détache aussitôt. */
+    for (let t = Math.max(0, t1 - 0.5); t <= t1; t += 0.07) {
       const e = ellipse(cx1, cy1, rx1, ry1, pf.rot1, pf.sens, pf.t0 + t);
       orbite1.push([e.x, e.y]);
     }
@@ -428,8 +429,7 @@ function FondCourbes({ racine }: { racine: React.RefObject<HTMLElement | null> }
         let pos = f;
         if (!reduit) {
           const tour = ((maintenant / 9000 + c * 0.31) % 1);
-          if (phase === "haut" && f >= tb.f1 * 0.98) pos = tour * tb.f1;
-          else if (phase === "bas" && f >= 0.985) pos = tb.f2 + tour * (1 - tb.f2);
+          if (phase === "bas" && f >= 0.985) pos = tb.f2 + tour * (1 - tb.f2);
         }
         courant[c].dot = pos;
         const q = p.getPointAtLength(tb.L * pos);

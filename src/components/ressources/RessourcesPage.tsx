@@ -2,7 +2,7 @@
 
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, ArrowUpRight, ExternalLink, GitCompareArrows, Pause, Play } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Droplets, ExternalLink, Flame, GitCompareArrows, Fuel } from "lucide-react";
 import { EnTete, ImagePlaceholder, LENT, Pied, TitreSection } from "@/components/concept/pieces";
 import { Jetons, Dessin } from "@/components/concept/Jetons";
 import { Loupe } from "@/components/concept/Loupe";
@@ -24,6 +24,9 @@ import {
 import { nomZone } from "@/data/ressources/noms";
 import type { EntreeIndex, JeuRessource, Zone } from "@/data/ressources/types";
 import { Courbes, Repartition, type SerieCourbe } from "./Courbes";
+import { EvolutionCourbe } from "@/components/concept/EvolutionCourbe";
+import { TempsReelBloc, type CompteurTR } from "@/components/concept/TempsReelBloc";
+import { CADENCES_RESSOURCES, parSeconde as debitRessource } from "@/data/ressources/tempsReel";
 import "@/components/concept/concept.css";
 import "@/components/concept/v2eco.css";
 import "@/components/explorer/explorer.css";
@@ -67,6 +70,18 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
   const rectangle = useRef<HTMLDivElement>(null);
   const railDebats = useRef<HTMLDivElement>(null);
   const priseDebats = useRef<{ x: number; g: number } | null>(null);
+  const railArts = useRef<HTMLDivElement>(null);
+  const priseArts = useRef<{ x: number; g: number } | null>(null);
+
+  const anneeEnCours = new Date().getFullYear();
+  const compteurs = useMemo<CompteurTR[]>(
+    () => CADENCES_RESSOURCES.map((c) => ({
+      id: c.id, label: c.label, base: c.stock ?? 0, parSeconde: debitRessource(c), dec: c.dec, unite: c.unite, mot: c.mot, note: c.note,
+      depuisMs: c.stockMs ?? Date.UTC(new Date().getFullYear(), 0, 1),
+      icone: c.id === "foret" ? Flame : c.id === "eau" ? Droplets : Fuel,
+    })),
+    [],
+  );
 
   const [index, setIndex] = useState<EntreeIndex[] | null>(null);
   const [resId, setResId] = useState<string | null>(null);
@@ -78,7 +93,6 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
   const [annee, setAnnee] = useState<number>(2024);
   const [m49, setM49] = useState<string | null>(null);
   const [compare, setCompare] = useState<string[] | null>(null);
-  const [lecture, setLecture] = useState(false);
   const [filtre, setFiltre] = useState("");
   const [col, setCol] = useState<Col>("production");
   const [sens, setSens] = useState<1 | -1>(-1);
@@ -123,13 +137,6 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
   const uniteTxt = UNITES_LIBELLE[unite] ?? unite;
   const [a0, a1] = jeu?.annees ?? [1961, 2024];
   const nomRes = res?.nomFr ?? "Ressource";
-
-  /* La lecture automatique des années. */
-  useEffect(() => {
-    if (!lecture) return;
-    const t = window.setInterval(() => setAnnee((a) => (a >= a1 ? (setLecture(false), a) : a + 1)), 420);
-    return () => clearInterval(t);
-  }, [lecture, a1]);
 
   /* ── Les calculs, une fois par changement de filtre ───────────────────────── */
   const cl = useMemo(() => (jeu ? classement(jeu, ind, annee, "Monde", COMPARAISON) : []), [jeu, ind, annee]);
@@ -225,7 +232,6 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
   /* ── Le classement en tableau : trois indicateurs côte à côte, comme sur Économie ── */
   const lignes = useMemo(() => {
     if (!jeu || !ix) return [];
-    const q = filtre.trim().toLowerCase();
     const totalProd = totalMonde(jeu, "production", annee)?.valeur ?? null;
     const rows = jeu.zones
       .filter((z) => z.type === "pays" || z.type === "historique")
@@ -235,7 +241,7 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
         const r = obs(jeu, z.m49, "rendement", annee);
         return { z, nom: nomZone(z), production: p, surface: s, rendement: r, part: p && totalProd ? (p.valeur / totalProd) * 100 : null };
       })
-      .filter((r) => (r.production || r.surface || r.rendement) && (!q || r.nom.toLowerCase().includes(q)));
+      .filter((r) => r.production || r.surface || r.rendement);
     const v = (r: (typeof rows)[number]) => (col === "part" ? r.part : r[col]?.valeur ?? null);
     rows.sort((a, b) => {
       const x = v(a), y = v(b);
@@ -245,7 +251,7 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
       return (x - y) * sens || a.nom.localeCompare(b.nom, "fr");
     });
     return rows;
-  }, [jeu, ix, annee, filtre, col, sens]);
+  }, [jeu, ix, annee, col, sens]);
   const trier = (c: Col) => { if (c === col) setSens((s) => (s === -1 ? 1 : -1)); else { setCol(c); setSens(-1); } };
 
   const puces = useMemo(() => {
@@ -260,8 +266,6 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
     for (const a of actives) if (!out.some((o) => o.cle === a.id)) out.push({ cle: a.id, id: a.id, nom: a.nomFr });
     return out.sort((a, b) => Number(b.id !== null) - Number(a.id !== null));
   }, [actives]);
-
-  const dernierAn = annee === a1;
 
   return (
     <div className="cg cg-eco cg-v2 cg-ressources">
@@ -281,6 +285,20 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
           <span className="cg-arc-corps" /><span className="cg-arc-trait" /><span className="cg-arc-nappe" /><span className="cg-arc-point" />
         </div>
       </section>
+
+      <TempsReelBloc
+        id="temps-reel-ressources"
+        sous={<>Depuis le 1<sup>er</sup> janvier {anneeEnCours}</>}
+        compteurs={compteurs}
+        sources={
+          <>
+            Chaque compteur étale une grandeur annuelle publiée sur l’année en cours ; rien n’est mesuré à la seconde.{" "}
+            {CADENCES_RESSOURCES.map((c, i) => (
+              <span key={c.id}>{i > 0 && " "}<a href={c.source.url} target="_blank" rel="noopener noreferrer">{c.source.nom}</a> : {c.source.precision}.</span>
+            ))}
+          </>
+        }
+      />
 
       {/* ── Le globe, sa frise ───────────────────────────────────────────────── */}
       <section id="globe" className="cg-section cg-eco-globe">
@@ -352,7 +370,7 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
             {/* La frise des années, sous le rectangle : la même que celle d'Économie. */}
             {jeu && (
               <div className="ge-sous">
-                <FriseAnnees annees={jeu.annees} valeur={annee} onAnnee={setAnnee} lecture={lecture} onLecture={() => { if (annee >= a1) setAnnee(a0); setLecture((l) => !l); }} dernier={dernierAn} />
+                <FriseAnnees annees={jeu.annees} valeur={annee} onAnnee={setAnnee} />
               </div>
             )}
           </div>
@@ -430,13 +448,13 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
                 <span className="cg-an-choix-l">Date</span>
                 <Selecteur valeur={annee} options={Array.from({ length: a1 - a0 + 1 }, (_, i) => a1 - i)} onChange={setAnnee} label="Date du classement" />
               </label>
-              <input className="cg-filtre cg-filtre-clair" type="search" placeholder="Filtrer un pays" value={filtre} onChange={(e) => setFiltre(e.target.value)} aria-label="Filtrer un pays" />
+              <input className="cg-filtre cg-filtre-clair" type="search" placeholder="Trouver un pays" value={filtre} onChange={(e) => setFiltre(e.target.value)} aria-label="Trouver un pays dans le classement" />
             </div>
           </div>
           <div className="cg-bande-bloc">
-            <Tableau lignes={lignes} col={col} sens={sens} choisi={m49} onTrier={trier} onChoisi={(id) => selectionner(id)} jeu={jeu} />
+            <Tableau lignes={lignes} col={col} sens={sens} choisi={m49} onTrier={trier} onChoisi={(id) => selectionner(id)} jeu={jeu} recherche={filtre} />
             <p className="cg-bande-n">
-              {lignes.length} entités affichées · « n.d. » signale une valeur que FAOSTAT ne publie pas pour cette entité cette année-là ; ces lignes passent en fin de tri, elles ne sont pas classées dernières.
+              {filtre.trim() ? `${nf(lignes.filter((r) => r.nom.toLowerCase().includes(filtre.trim().toLowerCase())).length)} correspondance(s) · ` : `${nf(lignes.length)} entités · `}« n.d. » signale une valeur que FAOSTAT ne publie pas pour cette entité cette année-là ; ces lignes passent en fin de tri, elles ne sont pas classées dernières.
               Une lettre en exposant marque une valeur non officielle (E estimée, I imputée, X source externe). La part se calcule sur le total recalculé de {annee}, pas sur un total officiel. Cliquez une ligne pour la retrouver sur le globe.
             </p>
           </div>
@@ -464,7 +482,16 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
                     <span className="cg-debats-st">Nos plus gros débats</span>
                     <span className="cg-debats-n">{debats.length} en cours</span>
                   </div>
-                  <div ref={railDebats} className="cg-debats-l" onPointerDown={(e) => { priseDebats.current = { x: e.clientX, g: e.currentTarget.scrollLeft }; e.currentTarget.setPointerCapture(e.pointerId); }} onPointerMove={(e) => { if (!priseDebats.current || !railDebats.current) return; railDebats.current.scrollLeft = priseDebats.current.g - (e.clientX - priseDebats.current.x); }} onPointerUp={() => { priseDebats.current = null; }} onPointerCancel={() => { priseDebats.current = null; }}>
+                  <div
+                    ref={railDebats}
+                    className="cg-debats-l"
+                    onPointerDown={(e) => { delete e.currentTarget.dataset.mv; priseDebats.current = { x: e.clientX, g: e.currentTarget.scrollLeft }; e.currentTarget.setPointerCapture(e.pointerId); }}
+                    onPointerMove={(e) => { if (!priseDebats.current || !railDebats.current) return; if (Math.abs(e.clientX - priseDebats.current.x) > 5) railDebats.current.dataset.mv = "1"; railDebats.current.scrollLeft = priseDebats.current.g - (e.clientX - priseDebats.current.x); }}
+                    onPointerUp={() => { priseDebats.current = null; }}
+                    onPointerCancel={() => { priseDebats.current = null; }}
+                    onDragStart={(e) => e.preventDefault()}
+                    onClickCapture={(e) => { if (railDebats.current?.dataset.mv) { e.preventDefault(); e.stopPropagation(); } }}
+                  >
                     {debats.map((d) => (
                       <a key={d.id} href="/forum" className="cg-debat">
                         <span className="cg-debat-q">{d.question}</span>
@@ -477,9 +504,16 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
 
               <div className="cg-arts-c">
                 <h3 className="cg-arts-st">Nos articles</h3>
-                <div className="cg-arts">
+                <div
+                  ref={railArts}
+                  className="cg-arts"
+                  onPointerDown={(e) => { delete e.currentTarget.dataset.mv; priseArts.current = { x: e.clientX, g: e.currentTarget.scrollLeft }; e.currentTarget.setPointerCapture(e.pointerId); }}
+                  onPointerMove={(e) => { if (!priseArts.current || !railArts.current) return; if (Math.abs(e.clientX - priseArts.current.x) > 5) railArts.current.dataset.mv = "1"; railArts.current.scrollLeft = priseArts.current.g - (e.clientX - priseArts.current.x); }}
+                  onPointerUp={() => { priseArts.current = null; }}
+                  onPointerCancel={() => { priseArts.current = null; }}
+                >
                   {articles.slice(1).map((a, k) => (
-                    <article key={a.slug} className="cg-art" onClick={a.href ? () => { window.location.href = a.href!; } : undefined} style={a.href ? { cursor: "pointer" } : undefined}>
+                    <article key={a.slug} className="cg-art" onClick={a.href ? () => { if (!railArts.current?.dataset.mv) window.location.href = a.href!; } : undefined} style={a.href ? { cursor: "pointer" } : undefined}>
                       <ImagePlaceholder nom={`IMAGE_PNG_RES_0${((k + 1) % 9) + 1}`} ratio="16 / 9" />
                       <span className="cg-rubrique">{a.rubrique} · {a.duree}</span>
                       <h4 className="cg-art-t">{a.titre}</h4>
@@ -571,14 +605,11 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
 /* ── La frise des années : celle d'Économie, sur les années du fichier ───── */
 
 const FriseAnnees = memo(function FriseAnnees({
-  annees, valeur, onAnnee, lecture, onLecture, dernier,
+  annees, valeur, onAnnee,
 }: {
   annees: [number, number];
   valeur: number;
   onAnnee: (a: number) => void;
-  lecture: boolean;
-  onLecture: () => void;
-  dernier: boolean;
 }) {
   const [vue, setVue] = useState(valeur);
   const vueRef = useRef(valeur);
@@ -644,13 +675,6 @@ const FriseAnnees = memo(function FriseAnnees({
           ))}
         </div>
       </div>
-      <p className="cg-frise-n rs-frise-n">
-        <button type="button" className="rs-play" onClick={onLecture} aria-label={lecture ? "Pause" : "Lire les années"}>
-          {lecture ? <Pause size={13} aria-hidden="true" /> : <Play size={13} aria-hidden="true" />}
-          {lecture ? "Pause" : "Lire les années"}
-        </button>
-        Les années affichées sont celles publiées par FAOSTAT. Rien n’est interpolé : une année absente reste absente.{dernier && <> {liste[liste.length - 1]} est la dernière année de ce fichier.</>}
-      </p>
     </div>
   );
 });
@@ -663,13 +687,25 @@ type Rangee = {
 };
 
 const Tableau = memo(function Tableau({
-  lignes, col, sens, choisi, onTrier, onChoisi, jeu,
+  lignes, col, sens, choisi, onTrier, onChoisi, jeu, recherche,
 }: {
-  lignes: Rangee[]; col: Col; sens: 1 | -1; choisi: string | null; onTrier: (c: Col) => void; onChoisi: (id: string) => void; jeu: JeuRessource;
+  lignes: Rangee[]; col: Col; sens: 1 | -1; choisi: string | null; onTrier: (c: Col) => void; onChoisi: (id: string) => void; jeu: JeuRessource; recherche: string;
 }) {
   const cadre = useRef<HTMLDivElement>(null);
   const allumee = useRef<HTMLElement | null>(null);
-  useEffect(() => { cadre.current?.scrollTo({ top: 0 }); }, [col, sens, lignes.length]);
+  useEffect(() => { cadre.current?.scrollTo({ top: 0 }); }, [col, sens, lignes]);
+
+  /* La recherche ne masque rien : le rang reste celui du classement complet, et le tableau
+     défile jusqu'à la première ligne trouvée, qui s'allume. */
+  const q = recherche.trim().toLowerCase();
+  const trouvees = useMemo(() => (q ? new Set(lignes.filter((r) => r.nom.toLowerCase().includes(q)).map((r) => r.z.m49)) : null), [lignes, q]);
+  useEffect(() => {
+    const el = cadre.current;
+    if (!el || !trouvees || !trouvees.size) return;
+    const i = lignes.findIndex((r) => trouvees.has(r.z.m49));
+    const tr = el.querySelector<HTMLElement>(`tbody tr:nth-child(${i + 1})`);
+    if (tr) el.scrollTo({ top: Math.max(0, tr.offsetTop - el.clientHeight / 3), behavior: "smooth" });
+  }, [trouvees, lignes, col, sens]);
 
   /* La lueur suit le pointeur, comme sur Économie. */
   const suit = useCallback((e: React.PointerEvent<HTMLTableSectionElement>) => {
@@ -718,7 +754,7 @@ const Tableau = memo(function Tableau({
         </thead>
         <tbody onPointerMove={suit} onPointerLeave={eteint}>
           {lignes.map((r, i) => (
-            <tr key={r.z.m49} data-pays={r.z.m49} className={choisi === r.z.m49 ? "cg-tab-on" : undefined} onClick={() => onChoisi(r.z.m49)}>
+            <tr key={r.z.m49} data-pays={r.z.m49} className={`${choisi === r.z.m49 ? "cg-tab-on" : ""}${trouvees?.has(r.z.m49) ? " cg-tab-trouve" : ""}` || undefined} onClick={() => onChoisi(r.z.m49)}>
               <td className="cg-tab-r">{String(i + 1).padStart(2, "0")}</td>
               <td className="cg-tab-p">{r.nom}{r.z.type === "historique" && <em className="rs-tag">{r.z.debut}–{r.z.fin}</em>}</td>
               <td className={r.production ? undefined : "cg-tab-vide"}>{cellule(r.production)}</td>
@@ -882,122 +918,21 @@ function FichePays({
         })}
       </div>
 
-      <Evolution points={sp} unite={unite} libelle={`${NOMS_INDICATEUR[ind]} · ${z.debut}–${z.fin}`} />
+      <EvolutionCourbe
+        titre={`${NOMS_INDICATEUR[ind]} · ${z.debut}–${z.fin}`}
+        reinit={`${J.source.fichier}|${z.m49}|${ind}`}
+        points={sp.map((q) => ({ annee: q.annee, valeur: q.valeur, note: q.valeur !== null && q.flag && q.flag !== "A" ? `${flagLibelle(q.flag).toLowerCase()}${q.nonOfficielle ? ", non officielle" : ""}` : undefined }))}
+        format={(v) => `${complet(v)} ${UNITES_LIBELLE[unite] ?? unite}`}
+        ecart={(a, b) => {
+          const diff = b.valeur - a.valeur;
+          const u = UNITES_LIBELLE[unite] ?? unite;
+          return { texte: a.valeur > 0 ? pct(((b.valeur - a.valeur) / a.valeur) * 100) : `${diff >= 0 ? "+" : ""}${complet(diff)} ${u}`, detail: `${a.annee} → ${b.annee} · ${complet(a.valeur)} → ${complet(b.valeur)} ${u}`, sens: diff > 0 ? 1 : diff < 0 ? -1 : 0 };
+        }}
+      />
 
       <div className="rs-actions">
         {z.type === "pays" && <button type="button" className="rs-btn" onClick={() => onComparer(z.m49)}><GitCompareArrows size={14} aria-hidden="true" /> Comparer ce pays</button>}
       </div>
     </>
-  );
-}
-
-/* ── L'évolution d'un pays : les informations en haut à gauche, comme sur Économie ─────────────
-   Pas d'infobulle : au repos, les deux bouts ; au survol, l'année lue ; en cliquant deux années, l'écart entre elles. */
-
-function Evolution({ points: pts, unite, libelle }: { points: ReturnType<typeof points>; unite: string; libelle: string }) {
-  const cadre = useRef<HTMLDivElement>(null);
-  const [survol, setSurvol] = useState<number | null>(null);
-  const [bornes, setBornes] = useState<number[]>([]);
-  const valides = pts.filter((p) => p.valeur !== null) as { annee: number; valeur: number; flag: string; nonOfficielle: boolean }[];
-  const u = UNITES_LIBELLE[unite] ?? unite;
-
-  const geometrie = useMemo(() => {
-    if (valides.length < 2) return null;
-    const a0 = pts[0].annee, a1 = pts[pts.length - 1].annee;
-    const vs = valides.map((p) => p.valeur);
-    const lo = Math.min(...vs), hi = Math.max(...vs);
-    const X = (an: number) => (a1 === a0 ? 0 : ((an - a0) / (a1 - a0)) * 100);
-    const Y = (v: number) => (hi === lo ? 15 : 28 - ((v - lo) / (hi - lo)) * 26);
-    let d = "";
-    let ouvert = false;
-    for (const p of pts) {
-      if (p.valeur === null) { ouvert = false; continue; }
-      d += `${ouvert ? "L" : "M"}${X(p.annee).toFixed(2)},${Y(p.valeur).toFixed(2)}`;
-      ouvert = true;
-    }
-    const pos = new Map(valides.map((p) => [p.annee, { x: X(p.annee), y: Y(p.valeur) }]));
-    return { d, pos, a0, a1 };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pts]);
-
-  if (!geometrie) return (
-    <div className="ge-evo">
-      <p className="ge-evo-t">Évolution · {libelle}</p>
-      <p className="ge-evo-vide">Moins de deux années publiées pour ce pays sur cet indicateur.</p>
-    </div>
-  );
-
-  const parAn = new Map(valides.map((p) => [p.annee, p]));
-  const premier = valides[0], dernier = valides[valides.length - 1];
-  const lu = survol !== null ? parAn.get(survol) ?? null : null;
-  const [ba, bb] = bornes.length === 2 ? [parAn.get(bornes[0])!, parAn.get(bornes[1])!] : [null, null];
-  const ecart = ba && bb ? { a: ba, b: bb, diff: bb.valeur - ba.valeur, pct: ba.valeur > 0 ? ((bb.valeur - ba.valeur) / ba.valeur) * 100 : null } : null;
-
-  const vise = (x: number) => {
-    const el = cadre.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const t = Math.max(0, Math.min(1, (x - r.left) / (r.width || 1)));
-    const cible = geometrie.a0 + t * (geometrie.a1 - geometrie.a0);
-    let best = valides[0];
-    for (const p of valides) if (Math.abs(p.annee - cible) < Math.abs(best.annee - cible)) best = p;
-    setSurvol(best.annee);
-  };
-  const pose = (an: number) => setBornes((b) => (b.length === 1 ? (b[0] === an ? [] : [b[0], an].sort((x, y) => x - y)) : b.length === 2 ? [an] : [an]));
-  const signe = ecart ? Math.sign(ecart.diff) : 0;
-  const fmt = (v: number) => `${complet(v)} ${u}`;
-
-  return (
-    <div className="ge-evo">
-      <p className="ge-evo-t">Évolution · {libelle}</p>
-      <div className="ge-evo-h">
-        {ecart ? (
-          <span className={`ge-evo-ec${signe > 0 ? " ge-evo-ec-h" : signe < 0 ? " ge-evo-ec-b" : ""}`}>
-            <b>{ecart.pct !== null ? pct(ecart.pct) : `${ecart.diff >= 0 ? "+" : ""}${complet(ecart.diff)} ${u}`}</b>
-            {ecart.a.annee} → {ecart.b.annee} · {fmt(ecart.a.valeur)} → {fmt(ecart.b.valeur)}
-          </span>
-        ) : lu ? (
-          <span className="ge-evo-lu">
-            <b>{fmt(lu.valeur)}</b>
-            {lu.annee}{lu.flag !== "A" ? ` · ${flagLibelle(lu.flag).toLowerCase()}${lu.nonOfficielle ? ", non officielle" : ""}` : ""}
-          </span>
-        ) : (
-          <>
-            <span className="ge-evo-bout"><b>{fmt(premier.valeur)}</b>{premier.annee}</span>
-            <span className="ge-evo-bout ge-evo-bout-d"><b>{fmt(dernier.valeur)}</b>{dernier.annee}</span>
-          </>
-        )}
-      </div>
-      <div
-        ref={cadre}
-        className="ge-evo-c"
-        onPointerMove={(e) => vise(e.clientX)}
-        onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); vise(e.clientX); }}
-        onClick={() => survol !== null && pose(survol)}
-        onPointerLeave={() => setSurvol(null)}
-        onPointerCancel={() => setSurvol(null)}
-      >
-        <svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">
-          <path d={geometrie.d} fill="none" stroke="var(--froid)" strokeWidth="1.4" vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
-          {ecart && (
-            <>
-              <rect x={Math.min(geometrie.pos.get(ecart.a.annee)!.x, geometrie.pos.get(ecart.b.annee)!.x)} y="0" width={Math.abs(geometrie.pos.get(ecart.b.annee)!.x - geometrie.pos.get(ecart.a.annee)!.x)} height="30" fill="rgba(124,77,255,0.10)" />
-              {[ecart.a, ecart.b].map((m) => <line key={m.annee} x1={geometrie.pos.get(m.annee)!.x} y1="0" x2={geometrie.pos.get(m.annee)!.x} y2="30" stroke="var(--froid)" strokeWidth="1" vectorEffect="non-scaling-stroke" />)}
-            </>
-          )}
-          {lu && <line x1={geometrie.pos.get(lu.annee)!.x} y1="0" x2={geometrie.pos.get(lu.annee)!.x} y2="30" stroke="var(--bord)" strokeWidth="1" vectorEffect="non-scaling-stroke" />}
-        </svg>
-        <div className="ge-evo-pts" aria-hidden="true">
-          <span className="ge-evo-pt ge-evo-pt-d" style={{ left: `${geometrie.pos.get(premier.annee)!.x}%`, top: `${(geometrie.pos.get(premier.annee)!.y / 30) * 100}%` }} />
-          <span className="ge-evo-pt ge-evo-pt-f" style={{ left: `${geometrie.pos.get(dernier.annee)!.x}%`, top: `${(geometrie.pos.get(dernier.annee)!.y / 30) * 100}%` }} />
-          {ecart && [ecart.a, ecart.b].map((m) => <span key={m.annee} className="ge-evo-pt ge-evo-pt-e" style={{ left: `${geometrie.pos.get(m.annee)!.x}%`, top: `${(geometrie.pos.get(m.annee)!.y / 30) * 100}%` }} />)}
-          {!ecart && bornes.length === 1 && parAn.get(bornes[0]) && <span className="ge-evo-pt ge-evo-pt-e" style={{ left: `${geometrie.pos.get(bornes[0])!.x}%`, top: `${(geometrie.pos.get(bornes[0])!.y / 30) * 100}%` }} />}
-          {lu && <span className="ge-evo-pt ge-evo-pt-l" style={{ left: `${geometrie.pos.get(lu.annee)!.x}%`, top: `${(geometrie.pos.get(lu.annee)!.y / 30) * 100}%` }} />}
-        </div>
-      </div>
-      <p className="ge-evo-aide">
-        {bornes.length === 0 ? "Cliquez deux années pour mesurer l’écart." : bornes.length === 1 ? `${bornes[0]} posée. Cliquez la seconde année.` : "Cliquez ailleurs pour repartir."}
-      </p>
-    </div>
   );
 }

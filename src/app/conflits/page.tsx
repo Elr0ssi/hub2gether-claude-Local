@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ConflitsPage } from "@/components/conflits/ConflitsPage";
 import { conflitsDuFichier } from "@/data/conflits";
+import { articlesConflits, debatsConflits } from "@/data/conflits/lectures";
 import { jsonLdString } from "@/lib/schema";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theessentialdata.com";
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  const { inventaire } = conflitsDuFichier();
+  const { inventaire, conflits } = conflitsDuFichier();
   const jeu = {
     "@context": "https://schema.org",
     "@type": "Dataset",
@@ -53,7 +54,7 @@ export default function Page() {
         d’après un inventaire éditorial du {inventaire.date_inventaire}. Ce n’est ni un décompte officiel de guerres ni un flux d’actualité : les fiches sont sourcées
         et à recouper avec UCDP et ACLED.
       </p>
-      <ConflitsPage />
+      <ConflitsPage articles={articlesConflits()} debats={debatsConflits(conflits)} />
     </>
   );
 }

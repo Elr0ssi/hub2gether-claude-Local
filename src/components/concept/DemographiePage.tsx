@@ -13,6 +13,7 @@ import { Loupe } from "./Loupe";
 import { Selecteur } from "./Selecteur";
 import { Odometre, gelerOdometres } from "./Roulement";
 import { Lettres } from "./Lettres";
+import { useRechercheTableau } from "./rechercheTableau";
 import { compteurPossibleDemo, familleDe, GlobeDemographie, TOUTES, type MetriqueDemo } from "./GlobeDemographie";
 import { Titre, usePret, useProgression, useSocleComplet, useVu } from "./ouverture";
 import { cle } from "@/data/concept/cle";
@@ -336,6 +337,8 @@ const FriseDemo = ({
    ═══════════════════════════════════════════════════════════════════════════ */
 const MARGE = 8;
 
+const nomFr = (r: { fr: string }) => r.fr;
+
 function TableauDemo({
   lignes,
   colonnes,
@@ -344,7 +347,9 @@ function TableauDemo({
   choisi,
   onChoisi,
   onTrier,
+  recherche,
 }: {
+  recherche: string;
   lignes: Rang[];
   colonnes: MetriqueDemo[];
   col: DemographyMetricId;
@@ -384,6 +389,7 @@ function TableauDemo({
   useEffect(() => {
     cadre.current?.scrollTo({ top: 0 });
   }, [col, sens, lignes]);
+  const trouvees = useRechercheTableau(cadre, lignes, nomFr, recherche, haut);
 
   const a = Math.min(fen.a, Math.max(0, lignes.length - 1));
   const b = Math.min(fen.b, lignes.length);
@@ -418,7 +424,7 @@ function TableauDemo({
             </tr>
           )}
           {lignes.slice(a, b).map((r, i) => (
-            <tr key={r.nom} data-pays={r.nom} className={choisi === r.nom ? "cg-tab-on" : undefined} onClick={() => onChoisi(r.nom)}>
+            <tr key={r.nom} data-pays={r.nom} className={`${choisi === r.nom ? "cg-tab-on" : ""}${trouvees?.has(r.fr) ? " cg-tab-trouve" : ""}` || undefined} onClick={() => onChoisi(r.nom)}>
               <td className="cg-tab-r">{String(a + i + 1).padStart(2, "0")}</td>
               <td className="cg-tab-p">{r.fr}</td>
               {colonnes.map((c) => (
@@ -534,9 +540,7 @@ export function DemographiePage({
   }, [socle, annee]);
 
   const tries = useMemo(() => {
-    const q = filtre.trim().toLowerCase();
-    const base = q ? rangs.filter((r) => r.fr.toLowerCase().includes(q)) : rangs;
-    return [...base].sort((a, b) => {
+    return [...rangs].sort((a, b) => {
       const x = a[metrique];
       const y = b[metrique];
       if (x === null && y === null) return a.fr.localeCompare(b.fr);
@@ -544,7 +548,7 @@ export function DemographiePage({
       if (y === null) return -1;
       return (x - y) * sens;
     });
-  }, [rangs, metrique, sens, filtre]);
+  }, [rangs, metrique, sens]);
 
   /* Cliquer une colonne du classement trie dessus et affiche cette grandeur
      sur le globe ; cliquer une famille ou une grandeur voisine sur le globe
@@ -698,10 +702,10 @@ export function DemographiePage({
             <input
               className="cg-filtre cg-filtre-clair"
               type="search"
-              placeholder="Filtrer un pays"
+              placeholder="Trouver un pays"
               value={filtre}
               onChange={(e) => setFiltre(e.target.value)}
-              aria-label="Filtrer un pays"
+              aria-label="Trouver un pays dans le classement"
             />
           </div>
         </div>
@@ -715,9 +719,10 @@ export function DemographiePage({
             choisi={choisi}
             onChoisi={setChoisi}
             onTrier={trier}
+            recherche={filtre}
           />
           <p className="cg-bande-n">
-            {tries.length} pays affichés · « n.d. » signale une valeur que la source ne publie pas pour ce pays cette
+            {filtre.trim() ? `${tries.filter((r) => r.fr.toLowerCase().includes(filtre.trim().toLowerCase())).length} correspondance(s) · ` : `${tries.length} pays · `}« n.d. » signale une valeur que la source ne publie pas pour ce pays cette
             année-là ; ces pays passent en fin de tri, ils ne sont pas classés derniers. Cliquez une ligne pour la
             retrouver sur le globe.
           </p>
