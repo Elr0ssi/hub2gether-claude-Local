@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowUpRight, ChevronDown, Crosshair, ExternalLink, MapPin, Minus, Plus, Search, Ship, Swords, X, type LucideIcon } from "lucide-react";
 import { EnTete, Pied, TitreSection } from "@/components/concept/pieces";
@@ -21,20 +20,13 @@ import { periodeTexte, titreCourt, type DossierConflit } from "@/data/conflits/c
 import { dossierFusionne } from "@/data/conflits/fusion";
 import type { Repere } from "@/data/explorer/couches";
 import type { Coloration, GlobeExplorerHandle, VueGlobe } from "@/components/explorer/GlobeExplorer";
+import { GlobeCompact, type InfoBulle } from "@/components/explorer/GlobeCompact";
 import { boiteDe, vueDePays } from "@/components/explorer/vues";
 import "@/components/concept/concept.css";
 import "@/components/concept/v2eco.css";
 import "@/components/explorer/explorer.css";
 import "./conflits.css";
 
-const GlobeExplorer = dynamic(() => import("@/components/explorer/GlobeExplorer").then((m) => m.GlobeExplorer), {
-  ssr: false,
-  loading: () => <div className="xp-attente" aria-hidden="true"><span /></div>,
-});
-
-const AUCUNE_RIVIERE: never[] = [];
-const AUCUN_ENSEMBLE = new Set<never>();
-const AUCUN_ARC: [string, string][] = [];
 const DATE = (iso: string) => new Date(iso + "T12:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 const nf = (v: number) => v.toLocaleString("fr-FR");
 
@@ -84,7 +76,6 @@ export function ConflitsPage() {
   const [evt, setEvt] = useState<string | null>(null);
   const [rubrique, setRubrique] = useState<string | null>(null);
   const [survolEvt, setSurvolEvt] = useState<string | null>(null);
-  const [survol, setSurvol] = useState<{ nom: string; x: number; y: number } | null>(null);
   const [geo, setGeo] = useState<GeoJSON.FeatureCollection | null>(null);
   const [ouvert, setOuvert] = useState<string | null>(null);
   const globe = useRef<GlobeExplorerHandle>(null);
@@ -340,7 +331,15 @@ export function ConflitsPage() {
 
   const versGlobe = useCallback(() => rectangle.current?.scrollIntoView({ behavior: "smooth", block: "center" }), []);
 
-  const tip = survol && !survolEvt && parPays.get(survol.nom);
+  /* L'infobulle d'un pays : son nom, et sa fiche (ou le nombre de fiches). Calculée dans le globe, pas dans la page. */
+  const infoBulle = useCallback(
+    (nom: string): InfoBulle | null => {
+      const l = parPays.get(nom);
+      if (!l || !l.length) return null;
+      return { titre: nomPays(nom), ligne: `${l.length === 1 ? l[0].nom : `${l.length} fiches`} · ${l.length === 1 ? l[0].categorie : categorieDominante(l)}` };
+    },
+    [parPays, nomPays],
+  );
   const typesPresents = useMemo(() => [...new Set(points.map((e) => e.type))], [points]);
 
   return (
@@ -414,51 +413,30 @@ export function ConflitsPage() {
 
             <div className="ge-corps cf-corps" ref={rectangle}>
               <div className="ge-colonne">
-                <div className="ge-scene cf-scene" data-intro={intro} onPointerDown={() => intro === "joue" && arreterIntro()}>
-                  {geo ? (
-                    <GlobeExplorer
-                      ref={globe}
-                      compact
-                      geo={geo}
-                      nuit={theme === "nuit"}
-                      reperes={reperes}
-                      rivieres={AUCUNE_RIVIERE}
-                      rivieresVives={AUCUN_ENSEMBLE}
-                      pays={null}
-                      survol={survolEvt}
-                      choisi={evt}
-                      cartes={cartes}
-                      monde={false}
-                      arcs={AUCUN_ARC}
-                      arcsLL={arcsLL}
-                      relief3D={false}
-                      colorations={colorations}
-                      contours={contours}
-                      vue={vue}
-                      onSurvol={setSurvolEvt}
-                      onChoix={surRepere}
-                      onPays={surPays}
-                      onPaysSurvol={setSurvol}
-                    />
-                  ) : (
-                    <div className="xp-attente" aria-hidden="true"><span /></div>
-                  )}
-                  <div className="cf-zoom">
-                    <button type="button" aria-label="Zoomer" onClick={() => globe.current?.zoomer(0.78)}><Plus size={16} aria-hidden="true" /></button>
-                    <button type="button" aria-label="Dézoomer" onClick={() => globe.current?.zoomer(1.28)}><Minus size={16} aria-hidden="true" /></button>
-                  </div>
+                <GlobeCompact
+                  ref={globe}
+                  className="cf-scene"
+                  sceneProps={{ "data-intro": intro, onPointerDown: () => intro === "joue" && arreterIntro() }}
+                  geo={geo}
+                  nuit={theme === "nuit"}
+                  reperes={reperes}
+                  survol={survolEvt}
+                  choisi={evt}
+                  cartes={cartes}
+                  arcsLL={arcsLL}
+                  colorations={colorations}
+                  contours={contours}
+                  vue={vue}
+                  repereSurvole={!!survolEvt}
+                  infoBulle={infoBulle}
+                  onSurvol={setSurvolEvt}
+                  onChoix={surRepere}
+                  onPays={surPays}
+                >
                   {intro === "joue" && (
                     <div className="cf-onde" aria-hidden="true">
                       <i /><i /><i />
                       <span className="cf-balai" />
-                    </div>
-                  )}
-                  {survol && tip && tip.length > 0 && (
-                    <div className={`cf-tip${survol.x > (rectangle.current?.querySelector(".cf-scene")?.clientWidth ?? 9999) - 230 ? " cf-tip-g" : ""}`} style={{ left: survol.x, top: survol.y }} aria-hidden="true">
-                      <b>{nomPays(survol.nom)}</b>
-                      <span>
-                        {tip.length === 1 ? tip[0].nom : `${tip.length} fiches`} · {tip.length === 1 ? tip[0].categorie : categorieDominante(tip)}
-                      </span>
                     </div>
                   )}
                   <div className="ge-echelle cf-legende" aria-hidden="true">
@@ -476,7 +454,7 @@ export function ConflitsPage() {
                       </>
                     )}
                   </div>
-                </div>
+                </GlobeCompact>
               </div>
 
               <aside className="ge-panneau cf-panneau" aria-live="polite">

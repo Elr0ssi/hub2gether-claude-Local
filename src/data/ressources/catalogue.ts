@@ -37,7 +37,7 @@ export const CATALOGUE: Famille[] = [
     ],
   },
   { id: "energie", nom: "Énergie", aVenir: ["Pétrole", "Gaz naturel", "Charbon", "Uranium"] },
-  { id: "minerais", nom: "Minerais", aVenir: ["Lithium", "Cuivre", "Fer", "Or"] },
+  { id: "minerais", nom: "Minerais", aVenir: ["Lithium", "Cuivre", "Fer", "Or", "Argent"] },
   { id: "eau-forets", nom: "Eau et forêts", aVenir: [] },
 ];
 

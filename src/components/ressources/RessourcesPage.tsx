@@ -1,69 +1,66 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowUpRight, ChevronDown, ExternalLink, Minus, Pause, Play, Plus } from "lucide-react";
-import { EnTete, Pied, TitreSection } from "@/components/concept/pieces";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowLeft, ArrowUpRight, ExternalLink, GitCompareArrows, Pause, Play } from "lucide-react";
+import { EnTete, ImagePlaceholder, LENT, Pied, TitreSection } from "@/components/concept/pieces";
 import { Jetons, Dessin } from "@/components/concept/Jetons";
 import { Loupe } from "@/components/concept/Loupe";
-import { Odometre } from "@/components/concept/Roulement";
-import { Titre, usePret, useProgression } from "@/components/concept/ouverture";
+import { Odometre, gelerOdometres } from "@/components/concept/Roulement";
+import { Selecteur } from "@/components/concept/Selecteur";
+import { Titre, usePret, useProgression, useVu } from "@/components/concept/ouverture";
 import { useTheme } from "@/components/concept/Theme";
 import { countryFr } from "@/data/countryNamesFr";
+import type { FicheArticle } from "@/data/concept/conceptGeo";
 import type { Coloration, GlobeExplorerHandle, VueGlobe } from "@/components/explorer/GlobeExplorer";
+import { GlobeCompact, type InfoBulle } from "@/components/explorer/GlobeCompact";
 import { vueDePays } from "@/components/explorer/vues";
 import { chargerIndex, chargerJeu } from "@/data/ressources/charger";
-import { CATALOGUE, NOMS_FR_ENTITES, ressourcesActives, type RessourceActive } from "@/data/ressources/catalogue";
+import { CATALOGUE, ressourcesActives, type RessourceActive } from "@/data/ressources/catalogue";
 import {
-  CONTINENTS, NOMS_INDICATEUR, UNITES_LIBELLE, VUES_ZONE, FLAGS, classeDe, classement, complet, court, derniere, flagLibelle, indexer, manquante, obs, points,
-  rangDe, seuils, totalMonde,
+  FLAGS, NOMS_INDICATEUR, UNITES_LIBELLE, classeDe, classement, complet, court, derniere, flagLibelle, indexer, manquante, obs, points, rangDe, seuils, totalMonde,
 } from "@/data/ressources/calc";
-import type { EntreeIndex, JeuRessource, Zone, ZoneFiltre } from "@/data/ressources/types";
+import { nomZone } from "@/data/ressources/noms";
+import type { EntreeIndex, JeuRessource, Zone } from "@/data/ressources/types";
 import { Courbes, Repartition, type SerieCourbe } from "./Courbes";
 import "@/components/concept/concept.css";
 import "@/components/concept/v2eco.css";
 import "@/components/explorer/explorer.css";
 import "./ressources.css";
 
-const GlobeExplorer = dynamic(() => import("@/components/explorer/GlobeExplorer").then((m) => m.GlobeExplorer), {
-  ssr: false,
-  loading: () => <div className="xp-attente" aria-hidden="true"><span /></div>,
-});
-
 /* ═══════════════════════════════════════════════════════════════════════════
    LA PAGE RESSOURCES
 
-   Même construction que Économie et Conflits : un grand rectangle (globe à gauche, panneau à droite), des filtres au-dessus, des
-   graphiques en dessous. Les données viennent de public/ressources/<id>.json (voir scripts/ressources) ; la logique de src/data/ressources.
+   Même construction que Économie : un grand rectangle (globe à gauche, fiche à droite), la frise des années dessous, les graphiques, le
+   classement dans sa bande claire, les articles, la FAQ. Les données viennent de public/ressources/<id>.json (scripts/ressources).
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const RAMPE = ["#ede9fe", "#d4c6fd", "#b39afb", "#8f6bf7", "#6a3fe0", "#43198f"];
 const COULEURS_PAYS = ["#6d4aff", "#e5484d", "#0891b2", "#f08a24", "#16a34a", "#d946ef"];
-const ZONES: ZoneFiltre[] = ["Monde", ...CONTINENTS];
-const INDICATEURS_ORDRE = ["production", "surface", "rendement"] as const;
+const INDICATEURS = ["production", "surface", "rendement"] as const;
 const COMPARAISON = 10;
-const TITRES_CLASSEMENT: Record<string, string> = { production: "Principaux producteurs", surface: "Plus grandes surfaces récoltées", rendement: "Rendements les plus élevés" };
-/** Une évolution en %, sans « -0 % » : une variation qui s'arrondit à zéro s'écrit 0 %. */
-const pct = (x: number) => { const r = Math.round(x); return r === 0 ? "0 %" : `${r > 0 ? "+" : ""}${r.toLocaleString("fr-FR")} %`; };
-
-const AUCUN_REPERE: never[] = [];
-const AUCUN_ENSEMBLE = new Set<never>();
-const AUCUN_ARC: [string, string][] = [];
-const AUCUNE_CARTE: string[] = [];
 const AUCUN_CONTOUR: string[] = [];
-const RIEN = () => {};
-const nf = (v: number) => v.toLocaleString("fr-FR");
 
-function nomZone(z: Zone) {
-  if (NOMS_FR_ENTITES[z.m49]) return NOMS_FR_ENTITES[z.m49];
-  if (z.m49 === "156") return "Chine continentale";
-  return z.ne ? countryFr(z.ne) : z.nom;
+const nf = (v: number) => v.toLocaleString("fr-FR");
+/** Une évolution en %, sans « -0 % » : une variation qui s'arrondit à zéro s'écrit 0 %. */
+const pct = (x: number) => {
+  const r = Math.round(x);
+  return r === 0 ? "0 %" : `${r > 0 ? "+" : ""}${r.toLocaleString("fr-FR")} %`;
+};
+const nbsp = (u: string) => ` ${u}`;
+
+interface Props {
+  articles: FicheArticle[];
+  faq: { question: string; answer: string }[];
 }
 
-export function RessourcesPage() {
+type Col = "production" | "surface" | "rendement" | "part";
+
+export function RessourcesPage({ articles, faq }: Props) {
   const [theme] = useTheme();
   const ouverture = useProgression();
   const pret = usePret();
+  const bande = useVu();
   const globe = useRef<GlobeExplorerHandle>(null);
   const rectangle = useRef<HTMLDivElement>(null);
 
@@ -75,21 +72,24 @@ export function RessourcesPage() {
 
   const [ind, setInd] = useState<string>("production");
   const [annee, setAnnee] = useState<number>(2024);
-  const [zone, setZone] = useState<ZoneFiltre>("Monde");
   const [m49, setM49] = useState<string | null>(null);
   const [compare, setCompare] = useState<string[] | null>(null);
   const [lecture, setLecture] = useState(false);
-  const [survol, setSurvol] = useState<{ nom: string; x: number; y: number } | null>(null);
-  const [toutVoir, setToutVoir] = useState(false);
+  const [filtre, setFiltre] = useState("");
+  const [col, setCol] = useState<Col>("production");
+  const [sens, setSens] = useState<1 | -1>(-1);
+  const [qOuverte, setQOuverte] = useState<number | null>(0);
 
   /* ── Chargements : l'index, la géométrie, puis la ressource choisie ───────── */
   useEffect(() => {
     let vivant = true;
-    chargerIndex().then((l) => {
-      if (!vivant) return;
-      setIndex(l);
-      setResId((c) => c ?? ressourcesActives(l)[0]?.id ?? null);
-    }).catch(() => vivant && setErreur("Impossible de charger la liste des ressources."));
+    chargerIndex()
+      .then((l) => {
+        if (!vivant) return;
+        setIndex(l);
+        setResId((c) => c ?? ressourcesActives(l)[0]?.id ?? null);
+      })
+      .catch(() => vivant && setErreur("Impossible de charger la liste des ressources."));
     fetch("/geo/ne_50m_countries.simplified.geojson").then((r) => r.json()).then((g) => vivant && setGeo(g)).catch(() => {});
     return () => { vivant = false; };
   }, []);
@@ -99,14 +99,16 @@ export function RessourcesPage() {
     let vivant = true;
     setJeu(null);
     setErreur(null);
-    chargerJeu(resId).then((j) => {
-      if (!vivant) return;
-      setJeu(j);
-      setAnnee(j.annees[1]);
-      setM49(null);
-      setCompare(null);
-      setInd((c) => (j.indicateurs[c] ? c : Object.keys(j.indicateurs)[0]));
-    }).catch(() => vivant && setErreur("Impossible de charger les données de cette ressource."));
+    chargerJeu(resId)
+      .then((j) => {
+        if (!vivant) return;
+        setJeu(j);
+        setAnnee(j.annees[1]);
+        setM49(null);
+        setCompare(null);
+        setInd((c) => (j.indicateurs[c] ? c : Object.keys(j.indicateurs)[0]));
+      })
+      .catch(() => vivant && setErreur("Impossible de charger les données de cette ressource."));
     return () => { vivant = false; };
   }, [resId]);
 
@@ -116,6 +118,7 @@ export function RessourcesPage() {
   const unite = jeu?.indicateurs[ind]?.unite ?? "";
   const uniteTxt = UNITES_LIBELLE[unite] ?? unite;
   const [a0, a1] = jeu?.annees ?? [1961, 2024];
+  const nomRes = res?.nomFr ?? "Ressource";
 
   /* La lecture automatique des années. */
   useEffect(() => {
@@ -125,11 +128,10 @@ export function RessourcesPage() {
   }, [lecture, a1]);
 
   /* ── Les calculs, une fois par changement de filtre ───────────────────────── */
-  const clMonde = useMemo(() => (jeu ? classement(jeu, ind, annee, "Monde", COMPARAISON) : []), [jeu, ind, annee]);
-  const cl = useMemo(() => (zone === "Monde" ? clMonde : clMonde.filter((l) => l.continent === zone).map((l, i) => ({ ...l, rang: i + 1 }))), [clMonde, zone]);
+  const cl = useMemo(() => (jeu ? classement(jeu, ind, annee, "Monde", COMPARAISON) : []), [jeu, ind, annee]);
   const total = jeu ? totalMonde(jeu, ind, annee) : null;
   const totalAvant = jeu ? totalMonde(jeu, ind, annee - COMPARAISON) : null;
-  const seuil = useMemo(() => seuils(clMonde.filter((l) => l.type === "pays").map((l) => l.valeur)), [clMonde]);
+  const seuil = useMemo(() => seuils(cl.filter((l) => l.type === "pays").map((l) => l.valeur)), [cl]);
 
   const valeurParNe = useMemo(() => {
     const m = new Map<string, number>();
@@ -149,45 +151,51 @@ export function RessourcesPage() {
     return geo.features.map((f) => {
       const nom = (f.properties as { name: string }).name;
       const v = valeurParNe.get(nom);
-      const z = ix?.parNe.get(nom);
-      const horsZone = zone !== "Monde" && z?.continent !== zone;
-      if (v === undefined) return { nom, couleur: "#8b8fa3", opacite: horsZone ? 0.05 : 0.15 };
-      const base = neSel ? (nom === neSel ? 0.9 : 0.5) : 0.8;
-      return { nom, couleur: RAMPE[classeDe(v, seuil)], opacite: horsZone ? 0.22 : base };
+      if (v === undefined) return { nom, couleur: "#8b8fa3", opacite: 0.15 };
+      return { nom, couleur: RAMPE[classeDe(v, seuil)], opacite: neSel ? (nom === neSel ? 0.92 : 0.5) : 0.82 };
     });
-  }, [geo, valeurParNe, ix, zone, seuil, neSel]);
+  }, [geo, valeurParNe, seuil, neSel]);
 
   const contours = useMemo(() => (neSel ? [neSel] : AUCUN_CONTOUR), [neSel]);
-
-  const vue = useMemo<VueGlobe | null>(() => {
-    if (!geo) return null;
-    if (neSel) return vueDePays(geo, [neSel]);
-    return VUES_ZONE[zone];
-  }, [geo, neSel, zone]);
+  const vue = useMemo<VueGlobe | null>(() => (geo && neSel ? vueDePays(geo, [neSel]) : null), [geo, neSel]);
 
   /* ── Actions ──────────────────────────────────────────────────────────────── */
-  const choisirZone = (z: ZoneFiltre) => { setZone(z); setM49(null); };
-  const surPays = useCallback((nom: string | null) => {
-    if (!nom || !ix) { setM49(null); return; }
-    const z = ix.parNe.get(nom);
-    setM49(z ? z.m49 : null);
-  }, [ix]);
+  const surPays = useCallback(
+    (nom: string | null) => {
+      if (!nom || !ix) { setM49(null); return; }
+      const z = ix.parNe.get(nom);
+      setM49(z ? z.m49 : null);
+    },
+    [ix],
+  );
   const selectionner = (id: string, defiler = true) => {
     setM49(id);
     if (defiler) rectangle.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
   const retour = () => { setM49(null); globe.current?.recentrer(); };
 
+  const infoBulle = useCallback(
+    (nom: string): InfoBulle | null => {
+      if (!jeu || !ix) return null;
+      const z = ix.parNe.get(nom);
+      const o = z ? obs(jeu, z.m49, ind, annee) : null;
+      return { titre: countryFr(nom), ligne: o ? `${complet(o.valeur)} ${unite}` : `Indisponible en ${annee}` };
+    },
+    [jeu, ix, ind, annee, unite],
+  );
+
   /* Les pays comparés : par défaut les quatre premiers de l'année. */
   const idsCompare = useMemo(() => compare ?? cl.filter((l) => l.type === "pays").slice(0, 4).map((l) => l.m49), [compare, cl]);
+  const comparer = (id: string) => {
+    setCompare((c) => { const base = c ?? idsCompare; return base.includes(id) ? base : [...base, id].slice(-6); });
+    document.getElementById("comparaison")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   /* ── Les séries des graphiques ────────────────────────────────────────────── */
   const serieMonde = useMemo<SerieCourbe | null>(() => {
     if (!jeu?.monde[ind]) return null;
-    const m = jeu.monde[ind];
-    return { id: "monde", nom: "Somme des entités du fichier", couleur: "#6d4aff", pts: m.v.map((v, i) => ({ annee: a0 + i, valeur: v, flag: v === null ? undefined : "A" })) };
+    return { id: "monde", nom: "Somme des entités du fichier", couleur: "#6d4aff", pts: jeu.monde[ind].v.map((v, i) => ({ annee: a0 + i, valeur: v, flag: v === null ? undefined : "A" })) };
   }, [jeu, ind, a0]);
-
   const sId = (id: string, couleur: string): SerieCourbe | null => {
     const z = ix?.parM49.get(id);
     if (!jeu || !z) return null;
@@ -197,24 +205,59 @@ export function RessourcesPage() {
   const seriePays = idPays ? sId(idPays, "#6d4aff") : null;
   const seriesCompare = idsCompare.map((id, i) => sId(id, COULEURS_PAYS[i % COULEURS_PAYS.length])).filter(Boolean) as SerieCourbe[];
 
-  /* ── Rendu ────────────────────────────────────────────────────────────────── */
-  const surfaceIndisponible = !jeu || !ix;
-  const nomRes = res?.nomFr ?? "Ressource";
-  const zoneTxt = zone === "Monde" ? "Monde" : zone;
   const parts = useMemo(() => {
-    if (!total || !jeu || ind === "rendement") return [];
-    const top = clMonde.filter((l) => l.type !== "agregat").slice(0, 10);
+    if (!total || !jeu || !ix || ind === "rendement") return [];
+    const top = cl.slice(0, 10);
     const reste = total.valeur - top.reduce((s, l) => s + l.valeur, 0);
-    const ls = top.map((l, i) => ({
-      id: l.m49, nom: nomZone(ix!.parM49.get(l.m49)!), valeur: l.valeur, part: (l.valeur / total.valeur) * 100, couleur: RAMPE[Math.max(2, 5 - Math.floor(i / 2))],
+    const ls: { id: string; nom: string; valeur: number; part: number; couleur: string; note?: string; onClick?: () => void }[] = top.map((l, i) => ({
+      id: l.m49, nom: nomZone(ix.parM49.get(l.m49)!), valeur: l.valeur, part: (l.valeur / total.valeur) * 100, couleur: RAMPE[Math.max(2, 5 - Math.floor(i / 2))],
       note: l.type === "historique" ? "entité historique" : undefined, onClick: () => selectionner(l.m49),
     }));
-    if (reste > 0) ls.push({ id: "autres", nom: "Autres entités du fichier", valeur: reste, part: (reste / total.valeur) * 100, couleur: "#9ca3af", note: undefined, onClick: undefined as unknown as () => void });
+    if (reste > 0) ls.push({ id: "autres", nom: "Autres entités du fichier", valeur: reste, part: (reste / total.valeur) * 100, couleur: "#9ca3af" });
     return ls;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [total, clMonde, ind, jeu, ix]);
+  }, [total, cl, ind, jeu, ix]);
 
-  const affiche = toutVoir ? cl : cl.slice(0, 15);
+  /* ── Le classement en tableau : trois indicateurs côte à côte, comme sur Économie ── */
+  const lignes = useMemo(() => {
+    if (!jeu || !ix) return [];
+    const q = filtre.trim().toLowerCase();
+    const totalProd = totalMonde(jeu, "production", annee)?.valeur ?? null;
+    const rows = jeu.zones
+      .filter((z) => z.type === "pays" || z.type === "historique")
+      .map((z) => {
+        const p = obs(jeu, z.m49, "production", annee);
+        const s = obs(jeu, z.m49, "surface", annee);
+        const r = obs(jeu, z.m49, "rendement", annee);
+        return { z, nom: nomZone(z), production: p, surface: s, rendement: r, part: p && totalProd ? (p.valeur / totalProd) * 100 : null };
+      })
+      .filter((r) => (r.production || r.surface || r.rendement) && (!q || r.nom.toLowerCase().includes(q)));
+    const v = (r: (typeof rows)[number]) => (col === "part" ? r.part : r[col]?.valeur ?? null);
+    rows.sort((a, b) => {
+      const x = v(a), y = v(b);
+      if (x === null && y === null) return a.nom.localeCompare(b.nom, "fr");
+      if (x === null) return 1;
+      if (y === null) return -1;
+      return (x - y) * sens || a.nom.localeCompare(b.nom, "fr");
+    });
+    return rows;
+  }, [jeu, ix, annee, filtre, col, sens]);
+  const trier = (c: Col) => { if (c === col) setSens((s) => (s === -1 ? 1 : -1)); else { setCol(c); setSens(-1); } };
+
+  const puces = useMemo(() => {
+    const dispo = new Map(actives.map((a) => [a.id, a]));
+    const out: { cle: string; id: string | null; nom: string }[] = [];
+    const parcourir = (f: (typeof CATALOGUE)[number]) => {
+      for (const r of f.ressources ?? []) out.push({ cle: r.id, id: dispo.has(r.id) ? r.id : null, nom: r.nomFr });
+      for (const e of f.enfants ?? []) parcourir(e);
+      for (const n of f.aVenir ?? []) out.push({ cle: `${f.id}-${n}`, id: null, nom: n });
+    };
+    CATALOGUE.forEach(parcourir);
+    for (const a of actives) if (!out.some((o) => o.cle === a.id)) out.push({ cle: a.id, id: a.id, nom: a.nomFr });
+    return out.sort((a, b) => Number(b.id !== null) - Number(a.id !== null));
+  }, [actives]);
+
+  const dernierAn = annee === a1;
 
   return (
     <div className="cg cg-eco cg-v2 cg-ressources">
@@ -235,147 +278,79 @@ export function RessourcesPage() {
         </div>
       </section>
 
+      {/* ── Le globe, sa frise ───────────────────────────────────────────────── */}
       <section id="globe" className="cg-section cg-eco-globe">
         <div className="cg-wrap">
           <header className="v2-tete">
-            <h2 className="v2-h2">D’où viennent les ressources</h2>
-            <p className="v2-sous">
-              {res ? `${res.chemin} · ${jeu ? `FAOSTAT ${a0}–${a1}` : "chargement…"}` : "Observatoire des ressources agricoles et naturelles"}
-            </p>
+            <h2 className="v2-h2">Notre globe</h2>
+            <p className="v2-sous">{jeu ? `De ${a0} à ${a1} · ${nomRes} · FAOSTAT` : "Chargement…"}</p>
           </header>
 
           <div className="ge">
-            {/* ── Les filtres ─────────────────────────────────────────────── */}
-            <div className="rs-filtres">
-              <label className="rs-champ">
-                <span>Ressource</span>
-                <select value={resId ?? ""} onChange={(e) => setResId(e.target.value)} aria-label="Ressource">
-                  {CATALOGUE.map((f) => (
-                    <optgroup key={f.id} label={f.nom}>
-                      {(f.enfants ?? []).flatMap((e) => e.ressources ?? []).map((r) => {
-                        const dispo = actives.some((a) => a.id === r.id);
-                        return <option key={r.id} value={r.id} disabled={!dispo}>{r.nomFr}{dispo ? "" : " — fichier FAOSTAT à importer"}</option>;
-                      })}
-                      {(f.aVenir ?? []).map((n) => <option key={n} disabled>{n} — à venir</option>)}
-                    </optgroup>
-                  ))}
-                  {actives.filter((a) => a.chemin.endsWith("Autres cultures")).map((a) => <option key={a.id} value={a.id}>{a.nomFr}</option>)}
-                </select>
-              </label>
-              <div className="ge-metriques rs-ind" role="tablist" aria-label="Indicateur">
-                {INDICATEURS_ORDRE.filter((i) => !jeu || jeu.indicateurs[i]).map((i) => (
-                  <button key={i} type="button" role="tab" aria-selected={ind === i} className={`ge-metrique${ind === i ? " ge-metrique-on" : ""}`} onClick={() => setInd(i)}>
-                    {NOMS_INDICATEUR[i]}
-                  </button>
-                ))}
-              </div>
-              <div className="ge-metriques rs-zones" role="tablist" aria-label="Zone géographique">
-                {ZONES.map((z) => (
-                  <button key={z} type="button" role="tab" aria-selected={zone === z} className={`ge-metrique${zone === z ? " ge-metrique-on" : ""}`} onClick={() => choisirZone(z)}>{z}</button>
-                ))}
-              </div>
-              <label className="rs-champ rs-champ-pays">
-                <span>Pays</span>
-                <select value={m49 ?? ""} onChange={(e) => (e.target.value ? selectionner(e.target.value, false) : retour())} aria-label="Pays">
-                  <option value="">Tous les pays</option>
-                  {CONTINENTS.map((c) => (
-                    <optgroup key={c} label={c}>
-                      {(jeu?.zones ?? []).filter((z) => z.continent === c && z.type !== "agregat").sort((x, y) => nomZone(x).localeCompare(nomZone(y), "fr")).map((z) => (
-                        <option key={z.m49} value={z.m49}>{nomZone(z)}{z.type === "historique" ? ` (${z.debut}–${z.fin})` : ""}</option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
-              </label>
-            </div>
-            <div className="rs-annee">
-              <button type="button" className="rs-play" onClick={() => { if (annee >= a1) setAnnee(a0); setLecture((l) => !l); }} aria-label={lecture ? "Pause" : "Lire les années"}>
-                {lecture ? <Pause size={15} aria-hidden="true" /> : <Play size={15} aria-hidden="true" />}
-              </button>
-              <span className="rs-annee-l">Année</span>
-              <input type="range" min={a0} max={a1} step={1} value={annee} onChange={(e) => { setLecture(false); setAnnee(Number(e.target.value)); }} aria-label="Année" />
-              <output className="rs-annee-v">{annee}</output>
-              {annee === a1 && <span className="rs-annee-n">dernière année du fichier</span>}
+            {/* Les ressources, comme les indicateurs sur Économie : on choisit ce que le globe montre. */}
+            <div className="ge-metriques rs-res" role="tablist" aria-label="Ressource">
+              {puces.map((p) => (
+                <button
+                  key={p.cle}
+                  type="button"
+                  role="tab"
+                  aria-selected={p.id === resId}
+                  disabled={!p.id}
+                  title={p.id ? undefined : "Données à venir : aucun fichier importé pour cette ressource"}
+                  className={`ge-metrique${p.id === resId ? " ge-metrique-on" : ""}${p.id ? "" : " rs-bientot"}`}
+                  onClick={() => p.id && setResId(p.id)}
+                >
+                  {p.nom}
+                </button>
+              ))}
             </div>
 
-            {/* ── Le rectangle ────────────────────────────────────────────── */}
             <div className="ge-corps rs-corps" ref={rectangle}>
               <div className="ge-colonne">
-                <div className="ge-scene rs-scene">
-                  {geo && jeu ? (
-                    <GlobeExplorer
-                      ref={globe}
-                      compact
-                      geo={geo}
-                      nuit={theme === "nuit"}
-                      reperes={AUCUN_REPERE}
-                      rivieres={AUCUN_REPERE}
-                      rivieresVives={AUCUN_ENSEMBLE}
-                      pays={null}
-                      survol={null}
-                      choisi={null}
-                      cartes={AUCUNE_CARTE}
-                      monde={false}
-                      arcs={AUCUN_ARC}
-                      relief3D={false}
-                      colorations={colorations}
-                      contours={contours}
-                      vue={vue}
-                      onSurvol={RIEN}
-                      onChoix={RIEN}
-                      onPays={surPays}
-                      onPaysSurvol={setSurvol}
-                    />
-                  ) : (
-                    <div className="xp-attente" aria-hidden="true"><span /></div>
-                  )}
-                  <div className="rs-zoom">
-                    <button type="button" aria-label="Zoomer" onClick={() => globe.current?.zoomer(0.78)}><Plus size={16} aria-hidden="true" /></button>
-                    <button type="button" aria-label="Dézoomer" onClick={() => globe.current?.zoomer(1.28)}><Minus size={16} aria-hidden="true" /></button>
-                  </div>
-                  {survol && jeu && ix && (() => {
-                    const z = ix.parNe.get(survol.nom);
-                    const o = z ? obs(jeu, z.m49, ind, annee) : null;
-                    return (
-                      <div className={`cf-tip${survol.x > 330 ? " cf-tip-g" : ""} rs-tip`} style={{ left: survol.x, top: survol.y }} aria-hidden="true">
-                        <b>{countryFr(survol.nom)}</b>
-                        <span>{o ? `${complet(o.valeur)} ${unite} · ${annee}` : `Indisponible en ${annee}`}</span>
-                      </div>
-                    );
-                  })()}
-                  <div className="ge-echelle rs-legende" aria-hidden="true">
+                <GlobeCompact
+                  ref={globe}
+                  className="rs-scene"
+                  geo={geo && jeu ? geo : null}
+                  nuit={theme === "nuit"}
+                  colorations={colorations}
+                  contours={contours}
+                  vue={vue}
+                  infoBulle={infoBulle}
+                  onPays={surPays}
+                >
+                  <div className="rs-leg" aria-hidden="true">
                     <b>{NOMS_INDICATEUR[ind] ?? ind} · {annee}</b>
-                    <div className="rs-rampe">
-                      {RAMPE.map((c, i) => (
-                        <span key={c}><i style={{ background: c }} />{i === 0 ? `< ${court(seuil[0] ?? 0)}` : i === RAMPE.length - 1 ? `≥ ${court(seuil[seuil.length - 1] ?? 0)}` : `${court(seuil[i - 1] ?? 0)} – ${court(seuil[i] ?? 0)}`}</span>
-                      ))}
-                      <span><i style={{ background: "#8b8fa3", opacity: 0.4 }} />Indisponible</span>
+                    <div className="rs-leg-barre">{RAMPE.map((c) => <i key={c} style={{ background: c }} />)}</div>
+                    <div className="rs-leg-b">
+                      <span>{`< ${court(seuil[0] ?? 0)}`}</span>
+                      <span>{`≥ ${court(seuil[seuil.length - 1] ?? 0)}`}</span>
                     </div>
-                    <em>{uniteTxt} · classes par quantiles</em>
+                    <span className="rs-leg-nd"><i />Indisponible · {uniteTxt}</span>
                   </div>
-                </div>
+                </GlobeCompact>
               </div>
 
               <aside className="ge-panneau rs-panneau" aria-live="polite">
                 <div className="ge-fiche rs-vue" key={`${resId}|${m49 ?? "-"}`}>
                   {erreur ? (
                     <p className="rs-erreur">{erreur}</p>
-                  ) : surfaceIndisponible ? (
+                  ) : !jeu || !ix ? (
                     <p className="rs-chargement">Chargement des données FAOSTAT…</p>
                   ) : zoneSel ? (
-                    <FichePays
-                      J={jeu!} z={zoneSel} ind={ind} annee={annee} cl={clMonde} clZone={cl} zone={zone} retour={retour}
-                      nom={nomZone(zoneSel)} total={total?.valeur ?? null}
-                    />
+                    <FichePays J={jeu} z={zoneSel} ind={ind} annee={annee} cl={cl} nom={nomZone(zoneSel)} total={total?.valeur ?? null} retour={retour} onInd={setInd} onComparer={comparer} />
                   ) : (
-                    <Synthese
-                      J={jeu!} nomRes={nomRes} ind={ind} annee={annee} zone={zone} unite={unite} uniteTxt={uniteTxt} total={total} totalAvant={totalAvant}
-                      cl={cl} nZones={cl.length} onPays={(id) => selectionner(id, false)} nomDe={(id) => nomZone(ix!.parM49.get(id)!)}
-                    />
+                    <Synthese J={jeu} nomRes={nomRes} ind={ind} annee={annee} total={total} totalAvant={totalAvant} cl={cl} onInd={setInd} onPays={(id) => selectionner(id, false)} nomDe={(id) => nomZone(ix.parM49.get(id)!)} />
                   )}
                 </div>
               </aside>
             </div>
+
+            {/* La frise des années, sous le rectangle : la même que celle d'Économie. */}
+            {jeu && (
+              <div className="ge-sous">
+                <FriseAnnees annees={jeu.annees} valeur={annee} onAnnee={setAnnee} lecture={lecture} onLecture={() => { if (annee >= a1) setAnnee(a0); setLecture((l) => !l); }} dernier={dernierAn} />
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -384,7 +359,7 @@ export function RessourcesPage() {
       {jeu && ix && (
         <section id="graphiques" className="cg-section rs-graph-section">
           <div className="cg-wrap">
-            <TitreSection titre="Évolution et comparaisons" sous={`${nomRes} · ${NOMS_INDICATEUR[ind] ?? ind} · ${a0}–${a1}`} />
+            <TitreSection titre="Évolution et comparaisons" sous={`${nomRes} · ${NOMS_INDICATEUR[ind]} · ${a0}–${a1}`} />
             <div className="rs-graphs">
               <article className="rs-carte rs-carte-l">
                 <h3>{ind === "rendement" ? "Rendement : pas de total mondial" : `${NOMS_INDICATEUR[ind]} mondiale`}</h3>
@@ -404,8 +379,8 @@ export function RessourcesPage() {
                 <p className="rs-note">Cercle creux : valeur estimée, imputée ou externe. Une lacune de la courbe = valeur absente ou manquante.</p>
               </article>
 
-              <article className="rs-carte">
-                <h3>Comparer des pays</h3>
+              <article className="rs-carte" id="comparaison">
+                <h3>Comparer des pays<a className="rs-lien" href="/comparer">Comparaison complète <ArrowUpRight size={13} aria-hidden="true" /></a></h3>
                 <div className="rs-chips">
                   {seriesCompare.map((s) => (
                     <button key={s.id} type="button" className="rs-chip" onClick={() => setCompare(idsCompare.filter((x) => x !== s.id))} aria-label={`Retirer ${s.nom}`}>
@@ -438,49 +413,111 @@ export function RessourcesPage() {
         </section>
       )}
 
-      {/* ── Le classement ───────────────────────────────────────────────────── */}
+      {/* ── Le classement : la bande claire d'Économie, le même tableau ─────── */}
       {jeu && ix && (
-        <section id="classement" className="cg-section rs-classement-section">
-          <div className="cg-wrap">
-            <TitreSection titre={`${TITRES_CLASSEMENT[ind] ?? "Classement"} — ${annee}`} sous={`${nomRes} · ${NOMS_INDICATEUR[ind]} · ${zoneTxt} · ${nf(cl.length)} entités avec une valeur`} />
-            <div className="rs-table-cadre">
-              <table className="rs-table">
-                <thead>
-                  <tr>
-                    <th>Rang</th><th>Pays</th><th className="rs-d">{NOMS_INDICATEUR[ind]} ({unite})</th>
-                    <th className="rs-d">{ind === "rendement" ? "—" : "Part du total*"}</th>
-                    <th className="rs-d">vs {annee - COMPARAISON}</th><th>Qualité</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {affiche.map((l) => (
-                    <tr key={l.m49} className={m49 === l.m49 ? "rs-on" : ""} onClick={() => selectionner(l.m49)} tabIndex={0} onKeyDown={(e) => e.key === "Enter" && selectionner(l.m49)}>
-                      <td>{l.rang}</td>
-                      <td><b>{nomZone(ix.parM49.get(l.m49)!)}</b>{l.type === "historique" && <em className="rs-tag">historique</em>}</td>
-                      <td className="rs-d">{complet(l.valeur)}</td>
-                      <td className="rs-d">{l.part !== null && ind !== "rendement" ? `${l.part.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %` : "—"}</td>
-                      <td className={`rs-d ${l.evolution === null ? "" : l.evolution >= 0 ? "rs-haut" : "rs-bas"}`}>{l.evolution === null ? "—" : pct(l.evolution)}</td>
-                      <td><span className={`rs-flag rs-flag-${l.flag}`} title={FLAGS[l.flag]?.libelle}>{flagLibelle(l.flag)}</span>{l.nonOfficielle && <em className="rs-tag">non officielle</em>}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        <section ref={bande.ref as React.RefObject<HTMLElement>} className="cg-bande" data-vu={bande.vu ? "1" : "0"}>
+          <div className="cg-bande-h">
+            <h2 className="cg-bande-t">Le classement</h2>
+            <p className="cg-bande-c">
+              {nf(jeu.zones.filter((z) => z.type === "pays" || z.type === "historique").length)} entités, {nf(a1 - a0 + 1)} années, trois indicateurs. Choisissez une année, triez la colonne qui vous intéresse.
+            </p>
+            <div className="cg-bande-ctrl">
+              <label className="cg-an-choix">
+                <span className="cg-an-choix-l">Date</span>
+                <Selecteur valeur={annee} options={Array.from({ length: a1 - a0 + 1 }, (_, i) => a1 - i)} onChange={setAnnee} label="Date du classement" />
+              </label>
+              <input className="cg-filtre cg-filtre-clair" type="search" placeholder="Filtrer un pays" value={filtre} onChange={(e) => setFiltre(e.target.value)} aria-label="Filtrer un pays" />
             </div>
-            {cl.length > 15 && (
-              <button type="button" className="rs-plus" onClick={() => setToutVoir((v) => !v)}>
-                {toutVoir ? "Réduire" : `Voir les ${nf(cl.length)} entités`} <ChevronDown size={14} aria-hidden="true" style={{ transform: toutVoir ? "rotate(180deg)" : undefined }} />
-              </button>
-            )}
-            <p className="rs-note">* Part du total recalculé (somme des entités du fichier), pas d’un total officiel. « vs {annee - COMPARAISON} » : évolution depuis cette année quand elle existe pour l’entité. Le classement exclut l’agrégat « China », qui recouvre « Chine continentale » et « Taïwan ».</p>
+          </div>
+          <div className="cg-bande-bloc">
+            <Tableau lignes={lignes} col={col} sens={sens} choisi={m49} onTrier={trier} onChoisi={(id) => selectionner(id)} jeu={jeu} />
+            <p className="cg-bande-n">
+              {lignes.length} entités affichées · « n.d. » signale une valeur que FAOSTAT ne publie pas pour cette entité cette année-là ; ces lignes passent en fin de tri, elles ne sont pas classées dernières.
+              Une lettre en exposant marque une valeur non officielle (E estimée, I imputée, X source externe). La part se calcule sur le total recalculé de {annee}, pas sur un total officiel. Cliquez une ligne pour la retrouver sur le globe.
+            </p>
           </div>
         </section>
       )}
 
-      {/* ── Sources et qualité ──────────────────────────────────────────────── */}
+      {/* ── Les articles ────────────────────────────────────────────────────── */}
+      {articles.length > 0 && (
+        <section className="cg-section cg-lectures">
+          <div className="cg-wrap">
+            <div className="cg-arts-tete">
+              <h2 className="cg-arts-h">Articles</h2>
+            </div>
+            <div className="cg-arts-l">
+              <article className="cg-art cg-art-une" onClick={articles[0].href ? () => { window.location.href = articles[0].href!; } : undefined} style={articles[0].href ? { cursor: "pointer" } : undefined}>
+                <ImagePlaceholder nom="IMAGE_PNG_RES_01" ratio="16 / 10" />
+                <span className="cg-rubrique">{articles[0].rubrique} · {articles[0].duree}</span>
+                <h3 className="cg-art-t">{articles[0].titre}</h3>
+                <p className="cg-art-c">{articles[0].chapo}</p>
+                {articles[0].href && <a className="cg-art-lien" href={articles[0].href}>Lire le dossier <span aria-hidden="true">→</span></a>}
+              </article>
+              <div className="cg-arts-c">
+                <h3 className="cg-arts-st">Nos articles</h3>
+                <div className="cg-arts">
+                  {articles.slice(1).map((a, k) => (
+                    <article key={a.slug} className="cg-art" onClick={a.href ? () => { window.location.href = a.href!; } : undefined} style={a.href ? { cursor: "pointer" } : undefined}>
+                      <ImagePlaceholder nom={`IMAGE_PNG_RES_0${((k + 1) % 9) + 1}`} ratio="16 / 9" />
+                      <span className="cg-rubrique">{a.rubrique} · {a.duree}</span>
+                      <h4 className="cg-art-t">{a.titre}</h4>
+                      {a.href && <a className="cg-art-lien" href={a.href}>Lire le dossier <span aria-hidden="true">→</span></a>}
+                    </article>
+                  ))}
+                </div>
+                <div className="cg-arts-f" aria-hidden="true" />
+              </div>
+            </div>
+            <p className="rs-note rs-note-arts">Aucun article ne traite encore des ressources : ces lectures sont celles de nos dossiers économiques, en attendant les premiers dossiers sur le blé, l’énergie et les minerais.</p>
+          </div>
+        </section>
+      )}
+
+      {/* ── La FAQ ──────────────────────────────────────────────────────────── */}
+      {faq.length > 0 && (
+        <section className="cg-section cg-questions">
+          <div className="cg-wrap">
+            <TitreSection titre={`Les questions sur ${nomRes === "Ressource" ? "les ressources" : `le ${nomRes.toLowerCase()}`}`} />
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "FAQPage",
+                  mainEntity: faq.map((q) => ({ "@type": "Question", name: q.question, acceptedAnswer: { "@type": "Answer", text: q.answer } })),
+                }),
+              }}
+            />
+            <div className="cg-q-liste">
+              {faq.map((q, k) => {
+                const on = qOuverte === k;
+                return (
+                  <div key={q.question} className={`cg-q${on ? " cg-q-on" : ""}`}>
+                    <button type="button" className="cg-q-t" aria-expanded={on} onClick={() => setQOuverte(on ? null : k)}>
+                      {q.question}
+                      <span className="cg-q-signe" aria-hidden="true" />
+                    </button>
+                    <AnimatePresence initial={false}>
+                      {on && (
+                        <motion.div className="cg-q-r" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.36, ease: LENT }}>
+                          <p>{q.answer}</p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Méthodologie et sources ─────────────────────────────────────────── */}
       {jeu && (
         <section id="sources" className="cg-section rs-sources-section">
           <div className="cg-wrap">
-            <TitreSection titre="Sources et qualité des données" />
+            <TitreSection titre="Méthodologie et sources" sous="D’où viennent ces données" />
             <div className="rs-src">
               <div>
                 <h4>Provenance</h4>
@@ -510,43 +547,231 @@ export function RessourcesPage() {
   );
 }
 
-/* ── Le panneau : la synthèse ────────────────────────────────────────────── */
+/* ── La frise des années : celle d'Économie, sur les années du fichier ───── */
+
+const FriseAnnees = memo(function FriseAnnees({
+  annees, valeur, onAnnee, lecture, onLecture, dernier,
+}: {
+  annees: [number, number];
+  valeur: number;
+  onAnnee: (a: number) => void;
+  lecture: boolean;
+  onLecture: () => void;
+  dernier: boolean;
+}) {
+  const [vue, setVue] = useState(valeur);
+  const vueRef = useRef(valeur);
+  const rail = useRef<HTMLDivElement>(null);
+  const tire = useRef(false);
+  const attente = useRef<number | null>(null);
+  const liste = useMemo(() => Array.from({ length: annees[1] - annees[0] + 1 }, (_, i) => annees[0] + i), [annees]);
+
+  useEffect(() => { setVue(valeur); vueRef.current = valeur; }, [valeur]);
+  useEffect(() => () => { if (attente.current) clearTimeout(attente.current); gelerOdometres(false); }, []);
+
+  const vise = useCallback((a: number, toutDeSuite = false) => {
+    vueRef.current = a;
+    setVue(a);
+    if (attente.current) clearTimeout(attente.current);
+    if (toutDeSuite) onAnnee(a);
+    else attente.current = window.setTimeout(() => onAnnee(a), 110);
+  }, [onAnnee]);
+
+  const viseX = (x: number) => {
+    const el = rail.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const t = Math.max(0, Math.min(1, (x - r.left) / (r.width || 1)));
+    vise(liste[Math.round(t * (liste.length - 1))]);
+  };
+  const pc = (a: number) => (liste.length < 2 ? 0 : ((a - liste[0]) / (liste.length - 1)) * 100);
+  const jalons = liste.filter((a) => a % 10 === 0 || (a >= 2000 && a % 5 === 0));
+
+  return (
+    <div className="cg-frise2">
+      <span className="cg-frise2-an">{vue}</span>
+      <div className="cg-frise2-piste">
+        <div
+          ref={rail}
+          className="cg-frise2-rail"
+          role="slider"
+          tabIndex={0}
+          aria-label="Année affichée"
+          aria-valuemin={liste[0]}
+          aria-valuemax={liste[liste.length - 1]}
+          aria-valuenow={vue}
+          onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); tire.current = true; gelerOdometres(true); viseX(e.clientX); }}
+          onPointerMove={(e) => tire.current && viseX(e.clientX)}
+          onPointerUp={() => { tire.current = false; gelerOdometres(false); vise(vueRef.current, true); }}
+          onPointerCancel={() => { tire.current = false; gelerOdometres(false); }}
+          onKeyDown={(e) => {
+            const i = vueRef.current - liste[0];
+            if (e.key === "ArrowLeft" || e.key === "ArrowDown") { e.preventDefault(); vise(liste[Math.max(0, i - 1)], true); }
+            else if (e.key === "ArrowRight" || e.key === "ArrowUp") { e.preventDefault(); vise(liste[Math.min(liste.length - 1, i + 1)], true); }
+            else if (e.key === "Home") { e.preventDefault(); vise(liste[0], true); }
+            else if (e.key === "End") { e.preventDefault(); vise(liste[liste.length - 1], true); }
+          }}
+        >
+          <span className="cg-frise2-ligne" aria-hidden="true" />
+          <span className="cg-frise2-faite" aria-hidden="true" style={{ width: `${pc(vue)}%` }} />
+          {jalons.map((a) => <span key={a} className="cg-frise2-jalon" style={{ left: `${pc(a)}%` }} aria-hidden="true" />)}
+          <span className="cg-frise2-point" aria-hidden="true" style={{ left: `${pc(vue)}%` }} />
+        </div>
+        <div className="cg-frise2-bornes">
+          {liste.filter((a) => a % 10 === 0 || (a >= 2000 && a % 5 === 0) || a === vue || a === liste[liste.length - 1]).map((a) => (
+            <button key={a} type="button" className={`cg-frise2-b${a === vue ? " cg-frise2-b-on" : ""}`} style={{ left: `${pc(a)}%` }} onClick={() => vise(a, true)} tabIndex={-1}>{a}</button>
+          ))}
+        </div>
+      </div>
+      <p className="cg-frise-n rs-frise-n">
+        <button type="button" className="rs-play" onClick={onLecture} aria-label={lecture ? "Pause" : "Lire les années"}>
+          {lecture ? <Pause size={13} aria-hidden="true" /> : <Play size={13} aria-hidden="true" />}
+          {lecture ? "Pause" : "Lire les années"}
+        </button>
+        Les années affichées sont celles publiées par FAOSTAT. Rien n’est interpolé : une année absente reste absente.{dernier && <> {liste[liste.length - 1]} est la dernière année de ce fichier.</>}
+      </p>
+    </div>
+  );
+});
+
+/* ── Le tableau : les classes et le comportement du tableau d'Économie ───── */
+
+type Rangee = {
+  z: Zone; nom: string; part: number | null;
+  production: ReturnType<typeof obs>; surface: ReturnType<typeof obs>; rendement: ReturnType<typeof obs>;
+};
+
+const Tableau = memo(function Tableau({
+  lignes, col, sens, choisi, onTrier, onChoisi, jeu,
+}: {
+  lignes: Rangee[]; col: Col; sens: 1 | -1; choisi: string | null; onTrier: (c: Col) => void; onChoisi: (id: string) => void; jeu: JeuRessource;
+}) {
+  const cadre = useRef<HTMLDivElement>(null);
+  const allumee = useRef<HTMLElement | null>(null);
+  useEffect(() => { cadre.current?.scrollTo({ top: 0 }); }, [col, sens, lignes.length]);
+
+  /* La lueur suit le pointeur, comme sur Économie. */
+  const suit = useCallback((e: React.PointerEvent<HTMLTableSectionElement>) => {
+    const tr = (e.target as HTMLElement).closest("tr") as HTMLElement | null;
+    if (!tr || !tr.dataset.pays) return;
+    const r = tr.getBoundingClientRect();
+    if (allumee.current && allumee.current !== tr) allumee.current.classList.remove("cg-tab-suivi");
+    tr.classList.add("cg-tab-suivi");
+    tr.style.setProperty("--x", `${e.clientX - r.left}px`);
+    allumee.current = tr;
+  }, []);
+  const eteint = useCallback(() => { allumee.current?.classList.remove("cg-tab-suivi"); allumee.current = null; }, []);
+
+  const colonnes: { id: Col; label: string }[] = [
+    { id: "production", label: `Production (${jeu.indicateurs.production?.unite ?? "t"})` },
+    { id: "surface", label: `Surface (${jeu.indicateurs.surface?.unite ?? "ha"})` },
+    { id: "rendement", label: `Rendement (${jeu.indicateurs.rendement?.unite ?? "kg/ha"})` },
+    { id: "part", label: "Part" },
+  ];
+  const cellule = (o: ReturnType<typeof obs>) =>
+    o ? (
+      <>
+        {complet(o.valeur)}
+        {(o.flag !== "A" || o.nonOfficielle) && <sup className={`rs-fl rs-fl-${o.flag}`} title={`${FLAGS[o.flag]?.libelle ?? o.flag}${o.nonOfficielle ? " · non officielle" : ""}`}>{o.flag}</sup>}
+      </>
+    ) : (
+      "n.d."
+    );
+
+  return (
+    <div className="cg-tab-cadre" ref={cadre}>
+      <table className="cg-tab">
+        <thead>
+          <tr>
+            <th className="cg-tab-r">#</th>
+            <th className="cg-tab-p">Pays</th>
+            {colonnes.map((c) => (
+              <th key={c.id}>
+                <button type="button" className={`cg-tri${col === c.id ? " cg-tri-on" : ""}`} onClick={() => onTrier(c.id)} aria-sort={col === c.id ? (sens === -1 ? "descending" : "ascending") : "none"}>
+                  {c.label}
+                  <span aria-hidden="true">{col === c.id ? (sens === -1 ? " ↓" : " ↑") : ""}</span>
+                </button>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody onPointerMove={suit} onPointerLeave={eteint}>
+          {lignes.map((r, i) => (
+            <tr key={r.z.m49} data-pays={r.z.m49} className={choisi === r.z.m49 ? "cg-tab-on" : undefined} onClick={() => onChoisi(r.z.m49)}>
+              <td className="cg-tab-r">{String(i + 1).padStart(2, "0")}</td>
+              <td className="cg-tab-p">{r.nom}{r.z.type === "historique" && <em className="rs-tag">{r.z.debut}–{r.z.fin}</em>}</td>
+              <td className={r.production ? undefined : "cg-tab-vide"}>{cellule(r.production)}</td>
+              <td className={r.surface ? undefined : "cg-tab-vide"}>{cellule(r.surface)}</td>
+              <td className={r.rendement ? undefined : "cg-tab-vide"}>{cellule(r.rendement)}</td>
+              <td className={r.part === null ? "cg-tab-vide" : undefined}>{r.part === null ? "n.d." : `${r.part.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+});
+
+/* ── Le panneau : la synthèse (aucun pays choisi) ────────────────────────── */
+
+function valeurIndicateur(J: JeuRessource, ind: string, an: number): { v: number; unite: string } | null {
+  const t = totalMonde(J, ind, an);
+  return t ? { v: t.valeur, unite: J.indicateurs[ind]?.unite ?? "" } : null;
+}
 
 function Synthese({
-  J, nomRes, ind, annee, zone, unite, uniteTxt, total, totalAvant, cl, nZones, onPays, nomDe,
+  J, nomRes, ind, annee, total, totalAvant, cl, onInd, onPays, nomDe,
 }: {
-  J: JeuRessource; nomRes: string; ind: string; annee: number; zone: ZoneFiltre; unite: string; uniteTxt: string;
-  total: { valeur: number; entites: number } | null; totalAvant: { valeur: number } | null; cl: ReturnType<typeof classement>; nZones: number;
-  onPays: (id: string) => void; nomDe: (id: string) => string;
+  J: JeuRessource; nomRes: string; ind: string; annee: number; total: { valeur: number; entites: number } | null; totalAvant: { valeur: number } | null;
+  cl: ReturnType<typeof classement>; onInd: (i: string) => void; onPays: (id: string) => void; nomDe: (id: string) => string;
 }) {
   const top = cl.slice(0, 5);
   const max = Math.max(1, ...top.map((l) => l.valeur));
   const evo = total && totalAvant && totalAvant.valeur > 0 ? ((total.valeur - totalAvant.valeur) / totalAvant.valeur) * 100 : null;
   const qual: Record<string, number> = {};
   for (const l of cl) qual[l.flag] = (qual[l.flag] ?? 0) + 1;
-  const [, a1] = J.annees;
+  const autres = INDICATEURS.filter((i) => i !== ind && J.indicateurs[i]);
+  const unite = J.indicateurs[ind]?.unite ?? "";
   return (
     <>
-      <h3 className="ge-nom">{nomRes} · {zone}</h3>
+      <h3 className="ge-nom">{nomRes} · Monde</h3>
       <div className="ge-vedette rs-vedette">
-        {total && zone === "Monde" ? (
+        <span className="ge-vedette-l">{NOMS_INDICATEUR[ind]} · {annee}</span>
+        {total ? (
           <>
-            <span className="ge-vedette-l">{NOMS_INDICATEUR[ind]} cumulée · {annee}</span>
-            <Odometre className="ge-vedette-v" valeur={total.valeur} dec={0} unite={`\u00a0${unite}`} duree={900} tours={1} couleur={1} />
-            <span className="ge-vedette-r">Somme recalculée de {nf(total.entites)} entités du fichier, non officielle{evo !== null ? ` · ${evo >= 0 ? "+" : ""}${evo.toLocaleString("fr-FR", { maximumFractionDigits: 0 })} % depuis ${annee - COMPARAISON}` : ""}</span>
+            <Odometre className="ge-vedette-v" valeur={total.valeur} dec={0} unite={nbsp(unite)} duree={900} tours={1} couleur={1} />
+            <span className="ge-vedette-r">Somme recalculée de {nf(total.entites)} entités{evo !== null ? ` · ${pct(evo)} depuis ${annee - COMPARAISON}` : ""}</span>
           </>
         ) : top[0] ? (
           <>
-            <span className="ge-vedette-l">{ind === "rendement" ? "Rendement le plus élevé" : "Premier producteur"} · {annee}</span>
             <b className="rs-vedette-v">{nomDe(top[0].m49)}</b>
-            <span className="ge-vedette-r">{complet(top[0].valeur)} {uniteTxt}{ind === "rendement" ? " : un rendement moyen, jamais une production" : ""}</span>
+            <span className="ge-vedette-r">{complet(top[0].valeur)} {UNITES_LIBELLE[unite] ?? unite} · le rendement le plus élevé</span>
           </>
         ) : (
-          <span className="ge-vedette-l">Aucune donnée pour {annee}</span>
+          <span className="ge-vedette-r">Aucune donnée pour {annee}</span>
         )}
       </div>
 
-      <h4 className="cf-st">Principaux pays{zone !== "Monde" ? ` · ${zone}` : ""}</h4>
+      <div className="ge-autres">
+        {autres.map((i) => {
+          const t = valeurIndicateur(J, i, annee);
+          const premier = classement(J, i, annee)[0];
+          return (
+            <button key={i} type="button" className="ge-autre" onClick={() => onInd(i)}>
+              <span className="ge-autre-l">{NOMS_INDICATEUR[i]}</span>
+              {t ? (
+                <Odometre className="ge-autre-v" valeur={t.v} dec={0} unite={nbsp(t.unite)} duree={900} tours={1} couleur={1} />
+              ) : premier ? (
+                <span className="ge-autre-v rs-autre-t">{complet(premier.valeur)}{nbsp(J.indicateurs[i].unite)}</span>
+              ) : (
+                <span className="ge-autre-v rs-nd">—</span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      <h4 className="cf-st">Principaux pays</h4>
       <ul className="rs-top">
         {top.map((l) => (
           <li key={l.m49}>
@@ -561,90 +786,102 @@ function Synthese({
       </ul>
 
       <div className="rs-qual">
-        <span>{nf(nZones)} entités avec une valeur en {annee}</span>
+        <span>{nf(cl.length)} entités avec une valeur</span>
         {Object.entries(qual).map(([k, n]) => <span key={k} className={`rs-flag rs-flag-${k}`} title={FLAGS[k]?.libelle}>{flagLibelle(k)} · {nf(n)}</span>)}
       </div>
-      {annee === a1 && <p className="ge-note rs-aide">{a1} est la dernière année de ce fichier FAOSTAT.</p>}
-      <p className="ge-note rs-aide">Clique un pays sur le globe ou dans la liste pour voir ses trois indicateurs et son évolution.</p>
     </>
   );
 }
 
-/* ── Le panneau : un pays ────────────────────────────────────────────────── */
+/* ── Le panneau : un pays, comme la fiche d'Économie ─────────────────────── */
 
 function FichePays({
-  J, z, ind, annee, cl, clZone, zone, retour, nom, total,
+  J, z, ind, annee, cl, nom, total, retour, onInd, onComparer,
 }: {
-  J: JeuRessource; z: Zone; ind: string; annee: number; cl: ReturnType<typeof classement>; clZone: ReturnType<typeof classement>; zone: ZoneFiltre;
-  retour: () => void; nom: string; total: number | null;
+  J: JeuRessource; z: Zone; ind: string; annee: number; cl: ReturnType<typeof classement>; nom: string; total: number | null;
+  retour: () => void; onInd: (i: string) => void; onComparer: (id: string) => void;
 }) {
   const rang = rangDe(cl, z.m49);
-  const rangZ = zone !== "Monde" ? rangDe(clZone, z.m49) : null;
   const o = obs(J, z.m49, ind, annee);
   const der = !o ? derniere(J, z.m49, ind, annee) : null;
-  const sp = points(J, z.m49, ind);
-  const serie = { id: z.m49, nom, couleur: "#6d4aff", pts: sp.map((p) => ({ annee: p.annee, valeur: p.valeur, flag: p.flag, nonOfficielle: p.nonOfficielle })) };
   const unite = J.indicateurs[ind]?.unite ?? "";
+  const sp = points(J, z.m49, ind);
+  const serie: SerieCourbe = { id: z.m49, nom, couleur: "#6d4aff", pts: sp.map((p) => ({ annee: p.annee, valeur: p.valeur, flag: p.flag, nonOfficielle: p.nonOfficielle })) };
+  const autres = INDICATEURS.filter((i) => i !== ind && J.indicateurs[i]);
   const evo = rang?.evolution ?? null;
   return (
     <>
       <button type="button" className="cf-retour" onClick={retour}><ArrowLeft size={14} aria-hidden="true" /> Synthèse mondiale</button>
-      <h3 className="ge-nom">{nom}{z.type === "historique" && <em className="rs-tag rs-tag-g">historique</em>}</h3>
-      {z.note && z.type === "historique" && <p className="rs-note">{z.note} Série {z.debut}–{z.fin}, non rattachée à une géométrie actuelle.</p>}
+      <h3 className="ge-nom">{nom}{z.type === "historique" && <em className="rs-tag rs-tag-g">historique {z.debut}–{z.fin}</em>}</h3>
+      {z.type === "historique" && z.note && <p className="rs-note">{z.note} Non rattachée à une frontière actuelle.</p>}
 
-      <div className="rs-inds">
-        {INDICATEURS_ORDRE.filter((i) => J.indicateurs[i]).map((i) => {
+      <div className="ge-vedette rs-vedette">
+        <span className="ge-vedette-l">{NOMS_INDICATEUR[ind]} · {annee}</span>
+        {o ? (
+          <>
+            <Odometre className="ge-vedette-v" valeur={o.valeur} dec={0} unite={nbsp(unite)} duree={900} tours={1} couleur={1} />
+            <span className="ge-vedette-r">
+              {rang ? <>{rang.rang}<sup>e</sup> sur {cl.length}</> : "Hors classement"}
+              {rang?.part !== null && rang?.part !== undefined && ind !== "rendement" && total ? ` · ${rang.part.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} % du total` : ""}
+              {evo !== null ? ` · ${pct(evo)} depuis ${annee - COMPARAISON}` : ""}
+            </span>
+          </>
+        ) : (
+          <>
+            <b className="rs-vedette-v">—</b>
+            <span className="ge-vedette-r">{manquante(J, z.m49, ind, annee) ? `Valeur manquante en ${annee}` : `Indisponible en ${annee}`}</span>
+          </>
+        )}
+      </div>
+      {o ? (
+        <p className="ge-note rs-statut">
+          <span className={`rs-flag rs-flag-${o.flag}`} title={FLAGS[o.flag]?.libelle}>{flagLibelle(o.flag)}{o.nonOfficielle ? " · non officielle" : ""}</span>
+          FAOSTAT · {unite}
+        </p>
+      ) : (
+        <p className="ge-note rs-statut">
+          {der ? <>Dernière observation : <b>{complet(der.valeur)} {unite} en {der.annee}</b> ({flagLibelle(der.flag)}).</> : "Aucune observation disponible jusqu’à cette année."}
+        </p>
+      )}
+
+      <div className="ge-autres">
+        {autres.map((i) => {
           const oi = obs(J, z.m49, i, annee);
-          const man = manquante(J, z.m49, i, annee);
+          const ri = rangDe(classement(J, i, annee), z.m49);
           return (
-            <div key={i} className={`rs-ind-c${i === ind ? " rs-ind-on" : ""}`}>
-              <small>{NOMS_INDICATEUR[i]}</small>
+            <button key={i} type="button" className="ge-autre" onClick={() => onInd(i)}>
+              <span className="ge-autre-l">{NOMS_INDICATEUR[i]}</span>
               {oi ? (
                 <>
-                  <b>{complet(oi.valeur)}</b>
-                  <span>{J.indicateurs[i].unite} · {annee}</span>
-                  <em className={`rs-flag rs-flag-${oi.flag}`} title={FLAGS[oi.flag]?.libelle}>{flagLibelle(oi.flag)}{oi.nonOfficielle ? " · non officielle" : ""}</em>
+                  <Odometre className="ge-autre-v" valeur={oi.valeur} dec={0} unite={nbsp(J.indicateurs[i].unite)} duree={900} tours={1} couleur={1} />
+                  {ri && <small className="rs-autre-r">{ri.rang}<sup>e</sup> sur {classement(J, i, annee).length}</small>}
                 </>
               ) : (
-                <>
-                  <b className="rs-nd">—</b>
-                  <span>{man ? `Manquante en ${annee}` : `Indisponible en ${annee}`}</span>
-                </>
+                <span className="ge-autre-v rs-nd">—</span>
               )}
-            </div>
+            </button>
           );
         })}
       </div>
 
-      {!o && (
-        <p className="rs-note">
-          {der ? <>Pas de valeur en {annee} pour cet indicateur. Dernière observation : <b>{complet(der.valeur)} {unite} en {der.annee}</b> ({flagLibelle(der.flag)}).</> : "Aucune observation disponible jusqu’à cette année."}
-        </p>
-      )}
+      <div className="ge-evo">
+        <p className="ge-evo-t">Évolution · {NOMS_INDICATEUR[ind]} · {z.debut}–{z.fin}</p>
+        <Courbes series={[serie]} unite={UNITES_LIBELLE[unite] ?? unite} annee={annee} titre={`${nom} : ${NOMS_INDICATEUR[ind]}`} hauteur={130} />
+      </div>
 
-      {o && rang && (
-        <ul className="rs-faits">
-          <li><span>Rang mondial</span><b>{rang.rang}<small> sur {cl.length}</small></b></li>
-          {rangZ && <li><span>Rang · {zone}</span><b>{rangZ.rang}<small> sur {clZone.length}</small></b></li>}
-          {rang.part !== null && ind !== "rendement" && total && <li><span>Part du total recalculé</span><b>{rang.part.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %</b></li>}
-          <li><span>vs {annee - COMPARAISON}</span><b className={evo === null ? "" : evo >= 0 ? "rs-haut" : "rs-bas"}>{evo === null ? "—" : pct(evo)}<small>{rang.avant ? ` (${complet(rang.avant.valeur)} en ${rang.avant.annee})` : ""}</small></b></li>
-        </ul>
-      )}
-
-      <h4 className="cf-st">{NOMS_INDICATEUR[ind]} · {z.debut}–{z.fin}</h4>
-      <Courbes series={[serie]} unite={UNITES_LIBELLE[unite] ?? unite} annee={annee} titre={`${nom} : ${NOMS_INDICATEUR[ind]}`} hauteur={170} />
-
-      <details className="rs-trace">
-        <summary>Ligne source {o ? `· ${annee}` : ""}</summary>
-        <p>
-          {o ? (
-            <>FAOSTAT {J.ressource.domaine} · zone M49 {z.m49} ({z.nom}) · élément {J.indicateurs[ind].code_element} ({J.indicateurs[ind].nom_fao}) · produit CPC {J.ressource.code_item} ({J.ressource.nom_fao}) · année {annee} · valeur {complet(o.valeur)} {unite} · flag {o.flag}{o.nonOfficielle ? " · note « Unofficial figure »" : ""}</>
-          ) : (
-            <>Aucune ligne utilisable pour {annee} : zone M49 {z.m49}, élément {J.indicateurs[ind].code_element}.</>
-          )}
-        </p>
-        <a href={J.source.url} target="_blank" rel="noopener noreferrer">FAOSTAT <ArrowUpRight size={12} aria-hidden="true" /></a>
-      </details>
+      <div className="rs-actions">
+        {z.type === "pays" && <button type="button" className="rs-btn" onClick={() => onComparer(z.m49)}><GitCompareArrows size={14} aria-hidden="true" /> Comparer ce pays</button>}
+        <details className="rs-trace">
+          <summary>Ligne source</summary>
+          <p>
+            {o ? (
+              <>FAOSTAT {J.ressource.domaine} · zone M49 {z.m49} ({z.nom}) · élément {J.indicateurs[ind].code_element} ({J.indicateurs[ind].nom_fao}) · produit CPC {J.ressource.code_item} ({J.ressource.nom_fao}) · année {annee} · valeur {complet(o.valeur)} {unite} · flag {o.flag}{o.nonOfficielle ? " · note « Unofficial figure »" : ""}</>
+            ) : (
+              <>Aucune ligne utilisable pour {annee} : zone M49 {z.m49}, élément {J.indicateurs[ind].code_element}.</>
+            )}
+          </p>
+        </details>
+      </div>
     </>
   );
 }

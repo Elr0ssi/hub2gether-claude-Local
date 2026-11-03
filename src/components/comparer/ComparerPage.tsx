@@ -401,12 +401,12 @@ function Barres({
                 {v !== null && v === haut && <Crown size={14} aria-label="Valeur la plus élevée" />}
               </span>
               <span className="cmp-b2-val">{v === null ? "—" : indic.fmt(v)}</span>
-              {epingle === j || actif === j ? (
-                <span className="cmp-b2-detail">
+              {(
+                <span className={`cmp-b2-detail${epingle === j || actif === j ? "" : " cmp-b2-detail-cache"}`} aria-hidden={!(epingle === j || actif === j)}>
                   {r ? `${r.rang}${r.rang === 1 ? "er" : "ᵉ"} sur ${r.total} dans le monde` : "Rang indisponible"}
                   {j > 0 && v !== null && vals[0] !== null && v > 0 && (vals[0] as number) > 0 && ` · ${v >= (vals[0] as number) ? "×" : "÷"}${ratio(v, vals[0] as number)} ${fr(pays[0])}`}
                 </span>
-              ) : null}
+              )}
             </button>
           );
         })}

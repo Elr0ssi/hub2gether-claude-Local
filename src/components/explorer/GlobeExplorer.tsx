@@ -264,6 +264,8 @@ interface Props {
   relief3D: boolean;
   /** Le pays sous le curseur (nom anglais et position à l'écran), ou null. */
   onPaysSurvol: (info: { nom: string; x: number; y: number } | null) => void;
+  /** Faux : le globe ne tourne jamais seul (il ne bouge que sous la main ou par un cadrage). Vrai par défaut. */
+  rotation?: boolean;
   /** Mode compact (la page Conflits) : définition d'image plafonnée, sphère un peu moins détaillée. */
   compact?: boolean;
   /** Des pays peints d'une couleur, sous le contour du pays choisi. */
@@ -379,11 +381,13 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
 
     /* Le voile du pays choisi, posé sur le globe (même relief que lui, juste au-dessus). */
     const voileToile = document.createElement("canvas");
-    voileToile.width = 2048;
-    voileToile.height = 1024;
+    /* Le voile des pays colorés : en 4096 × 2048 dans la version compacte, pour que les bords restent nets quand on zoome. */
+    voileToile.width = compact ? 4096 : 2048;
+    voileToile.height = compact ? 2048 : 1024;
     peindreSelection(geo, nuit, pays, voileToile, 1, colorations);
     const voileTex = new THREE.CanvasTexture(voileToile);
     voileTex.colorSpace = THREE.SRGBColorSpace;
+    voileTex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
     /* Le voile est la même sphère, avec les mêmes hauteurs : il épouse chaque montagne au lieu de flotter au-dessus. */
     const voileGeo = geoBoule;
     const voileMat = (carte: THREE.Texture) =>
@@ -858,7 +862,7 @@ export const GlobeExplorer = forwardRef<GlobeExplorerHandle, Props>(function Glo
       const doux = 1 - Math.exp(-dt / 170);
       const e = etat.current;
       /* Le globe tourne tout seul tant qu'on ne l'a pas touché et qu'aucun pays n'est choisi. */
-      if (!tout.glisse && !e.props.pays && !e.props.vue && !reduit && performance.now() - tout.dernierGeste > 2500) tout.try_ -= 0.00007 * dt;
+      if (!tout.glisse && e.props.rotation !== false && !e.props.pays && !e.props.vue && !reduit && performance.now() - tout.dernierGeste > 2500) tout.try_ -= 0.00007 * dt;
       if (!tout.glisse) {
         tout.ry += (tout.try_ - tout.ry) * doux;
         tout.rx += (tout.trx - tout.rx) * doux;
