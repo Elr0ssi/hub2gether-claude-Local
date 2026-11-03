@@ -18,4 +18,11 @@ function une<T>(url: string): Promise<T> {
 }
 
 export const chargerIndex = () => une<{ ressources: EntreeIndex[] }>("/ressources/index.json").then((x) => x.ressources);
-export const chargerJeu = (id: string) => une<JeuRessource>(`/ressources/${id}.json`);
+/** Les unités d'élevage de FAOSTAT (« kg/An » = par animal) s'écrivent en clair à l'affichage ; les fichiers gardent l'unité d'origine. */
+const UNITES_AFFICHEES: Record<string, string> = { "kg/An": "kg/animal", "g/An": "g/animal", "No/An": "œufs/animal" };
+
+export const chargerJeu = (id: string) =>
+  une<JeuRessource>(`/ressources/${id}.json`).then((j) => {
+    for (const ind of Object.values(j.indicateurs)) if (UNITES_AFFICHEES[ind.unite]) ind.unite = UNITES_AFFICHEES[ind.unite];
+    return j;
+  });

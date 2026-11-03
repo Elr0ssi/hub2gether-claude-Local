@@ -45,3 +45,9 @@ Un code M49 absent de ce fichier est signalé « inconnu » dans le rapport : l'
 
 Seules `src/data/ressources/charger.ts` (`chargerIndex`, `chargerJeu`) lisent les données : les remplacer par des requêtes renvoyant la même forme
 (`JeuRessource`, voir `types.ts`). Les calculs (`calc.ts`) et les composants n'en dépendent pas.
+
+## Rendements d'élevage (import du 3 novembre 2026)
+
+Pour l'élevage, FAOSTAT publie le « rendement » sous d'autres codes que les cultures : 5417 (kg/animal), 5424 (g/animal), 5413 (nombre/animal). L'importateur retient UN seul de ces éléments comme « rendement » par produit, dans l'ordre 5412 > 5417 > 5424 > 5413 ; les autres restent dans le fichier sous « el-<code> » (par exemple, pour les œufs, la production en milliers d'œufs et le nombre d'œufs par poule), sans être affichés. L'unité d'origine est conservée dans les fichiers ; l'affichage écrit « kg/animal », « g/animal ».
+Un produit qui n'a pas de surface ni de rendement (vin, huiles) n'affiche que la production et la part.
+Les territoires et petits États absents de la géométrie du globe (Guyane, Guadeloupe, Martinique, La Réunion, Macao, Nauru, Tuvalu, Maldives) figurent au classement et aux courbes, pas sur la carte.

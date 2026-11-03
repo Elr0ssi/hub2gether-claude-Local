@@ -23,6 +23,12 @@
   "nom": "Angola",
   "type": "pays"
  },
+ "028": {
+  "continent": "Amériques",
+  "ne": "Antigua and Barb.",
+  "nom": "Antigua and Barbuda",
+  "type": "pays"
+ },
  "031": {
   "continent": "Asie",
   "ne": "Azerbaijan",
@@ -47,6 +53,18 @@
   "nom": "Austria",
   "type": "pays"
  },
+ "044": {
+  "continent": "Amériques",
+  "ne": "Bahamas",
+  "nom": "Bahamas",
+  "type": "pays"
+ },
+ "048": {
+  "continent": "Asie",
+  "ne": "Bahrain",
+  "nom": "Bahrain",
+  "type": "pays"
+ },
  "050": {
   "continent": "Asie",
   "ne": "Bangladesh",
@@ -57,6 +75,12 @@
   "continent": "Asie",
   "ne": "Armenia",
   "nom": "Armenia",
+  "type": "pays"
+ },
+ "052": {
+  "continent": "Amériques",
+  "ne": "Barbados",
+  "nom": "Barbados",
   "type": "pays"
  },
  "056": {
@@ -106,6 +130,24 @@
   "nom": "Brazil",
   "type": "pays"
  },
+ "084": {
+  "continent": "Amériques",
+  "ne": "Belize",
+  "nom": "Belize",
+  "type": "pays"
+ },
+ "090": {
+  "continent": "Océanie",
+  "ne": "Solomon Is.",
+  "nom": "Solomon Islands",
+  "type": "pays"
+ },
+ "096": {
+  "continent": "Asie",
+  "ne": "Brunei",
+  "nom": "Brunei Darussalam",
+  "type": "pays"
+ },
  "100": {
   "continent": "Europe",
   "ne": "Bulgaria",
@@ -130,6 +172,12 @@
   "nom": "Belarus",
   "type": "pays"
  },
+ "116": {
+  "continent": "Asie",
+  "ne": "Cambodia",
+  "nom": "Cambodia",
+  "type": "pays"
+ },
  "120": {
   "continent": "Afrique",
   "ne": "Cameroon",
@@ -140,6 +188,24 @@
   "continent": "Amériques",
   "ne": "Canada",
   "nom": "Canada",
+  "type": "pays"
+ },
+ "132": {
+  "continent": "Afrique",
+  "ne": "Cabo Verde",
+  "nom": "Cabo Verde",
+  "type": "pays"
+ },
+ "140": {
+  "continent": "Afrique",
+  "ne": "Central African Rep.",
+  "nom": "Central African Republic",
+  "type": "pays"
+ },
+ "144": {
+  "continent": "Asie",
+  "ne": "Sri Lanka",
+  "nom": "Sri Lanka",
   "type": "pays"
  },
  "148": {
@@ -183,16 +249,46 @@
   "nom": "Colombia",
   "type": "pays"
  },
+ "174": {
+  "continent": "Afrique",
+  "ne": "Comoros",
+  "nom": "Comoros",
+  "type": "pays"
+ },
+ "178": {
+  "continent": "Afrique",
+  "ne": "Congo",
+  "nom": "Congo",
+  "type": "pays"
+ },
  "180": {
   "continent": "Afrique",
   "ne": "Dem. Rep. Congo",
   "nom": "Democratic Republic of the Congo",
   "type": "pays"
  },
+ "184": {
+  "continent": "Océanie",
+  "ne": "Cook Is.",
+  "nom": "Cook Islands",
+  "type": "pays"
+ },
+ "188": {
+  "continent": "Amériques",
+  "ne": "Costa Rica",
+  "nom": "Costa Rica",
+  "type": "pays"
+ },
  "191": {
   "continent": "Europe",
   "ne": "Croatia",
   "nom": "Croatia",
+  "type": "pays"
+ },
+ "192": {
+  "continent": "Amériques",
+  "ne": "Cuba",
+  "nom": "Cuba",
   "type": "pays"
  },
  "196": {
@@ -218,16 +314,46 @@
   "nom": "Czechia",
   "type": "pays"
  },
+ "204": {
+  "continent": "Afrique",
+  "ne": "Benin",
+  "nom": "Benin",
+  "type": "pays"
+ },
  "208": {
   "continent": "Europe",
   "ne": "Denmark",
   "nom": "Denmark",
   "type": "pays"
  },
+ "212": {
+  "continent": "Amériques",
+  "ne": "Dominica",
+  "nom": "Dominica",
+  "type": "pays"
+ },
+ "214": {
+  "continent": "Amériques",
+  "ne": "Dominican Rep.",
+  "nom": "Dominican Republic",
+  "type": "pays"
+ },
  "218": {
   "continent": "Amériques",
   "ne": "Ecuador",
   "nom": "Ecuador",
+  "type": "pays"
+ },
+ "222": {
+  "continent": "Amériques",
+  "ne": "El Salvador",
+  "nom": "El Salvador",
+  "type": "pays"
+ },
+ "226": {
+  "continent": "Afrique",
+  "ne": "Eq. Guinea",
+  "nom": "Equatorial Guinea",
   "type": "pays"
  },
  "230": {
@@ -259,6 +385,18 @@
   "nom": "Estonia",
   "type": "pays"
  },
+ "234": {
+  "continent": "Europe",
+  "ne": "Faeroe Is.",
+  "nom": "Faroe Islands",
+  "type": "pays"
+ },
+ "242": {
+  "continent": "Océanie",
+  "ne": "Fiji",
+  "nom": "Fiji",
+  "type": "pays"
+ },
  "246": {
   "continent": "Europe",
   "ne": "Finland",
@@ -271,10 +409,40 @@
   "nom": "France",
   "type": "pays"
  },
+ "254": {
+  "continent": "Amériques",
+  "ne": null,
+  "nom": "French Guiana",
+  "type": "pays"
+ },
+ "258": {
+  "continent": "Océanie",
+  "ne": "Fr. Polynesia",
+  "nom": "French Polynesia",
+  "type": "pays"
+ },
+ "262": {
+  "continent": "Afrique",
+  "ne": "Djibouti",
+  "nom": "Djibouti",
+  "type": "pays"
+ },
+ "266": {
+  "continent": "Afrique",
+  "ne": "Gabon",
+  "nom": "Gabon",
+  "type": "pays"
+ },
  "268": {
   "continent": "Asie",
   "ne": "Georgia",
   "nom": "Georgia",
+  "type": "pays"
+ },
+ "270": {
+  "continent": "Afrique",
+  "ne": "Gambia",
+  "nom": "Gambia",
   "type": "pays"
  },
  "275": {
@@ -289,10 +457,34 @@
   "nom": "Germany",
   "type": "pays"
  },
+ "288": {
+  "continent": "Afrique",
+  "ne": "Ghana",
+  "nom": "Ghana",
+  "type": "pays"
+ },
+ "296": {
+  "continent": "Océanie",
+  "ne": "Kiribati",
+  "nom": "Kiribati",
+  "type": "pays"
+ },
  "300": {
   "continent": "Europe",
   "ne": "Greece",
   "nom": "Greece",
+  "type": "pays"
+ },
+ "308": {
+  "continent": "Amériques",
+  "ne": "Grenada",
+  "nom": "Grenada",
+  "type": "pays"
+ },
+ "312": {
+  "continent": "Amériques",
+  "ne": null,
+  "nom": "Guadeloupe",
   "type": "pays"
  },
  "320": {
@@ -301,10 +493,34 @@
   "nom": "Guatemala",
   "type": "pays"
  },
+ "324": {
+  "continent": "Afrique",
+  "ne": "Guinea",
+  "nom": "Guinea",
+  "type": "pays"
+ },
+ "328": {
+  "continent": "Amériques",
+  "ne": "Guyana",
+  "nom": "Guyana",
+  "type": "pays"
+ },
+ "332": {
+  "continent": "Amériques",
+  "ne": "Haiti",
+  "nom": "Haiti",
+  "type": "pays"
+ },
  "340": {
   "continent": "Amériques",
   "ne": "Honduras",
   "nom": "Honduras",
+  "type": "pays"
+ },
+ "344": {
+  "continent": "Asie",
+  "ne": "Hong Kong",
+  "nom": "China, Hong Kong SAR",
   "type": "pays"
  },
  "348": {
@@ -313,10 +529,22 @@
   "nom": "Hungary",
   "type": "pays"
  },
+ "352": {
+  "continent": "Europe",
+  "ne": "Iceland",
+  "nom": "Iceland",
+  "type": "pays"
+ },
  "356": {
   "continent": "Asie",
   "ne": "India",
   "nom": "India",
+  "type": "pays"
+ },
+ "360": {
+  "continent": "Asie",
+  "ne": "Indonesia",
+  "nom": "Indonesia",
   "type": "pays"
  },
  "364": {
@@ -347,6 +575,18 @@
   "continent": "Europe",
   "ne": "Italy",
   "nom": "Italy",
+  "type": "pays"
+ },
+ "384": {
+  "continent": "Afrique",
+  "ne": "Côte d'Ivoire",
+  "nom": "Côte d'Ivoire",
+  "type": "pays"
+ },
+ "388": {
+  "continent": "Amériques",
+  "ne": "Jamaica",
+  "nom": "Jamaica",
   "type": "pays"
  },
  "392": {
@@ -397,6 +637,12 @@
   "nom": "Kyrgyzstan",
   "type": "pays"
  },
+ "418": {
+  "continent": "Asie",
+  "ne": "Laos",
+  "nom": "Lao People's Democratic Republic",
+  "type": "pays"
+ },
  "422": {
   "continent": "Asie",
   "ne": "Lebanon",
@@ -413,6 +659,12 @@
   "continent": "Europe",
   "ne": "Latvia",
   "nom": "Latvia",
+  "type": "pays"
+ },
+ "430": {
+  "continent": "Afrique",
+  "ne": "Liberia",
+  "nom": "Liberia",
   "type": "pays"
  },
  "434": {
@@ -433,6 +685,12 @@
   "nom": "Luxembourg",
   "type": "pays"
  },
+ "446": {
+  "continent": "Asie",
+  "ne": null,
+  "nom": "China, Macao SAR",
+  "type": "pays"
+ },
  "450": {
   "continent": "Afrique",
   "ne": "Madagascar",
@@ -443,6 +701,18 @@
   "continent": "Afrique",
   "ne": "Malawi",
   "nom": "Malawi",
+  "type": "pays"
+ },
+ "458": {
+  "continent": "Asie",
+  "ne": "Malaysia",
+  "nom": "Malaysia",
+  "type": "pays"
+ },
+ "462": {
+  "continent": "Asie",
+  "ne": null,
+  "nom": "Maldives",
   "type": "pays"
  },
  "466": {
@@ -457,10 +727,22 @@
   "nom": "Malta",
   "type": "pays"
  },
+ "474": {
+  "continent": "Amériques",
+  "ne": null,
+  "nom": "Martinique",
+  "type": "pays"
+ },
  "478": {
   "continent": "Afrique",
   "ne": "Mauritania",
   "nom": "Mauritania",
+  "type": "pays"
+ },
+ "480": {
+  "continent": "Afrique",
+  "ne": "Mauritius",
+  "nom": "Mauritius",
   "type": "pays"
  },
  "484": {
@@ -511,6 +793,12 @@
   "nom": "Namibia",
   "type": "pays"
  },
+ "520": {
+  "continent": "Océanie",
+  "ne": null,
+  "nom": "Naoero",
+  "type": "pays"
+ },
  "524": {
   "continent": "Asie",
   "ne": "Nepal",
@@ -529,10 +817,22 @@
   "nom": "New Caledonia",
   "type": "pays"
  },
+ "548": {
+  "continent": "Océanie",
+  "ne": "Vanuatu",
+  "nom": "Vanuatu",
+  "type": "pays"
+ },
  "554": {
   "continent": "Océanie",
   "ne": "New Zealand",
   "nom": "New Zealand",
+  "type": "pays"
+ },
+ "558": {
+  "continent": "Amériques",
+  "ne": "Nicaragua",
+  "nom": "Nicaragua",
   "type": "pays"
  },
  "562": {
@@ -547,16 +847,40 @@
   "nom": "Nigeria",
   "type": "pays"
  },
+ "570": {
+  "continent": "Océanie",
+  "ne": "Niue",
+  "nom": "Niue",
+  "type": "pays"
+ },
  "578": {
   "continent": "Europe",
   "ne": "Norway",
   "nom": "Norway",
   "type": "pays"
  },
+ "583": {
+  "continent": "Océanie",
+  "ne": "Micronesia",
+  "nom": "Micronesia (Federated States of)",
+  "type": "pays"
+ },
  "586": {
   "continent": "Asie",
   "ne": "Pakistan",
   "nom": "Pakistan",
+  "type": "pays"
+ },
+ "591": {
+  "continent": "Amériques",
+  "ne": "Panama",
+  "nom": "Panama",
+  "type": "pays"
+ },
+ "598": {
+  "continent": "Océanie",
+  "ne": "Papua New Guinea",
+  "nom": "Papua New Guinea",
   "type": "pays"
  },
  "600": {
@@ -571,6 +895,12 @@
   "nom": "Peru",
   "type": "pays"
  },
+ "608": {
+  "continent": "Asie",
+  "ne": "Philippines",
+  "nom": "Philippines",
+  "type": "pays"
+ },
  "616": {
   "continent": "Europe",
   "ne": "Poland",
@@ -583,10 +913,34 @@
   "nom": "Portugal",
   "type": "pays"
  },
+ "624": {
+  "continent": "Afrique",
+  "ne": "Guinea-Bissau",
+  "nom": "Guinea-Bissau",
+  "type": "pays"
+ },
+ "626": {
+  "continent": "Asie",
+  "ne": "Timor-Leste",
+  "nom": "Timor-Leste",
+  "type": "pays"
+ },
+ "630": {
+  "continent": "Amériques",
+  "ne": "Puerto Rico",
+  "nom": "Puerto Rico",
+  "type": "pays"
+ },
  "634": {
   "continent": "Asie",
   "ne": "Qatar",
   "nom": "Qatar",
+  "type": "pays"
+ },
+ "638": {
+  "continent": "Afrique",
+  "ne": null,
+  "nom": "Réunion",
   "type": "pays"
  },
  "642": {
@@ -607,10 +961,40 @@
   "nom": "Rwanda",
   "type": "pays"
  },
+ "659": {
+  "continent": "Amériques",
+  "ne": "St. Kitts and Nevis",
+  "nom": "Saint Kitts and Nevis",
+  "type": "pays"
+ },
+ "662": {
+  "continent": "Amériques",
+  "ne": "Saint Lucia",
+  "nom": "Saint Lucia",
+  "type": "pays"
+ },
+ "670": {
+  "continent": "Amériques",
+  "ne": "St. Vin. and Gren.",
+  "nom": "Saint Vincent and the Grenadines",
+  "type": "pays"
+ },
+ "678": {
+  "continent": "Afrique",
+  "ne": "São Tomé and Principe",
+  "nom": "Sao Tome and Principe",
+  "type": "pays"
+ },
  "682": {
   "continent": "Asie",
   "ne": "Saudi Arabia",
   "nom": "Saudi Arabia",
+  "type": "pays"
+ },
+ "686": {
+  "continent": "Afrique",
+  "ne": "Senegal",
+  "nom": "Senegal",
   "type": "pays"
  },
  "688": {
@@ -619,10 +1003,34 @@
   "nom": "Serbia",
   "type": "pays"
  },
+ "690": {
+  "continent": "Afrique",
+  "ne": "Seychelles",
+  "nom": "Seychelles",
+  "type": "pays"
+ },
+ "694": {
+  "continent": "Afrique",
+  "ne": "Sierra Leone",
+  "nom": "Sierra Leone",
+  "type": "pays"
+ },
+ "702": {
+  "continent": "Asie",
+  "ne": "Singapore",
+  "nom": "Singapore",
+  "type": "pays"
+ },
  "703": {
   "continent": "Europe",
   "ne": "Slovakia",
   "nom": "Slovakia",
+  "type": "pays"
+ },
+ "704": {
+  "continent": "Asie",
+  "ne": "Vietnam",
+  "nom": "Viet Nam",
   "type": "pays"
  },
  "705": {
@@ -655,6 +1063,12 @@
   "nom": "Spain",
   "type": "pays"
  },
+ "728": {
+  "continent": "Afrique",
+  "ne": "S. Sudan",
+  "nom": "South Sudan",
+  "type": "pays"
+ },
  "729": {
   "continent": "Afrique",
   "ne": "Sudan",
@@ -670,6 +1084,12 @@
    "729"
   ],
   "type": "historique"
+ },
+ "740": {
+  "continent": "Amériques",
+  "ne": "Suriname",
+  "nom": "Suriname",
+  "type": "pays"
  },
  "748": {
   "continent": "Afrique",
@@ -707,6 +1127,24 @@
   "nom": "Thailand",
   "type": "pays"
  },
+ "768": {
+  "continent": "Afrique",
+  "ne": "Togo",
+  "nom": "Togo",
+  "type": "pays"
+ },
+ "776": {
+  "continent": "Océanie",
+  "ne": "Tonga",
+  "nom": "Tonga",
+  "type": "pays"
+ },
+ "780": {
+  "continent": "Amériques",
+  "ne": "Trinidad and Tobago",
+  "nom": "Trinidad and Tobago",
+  "type": "pays"
+ },
  "784": {
   "continent": "Asie",
   "ne": "United Arab Emirates",
@@ -729,6 +1167,12 @@
   "continent": "Asie",
   "ne": "Turkmenistan",
   "nom": "Turkmenistan",
+  "type": "pays"
+ },
+ "798": {
+  "continent": "Océanie",
+  "ne": null,
+  "nom": "Tuvalu",
   "type": "pays"
  },
  "800": {
@@ -797,6 +1241,12 @@
   "nom": "United States of America",
   "type": "pays"
  },
+ "854": {
+  "continent": "Afrique",
+  "ne": "Burkina Faso",
+  "nom": "Burkina Faso",
+  "type": "pays"
+ },
  "858": {
   "continent": "Amériques",
   "ne": "Uruguay",
@@ -813,6 +1263,12 @@
   "continent": "Amériques",
   "ne": "Venezuela",
   "nom": "Venezuela (Bolivarian Republic of)",
+  "type": "pays"
+ },
+ "882": {
+  "continent": "Océanie",
+  "ne": "Samoa",
+  "nom": "Samoa",
   "type": "pays"
  },
  "887": {

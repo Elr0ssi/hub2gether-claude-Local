@@ -30,10 +30,57 @@ export const CATALOGUE: Famille[] = [
     id: "agriculture",
     nom: "Agriculture",
     enfants: [
-      { id: "cereales", nom: "Céréales", ressources: [{ id: "qcl-wheat", nomFr: "Blé", nomFao: "Wheat" }] },
+      {
+        id: "cereales",
+        nom: "Céréales",
+        ressources: [
+          { id: "qcl-wheat", nomFr: "Blé", nomFao: "Wheat" },
+          { id: "qcl-cereals-n-e-c", nomFr: "Autres céréales", nomFao: "Cereals n.e.c." },
+        ],
+      },
       { id: "fruits-a-coque", nom: "Fruits à coque", ressources: [{ id: "qcl-almonds-in-shell", nomFr: "Amandes en coque", nomFao: "Almonds, in shell" }] },
-      { id: "oleagineux", nom: "Oléagineux", ressources: [] },
-      { id: "autres-cultures", nom: "Autres cultures", ressources: [] },
+      { id: "fruits", nom: "Fruits", ressources: [{ id: "qcl-avocados", nomFr: "Avocats", nomFao: "Avocados" }] },
+      {
+        id: "oleagineux",
+        nom: "Huiles végétales",
+        ressources: [
+          { id: "qcl-olive-oil", nomFr: "Huile d’olive", nomFao: "Olive oil" },
+          { id: "qcl-sunflower-seed-oil-crude", nomFr: "Huile de tournesol brute", nomFao: "Sunflower-seed oil, crude" },
+        ],
+      },
+      {
+        id: "autres-cultures",
+        nom: "Cultures tropicales et épices",
+        ressources: [
+          { id: "qcl-cocoa-beans", nomFr: "Fèves de cacao", nomFao: "Cocoa beans" },
+          { id: "qcl-chillies-and-peppers-dry-capsicum-spp-pimenta-spp-raw", nomFr: "Piments secs", nomFao: "Chillies and peppers, dry (Capsicum spp., Pimenta spp.), raw" },
+        ],
+      },
+      { id: "boissons", nom: "Boissons", ressources: [{ id: "qcl-wine", nomFr: "Vin", nomFao: "Wine" }] },
+    ],
+  },
+  {
+    id: "elevage",
+    nom: "Élevage",
+    enfants: [
+      {
+        id: "viandes",
+        nom: "Viandes",
+        ressources: [
+          { id: "qcl-meat-of-chickens-fresh-or-chilled", nomFr: "Viande de poulet", nomFao: "Meat of chickens, fresh or chilled" },
+          { id: "qcl-meat-of-pig-with-the-bone-fresh-or-chilled", nomFr: "Viande de porc", nomFao: "Meat of pig with the bone, fresh or chilled" },
+          { id: "qcl-meat-of-ducks-fresh-or-chilled", nomFr: "Viande de canard", nomFao: "Meat of ducks, fresh or chilled" },
+          { id: "qcl-meat-of-camels-fresh-or-chilled", nomFr: "Viande de chameau", nomFao: "Meat of camels, fresh or chilled" },
+        ],
+      },
+      {
+        id: "lait-oeufs",
+        nom: "Lait et œufs",
+        ressources: [
+          { id: "qcl-raw-milk-of-cattle", nomFr: "Lait de vache", nomFao: "Raw milk of cattle" },
+          { id: "qcl-hen-eggs-in-shell-fresh", nomFr: "Œufs de poule", nomFao: "Hen eggs in shell, fresh" },
+        ],
+      },
     ],
   },
   { id: "energie", nom: "Énergie", aVenir: ["Pétrole", "Gaz naturel", "Charbon", "Uranium"] },
@@ -82,4 +129,13 @@ export const NOMS_FR_ENTITES: Record<string, string> = {
   "890": "Yougoslavie",
   "891": "Serbie-et-Monténégro",
   "159": "Chine (agrégat FAOSTAT)",
+  /* Des territoires et petits États que la géométrie du globe ne contient pas : ils figurent au classement et aux courbes, pas sur la carte. */
+  "254": "Guyane",
+  "312": "Guadeloupe",
+  "474": "Martinique",
+  "638": "La Réunion",
+  "446": "Macao (Chine)",
+  "520": "Nauru",
+  "798": "Tuvalu",
+  "462": "Maldives",
 };

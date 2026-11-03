@@ -29,6 +29,18 @@ const NE = new Set(JSON.parse(readFileSync(resolve(RACINE, "public/geo/ne_50m_co
 
 /** Codes d'éléments FAOSTAT connus → identifiant d'indicateur de Vizualize. Un code inconnu devient « el-<code> ». */
 const INDICATEURS = { 5510: "production", 5312: "surface", 5412: "rendement" };
+/** Les rendements que FAOSTAT publie sous d'autres codes (élevage : poids par animal, œufs par poule…). Un seul devient « rendement » par produit,
+    dans cet ordre ; les autres restent des éléments à part (« el-<code> »), jamais perdus ni mélangés avec lui. */
+const RENDEMENTS = [5412, 5417, 5424, 5413];
+
+/** Associe chaque code d'élément d'un produit à son indicateur. */
+export function indicateursDuProduit(codes) {
+  const out = {};
+  for (const c of codes) out[c] = INDICATEURS[c] ?? `el-${c}`;
+  const r = RENDEMENTS.find((c) => codes.has(c));
+  if (r !== undefined) out[r] = "rendement";
+  return out;
+}
 
 /* ── CSV (guillemets, virgules et sauts de ligne dans les champs) ─────────────────────────────── */
 export function lireCsv(texte) {
@@ -93,11 +105,12 @@ function main() {
       const series = {};
       const vus = new Set();
       const doublons = [];
+      const choix = indicateursDuProduit(new Set(rows.map((r) => Number(r["Element Code"]))));
       const rapport = { id, lignes_source: rows.length, lignes_traitees: 0, lignes_ecartees: [], valeurs_vides: 0, zeros: 0, flags: {}, notes: {}, unites: {}, doublons, geo: { associes: [], historiques: [], agregats: [], non_associes: [], ambigus: [] } };
 
       for (const r of rows) {
         const code = Number(r["Element Code"]);
-        const ind = INDICATEURS[code] ?? `el-${code}`;
+        const ind = choix[code];
         const unite = r["Unit"];
         if (!indicateurs[ind]) indicateurs[ind] = { code_element: code, nom_fao: r["Element"], unite };
         else if (indicateurs[ind].unite !== unite) { rapport.lignes_ecartees.push({ raison: "unité incohérente", ligne: r }); continue; }

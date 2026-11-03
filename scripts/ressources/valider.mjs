@@ -4,7 +4,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { lireCsv } from "./importer-faostat.mjs";
+import { lireCsv, indicateursDuProduit } from "./importer-faostat.mjs";
 
 const RACINE = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const GEO = JSON.parse(readFileSync(resolve(RACINE, "src/data/ressources/geo-m49.json"), "utf8"));
@@ -25,12 +25,13 @@ for (const f of fichiers) {
   for (const [id, lignes] of parRessource) {
     console.log(`\n${id} (${lignes.length} lignes)`);
     const J = JSON.parse(readFileSync(resolve(RACINE, `public/ressources/${id}.json`), "utf8"));
+    const choix = indicateursDuProduit(new Set(lignes.map((r) => Number(r["Element Code"]))));
     const [aMin, aMax] = J.annees;
 
     /* 1. Chaque ligne du CSV retrouvée à l'identique : valeur, flag, note, unité. */
     let faux = 0, vides = 0, zeros = 0, flagsFaux = 0, unitesFausses = 0;
     for (const r of lignes) {
-      const ind = INDICATEURS[Number(r["Element Code"])] ?? `el-${r["Element Code"]}`;
+      const ind = choix[Number(r["Element Code"])];
       const s = J.series[r["Area Code (M49)"]]?.[ind];
       const i = Number(r["Year"]) - aMin;
       if (!s) { faux++; continue; }

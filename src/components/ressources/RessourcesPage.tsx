@@ -123,6 +123,7 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
         setJeu(j);
         setAnnee(j.annees[1]);
         setM49(null);
+        setCol("production");
         setCompare(null);
         setInd((c) => (j.indicateurs[c] ? c : Object.keys(j.indicateurs)[0]));
       })
@@ -229,7 +230,7 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [total, cl, ind, jeu, ix]);
 
-  /* ── Le classement en tableau : trois indicateurs côte à côte, comme sur Économie ── */
+  /* ── Le classement en tableau : les indicateurs du fichier côte à côte, comme sur Économie ── */
   const lignes = useMemo(() => {
     if (!jeu || !ix) return [];
     const totalProd = totalMonde(jeu, "production", annee)?.valeur ?? null;
@@ -441,7 +442,7 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
           <div className="cg-bande-h">
             <h2 className="cg-bande-t">Le classement</h2>
             <p className="cg-bande-c">
-              {nf(jeu.zones.filter((z) => z.type === "pays" || z.type === "historique").length)} entités, {nf(a1 - a0 + 1)} années, trois indicateurs. Choisissez une année, triez la colonne qui vous intéresse.
+              {nf(jeu.zones.filter((z) => z.type === "pays" || z.type === "historique").length)} entités, {nf(a1 - a0 + 1)} années, {INDICATEURS.filter((i) => jeu.indicateurs[i]).length > 1 ? `${INDICATEURS.filter((i) => jeu.indicateurs[i]).length} indicateurs` : "un indicateur"}. Choisissez une année, triez la colonne qui vous intéresse.
             </p>
             <div className="cg-bande-ctrl">
               <label className="cg-an-choix">
@@ -720,10 +721,10 @@ const Tableau = memo(function Tableau({
   const eteint = useCallback(() => { allumee.current?.classList.remove("cg-tab-suivi"); allumee.current = null; }, []);
 
   const colonnes: { id: Col; label: string }[] = [
-    { id: "production", label: `Production (${jeu.indicateurs.production?.unite ?? "t"})` },
-    { id: "surface", label: `Surface (${jeu.indicateurs.surface?.unite ?? "ha"})` },
-    { id: "rendement", label: `Rendement (${jeu.indicateurs.rendement?.unite ?? "kg/ha"})` },
-    { id: "part", label: "Part" },
+    ...(jeu.indicateurs.production ? [{ id: "production" as Col, label: `Production (${jeu.indicateurs.production.unite})` }] : []),
+    ...(jeu.indicateurs.surface ? [{ id: "surface" as Col, label: `Surface (${jeu.indicateurs.surface.unite})` }] : []),
+    ...(jeu.indicateurs.rendement ? [{ id: "rendement" as Col, label: `Rendement (${jeu.indicateurs.rendement.unite})` }] : []),
+    ...(jeu.indicateurs.production ? [{ id: "part" as Col, label: "Part" }] : []),
   ];
   const cellule = (o: ReturnType<typeof obs>) =>
     o ? (
@@ -757,10 +758,11 @@ const Tableau = memo(function Tableau({
             <tr key={r.z.m49} data-pays={r.z.m49} className={`${choisi === r.z.m49 ? "cg-tab-on" : ""}${trouvees?.has(r.z.m49) ? " cg-tab-trouve" : ""}` || undefined} onClick={() => onChoisi(r.z.m49)}>
               <td className="cg-tab-r">{String(i + 1).padStart(2, "0")}</td>
               <td className="cg-tab-p">{r.nom}{r.z.type === "historique" && <em className="rs-tag">{r.z.debut}–{r.z.fin}</em>}</td>
-              <td className={r.production ? undefined : "cg-tab-vide"}>{cellule(r.production)}</td>
-              <td className={r.surface ? undefined : "cg-tab-vide"}>{cellule(r.surface)}</td>
-              <td className={r.rendement ? undefined : "cg-tab-vide"}>{cellule(r.rendement)}</td>
-              <td className={r.part === null ? "cg-tab-vide" : undefined}>{r.part === null ? "n.d." : `${r.part.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`}</td>
+              {colonnes.map((c) => c.id === "part" ? (
+                <td key="part" className={r.part === null ? "cg-tab-vide" : undefined}>{r.part === null ? "n.d." : `${r.part.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %`}</td>
+              ) : (
+                <td key={c.id} className={r[c.id] ? undefined : "cg-tab-vide"}>{cellule(r[c.id])}</td>
+              ))}
             </tr>
           ))}
         </tbody>
