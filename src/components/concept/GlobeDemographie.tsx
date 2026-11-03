@@ -1,14 +1,16 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { ArrowUpRight } from "lucide-react";
 import { slugDe } from "@/data/seo/francais";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "./Theme";
+import { EvolutionCourbe } from "./EvolutionCourbe";
 import { usePretGlobe } from "./ouverture";
 import type { CountryDemographyData, DemographyMetricId, DemographyYear } from "@/data/demographie/demographie";
 import { SOURCES_SOCLE_DEMO } from "@/data/demographie/demographie";
-import type { PaletteGlobe } from "@/components/map/DemographyGlobe";
+import { GlobeCompact, type InfoBulle } from "@/components/explorer/GlobeCompact";
+import type { Coloration, GlobeExplorerHandle } from "@/components/explorer/GlobeExplorer";
+import { vueDePays } from "@/components/explorer/vues";
 import { getMaxMetricValueDemo, getValueIntensityDemo } from "@/lib/demographyColors";
 import { Odometre } from "./Roulement";
 
@@ -35,75 +37,9 @@ function nb(v: number, d = 0) {
    peint sur texture que la page Économie, avec sa propre interactivité.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const DemographyGlobe = dynamic(
-  () => import("@/components/map/DemographyGlobe").then((m) => m.DemographyGlobe),
-  { ssr: false, loading: () => <AttenteGlobe /> },
-);
-
-/** Le petit globe qui tourne, à la place du vrai le temps qu'il se construise.
-    Pur CSS : un anneau et un méridien, sur les jetons du thème — il n'a donc
-    rien à charger et s'adapte de lui-même au jour comme à la nuit. */
-function AttenteGlobe() {
-  return (
-    <div className="ge-attente" aria-hidden="true">
-      <span className="ge-attente-globe">
-        <span className="ge-attente-meridien" />
-        <span className="ge-attente-meridien ge-attente-meridien-2" />
-      </span>
-    </div>
-  );
-}
-
-const BLEUS = [
-  "#123a72", "#174a91", "#1c5cab", "#256abf", "#2f7ad2",
-  "#4a92e0", "#6da7ec", "#93c0f2", "#c0dcf8",
-];
-const SANS = "#1d2531";
-
-const BLEUS_JOUR = [
-  "#dbe9fa", "#bcd7f4", "#9cc3ec", "#7cade3", "#5e96d6",
-  "#437cc4", "#2f63ad", "#204c92", "#153873",
-];
-const SANS_JOUR = "#d9d6cf";
-
-/* Le plafond de l'échelle vient du repère « pour 100 000 habitants » quand
-   il est actif, jamais du paramètre `max` que le globe passe lui-même — ce
-   dernier ignore ce repère puisqu'il ne connaît que la grandeur brute. */
-function palette(sombre: boolean, pour100k: boolean): PaletteGlobe {
-  const sans = sombre ? SANS : SANS_JOUR;
-  const rampe = sombre ? BLEUS : BLEUS_JOUR;
-  return sombre
-    ? {
-        oceanProfond: "#050b16",
-        oceanMoyen: "#081426",
-        oceanPlateau: "#0b1c33",
-        terreSansDonnee: sans,
-        frontiere: "rgba(150,190,240,0.34)",
-        graticule: "rgba(140,185,245,0.09)",
-        accent: "#9EC7D8",
-        remplissage: (nom, countries, _max, metric) => {
-          const max = getMaxMetricValueDemo(countries, metric, pour100k);
-          const t = getValueIntensityDemo(nom, countries, max, metric, pour100k);
-          if (t === null) return sans;
-          return rampe[Math.round(Math.max(0, Math.min(1, t)) * (rampe.length - 1))];
-        },
-      }
-    : {
-        oceanProfond: "#cfdced",
-        oceanMoyen: "#dce7f3",
-        oceanPlateau: "#e6eef7",
-        terreSansDonnee: sans,
-        frontiere: "rgba(30,60,100,0.3)",
-        graticule: "rgba(40,80,130,0.1)",
-        accent: "#2f6f8a",
-        remplissage: (nom, countries, _max, metric) => {
-          const max = getMaxMetricValueDemo(countries, metric, pour100k);
-          const t = getValueIntensityDemo(nom, countries, max, metric, pour100k);
-          if (t === null) return sans;
-          return rampe[Math.round(Math.max(0, Math.min(1, t)) * (rampe.length - 1))];
-        },
-      };
-}
+/** La rampe du globe : celle d'Économie et de Ressources, du clair au foncé. */
+const RAMPE = ["#ede9fe", "#d4c6fd", "#b39afb", "#8f6bf7", "#6a3fe0", "#43198f"];
+const SANS_DONNEE = { couleur: "#8b8fa3", opacite: 0.15 };
 
 export interface MetriqueDemo {
   id: DemographyMetricId;
@@ -261,88 +197,62 @@ export function GlobeDemographie({
     return { rang: mieux + 1, total };
   }, [fiche, annee, metrique, versUnite]);
 
-  const courbe = useMemo(() => {
-    const pts = serie.filter((p) => p.v !== null) as { annee: number; v: number }[];
-    if (pts.length < 2) return null;
-    const bas = Math.min(...pts.map((p) => p.v));
-    const haut = Math.max(...pts.map((p) => p.v));
-    const ampl = haut - bas || 1;
-    const x = (a: number) => {
-      const i = serie.findIndex((p) => p.annee === a);
-      return (i / Math.max(1, serie.length - 1)) * 100;
-    };
-    const y = (v: number) => 30 - ((v - bas) / ampl) * 26;
-    const marques = pts.map((p) => ({ ...p, x: x(p.annee), y: y(p.v) }));
-    const d = marques
-      .map((p, k) => `${k === 0 ? "M" : "L"} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`)
-      .join(" ");
-    return { d, marques, debut: marques[0], fin: marques[marques.length - 1] };
-  }, [serie]);
-
-  const [survol, setSurvol] = useState<number | null>(null);
   const [theme] = useTheme();
-  const jour = theme === "clair";
 
-  const cadre = useRef<HTMLDivElement>(null);
+  /* Le globe : la même scène qu'Économie et Ressources, colorié sur la même rampe. */
+  const globe = useRef<GlobeExplorerHandle>(null);
+  const colonne = useRef<HTMLDivElement>(null);
+  const pretGlobe = usePretGlobe(colonne);
+  const [geo, setGeo] = useState<GeoJSON.FeatureCollection | null>(null);
+  useEffect(() => {
+    if (!pretGlobe) return;
+    let vivant = true;
+    fetch("/geo/ne_50m_countries.simplified.geojson").then((r) => r.json()).then((g) => vivant && setGeo(g)).catch(() => {});
+    return () => { vivant = false; };
+  }, [pretGlobe]);
 
-  const scene = useRef<HTMLDivElement>(null);
-  /* Le globe ne monte qu'une fois l'entrée du héros finie, ou quand on
-     arrive à lui en défilant. Voir la même note dans GlobeEco.tsx. */
-  const pretGlobe = usePretGlobe(scene);
-  const mesureLimbe = useCallback((diametre: number) => {
-    const el = scene.current;
-    if (!el) return;
-    el.style.setProperty("--ge-d", `${Math.round(diametre)}px`);
-    const cote = Math.min(el.clientWidth, el.clientHeight);
-    const sortie = cote ? (diametre - cote) / (cote * 0.35) : 0;
-    el.style.setProperty("--ge-eclat-o", String(Math.max(0, Math.min(1, 1 - sortie))));
-  }, []);
-  const vise = useCallback(
-    (clientX: number) => {
-      const el = cadre.current;
-      if (!el || !courbe) return;
-      const r = el.getBoundingClientRect();
-      const t = Math.max(0, Math.min(100, ((clientX - r.left) / (r.width || 1)) * 100));
-      let best = 0;
-      let d = Infinity;
-      courbe.marques.forEach((p, i) => {
-        const e = Math.abs(p.x - t);
-        if (e < d) {
-          d = e;
-          best = i;
-        }
-      });
-      setSurvol(best);
+  const maxV = useMemo(() => getMaxMetricValueDemo(annee.countries, metrique.id, pour100k), [annee, metrique.id, pour100k]);
+  const colorations = useMemo<Coloration[]>(() => {
+    if (!geo) return [];
+    return geo.features.map((f) => {
+      const nom = (f.properties as { name: string }).name;
+      const t = getValueIntensityDemo(nom, annee.countries, maxV, metrique.id, pour100k);
+      if (t === null) return { nom, ...SANS_DONNEE };
+      return { nom, couleur: RAMPE[Math.round(Math.max(0, Math.min(1, t)) * (RAMPE.length - 1))], opacite: choisi ? (nom === choisi ? 0.92 : 0.5) : 0.82 };
+    });
+  }, [geo, annee, maxV, metrique.id, pour100k, choisi]);
+  const contours = useMemo(() => (choisi ? [choisi] : []), [choisi]);
+  const vueGlobe = useMemo(() => (geo && choisi ? vueDePays(geo, [choisi]) : null), [geo, choisi]);
+  const infoBulle = useCallback(
+    (nom: string): InfoBulle | null => {
+      const d = annee.countries[nom];
+      const v = d ? versUnite(d[metrique.id] ?? null, d.population) : null;
+      return { titre: nomFr(nom), ligne: v === null ? "Indisponible" : pour100k && metrique.unite === "hab" ? `${v.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} /100 000 hab.` : fmtDemo(v, metrique.unite) };
     },
-    [courbe],
+    [annee, metrique, nomFr, pour100k, versUnite],
   );
-  const lu = survol !== null && courbe ? courbe.marques[survol] : null;
+  const surPays = useCallback((nom: string | null) => onChoisi(nom), [onChoisi]);
 
-  const [bornes, setBornes] = useState<number[]>([]);
-  const pose = useCallback((i: number) => {
-    setBornes((b) => (b.length >= 2 ? [i] : b.length === 1 && b[0] === i ? [] : [...b, i].sort((x, y) => x - y)));
-  }, []);
-  useEffect(() => setBornes([]), [choisi, metrique.id]);
-
-  const ecart = useMemo(() => {
-    if (!courbe || bornes.length < 2) return null;
-    const a = courbe.marques[bornes[0]];
-    const b = courbe.marques[bornes[1]];
-    if (!a || !b || a.v === 0) return null;
-    const r = b.v / a.v;
-    const memeSigne = a.v > 0 === b.v > 0;
-    const pct = ((b.v - a.v) / Math.abs(a.v)) * 100;
-    return {
-      a,
-      b,
-      texte: !memeSigne
-        ? `${pct > 0 ? "+" : "−"}${Math.abs(pct).toFixed(0)} %, en changeant de signe`
-        : Math.abs(r) >= 2
-          ? `×${r.toFixed(1).replace(".", ",")}`
-          : `${pct >= 0 ? "+" : "−"}${Math.abs(pct).toFixed(pct < 10 && pct > -10 ? 1 : 0).replace(".", ",")} %`,
-      sens: b.v > a.v ? 1 : b.v < a.v ? -1 : 0,
-    };
-  }, [courbe, bornes]);
+  /* Le rapport entre deux dates : « ×8,4 » se saisit d'un coup d'œil là où « +740 % » demande un calcul. */
+  const ecartDemo = useCallback(
+    (a: { annee: number; valeur: number }, b: { annee: number; valeur: number }) => {
+      if (a.valeur === 0) return null;
+      const r = b.valeur / a.valeur;
+      const memeSigne = a.valeur > 0 === b.valeur > 0;
+      const pct = ((b.valeur - a.valeur) / Math.abs(a.valeur)) * 100;
+      return {
+        texte: !memeSigne
+          ? `${pct > 0 ? "+" : "−"}${Math.abs(pct).toFixed(0)} %, en changeant de signe`
+          : Math.abs(r) >= 2
+            ? `×${r.toFixed(1).replace(".", ",")}`
+            : `${pct >= 0 ? "+" : "−"}${Math.abs(pct).toFixed(pct < 10 && pct > -10 ? 1 : 0).replace(".", ",")} %`,
+        detail: `${a.annee} → ${b.annee}`,
+        sens: (b.valeur > a.valeur ? 1 : b.valeur < a.valeur ? -1 : 0) as 1 | -1 | 0,
+      };
+    },
+    [],
+  );
+  const pointsEvo = useMemo(() => serie.map((p) => ({ annee: p.annee, valeur: p.v })), [serie]);
 
   /** Comme pieceDemo, mais ramenée pour 100 000 habitants quand ce repère
       est actif — les taux (pour1000) n'ont pas ce repère, il ne vaut que
@@ -399,39 +309,24 @@ export function GlobeDemographie({
       </div>
 
       <div className="ge-corps">
-        <div className="ge-colonne">
-          <div className="ge-scene" ref={scene}>
-            {pretGlobe ? (
-              <DemographyGlobe
-                demographyYear={annee}
-                metric={metrique.id}
-                selectedCountry={choisi}
-                onCountryClick={(n) => onChoisi(n)}
-                key={`${theme}-${pour100k}`}
-                palette={palette(!jour, pour100k)}
-                marge={1.06}
-                onCadrage={mesureLimbe}
-                /* Quatre mille texels au départ, la toile pleine au premier
-                   zoom appuyé : voir la même note dans GlobeEco.tsx. */
-                texelsMax={4096}
-              />
-            ) : (
-              <AttenteGlobe />
-            )}
-            <span className="ge-eclat" aria-hidden="true" />
-            <span className="ge-eclat ge-eclat-2" aria-hidden="true" />
-            <div className="ge-echelle" aria-hidden="true">
-              <span
-                className="ge-echelle-barre"
-                style={{ background: `linear-gradient(90deg, ${(jour ? BLEUS_JOUR : BLEUS).join(", ")})` }}
-              />
-              <span className="ge-echelle-l">
-                {metrique.label}
-                {pour100k ? " /100k" : ""} · faible à élevé
-                <i className="ge-echelle-sans" /> sans donnée
-              </span>
+        <div className="ge-colonne" ref={colonne}>
+          <GlobeCompact
+            ref={globe}
+            geo={pretGlobe ? geo : null}
+            nuit={theme === "nuit"}
+            colorations={colorations}
+            contours={contours}
+            vue={vueGlobe}
+            infoBulle={infoBulle}
+            onPays={surPays}
+          >
+            <div className="gc-ech" aria-hidden="true">
+              <b>{metrique.label}{pour100k ? " /100k" : ""} · {annee.year}</b>
+              <div className="gc-ech-barre">{RAMPE.map((c) => <i key={c} style={{ background: c }} />)}</div>
+              <div className="gc-ech-b"><span>Faible</span><span>Élevé</span></div>
+              <span className="gc-ech-nd"><i />Indisponible</span>
             </div>
-          </div>
+          </GlobeCompact>
           {sousLeGlobe && <div className="ge-sous">{sousLeGlobe}</div>}
         </div>
 
@@ -547,97 +442,14 @@ export function GlobeDemographie({
                     })}
                 </div>
 
-                <div className="ge-evo">
-                  <p className="ge-evo-t">Évolution · {metrique.label}</p>
-                  {courbe ? (
-                    <>
-                      <div className="ge-evo-h">
-                        {ecart ? (
-                          <span
-                            className={`ge-evo-ec${ecart.sens > 0 ? " ge-evo-ec-h" : ecart.sens < 0 ? " ge-evo-ec-b" : ""}`}
-                          >
-                            <b>{ecart.texte}</b>
-                            {ecart.a.annee} → {ecart.b.annee}
-                          </span>
-                        ) : lu ? (
-                          <span className="ge-evo-lu">
-                            <b>{fmtDemo(lu.v, metrique.unite)}</b>
-                            {lu.annee}
-                          </span>
-                        ) : (
-                          <>
-                            <span className="ge-evo-bout">
-                              <b>{fmtDemo(courbe.debut.v, metrique.unite)}</b>
-                              {courbe.debut.annee}
-                            </span>
-                            <span className="ge-evo-bout ge-evo-bout-d">
-                              <b>{fmtDemo(courbe.fin.v, metrique.unite)}</b>
-                              {courbe.fin.annee}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                      <div
-                        ref={cadre}
-                        className="ge-evo-c"
-                        onPointerMove={(e) => vise(e.clientX)}
-                        onPointerDown={(e) => {
-                          e.currentTarget.setPointerCapture(e.pointerId);
-                          vise(e.clientX);
-                        }}
-                        onClick={() => survol !== null && pose(survol)}
-                        onPointerLeave={() => setSurvol(null)}
-                        onPointerCancel={() => setSurvol(null)}
-                      >
-                        <svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">
-                          <path
-                            d={courbe.d}
-                            fill="none"
-                            stroke="var(--froid)"
-                            strokeWidth="1.4"
-                            vectorEffect="non-scaling-stroke"
-                            strokeLinejoin="round"
-                            strokeLinecap="round"
-                          />
-                          <circle cx={courbe.debut.x} cy={courbe.debut.y} r="0.9" fill="var(--encre-3)" vectorEffect="non-scaling-stroke" />
-                          <circle cx={courbe.fin.x} cy={courbe.fin.y} r="1.3" fill="var(--froid)" vectorEffect="non-scaling-stroke" />
-                          {ecart && (
-                            <>
-                              <rect
-                                x={Math.min(ecart.a.x, ecart.b.x)}
-                                y="0"
-                                width={Math.abs(ecart.b.x - ecart.a.x)}
-                                height="30"
-                                fill="rgba(158,199,216,0.1)"
-                              />
-                              {[ecart.a, ecart.b].map((m) => (
-                                <g key={m.annee}>
-                                  <line x1={m.x} y1="0" x2={m.x} y2="30" stroke="var(--froid)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-                                  <circle cx={m.x} cy={m.y} r="1.7" fill="var(--froid)" vectorEffect="non-scaling-stroke" />
-                                </g>
-                              ))}
-                            </>
-                          )}
-                          {lu && (
-                            <>
-                              <line x1={lu.x} y1="0" x2={lu.x} y2="30" stroke="var(--bord)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-                              <circle cx={lu.x} cy={lu.y} r="1.8" fill="var(--encre)" vectorEffect="non-scaling-stroke" />
-                            </>
-                          )}
-                        </svg>
-                      </div>
-                      <p className="ge-evo-aide">
-                        {bornes.length === 0
-                          ? "Cliquez deux dates pour mesurer l'écart."
-                          : bornes.length === 1
-                            ? `${courbe.marques[bornes[0]].annee} posée. Cliquez la seconde date.`
-                            : "Cliquez ailleurs pour repartir."}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="ge-evo-vide">Moins de deux dates publiés pour ce pays sur cet indicateur.</p>
-                  )}
-                </div>
+                <EvolutionCourbe
+                  titre={metrique.label}
+                  reinit={`${choisi}|${metrique.id}|${pour100k}`}
+                  points={pointsEvo}
+                  format={(v) => fmtDemo(v, metrique.unite)}
+                  ecart={ecartDemo}
+                  vide="Moins de deux dates publiées pour ce pays sur cet indicateur."
+                />
 
                 <p className="ge-source">
                   {SOURCES_SOCLE_DEMO[metrique.id]?.source ?? "Nations Unies, World Population Prospects 2024"} ·{" "}

@@ -304,6 +304,9 @@ function construireCourbes(zone: HTMLElement): GeoCourbe[] | null {
   });
 }
 
+/** Le temps que le globe d'accueil met à grossir jusqu'à sa taille finale, avant que les orbites ne se déploient. */
+const ATTENTE_GLOBE = 1500;
+
 const CLASSES_COURBES = ["a", "b", "c"] as const;
 
 function FondCourbes({ racine }: { racine: React.RefObject<HTMLElement | null> }) {
@@ -374,6 +377,7 @@ function FondCourbes({ racine }: { racine: React.RefObject<HTMLElement | null> }
     const courant = geo.map(() => ({ f: 0, dot: 0 }));
     let id = 0;
     let avant = performance.now();
+    const debut = avant;
     let immobile = 0;
     const boucle = (maintenant: number) => {
       id = requestAnimationFrame(boucle);
@@ -397,7 +401,8 @@ function FondCourbes({ racine }: { racine: React.RefObject<HTMLElement | null> }
         let cible: number;
         let phase: "haut" | "traverse" | "bas";
         if (regard <= ya) {
-          cible = tb.f1;
+          /* Les orbites ne commencent à se déployer qu'une fois le globe à sa taille finale. */
+          cible = maintenant - debut < ATTENTE_GLOBE ? 0 : tb.f1;
           phase = "haut";
         } else if (regard < yb) {
           let k = Math.floor(tb.f1 * SAMPLES);
@@ -658,7 +663,7 @@ function Ouverture({ reperes, donnees, annee, dette }: Props) {
 
         <div className="ax-globe-zone">
           <div className="ax-globe-halo" aria-hidden="true" />
-          <div className="ax-globe-c">
+          <div className="ax-globe-c" data-zoom={globe ? "1" : "0"}>
             {globe && (
               <GlobePoints
                 markers={marqueurs}

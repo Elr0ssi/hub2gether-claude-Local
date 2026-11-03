@@ -1005,3 +1005,9 @@ a.ax-dos:hover { border-color: var(--ax-ligne); }
 .ax-cles-rail { transition: opacity 0.4s ease; }
 /* Plus de lueur floue derrière les courbes : elle faisait un halo violet autour du globe d'accueil. */
 .ax-co-lueur { display: none; }
+
+/* Le globe d'accueil arrive en zoomant : petit, depuis sa position, il grossit jusqu'à sa taille finale ; les orbites attendent. */
+.ax-globe-c[data-zoom="1"] { animation: ax-globe-zoom 1.4s cubic-bezier(0.22, 0.8, 0.2, 1) both; transform-origin: 50% 50%; }
+.ax-globe-c[data-zoom="0"] { opacity: 0; }
+@keyframes ax-globe-zoom { from { transform: scale(0.18); opacity: 0; } 25% { opacity: 1; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ax-globe-c[data-zoom="1"] { animation: none; } }
