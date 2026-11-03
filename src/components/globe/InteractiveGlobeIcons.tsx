@@ -134,6 +134,8 @@ export interface InteractiveGlobeIconsProps {
   /** Les cartes de chiffres posées sur la sphère : par défaut du verre sombre à texte blanc ; en thème clair, du verre blanc à texte sombre. */
   /** Le halo diffus autour de la sphère (vrai par défaut). */
   atmosphere?: boolean;
+  /** Un éclairage sans surexposition : la sphère reste un seul disque, sans croissant sombre ni lueur colorée sur son bord. */
+  doux?: boolean;
   carte?: { fond: string; bord: string; ombre: string; chiffre: string; label: string };
 }
 
@@ -150,6 +152,7 @@ export default function InteractiveGlobeIcons({
   sphereColor = "#f6f8f7",
   carte = CARTE_SOMBRE,
   atmosphere = true,
+  doux = false,
 }: InteractiveGlobeIconsProps = {}) {
   const mountRef = useRef<HTMLDivElement>(null);
   const markerElsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -201,13 +204,15 @@ export default function InteractiveGlobeIcons({
     scene.add(globeGroup);
 
     // --- Lighting for a soft shaded "ball" look ---
-    scene.add(new THREE.AmbientLight(0xffffff, 2.6));
-    const keyLight = new THREE.DirectionalLight(0xffffff, 3.4);
+    scene.add(new THREE.AmbientLight(0xffffff, doux ? 3.0 : 2.6));
+    const keyLight = new THREE.DirectionalLight(0xffffff, doux ? 0.45 : 3.4);
     keyLight.position.set(-4, 5, 6);
     scene.add(keyLight);
-    const fillLight = new THREE.DirectionalLight(glowColor.getHex(), 0.6);
-    fillLight.position.set(3, -4, -2);
-    scene.add(fillLight);
+    if (!doux) {
+      const fillLight = new THREE.DirectionalLight(glowColor.getHex(), 0.6);
+      fillLight.position.set(3, -4, -2);
+      scene.add(fillLight);
+    }
 
     // --- Solid base sphere ---
     const baseGeom = new THREE.SphereGeometry(GLOBE_RADIUS, 96, 96);
