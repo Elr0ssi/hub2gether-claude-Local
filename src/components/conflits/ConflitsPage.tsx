@@ -43,16 +43,6 @@ type Cat = Categorie | "Tous";
 
 const ICONE: Record<TypeEvenement, LucideIcon> = { frappe: Crosshair, navire: Ship, front: Swords };
 
-/** Le tour du monde de l'ouverture : quatre escales, puis le globe entier. Des cadrages, pas des données. */
-const ESCALES: VueGlobe[] = [
-  { lat: 30, lon: 46, largeur: 64, hauteur: 40 },
-  { lat: 4, lon: 20, largeur: 66, hauteur: 58 },
-  { lat: 24, lon: 100, largeur: 78, hauteur: 48 },
-  { lat: 50, lon: 30, largeur: 46, hauteur: 30 },
-];
-const PAS_ESCALE = 1250;
-const PAR_PAS = 3;
-
 /** Le cadrage qui contient des points : un peu d'air autour, et jamais plus serré que 9 degrés. */
 function vueDePoints(pts: { lat: number; lon: number }[]): VueGlobe | null {
   if (!pts.length) return null;
@@ -80,11 +70,6 @@ export function ConflitsPage() {
   const [ouvert, setOuvert] = useState<string | null>(null);
   const globe = useRef<GlobeExplorerHandle>(null);
   const rectangle = useRef<HTMLDivElement>(null);
-
-  /* L'ouverture du globe : un tour du monde, les pays s'allument en vague depuis le Moyen-Orient. */
-  const [intro, setIntro] = useState<"attente" | "joue" | "fini">("attente");
-  const [introVue, setIntroVue] = useState<VueGlobe | null>(null);
-  const [pas, setPas] = useState(0);
 
   const ouverture = useProgression();
   const pret = usePret();
@@ -166,47 +151,20 @@ export function ConflitsPage() {
   );
   const cartes = useMemo(() => [evt ?? survolEvt].filter((x): x is string => !!x && points.some((e) => e.id === x)), [evt, survolEvt, points]);
 
-  /* La vague de l'ouverture : les pays par distance au Moyen-Orient, trois par trois. */
-  const ordre = useMemo(() => {
-    if (!geo) return [] as string[];
-    const noms = new Set<string>();
-    for (const c of conflits) for (const p of c.pays) noms.add(p);
-    return [...noms]
-      .map((n) => {
-        const b = boiteDe(geo, n);
-        const d = b ? Math.hypot(((b[0] + b[2]) / 2 - 45) * 0.8, (b[1] + b[3]) / 2 - 30) : 999;
-        return { n, d };
-      })
-      .sort((a, b) => a.d - b.d)
-      .map((x) => x.n);
-  }, [geo, conflits]);
-
   const colorations = useMemo<Coloration[]>(() => {
     const direct = new Map<string, Conflit[]>();
     for (const c of visibles) for (const p of c.pays) direct.set(p, [...(direct.get(p) ?? []), c]);
     const cibles = choisi ? new Set(choisi.pays) : pays ? new Set([pays]) : null;
-    const lumiere = intro === "joue" ? pas * PAR_PAS : Infinity;
-    return [...direct.entries()]
-      .filter(([nom]) => {
-        if (intro === "fini") return true;
-        if (intro === "attente") return false;
-        return ordre.indexOf(nom) < lumiere;
-      })
-      .map(([nom, l]) => {
-        const rang = ordre.indexOf(nom);
-        const neuf = intro === "joue" && rang >= lumiere - PAR_PAS;
-        return {
-          nom,
-          couleur: COULEUR[categorieDominante(l)],
-          opacite: neuf ? 0.86 : cibles ? (cibles.has(nom) ? 0.62 : 0.14) : 0.42,
-        };
-      });
-  }, [visibles, choisi, pays, intro, pas, ordre]);
+    return [...direct.entries()].map(([nom, l]) => ({
+      nom,
+      couleur: COULEUR[categorieDominante(l)],
+      opacite: cibles ? (cibles.has(nom) ? 0.68 : 0.16) : 0.5,
+    }));
+  }, [visibles, choisi, pays]);
 
   const contours = useMemo(() => (choisi ? choisi.pays : pays ? [pays] : []), [choisi, pays]);
 
   const vue = useMemo<VueGlobe | null>(() => {
-    if (introVue) return introVue;
     if (!geo) return null;
     if (evtChoisi) return { lat: evtChoisi.lat, lon: evtChoisi.lon, largeur: evtChoisi.precision === "site" ? 6 : 12, hauteur: evtChoisi.precision === "site" ? 5 : 9 };
     if ((choisi || pays) && points.length) return vueDePoints(points);
@@ -216,50 +174,7 @@ export function ConflitsPage() {
     }
     if (pays) return vueDePays(geo, [pays]);
     return null;
-  }, [geo, introVue, evtChoisi, choisi, pays, points]);
-
-  /* ── L'ouverture : elle se joue une fois, quand le rectangle apparaît ─────── */
-  const arreterIntro = useCallback(() => {
-    setIntroVue(null);
-    setIntro("fini");
-  }, []);
-
-  useEffect(() => {
-    if (!geo || intro !== "attente") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setIntro("fini");
-      return;
-    }
-    const el = rectangle.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([en]) => {
-        if (en.isIntersecting) {
-          io.disconnect();
-          setIntro("joue");
-        }
-      },
-      { threshold: 0.4 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [geo, intro]);
-
-  useEffect(() => {
-    if (intro !== "joue") return;
-    const t: number[] = [];
-    ESCALES.forEach((v, i) => t.push(window.setTimeout(() => setIntroVue(v), 200 + i * PAS_ESCALE)));
-    const nb = Math.ceil(ordre.length / PAR_PAS) + 1;
-    for (let k = 1; k <= nb; k++) t.push(window.setTimeout(() => setPas(k), 450 + k * 105));
-    t.push(
-      window.setTimeout(() => {
-        setIntroVue(null);
-        setIntro("fini");
-        globe.current?.recentrer();
-      }, 200 + ESCALES.length * PAS_ESCALE + 300),
-    );
-    return () => t.forEach(clearTimeout);
-  }, [intro, ordre.length]);
+  }, [geo, evtChoisi, choisi, pays, points]);
 
   const revenir = useCallback(() => {
     if (evt) setEvt(null);
@@ -416,7 +331,6 @@ export function ConflitsPage() {
                 <GlobeCompact
                   ref={globe}
                   className="cf-scene"
-                  sceneProps={{ "data-intro": intro, onPointerDown: () => intro === "joue" && arreterIntro() }}
                   geo={geo}
                   nuit={theme === "nuit"}
                   reperes={reperes}
@@ -433,26 +347,21 @@ export function ConflitsPage() {
                   onChoix={surRepere}
                   onPays={surPays}
                 >
-                  {intro === "joue" && (
-                    <div className="cf-onde" aria-hidden="true">
-                      <i /><i /><i />
-                      <span className="cf-balai" />
+                  <div className="gc-leg" aria-hidden="true">
+                    <b>Catégories</b>
+                    <div className="gc-leg-l">
+                      {CATEGORIES.map((c) => (
+                        <span key={c.id}><i style={{ background: c.couleur }} />{c.pluriel}</span>
+                      ))}
                     </div>
-                  )}
-                  <div className="ge-echelle cf-legende" aria-hidden="true">
-                    {CATEGORIES.map((c) => (
-                      <span key={c.id}><i style={{ background: c.couleur }} />{c.pluriel}</span>
-                    ))}
-                    <em>des catégories, pas un score de gravité</em>
                     {typesPresents.length > 0 && (
-                      <>
-                        <hr />
+                      <div className="gc-leg-l">
                         {typesPresents.map((t) => (
                           <span key={t}><i className="cf-lg-p" style={{ background: TYPES[t].couleur }} />{TYPES[t].pluriel}</span>
                         ))}
-                        {arcsLL.length > 0 && <em>un trait relie la capitale de l’acteur au point, sans être une trajectoire</em>}
-                      </>
+                      </div>
                     )}
+                    <em>{typesPresents.length > 0 && arcsLL.length > 0 ? "Un trait relie la capitale de l’acteur au point, sans être une trajectoire." : "Des catégories, pas un score de gravité."}</em>
                   </div>
                 </GlobeCompact>
               </div>

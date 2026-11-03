@@ -5,6 +5,7 @@ import { RessourcesPage } from "@/components/ressources/RessourcesPage";
 import { articlesDette } from "@/data/dettes/fiches";
 import { ressourcesActives } from "@/data/ressources/catalogue";
 import { faqRessource } from "@/data/ressources/faq";
+import { debatsRessource } from "@/data/ressources/debats";
 import type { EntreeIndex, JeuRessource } from "@/data/ressources/types";
 import { jsonLdString } from "@/lib/schema";
 
@@ -25,20 +26,22 @@ export const metadata: Metadata = {
   },
 };
 
-/** La FAQ est calculée à partir du fichier importé de la première ressource : jamais un chiffre écrit à la main. */
-function faqDuJeu() {
+/** La FAQ et les sujets de forum sont CALCULÉS à partir du fichier importé de la première ressource : jamais un chiffre écrit à la main. */
+function contenuDuJeu() {
   try {
     const lire = (f: string) => JSON.parse(readFileSync(join(process.cwd(), "public/ressources", f), "utf8"));
     const index = (lire("index.json") as { ressources: EntreeIndex[] }).ressources;
     const r = ressourcesActives(index)[0];
-    return r ? faqRessource(lire(`${r.id}.json`) as JeuRessource, r.nomFr) : [];
+    if (!r) return { faq: [], debats: [] };
+    const jeu = lire(`${r.id}.json`) as JeuRessource;
+    return { faq: faqRessource(jeu, r.nomFr), debats: debatsRessource(jeu, r.nomFr) };
   } catch {
-    return [];
+    return { faq: [], debats: [] };
   }
 }
 
 export default function Page() {
-  const faq = faqDuJeu();
+  const { faq, debats } = contenuDuJeu();
   const jeu = {
     "@context": "https://schema.org",
     "@type": "Dataset",
@@ -65,7 +68,7 @@ export default function Page() {
         Cette page présente la production, la surface récoltée et le rendement des ressources agricoles par pays, de 1961 à 2024, d’après FAOSTAT. Les totaux mondiaux
         sont recalculés à partir des entités du fichier, les entités historiques ne sont pas rattachées aux frontières actuelles, et les valeurs estimées ou manquantes sont signalées.
       </p>
-      <RessourcesPage articles={articlesDette(6)} faq={faq} />
+      <RessourcesPage articles={articlesDette(6)} faq={faq} debats={debats} />
     </>
   );
 }

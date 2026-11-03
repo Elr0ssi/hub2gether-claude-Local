@@ -12,6 +12,7 @@ import { Titre, usePret, useProgression, useVu } from "@/components/concept/ouve
 import { useTheme } from "@/components/concept/Theme";
 import { countryFr } from "@/data/countryNamesFr";
 import type { FicheArticle } from "@/data/concept/conceptGeo";
+import type { FicheDebat } from "@/data/concept/conceptEconomie";
 import type { Coloration, GlobeExplorerHandle, VueGlobe } from "@/components/explorer/GlobeExplorer";
 import { GlobeCompact, type InfoBulle } from "@/components/explorer/GlobeCompact";
 import { vueDePays } from "@/components/explorer/vues";
@@ -52,17 +53,20 @@ const nbsp = (u: string) => ` ${u}`;
 interface Props {
   articles: FicheArticle[];
   faq: { question: string; answer: string }[];
+  debats: FicheDebat[];
 }
 
 type Col = "production" | "surface" | "rendement" | "part";
 
-export function RessourcesPage({ articles, faq }: Props) {
+export function RessourcesPage({ articles, faq, debats }: Props) {
   const [theme] = useTheme();
   const ouverture = useProgression();
   const pret = usePret();
   const bande = useVu();
   const globe = useRef<GlobeExplorerHandle>(null);
   const rectangle = useRef<HTMLDivElement>(null);
+  const railDebats = useRef<HTMLDivElement>(null);
+  const priseDebats = useRef<{ x: number; g: number } | null>(null);
 
   const [index, setIndex] = useState<EntreeIndex[] | null>(null);
   const [resId, setResId] = useState<string | null>(null);
@@ -283,7 +287,7 @@ export function RessourcesPage({ articles, faq }: Props) {
         <div className="cg-wrap">
           <header className="v2-tete">
             <h2 className="v2-h2">Notre globe</h2>
-            <p className="v2-sous">{jeu ? `De ${a0} à ${a1} · ${nomRes} · FAOSTAT` : "Chargement…"}</p>
+            <p className="v2-sous">{jeu ? `De ${a0} à ${a1} · ${nomRes}` : "Chargement…"}</p>
           </header>
 
           <div className="ge">
@@ -454,6 +458,23 @@ export function RessourcesPage({ articles, faq }: Props) {
                 <p className="cg-art-c">{articles[0].chapo}</p>
                 {articles[0].href && <a className="cg-art-lien" href={articles[0].href}>Lire le dossier <span aria-hidden="true">→</span></a>}
               </article>
+              {debats.length > 0 && (
+                <div className="cg-debats">
+                  <div className="cg-debats-t">
+                    <span className="cg-debats-st">Nos plus gros débats</span>
+                    <span className="cg-debats-n">{debats.length} en cours</span>
+                  </div>
+                  <div ref={railDebats} className="cg-debats-l" onPointerDown={(e) => { priseDebats.current = { x: e.clientX, g: e.currentTarget.scrollLeft }; e.currentTarget.setPointerCapture(e.pointerId); }} onPointerMove={(e) => { if (!priseDebats.current || !railDebats.current) return; railDebats.current.scrollLeft = priseDebats.current.g - (e.clientX - priseDebats.current.x); }} onPointerUp={() => { priseDebats.current = null; }} onPointerCancel={() => { priseDebats.current = null; }}>
+                    {debats.map((d) => (
+                      <a key={d.id} href="/forum" className="cg-debat">
+                        <span className="cg-debat-q">{d.question}</span>
+                        <span className="cg-debat-a">{d.ancre}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="cg-arts-c">
                 <h3 className="cg-arts-st">Nos articles</h3>
                 <div className="cg-arts">
@@ -736,16 +757,14 @@ function Synthese({
     <>
       <h3 className="ge-nom">{nomRes} · Monde</h3>
       <div className="ge-vedette rs-vedette">
-        <span className="ge-vedette-l">{NOMS_INDICATEUR[ind]} · {annee}</span>
-        {total ? (
+        <span className="ge-vedette-l">{ind === "rendement" ? "Rendement le plus élevé" : NOMS_INDICATEUR[ind]} · {annee}</span>
+        {total || top[0] ? (
           <>
-            <Odometre className="ge-vedette-v" valeur={total.valeur} dec={0} unite={nbsp(unite)} duree={900} tours={1} couleur={1} />
-            <span className="ge-vedette-r">Somme recalculée de {nf(total.entites)} entités{evo !== null ? ` · ${pct(evo)} depuis ${annee - COMPARAISON}` : ""}</span>
-          </>
-        ) : top[0] ? (
-          <>
-            <b className="rs-vedette-v">{nomDe(top[0].m49)}</b>
-            <span className="ge-vedette-r">{complet(top[0].valeur)} {UNITES_LIBELLE[unite] ?? unite} · le rendement le plus élevé</span>
+            <Odometre className="ge-vedette-v" valeur={total ? total.valeur : top[0].valeur} dec={0} unite={nbsp(unite)} duree={900} tours={1} couleur={1} />
+            <span className="ge-vedette-r">
+              Basé sur {nf(cl.length)} sources officielles ou reconstituées
+              {total ? ` · somme recalculée, non officielle${evo !== null ? ` · ${pct(evo)} depuis ${annee - COMPARAISON}` : ""}` : ""}
+            </span>
           </>
         ) : (
           <span className="ge-vedette-r">Aucune donnée pour {annee}</span>
@@ -806,7 +825,6 @@ function FichePays({
   const der = !o ? derniere(J, z.m49, ind, annee) : null;
   const unite = J.indicateurs[ind]?.unite ?? "";
   const sp = points(J, z.m49, ind);
-  const serie: SerieCourbe = { id: z.m49, nom, couleur: "#6d4aff", pts: sp.map((p) => ({ annee: p.annee, valeur: p.valeur, flag: p.flag, nonOfficielle: p.nonOfficielle })) };
   const autres = INDICATEURS.filter((i) => i !== ind && J.indicateurs[i]);
   const evo = rang?.evolution ?? null;
   return (
@@ -836,7 +854,7 @@ function FichePays({
       {o ? (
         <p className="ge-note rs-statut">
           <span className={`rs-flag rs-flag-${o.flag}`} title={FLAGS[o.flag]?.libelle}>{flagLibelle(o.flag)}{o.nonOfficielle ? " · non officielle" : ""}</span>
-          FAOSTAT · {unite}
+          {unite}
         </p>
       ) : (
         <p className="ge-note rs-statut">
@@ -864,24 +882,122 @@ function FichePays({
         })}
       </div>
 
-      <div className="ge-evo">
-        <p className="ge-evo-t">Évolution · {NOMS_INDICATEUR[ind]} · {z.debut}–{z.fin}</p>
-        <Courbes series={[serie]} unite={UNITES_LIBELLE[unite] ?? unite} annee={annee} titre={`${nom} : ${NOMS_INDICATEUR[ind]}`} hauteur={130} />
-      </div>
+      <Evolution points={sp} unite={unite} libelle={`${NOMS_INDICATEUR[ind]} · ${z.debut}–${z.fin}`} />
 
       <div className="rs-actions">
         {z.type === "pays" && <button type="button" className="rs-btn" onClick={() => onComparer(z.m49)}><GitCompareArrows size={14} aria-hidden="true" /> Comparer ce pays</button>}
-        <details className="rs-trace">
-          <summary>Ligne source</summary>
-          <p>
-            {o ? (
-              <>FAOSTAT {J.ressource.domaine} · zone M49 {z.m49} ({z.nom}) · élément {J.indicateurs[ind].code_element} ({J.indicateurs[ind].nom_fao}) · produit CPC {J.ressource.code_item} ({J.ressource.nom_fao}) · année {annee} · valeur {complet(o.valeur)} {unite} · flag {o.flag}{o.nonOfficielle ? " · note « Unofficial figure »" : ""}</>
-            ) : (
-              <>Aucune ligne utilisable pour {annee} : zone M49 {z.m49}, élément {J.indicateurs[ind].code_element}.</>
-            )}
-          </p>
-        </details>
       </div>
     </>
+  );
+}
+
+/* ── L'évolution d'un pays : les informations en haut à gauche, comme sur Économie ─────────────
+   Pas d'infobulle : au repos, les deux bouts ; au survol, l'année lue ; en cliquant deux années, l'écart entre elles. */
+
+function Evolution({ points: pts, unite, libelle }: { points: ReturnType<typeof points>; unite: string; libelle: string }) {
+  const cadre = useRef<HTMLDivElement>(null);
+  const [survol, setSurvol] = useState<number | null>(null);
+  const [bornes, setBornes] = useState<number[]>([]);
+  const valides = pts.filter((p) => p.valeur !== null) as { annee: number; valeur: number; flag: string; nonOfficielle: boolean }[];
+  const u = UNITES_LIBELLE[unite] ?? unite;
+
+  const geometrie = useMemo(() => {
+    if (valides.length < 2) return null;
+    const a0 = pts[0].annee, a1 = pts[pts.length - 1].annee;
+    const vs = valides.map((p) => p.valeur);
+    const lo = Math.min(...vs), hi = Math.max(...vs);
+    const X = (an: number) => (a1 === a0 ? 0 : ((an - a0) / (a1 - a0)) * 100);
+    const Y = (v: number) => (hi === lo ? 15 : 28 - ((v - lo) / (hi - lo)) * 26);
+    let d = "";
+    let ouvert = false;
+    for (const p of pts) {
+      if (p.valeur === null) { ouvert = false; continue; }
+      d += `${ouvert ? "L" : "M"}${X(p.annee).toFixed(2)},${Y(p.valeur).toFixed(2)}`;
+      ouvert = true;
+    }
+    const pos = new Map(valides.map((p) => [p.annee, { x: X(p.annee), y: Y(p.valeur) }]));
+    return { d, pos, a0, a1 };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pts]);
+
+  if (!geometrie) return (
+    <div className="ge-evo">
+      <p className="ge-evo-t">Évolution · {libelle}</p>
+      <p className="ge-evo-vide">Moins de deux années publiées pour ce pays sur cet indicateur.</p>
+    </div>
+  );
+
+  const parAn = new Map(valides.map((p) => [p.annee, p]));
+  const premier = valides[0], dernier = valides[valides.length - 1];
+  const lu = survol !== null ? parAn.get(survol) ?? null : null;
+  const [ba, bb] = bornes.length === 2 ? [parAn.get(bornes[0])!, parAn.get(bornes[1])!] : [null, null];
+  const ecart = ba && bb ? { a: ba, b: bb, diff: bb.valeur - ba.valeur, pct: ba.valeur > 0 ? ((bb.valeur - ba.valeur) / ba.valeur) * 100 : null } : null;
+
+  const vise = (x: number) => {
+    const el = cadre.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const t = Math.max(0, Math.min(1, (x - r.left) / (r.width || 1)));
+    const cible = geometrie.a0 + t * (geometrie.a1 - geometrie.a0);
+    let best = valides[0];
+    for (const p of valides) if (Math.abs(p.annee - cible) < Math.abs(best.annee - cible)) best = p;
+    setSurvol(best.annee);
+  };
+  const pose = (an: number) => setBornes((b) => (b.length === 1 ? (b[0] === an ? [] : [b[0], an].sort((x, y) => x - y)) : b.length === 2 ? [an] : [an]));
+  const signe = ecart ? Math.sign(ecart.diff) : 0;
+  const fmt = (v: number) => `${complet(v)} ${u}`;
+
+  return (
+    <div className="ge-evo">
+      <p className="ge-evo-t">Évolution · {libelle}</p>
+      <div className="ge-evo-h">
+        {ecart ? (
+          <span className={`ge-evo-ec${signe > 0 ? " ge-evo-ec-h" : signe < 0 ? " ge-evo-ec-b" : ""}`}>
+            <b>{ecart.pct !== null ? pct(ecart.pct) : `${ecart.diff >= 0 ? "+" : ""}${complet(ecart.diff)} ${u}`}</b>
+            {ecart.a.annee} → {ecart.b.annee} · {fmt(ecart.a.valeur)} → {fmt(ecart.b.valeur)}
+          </span>
+        ) : lu ? (
+          <span className="ge-evo-lu">
+            <b>{fmt(lu.valeur)}</b>
+            {lu.annee}{lu.flag !== "A" ? ` · ${flagLibelle(lu.flag).toLowerCase()}${lu.nonOfficielle ? ", non officielle" : ""}` : ""}
+          </span>
+        ) : (
+          <>
+            <span className="ge-evo-bout"><b>{fmt(premier.valeur)}</b>{premier.annee}</span>
+            <span className="ge-evo-bout ge-evo-bout-d"><b>{fmt(dernier.valeur)}</b>{dernier.annee}</span>
+          </>
+        )}
+      </div>
+      <div
+        ref={cadre}
+        className="ge-evo-c"
+        onPointerMove={(e) => vise(e.clientX)}
+        onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); vise(e.clientX); }}
+        onClick={() => survol !== null && pose(survol)}
+        onPointerLeave={() => setSurvol(null)}
+        onPointerCancel={() => setSurvol(null)}
+      >
+        <svg viewBox="0 0 100 30" preserveAspectRatio="none" aria-hidden="true">
+          <path d={geometrie.d} fill="none" stroke="var(--froid)" strokeWidth="1.4" vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
+          {ecart && (
+            <>
+              <rect x={Math.min(geometrie.pos.get(ecart.a.annee)!.x, geometrie.pos.get(ecart.b.annee)!.x)} y="0" width={Math.abs(geometrie.pos.get(ecart.b.annee)!.x - geometrie.pos.get(ecart.a.annee)!.x)} height="30" fill="rgba(124,77,255,0.10)" />
+              {[ecart.a, ecart.b].map((m) => <line key={m.annee} x1={geometrie.pos.get(m.annee)!.x} y1="0" x2={geometrie.pos.get(m.annee)!.x} y2="30" stroke="var(--froid)" strokeWidth="1" vectorEffect="non-scaling-stroke" />)}
+            </>
+          )}
+          {lu && <line x1={geometrie.pos.get(lu.annee)!.x} y1="0" x2={geometrie.pos.get(lu.annee)!.x} y2="30" stroke="var(--bord)" strokeWidth="1" vectorEffect="non-scaling-stroke" />}
+        </svg>
+        <div className="ge-evo-pts" aria-hidden="true">
+          <span className="ge-evo-pt ge-evo-pt-d" style={{ left: `${geometrie.pos.get(premier.annee)!.x}%`, top: `${(geometrie.pos.get(premier.annee)!.y / 30) * 100}%` }} />
+          <span className="ge-evo-pt ge-evo-pt-f" style={{ left: `${geometrie.pos.get(dernier.annee)!.x}%`, top: `${(geometrie.pos.get(dernier.annee)!.y / 30) * 100}%` }} />
+          {ecart && [ecart.a, ecart.b].map((m) => <span key={m.annee} className="ge-evo-pt ge-evo-pt-e" style={{ left: `${geometrie.pos.get(m.annee)!.x}%`, top: `${(geometrie.pos.get(m.annee)!.y / 30) * 100}%` }} />)}
+          {!ecart && bornes.length === 1 && parAn.get(bornes[0]) && <span className="ge-evo-pt ge-evo-pt-e" style={{ left: `${geometrie.pos.get(bornes[0])!.x}%`, top: `${(geometrie.pos.get(bornes[0])!.y / 30) * 100}%` }} />}
+          {lu && <span className="ge-evo-pt ge-evo-pt-l" style={{ left: `${geometrie.pos.get(lu.annee)!.x}%`, top: `${(geometrie.pos.get(lu.annee)!.y / 30) * 100}%` }} />}
+        </div>
+      </div>
+      <p className="ge-evo-aide">
+        {bornes.length === 0 ? "Cliquez deux années pour mesurer l’écart." : bornes.length === 1 ? `${bornes[0]} posée. Cliquez la seconde année.` : "Cliquez ailleurs pour repartir."}
+      </p>
+    </div>
   );
 }
