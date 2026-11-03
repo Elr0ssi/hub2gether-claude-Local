@@ -35,10 +35,20 @@ export const CATALOGUE: Famille[] = [
         nom: "Céréales",
         ressources: [
           { id: "qcl-wheat", nomFr: "Blé", nomFao: "Wheat" },
+          { id: "qcl-rice", nomFr: "Riz", nomFao: "Rice" },
+          { id: "qcl-quinoa", nomFr: "Quinoa", nomFao: "Quinoa" },
           { id: "qcl-cereals-n-e-c", nomFr: "Autres céréales", nomFao: "Cereals n.e.c." },
         ],
       },
       { id: "fruits-a-coque", nom: "Fruits à coque", ressources: [{ id: "qcl-almonds-in-shell", nomFr: "Amandes en coque", nomFao: "Almonds, in shell" }] },
+      {
+        id: "legumes",
+        nom: "Légumes et tubercules",
+        ressources: [
+          { id: "qcl-potatoes", nomFr: "Pommes de terre", nomFao: "Potatoes" },
+          { id: "qcl-tomatoes", nomFr: "Tomates", nomFao: "Tomatoes" },
+        ],
+      },
       { id: "fruits", nom: "Fruits", ressources: [{ id: "qcl-avocados", nomFr: "Avocats", nomFao: "Avocados" }] },
       {
         id: "oleagineux",

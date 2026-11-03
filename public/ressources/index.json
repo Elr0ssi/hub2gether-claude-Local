@@ -167,6 +167,40 @@
    "date_export": "2026-11-03"
   },
   {
+   "id": "qcl-potatoes",
+   "nom_fao": "Potatoes",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "surface",
+    "rendement",
+    "production"
+   ],
+   "zones": 168,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-quinoa",
+   "nom_fao": "Quinoa",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "surface",
+    "production",
+    "rendement"
+   ],
+   "zones": 4,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
    "id": "qcl-raw-milk-of-cattle",
    "nom_fao": "Raw milk of cattle",
    "domaine": "QCL",
@@ -183,6 +217,23 @@
    "date_export": "2026-11-03"
   },
   {
+   "id": "qcl-rice",
+   "nom_fao": "Rice",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "surface",
+    "rendement",
+    "production"
+   ],
+   "zones": 146,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
    "id": "qcl-sunflower-seed-oil-crude",
    "nom_fao": "Sunflower-seed oil, crude",
    "domaine": "QCL",
@@ -194,6 +245,23 @@
     "production"
    ],
    "zones": 99,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-tomatoes",
+   "nom_fao": "Tomatoes",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "surface",
+    "rendement",
+    "production"
+   ],
+   "zones": 182,
    "importe_le": "2026-11-03",
    "date_export": "2026-11-03"
   },
