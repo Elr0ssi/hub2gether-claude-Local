@@ -27,7 +27,14 @@ export function boiteDe(geo: GeoJSON.FeatureCollection, nom: string) {
 export function vueDePays(geo: GeoJSON.FeatureCollection, pays: string[]): VueGlobe | null {
   const boites = pays.map((p) => boiteDe(geo, p)).filter(Boolean) as number[][];
   if (!boites.length) return null;
-  const un = (b: number[]): VueGlobe => ({ lon: (b[0] + b[2]) / 2, lat: (b[1] + b[3]) / 2, largeur: b[2] - b[0], hauteur: (b[3] - b[1]) * 1.2 });
+  /* Un recentrage et un zoom LÉGER : le pays est ramené au centre, mais la caméra ne s'en approche que d'un tiers environ, même pour un
+     petit pays. Les étendues sont élargies (et jamais en dessous de ces planchers) pour que le globe reste lisible, voisins compris. */
+  const un = (b: number[]): VueGlobe => ({
+    lon: (b[0] + b[2]) / 2,
+    lat: (b[1] + b[3]) / 2,
+    largeur: Math.max((b[2] - b[0]) * 1.6, 52),
+    hauteur: Math.max((b[3] - b[1]) * 1.2 * 1.6, 34),
+  });
   if (boites.length === 1) return un(boites[0]);
   const u = [Math.min(...boites.map((b) => b[0])), Math.min(...boites.map((b) => b[1])), Math.max(...boites.map((b) => b[2])), Math.max(...boites.map((b) => b[3]))];
   if (u[2] - u[0] > 45 || u[3] - u[1] > 40) return un(boites[0]);
