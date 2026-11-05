@@ -130,19 +130,28 @@ export function Courbes({
         {survol !== null && <line x1={x(survol)} x2={x(survol)} y1={m.h} y2={hauteur - m.b} className="rs-curseur" />}
         {ligneSurvol?.map(({ s, q }) => q && q.valeur !== null && <circle key={s.id} cx={x(survol as number)} cy={y(q.valeur)} r={4} fill={s.couleur} stroke="var(--surface-2, #fff)" strokeWidth={2} />)}
       </svg>
-      {ligneSurvol && survol !== null && (
-        <div className="rs-bulle" style={{ left: Math.min(Math.max(x(survol), 90), w - 90) }}>
-          <b>{survol}</b>
-          {ligneSurvol.map(({ s, q }) => (
-            <span key={s.id}>
-              <i style={{ background: s.couleur }} />
-              {s.nom}
-              <strong>{q ? (q.valeur === null ? "manquante" : `${complet(q.valeur)} ${unite}`) : "pas de donnée"}</strong>
-              {q && q.flag && q.valeur !== null && <em>{flagLibelle(q.flag)}{q.nonOfficielle ? " · non officielle" : ""}</em>}
-            </span>
-          ))}
-        </div>
-      )}
+      {ligneSurvol && survol !== null && (() => {
+        /* L'infobulle se tient à côté du curseur, jamais dessus : à droite tant qu'il y a de la place, sinon à gauche. Une ligne par série,
+           rangées de la plus haute à la plus basse, avec un point de la couleur de la courbe. */
+        const cx = x(survol);
+        const adroite = cx < w * 0.55;
+        const lignes = [...ligneSurvol].sort((a, b) => (b.q?.valeur ?? -Infinity) - (a.q?.valeur ?? -Infinity));
+        return (
+          <div className={`rs-bulle${adroite ? "" : " rs-bulle-g"}`} style={{ left: adroite ? cx + 14 : cx - 14 }}>
+            <b>{survol}</b>
+            {lignes.map(({ s, q }) => (
+              <span key={s.id}>
+                <i style={{ background: s.couleur }} />
+                <u>{s.nom}</u>
+                <strong>
+                  {q ? (q.valeur === null ? "manquante" : `${complet(q.valeur)} ${unite}`) : "pas de donnée"}
+                  {q && q.flag && q.valeur !== null && q.flag !== "A" && <sup title={`${flagLibelle(q.flag)}${q.nonOfficielle ? " · non officielle" : ""}`}>{q.flag}</sup>}
+                </strong>
+              </span>
+            ))}
+          </div>
+        );
+      })()}
     </div>
   );
 }

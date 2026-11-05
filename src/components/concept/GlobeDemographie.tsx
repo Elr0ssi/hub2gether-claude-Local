@@ -5,6 +5,7 @@ import { slugDe } from "@/data/seo/francais";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "./Theme";
 import { EvolutionCourbe } from "./EvolutionCourbe";
+import { LibelleTronque } from "./LibelleTronque";
 import { usePretGlobe } from "./ouverture";
 import type { CountryDemographyData, DemographyMetricId, DemographyYear } from "@/data/demographie/demographie";
 import { SOURCES_SOCLE_DEMO } from "@/data/demographie/demographie";
@@ -410,14 +411,14 @@ export function GlobeDemographie({
                   )}
                 </div>
 
-                <div className="ge-autres">
+                <div className={`ge-autres${famille.membres.length > 4 ? " ge-autres-dense" : ""}`}>
                   {famille.membres
                     .filter((m) => m.id !== metrique.id)
                     .map((m) => {
                       const info = infosTuile(m, fiche[m.id]);
                       return (
                         <button key={m.id} type="button" className="ge-autre" onClick={() => onMetrique(m.id)}>
-                          <span className="ge-autre-l">{m.label}</span>
+                          <LibelleTronque texte={m.label} className="ge-autre-l" />
                           {info.live ? (
                             <Odometre
                               className="ge-autre-v"

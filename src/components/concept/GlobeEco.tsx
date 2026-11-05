@@ -5,6 +5,7 @@ import { slugDe } from "@/data/seo/francais";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "./Theme";
 import { EvolutionCourbe } from "./EvolutionCourbe";
+import { LibelleTronque } from "./LibelleTronque";
 import { usePretGlobe } from "./ouverture";
 import { monnaieCourante } from "./Monnaie";
 import { fiche } from "@/data/finance/tauxChange";
@@ -390,7 +391,7 @@ export function GlobeEco({
                   <p className="ge-note">Créancier principal · {creancier}</p>
                 )}
 
-                <div className="ge-autres">
+                <div className={`ge-autres${famille.membres.length > 4 ? " ge-autres-dense" : ""}`}>
                   {famille.membres
                     .filter((m) => m.id !== metrique.id)
                     .map((m) => {
@@ -402,7 +403,7 @@ export function GlobeEco({
                           className="ge-autre"
                           onClick={() => onMetrique(m.id)}
                         >
-                          <span className="ge-autre-l">{m.label}</span>
+                          <LibelleTronque texte={m.label} className="ge-autre-l" />
                           <Odometre
                             className="ge-autre-v"
                             valeur={p.v}

@@ -344,7 +344,7 @@
 
 /* Le panneau tient sans barre de défilement : plus d'air, des blocs resserrés. */
 .cg-v2 .ge-corps { --ge-h: clamp(540px, 76vh, 760px); }
-.cg-v2 .ge-panneau { padding: 14px 16px; overflow-y: hidden; }
+.cg-v2 .ge-panneau { padding: 14px 16px; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
 .cg-v2 .ge-evo { margin-top: 12px; padding-top: 12px; }
 .cg-v2 .ge-evo svg { height: 44px; }
 .cg-v2 .ge-evo-pts { height: 44px; }
