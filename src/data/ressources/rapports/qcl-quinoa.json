@@ -1,0 +1,52 @@
+{
+ "id": "qcl-quinoa",
+ "lignes_source": 593,
+ "lignes_traitees": 593,
+ "lignes_ecartees": [],
+ "valeurs_vides": 2,
+ "zeros": 0,
+ "flags": {
+  "M": 2,
+  "A": 505,
+  "E": 76,
+  "X": 2,
+  "I": 8
+ },
+ "notes": {
+  "Unofficial figure": 2
+ },
+ "unites": {
+  "ha": 198,
+  "t": 198,
+  "kg/ha": 197
+ },
+ "doublons": [],
+ "geo": {
+  "associes": [
+   {
+    "m49": "064",
+    "nom": "Bhutan",
+    "ne": "Bhutan"
+   },
+   {
+    "m49": "068",
+    "nom": "Bolivia (Plurinational State of)",
+    "ne": "Bolivia"
+   },
+   {
+    "m49": "218",
+    "nom": "Ecuador",
+    "ne": "Ecuador"
+   },
+   {
+    "m49": "604",
+    "nom": "Peru",
+    "ne": "Peru"
+   }
+  ],
+  "historiques": [],
+  "agregats": [],
+  "non_associes": [],
+  "ambigus": []
+ }
+}

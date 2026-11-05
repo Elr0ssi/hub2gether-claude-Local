@@ -1,0 +1,17 @@
+{
+  "country": "POL",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Pologne",
+  "iso2": "PL",
+  "data": {
+    "2000": 16.1,
+    "2005": 17.7,
+    "2010": 9.6,
+    "2015": 7.5,
+    "2020": 3.2,
+    "2023": 2.8,
+    "2025": 3
+  }
+}

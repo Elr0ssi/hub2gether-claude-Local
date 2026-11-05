@@ -1,0 +1,419 @@
+{
+ "id": "qcl-cereals-n-e-c",
+ "lignes_source": 8560,
+ "lignes_traitees": 8560,
+ "lignes_ecartees": [],
+ "valeurs_vides": 784,
+ "zeros": 162,
+ "flags": {
+  "A": 3945,
+  "E": 2695,
+  "I": 868,
+  "M": 784,
+  "X": 268
+ },
+ "notes": {
+  "Unofficial figure": 203
+ },
+ "unites": {
+  "ha": 3017,
+  "kg/ha": 2535,
+  "t": 3008
+ },
+ "doublons": [],
+ "geo": {
+  "associes": [
+   {
+    "m49": "032",
+    "nom": "Argentina",
+    "ne": "Argentina"
+   },
+   {
+    "m49": "040",
+    "nom": "Austria",
+    "ne": "Austria"
+   },
+   {
+    "m49": "051",
+    "nom": "Armenia",
+    "ne": "Armenia"
+   },
+   {
+    "m49": "056",
+    "nom": "Belgium",
+    "ne": "Belgium"
+   },
+   {
+    "m49": "064",
+    "nom": "Bhutan",
+    "ne": "Bhutan"
+   },
+   {
+    "m49": "068",
+    "nom": "Bolivia (Plurinational State of)",
+    "ne": "Bolivia"
+   },
+   {
+    "m49": "072",
+    "nom": "Botswana",
+    "ne": "Botswana"
+   },
+   {
+    "m49": "100",
+    "nom": "Bulgaria",
+    "ne": "Bulgaria"
+   },
+   {
+    "m49": "104",
+    "nom": "Myanmar",
+    "ne": "Myanmar"
+   },
+   {
+    "m49": "108",
+    "nom": "Burundi",
+    "ne": "Burundi"
+   },
+   {
+    "m49": "112",
+    "nom": "Belarus",
+    "ne": "Belarus"
+   },
+   {
+    "m49": "148",
+    "nom": "Chad",
+    "ne": "Chad"
+   },
+   {
+    "m49": "156",
+    "nom": "China, mainland",
+    "ne": "China"
+   },
+   {
+    "m49": "158",
+    "nom": "China, Taiwan Province of",
+    "ne": "Taiwan"
+   },
+   {
+    "m49": "170",
+    "nom": "Colombia",
+    "ne": "Colombia"
+   },
+   {
+    "m49": "178",
+    "nom": "Congo",
+    "ne": "Congo"
+   },
+   {
+    "m49": "191",
+    "nom": "Croatia",
+    "ne": "Croatia"
+   },
+   {
+    "m49": "203",
+    "nom": "Czechia",
+    "ne": "Czechia"
+   },
+   {
+    "m49": "231",
+    "nom": "Ethiopia",
+    "ne": "Ethiopia"
+   },
+   {
+    "m49": "232",
+    "nom": "Eritrea",
+    "ne": "Eritrea"
+   },
+   {
+    "m49": "233",
+    "nom": "Estonia",
+    "ne": "Estonia"
+   },
+   {
+    "m49": "246",
+    "nom": "Finland",
+    "ne": "Finland"
+   },
+   {
+    "m49": "250",
+    "nom": "France",
+    "ne": "France"
+   },
+   {
+    "m49": "268",
+    "nom": "Georgia",
+    "ne": "Georgia"
+   },
+   {
+    "m49": "270",
+    "nom": "Gambia",
+    "ne": "Gambia"
+   },
+   {
+    "m49": "275",
+    "nom": "Palestine",
+    "ne": "Palestine"
+   },
+   {
+    "m49": "300",
+    "nom": "Greece",
+    "ne": "Greece"
+   },
+   {
+    "m49": "348",
+    "nom": "Hungary",
+    "ne": "Hungary"
+   },
+   {
+    "m49": "372",
+    "nom": "Ireland",
+    "ne": "Ireland"
+   },
+   {
+    "m49": "380",
+    "nom": "Italy",
+    "ne": "Italy"
+   },
+   {
+    "m49": "398",
+    "nom": "Kazakhstan",
+    "ne": "Kazakhstan"
+   },
+   {
+    "m49": "400",
+    "nom": "Jordan",
+    "ne": "Jordan"
+   },
+   {
+    "m49": "410",
+    "nom": "Republic of Korea",
+    "ne": "South Korea"
+   },
+   {
+    "m49": "428",
+    "nom": "Latvia",
+    "ne": "Latvia"
+   },
+   {
+    "m49": "440",
+    "nom": "Lithuania",
+    "ne": "Lithuania"
+   },
+   {
+    "m49": "442",
+    "nom": "Luxembourg",
+    "ne": "Luxembourg"
+   },
+   {
+    "m49": "466",
+    "nom": "Mali",
+    "ne": "Mali"
+   },
+   {
+    "m49": "470",
+    "nom": "Malta",
+    "ne": "Malta"
+   },
+   {
+    "m49": "484",
+    "nom": "Mexico",
+    "ne": "Mexico"
+   },
+   {
+    "m49": "496",
+    "nom": "Mongolia",
+    "ne": "Mongolia"
+   },
+   {
+    "m49": "504",
+    "nom": "Morocco",
+    "ne": "Morocco"
+   },
+   {
+    "m49": "512",
+    "nom": "Oman",
+    "ne": "Oman"
+   },
+   {
+    "m49": "528",
+    "nom": "Netherlands (Kingdom of the)",
+    "ne": "Netherlands"
+   },
+   {
+    "m49": "554",
+    "nom": "New Zealand",
+    "ne": "New Zealand"
+   },
+   {
+    "m49": "562",
+    "nom": "Niger",
+    "ne": "Niger"
+   },
+   {
+    "m49": "604",
+    "nom": "Peru",
+    "ne": "Peru"
+   },
+   {
+    "m49": "616",
+    "nom": "Poland",
+    "ne": "Poland"
+   },
+   {
+    "m49": "620",
+    "nom": "Portugal",
+    "ne": "Portugal"
+   },
+   {
+    "m49": "624",
+    "nom": "Guinea-Bissau",
+    "ne": "Guinea-Bissau"
+   },
+   {
+    "m49": "634",
+    "nom": "Qatar",
+    "ne": "Qatar"
+   },
+   {
+    "m49": "642",
+    "nom": "Romania",
+    "ne": "Romania"
+   },
+   {
+    "m49": "643",
+    "nom": "Russian Federation",
+    "ne": "Russia"
+   },
+   {
+    "m49": "682",
+    "nom": "Saudi Arabia",
+    "ne": "Saudi Arabia"
+   },
+   {
+    "m49": "686",
+    "nom": "Senegal",
+    "ne": "Senegal"
+   },
+   {
+    "m49": "688",
+    "nom": "Serbia",
+    "ne": "Serbia"
+   },
+   {
+    "m49": "694",
+    "nom": "Sierra Leone",
+    "ne": "Sierra Leone"
+   },
+   {
+    "m49": "703",
+    "nom": "Slovakia",
+    "ne": "Slovakia"
+   },
+   {
+    "m49": "705",
+    "nom": "Slovenia",
+    "ne": "Slovenia"
+   },
+   {
+    "m49": "710",
+    "nom": "South Africa",
+    "ne": "South Africa"
+   },
+   {
+    "m49": "716",
+    "nom": "Zimbabwe",
+    "ne": "Zimbabwe"
+   },
+   {
+    "m49": "724",
+    "nom": "Spain",
+    "ne": "Spain"
+   },
+   {
+    "m49": "756",
+    "nom": "Switzerland",
+    "ne": "Switzerland"
+   },
+   {
+    "m49": "764",
+    "nom": "Thailand",
+    "ne": "Thailand"
+   },
+   {
+    "m49": "768",
+    "nom": "Togo",
+    "ne": "Togo"
+   },
+   {
+    "m49": "788",
+    "nom": "Tunisia",
+    "ne": "Tunisia"
+   },
+   {
+    "m49": "804",
+    "nom": "Ukraine",
+    "ne": "Ukraine"
+   },
+   {
+    "m49": "834",
+    "nom": "United Republic of Tanzania",
+    "ne": "Tanzania"
+   },
+   {
+    "m49": "860",
+    "nom": "Uzbekistan",
+    "ne": "Uzbekistan"
+   }
+  ],
+  "historiques": [
+   {
+    "m49": "200",
+    "nom": "Czechoslovakia",
+    "note": "Entité dissoute fin 1992 (Tchéquie, Slovaquie).",
+    "successeurs": [
+     "203",
+     "703"
+    ]
+   },
+   {
+    "m49": "230",
+    "nom": "Ethiopia PDR",
+    "note": "Éthiopie avant la sécession de l'Érythrée (1993).",
+    "successeurs": [
+     "231",
+     "232"
+    ]
+   },
+   {
+    "m49": "810",
+    "nom": "USSR",
+    "note": "Union soviétique, jusqu'en 1991 : ne correspond à aucune géométrie actuelle.",
+    "successeurs": [
+     "643",
+     "804",
+     "112",
+     "498",
+     "233",
+     "428",
+     "440",
+     "051",
+     "031",
+     "268",
+     "398",
+     "417",
+     "762",
+     "795",
+     "860"
+    ]
+   }
+  ],
+  "agregats": [
+   {
+    "m49": "159",
+    "nom": "China",
+    "note": "Agrégat FAOSTAT : Chine continentale, Taïwan, Hong Kong et Macao. Recoupe les séries 156 et 158 : jamais additionné avec elles."
+   }
+  ],
+  "non_associes": [],
+  "ambigus": []
+ }
+}

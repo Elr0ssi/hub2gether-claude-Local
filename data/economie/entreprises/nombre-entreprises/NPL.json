@@ -1,0 +1,16 @@
+{
+  "country": "NPL",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Népal",
+  "iso2": "NP",
+  "data": {
+    "2000": 130,
+    "2005": 180,
+    "2010": 220,
+    "2015": 255,
+    "2020": 270,
+    "2023": 290
+  }
+}

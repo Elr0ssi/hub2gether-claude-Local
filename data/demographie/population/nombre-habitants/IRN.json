@@ -1,0 +1,17 @@
+{
+  "country": "IRN",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Iran",
+  "iso2": "IR",
+  "data": {
+    "2000": 65.5,
+    "2005": 70,
+    "2010": 74.5,
+    "2015": 79.4,
+    "2020": 84,
+    "2023": 88.6,
+    "2025": 90.6
+  }
+}

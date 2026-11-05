@@ -177,7 +177,7 @@ export function InteractiveMap({
       >
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm" style={{ background: "rgba(57,255,136,0.88)", border: "1px solid #1AD965" }} />
-          <span style={{ color: "var(--ink-3)", fontSize: "0.62rem", fontWeight: 600 }}>Territoire de l&apos;empire</span>
+          <span style={{ color: "var(--ink-3)", fontSize: "0.62rem", fontWeight: 600 }}>Territoire de l’empire</span>
         </div>
         <div className="flex items-center gap-2 mt-1">
           <div className="w-3 h-3 rounded-sm" style={{ background: "#E8E2D4", border: "1px solid #C8C0A8" }} />

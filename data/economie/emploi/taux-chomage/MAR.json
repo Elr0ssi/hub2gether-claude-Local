@@ -1,0 +1,17 @@
+{
+  "country": "MAR",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Maroc",
+  "iso2": "MA",
+  "data": {
+    "2000": 13.4,
+    "2005": 11,
+    "2010": 9.1,
+    "2015": 9.7,
+    "2020": 11.9,
+    "2023": 13,
+    "2025": 12.5
+  }
+}

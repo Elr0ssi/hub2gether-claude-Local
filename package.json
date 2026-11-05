@@ -6,7 +6,25 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "donnees:importer": "node scripts/importer-donnees/importer.mjs",
+    "donnees:controler": "node scripts/importer-donnees/controler.mjs",
+    "donnees:pont": "node scripts/importer-donnees/pont-geographies.mjs",
+    "donnees:socle": "node scripts/importer-donnees/socle-economie.mjs",
+    "base:migrer": "node scripts/base/migrer.mjs",
+    "base:verifier": "node scripts/base/verifier.mjs",
+    "base:cache": "node scripts/base/cache-globe.mjs",
+    "base:socle": "node scripts/base/socle-site.mjs",
+    "ressources:importer": "node scripts/ressources/importer-faostat.mjs",
+    "ressources:valider": "node scripts/ressources/valider.mjs",
+    "conflits:importer": "node scripts/conflits/importer-enrichissement.mjs",
+    "conflits:valider": "node scripts/conflits/valider.mjs",
+    "conflits:couverture": "node scripts/conflits/rapport-couverture.mjs",
+    "conflits:ucdp": "node scripts/conflits/importer-ucdp.mjs",
+    "conflits:tester-connecteurs": "node scripts/conflits/tester-connecteurs.mjs",
+    "conflits:tester-fusion": "tsx scripts/conflits/tester-fusion.ts",
+    "conflits:tout": "npm run conflits:importer && npm run conflits:valider && npm run conflits:tester-connecteurs && npm run conflits:tester-fusion && npm run conflits:couverture",
+    "conflits:tester-navigation": "node scripts/conflits/test-navigation.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.2",
@@ -14,6 +32,8 @@
     "@radix-ui/react-select": "^2.1.2",
     "@radix-ui/react-separator": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.3",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.116.0",
     "@types/leaflet": "^1.9.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -39,6 +59,7 @@
     "eslint-config-next": "^16.2.6",
     "postcss": "^8",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "world-atlas": "^2.0.2"
   }

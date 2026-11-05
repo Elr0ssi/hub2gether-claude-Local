@@ -1,0 +1,17 @@
+{
+  "country": "IND",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Inde",
+  "iso2": "IN",
+  "data": {
+    "2000": 4.3,
+    "2005": 4.4,
+    "2010": 3.5,
+    "2015": 3.5,
+    "2020": 7.1,
+    "2023": 7.9,
+    "2025": 7.8
+  }
+}

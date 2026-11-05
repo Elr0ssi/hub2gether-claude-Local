@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Layout } from "@/components/layout/Layout";
+import { PageConfiance } from "@/components/legal/PageConfiance";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Sources de données — The Essential Data",
+  title: "Sources de données · Visualize",
   description:
-    "Toutes les sources de données utilisées par The Essential Data : FMI, Banque mondiale, OMS, SIPRI, AWMC et médias internationaux de référence.",
+    "Toutes les sources de données utilisées par Visualize : FMI, Banque mondiale, OMS, SIPRI, AWMC et médias internationaux de référence.",
   alternates: {
     canonical: "/sources",
   },
@@ -32,10 +32,10 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
     description: "Données macroéconomiques, PIB, dette publique, taux de chômage.",
     sources: [
       {
-        name: "FMI — WEO",
-        fullName: "Fonds Monétaire International — World Economic Outlook",
+        name: "FMI · WEO",
+        fullName: "Fonds Monétaire International · World Economic Outlook",
         url: "https://www.imf.org/en/Publications/WEO",
-        usage: "PIB nominal par pays, dette/PIB, taux de chômage. Millésime 2024.",
+        usage: "PIB nominal par pays, dette/PIB, taux de chômage. Données 2024.",
         license: "Données librement consultables",
       },
       {
@@ -54,7 +54,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
       },
       {
         name: "Fortune Global 500",
-        fullName: "Fortune Magazine — Global 500 ranking",
+        fullName: "Fortune Magazine · Global 500 ranking",
         url: "https://fortune.com/global500/",
         usage: "Classement des plus grandes entreprises mondiales par chiffre d'affaires.",
       },
@@ -67,7 +67,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
     sources: [
       {
         name: "OMS / WHO",
-        fullName: "Organisation Mondiale de la Santé — World Health Organization",
+        fullName: "Organisation Mondiale de la Santé · World Health Organization",
         url: "https://www.who.int/data",
         usage: "Données COVID-19, VIH/SIDA, maladies infectieuses, mortalité mondiale.",
         license: "Données librement consultables",
@@ -95,7 +95,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
       },
       {
         name: "Our World in Data",
-        fullName: "Our World in Data — University of Oxford",
+        fullName: "Our World in Data · University of Oxford",
         url: "https://ourworldindata.org/health",
         usage: "Séries temporelles historiques des épidémies, visualisations vérifiées.",
         license: "CC BY 4.0",
@@ -116,7 +116,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
       },
       {
         name: "IISS",
-        fullName: "International Institute for Strategic Studies — The Military Balance",
+        fullName: "International Institute for Strategic Studies · The Military Balance",
         url: "https://www.iiss.org/publications/the-military-balance",
         usage: "Effectifs militaires, équipements, capacités opérationnelles par pays.",
       },
@@ -136,7 +136,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
     sources: [
       {
         name: "AWMC",
-        fullName: "Ancient World Mapping Center — UNC Chapel Hill",
+        fullName: "Ancient World Mapping Center · UNC Chapel Hill",
         url: "https://awmc.unc.edu",
         usage: "Référence cartographique principale pour les frontières des empires antiques.",
         license: "CC BY 4.0",
@@ -149,7 +149,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
       },
       {
         name: "Encyclopedia Iranica",
-        fullName: "Encyclopaedia Iranica — Columbia University",
+        fullName: "Encyclopaedia Iranica · Columbia University",
         url: "https://www.iranicaonline.org",
         usage: "Sources sur l'Empire perse achéménide, sassanide et parthe.",
         license: "Accès libre en ligne",
@@ -169,7 +169,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
     sources: [
       {
         name: "Natural Earth",
-        fullName: "Natural Earth — Free Vector and Raster Map Data",
+        fullName: "Natural Earth · Free Vector and Raster Map Data",
         url: "https://www.naturalearthdata.com",
         usage: "Frontières politiques actuelles, pays, océans, projections. Échelle 1:10m et 1:50m.",
         license: "Domaine public",
@@ -202,7 +202,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
       },
       {
         name: "BBC News",
-        fullName: "British Broadcasting Corporation — News",
+        fullName: "British Broadcasting Corporation · News",
         url: "https://www.bbc.com/news",
         usage: "Analyses et reportages sur les conflits, épidémies et économie mondiale.",
       },
@@ -242,7 +242,7 @@ const SOURCE_CATEGORIES: SourceCategory[] = [
 
 export default function SourcesPage() {
   return (
-    <Layout>
+    <PageConfiance>
       <div className="max-w-4xl mx-auto px-6 py-12">
         <Link
           href="/"
@@ -270,7 +270,7 @@ export default function SourcesPage() {
           </h1>
           <p className="text-base leading-relaxed mb-4" style={{ color: "var(--ink-2)", fontSize: "1.0625rem" }}>
             L'ensemble des sources primaires utilisées pour alimenter les visualisations interactives
-            et les synthèses éditoriales de The Essential Data.
+            et les synthèses éditoriales de Visualize.
           </p>
           <p className="text-sm" style={{ color: "var(--ink-3)" }}>
             Conformément à nos engagements de transparence et aux exigences de l'EU AI Act, chaque source
@@ -361,13 +361,13 @@ export default function SourcesPage() {
           style={{ borderTop: "1px solid var(--border)" }}
         >
           <p className="text-xs" style={{ color: "var(--ink-4)" }}>
-            Dernière mise à jour : juin 2025 · The Essential Data ·{" "}
+            Dernière mise à jour : juin 2025 · Visualize ·{" "}
             <Link href="/methodology" className="underline underline-offset-2" style={{ color: "var(--ink-3)" }}>
               Méthodologie →
             </Link>
           </p>
         </div>
       </div>
-    </Layout>
+    </PageConfiance>
   );
 }

@@ -17,13 +17,13 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       {
         type: "lead",
         content:
-          "En janvier 2025, les hôpitaux pédiatriques de plusieurs grandes villes chinoises — Pékin, Shanghai, Guangzhou — signalaient une hausse inhabituelle des hospitalisations pour infections respiratoires aiguës. Le coupable identifié : le Métapneumovirus humain (hMPV), un virus connu depuis 2001, mais jamais aussi médiatisé. Cousin du Virus Respiratoire Syncytial (VRS), le hMPV provoque des bronchiolites, pneumonies et syndromes pseudo-grippaux. Il ne représente pas une menace pandémique comparable au SARS-CoV-2, mais son émergence dans un contexte de surveillance renforcée post-COVID a justifié une attention mondiale.",
+          "En janvier 2025, les hôpitaux pédiatriques de plusieurs grandes villes chinoises, Pékin, Shanghai, Guangzhou, signalaient une hausse inhabituelle des hospitalisations pour infections respiratoires aiguës. Le coupable identifié : le Métapneumovirus humain (hMPV), un virus connu depuis 2001, mais jamais aussi médiatisé. Cousin du Virus Respiratoire Syncytial (VRS), le hMPV provoque des bronchiolites, pneumonies et syndromes pseudo-grippaux. Il ne représente pas une menace pandémique comparable au SARS-CoV-2, mais son émergence dans un contexte de surveillance renforcée post-COVID a justifié une attention mondiale.",
       },
       {
         type: "stats",
         items: [
           { value: "2001", label: "Découverte du hMPV", note: "Par des chercheurs néerlandais" },
-          { value: "15–20%", label: "Infections respiratoires", note: "Causées par hMPV chez enfants" },
+          { value: "15-20%", label: "Infections respiratoires", note: "Causées par hMPV chez enfants" },
           { value: "200M+", label: "Cas estimés/an", note: "Toutes formes, monde entier" },
           { value: "~160 000", label: "Décès annuels", note: "Enfants <5 ans (OMS estimation)" },
         ],
@@ -32,12 +32,12 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         type: "text",
         heading: "Pourquoi ce regain d'activité en 2025 ?",
         content:
-          "Plusieurs facteurs expliquent la résurgence du hMPV début 2025. D'abord, la dette immunitaire accumulée pendant les années COVID : le port du masque et les confinements de 2020–2022 ont réduit la circulation de tous les virus respiratoires, créant des cohortes d'enfants en bas âge sans immunité préalable. Ensuite, le relâchement des mesures barrières et la reprise des déplacements internationaux ont permis une circulation accélérée. Enfin, les systèmes de surveillance renforcés post-COVID ont simplement mieux détecté un virus qui circulait probablement sans bruit depuis des années.",
+          "Plusieurs facteurs expliquent la résurgence du hMPV début 2025. D'abord, la dette immunitaire accumulée pendant les années COVID : le port du masque et les confinements de 2020-2022 ont réduit la circulation de tous les virus respiratoires, créant des cohortes d'enfants en bas âge sans immunité préalable. Ensuite, le relâchement des mesures barrières et la reprise des déplacements internationaux ont permis une circulation accélérée. Enfin, les systèmes de surveillance renforcés post-COVID ont simplement mieux détecté un virus qui circulait probablement sans bruit depuis des années.",
       },
       {
         type: "chart",
         title: "Cas de hMPV détectés en 2025 (hospitalisations pour 100 000 hab.)",
-        subtitle: "Données de surveillance nationale, saison hivernale jan.–mars 2025",
+        subtitle: "Données de surveillance nationale, saison hivernale jan.-mars 2025",
         unit: "pour 100k hab.",
         bars: [
           { label: "Chine", flag: "cn", value: 42, color: "#ef4444" },
@@ -53,7 +53,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "map-highlight",
-        title: "Pays sous surveillance hMPV — début 2025",
+        title: "Pays sous surveillance hMPV · début 2025",
         subtitle: "Zones de forte circulation (rouge) et surveillance active (orange)",
         countries: {
           "China": { color: "#ef4444", label: "Épicentre jan. 2025" },
@@ -89,13 +89,13 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "comparison-table",
-        title: "hMPV vs autres virus respiratoires — comparaison clinique",
+        title: "hMPV vs autres virus respiratoires · comparaison clinique",
         headers: ["Virus", "Transmission", "Létalité", "Vaccin", "Traitement"],
         rows: [
-          { label: "hMPV", cells: ["Gouttelettes / contact", "0,1–0,5% (enfants <5)", "Aucun (2025)", "Symptomatique"] },
-          { label: "VRS", cells: ["Gouttelettes / contact", "0,1–0,2% (nourrissons)", "Nirsevimab (2023)", "Symptomatique"] },
+          { label: "hMPV", cells: ["Gouttelettes / contact", "0,1-0,5% (enfants <5)", "Aucun (2025)", "Symptomatique"] },
+          { label: "VRS", cells: ["Gouttelettes / contact", "0,1-0,2% (nourrissons)", "Nirsevimab (2023)", "Symptomatique"] },
           { label: "Grippe A/B", cells: ["Gouttelettes / aérosols", "0,1% (adultes sains)", "Annuel", "Antiviraux (oseltamivir)"] },
-          { label: "SARS-CoV-2", cells: ["Aérosols / gouttelettes", "0,3–1% (variantes récentes)", "Oui (ARNm / vecteur)", "Antiviraux + anticorps"] },
+          { label: "SARS-CoV-2", cells: ["Aérosols / gouttelettes", "0,3-1% (variantes récentes)", "Oui (ARNm / vecteur)", "Antiviraux + anticorps"] },
           { label: "MERS-CoV", cells: ["Contact proche / zoonose", "35%", "En développement", "Symptomatique / AVP"] },
         ],
       },
@@ -103,7 +103,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         type: "image-text",
         heading: "Quels groupes sont les plus à risque ?",
         content:
-          "Le hMPV est particulièrement dangereux pour les nourrissons de moins de 2 ans (système immunitaire immature), les personnes âgées de plus de 65 ans, et les immunodéprimés (greffés, chimiothérapie, HIV non contrôlé). Chez les personnes en bonne santé, l'infection cause généralement un rhume banal résolutif en 5–7 jours. La mortalité mondiale est estimée à environ 160 000 décès par an chez les enfants de moins de 5 ans, principalement dans les pays à revenus faibles où l'accès aux soins intensifs est limité. Aucun vaccin n'est encore disponible en 2025, bien que plusieurs candidats soient en phase 2–3 d'essais cliniques.",
+          "Le hMPV est particulièrement dangereux pour les nourrissons de moins de 2 ans (système immunitaire immature), les personnes âgées de plus de 65 ans, et les immunodéprimés (greffés, chimiothérapie, HIV non contrôlé). Chez les personnes en bonne santé, l'infection cause généralement un rhume banal résolutif en 5-7 jours. La mortalité mondiale est estimée à environ 160 000 décès par an chez les enfants de moins de 5 ans, principalement dans les pays à revenus faibles où l'accès aux soins intensifs est limité. Aucun vaccin n'est encore disponible en 2025, bien que plusieurs candidats soient en phase 2-3 d'essais cliniques.",
         imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Pneumonia_x-ray.jpg/800px-Pneumonia_x-ray.jpg",
         imageAlt: "Radiographie pulmonaire montrant une pneumonie",
         flip: true,
@@ -113,11 +113,11 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         title: "Chronologie du hMPV : de la découverte à 2025",
         items: [
           { date: "2001", title: "Découverte aux Pays-Bas", description: "Le Dr Bernadette van den Hoogen identifie un nouveau paramyxovirus chez des enfants hospitalisés pour infections respiratoires." },
-          { date: "2002–2019", title: "Circulation silencieuse mondiale", description: "Le hMPV est reconnu comme cause majeure d'infections respiratoires basses, responsable de 5 à 10% des hospitalisations pédiatriques hivernales. Peu médiatisé." },
-          { date: "2020–2022", title: "Disparition temporaire pendant COVID", description: "Les mesures barrières réduisent drastiquement la circulation de tous les virus respiratoires. Fenêtre épidémiologique artificielle." },
+          { date: "2002-2019", title: "Circulation silencieuse mondiale", description: "Le hMPV est reconnu comme cause majeure d'infections respiratoires basses, responsable de 5 à 10% des hospitalisations pédiatriques hivernales. Peu médiatisé." },
+          { date: "2020-2022", title: "Disparition temporaire pendant COVID", description: "Les mesures barrières réduisent drastiquement la circulation de tous les virus respiratoires. Fenêtre épidémiologique artificielle." },
           { date: "2023", title: "Rebond post-COVID", description: "Première résurgence notable, notamment en Europe et aux États-Unis, attribuée à la dette immunitaire accumulée." },
           { date: "Jan. 2025", title: "Épidémie en Chine", description: "Hausse marquée des hospitalisations pédiatriques dans les grandes villes chinoises. L'OMS surveille mais ne classe pas en urgence internationale." },
-          { date: "Fév.–mars 2025", title: "Propagation mondiale documentée", description: "Détections en hausse sur tous les continents. Alertes émises par CDC (USA), UKHSA (UK), Santé Publique France." },
+          { date: "Fév.-mars 2025", title: "Propagation mondiale documentée", description: "Détections en hausse sur tous les continents. Alertes émises par CDC (USA), UKHSA (UK), Santé Publique France." },
         ],
       },
       {
@@ -136,7 +136,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       {
         type: "highlight",
         content:
-          "Le hMPV n'est pas un nouveau virus — il circule depuis au moins les années 1960. Ce qui est nouveau en 2025, c'est notre capacité à le détecter et à en parler, héritée de la surveillance épidémiologique renforcée post-COVID-19.",
+          "Le hMPV n'est pas un nouveau virus, il circule depuis au moins les années 1960. Ce qui est nouveau en 2025, c'est notre capacité à le détecter et à en parler, héritée de la surveillance épidémiologique renforcée post-COVID-19.",
       },
       {
         type: "quote",
@@ -145,18 +145,18 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
     ],
     sources: [
-        { title: "Human Metapneumovirus — Factsheet", outlet: "CDC", url: "https://www.cdc.gov/human-metapneumovirus/" },
-        { title: "ECDC Communicable Disease Threats Report — HMPV 2024-2025", outlet: "ECDC", year: "2025", url: "https://www.ecdc.europa.eu" },
-        { title: "China hMPV surveillance — National Influenza Sentinel Hospitals", outlet: "OMS / CCDC China", year: "2025" },
+        { title: "Human Metapneumovirus · Factsheet", outlet: "CDC", url: "https://www.cdc.gov/human-metapneumovirus/" },
+        { title: "ECDC Communicable Disease Threats Report · HMPV 2024-2025", outlet: "ECDC", year: "2025", url: "https://www.ecdc.europa.eu" },
+        { title: "China hMPV surveillance · National Influenza Sentinel Hospitals", outlet: "OMS / CCDC China", year: "2025" },
         { title: "Human metapneumovirus and lower respiratory disease in children", outlet: "New England Journal of Medicine", year: "2004" },
-        { title: "OMS — HMPV Risk Assessment 2025", outlet: "OMS / WHO", year: "2025" },
+        { title: "OMS · HMPV Risk Assessment 2025", outlet: "OMS / WHO", year: "2025" },
     ],
   },
   {
     slug: "carte-epidemies-monde-comparaison-historique",
     title: "Des épidémies à travers l'histoire : ce que les cartes révèlent",
     excerpt:
-      "Comparer la Peste Noire de 1347 et le COVID-19 de 2020 sur une carte, c'est mesurer 700 ans de progrès médical — et pointer les inégalités persistantes dans la réponse aux crises sanitaires.",
+      "Comparer la Peste Noire de 1347 et le COVID-19 de 2020 sur une carte, c'est mesurer 700 ans de progrès médical · et pointer les inégalités persistantes dans la réponse aux crises sanitaires.",
     theme: "epidemics",
     publishedAt: "2025-03-05",
     readingTime: 10,
@@ -167,12 +167,12 @@ export const EPIDEMICS_ARTICLES: Article[] = [
     body: [
       {
         type: "lead",
-        content: "Chaque épidémie laisse une empreinte géographique. La Peste Noire a suivi les routes commerciales médiévales — le long des côtes méditerranéennes d'abord, remontant vers le nord par les fleuves et les axes de caravanes. Le COVID-19 a suivi les routes aériennes mondiales : Wuhan → Milan → New York → São Paulo en moins de 90 jours. Ces géographies de la maladie en disent autant sur les sociétés qui les ont vécues que sur les agents pathogènes eux-mêmes.",
+        content: "Chaque épidémie laisse une empreinte géographique. La Peste Noire a suivi les routes commerciales médiévales, le long des côtes méditerranéennes d'abord, remontant vers le nord par les fleuves et les axes de caravanes. Le COVID-19 a suivi les routes aériennes mondiales : Wuhan → Milan → New York → São Paulo en moins de 90 jours. Ces géographies de la maladie en disent autant sur les sociétés qui les ont vécues que sur les agents pathogènes eux-mêmes.",
       },
       {
         type: "stats",
         items: [
-          { value: "75M", label: "Morts Peste Noire", note: "1347–1353 estimé" },
+          { value: "75M", label: "Morts Peste Noire", note: "1347-1353 estimé" },
           { value: "7M+", label: "Morts COVID-19", note: "Chiffre officiel OMS 2024" },
           { value: "700 ans", label: "Écart temporel", note: "Entre les deux épidémies" },
           { value: "33%", label: "Mortalité Europe Peste Noire", note: "Part de la population" },
@@ -180,20 +180,20 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "comparison-table",
-        title: "Les 6 grandes épidémies de l'histoire moderne — comparaison",
+        title: "Les 6 grandes épidémies de l'histoire moderne · comparaison",
         headers: ["Épidémie", "Période", "Agent", "Décès estimés", "Mortalité/cas"],
         rows: [
-          { label: "Peste Noire", cells: ["1347–1353", "Yersinia pestis", "75–200 millions", "30–60%"] },
-          { label: "Grippe espagnole", cells: ["1918–1920", "Influenza H1N1", "50–100 millions", "2–3%"] },
-          { label: "VIH/SIDA", cells: ["1981–auj.", "Rétrovirus VIH", "42 millions (cumulé)", "~100% sans ARV"] },
-          { label: "COVID-19", cells: ["2019–2023", "SARS-CoV-2", "7–20 millions", "0,3–1%"] },
-          { label: "Ebola (2014–16)", cells: ["2014–2016", "Filovirus Ebola", "11 310", "40–60%"] },
-          { label: "Choléra (séries)", cells: ["1817–auj.", "Vibrio cholerae", "Millions/siècle", "1–3% traité"] },
+          { label: "Peste Noire", cells: ["1347-1353", "Yersinia pestis", "75-200 millions", "30-60%"] },
+          { label: "Grippe espagnole", cells: ["1918-1920", "Influenza H1N1", "50-100 millions", "2-3%"] },
+          { label: "VIH/SIDA", cells: ["1981-auj.", "Rétrovirus VIH", "42 millions (cumulé)", "~100% sans ARV"] },
+          { label: "COVID-19", cells: ["2019-2023", "SARS-CoV-2", "7-20 millions", "0,3-1%"] },
+          { label: "Ebola (2014-16)", cells: ["2014-2016", "Filovirus Ebola", "11 310", "40-60%"] },
+          { label: "Choléra (séries)", cells: ["1817-auj.", "Vibrio cholerae", "Millions/siècle", "1-3% traité"] },
         ],
       },
       {
         type: "chart",
-        title: "Décès par grandes épidémies — estimation historique (en millions)",
+        title: "Décès par grandes épidémies · estimation historique (en millions)",
         subtitle: "Données compilées CDC / OMS / études académiques",
         unit: "millions de décès",
         bars: [
@@ -207,7 +207,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "map-highlight",
-        title: "Géographie des grandes épidémies — zones d'impact majeur",
+        title: "Géographie des grandes épidémies · zones d'impact majeur",
         subtitle: "Pays touchés par au moins deux grandes épidémies historiques",
         countries: {
           "United States": { color: "#dc2626", label: "Grippe 1918 + COVID" },
@@ -234,19 +234,19 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         type: "text",
         heading: "Ce que les routes commerciales révèlent sur la propagation",
         content:
-          "La géographie de la Peste Noire suit exactement les routes maritimes génoises et vénitiennes de 1347 : Caffa (Crimée) → Constantinople → Messine → Marseille → Paris → Londres. Chaque étape est une escale commerciale, non une frontière naturelle. En 2020, la propagation du SARS-CoV-2 suit les liaisons aériennes à haute fréquence : Wuhan-Milan, Milan-New York, New York-São Paulo. La mondialisation a transformé les frontières de la maladie. Mais un invariant demeure : ce sont les hubs — commerciaux hier, aéroportuaires aujourd'hui — qui amplifient la propagation.",
+          "La géographie de la Peste Noire suit exactement les routes maritimes génoises et vénitiennes de 1347 : Caffa (Crimée) → Constantinople → Messine → Marseille → Paris → Londres. Chaque étape est une escale commerciale, non une frontière naturelle. En 2020, la propagation du SARS-CoV-2 suit les liaisons aériennes à haute fréquence : Wuhan-Milan, Milan-New York, New York-São Paulo. La mondialisation a transformé les frontières de la maladie. Mais un invariant demeure : ce sont les hubs, commerciaux hier, aéroportuaires aujourd'hui, qui amplifient la propagation.",
       },
       {
         type: "timeline",
-        title: "700 ans de gestion des pandémies — jalons clés",
+        title: "700 ans de gestion des pandémies · jalons clés",
         items: [
           { date: "1347", title: "Quarantaine de Venise", description: "Venise invente la quarantaine de 40 jours (quarantina giorni) pour les navires arrivant de zones pestiférées. Premier système sanitaire institutionnel." },
           { date: "1796", title: "Vaccin antivariolique", description: "Edward Jenner démontre que l'inoculation de vaccine protège contre la variole. Premier vaccin de l'histoire." },
           { date: "1854", title: "John Snow et le choléra", description: "Snow cartographie les cas de choléra à Londres et identifie la pompe à eau contaminée. Naissance de l'épidémiologie moderne." },
-          { date: "1918", title: "Grippe espagnole — coordination absente", description: "50 millions de morts, aucune coordination internationale. La SDN n'a aucun mandat sanitaire." },
+          { date: "1918", title: "Grippe espagnole · coordination absente", description: "50 millions de morts, aucune coordination internationale. La SDN n'a aucun mandat sanitaire." },
           { date: "1948", title: "Création de l'OMS", description: "L'Organisation Mondiale de la Santé est créée le 7 avril 1948. Premier système de gouvernance sanitaire mondiale." },
-          { date: "1980", title: "Éradication de la variole", description: "L'OMS certifie l'éradication mondiale de la variole — première et unique maladie humaine éradiquée grâce à la vaccination." },
-          { date: "2020", title: "COVID-19 — test du RSI", description: "La pandémie révèle les limites du Règlement Sanitaire International : notifications tardives, absence de pouvoir coercitif de l'OMS." },
+          { date: "1980", title: "Éradication de la variole", description: "L'OMS certifie l'éradication mondiale de la variole · première et unique maladie humaine éradiquée grâce à la vaccination." },
+          { date: "2020", title: "COVID-19 · test du RSI", description: "La pandémie révèle les limites du Règlement Sanitaire International : notifications tardives, absence de pouvoir coercitif de l'OMS." },
         ],
       },
       {
@@ -264,7 +264,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         style: "number",
         items: [
           { text: "La vitesse de réponse est le facteur déterminant : chaque semaine de retard dans la détection multiplie les cas par 2 à 4" },
-          { text: "Les épidémies suivent les flux économiques — routes commerciales, aéroports, ports — pas les frontières politiques" },
+          { text: "Les épidémies suivent les flux économiques · routes commerciales, aéroports, ports · pas les frontières politiques" },
           { text: "Les inégalités sociales amplifient la mortalité : en 1918 comme en 2020, les pauvres meurent plus que les riches" },
           { text: "Les vaccins sont le seul outil d'éradication : la variole est la seule maladie humaine éradiquée, grâce à la vaccination" },
           { text: "La gouvernance sanitaire mondiale reste structurellement insuffisante : l'OMS n'a aucun pouvoir coercitif sur les États membres" },
@@ -282,10 +282,10 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
     ],
     sources: [
-        { title: "Historical Pandemics — Timeline and Data", outlet: "Our World in Data", url: "https://ourworldindata.org/historical-pandemics" },
+        { title: "Historical Pandemics · Timeline and Data", outlet: "Our World in Data", url: "https://ourworldindata.org/historical-pandemics" },
         { title: "Plagues and Peoples", outlet: "William H. McNeill, Anchor Books", year: "1976" },
         { title: "Epidemics and Society: From the Black Death to the Present", outlet: "Frank Snowden, Yale University Press", year: "2019" },
-        { title: "WHO — Disease Outbreak News Archive", outlet: "OMS / WHO", url: "https://www.who.int/csr/don/en/" },
+        { title: "WHO · Disease Outbreak News Archive", outlet: "OMS / WHO", url: "https://www.who.int/csr/don/en/" },
         { title: "Cambridge World History of Human Disease", outlet: "Cambridge University Press", year: "1993" },
     ],
   },
@@ -293,7 +293,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
     slug: "covid-mondialisation-90-jours",
     title: "COVID-19 et mondialisation : comment le virus a fait le tour du monde en 90 jours",
     excerpt:
-      "Identifié à Wuhan en décembre 2019, le SARS-CoV-2 atteignait 114 pays le 11 mars 2020 — date de la déclaration de pandémie par l'OMS. Une propagation sans précédent dans l'histoire humaine.",
+      "Identifié à Wuhan en décembre 2019, le SARS-CoV-2 atteignait 114 pays le 11 mars 2020, date de la déclaration de pandémie par l'OMS. Une propagation sans précédent dans l'histoire humaine.",
     theme: "epidemics",
     publishedAt: "2025-02-10",
     readingTime: 9,
@@ -304,20 +304,20 @@ export const EPIDEMICS_ARTICLES: Article[] = [
     body: [
       {
         type: "lead",
-        content: "Le 31 décembre 2019, les autorités chinoises informaient l'OMS d'une série de cas de pneumonies d'origine inconnue à Wuhan, Hubei. Soixante-douze jours plus tard, le 11 mars 2020, l'OMS déclarait l'état de pandémie mondiale — 114 pays touchés, plus de 118 000 cas confirmés, 4 291 décès. Jamais dans l'histoire de l'humanité moderne, un agent pathogène n'avait traversé la planète aussi vite.",
+        content: "Le 31 décembre 2019, les autorités chinoises informaient l'OMS d'une série de cas de pneumonies d'origine inconnue à Wuhan, Hubei. Soixante-douze jours plus tard, le 11 mars 2020, l'OMS déclarait l'état de pandémie mondiale, 114 pays touchés, plus de 118 000 cas confirmés, 4 291 décès. Jamais dans l'histoire de l'humanité moderne, un agent pathogène n'avait traversé la planète aussi vite.",
       },
       {
         type: "stats",
         items: [
-          { value: "90 jours", label: "De Wuhan au monde entier", note: "Décembre 2019 — mars 2020" },
+          { value: "90 jours", label: "De Wuhan au monde entier", note: "Décembre 2019 · mars 2020" },
           { value: "7M+", label: "Décès officiels OMS", note: "Cumul jusqu'en 2024" },
           { value: "774M", label: "Cas confirmés cumulés", note: "Chiffre OMS début 2024" },
-          { value: "12 500 Md€", label: "Coût économique mondial", note: "FMI estimation 2020–2023" },
+          { value: "12 500 Md€", label: "Coût économique mondial", note: "FMI estimation 2020-2023" },
         ],
       },
       {
         type: "chart",
-        title: "Pays les plus touchés par COVID-19 — décès cumulés (en milliers)",
+        title: "Pays les plus touchés par COVID-19 · décès cumulés (en milliers)",
         subtitle: "Données officielles OMS, cumul à fin 2023",
         unit: "milliers de décès",
         bars: [
@@ -335,7 +335,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "map-highlight",
-        title: "Propagation du COVID-19 — bilan des vagues successives",
+        title: "Propagation du COVID-19 · bilan des vagues successives",
         subtitle: "Impact cumulé par région, décès pour 100 000 habitants",
         countries: {
           "United States": { color: "#dc2626", label: "338 décès/100k" },
@@ -378,15 +378,15 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       {
         type: "text",
         heading: "Comment la mondialisation a amplifié la vitesse de propagation",
-        content: "En 2019, 4,5 milliards de passagers aériens ont voyagé dans le monde — contre 310 millions en 1970. Cette densité de connectivité globale est la raison pour laquelle le SARS-CoV-2 a touché tous les continents en trois mois. Les modèles épidémiologiques ont montré que même une réduction de 50% du trafic aérien n'aurait fait que ralentir la propagation de 2 à 3 semaines, sans l'empêcher. La pandémie de COVID-19 n'est pas un accident de la mondialisation — c'en est la conséquence structurelle.",
+        content: "En 2019, 4,5 milliards de passagers aériens ont voyagé dans le monde, contre 310 millions en 1970. Cette densité de connectivité globale est la raison pour laquelle le SARS-CoV-2 a touché tous les continents en trois mois. Les modèles épidémiologiques ont montré que même une réduction de 50% du trafic aérien n'aurait fait que ralentir la propagation de 2 à 3 semaines, sans l'empêcher. La pandémie de COVID-19 n'est pas un accident de la mondialisation, c'en est la conséquence structurelle.",
       },
       {
         type: "timeline",
-        title: "Chronologie des 90 jours — de Wuhan à la pandémie mondiale",
+        title: "Chronologie des 90 jours · de Wuhan à la pandémie mondiale",
         items: [
-          { date: "31 déc. 2019", title: "Alerte OMS — Wuhan", description: "Les autorités chinoises notifient l'OMS d'un cluster de pneumonies d'étiologie inconnue dans la ville de Wuhan, province du Hubei." },
+          { date: "31 déc. 2019", title: "Alerte OMS · Wuhan", description: "Les autorités chinoises notifient l'OMS d'un cluster de pneumonies d'étiologie inconnue dans la ville de Wuhan, province du Hubei." },
           { date: "7 jan. 2020", title: "Identification du SARS-CoV-2", description: "Les chercheurs chinois identifient un nouveau coronavirus. Son génome est séquencé et partagé avec l'OMS le 11 janvier." },
-          { date: "22 jan. 2020", title: "Confinement de Wuhan", description: "La Chine confine 11 millions d'habitants à Wuhan — mesure sans précédent dans l'histoire moderne." },
+          { date: "22 jan. 2020", title: "Confinement de Wuhan", description: "La Chine confine 11 millions d'habitants à Wuhan · mesure sans précédent dans l'histoire moderne." },
           { date: "30 jan. 2020", title: "Urgence de santé publique (OMS)", description: "L'OMS déclare une urgence de santé publique de portée internationale. Le virus est déjà présent dans 18 pays." },
           { date: "21 fév. 2020", title: "Explosion en Italie et Iran", description: "La Lombardie devient le premier foyer européen majeur. L'Iran signale 18 décès en 48 heures." },
           { date: "11 mars 2020", title: "Déclaration de pandémie", description: "L'OMS déclare officiellement la pandémie mondiale. 114 pays touchés, 118 000 cas, 4 291 décès." },
@@ -394,7 +394,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "comparison-table",
-        title: "Stratégies nationales face à COVID-19 — résultats comparés",
+        title: "Stratégies nationales face à COVID-19 · résultats comparés",
         headers: ["Pays", "Stratégie initiale", "Confinement", "Vaccinat. (%)", "Décès/100k"],
         rows: [
           { label: "Nouvelle-Zélande", flag: "nz", cells: ["Élimination (zéro COVID)", "Strict, court", "78%", "18"] },
@@ -412,17 +412,17 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         heading: "5 ruptures durables laissées par la pandémie",
         style: "bullet",
         items: [
-          { text: "Télétravail généralisé — 30% des postes en France encore partiellement en télétravail en 2024", note: "Avant-COVID : 3%" },
-          { text: "Accélération de la santé numérique — téléconsultation, dossier médical partagé, IA diagnostique" },
-          { text: "Souveraineté sanitaire — relocalisation de production de médicaments essentiels en Europe et aux États-Unis" },
-          { text: "Défiance institutionnelle accrue — confiance dans la parole scientifique et gouvernementale durablement fragilisée" },
-          { text: "Inflation structurelle — les programmes de relance massifs ont alimenté l'inflation 2022–2024" },
+          { text: "Télétravail généralisé · 30% des postes en France encore partiellement en télétravail en 2024", note: "Avant-COVID : 3%" },
+          { text: "Accélération de la santé numérique · téléconsultation, dossier médical partagé, IA diagnostique" },
+          { text: "Souveraineté sanitaire · relocalisation de production de médicaments essentiels en Europe et aux États-Unis" },
+          { text: "Défiance institutionnelle accrue · confiance dans la parole scientifique et gouvernementale durablement fragilisée" },
+          { text: "Inflation structurelle · les programmes de relance massifs ont alimenté l'inflation 2022-2024" },
         ],
       },
       {
         type: "highlight",
         content:
-          "Le COVID-19 n'a pas créé la mondialisation vulnérable — il a prouvé ce que les épidémiologistes répètent depuis les années 2000 : une pandémie mondiale via les réseaux aériens est inévitable. La question n'était pas 'si', mais 'quand'.",
+          "Le COVID-19 n'a pas créé la mondialisation vulnérable, il a prouvé ce que les épidémiologistes répètent depuis les années 2000 : une pandémie mondiale via les réseaux aériens est inévitable. La question n'était pas 'si', mais 'quand'.",
       },
       {
         type: "quote",
@@ -431,10 +431,10 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
     ],
     sources: [
-        { title: "WHO COVID-19 Dashboard — Epidemiological data 2020", outlet: "OMS / WHO", year: "2020", url: "https://covid19.who.int" },
-        { title: "COVID-19 — The First 100 Days Report", outlet: "Johns Hopkins Bloomberg School of Public Health", year: "2020" },
+        { title: "WHO COVID-19 Dashboard · Epidemiological data 2020", outlet: "OMS / WHO", year: "2020", url: "https://covid19.who.int" },
+        { title: "COVID-19 · The First 100 Days Report", outlet: "Johns Hopkins Bloomberg School of Public Health", year: "2020" },
         { title: "COVID-19 Data Explorer", outlet: "Our World in Data", url: "https://ourworldindata.org/covid-cases" },
-        { title: "SARS-CoV-2 phylogenetic analysis — early spread", outlet: "Nature Medicine", year: "2020" },
+        { title: "SARS-CoV-2 phylogenetic analysis · early spread", outlet: "Nature Medicine", year: "2020" },
         { title: "China's COVID response: timeline and data", outlet: "Reuters / WHO Mission Report", year: "2020" },
     ],
   },
@@ -453,13 +453,13 @@ export const EPIDEMICS_ARTICLES: Article[] = [
     body: [
       {
         type: "lead",
-        content: "En octobre 1347, douze navires génois amarrés au port de Messine (Sicile) introduisirent en Europe occidentale la mort noire. Les marins encore vivants étaient couverts de bubons purulents. En six ans, la Yersinia pestis devait tuer entre 75 et 200 millions de personnes dans le monde connu — réduisant la population européenne d'un tiers à la moitié.",
+        content: "En octobre 1347, douze navires génois amarrés au port de Messine (Sicile) introduisirent en Europe occidentale la mort noire. Les marins encore vivants étaient couverts de bubons purulents. En six ans, la Yersinia pestis devait tuer entre 75 et 200 millions de personnes dans le monde connu, réduisant la population européenne d'un tiers à la moitié.",
       },
       {
         type: "stats",
         items: [
-          { value: "75–200M", label: "Morts mondiaux estimés", note: "1347–1353" },
-          { value: "30–60%", label: "Population européenne tuée", note: "Selon les régions" },
+          { value: "75-200M", label: "Morts mondiaux estimés", note: "1347-1353" },
+          { value: "30-60%", label: "Population européenne tuée", note: "Selon les régions" },
           { value: "5 ans", label: "Durée de la première vague", note: "Propagation ouest-est" },
           { value: "150 ans", label: "Temps de reconstitution démo.", note: "Europe revient au niveau 1347" },
         ],
@@ -482,25 +482,25 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "map-highlight",
-        title: "Propagation de la Peste Noire en Europe (1347–1353)",
+        title: "Propagation de la Peste Noire en Europe (1347-1353)",
         subtitle: "Route de propagation suivant les axes commerciaux médiévaux",
         countries: {
-          "Italy": { color: "#dc2626", label: "1347 — Premier foyer européen" },
-          "France": { color: "#dc2626", label: "1348 — Marseille → Paris" },
-          "Spain": { color: "#ef4444", label: "1348 — Via Catalogne" },
-          "United Kingdom": { color: "#ef4444", label: "1348-49 — Via Bordeaux" },
+          "Italy": { color: "#dc2626", label: "1347 · Premier foyer européen" },
+          "France": { color: "#dc2626", label: "1348 · Marseille → Paris" },
+          "Spain": { color: "#ef4444", label: "1348 · Via Catalogne" },
+          "United Kingdom": { color: "#ef4444", label: "1348-49 · Via Bordeaux" },
           "Germany": { color: "#f97316", label: "1349-50" },
-          "Norway": { color: "#f97316", label: "1349 — Bateau fantôme" },
+          "Norway": { color: "#f97316", label: "1349 · Bateau fantôme" },
           "Sweden": { color: "#fbbf24", label: "1350" },
-          "Russia": { color: "#fbbf24", label: "1351 — Via Horde d'Or" },
-          "Poland": { color: "#10b981", label: "Impact limité — mesures préventives" },
+          "Russia": { color: "#fbbf24", label: "1351 · Via Horde d'Or" },
+          "Poland": { color: "#10b981", label: "Impact limité · mesures préventives" },
           "Hungary": { color: "#fbbf24", label: "1349-50" },
         },
         legend: [
-          { color: "#dc2626", label: "1347–1348 (vague initiale)" },
-          { color: "#ef4444", label: "1348–1349" },
-          { color: "#f97316", label: "1349–1350" },
-          { color: "#fbbf24", label: "1350–1352" },
+          { color: "#dc2626", label: "1347-1348 (vague initiale)" },
+          { color: "#ef4444", label: "1348-1349" },
+          { color: "#f97316", label: "1349-1350" },
+          { color: "#fbbf24", label: "1350-1352" },
           { color: "#10b981", label: "Impact limité" },
         ],
       },
@@ -508,11 +508,11 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         type: "carousel",
         title: "Pays les plus touchés par la Peste Noire",
         items: [
-          { name: "Italie", emoji: "🇮🇹", detail: "50–60% de mortalité", subdetail: "Florence perdit 60% de sa population. Les marchands italiens ont aussi involontairement facilité l'entrée du bacille par leurs réseaux commerciaux." },
+          { name: "Italie", emoji: "🇮🇹", detail: "50-60% de mortalité", subdetail: "Florence perdit 60% de sa population. Les marchands italiens ont aussi involontairement facilité l'entrée du bacille par leurs réseaux commerciaux." },
           { name: "France", emoji: "🇫🇷", detail: "~40% de mortalité", subdetail: "Paris et les grandes villes particulièrement touchées. Avignon, siège papal, subit une mortalité extrême." },
-          { name: "Angleterre", emoji: "🇬🇧", detail: "30–40% de mortalité", subdetail: "Arrivée en 1348. Villages entiers abandonnés. Raccourcissement dramatique de la main-d'œuvre rurale." },
+          { name: "Angleterre", emoji: "🇬🇧", detail: "30-40% de mortalité", subdetail: "Arrivée en 1348. Villages entiers abandonnés. Raccourcissement dramatique de la main-d'œuvre rurale." },
           { name: "Espagne", emoji: "🇪🇸", detail: "~30% de mortalité", subdetail: "Arrivée par la côte méditerranéenne. La Reconquête ralentie temporairement par le manque d'hommes." },
-          { name: "Allemagne", emoji: "🇩🇪", detail: "25–30% de mortalité", subdetail: "Pogroms contre les communautés juives accusées d'avoir empoisonné les puits — l'une des conséquences les plus tragiques." },
+          { name: "Allemagne", emoji: "🇩🇪", detail: "25-30% de mortalité", subdetail: "Pogroms contre les communautés juives accusées d'avoir empoisonné les puits · l'une des conséquences les plus tragiques." },
           { name: "Russie", emoji: "🇷🇺", detail: "Arrivée plus tardive (~1351)", subdetail: "Propagation via les routes commerciales de la Horde d'Or. Impact important mais moins documenté que pour l'Europe occidentale." },
         ],
       },
@@ -520,9 +520,9 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         type: "image-text",
         heading: "La Yersinia pestis : biologie d'une tueuse",
         content:
-          "La Yersinia pestis est une bactérie transmise par les puces du rat (Xenopsylla cheopis). Quand le rat meurt, ses puces cherchent d'autres hôtes — dont l'humain. La bactérie pénètre dans la lymphe et provoque un bubon aux aisselles, à l'aine ou au cou. Sans traitement antibiotique, la forme bubonique est mortelle dans 30 à 60% des cas. La forme pulmonaire, transmise directement par voie aérienne, est quasiment 100% mortelle sans traitement. En 1347, la médecine médiévale ne dispose d'aucun remède efficace — ni antibiotiques (découverts en 1928), ni même la notion de germe pathogène.",
+          "La Yersinia pestis est une bactérie transmise par les puces du rat (Xenopsylla cheopis). Quand le rat meurt, ses puces cherchent d'autres hôtes, dont l'humain. La bactérie pénètre dans la lymphe et provoque un bubon aux aisselles, à l'aine ou au cou. Sans traitement antibiotique, la forme bubonique est mortelle dans 30 à 60% des cas. La forme pulmonaire, transmise directement par voie aérienne, est quasiment 100% mortelle sans traitement. En 1347, la médecine médiévale ne dispose d'aucun remède efficace, ni antibiotiques (découverts en 1928), ni même la notion de germe pathogène.",
         imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Plague_-bubonic_plague.jpg/800px-Plague_-bubonic_plague.jpg",
-        imageAlt: "Bubon pesteux — ganglion lymphatique inflammatoire caractéristique de la peste bubonique",
+        imageAlt: "Bubon pesteux · ganglion lymphatique inflammatoire caractéristique de la peste bubonique",
         flip: false,
       },
       {
@@ -543,9 +543,9 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         items: [
           { date: "1346", title: "Siège de Caffa (Crimée)", description: "Les Mongols de la Horde d'Or catapultent des cadavres pesteux dans la forteresse génoise de Caffa. Premier exemple documenté de guerre bactériologique." },
           { date: "Oct. 1347", title: "Arrivée à Messine", description: "Douze navires génois en provenance de Crimée accostent à Messine, Sicile. Marins mourants couverts de bubons noirs." },
-          { date: "1348", title: "Propagation en Europe occidentale", description: "Marseille, Venise, Florence, Paris sont dévastées. Le pape Clément VI publie une bulle exonérant les Juifs — ignorée en Allemagne." },
-          { date: "1349", title: "Angleterre, Scandinavie", description: "La Peste arrive en Angleterre. En Norvège, un bateau fantôme s'échoue — tout l'équipage mort." },
-          { date: "1350–1353", title: "Europe de l'Est et Russie", description: "Pologne relativement épargnée grâce à des mesures sanitaires de Casimir III. Russie touchée via la Horde d'Or." },
+          { date: "1348", title: "Propagation en Europe occidentale", description: "Marseille, Venise, Florence, Paris sont dévastées. Le pape Clément VI publie une bulle exonérant les Juifs, ignorée en Allemagne." },
+          { date: "1349", title: "Angleterre, Scandinavie", description: "La Peste arrive en Angleterre. En Norvège, un bateau fantôme s'échoue, tout l'équipage mort." },
+          { date: "1350-1353", title: "Europe de l'Est et Russie", description: "Pologne relativement épargnée grâce à des mesures sanitaires de Casimir III. Russie touchée via la Horde d'Or." },
           { date: "1353", title: "Fin de la première vague", description: "La mortalité s'atténue. Mais la Yersinia pestis restera endémique en Europe pendant 400 ans (dernière grande épidémie : Marseille, 1720)." },
         ],
       },
@@ -554,8 +554,8 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         heading: "Héritages inattendus de la Peste Noire",
         style: "bullet",
         items: [
-          { text: "Invention de la quarantaine : Venise impose 40 jours d'isolement aux navires (1377) — toujours appliqué sous ce nom", note: "quarantina giorni en italien" },
-          { text: "Hausse des salaires agricoles : la pénurie de main-d'œuvre force les propriétaires à payer davantage — début de la fin du servage en Europe occidentale" },
+          { text: "Invention de la quarantaine : Venise impose 40 jours d'isolement aux navires (1377) · toujours appliqué sous ce nom", note: "quarantina giorni en italien" },
+          { text: "Hausse des salaires agricoles : la pénurie de main-d'œuvre force les propriétaires à payer davantage · début de la fin du servage en Europe occidentale" },
           { text: "Accélération de la Renaissance : la remise en question de l'Église et la valorisation de la vie terrestre ont nourri l'humanisme renaissant" },
           { text: "Développement de la médecine légale : besoin de comprendre les causes de mort a poussé les premières autopsies systématiques" },
           { text: "Naissance des archives d'état civil : pour suivre les décès, les villes créent les premiers registres de naissances et décès" },
@@ -564,20 +564,20 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       {
         type: "highlight",
         content:
-          "La Peste Noire a tué en 5 ans ce que la Première Guerre mondiale a tué en 4 ans. Mais contrairement à la guerre, elle n'a pas choisi ses victimes selon leur âge ou leur sexe — elle a décimé papes et paysans, nobles et vilains, avec une indifférence absolue.",
+          "La Peste Noire a tué en 5 ans ce que la Première Guerre mondiale a tué en 4 ans. Mais contrairement à la guerre, elle n'a pas choisi ses victimes selon leur âge ou leur sexe, elle a décimé papes et paysans, nobles et vilains, avec une indifférence absolue.",
       },
       {
         type: "quote",
         text: "Si mourir était horrible, voir mourir l'était encore plus. Et si voir mourir était horrible, vivre avec les morts l'était plus encore.",
-        source: "Giovanni Boccace, Décaméron, 1353 — récit de la Peste de Florence",
+        source: "Giovanni Boccace, Décaméron, 1353 · récit de la Peste de Florence",
       },
     ],
     sources: [
         { title: "The Black Death", outlet: "Philip Ziegler, Collins", year: "1969" },
         { title: "The Great Mortality: An Intimate History of the Black Death", outlet: "John Kelly, HarperCollins", year: "2005" },
-        { title: "Historical mortality estimates — European Black Death", outlet: "Our World in Data / J.-N. Biraben", url: "https://ourworldindata.org/historical-pandemics" },
+        { title: "Historical mortality estimates · European Black Death", outlet: "Our World in Data / J.-N. Biraben", url: "https://ourworldindata.org/historical-pandemics" },
         { title: "Ancient Yersinia pestis genomics and the Black Death", outlet: "Nature Communications", year: "2022" },
-        { title: "The Cambridge World History of Human Disease — Plague", outlet: "Cambridge University Press", year: "1993" },
+        { title: "The Cambridge World History of Human Disease · Plague", outlet: "Cambridge University Press", year: "1993" },
     ],
   },
   {
@@ -591,7 +591,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
     tags: ["VIH", "SIDA", "Afrique", "Santé mondiale", "ONUSIDA"],
     featured: false,
     heroImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/HIV-budding-Color.jpg/1280px-HIV-budding-Color.jpg",
-    heroCaption: "Virus VIH (en vert) bourgeonnant d'un lymphocyte T humain (en bleu) — microscopie électronique colorisée (CDC).",
+    heroCaption: "Virus VIH (en vert) bourgeonnant d'un lymphocyte T humain (en bleu) · microscopie électronique colorisée (CDC).",
     body: [
       {
         type: "lead",
@@ -608,7 +608,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "chart",
-        title: "Prévalence VIH — adultes de 15 à 49 ans (% de la population)",
+        title: "Prévalence VIH · adultes de 15 à 49 ans (% de la population)",
         subtitle: "Données ONUSIDA 2023",
         unit: "% prévalence adultes",
         bars: [
@@ -626,10 +626,10 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "map-highlight",
-        title: "Prévalence VIH mondiale — adultes 15-49 ans",
+        title: "Prévalence VIH mondiale · adultes 15-49 ans",
         subtitle: "Concentration sans précédent en Afrique australe et orientale",
         countries: {
-          "Eswatini": { color: "#7f1d1d", label: "26% — record mondial" },
+          "Eswatini": { color: "#7f1d1d", label: "26% · record mondial" },
           "Lesotho": { color: "#7f1d1d", label: "21,1%" },
           "Botswana": { color: "#dc2626", label: "20,8%" },
           "South Africa": { color: "#dc2626", label: "13,7% · 8,2M personnes" },
@@ -645,9 +645,9 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         },
         legend: [
           { color: "#7f1d1d", label: ">20% prévalence" },
-          { color: "#dc2626", label: "10–20%" },
-          { color: "#f97316", label: "5–10%" },
-          { color: "#fbbf24", label: "1–5%" },
+          { color: "#dc2626", label: "10-20%" },
+          { color: "#f97316", label: "5-10%" },
+          { color: "#fbbf24", label: "1-5%" },
           { color: "#d1fae5", label: "<1%" },
         ],
       },
@@ -655,7 +655,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         type: "text",
         heading: "Pourquoi l'Afrique subsaharienne concentre-t-elle 67% des cas ?",
         content:
-          "La réponse est multifactorielle. D'abord, l'Afrique subsaharienne est le berceau évolutif du VIH-1 (origine en République démocratique du Congo, années 1920-1950) — l'épidémie s'est développée silencieusement pendant des décennies avant d'être identifiée. Ensuite, les conditions socioéconomiques jouent un rôle central : pauvreté, migrations liées au travail minier, inégalités de genre (les femmes représentent 63% des nouvelles infections), et stigmatisation sociale qui retarde le dépistage. Enfin, l'accès aux antirétroviraux, bien qu'amélioré depuis les accords de Doha (2001), reste inégal.",
+          "La réponse est multifactorielle. D'abord, l'Afrique subsaharienne est le berceau évolutif du VIH-1 (origine en République démocratique du Congo, années 1920-1950), l'épidémie s'est développée silencieusement pendant des décennies avant d'être identifiée. Ensuite, les conditions socioéconomiques jouent un rôle central : pauvreté, migrations liées au travail minier, inégalités de genre (les femmes représentent 63% des nouvelles infections), et stigmatisation sociale qui retarde le dépistage. Enfin, l'accès aux antirétroviraux, bien qu'amélioré depuis les accords de Doha (2001), reste inégal.",
       },
       {
         type: "carousel",
@@ -671,7 +671,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "comparison-table",
-        title: "VIH/SIDA en chiffres — comparaison régionale mondiale",
+        title: "VIH/SIDA en chiffres · comparaison régionale mondiale",
         headers: ["Région", "Personnes VIH+", "Nouvelles infect./an", "Décès/an", "Couverture ARV"],
         rows: [
           { label: "Afrique subsah.", cells: ["25,6M (67%)", "660 000", "380 000", "77%"] },
@@ -684,13 +684,13 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "timeline",
-        title: "40 ans de lutte contre le VIH/SIDA — jalons majeurs",
+        title: "40 ans de lutte contre le VIH/SIDA · jalons majeurs",
         items: [
           { date: "1981", title: "Premiers cas identifiés aux USA", description: "Les CDC décrivent un déficit immunitaire inexpliqué chez des jeunes homosexuels à San Francisco et New York." },
           { date: "1983", title: "Découverte du virus", description: "L'équipe de Luc Montagnier (Institut Pasteur) isole le virus, nommé LAV puis VIH. Prix Nobel 2008." },
-          { date: "1987", title: "Premier médicament — AZT", description: "La zidovudine (AZT) est approuvée par la FDA. Premier antirétroviral. Efficace mais très toxique seul." },
-          { date: "1996", title: "Trithérapie — révolution thérapeutique", description: "La combinaison de 3 antiviraux (ARV) transforme le SIDA en maladie chronique dans les pays riches. Espérance de vie proche de la normale." },
-          { date: "2001", title: "Accords de Doha — accès universel", description: "L'OMC permet aux pays en développement de produire des génériques ARV. Prix divisés par 100." },
+          { date: "1987", title: "Premier médicament · AZT", description: "La zidovudine (AZT) est approuvée par la FDA. Premier antirétroviral. Efficace mais très toxique seul." },
+          { date: "1996", title: "Trithérapie · révolution thérapeutique", description: "La combinaison de 3 antiviraux (ARV) transforme le SIDA en maladie chronique dans les pays riches. Espérance de vie proche de la normale." },
+          { date: "2001", title: "Accords de Doha · accès universel", description: "L'OMC permet aux pays en développement de produire des génériques ARV. Prix divisés par 100." },
           { date: "2012", title: "PrEP approuvée aux USA", description: "La FDA approuve le Truvada en prévention. Prise quotidienne réduit la transmission de 99%." },
         ],
       },
@@ -700,7 +700,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         content:
           "En Afrique subsaharienne, 63% des nouvelles infections en 2022 concernaient des femmes et des adolescentes. Les raisons sont structurelles : rapports de pouvoir inégaux limitant la négociation du préservatif, mariages précoces, violence sexuelle, dépendance économique. Les jeunes femmes de 15 à 24 ans ont un risque d'infection 3 fois supérieur à leurs homologues masculins. La PrEP représente un outil d'autonomisation majeur pour ce groupe, mais son accès reste limité par les coûts et la stigmatisation.",
         imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Red_Ribbon.svg/800px-Red_Ribbon.svg.png",
-        imageAlt: "Ruban rouge — symbole mondial de la lutte contre le SIDA",
+        imageAlt: "Ruban rouge · symbole mondial de la lutte contre le SIDA",
         flip: true,
       },
       {
@@ -710,8 +710,8 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         items: [
           { text: "Atteindre l'objectif 95-95-95 : 95% des porteurs diagnostiqués, 95% des diagnostiqués sous traitement, 95% avec charge virale indétectable" },
           { text: "Combler les inégalités d'accès aux ARV entre pays riches (88%) et Afrique subsaharienne (77%) et Asie centrale (51%)" },
-          { text: "Développer un vaccin préventif — 40 ans de recherche, aucun candidat en phase 3 n'a atteint l'efficacité requise" },
-          { text: "Lutter contre la stigmatisation qui retarde le dépistage — 26% des porteurs ne connaissent pas leur statut en Afrique subsaharienne" },
+          { text: "Développer un vaccin préventif · 40 ans de recherche, aucun candidat en phase 3 n'a atteint l'efficacité requise" },
+          { text: "Lutter contre la stigmatisation qui retarde le dépistage · 26% des porteurs ne connaissent pas leur statut en Afrique subsaharienne" },
           { text: "Maintenir les financements internationaux (PEPFAR, Fonds mondial) malgré les pressions budgétaires dans les pays donateurs" },
         ],
       },
@@ -727,11 +727,11 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
     ],
     sources: [
-        { title: "Global AIDS Update 2024 — The Urgency of Now", outlet: "UNAIDS", year: "2024", url: "https://www.unaids.org/en/resources/documents/2024" },
+        { title: "Global AIDS Update 2024 · The Urgency of Now", outlet: "UNAIDS", year: "2024", url: "https://www.unaids.org/en/resources/documents/2024" },
         { title: "HIV/AIDS Data and Statistics", outlet: "OMS / WHO", url: "https://www.who.int/data/gho/data/themes/hiv-aids" },
-        { title: "HIV Data — Our World in Data", outlet: "Our World in Data / Global Burden of Disease", url: "https://ourworldindata.org/hiv-aids" },
-        { title: "UNAIDS Fact Sheet 2024 — Sub-Saharan Africa", outlet: "UNAIDS", year: "2024" },
-        { title: "The Lancet HIV — Antiretroviral therapy coverage Sub-Saharan Africa", outlet: "The Lancet HIV", year: "2023" },
+        { title: "HIV Data · Our World in Data", outlet: "Our World in Data / Global Burden of Disease", url: "https://ourworldindata.org/hiv-aids" },
+        { title: "UNAIDS Fact Sheet 2024 · Sub-Saharan Africa", outlet: "UNAIDS", year: "2024" },
+        { title: "The Lancet HIV · Antiretroviral therapy coverage Sub-Saharan Africa", outlet: "The Lancet HIV", year: "2023" },
     ],
   },
   {
@@ -747,13 +747,13 @@ export const EPIDEMICS_ARTICLES: Article[] = [
     body: [
       {
         type: "lead",
-        content: "L'hantavirus est l'une des maladies infectieuses les plus méconnues du grand public — et pourtant l'une des plus mortelles dans les régions où elle sévit. Contrairement à la grippe, au COVID-19 ou à la rougeole, il ne se transmet pas d'humain à humain. Il exige un intermédiaire : les rongeurs (mulots, campagnols, rats des champs) qui l'excrètent dans leurs urine, fèces et salive.",
+        content: "L'hantavirus est l'une des maladies infectieuses les plus méconnues du grand public, et pourtant l'une des plus mortelles dans les régions où elle sévit. Contrairement à la grippe, au COVID-19 ou à la rougeole, il ne se transmet pas d'humain à humain. Il exige un intermédiaire : les rongeurs (mulots, campagnols, rats des champs) qui l'excrètent dans leurs urine, fèces et salive.",
       },
       {
         type: "stats",
         items: [
           { value: "~35%", label: "Létalité SPH Amériques", note: "Syndrome pulmonaire" },
-          { value: "1–15%", label: "Létalité FHSR Eurasie", note: "Selon le variant" },
+          { value: "1-15%", label: "Létalité FHSR Eurasie", note: "Selon le variant" },
           { value: "20 000+", label: "Cas annuels mondiaux", note: "Estimation OMS / CDC" },
           { value: "1993", label: "Première identification SPH", note: "Sin Nombre, Four Corners (USA)" },
         ],
@@ -766,19 +766,19 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "chart",
-        title: "Cas d'hantavirus rapportés — principaux pays touchés (2015-2023)",
+        title: "Cas d'hantavirus rapportés · principaux pays touchés (2015-2023)",
         subtitle: "Données OMS / CDC / ECDC",
         unit: "cas documentés",
         bars: [
-          { label: "Chine", flag: "cn", value: 8500, color: "#dc2626", note: "FHSR — Hantaan/Seoul" },
-          { label: "Russie", flag: "ru", value: 5200, color: "#ef4444", note: "FHSR — Puumala/Hantaan" },
-          { label: "Allemagne", flag: "de", value: 2900, color: "#f97316", note: "FHSR — Puumala" },
-          { label: "Finlande", flag: "fi", value: 3100, color: "#f97316", note: "FHSR — Puumala (campagnols)" },
-          { label: "Suède", flag: "se", value: 1800, color: "#f97316", note: "FHSR — Puumala" },
-          { label: "États-Unis", flag: "us", value: 850, color: "#3b82f6", note: "SPH — Sin Nombre" },
-          { label: "Argentine", flag: "ar", value: 620, color: "#3b82f6", note: "SPH — Andes" },
-          { label: "Chili", flag: "cl", value: 480, color: "#3b82f6", note: "SPH — Andes" },
-          { label: "Brésil", flag: "br", value: 420, color: "#8b5cf6", note: "SPH — variants locaux" },
+          { label: "Chine", flag: "cn", value: 8500, color: "#dc2626", note: "FHSR · Hantaan/Seoul" },
+          { label: "Russie", flag: "ru", value: 5200, color: "#ef4444", note: "FHSR · Puumala/Hantaan" },
+          { label: "Allemagne", flag: "de", value: 2900, color: "#f97316", note: "FHSR · Puumala" },
+          { label: "Finlande", flag: "fi", value: 3100, color: "#f97316", note: "FHSR · Puumala (campagnols)" },
+          { label: "Suède", flag: "se", value: 1800, color: "#f97316", note: "FHSR · Puumala" },
+          { label: "États-Unis", flag: "us", value: 850, color: "#3b82f6", note: "SPH · Sin Nombre" },
+          { label: "Argentine", flag: "ar", value: 620, color: "#3b82f6", note: "SPH · Andes" },
+          { label: "Chili", flag: "cl", value: 480, color: "#3b82f6", note: "SPH · Andes" },
+          { label: "Brésil", flag: "br", value: 420, color: "#8b5cf6", note: "SPH · variants locaux" },
         ],
       },
       {
@@ -786,17 +786,17 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         title: "Distribution mondiale de l'hantavirus par syndrome",
         subtitle: "SPH (Amériques) vs FHSR (Eurasie) selon l'espèce de rongeur réservoir",
         countries: {
-          "United States": { color: "#dc2626", label: "SPH — Sin Nombre" },
-          "Argentina": { color: "#dc2626", label: "SPH — Andes (seul variant interhumain)" },
-          "Chile": { color: "#ef4444", label: "SPH — Andes" },
-          "Brazil": { color: "#ef4444", label: "SPH — variants locaux" },
-          "Canada": { color: "#f97316", label: "SPH — Sin Nombre (rare)" },
-          "Russia": { color: "#dc2626", label: "FHSR — Hantaan/Puumala" },
-          "China": { color: "#dc2626", label: "FHSR — Hantaan" },
-          "Finland": { color: "#f97316", label: "FHSR — Puumala (épidémies cycliques)" },
-          "Sweden": { color: "#f97316", label: "FHSR — Puumala" },
-          "Germany": { color: "#f97316", label: "FHSR — Puumala" },
-          "South Korea": { color: "#fbbf24", label: "FHSR — Seoul/Hantaan" },
+          "United States": { color: "#dc2626", label: "SPH · Sin Nombre" },
+          "Argentina": { color: "#dc2626", label: "SPH · Andes (seul variant interhumain)" },
+          "Chile": { color: "#ef4444", label: "SPH · Andes" },
+          "Brazil": { color: "#ef4444", label: "SPH · variants locaux" },
+          "Canada": { color: "#f97316", label: "SPH · Sin Nombre (rare)" },
+          "Russia": { color: "#dc2626", label: "FHSR · Hantaan/Puumala" },
+          "China": { color: "#dc2626", label: "FHSR · Hantaan" },
+          "Finland": { color: "#f97316", label: "FHSR · Puumala (épidémies cycliques)" },
+          "Sweden": { color: "#f97316", label: "FHSR · Puumala" },
+          "Germany": { color: "#f97316", label: "FHSR · Puumala" },
+          "South Korea": { color: "#fbbf24", label: "FHSR · Seoul/Hantaan" },
         },
         legend: [
           { color: "#dc2626", label: "Zone d'endémie forte" },
@@ -811,27 +811,27 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         content:
           "La transmission se fait principalement par inhalation d'aérosols contaminés par les excréments de rongeurs infectés. Les activités à risque comprennent : le nettoyage de greniers, caves ou hangars infestés de rongeurs ; les travaux agricoles au contact de foin ou de céréales stockées ; le camping ou la randonnée en zones à forte densité de rongeurs. Le virus survit plusieurs jours à l'extérieur de son hôte dans des conditions fraîches et humides. La prévention repose sur des équipements de protection (masques FFP2 ou P3) lors des nettoyages à risque.",
         imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Peromyscus_maniculatus_deer_mouse.jpg/800px-Peromyscus_maniculatus_deer_mouse.jpg",
-        imageAlt: "Peromyscus maniculatus (souris sylvestre) — réservoir principal de Sin Nombre aux États-Unis",
+        imageAlt: "Peromyscus maniculatus (souris sylvestre) · réservoir principal de Sin Nombre aux États-Unis",
         flip: true,
       },
       {
         type: "comparison-table",
-        title: "SPH vs FHSR — deux syndromes, deux pronostics",
+        title: "SPH vs FHSR · deux syndromes, deux pronostics",
         headers: ["Critère", "SPH (Amériques)", "FHSR (Eurasie)"],
         rows: [
           { label: "Variant principal", cells: ["Sin Nombre (USA), Andes (Amér. Sud)", "Puumala (Europe), Hantaan (Asie)"] },
           { label: "Réservoir principal", cells: ["Souris sylvestre (Peromyscus)", "Campagnol roussâtre (Myodes glareolus)"] },
           { label: "Organe cible", cells: ["Poumons (détresse respiratoire)", "Reins (insuffisance rénale aiguë)"] },
-          { label: "Létalité", cells: ["35–40%", "0,1–15% selon variant"] },
+          { label: "Létalité", cells: ["35-40%", "0,1-15% selon variant"] },
           { label: "Traitement", cells: ["Soins intensifs, pas d'antiviral approuvé", "Soins supportifs, ribavirine (Hantaan)"] },
-          { label: "Transmission interhumaine", cells: ["Non (sauf Andes — cas rares)", "Non"] },
+          { label: "Transmission interhumaine", cells: ["Non (sauf Andes · cas rares)", "Non"] },
         ],
       },
       {
         type: "timeline",
         title: "Histoire de la découverte de l'hantavirus",
         items: [
-          { date: "1950-53", title: "Guerre de Corée — 3 000 soldats ONU malades", description: "Des milliers de soldats américains et alliés contractent une mystérieuse fièvre hémorragique avec atteinte rénale dans les rizières coréennes. Cause inconnue." },
+          { date: "1950-53", title: "Guerre de Corée · 3 000 soldats ONU malades", description: "Des milliers de soldats américains et alliés contractent une mystérieuse fièvre hémorragique avec atteinte rénale dans les rizières coréennes. Cause inconnue." },
           { date: "1976", title: "Isolement du virus Hantaan", description: "Le Dr Ho Wang Lee isole le virus dans les poumons de rongeurs Apodemus agrarius près de la rivière Hantan (Corée du Sud)." },
           { date: "1993", title: "Épidémie Four Corners (USA)", description: "Cluster mortel dans la région Four Corners. 10 décès inexpliqués. CDC identifie un nouveau hantavirus : Sin Nombre." },
           { date: "1995-96", title: "Épidémie Andes (Patagonie)", description: "Premiers cas de transmission interhumaine documentés avec le variant Andes en Argentine et au Chili. Exception unique." },
@@ -840,12 +840,12 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "list",
-        heading: "Gestes de prévention — populations à risque",
+        heading: "Gestes de prévention · populations à risque",
         style: "check",
         items: [
           { text: "Porter un masque FFP2/FFP3 (non chirurgical) lors du nettoyage de greniers, caves ou remises non utilisées" },
           { text: "Humidifier les zones poussiéreuses avant nettoyage pour éviter la mise en suspension des aérosols" },
-          { text: "Éviter de balayer à sec — aspirer ou nettoyer à l'eau les zones potentiellement contaminées" },
+          { text: "Éviter de balayer à sec · aspirer ou nettoyer à l'eau les zones potentiellement contaminées" },
           { text: "Protéger les stocks alimentaires contre les rongeurs (containers hermétiques)" },
           { text: "Consulter un médecin immédiatement en cas de fièvre élevée après exposition potentielle", note: "Pronostic meilleur si prise en charge précoce" },
         ],
@@ -853,7 +853,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       {
         type: "highlight",
         content:
-          "L'hantavirus illustre parfaitement le concept de 'spillover' : un agent pathogène qui circule silencieusement dans les populations animales depuis des millénaires et qui devient dangereux uniquement quand les activités humaines créent des ponts avec ces réservoirs — déforestation, expansion agricole, urbanisation.",
+          "L'hantavirus illustre parfaitement le concept de 'spillover' : un agent pathogène qui circule silencieusement dans les populations animales depuis des millénaires et qui devient dangereux uniquement quand les activités humaines créent des ponts avec ces réservoirs · déforestation, expansion agricole, urbanisation.",
       },
       {
         type: "quote",
@@ -862,11 +862,11 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
     ],
     sources: [
-        { title: "Hantavirus — Epidemiology and Factsheet", outlet: "CDC", url: "https://www.cdc.gov/hantavirus/" },
-        { title: "Hantavirus in the Americas — PAHO Surveillance", outlet: "PAHO / OPS", url: "https://www.paho.org/en/topics/hantavirus" },
-        { title: "Hantavirus Disease — Global Surveillance", outlet: "ECDC", url: "https://www.ecdc.europa.eu/en/hantavirus-infection" },
+        { title: "Hantavirus · Epidemiology and Factsheet", outlet: "CDC", url: "https://www.cdc.gov/hantavirus/" },
+        { title: "Hantavirus in the Americas · PAHO Surveillance", outlet: "PAHO / OPS", url: "https://www.paho.org/en/topics/hantavirus" },
+        { title: "Hantavirus Disease · Global Surveillance", outlet: "ECDC", url: "https://www.ecdc.europa.eu/en/hantavirus-infection" },
         { title: "OMS Hantavirus Disease Fact Sheet", outlet: "OMS / WHO", url: "https://www.who.int/news-room/fact-sheets/detail/hantavirus-disease" },
-        { title: "Sin Nombre Virus: The Four Corners Outbreak — NEJM", outlet: "New England Journal of Medicine", year: "1994" },
+        { title: "Sin Nombre Virus: The Four Corners Outbreak · NEJM", outlet: "New England Journal of Medicine", year: "1994" },
     ],
   },
   {
@@ -884,7 +884,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
     body: [
       {
         type: "lead",
-        content: "La pandémie de COVID-19 a mis à nu la fragilité de la gouvernance sanitaire mondiale. Derrière les discours de solidarité internationale, la réalité a été celle de la compétition : pour les masques, les respirateurs, les vaccins. Le \"nationalisme vaccinal\" des pays riches — qui ont pré-acheté plusieurs fois leur dotation — a retardé la protection des populations vulnérables et facilité l'émergence de variants.",
+        content: "La pandémie de COVID-19 a mis à nu la fragilité de la gouvernance sanitaire mondiale. Derrière les discours de solidarité internationale, la réalité a été celle de la compétition : pour les masques, les respirateurs, les vaccins. Le \"nationalisme vaccinal\" des pays riches, qui ont pré-acheté plusieurs fois leur dotation, a retardé la protection des populations vulnérables et facilité l'émergence de variants.",
       },
       {
         type: "stats",
@@ -897,7 +897,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "chart",
-        title: "Doses COVID-19 administrées pour 100 habitants — fin 2021",
+        title: "Doses COVID-19 administrées pour 100 habitants · fin 2021",
         subtitle: "Illustration du nationalisme vaccinal mondial",
         unit: "doses / 100 habitants",
         bars: [
@@ -915,7 +915,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "map-highlight",
-        title: "Couverture vaccinale COVID-19 mondiale — fin 2021",
+        title: "Couverture vaccinale COVID-19 mondiale · fin 2021",
         subtitle: "Les fractures géopolitiques de la distribution vaccinale",
         countries: {
           "United States": { color: "#10b981", label: "75% vaccinés" },
@@ -936,8 +936,8 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         },
         legend: [
           { color: "#10b981", label: ">70% vaccinés" },
-          { color: "#fbbf24", label: "40–70%" },
-          { color: "#f97316", label: "20–40%" },
+          { color: "#fbbf24", label: "40-70%" },
+          { color: "#f97316", label: "20-40%" },
           { color: "#dc2626", label: "<10%" },
         ],
       },
@@ -945,11 +945,11 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         type: "text",
         heading: "La diplomatie vaccinale comme nouvel outil géopolitique",
         content:
-          "La pandémie a créé un nouveau terrain d'influence : la diplomatie vaccinale. La Chine a distribué Sinovac à plus de 100 pays, souvent assortie de conditions politiques implicites. La Russie a promu son Spoutnik V comme vitrine technologique. Les États-Unis, sous Biden, ont déployé des dons de vaccins (500 millions de doses Pfizer) comme réponse directe à l'influence chinoise. L'Europe a tardé, puis distribué via le mécanisme COVAX — critiqué pour sa lenteur et ses défaillances. Cette géopolitique vaccinale préfigure les batailles futures pour le contrôle des antibiotiques, des thérapies géniques et des ARNm.",
+          "La pandémie a créé un nouveau terrain d'influence : la diplomatie vaccinale. La Chine a distribué Sinovac à plus de 100 pays, souvent assortie de conditions politiques implicites. La Russie a promu son Spoutnik V comme vitrine technologique. Les États-Unis, sous Biden, ont déployé des dons de vaccins (500 millions de doses Pfizer) comme réponse directe à l'influence chinoise. L'Europe a tardé, puis distribué via le mécanisme COVAX, critiqué pour sa lenteur et ses défaillances. Cette géopolitique vaccinale préfigure les batailles futures pour le contrôle des antibiotiques, des thérapies géniques et des ARNm.",
       },
       {
         type: "comparison-table",
-        title: "Organisations et initiatives sanitaires mondiales — comparaison des mandats",
+        title: "Organisations et initiatives sanitaires mondiales · comparaison des mandats",
         headers: ["Organisation", "Budget annuel", "Pouvoir coercitif", "Rôle COVID-19", "Limites"],
         rows: [
           { label: "OMS", cells: ["~2 Mds $", "Aucun", "Coordination, guidelines", "Dépendante des États membres"] },
@@ -972,14 +972,14 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "timeline",
-        title: "Vers une gouvernance sanitaire mondiale — jalons et échecs",
+        title: "Vers une gouvernance sanitaire mondiale · jalons et échecs",
         items: [
           { date: "1948", title: "Création de l'OMS", description: "7 avril 1948 : l'OMS remplace l'Office International d'Hygiène Publique. Budget financé par cotisations des États membres." },
-          { date: "2003", title: "SRAS — révélateur des lacunes", description: "La dissimulation chinoise du SRAS révèle l'impossibilité pour l'OMS d'imposer une transparence aux États. Réforme du RSI engagée." },
+          { date: "2003", title: "SRAS · révélateur des lacunes", description: "La dissimulation chinoise du SRAS révèle l'impossibilité pour l'OMS d'imposer une transparence aux États. Réforme du RSI engagée." },
           { date: "2005", title: "Nouveau Règlement Sanitaire International", description: "Le RSI 2005 oblige les États à notifier les urgences sanitaires et à renforcer leurs capacités de surveillance. Mais aucune sanction possible." },
-          { date: "2016", title: "Rapport Ebola — faillite systémique", description: "La commission d'enquête post-Ebola juge la réponse 'profondément inadéquate' et propose un Fonds d'urgence OMS. Partiellement créé." },
+          { date: "2016", title: "Rapport Ebola · faillite systémique", description: "La commission d'enquête post-Ebola juge la réponse 'profondément inadéquate' et propose un Fonds d'urgence OMS. Partiellement créé." },
           { date: "2021", title: "Traité pandémique en négociation", description: "Après COVID-19, 194 États négocient un Traité Pandémique contraignant. Enjeux : partage des données, production vaccinale, pouvoirs OMS." },
-          { date: "2024", title: "Accord de pandémie — impasse", description: "Les négociations achoppent sur le partage des bénéfices des vaccins et les pouvoirs de l'OMS. Accord minimal adopté, jugé insuffisant par les ONG." },
+          { date: "2024", title: "Accord de pandémie · impasse", description: "Les négociations achoppent sur le partage des bénéfices des vaccins et les pouvoirs de l'OMS. Accord minimal adopté, jugé insuffisant par les ONG." },
         ],
       },
       {
@@ -1024,7 +1024,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
     tags: ["Vaccins", "COVID-19", "Inégalités", "COVAX", "Santé mondiale"],
     featured: false,
     heroImage: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/COVID-19_Moderna_Vaccine.jpg/1280px-COVID-19_Moderna_Vaccine.jpg",
-    heroCaption: "Flacons de vaccin Moderna COVID-19 — symbole des inégalités de distribution mondiale (CDC).",
+    heroCaption: "Flacons de vaccin Moderna COVID-19 · symbole des inégalités de distribution mondiale (CDC).",
     body: [
       {
         type: "lead",
@@ -1041,8 +1041,8 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "chart",
-        title: "Doses COVID-19 achetées vs population — ratio d'approvisionnement (fin 2021)",
-        subtitle: "Nombre de doses achetées pour 100 habitants — 'ratio d'accaparement'",
+        title: "Doses COVID-19 achetées vs population · ratio d'approvisionnement (fin 2021)",
+        subtitle: "Nombre de doses achetées pour 100 habitants · 'ratio d'accaparement'",
         unit: "doses achetées / 100 hab.",
         bars: [
           { label: "Canada", flag: "ca", value: 380, color: "#dc2626", note: "Pré-achat le plus élevé" },
@@ -1058,7 +1058,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "map-highlight",
-        title: "Taux de vaccination COVID-19 mondial — mi-2022",
+        title: "Taux de vaccination COVID-19 mondial · mi-2022",
         subtitle: "La fracture vaccinale Nord-Sud en chiffres",
         countries: {
           "Canada": { color: "#10b981", label: "88% vaccinés" },
@@ -1068,7 +1068,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
           "Germany": { color: "#10b981", label: "77% vaccinés" },
           "Australia": { color: "#10b981", label: "87% vaccinés" },
           "Japan": { color: "#10b981", label: "81% vaccinés" },
-          "China": { color: "#fbbf24", label: "90% (Sinovac — efficacité moindre)" },
+          "China": { color: "#fbbf24", label: "90% (Sinovac · efficacité moindre)" },
           "Brazil": { color: "#fbbf24", label: "80% (hétérogène)" },
           "India": { color: "#fbbf24", label: "67% (incertitude données)" },
           "Nigeria": { color: "#dc2626", label: "4% fin 2021" },
@@ -1080,8 +1080,8 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         },
         legend: [
           { color: "#10b981", label: ">70% vaccinés" },
-          { color: "#fbbf24", label: "50–70%" },
-          { color: "#f97316", label: "20–50%" },
+          { color: "#fbbf24", label: "50-70%" },
+          { color: "#f97316", label: "20-50%" },
           { color: "#dc2626", label: "<10%" },
         ],
       },
@@ -1096,10 +1096,10 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         title: "Coût et accès aux vaccins COVID selon les pays",
         headers: ["Vaccin", "Coût/dose pays riches", "Coût/dose COVAX", "Stockage", "Disponibilité PED"],
         rows: [
-          { label: "Pfizer-BioNTech", cells: ["12–19 €", "6,75 €", "-70°C (complexe)", "Limitée (logistique)"] },
-          { label: "Moderna", cells: ["14–25 €", "9,90 €", "-20°C", "Limitée (prix)"] },
-          { label: "AstraZeneca", cells: ["2–3 €", "1,80 €", "+2/+8°C", "Principale via COVAX"] },
-          { label: "Johnson & Johnson", cells: ["8–10 €", "5,70 €", "+2/+8°C", "Bonne (1 dose)"] },
+          { label: "Pfizer-BioNTech", cells: ["12-19 €", "6,75 €", "-70°C (complexe)", "Limitée (logistique)"] },
+          { label: "Moderna", cells: ["14-25 €", "9,90 €", "-20°C", "Limitée (prix)"] },
+          { label: "AstraZeneca", cells: ["2-3 €", "1,80 €", "+2/+8°C", "Principale via COVAX"] },
+          { label: "Johnson & Johnson", cells: ["8-10 €", "5,70 €", "+2/+8°C", "Bonne (1 dose)"] },
           { label: "Sinovac (Chine)", cells: ["N/A", "Variable (bilatéral)", "+2/+8°C", "Via diplomatie chinoise"] },
           { label: "Spoutnik V (Russie)", cells: ["N/A", "10 $ (export)", "+2/+8°C", "Via diplomatie russe"] },
         ],
@@ -1109,29 +1109,29 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         title: "Les acteurs du nationalisme vaccinal et leurs motivations",
         items: [
           { name: "Union européenne", emoji: "🇪🇺", detail: "Pré-achat massif + litige AstraZeneca", subdetail: "L'UE a commandé 2,3 Mds de doses pour 450M habitants. Son litige avec AstraZeneca a retardé les livraisons mondialement." },
-          { name: "États-Unis", emoji: "🇺🇸", detail: "Defense Production Act — priorité absolue", subdetail: "Trump puis Biden ont utilisé la DPA pour interdire les exportations depuis les usines américaines." },
-          { name: "Inde (Serum Institute)", emoji: "🇮🇳", detail: "Exportations stoppées mai 2021", subdetail: "Face à la vague Delta catastrophique, Modi interdit les exportations du principal fabricant mondial — paralysant COVAX." },
-          { name: "Royaume-Uni", emoji: "🇬🇧", detail: "Avantage Brexit — approvisionnement prioritaire", subdetail: "Hors UE, le RU a pu signer des contrats préférentiels avec Pfizer et AstraZeneca, devenant pionnier de la vaccination." },
-          { name: "Chine", emoji: "🇨🇳", detail: "Diplomatie Sinovac — 100 pays livrés", subdetail: "La Chine a livré Sinovac à 100+ pays, souvent moins chers mais moins efficaces (55% contre le Delta)." },
+          { name: "États-Unis", emoji: "🇺🇸", detail: "Defense Production Act · priorité absolue", subdetail: "Trump puis Biden ont utilisé la DPA pour interdire les exportations depuis les usines américaines." },
+          { name: "Inde (Serum Institute)", emoji: "🇮🇳", detail: "Exportations stoppées mai 2021", subdetail: "Face à la vague Delta catastrophique, Modi interdit les exportations du principal fabricant mondial · paralysant COVAX." },
+          { name: "Royaume-Uni", emoji: "🇬🇧", detail: "Avantage Brexit · approvisionnement prioritaire", subdetail: "Hors UE, le RU a pu signer des contrats préférentiels avec Pfizer et AstraZeneca, devenant pionnier de la vaccination." },
+          { name: "Chine", emoji: "🇨🇳", detail: "Diplomatie Sinovac · 100 pays livrés", subdetail: "La Chine a livré Sinovac à 100+ pays, souvent moins chers mais moins efficaces (55% contre le Delta)." },
         ],
       },
       {
         type: "timeline",
-        title: "Les étapes de l'inégalité vaccinale mondiale — 2020-2023",
+        title: "Les étapes de l'inégalité vaccinale mondiale · 2020-2023",
         items: [
-          { date: "2020", title: "Accords de pré-achat — course sans règles", description: "Les pays riches signent des accords confidentiels avec Pfizer, Moderna et AstraZeneca. 4,2 Mds de doses pré-achetées par 10% de la population mondiale." },
-          { date: "Janv. 2021", title: "Lancement COVAX — objectif 2 Mds de doses", description: "COVAX annonce un objectif de 2 milliards de doses pour les 92 pays les plus pauvres. Les livraisons tardent." },
-          { date: "Mai 2021", title: "Inde bloque les exportations — COVAX paralysé", description: "La vague Delta dévaste l'Inde. Le Serum Institute est réquisitionné pour la production nationale. COVAX manque 700M de doses." },
+          { date: "2020", title: "Accords de pré-achat · course sans règles", description: "Les pays riches signent des accords confidentiels avec Pfizer, Moderna et AstraZeneca. 4,2 Mds de doses pré-achetées par 10% de la population mondiale." },
+          { date: "Janv. 2021", title: "Lancement COVAX · objectif 2 Mds de doses", description: "COVAX annonce un objectif de 2 milliards de doses pour les 92 pays les plus pauvres. Les livraisons tardent." },
+          { date: "Mai 2021", title: "Inde bloque les exportations · COVAX paralysé", description: "La vague Delta dévaste l'Inde. Le Serum Institute est réquisitionné pour la production nationale. COVAX manque 700M de doses." },
           { date: "Juill. 2021", title: "G7 promet 1 milliard de doses", description: "Le G7 annonce 1 milliard de doses pour les pays pauvres. La majorité sont des dons proches de la péremption, rendant la logistique très difficile." },
-          { date: "Nov. 2021", title: "Omicron — la conséquence prévisible", description: "Omicron émerge en Afrique du Sud, où moins de 30% de la population est vaccinée. La variante se propage mondialement, causant une 4e vague." },
-          { date: "2022-23", title: "Fin de la 'fenêtre critique' — leçons ignorées", description: "La pandémie entre en phase endémique. Les propositions de levée des brevets (TRIPS waiver) sont enterrées. Des millions de doses périmées dans les pays riches sont documentées." },
+          { date: "Nov. 2021", title: "Omicron · la conséquence prévisible", description: "Omicron émerge en Afrique du Sud, où moins de 30% de la population est vaccinée. La variante se propage mondialement, causant une 4e vague." },
+          { date: "2022-23", title: "Fin de la 'fenêtre critique' · leçons ignorées", description: "La pandémie entre en phase endémique. Les propositions de levée des brevets (TRIPS waiver) sont enterrées. Des millions de doses périmées dans les pays riches sont documentées." },
         ],
       },
       {
         type: "image-text",
         heading: "Les brevets comme obstacle à la santé mondiale",
         content:
-          "En mai 2021, l'Inde et l'Afrique du Sud ont proposé à l'OMC une levée temporaire des droits de propriété intellectuelle sur les vaccins COVID (TRIPS waiver). Cette proposition aurait permis aux pays en développement de produire leurs propres doses. Elle a été bloquée pendant 2 ans par les États-Unis, l'UE, le Royaume-Uni, la Suisse et le Japon — sous pression des laboratoires pharmaceutiques. Un accord minimal a finalement été adopté en juin 2022, jugé insuffisant par MSF et Oxfam. Ce débat préfigure la bataille future sur l'accès aux thérapies géniques et aux antibiotiques contre les bactéries résistantes.",
+          "En mai 2021, l'Inde et l'Afrique du Sud ont proposé à l'OMC une levée temporaire des droits de propriété intellectuelle sur les vaccins COVID (TRIPS waiver). Cette proposition aurait permis aux pays en développement de produire leurs propres doses. Elle a été bloquée pendant 2 ans par les États-Unis, l'UE, le Royaume-Uni, la Suisse et le Japon, sous pression des laboratoires pharmaceutiques. Un accord minimal a finalement été adopté en juin 2022, jugé insuffisant par MSF et Oxfam. Ce débat préfigure la bataille future sur l'accès aux thérapies géniques et aux antibiotiques contre les bactéries résistantes.",
         imageUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/COVID-19_vaccination_Abu_Dhabi_UAE.jpg/1024px-COVID-19_vaccination_Abu_Dhabi_UAE.jpg",
         imageAlt: "Centre de vaccination COVID-19 aux Émirats arabes unis",
         flip: false,
@@ -1142,7 +1142,7 @@ export const EPIDEMICS_ARTICLES: Article[] = [
         style: "bullet",
         items: [
           { text: "2 millions de morts supplémentaires évitables en 2021, selon les modèles épidémiologiques de l'Université Duke" },
-          { text: "Variantes Delta et Omicron nées dans des populations non vaccinées, puis exportées mondialement — 4e et 5e vagues dans les pays riches" },
+          { text: "Variantes Delta et Omicron nées dans des populations non vaccinées, puis exportées mondialement · 4e et 5e vagues dans les pays riches" },
           { text: "Coût économique de 1 500 Mds€ : le FMI estime que les retards dus aux variants ont coûté cette somme en croissance mondiale perdue" },
           { text: "Défiance accrue envers les institutions internationales dans les pays en développement, alimentant les théories complotistes" },
           { text: "Précédent dangereux pour les futures pandémies : sans changement structurel, le scénario de 2021 se répétera" },
@@ -1155,16 +1155,16 @@ export const EPIDEMICS_ARTICLES: Article[] = [
       },
       {
         type: "quote",
-        text: "Personne n'est en sécurité tant que tout le monde ne l'est pas. Ce n'est pas de la compassion — c'est de la biologie.",
+        text: "Personne n'est en sécurité tant que tout le monde ne l'est pas. Ce n'est pas de la compassion, c'est de la biologie.",
         source: "Tedros Adhanom Ghebreyesus, Directeur général OMS, Assemblée Mondiale de la Santé, mai 2021",
       },
     ],
     sources: [
-        { title: "COVAX Facility — Delivering on the Promise", outlet: "GAVI / OMS / CEPI", year: "2022", url: "https://www.gavi.org/covax-facility" },
+        { title: "COVAX Facility · Delivering on the Promise", outlet: "GAVI / OMS / CEPI", year: "2022", url: "https://www.gavi.org/covax-facility" },
         { title: "The People's Vaccine: COVID-19 access inequalities", outlet: "Oxfam International", year: "2021" },
-        { title: "TRIPS Waiver negotiations — WTO", outlet: "Organisation Mondiale du Commerce (OMC)", year: "2022" },
+        { title: "TRIPS Waiver negotiations · WTO", outlet: "Organisation Mondiale du Commerce (OMC)", year: "2022" },
         { title: "Vaccine equity: the pandemic's unresolved crisis", outlet: "The Lancet", year: "2022" },
-        { title: "MSF — Access to COVID-19 Vaccines Tracker", outlet: "Médecins Sans Frontières", year: "2022" },
+        { title: "MSF · Access to COVID-19 Vaccines Tracker", outlet: "Médecins Sans Frontières", year: "2022" },
         { title: "COVID-19 vaccination gap: who got vaccinated?", outlet: "Our World in Data", url: "https://ourworldindata.org/covid-vaccinations" },
     ],
   },

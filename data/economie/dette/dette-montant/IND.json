@@ -1,0 +1,13 @@
+{
+  "country": "IND",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Inde",
+  "iso2": "IN",
+  "data": {
+    "2000": 260,
+    "2014": 1410,
+    "2024": 2950
+  }
+}

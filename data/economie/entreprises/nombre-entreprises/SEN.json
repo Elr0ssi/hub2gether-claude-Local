@@ -1,0 +1,17 @@
+{
+  "country": "SEN",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Sénégal",
+  "iso2": "SN",
+  "data": {
+    "2000": 110,
+    "2005": 140,
+    "2010": 165,
+    "2015": 175,
+    "2020": 185,
+    "2023": 200,
+    "2025": 220
+  }
+}

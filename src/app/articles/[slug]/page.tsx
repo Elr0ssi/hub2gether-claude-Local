@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Clock, Tag, ExternalLink, Info } from "lucide-react";
 import Image from "next/image";
-import { Layout } from "@/components/layout/Layout";
+import { PageLecture } from "@/components/legal/PageConfiance";
 import { ArticleCarousel } from "@/components/articles/ArticleCarousel";
 import { ArticleBody } from "@/components/articles/ArticleBody";
 import { ARTICLES, getArticleBySlug, getArticlesByTheme } from "@/data/articles";
@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: article.excerpt,
     keywords: article.tags,
     openGraph: {
-      title: `${article.title} | The Essential Data`,
+      title: `${article.title} | Visualize`,
       description: article.excerpt,
       type: "article",
       publishedTime: article.publishedAt,
@@ -55,28 +55,10 @@ function formatDate(iso: string, locale: string) {
   });
 }
 
-function AdSlot({ format }: { format: "vertical" | "horizontal" }) {
-  const dim = format === "vertical"
-    ? { width: "160px", height: "600px", label: "160×600" }
-    : { width: "100%", height: "90px", label: "728×90" };
-  return (
-    <div style={{
-      width: dim.width, height: dim.height,
-      border: "1px dashed var(--border)",
-      background: "var(--surface-2)",
-      borderRadius: "8px",
-      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "4px",
-    }}>
-      <span style={{ color: "var(--ink-4)", fontSize: "0.58rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>Publicité</span>
-      <span style={{ color: "var(--ink-4)", fontSize: "0.5rem", opacity: 0.6 }}>{dim.label}</span>
-    </div>
-  );
-}
-
 const THEME_MAP: Record<string, { label: string; backHref: string; locale: string }> = {
-  economy:   { label: "Économie",  backHref: "/map/economy",   locale: "fr-FR" },
-  epidemics: { label: "Épidémies", backHref: "/map/epidemics", locale: "fr-FR" },
-  empires:   { label: "Empires",   backHref: "/map/empires",   locale: "en-US" },
+  economy:   { label: "Économie",  backHref: "/economie",   locale: "fr-FR" },
+  epidemics: { label: "Épidémies", backHref: "/demographie", locale: "fr-FR" },
+  empires:   { label: "Empires",   backHref: "/",   locale: "en-US" },
 };
 
 export default async function ArticlePage({ params }: PageProps) {
@@ -97,8 +79,8 @@ export default async function ArticlePage({ params }: PageProps) {
     datePublished: article.publishedAt,
     dateModified: article.publishedAt,
     image: article.heroImage,
-    author: { "@type": "Organization", name: "The Essential Data", url: siteUrl },
-    publisher: { "@type": "Organization", name: "The Essential Data", url: siteUrl },
+    author: { "@type": "Organization", name: "Visualize", url: siteUrl },
+    publisher: { "@type": "Organization", name: "Visualize", url: siteUrl },
     keywords: article.tags.join(", "),
     url: `${siteUrl}/articles/${slug}`,
   };
@@ -114,7 +96,7 @@ export default async function ArticlePage({ params }: PageProps) {
   };
 
   return (
-    <Layout>
+    <PageLecture>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbSchema) }} />
 
@@ -163,18 +145,9 @@ export default async function ArticlePage({ params }: PageProps) {
 
       {/* Ad + Article layout */}
       <div className="flex justify-center gap-6">
-        {/* Left ad — desktop only */}
-        <aside className="hidden xl:flex flex-col flex-shrink-0 pt-10" style={{ width: "160px" }}>
-          <AdSlot format="vertical" />
-        </aside>
 
         {/* Article content column */}
         <div className="w-full min-w-0" style={{ maxWidth: "48rem" }}>
-
-          {/* Mobile top ad */}
-          <div className="xl:hidden px-6 pt-6">
-            <AdSlot format="horizontal" />
-          </div>
 
       <article className="px-6 py-10">
         {/* Back link */}
@@ -223,7 +196,7 @@ export default async function ArticlePage({ params }: PageProps) {
             </div>
             <div>
               <p className="text-xs font-semibold" style={{ color: "var(--ink)" }}>
-                The Essential Data
+                Visualize
               </p>
               <p className="text-xs" style={{ color: "var(--ink-4)" }}>
                 {formatDate(article.publishedAt, themeConfig.locale)}
@@ -238,7 +211,7 @@ export default async function ArticlePage({ params }: PageProps) {
             <span
               className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
               style={{ background: "rgba(57,255,136,0.12)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)" }}
-              title="Contenu synthétisé par IA à partir de sources vérifiées — Conformité EU AI Act"
+              title="Contenu synthétisé par IA à partir de sources vérifiées · Conformité EU AI Act"
             >
               <Info size={9} />
               Synthèse IA
@@ -362,7 +335,7 @@ export default async function ArticlePage({ params }: PageProps) {
                       )}
                       {(src.outlet || src.year) && (
                         <span style={{ color: "var(--ink-4)" }}>
-                          {" — "}
+                          {" · "}
                           {[src.outlet, src.year].filter(Boolean).join(", ")}
                         </span>
                       )}
@@ -375,17 +348,7 @@ export default async function ArticlePage({ params }: PageProps) {
         </div>
       </article>
 
-          {/* Mobile bottom ad */}
-          <div className="xl:hidden px-6 pb-6">
-            <AdSlot format="horizontal" />
-          </div>
-
         </div>{/* end article content column */}
-
-        {/* Right ad — desktop only */}
-        <aside className="hidden xl:flex flex-col flex-shrink-0 pt-10" style={{ width: "160px" }}>
-          <AdSlot format="vertical" />
-        </aside>
       </div>{/* end ad + article layout */}
 
       {/* Related articles */}
@@ -406,6 +369,6 @@ export default async function ArticlePage({ params }: PageProps) {
           </div>
         </div>
       )}
-    </Layout>
+    </PageLecture>
   );
 }

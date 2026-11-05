@@ -1,0 +1,17 @@
+{
+  "country": "SAU",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Arabie saoudite",
+  "iso2": "SA",
+  "data": {
+    "2000": 700,
+    "2005": 850,
+    "2010": 900,
+    "2015": 950,
+    "2020": 1000,
+    "2023": 1100,
+    "2025": 1500
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "country": "IND",
+  "indicator": "IMPORTS",
+  "unit": "MD_USD",
+  "source": "OMC · FMI (WEO) · Banque mondiale (BOP)",
+  "name": "Inde",
+  "iso2": "IN",
+  "data": {
+    "2024": 650
+  },
+  "notes": [
+    "La source date ces valeurs « 2024/2025 » sans trancher. Elles sont rangées sous 2024, date la plus récente que la source nomme explicitement."
+  ]
+}

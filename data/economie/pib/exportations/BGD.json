@@ -1,0 +1,14 @@
+{
+  "country": "BGD",
+  "indicator": "EXPORTS",
+  "unit": "MD_USD",
+  "source": "OMC · FMI (WEO) · Banque mondiale (BOP)",
+  "name": "Bangladesh",
+  "iso2": "BD",
+  "data": {
+    "2024": 52
+  },
+  "notes": [
+    "La source date ces valeurs « 2024/2025 » sans trancher. Elles sont rangées sous 2024, date la plus récente que la source nomme explicitement."
+  ]
+}

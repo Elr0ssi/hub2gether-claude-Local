@@ -1,0 +1,13 @@
+{
+  "country": "UZB",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Ouzbékistan",
+  "iso2": "UZ",
+  "data": {
+    "2000": 5,
+    "2014": 8,
+    "2024": 30
+  }
+}

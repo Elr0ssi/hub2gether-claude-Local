@@ -1,0 +1,17 @@
+{
+  "country": "CYM",
+  "indicator": "INFLATION",
+  "unit": "PCT",
+  "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+  "name": "Îles Caïmans",
+  "iso2": "KY",
+  "data": {
+    "2010": 0.276140861750108,
+    "2011": 1.32543575779664,
+    "2012": 1.18894845245608,
+    "2013": 2.16061146813391,
+    "2014": 1.27397911533388,
+    "2015": -2.34752770165615,
+    "2016": -0.62525835861814
+  }
+}

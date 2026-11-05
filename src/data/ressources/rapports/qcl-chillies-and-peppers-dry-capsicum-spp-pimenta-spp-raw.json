@@ -1,0 +1,464 @@
+{
+ "id": "qcl-chillies-and-peppers-dry-capsicum-spp-pimenta-spp-raw",
+ "lignes_source": 11517,
+ "lignes_traitees": 11517,
+ "lignes_ecartees": [],
+ "valeurs_vides": 671,
+ "zeros": 138,
+ "flags": {
+  "M": 671,
+  "E": 6046,
+  "I": 1884,
+  "A": 2837,
+  "X": 79
+ },
+ "notes": {
+  "Unofficial figure": 67
+ },
+ "unites": {
+  "ha": 3961,
+  "t": 4109,
+  "kg/ha": 3447
+ },
+ "doublons": [],
+ "geo": {
+  "associes": [
+   {
+    "m49": "012",
+    "nom": "Algeria",
+    "ne": "Algeria"
+   },
+   {
+    "m49": "032",
+    "nom": "Argentina",
+    "ne": "Argentina"
+   },
+   {
+    "m49": "050",
+    "nom": "Bangladesh",
+    "ne": "Bangladesh"
+   },
+   {
+    "m49": "064",
+    "nom": "Bhutan",
+    "ne": "Bhutan"
+   },
+   {
+    "m49": "070",
+    "nom": "Bosnia and Herzegovina",
+    "ne": "Bosnia and Herz."
+   },
+   {
+    "m49": "100",
+    "nom": "Bulgaria",
+    "ne": "Bulgaria"
+   },
+   {
+    "m49": "104",
+    "nom": "Myanmar",
+    "ne": "Myanmar"
+   },
+   {
+    "m49": "116",
+    "nom": "Cambodia",
+    "ne": "Cambodia"
+   },
+   {
+    "m49": "120",
+    "nom": "Cameroon",
+    "ne": "Cameroon"
+   },
+   {
+    "m49": "132",
+    "nom": "Cabo Verde",
+    "ne": "Cabo Verde"
+   },
+   {
+    "m49": "140",
+    "nom": "Central African Republic",
+    "ne": "Central African Rep."
+   },
+   {
+    "m49": "156",
+    "nom": "China, mainland",
+    "ne": "China"
+   },
+   {
+    "m49": "180",
+    "nom": "Democratic Republic of the Congo",
+    "ne": "Dem. Rep. Congo"
+   },
+   {
+    "m49": "203",
+    "nom": "Czechia",
+    "ne": "Czechia"
+   },
+   {
+    "m49": "204",
+    "nom": "Benin",
+    "ne": "Benin"
+   },
+   {
+    "m49": "231",
+    "nom": "Ethiopia",
+    "ne": "Ethiopia"
+   },
+   {
+    "m49": "262",
+    "nom": "Djibouti",
+    "ne": "Djibouti"
+   },
+   {
+    "m49": "288",
+    "nom": "Ghana",
+    "ne": "Ghana"
+   },
+   {
+    "m49": "300",
+    "nom": "Greece",
+    "ne": "Greece"
+   },
+   {
+    "m49": "308",
+    "nom": "Grenada",
+    "ne": "Grenada"
+   },
+   {
+    "m49": "348",
+    "nom": "Hungary",
+    "ne": "Hungary"
+   },
+   {
+    "m49": "356",
+    "nom": "India",
+    "ne": "India"
+   },
+   {
+    "m49": "360",
+    "nom": "Indonesia",
+    "ne": "Indonesia"
+   },
+   {
+    "m49": "364",
+    "nom": "Iran (Islamic Republic of)",
+    "ne": "Iran"
+   },
+   {
+    "m49": "368",
+    "nom": "Iraq",
+    "ne": "Iraq"
+   },
+   {
+    "m49": "384",
+    "nom": "Côte d'Ivoire",
+    "ne": "Côte d'Ivoire"
+   },
+   {
+    "m49": "388",
+    "nom": "Jamaica",
+    "ne": "Jamaica"
+   },
+   {
+    "m49": "392",
+    "nom": "Japan",
+    "ne": "Japan"
+   },
+   {
+    "m49": "398",
+    "nom": "Kazakhstan",
+    "ne": "Kazakhstan"
+   },
+   {
+    "m49": "404",
+    "nom": "Kenya",
+    "ne": "Kenya"
+   },
+   {
+    "m49": "417",
+    "nom": "Kyrgyzstan",
+    "ne": "Kyrgyzstan"
+   },
+   {
+    "m49": "418",
+    "nom": "Lao People's Democratic Republic",
+    "ne": "Laos"
+   },
+   {
+    "m49": "450",
+    "nom": "Madagascar",
+    "ne": "Madagascar"
+   },
+   {
+    "m49": "454",
+    "nom": "Malawi",
+    "ne": "Malawi"
+   },
+   {
+    "m49": "458",
+    "nom": "Malaysia",
+    "ne": "Malaysia"
+   },
+   {
+    "m49": "466",
+    "nom": "Mali",
+    "ne": "Mali"
+   },
+   {
+    "m49": "484",
+    "nom": "Mexico",
+    "ne": "Mexico"
+   },
+   {
+    "m49": "504",
+    "nom": "Morocco",
+    "ne": "Morocco"
+   },
+   {
+    "m49": "524",
+    "nom": "Nepal",
+    "ne": "Nepal"
+   },
+   {
+    "m49": "562",
+    "nom": "Niger",
+    "ne": "Niger"
+   },
+   {
+    "m49": "566",
+    "nom": "Nigeria",
+    "ne": "Nigeria"
+   },
+   {
+    "m49": "586",
+    "nom": "Pakistan",
+    "ne": "Pakistan"
+   },
+   {
+    "m49": "598",
+    "nom": "Papua New Guinea",
+    "ne": "Papua New Guinea"
+   },
+   {
+    "m49": "604",
+    "nom": "Peru",
+    "ne": "Peru"
+   },
+   {
+    "m49": "642",
+    "nom": "Romania",
+    "ne": "Romania"
+   },
+   {
+    "m49": "686",
+    "nom": "Senegal",
+    "ne": "Senegal"
+   },
+   {
+    "m49": "688",
+    "nom": "Serbia",
+    "ne": "Serbia"
+   },
+   {
+    "m49": "694",
+    "nom": "Sierra Leone",
+    "ne": "Sierra Leone"
+   },
+   {
+    "m49": "704",
+    "nom": "Viet Nam",
+    "ne": "Vietnam"
+   },
+   {
+    "m49": "705",
+    "nom": "Slovenia",
+    "ne": "Slovenia"
+   },
+   {
+    "m49": "710",
+    "nom": "South Africa",
+    "ne": "South Africa"
+   },
+   {
+    "m49": "716",
+    "nom": "Zimbabwe",
+    "ne": "Zimbabwe"
+   },
+   {
+    "m49": "724",
+    "nom": "Spain",
+    "ne": "Spain"
+   },
+   {
+    "m49": "728",
+    "nom": "South Sudan",
+    "ne": "S. Sudan"
+   },
+   {
+    "m49": "729",
+    "nom": "Sudan",
+    "ne": "Sudan"
+   },
+   {
+    "m49": "760",
+    "nom": "Syrian Arab Republic",
+    "ne": "Syria"
+   },
+   {
+    "m49": "764",
+    "nom": "Thailand",
+    "ne": "Thailand"
+   },
+   {
+    "m49": "768",
+    "nom": "Togo",
+    "ne": "Togo"
+   },
+   {
+    "m49": "788",
+    "nom": "Tunisia",
+    "ne": "Tunisia"
+   },
+   {
+    "m49": "792",
+    "nom": "Türkiye",
+    "ne": "Turkey"
+   },
+   {
+    "m49": "800",
+    "nom": "Uganda",
+    "ne": "Uganda"
+   },
+   {
+    "m49": "807",
+    "nom": "North Macedonia",
+    "ne": "North Macedonia"
+   },
+   {
+    "m49": "818",
+    "nom": "Egypt",
+    "ne": "Egypt"
+   },
+   {
+    "m49": "834",
+    "nom": "United Republic of Tanzania",
+    "ne": "Tanzania"
+   },
+   {
+    "m49": "840",
+    "nom": "United States of America",
+    "ne": "United States of America"
+   },
+   {
+    "m49": "860",
+    "nom": "Uzbekistan",
+    "ne": "Uzbekistan"
+   },
+   {
+    "m49": "894",
+    "nom": "Zambia",
+    "ne": "Zambia"
+   }
+  ],
+  "historiques": [
+   {
+    "m49": "200",
+    "nom": "Czechoslovakia",
+    "note": "Entité dissoute fin 1992 (Tchéquie, Slovaquie).",
+    "successeurs": [
+     "203",
+     "703"
+    ]
+   },
+   {
+    "m49": "230",
+    "nom": "Ethiopia PDR",
+    "note": "Éthiopie avant la sécession de l'Érythrée (1993).",
+    "successeurs": [
+     "231",
+     "232"
+    ]
+   },
+   {
+    "m49": "736",
+    "nom": "Sudan (former)",
+    "note": "Soudan avant la sécession du Soudan du Sud (2011) : frontières différentes de l'actuel.",
+    "successeurs": [
+     "729"
+    ]
+   },
+   {
+    "m49": "810",
+    "nom": "USSR",
+    "note": "Union soviétique, jusqu'en 1991 : ne correspond à aucune géométrie actuelle.",
+    "successeurs": [
+     "643",
+     "804",
+     "112",
+     "498",
+     "233",
+     "428",
+     "440",
+     "051",
+     "031",
+     "268",
+     "398",
+     "417",
+     "762",
+     "795",
+     "860"
+    ]
+   },
+   {
+    "m49": "890",
+    "nom": "Yugoslav SFR",
+    "note": "Yougoslavie fédérale, jusqu'en 1991.",
+    "successeurs": [
+     "070",
+     "191",
+     "705",
+     "807",
+     "891"
+    ]
+   },
+   {
+    "m49": "891",
+    "nom": "Serbia and Montenegro",
+    "note": "Serbie-et-Monténégro, 1992-2005.",
+    "successeurs": [
+     "688",
+     "499"
+    ]
+   }
+  ],
+  "agregats": [
+   {
+    "m49": "159",
+    "nom": "China",
+    "note": "Agrégat FAOSTAT : Chine continentale, Taïwan, Hong Kong et Macao. Recoupe les séries 156 et 158 : jamais additionné avec elles."
+   }
+  ],
+  "non_associes": [
+   {
+    "m49": "254",
+    "nom": "French Guiana",
+    "raison": "géométrie Natural Earth introuvable : null"
+   },
+   {
+    "m49": "462",
+    "nom": "Maldives",
+    "raison": "géométrie Natural Earth introuvable : null"
+   },
+   {
+    "m49": "474",
+    "nom": "Martinique",
+    "raison": "géométrie Natural Earth introuvable : null"
+   },
+   {
+    "m49": "638",
+    "nom": "Réunion",
+    "raison": "géométrie Natural Earth introuvable : null"
+   }
+  ],
+  "ambigus": []
+ }
+}

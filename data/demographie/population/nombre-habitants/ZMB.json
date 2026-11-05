@@ -1,0 +1,17 @@
+{
+  "country": "ZMB",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Zambie",
+  "iso2": "ZM",
+  "data": {
+    "2000": 9.9,
+    "2005": 11.4,
+    "2010": 13.6,
+    "2015": 16.4,
+    "2020": 19.5,
+    "2023": 20.6,
+    "2025": 21.3
+  }
+}

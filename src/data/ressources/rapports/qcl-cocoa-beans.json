@@ -1,0 +1,343 @@
+{
+ "id": "qcl-cocoa-beans",
+ "lignes_source": 11256,
+ "lignes_traitees": 11256,
+ "lignes_ecartees": [],
+ "valeurs_vides": 220,
+ "zeros": 120,
+ "flags": {
+  "E": 4304,
+  "A": 5158,
+  "X": 707,
+  "I": 867,
+  "M": 220
+ },
+ "notes": {
+  "Unofficial figure": 684
+ },
+ "unites": {
+  "ha": 3780,
+  "kg/ha": 3632,
+  "t": 3844
+ },
+ "doublons": [],
+ "geo": {
+  "associes": [
+   {
+    "m49": "024",
+    "nom": "Angola",
+    "ne": "Angola"
+   },
+   {
+    "m49": "068",
+    "nom": "Bolivia (Plurinational State of)",
+    "ne": "Bolivia"
+   },
+   {
+    "m49": "076",
+    "nom": "Brazil",
+    "ne": "Brazil"
+   },
+   {
+    "m49": "084",
+    "nom": "Belize",
+    "ne": "Belize"
+   },
+   {
+    "m49": "090",
+    "nom": "Solomon Islands",
+    "ne": "Solomon Is."
+   },
+   {
+    "m49": "120",
+    "nom": "Cameroon",
+    "ne": "Cameroon"
+   },
+   {
+    "m49": "140",
+    "nom": "Central African Republic",
+    "ne": "Central African Rep."
+   },
+   {
+    "m49": "144",
+    "nom": "Sri Lanka",
+    "ne": "Sri Lanka"
+   },
+   {
+    "m49": "170",
+    "nom": "Colombia",
+    "ne": "Colombia"
+   },
+   {
+    "m49": "174",
+    "nom": "Comoros",
+    "ne": "Comoros"
+   },
+   {
+    "m49": "178",
+    "nom": "Congo",
+    "ne": "Congo"
+   },
+   {
+    "m49": "180",
+    "nom": "Democratic Republic of the Congo",
+    "ne": "Dem. Rep. Congo"
+   },
+   {
+    "m49": "188",
+    "nom": "Costa Rica",
+    "ne": "Costa Rica"
+   },
+   {
+    "m49": "192",
+    "nom": "Cuba",
+    "ne": "Cuba"
+   },
+   {
+    "m49": "204",
+    "nom": "Benin",
+    "ne": "Benin"
+   },
+   {
+    "m49": "212",
+    "nom": "Dominica",
+    "ne": "Dominica"
+   },
+   {
+    "m49": "214",
+    "nom": "Dominican Republic",
+    "ne": "Dominican Rep."
+   },
+   {
+    "m49": "218",
+    "nom": "Ecuador",
+    "ne": "Ecuador"
+   },
+   {
+    "m49": "222",
+    "nom": "El Salvador",
+    "ne": "El Salvador"
+   },
+   {
+    "m49": "226",
+    "nom": "Equatorial Guinea",
+    "ne": "Eq. Guinea"
+   },
+   {
+    "m49": "242",
+    "nom": "Fiji",
+    "ne": "Fiji"
+   },
+   {
+    "m49": "266",
+    "nom": "Gabon",
+    "ne": "Gabon"
+   },
+   {
+    "m49": "288",
+    "nom": "Ghana",
+    "ne": "Ghana"
+   },
+   {
+    "m49": "308",
+    "nom": "Grenada",
+    "ne": "Grenada"
+   },
+   {
+    "m49": "320",
+    "nom": "Guatemala",
+    "ne": "Guatemala"
+   },
+   {
+    "m49": "324",
+    "nom": "Guinea",
+    "ne": "Guinea"
+   },
+   {
+    "m49": "328",
+    "nom": "Guyana",
+    "ne": "Guyana"
+   },
+   {
+    "m49": "332",
+    "nom": "Haiti",
+    "ne": "Haiti"
+   },
+   {
+    "m49": "340",
+    "nom": "Honduras",
+    "ne": "Honduras"
+   },
+   {
+    "m49": "356",
+    "nom": "India",
+    "ne": "India"
+   },
+   {
+    "m49": "360",
+    "nom": "Indonesia",
+    "ne": "Indonesia"
+   },
+   {
+    "m49": "384",
+    "nom": "Côte d'Ivoire",
+    "ne": "Côte d'Ivoire"
+   },
+   {
+    "m49": "388",
+    "nom": "Jamaica",
+    "ne": "Jamaica"
+   },
+   {
+    "m49": "430",
+    "nom": "Liberia",
+    "ne": "Liberia"
+   },
+   {
+    "m49": "450",
+    "nom": "Madagascar",
+    "ne": "Madagascar"
+   },
+   {
+    "m49": "458",
+    "nom": "Malaysia",
+    "ne": "Malaysia"
+   },
+   {
+    "m49": "484",
+    "nom": "Mexico",
+    "ne": "Mexico"
+   },
+   {
+    "m49": "548",
+    "nom": "Vanuatu",
+    "ne": "Vanuatu"
+   },
+   {
+    "m49": "558",
+    "nom": "Nicaragua",
+    "ne": "Nicaragua"
+   },
+   {
+    "m49": "566",
+    "nom": "Nigeria",
+    "ne": "Nigeria"
+   },
+   {
+    "m49": "583",
+    "nom": "Micronesia (Federated States of)",
+    "ne": "Micronesia"
+   },
+   {
+    "m49": "591",
+    "nom": "Panama",
+    "ne": "Panama"
+   },
+   {
+    "m49": "598",
+    "nom": "Papua New Guinea",
+    "ne": "Papua New Guinea"
+   },
+   {
+    "m49": "604",
+    "nom": "Peru",
+    "ne": "Peru"
+   },
+   {
+    "m49": "608",
+    "nom": "Philippines",
+    "ne": "Philippines"
+   },
+   {
+    "m49": "626",
+    "nom": "Timor-Leste",
+    "ne": "Timor-Leste"
+   },
+   {
+    "m49": "662",
+    "nom": "Saint Lucia",
+    "ne": "Saint Lucia"
+   },
+   {
+    "m49": "670",
+    "nom": "Saint Vincent and the Grenadines",
+    "ne": "St. Vin. and Gren."
+   },
+   {
+    "m49": "678",
+    "nom": "Sao Tome and Principe",
+    "ne": "São Tomé and Principe"
+   },
+   {
+    "m49": "694",
+    "nom": "Sierra Leone",
+    "ne": "Sierra Leone"
+   },
+   {
+    "m49": "704",
+    "nom": "Viet Nam",
+    "ne": "Vietnam"
+   },
+   {
+    "m49": "740",
+    "nom": "Suriname",
+    "ne": "Suriname"
+   },
+   {
+    "m49": "764",
+    "nom": "Thailand",
+    "ne": "Thailand"
+   },
+   {
+    "m49": "768",
+    "nom": "Togo",
+    "ne": "Togo"
+   },
+   {
+    "m49": "776",
+    "nom": "Tonga",
+    "ne": "Tonga"
+   },
+   {
+    "m49": "780",
+    "nom": "Trinidad and Tobago",
+    "ne": "Trinidad and Tobago"
+   },
+   {
+    "m49": "800",
+    "nom": "Uganda",
+    "ne": "Uganda"
+   },
+   {
+    "m49": "834",
+    "nom": "United Republic of Tanzania",
+    "ne": "Tanzania"
+   },
+   {
+    "m49": "862",
+    "nom": "Venezuela (Bolivarian Republic of)",
+    "ne": "Venezuela"
+   },
+   {
+    "m49": "882",
+    "nom": "Samoa",
+    "ne": "Samoa"
+   }
+  ],
+  "historiques": [],
+  "agregats": [],
+  "non_associes": [
+   {
+    "m49": "312",
+    "nom": "Guadeloupe",
+    "raison": "géométrie Natural Earth introuvable : null"
+   },
+   {
+    "m49": "474",
+    "nom": "Martinique",
+    "raison": "géométrie Natural Earth introuvable : null"
+   }
+  ],
+  "ambigus": []
+ }
+}

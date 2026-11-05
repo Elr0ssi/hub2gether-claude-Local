@@ -153,11 +153,16 @@ export interface TopCompany {
   revenue_bn: number;
 }
 
+/**
+ * Tout est facultatif : la base ne couvre pas les mêmes pays d'un indicateur
+ * à l'autre, ni les mêmes années. Un champ absent se lit comme une donnée
+ * que la source ne publie pas — jamais comme un zéro.
+ */
 export interface CountryEconomyData {
-  gdp: number;
-  debt_ratio: number;
-  unemployment: number;
-  companies: number;
+  gdp?: number;
+  debt_ratio?: number;
+  unemployment?: number;
+  companies?: number;
   gdp_per_capita?: number;
   trade_balance?: number;
   debt_amount?: number;

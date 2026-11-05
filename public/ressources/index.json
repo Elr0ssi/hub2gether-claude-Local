@@ -1,0 +1,301 @@
+{
+ "schema": 1,
+ "ressources": [
+  {
+   "id": "qcl-avocados",
+   "nom_fao": "Avocados",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "surface",
+    "production",
+    "rendement"
+   ],
+   "zones": 101,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-cereals-n-e-c",
+   "nom_fao": "Cereals n.e.c.",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "surface",
+    "rendement",
+    "production"
+   ],
+   "zones": 72,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-chillies-and-peppers-dry-capsicum-spp-pimenta-spp-raw",
+   "nom_fao": "Chillies and peppers, dry (Capsicum spp., Pimenta spp.), raw",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "surface",
+    "production",
+    "rendement"
+   ],
+   "zones": 78,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-cocoa-beans",
+   "nom_fao": "Cocoa beans",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "surface",
+    "rendement",
+    "production"
+   ],
+   "zones": 62,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-hen-eggs-in-shell-fresh",
+   "nom_fao": "Hen eggs in shell, fresh",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "el-5413",
+    "rendement",
+    "production",
+    "el-5513"
+   ],
+   "zones": 206,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-meat-of-camels-fresh-or-chilled",
+   "nom_fao": "Meat of camels, fresh or chilled",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "rendement",
+    "production"
+   ],
+   "zones": 41,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-meat-of-chickens-fresh-or-chilled",
+   "nom_fao": "Meat of chickens, fresh or chilled",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "rendement",
+    "production"
+   ],
+   "zones": 206,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-meat-of-ducks-fresh-or-chilled",
+   "nom_fao": "Meat of ducks, fresh or chilled",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "rendement",
+    "production"
+   ],
+   "zones": 97,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-meat-of-pig-with-the-bone-fresh-or-chilled",
+   "nom_fao": "Meat of pig with the bone, fresh or chilled",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "rendement",
+    "production"
+   ],
+   "zones": 186,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-olive-oil",
+   "nom_fao": "Olive oil",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2023
+   ],
+   "indicateurs": [
+    "production"
+   ],
+   "zones": 41,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-potatoes",
+   "nom_fao": "Potatoes",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "surface",
+    "rendement",
+    "production"
+   ],
+   "zones": 168,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-quinoa",
+   "nom_fao": "Quinoa",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "surface",
+    "production",
+    "rendement"
+   ],
+   "zones": 4,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-raw-milk-of-cattle",
+   "nom_fao": "Raw milk of cattle",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "rendement",
+    "production"
+   ],
+   "zones": 198,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-rice",
+   "nom_fao": "Rice",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "surface",
+    "rendement",
+    "production"
+   ],
+   "zones": 146,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-sunflower-seed-oil-crude",
+   "nom_fao": "Sunflower-seed oil, crude",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2023
+   ],
+   "indicateurs": [
+    "production"
+   ],
+   "zones": 99,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-tomatoes",
+   "nom_fao": "Tomatoes",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "surface",
+    "rendement",
+    "production"
+   ],
+   "zones": 182,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  },
+  {
+   "id": "qcl-wheat",
+   "nom_fao": "Wheat",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2024
+   ],
+   "indicateurs": [
+    "surface",
+    "rendement",
+    "production"
+   ],
+   "zones": 133,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-01"
+  },
+  {
+   "id": "qcl-wine",
+   "nom_fao": "Wine",
+   "domaine": "QCL",
+   "annees": [
+    1961,
+    2023
+   ],
+   "indicateurs": [
+    "production"
+   ],
+   "zones": 102,
+   "importe_le": "2026-11-03",
+   "date_export": "2026-11-03"
+  }
+ ]
+}

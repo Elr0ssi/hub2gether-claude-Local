@@ -1,0 +1,13 @@
+{
+  "country": "EST",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Estonie",
+  "iso2": "EE",
+  "data": {
+    "2000": 0.4,
+    "2014": 3,
+    "2024": 6
+  }
+}

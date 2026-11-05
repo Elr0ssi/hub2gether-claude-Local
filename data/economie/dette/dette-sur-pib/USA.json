@@ -1,0 +1,28 @@
+{
+  "country": "USA",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "États-Unis",
+  "iso2": "US",
+  "data": {
+    "2000": 54,
+    "2005": 62,
+    "2010": 95,
+    "2015": 105,
+    "2020": 133,
+    "2023": 123,
+    "2025": 124
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 58,
+        "2014": 100.5,
+        "2024": 120
+      }
+    }
+  ]
+}

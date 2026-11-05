@@ -1,0 +1,17 @@
+{
+  "country": "COD",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "République démocratique du Congo",
+  "iso2": "CD",
+  "data": {
+    "2000": 50.3,
+    "2005": 57.4,
+    "2010": 66.2,
+    "2015": 78.3,
+    "2020": 92.4,
+    "2023": 102.3,
+    "2025": 108
+  }
+}

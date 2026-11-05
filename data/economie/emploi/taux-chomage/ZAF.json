@@ -1,0 +1,17 @@
+{
+  "country": "ZAF",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Afrique du Sud",
+  "iso2": "ZA",
+  "data": {
+    "2000": 26.7,
+    "2005": 26.7,
+    "2010": 24.9,
+    "2015": 25.3,
+    "2020": 28.7,
+    "2023": 32.1,
+    "2025": 32.1
+  }
+}

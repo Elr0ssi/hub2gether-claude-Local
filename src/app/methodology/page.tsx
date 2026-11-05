@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Layout } from "@/components/layout/Layout";
+import { PageConfiance } from "@/components/legal/PageConfiance";
 import { ArrowLeft } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Méthodologie — The Essential Data",
+  title: "Méthodologie · Visualize",
   description:
-    "Découvrez comment The Essential Data collecte, synthétise et vérifie ses données. Transparence totale sur nos sources, notre approche éditoriale et notre conformité EU AI Act.",
+    "Découvrez comment Visualize collecte, synthétise et vérifie ses données. Transparence totale sur nos sources, notre approche éditoriale et notre conformité EU AI Act.",
   alternates: {
     canonical: "/methodology",
   },
@@ -17,7 +17,7 @@ const sections = [
     id: "approche",
     title: "Notre approche éditoriale",
     content: [
-      "The Essential Data est un média de data-journalisme géopolitique. Chaque article publié est une synthèse éditoriale construite à partir de sources primaires et secondaires vérifiées : rapports d'institutions internationales, presse mondiale de référence, recherches académiques et bases de données ouvertes.",
+      "Visualize est un média de data-journalisme géopolitique. Chaque article publié est une synthèse éditoriale construite à partir de sources primaires et secondaires vérifiées : rapports d'institutions internationales, presse mondiale de référence, recherches académiques et bases de données ouvertes.",
       "Notre objectif est d'offrir une vision impartiale et multi-perspectives sur des sujets géopolitiques complexes (économie mondiale, épidémies, empires historiques, conflits militaires). Nous agrégeons délibérément des points de vue issus de médias et institutions de différentes zones géographiques et culturelles pour éviter les biais régionaux.",
     ],
   },
@@ -51,7 +51,7 @@ const sections = [
       "Les cartes interactives sont alimentées par des données structurées issues des sources suivantes :",
     ],
     list: [
-      "PIB et données économiques : Fonds Monétaire International (FMI), Perspectives de l'économie mondiale (WEO), millésime 2024",
+      "PIB et données économiques : Fonds Monétaire International (FMI), Perspectives de l'économie mondiale (WEO), 2024",
       "Épidémies : Organisation Mondiale de la Santé (OMS/WHO), CDC (Centers for Disease Control and Prevention), ECDC",
       "Données militaires et conflits : SIPRI (Stockholm International Peace Research Institute), IISS",
       "Empires historiques : Ancient World Mapping Center (AWMC, UNC Chapel Hill), Barrington Atlas of the Greek and Roman World",
@@ -63,7 +63,7 @@ const sections = [
     title: "Limites et avertissements",
     content: [
       "Les frontières historiques représentées sur les cartes sont des approximations éditoriales. Les empires et entités politiques historiques n'avaient pas de frontières précises au sens moderne du terme ; les délimitations présentées reflètent les travaux historiographiques les plus récents mais restent sujettes à débat académique.",
-      "Les données économiques et épidémiologiques sont mises à jour périodiquement ; les chiffres affichés correspondent au millésime indiqué sur chaque visualisation. Des révisions ultérieures des données sources peuvent entraîner des écarts.",
+      "Les données économiques et épidémiologiques sont mises à jour périodiquement ; les chiffres affichés correspondent à la date indiquée sur chaque visualisation. Des révisions ultérieures des données sources peuvent entraîner des écarts.",
       "Cet outil est destiné à des fins éducatives et journalistiques. Il ne constitue pas un avis professionnel (médical, financier, juridique ou autre).",
     ],
   },
@@ -78,7 +78,7 @@ const sections = [
 
 export default function MethodologyPage() {
   return (
-    <Layout>
+    <PageConfiance>
       <div className="max-w-3xl mx-auto px-6 py-12">
         <Link
           href="/"
@@ -101,7 +101,7 @@ export default function MethodologyPage() {
               className="text-xs font-medium px-2.5 py-1 rounded-full"
               style={{ background: "rgba(57,255,136,0.12)", color: "#0D7A40", border: "1px solid rgba(57,255,136,0.3)" }}
             >
-              EU AI Act — Conformité
+              EU AI Act · Conformité
             </span>
           </div>
           <h1
@@ -181,13 +181,13 @@ export default function MethodologyPage() {
           style={{ borderTop: "1px solid var(--border)" }}
         >
           <p className="text-xs" style={{ color: "var(--ink-4)" }}>
-            Dernière mise à jour : juin 2025 · The Essential Data ·{" "}
+            Dernière mise à jour : juin 2025 · Visualize ·{" "}
             <Link href="/sources" className="underline underline-offset-2" style={{ color: "var(--ink-3)" }}>
               Voir toutes les sources de données →
             </Link>
           </p>
         </div>
       </div>
-    </Layout>
+    </PageConfiance>
   );
 }

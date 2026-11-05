@@ -1,0 +1,14 @@
+{
+  "country": "CYM",
+  "indicator": "TRADE_BALANCE",
+  "unit": "USD",
+  "source": "Banque mondiale · WDI (NE.RSB.GNFS.CD)",
+  "name": "Îles Caïmans",
+  "iso2": "KY",
+  "data": {
+    "2017": 1581246324.9853,
+    "2018": 1441085764.34306,
+    "2019": 1432205728.82292,
+    "2020": 780123120.492482
+  }
+}

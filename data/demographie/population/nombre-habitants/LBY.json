@@ -1,0 +1,17 @@
+{
+  "country": "LBY",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Libye",
+  "iso2": "LY",
+  "data": {
+    "2000": 5.2,
+    "2005": 5.9,
+    "2010": 6.4,
+    "2015": 6.4,
+    "2020": 6.9,
+    "2023": 7,
+    "2025": 7.1
+  }
+}

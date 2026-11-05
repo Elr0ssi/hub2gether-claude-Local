@@ -1,0 +1,17 @@
+{
+  "country": "IRN",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Iran",
+  "iso2": "IR",
+  "data": {
+    "2000": 1500,
+    "2005": 1700,
+    "2010": 1900,
+    "2015": 2100,
+    "2020": 2200,
+    "2023": 2400,
+    "2025": 2200
+  }
+}

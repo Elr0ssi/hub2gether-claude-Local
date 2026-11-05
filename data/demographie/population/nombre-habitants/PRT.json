@@ -1,0 +1,17 @@
+{
+  "country": "PRT",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Portugal",
+  "iso2": "PT",
+  "data": {
+    "2000": 10.3,
+    "2005": 10.5,
+    "2010": 10.6,
+    "2015": 10.3,
+    "2020": 10.3,
+    "2023": 10.5,
+    "2025": 10.6
+  }
+}

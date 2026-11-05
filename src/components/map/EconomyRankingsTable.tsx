@@ -1,9 +1,10 @@
 "use client";
 
+import { countryFr } from "@/data/countryNamesFr";
 import React, { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Search, ChevronUp, ChevronDown, ChevronsUpDown, TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { ECONOMY_METRICS, ECONOMY_YEARS } from "@/data/economy/economy";
+import { ECONOMY_METRICS, ECONOMY_YEARS, ECONOMY_YEAR_VALUES, iso2DePays } from "@/data/economy/economy";
 import type { EconomyMetricId, EconomyYear } from "@/types";
 
 const GDP_FAMILY: EconomyMetricId[] = ["gdp", "gdp_per_capita", "trade_balance"];
@@ -39,39 +40,47 @@ const FLAGS: Record<string, string> = {
 };
 
 // ── Flag image helper (avoids emoji rendering as text on some Android devices) ──
-function flagImg(emoji: string | undefined): React.ReactNode {
-  if (!emoji) return <span style={{ fontSize: "0.9rem" }}>🌍</span>;
-  const chars = [...emoji];
-  const a = chars[0]?.codePointAt(0) ?? 0;
-  const b = chars[1]?.codePointAt(0) ?? 0;
-  if (chars.length < 2 || a < 0x1F1E6 || b < 0x1F1E6) return <span style={{ fontSize: "0.9rem" }}>🌍</span>;
-  const code = (String.fromCharCode(a - 0x1F1E6 + 65) + String.fromCharCode(b - 0x1F1E6 + 65)).toLowerCase();
+// La table d'émojis ci-dessus ne couvrait qu'une centaine de pays. La base en
+// porte deux cents, avec leur code ISO2 : c'est lui qu'on interroge d'abord,
+// l'émoji ne servant plus qu'aux pays qu'elle ne couvre pas encore.
+function flagImg(name: string): React.ReactNode {
+  const code = iso2DePays(name)?.toLowerCase() ?? emojiVersIso2(FLAGS[name]);
+  if (!code) return <span style={{ fontSize: "0.9rem" }}>🌍</span>;
   return <img src={`https://flagcdn.com/20x15/${code}.png`} alt="" width={20} height={15} style={{ borderRadius: "2px", objectFit: "cover", flexShrink: 0 }} />;
 }
 
+function emojiVersIso2(emoji: string | undefined): string | null {
+  if (!emoji) return null;
+  const chars = [...emoji];
+  const a = chars[0]?.codePointAt(0) ?? 0;
+  const b = chars[1]?.codePointAt(0) ?? 0;
+  if (chars.length < 2 || a < 0x1F1E6 || b < 0x1F1E6) return null;
+  return (String.fromCharCode(a - 0x1F1E6 + 65) + String.fromCharCode(b - 0x1F1E6 + 65)).toLowerCase();
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
+/* Les montants viennent de la base au million près. À l'écran on les arrondit,
+   et l'arrondi suit la taille : trois chiffres significatifs suffisent à lire
+   un classement, et un pays à soixante millions de PIB ne doit pas s'afficher
+   à zéro pour autant. */
+function fmtMilliards(value: number): string {
+  const abs = Math.abs(value);
+  const decimales = abs >= 100 ? 0 : abs >= 10 ? 1 : 2;
+  return value.toLocaleString("fr-FR", { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
+}
+
 function formatValue(value: number | undefined, metricId: EconomyMetricId): string {
-  if (value === undefined || value === null) return "—";
+  if (value === undefined || value === null) return "-";
   if (metricId === "gdp") {
     if (value >= 1000) return `${(value / 1000).toFixed(1)} T$`;
-    return `${value.toLocaleString("fr-FR")} Mds`;
+    return `${fmtMilliards(value)} Mds`;
   }
   if (metricId === "debt_ratio") return `${value.toFixed(1)} %`;
   if (metricId === "unemployment") return `${value.toFixed(1)} %`;
   if (metricId === "companies") return `${value.toLocaleString("fr-FR")} k`;
   if (metricId === "gdp_per_capita") return `${Math.round(value).toLocaleString("fr-FR")} €`;
-  if (metricId === "trade_balance") return `${value > 0 ? "+" : ""}${value.toLocaleString("fr-FR")} Mds€`;
+  if (metricId === "trade_balance") return `${value > 0 ? "+" : ""}${fmtMilliards(value)} Mds€`;
   return String(value);
-}
-
-function getMetricValue(data: EconomyYear["countries"][string], metricId: EconomyMetricId): number {
-  if (metricId === "gdp") return data.gdp;
-  if (metricId === "debt_ratio") return data.debt_ratio;
-  if (metricId === "unemployment") return data.unemployment;
-  if (metricId === "companies") return data.companies;
-  if (metricId === "gdp_per_capita") return data.gdp_per_capita ?? 0;
-  if (metricId === "trade_balance") return data.trade_balance ?? 0;
-  return 0;
 }
 
 // Sort direction: GDP/Companies/PIB per capita/Balance → bigger is "better" → desc by default
@@ -93,7 +102,7 @@ interface ColDef {
 function gdpCol(): ColDef {
   return {
     key: "gdp", header: "PIB", unit: "Mds USD",
-    getValue: (d) => d.gdp,
+    getValue: (d) => d.gdp ?? -Infinity,
     format: (d) => formatValue(d.gdp, "gdp"),
     sortDir: "desc",
   };
@@ -125,25 +134,22 @@ function getColDefs(metric: EconomyMetricId): ColDef[] {
     primary = [
       {
         key: "debt_ratio", header: "% Dette / PIB", unit: "%",
-        getValue: (d) => d.debt_ratio,
-        format: (d) => `${d.debt_ratio.toFixed(1)} %`,
+        getValue: (d) => d.debt_ratio ?? -Infinity,
+        format: (d) => (d.debt_ratio === undefined ? "-" : `${d.debt_ratio.toFixed(1)} %`),
         sortDir: "desc",
       },
       {
         key: "debt_abs", header: "Montant dette", unit: "Mds USD",
-        getValue: (d) => Math.round(d.gdp * d.debt_ratio / 100),
-        format: (d) => {
-          const v = Math.round(d.gdp * d.debt_ratio / 100);
-          return formatValue(v, "gdp");
-        },
+        getValue: (d) => d.debt_amount ?? -Infinity,
+        format: (d) => formatValue(d.debt_amount, "gdp"),
         sortDir: "desc",
       },
     ];
   } else if (metric === "unemployment") {
     primary = [{
       key: "unemployment", header: "Chômage", unit: "%",
-      getValue: (d) => d.unemployment,
-      format: (d) => `${d.unemployment.toFixed(1)} %`,
+      getValue: (d) => d.unemployment ?? Infinity,
+      format: (d) => (d.unemployment === undefined ? "-" : `${d.unemployment.toFixed(1)} %`),
       sortDir: "asc",
     }];
   } else if (metric === "gdp_per_capita") {
@@ -171,6 +177,7 @@ interface EconomyRankingsTableProps {
   year: number;
   activeEconomyYear: EconomyYear;
   ytdMode: boolean;
+  onYearChange?: (year: number) => void;
   onCountryClick?: (name: string) => void;
 }
 
@@ -179,11 +186,13 @@ export function EconomyRankingsTable({
   year,
   activeEconomyYear,
   ytdMode,
+  onYearChange,
   onCountryClick,
 }: EconomyRankingsTableProps) {
   const [sortColKey, setSortColKey] = useState<string>(metric);
   const [sortDir, setSortDir] = useState<"asc" | "desc">(defaultSortDir(metric));
   const [search, setSearch] = useState("");
+  const reduced = useReducedMotion();
 
   // No ranking for companies
   const cols = getColDefs(metric);
@@ -206,14 +215,23 @@ export function EconomyRankingsTable({
 
   // Previous year data for rank delta
   const prevYearData = useMemo(() => {
-    const prev = ECONOMY_YEARS.find((y) => y.year === year - 1) ??
-      ECONOMY_YEARS.find((y) => y.year < year);
+    // ECONOMY_YEARS est trié dans l'ordre croissant : chercher la première
+    // année inférieure renvoyait 2000, si bien que la flèche montrait un écart
+    // de vingt-cinq ans en se faisant passer pour l'année précédente. C'est la
+    // dernière année inférieure qu'il faut.
+    const prev = [...ECONOMY_YEARS].reverse().find((y) => y.year < year);
     return prev ?? null;
   }, [year]);
 
   // Build ranked rows sorted by primary col
   const allRows = useMemo(() => {
-    const countries = Object.entries(activeEconomyYear.countries);
+    // Un classement ne se remplit pas de tirets : un pays dont la métrique
+    // affichée est absente de la base n'y figure pas, il reste gris sur la
+    // carte. Le compteur du pied de tableau dit alors combien la source
+    // couvre réellement cette année-là.
+    const countries = Object.entries(activeEconomyYear.countries).filter(
+      ([, d]) => Number.isFinite(primaryCol.getValue(d))
+    );
 
     const sorted = [...countries].sort(([, a], [, b]) => {
       const av = effectiveSortCol.getValue(a);
@@ -223,11 +241,13 @@ export function EconomyRankingsTable({
 
     const prevRankMap: Record<string, number> = {};
     if (prevYearData) {
-      const prevSorted = Object.entries(prevYearData.countries).sort(([, a], [, b]) => {
-        const av = primaryCol.getValue(a);
-        const bv = primaryCol.getValue(b);
-        return primaryCol.sortDir === "desc" ? bv - av : av - bv;
-      });
+      const prevSorted = Object.entries(prevYearData.countries)
+        .filter(([, d]) => Number.isFinite(primaryCol.getValue(d)))
+        .sort(([, a], [, b]) => {
+          const av = primaryCol.getValue(a);
+          const bv = primaryCol.getValue(b);
+          return primaryCol.sortDir === "desc" ? bv - av : av - bv;
+        });
       prevSorted.forEach(([name], i) => { prevRankMap[name] = i + 1; });
     }
 
@@ -243,14 +263,19 @@ export function EconomyRankingsTable({
   const filtered = useMemo(() => {
     if (!search.trim()) return allRows;
     const q = search.toLowerCase();
-    return allRows.filter((r) => r.name.toLowerCase().includes(q));
+    // Matched on both spellings: the reader types what is on screen, and the
+    // English key stays searchable for anyone who knows it.
+    return allRows.filter(
+      (r) =>
+        countryFr(r.name).toLowerCase().includes(q) || r.name.toLowerCase().includes(q)
+    );
   }, [allRows, search]);
 
   const currentMetric = ECONOMY_METRICS.find((m) => m.id === metric) ?? ECONOMY_METRICS[0];
 
   return (
     <div
-      className="rounded-2xl overflow-hidden mt-6"
+      className="rounded-2xl overflow-hidden"
       style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
     >
       {/* Table header */}
@@ -260,12 +285,42 @@ export function EconomyRankingsTable({
       >
         <div>
           <p className="section-title mb-0.5">Classement mondial</p>
-          <p className="text-heading-3" style={{ color: "var(--ink)" }}>
-            {currentMetric.label}{" "}
-            <span style={{ color: "var(--accent)" }}>
-              {ytdMode ? "En direct" : year}
-            </span>
-          </p>
+          {/* L'année se lisait, elle se choisit. Le classement vit dans sa
+              propre section : y renvoyer le lecteur à la frise, deux écrans
+              plus haut, pour comparer 1974 et 1975 n'était pas tenable. Le
+              choix reste le même que celui de la carte — c'est le même
+              paramètre d'URL. */}
+          <div className="flex items-baseline gap-2">
+            <p className="text-heading-3" style={{ color: "var(--ink)" }}>
+              {currentMetric.label}
+            </p>
+            {ytdMode || !onYearChange ? (
+              <span className="text-heading-3" style={{ color: "var(--accent)" }}>
+                {ytdMode ? "En direct" : year}
+              </span>
+            ) : (
+              <div className="relative flex items-center">
+                <select
+                  value={year}
+                  onChange={(e) => onYearChange(Number(e.target.value))}
+                  aria-label="Année du classement"
+                  className="appearance-none bg-transparent cursor-pointer text-heading-3 pr-5 outline-none"
+                  style={{ color: "var(--accent)", border: "none" }}
+                >
+                  {[...ECONOMY_YEAR_VALUES].reverse().map((y) => (
+                    <option key={y} value={y} style={{ color: "var(--ink)" }}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  size={14}
+                  className="pointer-events-none absolute right-0"
+                  style={{ color: "var(--accent)" }}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Search */}
@@ -286,7 +341,20 @@ export function EconomyRankingsTable({
       </div>
 
       {/* Table — translate="no" prevents browser auto-translation of units (Mds, k, %) */}
-      <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "460px" }} translate="no">
+      <div
+        className="overflow-x-auto overflow-y-auto"
+        // The wheel belongs to this table while the pointer is over it: the
+        // page's section-to-section run steps aside for anything marked as a
+        // scroll region, so reaching the last country does not throw the
+        // reader into the next section.
+        data-scroll-region
+        /* La fenêtre du tableau prend ce que la page lui laisse : sur un
+           portable elle s'arrêtait à sept pays, ce qui ne fait pas un
+           classement. Ce qui est retranché, c'est l'en-tête de la carte, sa
+           ligne de titres, son pied et les marges de la section. */
+        style={{ maxHeight: "min(760px, calc(100vh - 274px))" }}
+        translate="no"
+      >
         <table className="w-full" style={{ borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--border-light)", background: "var(--surface-2)" }}>
@@ -296,10 +364,13 @@ export function EconomyRankingsTable({
               <th className="px-3 py-2.5 text-left" style={{ color: "var(--ink-4)", fontSize: "0.62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                 Pays
               </th>
-              {cols.map((col) => (
+              {cols.map((col, i) => (
                 <th
                   key={col.key}
-                  className="px-3 py-2.5 text-right cursor-pointer transition-colors"
+                  // Sur un téléphone, seule la colonne que la carte met en
+                  // couleur reste : les autres sortaient de l'écran et se
+                  // lisaient déjà dans la fiche du pays.
+                  className={`px-3 py-2.5 text-right cursor-pointer transition-colors${i > 0 ? " eco-rank-extra" : ""}`}
                   onClick={() => handleSort(col.key, col.sortDir)}
                   style={{
                     color: col.key === effectiveSortKey ? "#0D7A40" : "var(--ink-4)",
@@ -330,13 +401,40 @@ export function EconomyRankingsTable({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18 }}
             >
+              {filtered.length === 0 && (
+                // Un tableau vide sans un mot laisse croire à une panne. Sur
+                // la dette et le chômage, seules sept années ont été saisies :
+                // les autres attendent leur import, et cela se dit.
+                <tr>
+                  <td
+                    colSpan={cols.length + 2}
+                    className="px-5 py-8 text-center"
+                    style={{ color: "var(--ink-3)", fontSize: "0.8rem" }}
+                  >
+                    {search.trim()
+                      ? `Aucun pays ne correspond à « ${search.trim()} ».`
+                      : `Aucune donnée « ${currentMetric.label} » pour ${year} : la source ne couvre pas encore cette année.`}
+                  </td>
+                </tr>
+              )}
               {filtered.map(({ name, data, rank, delta }, idx) => {
                 const isEven = idx % 2 === 1;
                 return (
-                  <tr
+                  // Countries land one after another. The delay is capped so a
+                  // re-sort of seventy-odd rows still resolves in under a
+                  // second — only the rows on screen carry the cascade.
+                  <motion.tr
                     key={name}
                     onClick={() => onCountryClick?.(name)}
                     className="transition-colors"
+                    initial={reduced ? false : { opacity: 0, x: -10 }}
+                    whileInView={reduced ? undefined : { opacity: 1, x: 0 }}
+                    viewport={{ once: true, amount: 0 }}
+                    transition={{
+                      duration: 0.34,
+                      delay: Math.min(idx, 16) * 0.045,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
                     style={{
                       background: isEven ? "var(--surface-2)" : "var(--surface)",
                       borderBottom: "1px solid var(--border-light)",
@@ -367,18 +465,18 @@ export function EconomyRankingsTable({
                     {/* Country */}
                     <td className="px-3 py-2.5">
                       <div className="flex items-center gap-2">
-                        {flagImg(FLAGS[name])}
-                        <span className="text-xs font-medium" style={{ color: "var(--ink)", whiteSpace: "nowrap" }}>
-                          {name}
+                        {flagImg(name)}
+                        <span className="text-xs font-medium eco-rank-country" style={{ color: "var(--ink)", whiteSpace: "nowrap" }}>
+                          {countryFr(name)}
                         </span>
                       </div>
                     </td>
 
                     {/* Data columns */}
-                    {cols.map((col) => (
+                    {cols.map((col, i) => (
                       <td
                         key={col.key}
-                        className="px-3 py-2.5 text-right tabular-nums"
+                        className={`px-3 py-2.5 text-right tabular-nums${i > 0 ? " eco-rank-extra" : ""}`}
                         style={{
                           background: "rgba(57,255,136,0.05)",
                           fontWeight: col.key === effectiveSortKey ? 700 : 500,
@@ -390,7 +488,7 @@ export function EconomyRankingsTable({
                         {col.format(data)}
                       </td>
                     ))}
-                  </tr>
+                  </motion.tr>
                 );
               })}
             </motion.tbody>

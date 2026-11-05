@@ -1,0 +1,17 @@
+{
+  "country": "EGY",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Égypte",
+  "iso2": "EG",
+  "data": {
+    "2000": 1100,
+    "2005": 1200,
+    "2010": 1400,
+    "2015": 1700,
+    "2020": 2000,
+    "2023": 2100,
+    "2025": 2300
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "country": "FRA",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "France",
+  "iso2": "FR",
+  "data": {
+    "2000": 57,
+    "2005": 67,
+    "2010": 82,
+    "2015": 95,
+    "2020": 115,
+    "2023": 110,
+    "2025": 113
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 57.3,
+        "2014": 94.9,
+        "2024": 112.2
+      }
+    }
+  ]
+}
