@@ -8,6 +8,7 @@ import { Jetons, Dessin } from "@/components/concept/Jetons";
 import { Loupe } from "@/components/concept/Loupe";
 import { Odometre, gelerOdometres } from "@/components/concept/Roulement";
 import { Selecteur } from "@/components/concept/Selecteur";
+import { SelecteurGroupes, type Groupe, type OptionGroupe } from "@/components/concept/SelecteurGroupes";
 import { Titre, usePret, useProgression, useVu } from "@/components/concept/ouverture";
 import { useTheme } from "@/components/concept/Theme";
 import { countryFr } from "@/data/countryNamesFr";
@@ -255,17 +256,26 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
   }, [jeu, ix, annee, col, sens]);
   const trier = (c: Col) => { if (c === col) setSens((s) => (s === -1 ? 1 : -1)); else { setCol(c); setSens(-1); } };
 
-  const puces = useMemo(() => {
-    const dispo = new Map(actives.map((a) => [a.id, a]));
-    const out: { cle: string; id: string | null; nom: string }[] = [];
-    const parcourir = (f: (typeof CATALOGUE)[number]) => {
-      for (const r of f.ressources ?? []) out.push({ cle: r.id, id: dispo.has(r.id) ? r.id : null, nom: r.nomFr });
-      for (const e of f.enfants ?? []) parcourir(e);
-      for (const n of f.aVenir ?? []) out.push({ cle: `${f.id}-${n}`, id: null, nom: n });
-    };
-    CATALOGUE.forEach(parcourir);
-    for (const a of actives) if (!out.some((o) => o.cle === a.id)) out.push({ cle: a.id, id: a.id, nom: a.nomFr });
-    return out.sort((a, b) => Number(b.id !== null) - Number(a.id !== null));
+  /* Les ressources rangées par catégorie principale (Agriculture, Élevage, Énergie…), pour le sélecteur. */
+  const groupes = useMemo<Groupe[]>(() => {
+    const dispo = new Set(actives.map((a) => a.id));
+    const vus = new Set<string>();
+    const out: Groupe[] = [];
+    for (const f of CATALOGUE) {
+      const options: OptionGroupe[] = [];
+      const parcourir = (g: (typeof CATALOGUE)[number], detail?: string) => {
+        for (const r of g.ressources ?? []) { vus.add(r.id); options.push({ id: r.id, label: r.nomFr, detail, actif: dispo.has(r.id) }); }
+        for (const e of g.enfants ?? []) parcourir(e, e.nom);
+        for (const n of g.aVenir ?? []) options.push({ id: `${g.id}-${n}`, label: n, actif: false });
+      };
+      parcourir(f);
+      /* Les ressources importées d'abord, puis celles à venir. */
+      options.sort((a, b) => Number(b.actif) - Number(a.actif));
+      if (options.length) out.push({ titre: f.nom, options });
+    }
+    const autres = actives.filter((a) => !vus.has(a.id)).map((a) => ({ id: a.id, label: a.nomFr, actif: true }));
+    if (autres.length) out.push({ titre: "Autres", options: autres });
+    return out;
   }, [actives]);
 
   return (
@@ -310,22 +320,10 @@ export function RessourcesPage({ articles, faq, debats }: Props) {
           </header>
 
           <div className="ge">
-            {/* Les ressources, comme les indicateurs sur Économie : on choisit ce que le globe montre. */}
-            <div className="ge-metriques rs-res" role="tablist" aria-label="Ressource">
-              {puces.map((p) => (
-                <button
-                  key={p.cle}
-                  type="button"
-                  role="tab"
-                  aria-selected={p.id === resId}
-                  disabled={!p.id}
-                  title={p.id ? undefined : "Données à venir : aucun fichier importé pour cette ressource"}
-                  className={`ge-metrique${p.id === resId ? " ge-metrique-on" : ""}${p.id ? "" : " rs-bientot"}`}
-                  onClick={() => p.id && setResId(p.id)}
-                >
-                  {p.nom}
-                </button>
-              ))}
+            {/* Les ressources : un sélecteur à catégories, le même que celui des classements. */}
+            <div className="rs-res rs-choix">
+              <span className="rs-choix-l">Ressource</span>
+              <SelecteurGroupes valeur={resId} groupes={groupes} onChange={setResId} label="Ressource affichée" />
             </div>
 
             <div className="ge-corps rs-corps" ref={rectangle}>

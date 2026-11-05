@@ -63,3 +63,15 @@
 .sl-l button.sl-vise { background: color-mix(in srgb, var(--voile) 9%, transparent); color: var(--encre); }
 .sl-l button.sl-on { color: #fff; background: linear-gradient(135deg, #5b2de0, #8a5cff); }
 @media (prefers-reduced-motion: reduce) { .sl-l { animation: none; } }
+
+/* Le sélecteur à catégories (Ressources) : la liste est plus haute et plus large ; chaque catégorie a son intitulé. */
+.sl-groupes .sl-b { min-width: 240px; font-size: 15px; }
+.sl-groupes .sl-l { max-height: min(460px, 70vh); min-width: 370px; }
+.sl-g { list-style: none; }
+.sl-g + .sl-g { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--v2-ligne, rgba(255, 255, 255, 0.12)); }
+.sl-g ul { list-style: none; margin: 0; padding: 0; }
+.sl-g-t { display: block; padding: 8px 14px 4px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--encre-3); }
+.sl-l button em { font-style: normal; font-size: 11px; color: var(--encre-3); white-space: nowrap; }
+.sl-l button.sl-on em { color: rgba(255, 255, 255, 0.8); }
+.sl-l button.sl-off { opacity: 0.45; cursor: default; }
+@media (max-width: 700px) { .sl-groupes .sl-b { min-width: 0; width: 100%; } .sl-groupes { display: block; } .sl-groupes .sl-l { min-width: 100%; } }

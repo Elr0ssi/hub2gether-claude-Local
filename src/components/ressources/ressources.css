@@ -166,3 +166,8 @@
 }
 /* La courbe de la fiche : pleine largeur, malgré la règle des sparklines d'Économie. */
 .cg-ressources .ge-evo .rs-courbes svg { height: 130px; width: 100%; }
+
+/* Le choix de la ressource : un libellé et le sélecteur, au-dessus du rectangle. */
+.cg-ressources .rs-choix { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; position: relative; z-index: 6; }
+.cg-ressources .rs-choix-l { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--encre-3); }
+@media (max-width: 700px) { .cg-ressources .rs-choix { flex-direction: column; align-items: stretch; gap: 6px; } }
