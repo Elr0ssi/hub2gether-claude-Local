@@ -34,7 +34,14 @@ export function EconomyInteractiveMap({ economyYear, metric, selectedCountry, on
   }, [onCountryClick]);
 
   return (
-    <div className="relative w-full" style={{ aspectRatio: "16/9", minHeight: "420px" }}>
+    // `height: 100%` so the map fills whatever box it is given instead of
+    // imposing 16/9 on it: the card caps its height on short screens, and an
+    // over-tall map pushed its own legend out of the visible area.
+    // The aspect ratio stays as the fallback when the parent has no height.
+    <div
+      className="relative w-full"
+      style={{ aspectRatio: "16/9", minHeight: "320px", height: "100%" }}
+    >
       <ComposableMap
         projection="geoNaturalEarth1"
         projectionConfig={{ center: [20, 10], scale: 155 }}

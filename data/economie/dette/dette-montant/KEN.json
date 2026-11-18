@@ -1,0 +1,13 @@
+{
+  "country": "KEN",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Kenya",
+  "iso2": "KE",
+  "data": {
+    "2000": 6,
+    "2014": 40,
+    "2024": 84
+  }
+}

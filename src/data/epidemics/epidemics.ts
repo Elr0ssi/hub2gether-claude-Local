@@ -9,7 +9,7 @@ export const EPIDEMICS: EpidemicDisease[] = [
   {
     id: "covid",
     label: "COVID-19",
-    period: "Déc. 2019 – présent",
+    period: "Déc. 2019, présent",
     pathogen: "SARS-CoV-2 coronavirus",
     ongoing: true,
     description:
@@ -71,13 +71,13 @@ export const EPIDEMICS: EpidemicDisease[] = [
   {
     id: "black-death",
     label: "Peste Noire",
-    period: "Oct. 1347 – 1353",
+    period: "Oct. 1347-1353",
     pathogen: "Yersinia pestis (bubonic plague)",
     ongoing: false,
     description:
       "La Peste Noire fut la pandémie la plus dévastatrice de l'histoire humaine. En moins de six ans, elle tua entre un tiers et la moitié de la population eurasienne, bouleversant durablement l'économie, la société et l'Église médiévale.",
     globalCases: "~200 millions",
-    globalDeaths: "75 – 100 millions",
+    globalDeaths: "75-100 millions",
     dataNote:
       "Estimations académiques basées sur des archives médiévales, recensements et fouilles archéologiques. Frontières modernes utilisées pour approximation géographique.",
     countries: {
@@ -116,7 +116,7 @@ export const EPIDEMICS: EpidemicDisease[] = [
   {
     id: "hiv",
     label: "VIH / SIDA",
-    period: "Juin 1981 – présent",
+    period: "Juin 1981 · présent",
     pathogen: "VIH (Virus de l'Immunodéficience Humaine)",
     ongoing: true,
     description:
@@ -170,13 +170,13 @@ export const EPIDEMICS: EpidemicDisease[] = [
   {
     id: "hantavirus",
     label: "Hantavirus",
-    period: "1976 – présent",
+    period: "1976 · présent",
     pathogen: "Hantavirus (famille Hantaviridae)",
     ongoing: true,
     description:
-      "Les hantavirus sont transmis par les rongeurs et provoquent deux syndromes graves : la fièvre hémorragique avec syndrome rénal (FHSR) en Eurasie, et le syndrome pulmonaire à hantavirus (SPH) en Amérique. La létalité du SPH atteint 35–40%. En 2024-2025, une recrudescence a été observée en Europe centrale et en Amérique du Sud.",
+      "Les hantavirus sont transmis par les rongeurs et provoquent deux syndromes graves : la fièvre hémorragique avec syndrome rénal (FHSR) en Eurasie, et le syndrome pulmonaire à hantavirus (SPH) en Amérique. La létalité du SPH atteint 35-40%. En 2024-2025, une recrudescence a été observée en Europe centrale et en Amérique du Sud.",
     globalCases: "~200 000 cas/an estimés",
-    globalDeaths: "~2 500 – 3 500/an (2024)",
+    globalDeaths: "~2 500-3 500/an (2024)",
     dataNote:
       "Source : OMS/CDC/ECDC 2024. Données cumulatives depuis 1978 (FHSR) et 1993 (SPH). La majorité des cas FHSR sont en Chine. deaths_per_year = estimation annuelle 2024.",
     countries: {
@@ -219,13 +219,13 @@ export const EPIDEMICS: EpidemicDisease[] = [
   {
     id: "hmpv",
     label: "HMPV",
-    period: "2001 – présent · surge 2025",
+    period: "2001 · présent · surge 2025",
     pathogen: "Métapneumovirus humain (hMPV)",
     ongoing: true,
     description:
       "Le métapneumovirus humain (hMPV) est un virus respiratoire identifié en 2001, proche du VRS. En janvier-février 2025, une vague exceptionnelle a touché la Chine, puis s'est propagée en Asie du Sud-Est et en Europe. Il cause des bronchiolites et pneumonies graves chez les nourrissons, personnes âgées et immunodéprimés.",
-    globalCases: "~10 – 15 millions/an (estimés)",
-    globalDeaths: "~150 000 – 250 000/an (2024-2025)",
+    globalCases: "~10-15 millions/an (estimés)",
+    globalDeaths: "~150 000-250 000/an (2024-2025)",
     dataNote:
       "Source : OMS/CDC/ECDC, estimation 2024-2025. Le hMPV est sous-déclaré ; les décès sont comptabilisés comme pneumonie ou insuffisance respiratoire. Données cumulatives depuis 2001.",
     countries: {

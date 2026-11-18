@@ -1,0 +1,14 @@
+{
+  "country": "MEX",
+  "indicator": "IMPORTS",
+  "unit": "MD_USD",
+  "source": "OMC · FMI (WEO) · Banque mondiale (BOP)",
+  "name": "Mexique",
+  "iso2": "MX",
+  "data": {
+    "2024": 625
+  },
+  "notes": [
+    "La source date ces valeurs « 2024/2025 » sans trancher. Elles sont rangées sous 2024, date la plus récente que la source nomme explicitement."
+  ]
+}

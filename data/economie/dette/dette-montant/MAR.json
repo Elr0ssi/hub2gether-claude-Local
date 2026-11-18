@@ -1,0 +1,13 @@
+{
+  "country": "MAR",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Maroc",
+  "iso2": "MA",
+  "data": {
+    "2000": 20,
+    "2014": 54,
+    "2024": 110
+  }
+}

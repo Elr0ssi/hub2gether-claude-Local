@@ -1,6 +1,6 @@
 // Population by country, in millions, for the 7 snapshot years used across the site (2000, 2005, 2010, 2015, 2020, 2023, 2025).
 // Used to derive "PIB par habitant" (GDP per capita) from the existing gdp (Mds $) field at each snapshot year.
-// Estimates based on UN/World Bank population trends — not extracted live (see dataNote on ECONOMY_YEARS).
+// Estimates based on UN/World Bank population trends, not extracted live (see dataNote on ECONOMY_YEARS).
 export const ECONOMY_YEARS_LIST = [2000, 2005, 2010, 2015, 2020, 2023, 2025] as const;
 
 export const POPULATION_BY_COUNTRY: Record<string, [number, number, number, number, number, number, number]> = {

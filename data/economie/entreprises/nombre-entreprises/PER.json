@@ -1,0 +1,17 @@
+{
+  "country": "PER",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Pérou",
+  "iso2": "PE",
+  "data": {
+    "2000": 850,
+    "2005": 1000,
+    "2010": 1200,
+    "2015": 1350,
+    "2020": 1430,
+    "2023": 1500,
+    "2025": 1200
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "GBR",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Royaume-Uni",
+  "iso2": "GB",
+  "data": {
+    "2000": 4200,
+    "2005": 4500,
+    "2010": 4700,
+    "2015": 5000,
+    "2020": 5400,
+    "2023": 5700,
+    "2025": 5200
+  }
+}

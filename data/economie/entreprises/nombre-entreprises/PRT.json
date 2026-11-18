@@ -1,0 +1,17 @@
+{
+  "country": "PRT",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Portugal",
+  "iso2": "PT",
+  "data": {
+    "2000": 780,
+    "2005": 850,
+    "2010": 920,
+    "2015": 960,
+    "2020": 1020,
+    "2023": 1050,
+    "2025": 1100
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "country": "URY",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Uruguay",
+  "iso2": "UY",
+  "data": {
+    "2000": 120,
+    "2005": 140,
+    "2010": 170,
+    "2015": 185,
+    "2020": 195,
+    "2023": 200
+  }
+}

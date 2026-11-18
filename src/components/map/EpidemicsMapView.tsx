@@ -177,7 +177,7 @@ export function EpidemicsMapView() {
               </button>
             ))}
 
-            {/* "Depuis 2026" — uniquement pour les épidémies en cours */}
+            {/* "Depuis 2026", uniquement pour les épidémies en cours */}
             {disease.ongoing && (
               <>
                 <div className="w-px h-4 shrink-0 mx-1" style={{ background: "var(--border)" }} />

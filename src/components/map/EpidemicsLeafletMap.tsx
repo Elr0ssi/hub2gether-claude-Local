@@ -12,7 +12,7 @@ import {
   GRADIENT_CSS,
 } from "@/lib/epidemicsColors";
 
-// Natural Earth 110m countries GeoJSON — same source as world-atlas, with `name` field
+// Natural Earth 110m countries GeoJSON, same source as world-atlas, with `name` field
 const GEO_URL =
   "/geo/ne_110m_admin_0_countries.geojson";
 
@@ -68,7 +68,7 @@ export function EpidemicsLeafletMap({
         cacheRef.current = data;
         setGeoData(data);
       })
-      .catch(() => {/* silent — map still renders without choropleth */});
+      .catch(() => {/* silent, map still renders without choropleth */});
   }, []);
 
   const maxDeaths = getMaxDeaths(disease.countries);

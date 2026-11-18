@@ -1,0 +1,17 @@
+{
+  "country": "COL",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Colombie",
+  "iso2": "CO",
+  "data": {
+    "2000": 39.7,
+    "2005": 42.9,
+    "2010": 45.5,
+    "2015": 47.5,
+    "2020": 50.9,
+    "2023": 52.2,
+    "2025": 52.7
+  }
+}

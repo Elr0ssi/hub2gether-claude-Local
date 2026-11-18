@@ -1,0 +1,13 @@
+{
+  "country": "UKR",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Ukraine",
+  "iso2": "UA",
+  "data": {
+    "2000": 15,
+    "2014": 73,
+    "2024": 180
+  }
+}

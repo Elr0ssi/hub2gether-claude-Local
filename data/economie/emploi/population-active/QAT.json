@@ -1,0 +1,14 @@
+{
+  "country": "QAT",
+  "indicator": "ACTIVE_POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "OCDE · OIT · estimations 2023",
+  "name": "Qatar",
+  "iso2": "QA",
+  "data": {
+    "2023": 2
+  },
+  "notes": [
+    "La source ne publie qu'une valeur, datée 2023. Elle est rangée sous 2023 et non répétée sur les autres années : aucune année n'est inventée."
+  ]
+}

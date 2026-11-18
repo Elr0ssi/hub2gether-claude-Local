@@ -1,0 +1,247 @@
+{
+ "id": "qcl-olive-oil",
+ "lignes_source": 1944,
+ "lignes_traitees": 1944,
+ "lignes_ecartees": [],
+ "valeurs_vides": 82,
+ "zeros": 42,
+ "flags": {
+  "I": 434,
+  "A": 929,
+  "E": 119,
+  "X": 380,
+  "M": 82
+ },
+ "notes": {
+  "Unofficial figure": 380
+ },
+ "unites": {
+  "t": 1944
+ },
+ "doublons": [],
+ "geo": {
+  "associes": [
+   {
+    "m49": "004",
+    "nom": "Afghanistan",
+    "ne": "Afghanistan"
+   },
+   {
+    "m49": "008",
+    "nom": "Albania",
+    "ne": "Albania"
+   },
+   {
+    "m49": "012",
+    "nom": "Algeria",
+    "ne": "Algeria"
+   },
+   {
+    "m49": "031",
+    "nom": "Azerbaijan",
+    "ne": "Azerbaijan"
+   },
+   {
+    "m49": "032",
+    "nom": "Argentina",
+    "ne": "Argentina"
+   },
+   {
+    "m49": "036",
+    "nom": "Australia",
+    "ne": "Australia"
+   },
+   {
+    "m49": "096",
+    "nom": "Brunei Darussalam",
+    "ne": "Brunei"
+   },
+   {
+    "m49": "152",
+    "nom": "Chile",
+    "ne": "Chile"
+   },
+   {
+    "m49": "170",
+    "nom": "Colombia",
+    "ne": "Colombia"
+   },
+   {
+    "m49": "191",
+    "nom": "Croatia",
+    "ne": "Croatia"
+   },
+   {
+    "m49": "196",
+    "nom": "Cyprus",
+    "ne": "Cyprus"
+   },
+   {
+    "m49": "222",
+    "nom": "El Salvador",
+    "ne": "El Salvador"
+   },
+   {
+    "m49": "250",
+    "nom": "France",
+    "ne": "France"
+   },
+   {
+    "m49": "275",
+    "nom": "Palestine",
+    "ne": "Palestine"
+   },
+   {
+    "m49": "300",
+    "nom": "Greece",
+    "ne": "Greece"
+   },
+   {
+    "m49": "364",
+    "nom": "Iran (Islamic Republic of)",
+    "ne": "Iran"
+   },
+   {
+    "m49": "376",
+    "nom": "Israel",
+    "ne": "Israel"
+   },
+   {
+    "m49": "380",
+    "nom": "Italy",
+    "ne": "Italy"
+   },
+   {
+    "m49": "400",
+    "nom": "Jordan",
+    "ne": "Jordan"
+   },
+   {
+    "m49": "422",
+    "nom": "Lebanon",
+    "ne": "Lebanon"
+   },
+   {
+    "m49": "434",
+    "nom": "Libya",
+    "ne": "Libya"
+   },
+   {
+    "m49": "470",
+    "nom": "Malta",
+    "ne": "Malta"
+   },
+   {
+    "m49": "484",
+    "nom": "Mexico",
+    "ne": "Mexico"
+   },
+   {
+    "m49": "499",
+    "nom": "Montenegro",
+    "ne": "Montenegro"
+   },
+   {
+    "m49": "504",
+    "nom": "Morocco",
+    "ne": "Morocco"
+   },
+   {
+    "m49": "604",
+    "nom": "Peru",
+    "ne": "Peru"
+   },
+   {
+    "m49": "620",
+    "nom": "Portugal",
+    "ne": "Portugal"
+   },
+   {
+    "m49": "682",
+    "nom": "Saudi Arabia",
+    "ne": "Saudi Arabia"
+   },
+   {
+    "m49": "705",
+    "nom": "Slovenia",
+    "ne": "Slovenia"
+   },
+   {
+    "m49": "716",
+    "nom": "Zimbabwe",
+    "ne": "Zimbabwe"
+   },
+   {
+    "m49": "724",
+    "nom": "Spain",
+    "ne": "Spain"
+   },
+   {
+    "m49": "760",
+    "nom": "Syrian Arab Republic",
+    "ne": "Syria"
+   },
+   {
+    "m49": "788",
+    "nom": "Tunisia",
+    "ne": "Tunisia"
+   },
+   {
+    "m49": "792",
+    "nom": "Türkiye",
+    "ne": "Turkey"
+   },
+   {
+    "m49": "804",
+    "nom": "Ukraine",
+    "ne": "Ukraine"
+   },
+   {
+    "m49": "807",
+    "nom": "North Macedonia",
+    "ne": "North Macedonia"
+   },
+   {
+    "m49": "818",
+    "nom": "Egypt",
+    "ne": "Egypt"
+   },
+   {
+    "m49": "840",
+    "nom": "United States of America",
+    "ne": "United States of America"
+   },
+   {
+    "m49": "858",
+    "nom": "Uruguay",
+    "ne": "Uruguay"
+   }
+  ],
+  "historiques": [
+   {
+    "m49": "890",
+    "nom": "Yugoslav SFR",
+    "note": "Yougoslavie fédérale, jusqu'en 1991.",
+    "successeurs": [
+     "070",
+     "191",
+     "705",
+     "807",
+     "891"
+    ]
+   },
+   {
+    "m49": "891",
+    "nom": "Serbia and Montenegro",
+    "note": "Serbie-et-Monténégro, 1992-2005.",
+    "successeurs": [
+     "688",
+     "499"
+    ]
+   }
+  ],
+  "agregats": [],
+  "non_associes": [],
+  "ambigus": []
+ }
+}

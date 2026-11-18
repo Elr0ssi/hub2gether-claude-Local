@@ -1,0 +1,17 @@
+{
+  "country": "POL",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Pologne",
+  "iso2": "PL",
+  "data": {
+    "2000": 38.3,
+    "2005": 38.2,
+    "2010": 38,
+    "2015": 38,
+    "2020": 37.8,
+    "2023": 36.7,
+    "2025": 36.6
+  }
+}

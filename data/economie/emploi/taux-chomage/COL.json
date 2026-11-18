@@ -1,0 +1,17 @@
+{
+  "country": "COL",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Colombie",
+  "iso2": "CO",
+  "data": {
+    "2000": 17.3,
+    "2005": 11.7,
+    "2010": 11.8,
+    "2015": 8.9,
+    "2020": 16.1,
+    "2023": 10.8,
+    "2025": 10.5
+  }
+}

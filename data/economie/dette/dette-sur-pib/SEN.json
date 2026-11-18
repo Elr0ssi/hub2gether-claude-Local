@@ -1,0 +1,17 @@
+{
+  "country": "SEN",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Sénégal",
+  "iso2": "SN",
+  "data": {
+    "2000": 81,
+    "2005": 56,
+    "2010": 33,
+    "2015": 47,
+    "2020": 69,
+    "2023": 84,
+    "2025": 82
+  }
+}

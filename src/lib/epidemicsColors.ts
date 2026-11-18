@@ -1,16 +1,20 @@
-// Shared color logic for the epidemics choropleth — used by both SVG and Leaflet maps.
+// Shared color logic for the epidemics choropleth, used by both SVG and Leaflet maps.
 
 // 4-stop gradient: neon (few deaths) → dark (most deaths)
 const COLOR_STOPS: [number, number, number][] = [
-  [ 57, 255, 136],  // neon #39FF88 — lowest intensity
+  [ 57, 255, 136],  // neon #39FF88, lowest intensity
   [ 80, 195, 115],  // medium green
   [ 28, 120,  60],  // forest green
-  [ 10,  45,  22],  // near-black deep green — highest intensity
+  [ 10,  45,  22],  // near-black deep green, highest intensity
 ];
 
 export function interpolateGreen(t: number): string {
   const n = COLOR_STOPS.length - 1;
-  const seg = Math.min(t * n, n - 0.001);
+  // Le haut de la plage était borné, le bas ne l'était pas : une intensité
+  // négative, ce que produit une inflation négative, c'est-à-dire une
+  // déflation, donnait un indice négatif, donc une borne inexistante, et la
+  // carte entière tombait. Les deux extrémités sont désormais tenues.
+  const seg = Math.max(0, Math.min(t * n, n - 0.001));
   const i = Math.floor(seg);
   const lt = seg - i;
   const [r1, g1, b1] = COLOR_STOPS[i];

@@ -1,0 +1,11 @@
+{
+  "country": "TUV",
+  "indicator": "INFLATION",
+  "unit": "PCT",
+  "source": "Banque mondiale · WDI (FP.CPI.TOTL.ZG) · FMI, International Financial Statistics",
+  "name": "Tuvalu",
+  "iso2": "TV",
+  "data": {
+    "2011": 0.5005807431527
+  }
+}

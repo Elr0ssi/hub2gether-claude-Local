@@ -1,0 +1,17 @@
+{
+  "country": "CIV",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Côte d'Ivoire",
+  "iso2": "CI",
+  "data": {
+    "2000": 140,
+    "2005": 170,
+    "2010": 210,
+    "2015": 245,
+    "2020": 265,
+    "2023": 280,
+    "2025": 370
+  }
+}

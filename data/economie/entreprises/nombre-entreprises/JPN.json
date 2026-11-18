@@ -1,0 +1,17 @@
+{
+  "country": "JPN",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Japon",
+  "iso2": "JP",
+  "data": {
+    "2000": 5500,
+    "2005": 5200,
+    "2010": 4900,
+    "2015": 4800,
+    "2020": 4700,
+    "2023": 4800,
+    "2025": 4900
+  }
+}

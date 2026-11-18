@@ -1,5 +1,6 @@
 "use client";
 
+import { countryFr } from "@/data/countryNamesFr";
 import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronUp, ChevronDown, Shield } from "lucide-react";
@@ -212,7 +213,7 @@ export function MilitaryRankingsTable({
                       <div className="flex items-center gap-2">
                         {flagImg(FLAGS[name])}
                         <span className="text-xs font-medium" style={{ color: isHighlighted ? metricDef.color : "var(--ink)", whiteSpace: "nowrap" }}>
-                          {name}
+                          {countryFr(name)}
                         </span>
                       </div>
                     </td>
@@ -238,7 +239,7 @@ export function MilitaryRankingsTable({
                     {showBudgetCols && (
                       <td className="px-3 py-2.5 text-right tabular-nums hidden md:table-cell" style={{ whiteSpace: "nowrap" }}>
                         <span style={{ color: pctGDP !== null ? "var(--ink)" : "var(--ink-4)", fontSize: "0.75rem", fontWeight: pctGDP !== null ? 600 : 400 }}>
-                          {pctGDP !== null ? `${pctGDP.toFixed(1)} %` : "—"}
+                          {pctGDP !== null ? `${pctGDP.toFixed(1)} %` : "-"}
                         </span>
                       </td>
                     )}
@@ -247,7 +248,7 @@ export function MilitaryRankingsTable({
                     {showBudgetCols && (
                       <td className="px-3 py-2.5 text-right tabular-nums hidden md:table-cell" style={{ whiteSpace: "nowrap" }}>
                         <span style={{ color: pctWorld !== null ? "var(--ink)" : "var(--ink-4)", fontSize: "0.75rem", fontWeight: pctWorld !== null ? 600 : 400 }}>
-                          {pctWorld !== null ? `${pctWorld.toFixed(1)} %` : "—"}
+                          {pctWorld !== null ? `${pctWorld.toFixed(1)} %` : "-"}
                         </span>
                       </td>
                     )}

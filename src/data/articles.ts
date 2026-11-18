@@ -1,4 +1,4 @@
-// Central aggregator — add articles in the per-theme files:
+// Central aggregator, add articles in the per-theme files:
 //   src/data/economy/articles.ts   → economy articles
 //   src/data/epidemics/articles.ts → epidemics articles
 //   src/data/empires/articles.ts   → empires articles

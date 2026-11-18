@@ -1,0 +1,15 @@
+{
+  "indicateur": "RETIREMENT_AGE",
+  "libelle": "Âge de départ à la retraite",
+  "unite": "ANNEES",
+  "categorie": "economie/emploi",
+  "chemin": "data/economie/emploi/age-retraite",
+  "sources": [
+    "OCDE · OIT · estimations 2023"
+  ],
+  "annees": [
+    2023
+  ],
+  "paysCouverts": 124,
+  "misAJour": "2026-09-21"
+}

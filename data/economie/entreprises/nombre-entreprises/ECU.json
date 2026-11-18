@@ -1,0 +1,16 @@
+{
+  "country": "ECU",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Équateur",
+  "iso2": "EC",
+  "data": {
+    "2000": 520,
+    "2005": 640,
+    "2010": 780,
+    "2015": 870,
+    "2020": 910,
+    "2023": 950
+  }
+}

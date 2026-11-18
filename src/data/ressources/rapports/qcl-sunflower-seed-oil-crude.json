@@ -1,0 +1,566 @@
+{
+ "id": "qcl-sunflower-seed-oil-crude",
+ "lignes_source": 4697,
+ "lignes_traitees": 4697,
+ "lignes_ecartees": [],
+ "valeurs_vides": 78,
+ "zeros": 373,
+ "flags": {
+  "I": 1798,
+  "E": 432,
+  "X": 1175,
+  "A": 1214,
+  "M": 78
+ },
+ "notes": {
+  "Unofficial figure": 1167
+ },
+ "unites": {
+  "t": 4697
+ },
+ "doublons": [],
+ "geo": {
+  "associes": [
+   {
+    "m49": "004",
+    "nom": "Afghanistan",
+    "ne": "Afghanistan"
+   },
+   {
+    "m49": "008",
+    "nom": "Albania",
+    "ne": "Albania"
+   },
+   {
+    "m49": "012",
+    "nom": "Algeria",
+    "ne": "Algeria"
+   },
+   {
+    "m49": "024",
+    "nom": "Angola",
+    "ne": "Angola"
+   },
+   {
+    "m49": "031",
+    "nom": "Azerbaijan",
+    "ne": "Azerbaijan"
+   },
+   {
+    "m49": "032",
+    "nom": "Argentina",
+    "ne": "Argentina"
+   },
+   {
+    "m49": "036",
+    "nom": "Australia",
+    "ne": "Australia"
+   },
+   {
+    "m49": "040",
+    "nom": "Austria",
+    "ne": "Austria"
+   },
+   {
+    "m49": "051",
+    "nom": "Armenia",
+    "ne": "Armenia"
+   },
+   {
+    "m49": "056",
+    "nom": "Belgium",
+    "ne": "Belgium"
+   },
+   {
+    "m49": "068",
+    "nom": "Bolivia (Plurinational State of)",
+    "ne": "Bolivia"
+   },
+   {
+    "m49": "070",
+    "nom": "Bosnia and Herzegovina",
+    "ne": "Bosnia and Herz."
+   },
+   {
+    "m49": "072",
+    "nom": "Botswana",
+    "ne": "Botswana"
+   },
+   {
+    "m49": "076",
+    "nom": "Brazil",
+    "ne": "Brazil"
+   },
+   {
+    "m49": "096",
+    "nom": "Brunei Darussalam",
+    "ne": "Brunei"
+   },
+   {
+    "m49": "100",
+    "nom": "Bulgaria",
+    "ne": "Bulgaria"
+   },
+   {
+    "m49": "104",
+    "nom": "Myanmar",
+    "ne": "Myanmar"
+   },
+   {
+    "m49": "112",
+    "nom": "Belarus",
+    "ne": "Belarus"
+   },
+   {
+    "m49": "124",
+    "nom": "Canada",
+    "ne": "Canada"
+   },
+   {
+    "m49": "144",
+    "nom": "Sri Lanka",
+    "ne": "Sri Lanka"
+   },
+   {
+    "m49": "152",
+    "nom": "Chile",
+    "ne": "Chile"
+   },
+   {
+    "m49": "156",
+    "nom": "China, mainland",
+    "ne": "China"
+   },
+   {
+    "m49": "170",
+    "nom": "Colombia",
+    "ne": "Colombia"
+   },
+   {
+    "m49": "191",
+    "nom": "Croatia",
+    "ne": "Croatia"
+   },
+   {
+    "m49": "203",
+    "nom": "Czechia",
+    "ne": "Czechia"
+   },
+   {
+    "m49": "208",
+    "nom": "Denmark",
+    "ne": "Denmark"
+   },
+   {
+    "m49": "233",
+    "nom": "Estonia",
+    "ne": "Estonia"
+   },
+   {
+    "m49": "246",
+    "nom": "Finland",
+    "ne": "Finland"
+   },
+   {
+    "m49": "250",
+    "nom": "France",
+    "ne": "France"
+   },
+   {
+    "m49": "268",
+    "nom": "Georgia",
+    "ne": "Georgia"
+   },
+   {
+    "m49": "276",
+    "nom": "Germany",
+    "ne": "Germany"
+   },
+   {
+    "m49": "300",
+    "nom": "Greece",
+    "ne": "Greece"
+   },
+   {
+    "m49": "320",
+    "nom": "Guatemala",
+    "ne": "Guatemala"
+   },
+   {
+    "m49": "348",
+    "nom": "Hungary",
+    "ne": "Hungary"
+   },
+   {
+    "m49": "356",
+    "nom": "India",
+    "ne": "India"
+   },
+   {
+    "m49": "360",
+    "nom": "Indonesia",
+    "ne": "Indonesia"
+   },
+   {
+    "m49": "364",
+    "nom": "Iran (Islamic Republic of)",
+    "ne": "Iran"
+   },
+   {
+    "m49": "368",
+    "nom": "Iraq",
+    "ne": "Iraq"
+   },
+   {
+    "m49": "376",
+    "nom": "Israel",
+    "ne": "Israel"
+   },
+   {
+    "m49": "380",
+    "nom": "Italy",
+    "ne": "Italy"
+   },
+   {
+    "m49": "392",
+    "nom": "Japan",
+    "ne": "Japan"
+   },
+   {
+    "m49": "398",
+    "nom": "Kazakhstan",
+    "ne": "Kazakhstan"
+   },
+   {
+    "m49": "400",
+    "nom": "Jordan",
+    "ne": "Jordan"
+   },
+   {
+    "m49": "404",
+    "nom": "Kenya",
+    "ne": "Kenya"
+   },
+   {
+    "m49": "417",
+    "nom": "Kyrgyzstan",
+    "ne": "Kyrgyzstan"
+   },
+   {
+    "m49": "422",
+    "nom": "Lebanon",
+    "ne": "Lebanon"
+   },
+   {
+    "m49": "428",
+    "nom": "Latvia",
+    "ne": "Latvia"
+   },
+   {
+    "m49": "440",
+    "nom": "Lithuania",
+    "ne": "Lithuania"
+   },
+   {
+    "m49": "442",
+    "nom": "Luxembourg",
+    "ne": "Luxembourg"
+   },
+   {
+    "m49": "450",
+    "nom": "Madagascar",
+    "ne": "Madagascar"
+   },
+   {
+    "m49": "454",
+    "nom": "Malawi",
+    "ne": "Malawi"
+   },
+   {
+    "m49": "458",
+    "nom": "Malaysia",
+    "ne": "Malaysia"
+   },
+   {
+    "m49": "484",
+    "nom": "Mexico",
+    "ne": "Mexico"
+   },
+   {
+    "m49": "498",
+    "nom": "Republic of Moldova",
+    "ne": "Moldova"
+   },
+   {
+    "m49": "504",
+    "nom": "Morocco",
+    "ne": "Morocco"
+   },
+   {
+    "m49": "508",
+    "nom": "Mozambique",
+    "ne": "Mozambique"
+   },
+   {
+    "m49": "516",
+    "nom": "Namibia",
+    "ne": "Namibia"
+   },
+   {
+    "m49": "528",
+    "nom": "Netherlands (Kingdom of the)",
+    "ne": "Netherlands"
+   },
+   {
+    "m49": "578",
+    "nom": "Norway",
+    "ne": "Norway"
+   },
+   {
+    "m49": "586",
+    "nom": "Pakistan",
+    "ne": "Pakistan"
+   },
+   {
+    "m49": "591",
+    "nom": "Panama",
+    "ne": "Panama"
+   },
+   {
+    "m49": "600",
+    "nom": "Paraguay",
+    "ne": "Paraguay"
+   },
+   {
+    "m49": "616",
+    "nom": "Poland",
+    "ne": "Poland"
+   },
+   {
+    "m49": "620",
+    "nom": "Portugal",
+    "ne": "Portugal"
+   },
+   {
+    "m49": "642",
+    "nom": "Romania",
+    "ne": "Romania"
+   },
+   {
+    "m49": "643",
+    "nom": "Russian Federation",
+    "ne": "Russia"
+   },
+   {
+    "m49": "688",
+    "nom": "Serbia",
+    "ne": "Serbia"
+   },
+   {
+    "m49": "703",
+    "nom": "Slovakia",
+    "ne": "Slovakia"
+   },
+   {
+    "m49": "710",
+    "nom": "South Africa",
+    "ne": "South Africa"
+   },
+   {
+    "m49": "716",
+    "nom": "Zimbabwe",
+    "ne": "Zimbabwe"
+   },
+   {
+    "m49": "724",
+    "nom": "Spain",
+    "ne": "Spain"
+   },
+   {
+    "m49": "728",
+    "nom": "South Sudan",
+    "ne": "S. Sudan"
+   },
+   {
+    "m49": "729",
+    "nom": "Sudan",
+    "ne": "Sudan"
+   },
+   {
+    "m49": "752",
+    "nom": "Sweden",
+    "ne": "Sweden"
+   },
+   {
+    "m49": "756",
+    "nom": "Switzerland",
+    "ne": "Switzerland"
+   },
+   {
+    "m49": "760",
+    "nom": "Syrian Arab Republic",
+    "ne": "Syria"
+   },
+   {
+    "m49": "762",
+    "nom": "Tajikistan",
+    "ne": "Tajikistan"
+   },
+   {
+    "m49": "764",
+    "nom": "Thailand",
+    "ne": "Thailand"
+   },
+   {
+    "m49": "788",
+    "nom": "Tunisia",
+    "ne": "Tunisia"
+   },
+   {
+    "m49": "792",
+    "nom": "Türkiye",
+    "ne": "Turkey"
+   },
+   {
+    "m49": "795",
+    "nom": "Turkmenistan",
+    "ne": "Turkmenistan"
+   },
+   {
+    "m49": "800",
+    "nom": "Uganda",
+    "ne": "Uganda"
+   },
+   {
+    "m49": "804",
+    "nom": "Ukraine",
+    "ne": "Ukraine"
+   },
+   {
+    "m49": "807",
+    "nom": "North Macedonia",
+    "ne": "North Macedonia"
+   },
+   {
+    "m49": "818",
+    "nom": "Egypt",
+    "ne": "Egypt"
+   },
+   {
+    "m49": "826",
+    "nom": "United Kingdom of Great Britain and Northern Ireland",
+    "ne": "United Kingdom"
+   },
+   {
+    "m49": "834",
+    "nom": "United Republic of Tanzania",
+    "ne": "Tanzania"
+   },
+   {
+    "m49": "840",
+    "nom": "United States of America",
+    "ne": "United States of America"
+   },
+   {
+    "m49": "858",
+    "nom": "Uruguay",
+    "ne": "Uruguay"
+   },
+   {
+    "m49": "860",
+    "nom": "Uzbekistan",
+    "ne": "Uzbekistan"
+   },
+   {
+    "m49": "862",
+    "nom": "Venezuela (Bolivarian Republic of)",
+    "ne": "Venezuela"
+   },
+   {
+    "m49": "894",
+    "nom": "Zambia",
+    "ne": "Zambia"
+   }
+  ],
+  "historiques": [
+   {
+    "m49": "058",
+    "nom": "Belgium-Luxembourg",
+    "note": "Série réunie de la Belgique et du Luxembourg jusqu'en 1999.",
+    "successeurs": [
+     "056",
+     "442"
+    ]
+   },
+   {
+    "m49": "200",
+    "nom": "Czechoslovakia",
+    "note": "Entité dissoute fin 1992 (Tchéquie, Slovaquie).",
+    "successeurs": [
+     "203",
+     "703"
+    ]
+   },
+   {
+    "m49": "736",
+    "nom": "Sudan (former)",
+    "note": "Soudan avant la sécession du Soudan du Sud (2011) : frontières différentes de l'actuel.",
+    "successeurs": [
+     "729"
+    ]
+   },
+   {
+    "m49": "810",
+    "nom": "USSR",
+    "note": "Union soviétique, jusqu'en 1991 : ne correspond à aucune géométrie actuelle.",
+    "successeurs": [
+     "643",
+     "804",
+     "112",
+     "498",
+     "233",
+     "428",
+     "440",
+     "051",
+     "031",
+     "268",
+     "398",
+     "417",
+     "762",
+     "795",
+     "860"
+    ]
+   },
+   {
+    "m49": "890",
+    "nom": "Yugoslav SFR",
+    "note": "Yougoslavie fédérale, jusqu'en 1991.",
+    "successeurs": [
+     "070",
+     "191",
+     "705",
+     "807",
+     "891"
+    ]
+   },
+   {
+    "m49": "891",
+    "nom": "Serbia and Montenegro",
+    "note": "Serbie-et-Monténégro, 1992-2005.",
+    "successeurs": [
+     "688",
+     "499"
+    ]
+   }
+  ],
+  "agregats": [
+   {
+    "m49": "159",
+    "nom": "China",
+    "note": "Agrégat FAOSTAT : Chine continentale, Taïwan, Hong Kong et Macao. Recoupe les séries 156 et 158 : jamais additionné avec elles."
+   }
+  ],
+  "non_associes": [],
+  "ambigus": []
+ }
+}

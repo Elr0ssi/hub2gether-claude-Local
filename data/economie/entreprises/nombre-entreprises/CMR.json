@@ -1,0 +1,17 @@
+{
+  "country": "CMR",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Cameroun",
+  "iso2": "CM",
+  "data": {
+    "2000": 140,
+    "2005": 180,
+    "2010": 220,
+    "2015": 260,
+    "2020": 285,
+    "2023": 300,
+    "2025": 310
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "country": "SDN",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Soudan",
+  "iso2": "SD",
+  "data": {
+    "2000": 120,
+    "2005": 160,
+    "2010": 200,
+    "2015": 220,
+    "2020": 230,
+    "2023": 250,
+    "2025": 220
+  }
+}

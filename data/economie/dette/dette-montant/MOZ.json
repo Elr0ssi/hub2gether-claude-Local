@@ -1,0 +1,13 @@
+{
+  "country": "MOZ",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Mozambique",
+  "iso2": "MZ",
+  "data": {
+    "2000": 2,
+    "2014": 9,
+    "2024": 14
+  }
+}

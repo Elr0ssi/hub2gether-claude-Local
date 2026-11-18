@@ -30,7 +30,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
           </span>
         </div>
 
-        {/* Title — 2 lines clamped */}
+        {/* Title, 2 lines clamped */}
         <h3
           className="text-heading-3 leading-snug"
           style={{
@@ -44,7 +44,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
           {article.title}
         </h3>
 
-        {/* Excerpt — 3 lines clamped */}
+        {/* Excerpt, 3 lines clamped */}
         <p
           className="text-small leading-relaxed flex-1"
           style={{
@@ -68,7 +68,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
             className="flex items-center gap-1 text-xs font-semibold transition-all group-hover:gap-2"
             style={{ color: "var(--accent-fg, #0D7A40)" }}
           >
-            Lire l&apos;article
+            Lire l’article
             <ArrowRight size={13} />
           </Link>
         </div>

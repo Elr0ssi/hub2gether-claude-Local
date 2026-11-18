@@ -1,7 +1,7 @@
 // Trade balance (external balance on goods and services), in Mds USD, for the 7 snapshot years (2000, 2005, 2010, 2015, 2020, 2023, 2025).
-// Positive = surplus (exports > imports), negative = deficit. Covers the major trading economies —
+// Positive = surplus (exports > imports), negative = deficit. Covers the major trading economies,
 // estimates based on IMF/WTO/World Bank historical trends, not extracted live (see dataNote on ECONOMY_YEARS).
-// Smaller economies not listed here show "—" in the rankings/map rather than an unreliable guess.
+// Smaller economies not listed here show "–" in the rankings/map rather than an unreliable guess.
 import { ECONOMY_YEARS_LIST } from "./populationData";
 
 export const TRADE_BALANCE_BY_COUNTRY: Record<string, [number, number, number, number, number, number, number]> = {

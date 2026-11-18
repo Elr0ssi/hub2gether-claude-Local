@@ -148,7 +148,7 @@ export function EmpireLeafletMap({
       >
         <div className="flex items-center gap-1.5">
           <div className="w-3 h-3 rounded-sm" style={{ background: "rgba(57,255,136,0.55)", border: "1.5px solid #1AD965" }} />
-          <span style={{ color: "#3a3a3a", fontSize: "0.62rem", fontWeight: 600 }}>Territoire de l&apos;empire</span>
+          <span style={{ color: "#3a3a3a", fontSize: "0.62rem", fontWeight: 600 }}>Territoire de l’empire</span>
         </div>
       </div>
 

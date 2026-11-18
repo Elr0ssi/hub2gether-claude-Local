@@ -94,7 +94,7 @@ export function MapView({ theme, initialYear = 117 }: MapViewProps) {
           <ThemeDropdown currentTheme={theme} />
           <div className="h-4 w-px shrink-0" style={{ background: "var(--border)" }} />
 
-          {/* Empire selector — horizontally scrollable on mobile */}
+          {/* Empire selector, horizontally scrollable on mobile */}
           <div className="flex items-center gap-1 overflow-x-auto scrollbar-none" style={{ scrollbarWidth: "none" }}>
             {EMPIRES.map((empire) => {
               const isActive = empire.id === empireId;
@@ -103,7 +103,7 @@ export function MapView({ theme, initialYear = 117 }: MapViewProps) {
                   key={empire.id}
                   onClick={() => handleEmpireChange(empire.id)}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 shrink-0"
-                  title={`${empire.name} — ${empire.period}`}
+                  title={`${empire.name} · ${empire.period}`}
                   style={
                     isActive
                       ? {

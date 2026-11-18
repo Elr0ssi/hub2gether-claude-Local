@@ -1,7 +1,9 @@
-import type { Metadata } from "next";
+import { SelectionApprentissage } from "@/components/apprentissage/SelectionApprentissage";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { jsonLdString } from "@/lib/schema";
 import "./globals.css";
+import "./mobile.css";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -10,53 +12,56 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theessentialdata.com";
+import { SITE_URL as siteUrl } from "@/lib/site";
+
+/* L'écran entier : le fond de la page passe sous l'encoche et l'heure, comme sur une app. */
+export const viewport: Viewport = {
+  viewportFit: "cover",
+  themeColor: "#fdfdfe",
+};
 
 export const metadata: Metadata = {
   title: {
-    default: "The Essential Data — Geopolitical Intelligence",
-    template: "%s | The Essential Data",
+    default: "Datlas · Maîtriser le monde en données : apprendre en s'amusant",
+    template: "%s | Datlas",
   },
   description:
-    "Cartes interactives mondiales : PIB par pays 2025, épidémies, empires historiques. Données FMI, Banque mondiale, OMS. The Essential Data — data journalism géopolitique.",
+    "Datlas vous fait maîtriser la géopolitique, l'économie, la démographie, les conflits et les ressources du monde : globes interactifs, classements, comparaisons et articles sourcés pour apprendre en jouant et retenir dans le temps, avec un carnet de révision et la traduction en anglais.",
   keywords: [
-    "carte PIB monde 2025",
-    "PIB par pays 2025",
+    "PIB par pays",
+    "population par pays",
+    "comparer deux pays",
     "dette publique par pays",
-    "carte chômage monde",
-    "world GDP map 2025",
-    "country GDP comparison",
-    "carte empire romain interactif",
-    "Roman Empire interactive map",
-    "carte épidémies mondiales",
-    "COVID-19 carte mondiale",
-    "données économiques pays 2025",
-    "comparaison économique pays",
-    "geopolitical data map",
-    "carte géopolitique interactive",
-    "données FMI 2025",
-    "world economic data",
-    "carte hantavirus",
-    "carte VIH monde",
-    "empire romain carte",
-    "Black Death map",
+    "inflation par pays",
+    "taux de chômage par pays",
+    "classement des pays",
+    "carte du monde interactive",
+    "globe interactif",
+    "données économiques mondiales",
+    "données démographiques",
+    "évolution du PIB depuis 1960",
+    "population mondiale en temps réel",
+    "statistiques par pays",
+    "apprendre la géopolitique",
+    "comprendre l'économie mondiale",
+    "apprentissage ludique et interactif",
+    "réviser avec des cartes",
+    "apprendre l'anglais en lisant l'actualité",
   ],
   metadataBase: new URL(siteUrl),
   openGraph: {
     type: "website",
-    siteName: "The Essential Data",
+    siteName: "Datlas",
     locale: "fr_FR",
-    alternateLocale: ["en_US"],
     url: siteUrl,
-    title: "The Essential Data — Cartes géopolitiques interactives",
+    title: "Datlas · Maîtriser le monde en données : apprendre en s'amusant",
     description:
-      "PIB par pays 2025, épidémies mondiales, empires historiques. Données FMI & Banque mondiale visualisées en cartes interactives.",
+      "Géopolitique, économie, démographie, conflits, ressources : apprendre de façon ludique et interactive, et retenir dans le temps.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Essential Data — Cartes géopolitiques interactives",
-    description:
-      "PIB par pays 2025, épidémies mondiales, empires historiques. Données FMI & Banque mondiale.",
+    title: "Datlas · Maîtriser le monde en données : apprendre en s'amusant",
+    description: "Géopolitique, économie, démographie : apprendre de façon ludique et interactive, et retenir dans le temps.",
   },
   robots: {
     index: true,
@@ -69,9 +74,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>",
-  },
 };
 
 export default function RootLayout({
@@ -80,14 +82,14 @@ export default function RootLayout({
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "The Essential Data",
+    name: "Datlas",
     description:
-      "Cartes interactives mondiales : PIB par pays 2025, épidémies, empires historiques. Données FMI et Banque mondiale.",
+      "Apprendre le monde de façon ludique et interactive : géopolitique, économie, démographie, conflits et ressources, sur des globes, des classements et des articles sourcés, avec révision espacée et traduction en anglais.",
     url: siteUrl,
-    inLanguage: ["fr", "en"],
+    inLanguage: "fr",
     publisher: {
       "@type": "Organization",
-      name: "The Essential Data",
+      name: "Datlas",
       url: siteUrl,
     },
   };
@@ -95,17 +97,28 @@ export default function RootLayout({
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "The Essential Data",
+    name: "Datlas",
     url: siteUrl,
     description:
-      "Média de data-journalisme géopolitique. Cartes interactives mondiales : PIB, épidémies, empires historiques, régimes politiques et puissances militaires.",
+      "Plateforme d'apprentissage par les données : maîtriser la géopolitique, l'économie, la démographie, les conflits et les ressources du monde, de façon ludique et interactive, pour retenir dans le temps.",
     sameAs: [],
   };
 
   return (
-    <html lang="fr" suppressHydrationWarning className={inter.variable}>
+    <html lang="fr" suppressHydrationWarning className={inter.variable} data-concept="clair">
       <head>
-        <meta name="theme-color" content="#FAFAFA" />
+        <meta name="theme-color" content="#fdfdfe" />
+        {/* Le thème des pages Datlas, posé avant le premier rendu. Le défaut
+            est le clair ; seul un choix explicite de la nuit le remplace. Sans
+            ce passage, une page choisie en nuit apparaîtrait claire le temps
+            d'une image, puis basculerait. Il ne fait rien d'autre que relire
+            un choix déjà pris, et se tait si le stockage est fermé. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{if(localStorage.getItem("visualize-theme-v2")==="nuit")delete document.documentElement.dataset.concept}catch(e){}',
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdString(websiteSchema) }}
@@ -117,6 +130,7 @@ export default function RootLayout({
       </head>
       <body style={{ fontFamily: "var(--font-inter), 'Inter', system-ui, sans-serif" }}>
         {children}
+        <SelectionApprentissage />
       </body>
     </html>
   );

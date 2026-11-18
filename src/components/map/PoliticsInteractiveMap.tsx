@@ -118,7 +118,7 @@ export function PoliticsInteractiveMap({ politicsData, selectedCountry, onCountr
         ))}
       </div>
 
-      {/* Legend — filterable checkboxes */}
+      {/* Legend, filterable checkboxes */}
       <div
         className="absolute bottom-3 left-3 px-3 py-2.5 rounded-xl"
         style={{

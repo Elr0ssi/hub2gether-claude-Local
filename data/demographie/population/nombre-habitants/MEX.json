@@ -1,0 +1,17 @@
+{
+  "country": "MEX",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Mexique",
+  "iso2": "MX",
+  "data": {
+    "2000": 97.9,
+    "2005": 103.9,
+    "2010": 112.5,
+    "2015": 120,
+    "2020": 126,
+    "2023": 128.5,
+    "2025": 130.4
+  }
+}

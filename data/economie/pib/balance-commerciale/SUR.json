@@ -1,0 +1,15 @@
+{
+  "country": "SUR",
+  "indicator": "TRADE_BALANCE",
+  "unit": "USD",
+  "source": "Banque mondiale · WDI (NE.RSB.GNFS.CD)",
+  "name": "Suriname",
+  "iso2": "SR",
+  "data": {
+    "2006": 192440864.526005,
+    "2007": 201821493.624772,
+    "2008": 164298724.954463,
+    "2009": 12750455.3734062,
+    "2010": 617392549.110026
+  }
+}

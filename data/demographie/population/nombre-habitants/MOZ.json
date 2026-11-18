@@ -1,0 +1,17 @@
+{
+  "country": "MOZ",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Mozambique",
+  "iso2": "MZ",
+  "data": {
+    "2000": 18.3,
+    "2005": 20.9,
+    "2010": 24.1,
+    "2015": 28,
+    "2020": 32.2,
+    "2023": 34.6,
+    "2025": 35.7
+  }
+}

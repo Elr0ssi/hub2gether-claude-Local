@@ -1,0 +1,28 @@
+{
+  "country": "KEN",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Kenya",
+  "iso2": "KE",
+  "data": {
+    "2000": 54,
+    "2005": 47,
+    "2010": 47,
+    "2015": 52,
+    "2020": 69,
+    "2023": 72,
+    "2025": 73
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 54,
+        "2014": 44.3,
+        "2024": 71.8
+      }
+    }
+  ]
+}

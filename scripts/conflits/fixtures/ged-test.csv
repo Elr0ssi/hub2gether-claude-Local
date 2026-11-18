@@ -1,0 +1,4 @@
+id,year,type_of_violence,conflict_name,country,date_start,best,low,high,deaths_civilians
+1,2001,1,Test,Testland,2001-04-02,5,3,8,2
+2,2001,1,Test,Testland,2001-05-11,2,2,3,0
+3,2001,3,Test,Testland,2001-06-01,10,8,12,10

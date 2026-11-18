@@ -1,0 +1,16 @@
+{
+  "country": "MMR",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Birmanie",
+  "iso2": "MM",
+  "data": {
+    "2000": 80,
+    "2005": 110,
+    "2010": 180,
+    "2015": 230,
+    "2020": 260,
+    "2023": 280
+  }
+}

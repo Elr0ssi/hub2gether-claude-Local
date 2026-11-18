@@ -1,4 +1,4 @@
-// Trade balance data — approximate 2024/2025, Mds USD
+// Trade balance data, approximate 2024/2025, Mds USD
 // Positive = surplus (exports > imports), Negative = deficit
 // Sources: WTO, IMF WEO, World Bank BOP
 
@@ -9,7 +9,7 @@ export interface TradeEntry {
   imports_bn: number;   // total imports, Mds USD
 }
 
-const TRADE_DATA: TradeEntry[] = [
+export const TRADE_DATA: TradeEntry[] = [
   { name: "United States of America", balance_bn: -1100, exports_bn: 3_100, imports_bn: 4_200 },
   { name: "China",                    balance_bn:  820,  exports_bn: 3_600, imports_bn: 2_780 },
   { name: "Germany",                  balance_bn:  270,  exports_bn: 1_700, imports_bn: 1_430 },

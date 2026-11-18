@@ -1,0 +1,17 @@
+{
+  "country": "AUS",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Australie",
+  "iso2": "AU",
+  "data": {
+    "2000": 1800,
+    "2005": 2000,
+    "2010": 2100,
+    "2015": 2200,
+    "2020": 2300,
+    "2023": 2400,
+    "2025": 2700
+  }
+}

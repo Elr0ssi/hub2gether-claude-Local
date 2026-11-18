@@ -1,0 +1,102 @@
+/* La page Articles en journal (UneArticles). Les jetons de la page : --encre, --surface, --bord. */
+.un { margin-top: 26px; }
+.un-k { font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #8b5cff; }
+.un-h2 { display: flex; align-items: baseline; gap: 12px; margin: 0 0 18px; font-size: clamp(24px, 2.8vw, 36px); font-weight: 800; letter-spacing: -0.045em; line-height: 1.1; }
+.un-h2 small { font-size: 13px; font-weight: 700; letter-spacing: 0; color: var(--encre-3); }
+.un-h3 { margin: 0 0 6px; padding-bottom: 10px; border-bottom: 2px solid var(--encre); font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.un-lire { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 750; color: #8b5cff; }
+.un a { color: inherit; text-decoration: none; }
+
+/* La barre des sections, collée sous le menu pendant la lecture. */
+.un-nav { position: sticky; top: 74px; z-index: 5; display: flex; gap: 4px; overflow-x: auto; padding: 6px; margin: 0 0 28px; border-radius: 99px; background: color-mix(in srgb, var(--surface) 97%, transparent); backdrop-filter: blur(12px); box-shadow: 0 10px 26px -18px rgba(0, 0, 0, 0.35); border: 1px solid var(--bord, rgba(255, 255, 255, 0.12)); scrollbar-width: none; }
+.un-nav a { flex-shrink: 0; padding: 8px 15px; border-radius: 99px; font-size: 13.5px; font-weight: 700; color: var(--encre-2); transition: background 0.2s, color 0.2s; }
+.un-nav a:hover { color: #fff; background: linear-gradient(135deg, #4a1fd0, #7c4dff); }
+.un section { scroll-margin-top: 140px; }
+.un-archives { scroll-margin-top: 140px; margin-top: clamp(50px, 8vh, 90px); padding-top: 26px; border-top: 1px solid var(--bord, rgba(255, 255, 255, 0.12)); }
+
+/* À la une : un grand article, ses titres voisins, et « En bref » sur toute la largeur. */
+.un-une { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 22px 34px; }
+.un-lead { display: flex; flex-direction: column; gap: 10px; }
+.un-cover { position: relative; display: block; aspect-ratio: 16 / 7; border-radius: 26px; overflow: hidden; margin-bottom: 8px; }
+.un-cover::after { content: ""; position: absolute; inset: 0; background: radial-gradient(70% 90% at 100% 0%, rgba(255, 255, 255, 0.26), transparent 60%); }
+.un-cover-k { position: absolute; left: 18px; bottom: 16px; z-index: 1; padding: 6px 12px; border-radius: 99px; font-size: 12px; font-weight: 800; color: #fff; background: rgba(0, 0, 0, 0.28); backdrop-filter: blur(6px); }
+.un-lead-t { font-size: clamp(28px, 3.4vw, 46px); font-weight: 800; letter-spacing: -0.045em; line-height: 1.04; }
+.un-lead-c { max-width: 62ch; font-size: 16.5px; line-height: 1.55; color: var(--encre-2); }
+.un-lead:hover .un-lead-t { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
+.un-aussi ul { list-style: none; margin: 0; padding: 0; }
+.un-aussi li + li { border-top: 1px solid var(--bord, rgba(255, 255, 255, 0.12)); }
+.un-aussi a { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 14px; padding: 15px 0; }
+.un-mini { aspect-ratio: 1; border-radius: 16px; }
+.un-aussi a > span:last-child { display: flex; flex-direction: column; gap: 5px; }
+.un-aussi strong { font-size: 17px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.25; }
+.un-aussi a:hover strong { color: #8b5cff; }
+.un-bref { grid-column: 1 / -1; }
+.un-bref ol { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 26px; list-style: none; margin: 0; padding: 0; counter-reset: bref; }
+.un-bref li { counter-increment: bref; padding: 14px 0 0; }
+.un-bref a { display: flex; flex-direction: column; gap: 6px; }
+.un-bref a::before { content: counter(bref, decimal-leading-zero); font-size: 26px; font-weight: 800; letter-spacing: -0.04em; color: #8b5cff; }
+.un-bref strong { font-size: 15.5px; font-weight: 750; line-height: 1.3; }
+.un-bref span { font-size: 13px; line-height: 1.5; color: var(--encre-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.un-bref a:hover strong { color: #8b5cff; }
+
+/* Tendances : les pays les plus traités, et le poids de chaque thématique. */
+.un-tend { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 34px; margin-top: clamp(44px, 7vh, 80px); padding: clamp(22px, 3vw, 34px); border-radius: 30px; background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.12)); }
+.un-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.un-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px 8px 10px; border-radius: 99px; font-size: 14px; font-weight: 700; border: 1px solid var(--bord, rgba(255, 255, 255, 0.14)); transition: border-color 0.2s, translate 0.3s; }
+.un-chip b { font-size: 11px; color: var(--encre-3); }
+.un-chip em { font-style: normal; font-size: 12px; color: #8b5cff; }
+.un-chip:hover { border-color: #8b5cff; translate: 0 -2px; }
+.un-themes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.un-themes a { display: grid; grid-template-columns: 130px minmax(0, 1fr) 36px; align-items: center; gap: 12px; font-size: 14px; font-weight: 650; }
+.un-themes i { height: 8px; border-radius: 99px; background: linear-gradient(90deg, #4a1fd0, #8b5cff); }
+.un-themes em { font-style: normal; font-size: 13px; color: var(--encre-3); text-align: right; }
+.un-themes a:hover span { color: #8b5cff; }
+
+/* Formats longs : une bande sombre, les enquêtes côte à côte. */
+.un-longs { margin: clamp(44px, 7vh, 80px) calc(50% - 50vw) 0; padding: clamp(40px, 6vh, 64px) max(16px, calc(50vw - 560px)); color: #fff; background: radial-gradient(60% 90% at 100% 0%, rgba(139, 92, 255, 0.4), transparent 60%), #120d26; }
+.un-longs .un-h2 small { color: rgba(255, 255, 255, 0.6); }
+.un-longs-l { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.un-long { position: relative; display: flex; flex-direction: column; gap: 9px; padding: 22px 22px 20px; border-radius: 24px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); transition: background 0.25s, translate 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+.un-long:hover { background: rgba(255, 255, 255, 0.1); translate: 0 -4px; }
+.un-long-n { font-size: 34px; font-weight: 800; letter-spacing: -0.05em; color: rgba(255, 255, 255, 0.3); }
+.un-long .un-k { color: #c4b2ff; }
+.un-long strong { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; }
+.un-long-c { font-size: 13.5px; line-height: 1.5; color: rgba(255, 255, 255, 0.72); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.un-long .un-lire { margin-top: auto; color: #c4b2ff; }
+
+/* Analyses : une grille de cartes à bandeau coloré. */
+.un-sec { margin-top: clamp(44px, 7vh, 80px); }
+.un-grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.un-carte { display: flex; flex-direction: column; gap: 8px; padding: 0 20px 20px; border-radius: 22px; overflow: hidden; background: var(--surface); border: 1px solid var(--bord, rgba(255, 255, 255, 0.12)); transition: translate 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s; }
+.un-carte:hover { translate: 0 -4px; border-color: #8b5cff; }
+.un-carte-b { display: block; height: 8px; margin: 0 -20px 10px; }
+.un-carte strong { font-size: 17px; font-weight: 750; letter-spacing: -0.02em; line-height: 1.25; }
+.un-carte-c { font-size: 13px; line-height: 1.5; color: var(--encre-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Rubriques : des colonnes de quotidien, séparées par des filets. */
+.un-cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 34px 32px; }
+.un-col { min-width: 0; }
+.un-col h3 { margin: 0 0 12px; padding-bottom: 10px; border-bottom: 2px solid var(--encre); font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.un-col h3 a { display: inline-flex; align-items: center; gap: 6px; }
+.un-col-une { display: flex; flex-direction: column; gap: 6px; padding-bottom: 12px; }
+.un-col-une strong { font-size: 18px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.2; }
+.un-col-une span { font-size: 13px; line-height: 1.5; color: var(--encre-2); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.un-col ul { list-style: none; margin: 0; padding: 0; }
+.un-col li { padding: 10px 0; border-top: 1px solid var(--bord, rgba(255, 255, 255, 0.12)); font-size: 14.5px; font-weight: 650; line-height: 1.3; }
+.un-col a:hover { color: #8b5cff; }
+.un-plus { display: inline-block; margin-top: 4px; font-size: 13px; font-weight: 700; color: #8b5cff !important; }
+
+/* Dossiers pays : un index de A à Z. */
+.un-az { columns: 4 200px; column-gap: 26px; }
+.un-az-g { break-inside: avoid; display: flex; flex-direction: column; gap: 3px; margin-bottom: 16px; }
+.un-az-g b { font-size: 22px; font-weight: 800; color: #8b5cff; }
+.un-az-g a { font-size: 14px; color: var(--encre-2); }
+.un-az-g a:hover { color: #8b5cff; }
+
+@media (max-width: 900px) {
+  .un-une, .un-tend { grid-template-columns: minmax(0, 1fr); }
+  .un-bref ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .un-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .un-nav { top: 64px; }
+}
+@media (max-width: 560px) { .un-cols { grid-template-columns: minmax(0, 1fr); } .un-bref ol { grid-template-columns: minmax(0, 1fr); } .un-themes a { grid-template-columns: 100px minmax(0, 1fr) 30px; } }

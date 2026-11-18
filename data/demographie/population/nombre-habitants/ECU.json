@@ -1,0 +1,17 @@
+{
+  "country": "ECU",
+  "indicator": "POPULATION",
+  "unit": "MILLIONS_HAB",
+  "source": "ONU · Banque mondiale · estimations sur 7 dates repères",
+  "name": "Équateur",
+  "iso2": "EC",
+  "data": {
+    "2000": 12.7,
+    "2005": 13.4,
+    "2010": 14.5,
+    "2015": 16,
+    "2020": 17.4,
+    "2023": 18,
+    "2025": 18.3
+  }
+}

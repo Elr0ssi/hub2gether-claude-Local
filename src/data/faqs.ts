@@ -1,4 +1,4 @@
-// Central aggregator — add FAQs in the per-theme files:
+// Central aggregator, add FAQs in the per-theme files:
 //   src/data/economy/faqs.ts   → economy FAQs
 //   src/data/epidemics/faqs.ts → epidemics FAQs
 //   src/data/empires/faqs.ts   → empires FAQs

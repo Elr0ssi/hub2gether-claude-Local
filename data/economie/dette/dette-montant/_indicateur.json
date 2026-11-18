@@ -1,0 +1,17 @@
+{
+  "indicateur": "DEBT_AMOUNT",
+  "libelle": "Montant de la dette publique",
+  "unite": "MD_EUR",
+  "categorie": "economie/dette",
+  "chemin": "data/economie/dette/dette-montant",
+  "sources": [
+    "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)"
+  ],
+  "annees": [
+    2000,
+    2014,
+    2024
+  ],
+  "paysCouverts": 88,
+  "misAJour": "2026-09-21"
+}

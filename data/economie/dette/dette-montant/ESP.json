@@ -1,0 +1,13 @@
+{
+  "country": "ESP",
+  "indicator": "DEBT_AMOUNT",
+  "unit": "MD_EUR",
+  "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+  "name": "Espagne",
+  "iso2": "ES",
+  "data": {
+    "2000": 350,
+    "2014": 1300,
+    "2024": 1700
+  }
+}

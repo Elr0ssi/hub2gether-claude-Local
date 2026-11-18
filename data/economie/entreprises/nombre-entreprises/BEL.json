@@ -1,0 +1,17 @@
+{
+  "country": "BEL",
+  "indicator": "COMPANIES",
+  "unit": "MILLIERS",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Belgique",
+  "iso2": "BE",
+  "data": {
+    "2000": 900,
+    "2005": 1000,
+    "2010": 1100,
+    "2015": 1100,
+    "2020": 1200,
+    "2023": 1200,
+    "2025": 1100
+  }
+}

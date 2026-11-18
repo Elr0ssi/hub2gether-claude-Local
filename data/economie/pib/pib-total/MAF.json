@@ -1,0 +1,14 @@
+{
+  "country": "MAF",
+  "indicator": "GDP_TOTAL",
+  "unit": "USD",
+  "source": "Banque mondiale · WDI (NY.GDP.MKTP.CD)",
+  "name": "Saint-Martin",
+  "iso2": "MF",
+  "data": {
+    "2011": 775875748.523832,
+    "2014": 772921958.529509,
+    "2019": 652206037.103874,
+    "2021": 649206262.847519
+  }
+}

@@ -1,0 +1,18 @@
+.chp { position: relative; display: inline-block; min-width: 0; }
+.chp-b { display: inline-flex; align-items: center; gap: 9px; width: 100%; padding: 10px 14px; border: 1px solid var(--bord, rgba(255, 255, 255, 0.14)); border-radius: 14px; font: inherit; font-size: 14px; font-weight: 700; color: var(--encre); background: var(--surface-2, #19222d); cursor: pointer; text-align: left; transition: border-color 0.25s, translate 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+.chp-b:hover { border-color: #7c4dff; translate: 0 -2px; }
+.chp-b[aria-expanded="true"] { border-color: #7c4dff; box-shadow: 0 0 0 4px rgba(124, 77, 255, 0.18); }
+.chp-d { font-size: 18px; line-height: 1; }
+.chp-n { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chp-b svg { flex: none; color: var(--encre-3); transition: transform 0.3s; }
+.chp-b svg.chp-ouv { transform: rotate(180deg); }
+.chp-c .chp-b { padding: 7px 11px; border-radius: 99px; font-size: 12.5px; }
+.chp-p { position: absolute; z-index: 40; top: calc(100% + 8px); left: 0; width: max(100%, 260px); padding: 8px; border-radius: 18px; background: var(--surface, #121a24); border: 1px solid var(--bord, rgba(255, 255, 255, 0.14)); box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.6); animation: chp-in 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes chp-in { from { opacity: 0; transform: translateY(-6px) scale(0.98); } }
+.chp-q { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 12px; background: var(--surface-2, #19222d); color: var(--encre-3); }
+.chp-q input { flex: 1; min-width: 0; border: 0; outline: 0; font: inherit; font-size: 13.5px; color: var(--encre); background: none; }
+.chp-l { list-style: none; margin: 8px 0 0; padding: 0; max-height: 260px; overflow-y: auto; }
+.chp-l li { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; font-size: 13.5px; font-weight: 600; color: var(--encre-2); cursor: pointer; }
+.chp-l li.chp-vise { background: rgba(124, 77, 255, 0.16); color: var(--encre); }
+.chp-l li.chp-on { color: #fff; background: linear-gradient(135deg, #4a1fd0, #7c4dff); }
+.chp-vide { cursor: default; color: var(--encre-3); }

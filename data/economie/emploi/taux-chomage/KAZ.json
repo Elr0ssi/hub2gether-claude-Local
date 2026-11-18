@@ -1,0 +1,17 @@
+{
+  "country": "KAZ",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Kazakhstan",
+  "iso2": "KZ",
+  "data": {
+    "2000": 12.8,
+    "2005": 8.1,
+    "2010": 5.8,
+    "2015": 5.1,
+    "2020": 4.9,
+    "2023": 4.9,
+    "2025": 4.8
+  }
+}

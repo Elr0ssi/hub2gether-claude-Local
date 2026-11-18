@@ -1,14 +1,15 @@
 import type { MetadataRoute } from "next";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://theessentialdata.com";
+import { SITE_URL } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: "/preview",
+      /* L'espace personnel, les routes techniques et l'aperçu n'ont rien à faire dans un moteur. */
+      disallow: ["/compte", "/api/", "/v2-eco"],
     },
-    sitemap: `${siteUrl}/sitemap.xml`,
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }

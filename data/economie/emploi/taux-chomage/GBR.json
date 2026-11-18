@@ -1,0 +1,17 @@
+{
+  "country": "GBR",
+  "indicator": "UNEMPLOYMENT",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Royaume-Uni",
+  "iso2": "GB",
+  "data": {
+    "2000": 5.5,
+    "2005": 4.8,
+    "2010": 7.9,
+    "2015": 5.3,
+    "2020": 4.5,
+    "2023": 4.2,
+    "2025": 4.5
+  }
+}

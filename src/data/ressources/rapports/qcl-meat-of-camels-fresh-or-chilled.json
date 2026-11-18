@@ -1,0 +1,245 @@
+{
+ "id": "qcl-meat-of-camels-fresh-or-chilled",
+ "lignes_source": 4486,
+ "lignes_traitees": 4486,
+ "lignes_ecartees": [],
+ "valeurs_vides": 14,
+ "zeros": 32,
+ "flags": {
+  "E": 2629,
+  "I": 815,
+  "A": 948,
+  "X": 80,
+  "M": 14
+ },
+ "notes": {
+  "Unofficial figure": 68
+ },
+ "unites": {
+  "kg/An": 2220,
+  "t": 2266
+ },
+ "doublons": [],
+ "geo": {
+  "associes": [
+   {
+    "m49": "004",
+    "nom": "Afghanistan",
+    "ne": "Afghanistan"
+   },
+   {
+    "m49": "012",
+    "nom": "Algeria",
+    "ne": "Algeria"
+   },
+   {
+    "m49": "048",
+    "nom": "Bahrain",
+    "ne": "Bahrain"
+   },
+   {
+    "m49": "148",
+    "nom": "Chad",
+    "ne": "Chad"
+   },
+   {
+    "m49": "156",
+    "nom": "China, mainland",
+    "ne": "China"
+   },
+   {
+    "m49": "231",
+    "nom": "Ethiopia",
+    "ne": "Ethiopia"
+   },
+   {
+    "m49": "232",
+    "nom": "Eritrea",
+    "ne": "Eritrea"
+   },
+   {
+    "m49": "262",
+    "nom": "Djibouti",
+    "ne": "Djibouti"
+   },
+   {
+    "m49": "364",
+    "nom": "Iran (Islamic Republic of)",
+    "ne": "Iran"
+   },
+   {
+    "m49": "368",
+    "nom": "Iraq",
+    "ne": "Iraq"
+   },
+   {
+    "m49": "376",
+    "nom": "Israel",
+    "ne": "Israel"
+   },
+   {
+    "m49": "398",
+    "nom": "Kazakhstan",
+    "ne": "Kazakhstan"
+   },
+   {
+    "m49": "400",
+    "nom": "Jordan",
+    "ne": "Jordan"
+   },
+   {
+    "m49": "404",
+    "nom": "Kenya",
+    "ne": "Kenya"
+   },
+   {
+    "m49": "414",
+    "nom": "Kuwait",
+    "ne": "Kuwait"
+   },
+   {
+    "m49": "434",
+    "nom": "Libya",
+    "ne": "Libya"
+   },
+   {
+    "m49": "466",
+    "nom": "Mali",
+    "ne": "Mali"
+   },
+   {
+    "m49": "478",
+    "nom": "Mauritania",
+    "ne": "Mauritania"
+   },
+   {
+    "m49": "496",
+    "nom": "Mongolia",
+    "ne": "Mongolia"
+   },
+   {
+    "m49": "504",
+    "nom": "Morocco",
+    "ne": "Morocco"
+   },
+   {
+    "m49": "512",
+    "nom": "Oman",
+    "ne": "Oman"
+   },
+   {
+    "m49": "562",
+    "nom": "Niger",
+    "ne": "Niger"
+   },
+   {
+    "m49": "586",
+    "nom": "Pakistan",
+    "ne": "Pakistan"
+   },
+   {
+    "m49": "634",
+    "nom": "Qatar",
+    "ne": "Qatar"
+   },
+   {
+    "m49": "643",
+    "nom": "Russian Federation",
+    "ne": "Russia"
+   },
+   {
+    "m49": "682",
+    "nom": "Saudi Arabia",
+    "ne": "Saudi Arabia"
+   },
+   {
+    "m49": "686",
+    "nom": "Senegal",
+    "ne": "Senegal"
+   },
+   {
+    "m49": "706",
+    "nom": "Somalia",
+    "ne": "Somalia"
+   },
+   {
+    "m49": "729",
+    "nom": "Sudan",
+    "ne": "Sudan"
+   },
+   {
+    "m49": "760",
+    "nom": "Syrian Arab Republic",
+    "ne": "Syria"
+   },
+   {
+    "m49": "784",
+    "nom": "United Arab Emirates",
+    "ne": "United Arab Emirates"
+   },
+   {
+    "m49": "788",
+    "nom": "Tunisia",
+    "ne": "Tunisia"
+   },
+   {
+    "m49": "792",
+    "nom": "Türkiye",
+    "ne": "Turkey"
+   },
+   {
+    "m49": "795",
+    "nom": "Turkmenistan",
+    "ne": "Turkmenistan"
+   },
+   {
+    "m49": "818",
+    "nom": "Egypt",
+    "ne": "Egypt"
+   },
+   {
+    "m49": "854",
+    "nom": "Burkina Faso",
+    "ne": "Burkina Faso"
+   },
+   {
+    "m49": "860",
+    "nom": "Uzbekistan",
+    "ne": "Uzbekistan"
+   },
+   {
+    "m49": "887",
+    "nom": "Yemen",
+    "ne": "Yemen"
+   }
+  ],
+  "historiques": [
+   {
+    "m49": "230",
+    "nom": "Ethiopia PDR",
+    "note": "Éthiopie avant la sécession de l'Érythrée (1993).",
+    "successeurs": [
+     "231",
+     "232"
+    ]
+   },
+   {
+    "m49": "736",
+    "nom": "Sudan (former)",
+    "note": "Soudan avant la sécession du Soudan du Sud (2011) : frontières différentes de l'actuel.",
+    "successeurs": [
+     "729"
+    ]
+   }
+  ],
+  "agregats": [
+   {
+    "m49": "159",
+    "nom": "China",
+    "note": "Agrégat FAOSTAT : Chine continentale, Taïwan, Hong Kong et Macao. Recoupe les séries 156 et 158 : jamais additionné avec elles."
+   }
+  ],
+  "non_associes": [],
+  "ambigus": []
+ }
+}

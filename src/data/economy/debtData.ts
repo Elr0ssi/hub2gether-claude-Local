@@ -1,4 +1,4 @@
-// Debt data parsed from CSV — Economy _ Capital _ PIB - Dettes monde.csv
+// Debt data parsed from CSV, Economy _ Capital _ PIB - Dettes monde.csv
 // Values in EUR billions. Mapped to Natural Earth country names.
 
 export interface DebtEntry {

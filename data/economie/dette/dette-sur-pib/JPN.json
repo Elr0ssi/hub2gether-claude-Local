@@ -1,0 +1,28 @@
+{
+  "country": "JPN",
+  "indicator": "DEBT_TO_GDP",
+  "unit": "PCT",
+  "source": "Saisie manuelle du site (Banque mondiale, FMI, OIT) · 7 dates repères",
+  "name": "Japon",
+  "iso2": "JP",
+  "data": {
+    "2000": 135,
+    "2005": 175,
+    "2010": 194,
+    "2015": 229,
+    "2020": 259,
+    "2023": 261,
+    "2025": 250
+  },
+  "autres_sources": [
+    {
+      "source": "Economy · Capital · PIB et dettes du monde (relevés 2000, 2014, 2024)",
+      "unit": "PCT",
+      "data": {
+        "2000": 128.2,
+        "2014": 241.2,
+        "2024": 260
+      }
+    }
+  ]
+}

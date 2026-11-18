@@ -33,7 +33,7 @@ const METRICS = [
     href: "/map/military",
     cols: 1,
   },
-  // Row 2 — three span-1 cards fill the row perfectly
+  // Row 2, three span-1 cards fill the row perfectly
   {
     id: "democracy",
     title: "Population en démocratie",
@@ -58,7 +58,7 @@ const METRICS = [
     bg: "rgba(239,68,68,0.06)",
     border: "rgba(239,68,68,0.20)",
     Icon: Activity,
-    detail: "OMS · données 2020–2024",
+    detail: "OMS · données 2020-2024",
     href: "/map/epidemics",
     cols: 1,
   },
@@ -76,7 +76,7 @@ const METRICS = [
     href: "/map/epidemics",
     cols: 1,
   },
-  // Row 3 — full-width banner
+  // Row 3, full-width banner
   {
     id: "decline",
     title: "Pays en recul démocratique",
@@ -167,7 +167,7 @@ export function DashboardSection() {
           </div>
 
           <p style={{ fontSize: "0.92rem", color: "#6B6B6B", lineHeight: 1.6 }}>
-            Données de référence — FMI, Banque mondiale, OMS, SIPRI, V-Dem 2024–2025
+            Données de référence · FMI, Banque mondiale, OMS, SIPRI, V-Dem 2024-2025
           </p>
         </motion.div>
 

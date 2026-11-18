@@ -1,0 +1,15 @@
+{
+  "indicateur": "ACTIVE_POPULATION",
+  "libelle": "Population active (15-64 ans)",
+  "unite": "MILLIONS_HAB",
+  "categorie": "economie/emploi",
+  "chemin": "data/economie/emploi/population-active",
+  "sources": [
+    "OCDE · OIT · estimations 2023"
+  ],
+  "annees": [
+    2023
+  ],
+  "paysCouverts": 124,
+  "misAJour": "2026-09-21"
+}
